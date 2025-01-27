@@ -195,6 +195,85 @@ PROFILES = {
             },
         },
     },
+    "777777777": {
+        "name": "Fatima Al-Zahra",
+        "description": "Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor huurtoeslag",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "777777777",
+                        "geboortedatum": "1991-04-15",
+                        "verblijfsadres": "Utrecht",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "MAROKKAANS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "777777777",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "777777777",
+                        "straat": "Rooseveltlaan",
+                        "huisnummer": "42",
+                        "postcode": "3527AK",
+                        "woonplaats": "Utrecht",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {
+                        "bsn": "777777777",
+                        "polis_status": "ACTIEF",
+                        "verdrag_status": "GEEN",
+                        "zorg_type": "BASIS",
+                    }
+                ]
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "777777777",
+                        "loon_uit_dienstbetrekking": 1400000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "777777777", "dividend": 0, "vervreemding_aandelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "777777777",
+                        "spaargeld": 1200000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "777777777", "bedrag": 0, "land": "GEEN"}],
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "777777777",
+                        "type": "ONBEPAALDE_TIJD_REGULIER",
+                        "status": "VERLEEND",
+                        "ingangsdatum": "2010-05-12",
+                        "einddatum": None,
+                    }
+                ]
+            },
+        },
+    },
     "999993654": {
         "name": "Maria Pietersen",
         "description": "AOW-gerechtigde met volledige opbouw, gehuwd, partner nog geen AOW-leeftijd",
@@ -678,6 +757,81 @@ PROFILES = {
                         "zorg_type": "BASIS",
                     }
                 ]
+            },
+        },
+    },
+    # Updated profile for Lisa de Jong
+    "888888888": {
+        "name": "Lisa de Jong",
+        "description": "Alleenstaande ouder met kinderopvang, komt in aanmerking voor kinderopvangtoeslag",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "888888888",
+                        "geboortedatum": "1990-05-15",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "888888888",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                        "children": [{"bsn": "111111111"}, {"bsn": "222222222"}],
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "888888888",
+                        "straat": "Keizersgracht",
+                        "huisnummer": "123",
+                        "postcode": "1015CJ",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "children": [
+                    {"kind_bsn": "111111111", "geboortedatum": "2020-03-01", "naam": "Sem de Jong"},
+                    {"kind_bsn": "222222222", "geboortedatum": "2022-07-15", "naam": "Emma de Jong"},
+                ],
+            },
+            "UWV": {
+                "dienstverbanden": [
+                    {
+                        "bsn": "888888888",
+                        "start_date": "2024-01-15",
+                        "end_date": "2024-01-30",
+                        "uren_per_week": 32,
+                        "worked_hours": 1664,  # 32 hours × 52 weeks
+                    }
+                ],
+                "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen": [{"BSN": "888888888", "insured_years": 5}],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "888888888",
+                        "loon_uit_dienstbetrekking": 3600000,  # €36.000
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "888888888", "dividend": 0, "vervreemding_aandelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "888888888",
+                        "spaargeld": 800000,  # €8.000
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
             },
         },
     },

@@ -24,15 +24,11 @@ class TypeSpec:
 
     def enforce(self, value: Any) -> Any:
         """Enforce type specifications on a value"""
+        if value is None:
+            return value
+
         if self.type == "string":
             return str(value)
-
-        if value is None:
-            if self.type == "int":
-                return 0
-            if self.type == "float":
-                return 0.0
-            return value
 
         # Convert to numeric if needed
         if isinstance(value, str):

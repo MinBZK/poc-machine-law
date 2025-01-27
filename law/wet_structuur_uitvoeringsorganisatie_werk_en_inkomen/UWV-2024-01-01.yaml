@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: c19a458e-3f5e-4d99-a7c3-67a4288aaa07
 name: Bepalen verzekerde jaren 2025
 law: wet_structuur_uitvoeringsorganisatie_werk_en_inkomen
@@ -70,6 +70,15 @@ properties:
         type: "period"
         period_type: "continuous"
 
+    - name: "worked_hours"
+      description: "Totaal gewerkte uren per jaar"
+      type: "number"
+      type_spec:
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
   definitions:
     VALID_BENEFIT_TYPES:
       - "WW"
@@ -78,6 +87,7 @@ properties:
       - "ZW"
       - "WAZO"
     DAYS_PER_YEAR: 365.25
+    HOURS_PER_DAY: 8
 
 actions:
   - output: "insured_years"
@@ -106,3 +116,17 @@ actions:
                   - "$end_date"
                   - "$start_date"
       - "$DAYS_PER_YEAR"
+
+  - output: "worked_hours"
+    operation: MULTIPLY
+    values:
+      - operation: FOREACH
+        combine: ADD
+        subject: "$EMPLOYMENT_PERIODS"
+        value:
+          - operation: SUBTRACT_DATE
+            unit: "days"
+            values:
+              - "$end_date"
+              - "$start_date"
+      - "$HOURS_PER_DAY"

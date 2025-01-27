@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
 name: Bepalen persoonsgegevens BRP
 law: wet_brp
@@ -85,6 +85,18 @@ properties:
       source_reference:
         table: "relaties"
         field: "partner_bsn"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "CHILDREN_DATA"
+      description: "Gegevens van de kinderen van de persoon"
+      type: "array"
+      source_reference:
+        table: "relaties"
+        field: "children"
         select_on:
           - name: "bsn"
             description: "Burgerservicenummer van de persoon"
@@ -267,6 +279,13 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
+    - name: "children_bsns"
+      description: "BSNs van de kinderen van de aanvrager"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
     - name: "residence_address"
       description: "Volledig adres"
       type: "string"
@@ -337,8 +356,6 @@ requirements:
   - all:
       - subject: "$BIRTH_DATE"
         operation: NOT_NULL
-      - subject: "$RESIDENCE_ADDRESS"
-        operation: NOT_NULL
 
 actions:
   - output: "birth_date"
@@ -346,7 +363,14 @@ actions:
   - output: "partner_birth_date"
     value: "$PARTNER_BIRTH_DATE"
   - output: "partner_bsn"
-    value: "$PARTNER_BSN"
+    operation: IF
+    conditions:
+        - test:
+            subject: "$PARTNER_TYPE"
+            operation: IN
+            values: "$VALID_PARTNER_TYPES"
+          then: "$PARTNER_BSN"
+        - else: null
   - output: "age"
     operation: SUBTRACT_DATE
     unit: "years"
@@ -354,7 +378,10 @@ actions:
       - "$calculation_date"
       - "$BIRTH_DATE"
     reference: "Wet BRP Art. 1.6"
-
+  - output: "children_bsns"
+    operation: FOREACH
+    subject: "$CHILDREN_DATA"
+    value: "$bsn"
   - output: "has_partner"
     subject: "$PARTNER_TYPE"
     operation: IN
