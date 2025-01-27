@@ -285,7 +285,8 @@
           "required": [
             "service",
             "field",
-            "law"
+            "law",
+            "parameters"
           ],
           "properties": {
             "service": {
