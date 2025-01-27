@@ -99,6 +99,13 @@ async def update_value(
         # Try parsing as JSON first (handles booleans)
         if new_value.lower() in ("true", "false"):
             parsed_value = new_value.lower() == "true"
+        # Try parsing as JSON array or object
+        elif new_value.startswith(("[", "{")):
+            try:
+                parsed_value = json.loads(new_value)
+            except json.JSONDecodeError:
+                # If JSON parsing fails, keep original string
+                pass
         # Try parsing as number
         elif new_value.replace(".", "", 1).isdigit() or (
             new_value.startswith("-") and new_value[1:].replace(".", "", 1).isdigit()
@@ -313,6 +320,12 @@ async def update_missing_values(
             # Parse value based on type
             if type_name == "boolean":
                 parsed_value = value.lower() == "true"
+            elif type_name == "array" and (value.startswith(("[", "{"))):
+                try:
+                    parsed_value = json.loads(value)
+                except json.JSONDecodeError:
+                    # If JSON parsing fails, keep original string
+                    pass
             elif type_name == "number":
                 parsed_value = float(value) if "." in value else int(value)
             elif type_name == "date" and len(value.split("-")) == 3:

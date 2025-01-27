@@ -97,7 +97,7 @@ def configure_logging(level: str | None = None):
     root_logger.addHandler(console_handler)
 
     # Set level based on input or default to INFO
-    log_level = getattr(logging, (level or "INFO").upper())
+    log_level = getattr(logging, (level or "DEBUG").upper())
     root_logger.setLevel(log_level)
 
     # Configure loggers for different components

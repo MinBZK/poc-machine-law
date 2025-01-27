@@ -217,7 +217,8 @@
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Benodigde gegevens invullen</h3>
             <form hx-post="/edit/update-missing-values"
                   hx-target="#missing-form-result"
-                  class="space-y-4">
+                  class="space-y-4"
+                  data-children-bsns="{{ path.CHILDREN_BSNS|join(',') if path.CHILDREN_BSNS is defined else '' }}">
                 <input type="hidden" name="case_id" value="{{ case_id }}">
                 <input type="hidden" name="service" value="{{ service }}">
                 <input type="hidden" name="law" value="{{ law }}">
@@ -236,7 +237,96 @@
                             <div class="mt-1">
                                 <input type="hidden" name="keys[{{ loop.index0 }}]" value="{{ item.key }}">
                                 <!-- Debug info: {{ item.node.details }} -->
-                                {% if item.node.details and item.node.details.type == 'boolean' %}
+                                {% if item.node.details and item.node.details.type == 'array' and item.node.details.type_spec and item.node.details.type_spec.fields %}
+                                    <!-- Array van objecten component -->
+                                    <div class="space-y-4"
+                                         x-data="{ arrayItems: [{}], hasFilledItems() { return this.arrayItems.some(item => Object.values(item).some(val => val !== undefined && val !== '')) } }">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <p class="text-xs text-gray-500">
+                                                Vul één of meerdere regels in voor {{ item.node.details.description|default("deze gegevens") }}
+                                            </p>
+                                            <button type="button"
+                                                    @click="arrayItems.push({})"
+                                                    class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <svg class="w-3.5 h-3.5 mr-1"
+                                                     fill="none"
+                                                     viewBox="0 0 24 24"
+                                                     stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                                Regel toevoegen
+                                            </button>
+                                        </div>
+                                        <template x-for="(item, index) in arrayItems" :key="index">
+                                            <div class="bg-white p-3 rounded-md border border-gray-200 relative mb-3">
+                                                <button type="button"
+                                                        @click="arrayItems.splice(index, 1)"
+                                                        class="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                                                        x-show="arrayItems.length > 1">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                                    {% for field in item.node.details.type_spec.fields %}
+                                                        <div>
+                                                            <label class="block text-xs font-medium text-gray-700 mb-1">{{ field.name|title|replace('_', ' ') }}</label>
+                                                            {% if field.type == 'string' and field.enum is defined %}
+                                                                <select x-model="item.{{ field.name }}"
+                                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                                    <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
+                                                                    {% if field.enum_values is defined %}
+                                                                        {% for value in field.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+                                                                    {% elif field.enum is defined and field.enum is iterable and field.enum is not string %}
+                                                                        {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}
+                                                                    {% endif %}
+                                                                </select>
+                                                            {% elif field.type == 'enum' %}
+                                                                <select x-model="item.{{ field.name }}"
+                                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                                    <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
+                                                                    {% if field.enum_values is defined %}
+                                                                        {% for value in field.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+                                                                    {% elif field.enum is defined and field.enum is iterable and field.enum is not string %}
+                                                                        {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}
+                                                                    {% endif %}
+                                                                </select>
+                                                            {% elif field.type == 'number' %}
+                                                                <input type="number"
+                                                                       x-model.number="item.{{ field.name }}"
+                                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                            {% elif field.type == 'amount' %}
+                                                                <div class="flex items-center">
+                                                                    <span class="mr-2 text-gray-700">€</span>
+                                                                    <input type="number"
+                                                                           x-model.number="item.{{ field.name }}"
+                                                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                                           step="0.01"
+                                                                           placeholder="0.00"
+                                                                           @input="item.{{ field.name }} = parseFloat($event.target.value) || 0">
+                                                                </div>
+                                                            {% else %}
+                                                                <input type="text"
+                                                                       x-model="item.{{ field.name }}"
+                                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <input type="hidden" name="values[{{ loop.index0 }}]" x-bind:value="JSON.stringify(arrayItems.map(item => { const result = {...item};
+                                        {% for field in item.node.details.type_spec.fields %}
+                                            {% if field.type == 'number' %}
+                                                if (item.{{ field.name }} !== undefined && item.{{ field.name }} !== '') { result.{{ field.name }} = Number(item.{{ field.name }}); }
+                                            {% elif field.type == 'amount' %}
+                                                if (item.{{ field.name }} !== undefined && item.{{ field.name }} !== '') { result.{{ field.name }} = Math.round(Number(item.{{ field.name }}) * 100); }
+                                            {% endif %}
+                                        {% endfor %}
+                                        return result; }))" x-init="$watch('arrayItems', () => { console.log('Array items updated:', arrayItems); })">
+                                    </div>
+                                    <input type="hidden" name="types[{{ loop.index0 }}]" value="array">
+                                {% elif item.node.details and item.node.details.type == 'boolean' %}
                                     <select id="value-{{ item.key }}"
                                             name="values[{{ loop.index0 }}]"
                                             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -258,8 +348,8 @@
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        required
-                                                       oninput=" document.getElementById('value-{{ item.key }}').value = Math.round(parseFloat(this.value || 0) * 100); "
-                                                       onchange="this.value = Number(this.value).toFixed(2);"
+                                                       oninput="document.getElementById('value-{{ item.key }}').value = Math.round(parseFloat(this.value || 0) * 100);"
+                                                       onchange="this.value = Number(this.value).toFixed(2); document.getElementById('value-{{ item.key }}').value = Math.round(parseFloat(this.value || 0) * 100);"
                                                        {% if loop.first %}autofocus{% endif %}>
                                                 <input type="hidden"
                                                        id="value-{{ item.key }}"
@@ -270,7 +360,7 @@
                                     {% else %}
                                         <input type="number"
                                                id="value-{{ item.key }}"
-                                               name="values"
+                                               name="values[{{ loop.index0 }}]"
                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                {% if item.node.details.type_spec and item.node.details.type_spec.min is defined %}min="{{ item.node.details.type_spec.min }}"{% endif %}
                                                {% if item.node.details.type_spec and item.node.details.type_spec.max is defined %}max="{{ item.node.details.type_spec.max }}"{% endif %}

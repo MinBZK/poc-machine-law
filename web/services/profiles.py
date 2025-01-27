@@ -1177,6 +1177,80 @@ PROFILES = {
             },
         },
     },
+    "888888888": {
+        "name": "Sarah de Boer",
+        "description": "Alleenstaande ouder met kinderopvang, komt in aanmerking voor kinderopvangtoeslag",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "888888888",
+                        "geboortedatum": "1990-05-15",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "888888888",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                        "children": [{"bsn": "111111111"}, {"bsn": "222222222"}],
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "888888888",
+                        "straat": "Keizersgracht",
+                        "huisnummer": "123",
+                        "postcode": "1015CJ",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "children": [
+                    {"kind_bsn": "111111111", "geboortedatum": "2020-03-01", "naam": "Sem de Jong"},
+                    {"kind_bsn": "222222222", "geboortedatum": "2022-07-15", "naam": "Emma de Jong"},
+                ],
+            },
+            "UWV": {
+                "dienstverbanden": [
+                    {
+                        "bsn": "888888888",
+                        "start_date": "2024-01-15",
+                        "end_date": "2024-01-30",
+                        "uren_per_week": 32,
+                        "worked_hours": 1664,  # 32 hours × 52 weeks
+                    }
+                ],
+                "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen": [{"BSN": "888888888", "insured_years": 5}],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "888888888",
+                        "loon_uit_dienstbetrekking": 3600000,  # €36.000
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "888888888", "dividend": 0, "vervreemding_aandelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "888888888",
+                        "spaargeld": 800000,  # €8.000
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+            },
+        },
+    },
 }
 
 
