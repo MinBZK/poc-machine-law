@@ -3,34 +3,25 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import pandas as pd
+from datetime import datetime
 
 from machine.service import Services
-from web.services.profiles import get_profile_data, get_all_profiles
+from web.services.profiles import get_profile_data
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
+TODAY = datetime.today().strftime("%Y-%m-%d")
+FORMATTED_DATE = datetime.today().strftime("%-d %B %Y")
+
 
 async def get_services():
     """Dependency to get Services instance"""
-    return Services("2025-01-31")  # Current date
+    return Services(TODAY)  # Use today's date
 
 
 @router.get("/profile/")
 async def switch_profile(request: Request, bsn: str = "999993653"):
-    """Handle profile switching"""
-    profile = get_profile_data(bsn)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    return templates.TemplateResponse(
-        "partials/dashboard.html",
-        {
-            "request": request,
-            "profile": profile,
-            "bsn": bsn
-        }
-    )
     """Handle profile switching"""
     profile = get_profile_data(bsn)
     if not profile:
@@ -82,7 +73,7 @@ async def execute_law(
         result = await services.evaluate(
             service_name,
             law=law_name,
-            reference_date="2025-01-31",
+            reference_date=TODAY,  # Use today's date
             parameters={"BSN": bsn}
         )
 
