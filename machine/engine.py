@@ -690,15 +690,20 @@ class RulesEngine:
         return result
 
     @staticmethod
-    def _evaluate_comparison(op: str, left: Any, right: Any) -> bool:
+    def _evaluate_comparison(op: str, left: Any, right: Any) -> bool | None:
         """Handle comparison operations"""
         if isinstance(left, date) and isinstance(right, str):
             right = datetime.strptime(right, "%Y-%m-%d").date()
         elif isinstance(right, date) and isinstance(left, str):
             left = datetime.strptime(left, "%Y-%m-%d").date()
 
-        result = RulesEngine.COMPARISON_OPS[op](left, right)
-        logger.debug(f"Compute {op}({left}, {right}) = {result}")
+        try:
+            result = RulesEngine.COMPARISON_OPS[op](left, right)
+            logger.debug(f"Compute {op}({left}, {right}) = {result}")
+        except TypeError as e:
+            logger.warning(f"Error computing {op}({left}, {right}): {e}")
+            result = None
+
         return result
 
     @staticmethod
