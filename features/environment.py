@@ -1,4 +1,4 @@
-from logging_config import configure_logging
+from machine.logging_config import configure_logging
 
 def before_all(context):
     log_level = context.config.userdata.get('log_level', 'DEBUG')

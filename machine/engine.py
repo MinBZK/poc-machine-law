@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Set, Union, TypeVar
 
 import pandas as pd
 
-from logging_config import IndentLogger
+from .logging_config import IndentLogger
 
 logger = IndentLogger(logging.getLogger('service'))
 
@@ -296,7 +296,7 @@ class RulesEngine:
     def __init__(self, spec: Dict[str, Any], service_provider: Optional[AbstractServiceProvider] = None):
         self.spec = spec
         self.service_name = spec.get('service')
-        self.law = spec.get('law')
+        self.law = spec.get('../law')
         self.requirements = spec.get('requirements', [])
         self.actions = spec.get('actions', [])
         self.parameter_specs = spec.get('properties', {}).get('parameters', {})

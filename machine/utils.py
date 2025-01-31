@@ -6,7 +6,6 @@ from typing import Optional, List
 
 import yaml
 
-# BASE_URL = "https://gitlab.com/ai-validation/regelspraak/-/raw/master/rules"
 BASE_DIR = "law"
 
 

@@ -1,12 +1,12 @@
 import logging
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, Any, Optional
+
 import pandas as pd
 
-from engine import RulesEngine, AbstractServiceProvider
-from logging_config import IndentLogger
-from utils import RuleResolver
+from .engine import RulesEngine, AbstractServiceProvider
+from .logging_config import IndentLogger
+from .utils import RuleResolver
 
 logger = IndentLogger(logging.getLogger('service'))
 

@@ -6,7 +6,7 @@ import pandas as pd
 from behave import given
 from behave import when, then
 
-from service import Services
+from machine.service import Services
 
 assertions = TestCase()
 
