@@ -5,6 +5,7 @@ from typing import Dict, Any, Optional
 PROFILES = {
     "999993653": {
         "name": "Jan Jansen",
+        "description": "Jongere met part-time baan naast MBO opleiding, komt in aanmerking voor zorgtoeslag",
         "sources": {
             "RvIG": {
                 "personen": [{
@@ -111,9 +112,9 @@ PROFILES = {
             }
         }
     },
-    # Maria's profile with similar complete data...
     "999993654": {
         "name": "Maria Pietersen",
+        "description": "AOW-gerechtigde met volledige opbouw, gehuwd, partner nog geen AOW-leeftijd",
         "sources": {
             # Similar complete data structure...
             "RvIG": {
@@ -167,6 +168,179 @@ PROFILES = {
                     "polis_status": "ACTIEF",
                     "verdrag_status": "GEEN",
                     "zorg_type": "BASIS"
+                }]
+            }
+        }
+    },
+    "999993655": {
+        "name": "Sarah de Wit",
+        "description": "Dakloze met briefadres, recht op bijstand met woonkostentoeslag",
+        "sources": {
+            "RvIG": {
+                "personen": [{
+                    "bsn": "999993655",
+                    "geboortedatum": "1980-01-01",
+                    "verblijfsadres": None,
+                    "land_verblijf": "NEDERLAND",
+                    "nationaliteit": "NEDERLANDS"
+                }],
+                "relaties": [{
+                    "bsn": "999993655",
+                    "partnerschap_type": "GEEN",
+                    "partner_bsn": None
+                }],
+                "verblijfplaats": [{
+                    "bsn": "999993655",
+                    "straat": "De Regenboog Groep",
+                    "huisnummer": "1",
+                    "postcode": "1012NX",
+                    "woonplaats": "Amsterdam",
+                    "type": "BRIEFADRES"
+                }]
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [{
+                    "bsn": "999993655",
+                    "arbeidsvermogen": "VOLLEDIG",
+                    "re_integratie_traject": "Werkstage"
+                }]
+            },
+            "BELASTINGDIENST": {
+                "box1": [{
+                    "bsn": "999993655",
+                    "loon_uit_dienstbetrekking": 0,
+                    "uitkeringen_en_pensioenen": 0,
+                    "winst_uit_onderneming": 0,
+                    "resultaat_overige_werkzaamheden": 0,
+                    "eigen_woning": 0
+                }]
+            }
+        }
+    },
+    "999993656": {
+        "name": "Peter Bakker",
+        "description": "ZZP'er met laag inkomen, recht op aanvullende bijstand en startkapitaal",
+        "sources": {
+            "RvIG": {
+                "personen": [{
+                    "bsn": "999993656",
+                    "geboortedatum": "1985-01-01",
+                    "verblijfsadres": "Amsterdam",
+                    "land_verblijf": "NEDERLAND",
+                    "nationaliteit": "NEDERLANDS"
+                }],
+                "relaties": [{
+                    "bsn": "999993656",
+                    "partnerschap_type": "GEEN",
+                    "partner_bsn": None
+                }],
+                "verblijfplaats": [{
+                    "bsn": "999993656",
+                    "straat": "Kalverstraat",
+                    "huisnummer": "1",
+                    "postcode": "1012NX",
+                    "woonplaats": "Amsterdam",
+                    "type": "WOONADRES"
+                }]
+            },
+            "BELASTINGDIENST": {
+                "box1": [{
+                    "bsn": "999993656",
+                    "loon_uit_dienstbetrekking": 0,
+                    "uitkeringen_en_pensioenen": 0,
+                    "winst_uit_onderneming": 50000,
+                    "resultaat_overige_werkzaamheden": 0,
+                    "eigen_woning": 0
+                }]
+            },
+            "KVK": {
+                "inschrijvingen": [{
+                    "bsn": "999993656",
+                    "rechtsvorm": "EENMANSZAAK",
+                    "status": "ACTIEF",
+                    "activiteit": "Webdesign"
+                }]
+            }
+        }
+    },
+    "999993657": {
+        "name": "Emma Visser",
+        "description": "Persoon met medische ontheffing, recht op bijstand zonder re-integratieverplichting",
+        "sources": {
+            "RvIG": {
+                "personen": [{
+                    "bsn": "999993657",
+                    "geboortedatum": "1975-01-01",
+                    "verblijfsadres": "Amsterdam",
+                    "land_verblijf": "NEDERLAND",
+                    "nationaliteit": "NEDERLANDS"
+                }],
+                "relaties": [{
+                    "bsn": "999993657",
+                    "partnerschap_type": "GEEN",
+                    "partner_bsn": None
+                }],
+                "verblijfplaats": [{
+                    "bsn": "999993657",
+                    "straat": "Kalverstraat",
+                    "huisnummer": "1",
+                    "postcode": "1012NX",
+                    "woonplaats": "Amsterdam",
+                    "type": "WOONADRES"
+                }]
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [{
+                    "bsn": "999993657",
+                    "arbeidsvermogen": "MEDISCH_VOLLEDIG",
+                    "ontheffing_reden": "Chronische ziekte",
+                    "ontheffing_einddatum": "2026-01-01"
+                }]
+            }
+        }
+    },
+    "999993658": {
+        "name": "Thomas Mulder",
+        "description": "Student met laag inkomen en studiefinanciering, recht op zorgtoeslag",
+        "sources": {
+            "RvIG": {
+                "personen": [{
+                    "bsn": "999993658",
+                    "geboortedatum": "2004-01-01",
+                    "verblijfsadres": "Amsterdam",
+                    "land_verblijf": "NEDERLAND",
+                    "nationaliteit": "NEDERLANDS"
+                }],
+                "relaties": [{
+                    "bsn": "999993658",
+                    "partnerschap_type": "GEEN",
+                    "partner_bsn": None
+                }]
+            },
+            "RVZ": {
+                "verzekeringen": [{
+                    "bsn": "999993658",
+                    "polis_status": "ACTIEF"
+                }]
+            },
+            "BELASTINGDIENST": {
+                "box1": [{
+                    "bsn": "999993658",
+                    "loon_uit_dienstbetrekking": 15000,
+                    "uitkeringen_en_pensioenen": 0,
+                    "winst_uit_onderneming": 0,
+                    "resultaat_overige_werkzaamheden": 0,
+                    "eigen_woning": 0
+                }]
+            },
+            "DUO": {
+                "inschrijvingen": [{
+                    "bsn": "999993658",
+                    "onderwijstype": "WO"
+                }],
+                "studiefinanciering": [{
+                    "bsn": "999993658",
+                    "aantal_studerend_gezin": 0
                 }]
             }
         }

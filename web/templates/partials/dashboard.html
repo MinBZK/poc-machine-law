@@ -1,47 +1,96 @@
 <!-- templates/partials/dashboard.html -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Zorgtoeslag -->
-    <div
-            hx-get="/laws/execute/zorgtoeslag?bsn={{ bsn }}"
-            hx-trigger="load"
-            class="bg-white rounded-lg shadow"
-    >
-        <div class="animate-pulse p-6">
-            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div class="space-y-3 mt-4">
-                <div class="h-4 bg-gray-200 rounded"></div>
-                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-            </div>
+<!-- Profile Info -->
+<section class="mb-8">
+    <div class="flex justify-between items-start">
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Waar heb ik recht op?</h2>
+            <p class="text-gray-600">
+                Bekijk hier uw toeslagen, uitkeringen en andere regelingen van de overheid.
+            </p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-600">Datum: 31 januari 2025</span>
         </div>
     </div>
+</section>
 
-    <!-- AOW -->
-    <div
-            hx-get="/laws/execute/aow?bsn={{ bsn }}"
-            hx-trigger="load"
-            class="bg-white rounded-lg shadow"
-    >
-        <div class="animate-pulse p-6">
-            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div class="space-y-3 mt-4">
-                <div class="h-4 bg-gray-200 rounded"></div>
-                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-            </div>
+<section class="mb-8 bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
+    </div>
+    <div class="grid md:grid-cols-3 gap-4">
+        <div>
+            <p class="text-sm text-gray-600">BSN</p>
+            <p class="font-medium">{{ bsn }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Geboortedatum</p>
+            <p class="font-medium">{{ profile.sources.RvIG.personen[0].geboortedatum }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Woonplaats</p>
+            <p class="font-medium">{{ profile.sources.RvIG.personen[0].verblijfsadres }}</p>
         </div>
     </div>
+</section>
 
-    <!-- Bijstand -->
-    <div
-            hx-get="/laws/execute/bijstand?bsn={{ bsn }}"
-            hx-trigger="load"
-            class="bg-white rounded-lg shadow"
-    >
-        <div class="animate-pulse p-6">
-            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div class="space-y-3 mt-4">
-                <div class="h-4 bg-gray-200 rounded"></div>
-                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-            </div>
+<!-- Laws Grid -->
+<section>
+    <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Zorgtoeslag -->
+        <div
+                hx-get="/laws/execute/zorgtoeslag?bsn={{ bsn }}"
+                hx-trigger="load"
+                class="bg-white rounded-lg shadow"
+        >
+            {% include "partials/loading.html" %}
+        </div>
+
+        <!-- AOW -->
+        <div
+                hx-get="/laws/execute/aow?bsn={{ bsn }}"
+                hx-trigger="load"
+                class="bg-white rounded-lg shadow"
+        >
+            {% include "partials/loading.html" %}
+        </div>
+
+        <!-- Bijstand -->
+        <div
+                hx-get="/laws/execute/bijstand?bsn={{ bsn }}"
+                hx-trigger="load"
+                class="bg-white rounded-lg shadow"
+        >
+            {% include "partials/loading.html" %}
         </div>
     </div>
-</div>
+</section>
+
+<!-- Info Section -->
+<section class="mt-12 grid md:grid-cols-2 gap-8">
+    <div class="bg-blue-50 rounded-lg p-6">
+        <h3 class="font-semibold text-lg mb-4">Over deze demo</h3>
+        <p class="text-gray-600">
+            Deze demo laat zien hoe wetten als code werken. De berekeningen zijn gebaseerd op echte wetteksten,
+            omgezet naar computercode. De getoonde profielen zijn voorbeelden uit de testscenarios.
+        </p>
+    </div>
+    <div class="bg-gray-50 rounded-lg p-6">
+        <h3 class="font-semibold text-lg mb-4">Beschikbare regelingen</h3>
+        <ul class="space-y-2">
+            <li class="flex items-center">
+                <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
+                <span>Zorgtoeslag (Wet op de zorgtoeslag)</span>
+            </li>
+            <li class="flex items-center">
+                <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+                <span>AOW (Algemene Ouderdomswet)</span>
+            </li>
+            <li class="flex items-center">
+                <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
+                <span>Bijstand (Participatiewet)</span>
+            </li>
+        </ul>
+    </div>
+</section>
