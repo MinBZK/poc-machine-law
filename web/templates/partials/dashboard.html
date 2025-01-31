@@ -1,0 +1,47 @@
+<!-- templates/partials/dashboard.html -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Zorgtoeslag -->
+    <div
+            hx-get="/laws/execute/zorgtoeslag?bsn={{ bsn }}"
+            hx-trigger="load"
+            class="bg-white rounded-lg shadow"
+    >
+        <div class="animate-pulse p-6">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="space-y-3 mt-4">
+                <div class="h-4 bg-gray-200 rounded"></div>
+                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AOW -->
+    <div
+            hx-get="/laws/execute/aow?bsn={{ bsn }}"
+            hx-trigger="load"
+            class="bg-white rounded-lg shadow"
+    >
+        <div class="animate-pulse p-6">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="space-y-3 mt-4">
+                <div class="h-4 bg-gray-200 rounded"></div>
+                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bijstand -->
+    <div
+            hx-get="/laws/execute/bijstand?bsn={{ bsn }}"
+            hx-trigger="load"
+            class="bg-white rounded-lg shadow"
+    >
+        <div class="animate-pulse p-6">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="space-y-3 mt-4">
+                <div class="h-4 bg-gray-200 rounded"></div>
+                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+            </div>
+        </div>
+    </div>
+</div>
