@@ -32,7 +32,8 @@ async def switch_profile(request: Request, bsn: str = "999993653"):
         {
             "request": request,
             "profile": profile,
-            "bsn": bsn
+            "bsn": bsn,
+            "formatted_date": FORMATTED_DATE
         }
     )
 
