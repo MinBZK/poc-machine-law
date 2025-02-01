@@ -26,7 +26,9 @@
             </div>
 
             {% if service == "KIESRAAD" and law.endswith("kieswet") %}
-            <p class="text-gray-600">Voor de verkiezingen van {{ input['$ELECTION_DATE']|format_date }}</p>
+            <p class="text-gray-600">
+                Voor de verkiezingen van <strong>{{ input['$ELECTION_DATE']|format_date }}</strong> heeft u
+            </p>
             {% if result.has_voting_rights %}
             <p class="text-4xl font-bold text-pink-600 mt-2">
                 STEMRECHT
