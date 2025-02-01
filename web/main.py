@@ -1,13 +1,14 @@
 # web/main.py
 import locale
+from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pathlib import Path
-from datetime import datetime
 
+from machine.service import Services
+from web.dependencies import FORMATTED_DATE, get_services
 from web.routers import laws
 from web.services.profiles import get_profile_data, get_all_profiles
 
@@ -33,15 +34,12 @@ app.include_router(laws.router)
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "999993653"):
+async def root(request: Request, bsn: str = "999993653",
+               services: Services = Depends(get_services)):
     """Render the main dashboard page"""
     profile = get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
-
-    formatted_date = datetime.today().strftime("%-d %B %Y")  # e.g. "31 januari 2025"
-
-    all_profiles = get_all_profiles()
 
     return templates.TemplateResponse(
         "index.html",
@@ -49,8 +47,9 @@ async def root(request: Request, bsn: str = "999993653"):
             "request": request,
             "profile": profile,
             "bsn": bsn,
-            "formatted_date": formatted_date,
-            "all_profiles": all_profiles  # Add this line
+            "formatted_date": FORMATTED_DATE,
+            "all_profiles": get_all_profiles(),
+            "discoverable_service_laws": services.get_discoverable_service_laws()
         }
     )
 

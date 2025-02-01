@@ -1,6 +1,7 @@
 uuid: 4d8c7237-b930-4f0f-aaa3-624ba035e449
-name: Bepalen verzekerde zorgtoeslag 2025
+name: Zorgtoeslag
 law: zorgtoeslagwet
+discoverable: "CITIZEN"
 valid_from: 2025-01-01
 service: "TOESLAGEN"
 description: >

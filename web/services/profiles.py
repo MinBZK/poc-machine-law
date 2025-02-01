@@ -1,12 +1,29 @@
 # web/services/profiles.py
 from typing import Dict, Any, Optional
 
+# Global service data that applies to all profiles
+GLOBAL_SERVICES = {
+    "CBS": {
+        "levensverwachting": [{
+            "jaar": 2025,
+            "verwachting_65": 20.5
+        }]
+    },
+    "KIESRAAD": {
+        "verkiezingen": [{
+            "type": "TWEEDE_KAMER",
+            "verkiezingsdatum": "2025-05-05"
+        }]
+    }
+}
+
 # Profile data extracted from feature files
 PROFILES = {
     "999993653": {
         "name": "Jan Jansen",
         "description": "Jongere met part-time baan naast MBO opleiding, komt in aanmerking voor zorgtoeslag",
         "sources": {
+            **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [{
                     "bsn": "999993653",
@@ -75,12 +92,6 @@ PROFILES = {
                     "aantal_studerende_broers_zussen": 0
                 }]
             },
-            "CBS": {
-                "levensverwachting": [{
-                    "jaar": 2025,
-                    "verwachting_65": 20.5
-                }]
-            },
             "DJI": {
                 "detenties": [{
                     "bsn": "999993653",
@@ -112,10 +123,11 @@ PROFILES = {
             }
         }
     },
-    "999993654": {  # Maria Pietersen
+    "999993654": {
         "name": "Maria Pietersen",
         "description": "AOW-gerechtigde met volledige opbouw, gehuwd, partner nog geen AOW-leeftijd",
         "sources": {
+            **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [{
                     "bsn": "999993654",
@@ -142,12 +154,6 @@ PROFILES = {
                 "verzekerde_tijdvakken": [{
                     "bsn": "999993654",
                     "woonperiodes": 50
-                }]
-            },
-            "CBS": {
-                "levensverwachting": [{
-                    "jaar": 2025,
-                    "verwachting_65": 20.5
                 }]
             },
             "BELASTINGDIENST": {
@@ -191,6 +197,7 @@ PROFILES = {
         "name": "Sarah de Wit",
         "description": "Dakloze met briefadres, recht op bijstand met woonkostentoeslag",
         "sources": {
+            **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [{
                     "bsn": "999993655",
@@ -236,6 +243,7 @@ PROFILES = {
         "name": "Peter Bakker",
         "description": "ZZP'er met laag inkomen, recht op aanvullende bijstand en startkapitaal",
         "sources": {
+            **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [{
                     "bsn": "999993656",
@@ -282,6 +290,7 @@ PROFILES = {
         "name": "Emma Visser",
         "description": "Persoon met medische ontheffing, recht op bijstand zonder re-integratieverplichting",
         "sources": {
+            **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [{
                     "bsn": "999993657",
@@ -318,6 +327,7 @@ PROFILES = {
         "name": "Thomas Mulder",
         "description": "Student met laag inkomen en studiefinanciering, recht op zorgtoeslag",
         "sources": {
+            **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [{
                     "bsn": "999993658",

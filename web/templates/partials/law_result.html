@@ -1,5 +1,5 @@
 <!-- templates/partials/law_result.html -->
-{% from "macros/logos.html" import org_logo, law_title %}
+{% from "macros/logos.html" import org_logo %}
 
 <div class="min-h-[16rem] bg-white rounded-lg shadow">
     {% if error %}
@@ -7,11 +7,11 @@
         <div class="flex items-start justify-between">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {{ law_title(law) }}
+                    {{ rule_spec.name }}
                 </h3>
                 <p class="text-red-600">Er is een fout opgetreden bij het berekenen</p>
             </div>
-            <div class="p-2">{{ org_logo(law) }}</div>
+            <div class="p-2">{{ org_logo(service) }}</div>
         </div>
     </div>
 
@@ -20,24 +20,36 @@
         <div class="flex-grow">
             <div class="flex items-start justify-between">
                 <h3 class="text-lg font-semibold text-gray-900">
-                    {{ law_title(law) }}
+                    {{ rule_spec.name }}
                 </h3>
-                <div class="-mt-2 -mr-2">{{ org_logo(law) }}</div>
+                <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
 
-            {% if law == "zorgtoeslag" and result.is_verzekerde_zorgtoeslag %}
+            {% if service == "KIESRAAD" and law.endswith("kieswet") %}
+            <p class="text-gray-600">Voor de volgende verkiezingen heeft u:</p>
+            {% if result.has_voting_rights %}
+            <p class="text-4xl font-bold text-pink-600 mt-2">
+                STEMRECHT
+            </p>
+            {% else %}
+            <p class="text-4xl font-bold text-pink-600 mt-2">
+                GEEN stemrecht
+            </p>
+            {% endif %}
+
+            {% elif service == "TOESLAGEN" and law.endswith("zorgtoeslagwet") and result.is_verzekerde_zorgtoeslag %}
             <p class="text-gray-600">Uw jaarlijkse zorgtoeslag</p>
             <p class="text-4xl font-bold text-green-600 mt-2">
                 € {{ "%.2f"|format(result.hoogte_toeslag / 100) }}
             </p>
 
-            {% elif law == "aow" and result.pension_amount %}
+            {% elif service == "SVB" and law.endswith("algemene_ouderdomswet") and result.pension_amount %}
             <p class="text-gray-600">Uw maandelijkse AOW pensioen</p>
             <p class="text-4xl font-bold text-blue-600 mt-2">
                 € {{ "%.2f"|format(result.pension_amount / 100) }}
             </p>
 
-            {% elif law == "bijstand" %}
+            {% elif service == "GEMEENTE_AMSTERDAM" and law.endswith("participatiewet/bijstand") %}
             <p class="text-gray-600">Uw maandelijkse bijstandsuitkering</p>
             {% if result.benefit_amount %}
             <p class="text-4xl font-bold text-purple-600 mt-2">
@@ -58,17 +70,23 @@
         </div>
 
         <div class="mt-6">
-            {% if law == "zorgtoeslag" %}
+            {% if service == "KIESRAAD" and law.endswith("kieswet") and result.has_voting_rights %}
+            <a href="https://www.kiesraad.nl/actueel/verkiezingen"
+               class="inline-block w-full px-6 py-3 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors">
+                Meer informatie over de verkiezingen
+            </a>
+
+            {% elif service == "TOESLAGEN" and law.endswith("zorgtoeslagwet") %}
             <a href="/form/zorgtoeslag"
                class="inline-block w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors">
                 Vraag zorgtoeslag aan
             </a>
-            {% elif law == "aow" %}
+            {% elif service == "SVB" and law.endswith("algemene_ouderdomswet") %}
             <a href="/form/aow"
                class="inline-block w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
                 Vraag AOW aan
             </a>
-            {% elif law == "bijstand" %}
+            {% elif service == "GEMEENTE_AMSTERDAM" and law.endswith("participatiewet/bijstand") %}
             <a href="/form/bijstand"
                class="inline-block w-full px-6 py-3 bg-purple-600 text-white text-center rounded-md hover:bg-purple-700 transition-colors">
                 Vraag bijstand aan
@@ -82,13 +100,13 @@
         <div class="flex items-start justify-between">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {{ law_title(law) }}
+                    {{ rule_spec.name }}
                 </h3>
                 <p class="text-gray-600">
                     U komt niet in aanmerking
                 </p>
             </div>
-            <div class="-mt-2 -mr-2">{{ org_logo(law) }}</div>
+            <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
         </div>
     </div>
     {% endif %}

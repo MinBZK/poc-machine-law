@@ -1,6 +1,7 @@
 uuid: d4c3b2a1-9876-4f0f-aaaa-123456789abc
-name: Bepalen kiesrecht Tweede Kamer
+name: Kiesrecht Tweede Kamer
 law: kieswet
+discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "KIESRAAD"
 description: >
@@ -19,10 +20,22 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+
+  sources:
     - name: "ELECTION_DATE"
       description: "Datum van de verkiezingen"
-      type: "string"
-      required: true
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "verkiezingen"
+        field: "verkiezingsdatum"
+        select_on:
+          - name: "type"
+            value: "TWEEDE_KAMER"
+            description: "Type verkiezing"
+            type: "string"
 
   input:
     - name: "AGE"

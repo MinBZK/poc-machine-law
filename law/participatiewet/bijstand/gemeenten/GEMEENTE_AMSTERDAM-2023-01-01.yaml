@@ -1,6 +1,7 @@
 uuid: 7d6e5f4c-9876-4f0f-bbbb-123456789def
-name: Bepalen bijstand Amsterdam
+name: Bijstand Gemeente Amsterdam
 law: participatiewet/bijstand
+discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "GEMEENTE_AMSTERDAM"
 description: >

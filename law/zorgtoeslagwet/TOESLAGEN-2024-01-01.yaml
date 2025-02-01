@@ -1,6 +1,7 @@
 uuid: f039a040-e414-484d-9116-3cd23e2fd5b2
-name: Bepalen verzekerde zorgtoeslag 2024
+name: Zorgtoeslag
 law: zorgtoeslagwet
+discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "TOESLAGEN"
 description: >

@@ -1,6 +1,7 @@
 uuid: a70a061f-7a6d-404d-81f1-b77bbc7863a7
-name: Bepalen AOW-uitkering 2025
+name: AOW-uitkering
 law: algemene_ouderdomswet
+discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "SVB"
 description: >

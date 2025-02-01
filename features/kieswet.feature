@@ -6,7 +6,9 @@ Feature: Bepalen kiesrecht Tweede Kamer
   Background:
     Given de datum is "2025-03-15"
     And een persoon met BSN "999993653"
-    And de datum van de verkiezingen is "2025-05-05"
+    And de volgende KIESRAAD verkiezingen gegevens:
+      | type          | verkiezingsdatum |
+      | TWEEDE_KAMER  | 2025-05-05       |
 
   Scenario: Persoon met Nederlandse nationaliteit van 18+ mag stemmen
     Given de volgende RvIG personen gegevens:

@@ -1,28 +1,18 @@
 # web/routers/laws.py
-import locale
 
+from pathlib import Path
+from urllib.parse import unquote
+
+import pandas as pd
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
-from pathlib import Path
-import pandas as pd
-from datetime import datetime
 
 from machine.service import Services
+from web.dependencies import TODAY, FORMATTED_DATE, get_services
 from web.services.profiles import get_profile_data
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
-
-# Set Dutch locale if not already set
-if locale.getlocale(locale.LC_TIME)[0] != 'nl_NL':
-    locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
-TODAY = datetime.today().strftime("%Y-%m-%d")
-FORMATTED_DATE = datetime.today().strftime("%-d %B %Y")
-
-
-async def get_services():
-    """Dependency to get Services instance"""
-    return Services(TODAY)  # Use today's date
 
 
 @router.get("/profile/")
@@ -43,55 +33,56 @@ async def switch_profile(request: Request, bsn: str = "999993653"):
     )
 
 
-@router.get("/execute/{law}")
+@router.get("/execute")
 async def execute_law(
         request: Request,
+        service: str,
         law: str,
         bsn: str,
         services: Services = Depends(get_services)
 ):
-    """Execute a specific law for a user"""
-    try:
-        # Get profile data for the BSN
-        profile_data = get_profile_data(bsn)
-        if not profile_data:
-            raise HTTPException(status_code=404, detail="Profile not found")
+    # try:
+    # Decode the law path
+    law = unquote(law)
 
-        # Load source data into services
-        for service_name, tables in profile_data["sources"].items():
-            for table_name, data in tables.items():
-                df = pd.DataFrame(data)
-                services.set_source_dataframe(service_name, table_name, df)
+    # Get the rule specification
+    rule_spec = services.resolver.get_rule_spec(law, TODAY, service)
+    if not rule_spec:
+        raise HTTPException(status_code=400, detail="Invalid law specified")
 
-        # Map law name to service and actual law name
-        law_mapping = {
-            "zorgtoeslag": ("TOESLAGEN", "zorgtoeslagwet"),
-            "aow": ("SVB", "algemene_ouderdomswet"),
-            "bijstand": ("GEMEENTE_AMSTERDAM", "participatiewet/bijstand"),
+    # Get profile data for the BSN
+    profile_data = get_profile_data(bsn)
+    if not profile_data:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Load source data into services
+    for service_name, tables in profile_data["sources"].items():
+        for table_name, data in tables.items():
+            df = pd.DataFrame(data)
+            services.set_source_dataframe(service_name, table_name, df)
+
+    # Execute the law
+    result = await services.evaluate(
+        service,
+        law=law,
+        reference_date=TODAY,
+        parameters={"BSN": bsn}
+    )
+
+    if law == "kieswet":
+        pass
+
+    return templates.TemplateResponse(
+        "partials/law_result.html",
+        {
+            "request": request,
+            "law": law,
+            "service": service,
+            "rule_spec": rule_spec,
+            "result": result.output,
+            "requirements_met": result.requirements_met
         }
+    )
 
-        if law not in law_mapping:
-            raise HTTPException(status_code=400, detail="Invalid law specified")
-
-        service_name, law_name = law_mapping[law]
-
-        # Execute the law
-        result = await services.evaluate(
-            service_name,
-            law=law_name,
-            reference_date=TODAY,  # Use today's date
-            parameters={"BSN": bsn}
-        )
-
-        return templates.TemplateResponse(
-            "partials/law_result.html",
-            {
-                "request": request,
-                "law": law,
-                "result": result.output,
-                "requirements_met": result.requirements_met
-            }
-        )
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))

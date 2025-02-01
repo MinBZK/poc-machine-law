@@ -171,32 +171,17 @@
 <section>
     <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Zorgtoeslag -->
-        <div
-                hx-get="/laws/execute/zorgtoeslag?bsn={{ bsn }}"
+        {% for service, laws in discoverable_service_laws.items() %}
+            {% for law in laws %}
+            <div
+                hx-get="/laws/execute?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
                 hx-trigger="load"
                 class="bg-white rounded-lg shadow"
-        >
-            {% include "partials/loading.html" %}
-        </div>
-
-        <!-- AOW -->
-        <div
-                hx-get="/laws/execute/aow?bsn={{ bsn }}"
-                hx-trigger="load"
-                class="bg-white rounded-lg shadow"
-        >
-            {% include "partials/loading.html" %}
-        </div>
-
-        <!-- Bijstand -->
-        <div
-                hx-get="/laws/execute/bijstand?bsn={{ bsn }}"
-                hx-trigger="load"
-                class="bg-white rounded-lg shadow"
-        >
-            {% include "partials/loading.html" %}
-        </div>
+            >
+                {% include "partials/loading.html" %}
+            </div>
+            {% endfor %}
+        {% endfor %}
     </div>
 </section>
 
