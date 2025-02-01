@@ -51,7 +51,13 @@
                             </div>
                             {% if profile.sources.RvIG.get('verblijfplaats') %}
                             <div>
-                                <dt class="text-sm text-gray-600">Woonadres</dt>
+                                <dt class="text-sm text-gray-600">
+                                    {% if profile.sources.RvIG.verblijfplaats[0].type == "BRIEFADRES" %}
+                                    Briefadres
+                                    {% else %}
+                                    Woonadres
+                                    {% endif %}
+                                </dt>
                                 <dd>{{ profile.sources.RvIG.verblijfplaats[0].straat }} {{
                                     profile.sources.RvIG.verblijfplaats[0].huisnummer }}
                                 </dd>

@@ -119,7 +119,7 @@ PROFILES = {
             "RvIG": {
                 "personen": [{
                     "bsn": "999993654",
-                    "geboortedatum": "1958-02-15",
+                    "geboortedatum": "1948-02-15",
                     "verblijfsadres": "Amsterdam",
                     "land_verblijf": "NEDERLAND",
                     "nationaliteit": "NEDERLANDS"
@@ -195,7 +195,7 @@ PROFILES = {
                 "personen": [{
                     "bsn": "999993655",
                     "geboortedatum": "1980-01-01",
-                    "verblijfsadres": None,
+                    "verblijfsadres": "Amsterdam",
                     "land_verblijf": "NEDERLAND",
                     "nationaliteit": "NEDERLANDS"
                 }],
@@ -221,49 +221,13 @@ PROFILES = {
                     "winst_uit_onderneming": 0,
                     "resultaat_overige_werkzaamheden": 0,
                     "eigen_woning": 0
-                }],
-                "box2": [{
-                    "bsn": "999993655",
-                    "dividend": 0,
-                    "vervreemding_aandelen": 0
-                }],
-                "box3": [{
-                    "bsn": "999993655",
-                    "spaargeld": 0,
-                    "beleggingen": 0,
-                    "onroerend_goed": 0,
-                    "schulden": 0
-                }],
-                "buitenlands_inkomen": [{
-                    "bsn": "999993655",
-                    "bedrag": 0,
-                    "land": "GEEN"
                 }]
             },
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [{
                     "bsn": "999993655",
                     "arbeidsvermogen": "VOLLEDIG",
-                    "re_integratie_traject": "Werkstage",
-                    "ontheffing_reden": None,
-                    "ontheffing_einddatum": None
-                }]
-            },
-            "RVZ": {
-                "verzekeringen": [{
-                    "bsn": "999993655",
-                    "polis_status": "ACTIEF",
-                    "verdrag_status": "GEEN",
-                    "zorg_type": "BASIS"
-                }]
-            },
-            "IND": {
-                "verblijfsvergunningen": [{
-                    "bsn": "999993655",
-                    "type": "ONBEPAALDE_TIJD_REGULIER",
-                    "status": "VERLEEND",
-                    "ingangsdatum": "2015-01-01",
-                    "einddatum": None
+                    "re_integratie_traject": "Werkstage"
                 }]
             }
         }
