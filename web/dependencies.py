@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
+from claims.application import ClaimsManager
 from machine.service import Services
 
 # Set Dutch locale
@@ -16,10 +17,12 @@ BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
+manager = ClaimsManager()
+
 
 async def get_services():
     """Dependency to get Services instance"""
-    return Services(TODAY)
+    return Services(TODAY, manager)
 
 
 def setup_jinja_env(directory: str) -> Jinja2Templates:

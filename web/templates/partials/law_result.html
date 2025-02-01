@@ -1,7 +1,7 @@
 <!-- templates/partials/law_result.html -->
 {% from "macros/logos.html" import org_logo %}
 
-<div class="min-h-[16rem] bg-white rounded-lg shadow">
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow">
     {% if error %}
     <div class="p-6">
         <div class="flex items-start justify-between">
@@ -24,6 +24,26 @@
                 </h3>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
+
+            {% if current_claim %}
+            <div class="mb-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    {% if current_claim.status.value == 'SUBMITTED' %}
+                        bg-blue-100 text-blue-800
+                    {% elif current_claim.status.value == 'UNDER_REVIEW' %}
+                        bg-yellow-100 text-yellow-800
+                    {% elif current_claim.status.value == 'APPROVED' %}
+                        bg-green-100 text-green-800
+                    {% elif current_claim.status.value == 'DENIED' %}
+                        bg-red-100 text-red-800
+                    {% elif current_claim.status.value == 'APPEALED' %}
+                        bg-purple-100 text-purple-800
+                    {% endif %}
+                ">
+                    {{ current_claim.status.value|replace('_', ' ')|title }}
+                </span>
+            </div>
+            {% endif %}
 
             {% if service == "KIESRAAD" and law.endswith("kieswet") %}
             <p class="text-gray-600">
@@ -57,42 +77,29 @@
             <p class="text-4xl font-bold text-purple-600 mt-2">
                 € {{ "%.2f"|format(result.benefit_amount / 100) }}
             </p>
-            {% if result.housing_assistance %}
-            <p class="text-lg text-purple-700 mt-2">
-                + € {{ "%.2f"|format(result.housing_assistance / 100) }} woonkostentoeslag
-            </p>
-            {% endif %}
-            {% if result.startup_assistance %}
-            <p class="text-lg text-purple-700 mt-2">
-                + € {{ "%.2f"|format(result.startup_assistance / 100) }} startkapitaal
-            </p>
-            {% endif %}
             {% endif %}
             {% endif %}
         </div>
 
         <div class="mt-6">
-            {% if service == "KIESRAAD" and law.endswith("kieswet") and result.has_voting_rights %}
-            <a href="https://www.kiesraad.nl/actueel/verkiezingen"
-               class="inline-block w-full px-6 py-3 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors">
-                Meer informatie over de verkiezingen
-            </a>
-
-            {% elif service == "TOESLAGEN" and law.endswith("zorgtoeslagwet") %}
-            <a href="/form/zorgtoeslag"
-               class="inline-block w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors">
-                Vraag zorgtoeslag aan
-            </a>
-            {% elif service == "SVB" and law.endswith("algemene_ouderdomswet") %}
-            <a href="/form/aow"
-               class="inline-block w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
-                Vraag AOW aan
-            </a>
-            {% elif service == "GEMEENTE_AMSTERDAM" and law.endswith("participatiewet/bijstand") %}
-            <a href="/form/bijstand"
-               class="inline-block w-full px-6 py-3 bg-purple-600 text-white text-center rounded-md hover:bg-purple-700 transition-colors">
-                Vraag bijstand aan
-            </a>
+            {% if not current_claim %}
+            <button
+                    hx-post="/laws/submit-claim?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                    hx-target="closest div.law-result-card"
+                    class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
+                Aanvragen
+            </button>
+            {% elif current_claim.status.value == 'SUBMITTED' %}
+            <p class="text-sm text-gray-600 text-center">Uw aanvraag wordt beoordeeld</p>
+            {% elif current_claim.status.value == 'APPROVED' %}
+            <p class="text-sm text-green-600 text-center">Uw aanvraag is goedgekeurd</p>
+            {% elif current_claim.status.value == 'DENIED' and current_claim.can_appeal() %}
+            <button
+                    hx-post="/laws/submit-appeal?claim_id={{ current_claim.id }}"
+                    hx-target="closest div.min-h-[16rem]"
+                    class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
+                In bezwaar gaan
+            </button>
             {% endif %}
         </div>
     </div>

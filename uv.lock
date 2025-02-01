@@ -113,6 +113,18 @@ wheels = [
 ]
 
 [[package]]
+name = "eventsourcing"
+version = "9.3.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/41/4f/ea439503e7c68edd703b1d22667f0c2cfa4c16b2d59e54d590025b38b863/eventsourcing-9.3.5.tar.gz", hash = "sha256:30ba7cc28c409abff0005967e9053f2f81334acb796793806444ed081f95a4f6", size = 69955 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/64/76830243518339da01d631acad42b800b0999925905ceb888af747dd458f/eventsourcing-9.3.5-py3-none-any.whl", hash = "sha256:7debbf1fbf5381cd3b072356a00fd21d6bd29ccf526412e3ca061cfe3068a92b", size = 73970 },
+]
+
+[[package]]
 name = "fastapi"
 version = "0.115.8"
 source = { registry = "https://pypi.org/simple" }
@@ -349,6 +361,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "behave" },
+    { name = "eventsourcing" },
     { name = "fastapi" },
     { name = "httpx" },
     { name = "jinja2" },
@@ -363,6 +376,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "behave", specifier = ">=1.2.6" },
+    { name = "eventsourcing", specifier = ">=9.3.5" },
     { name = "fastapi", specifier = ">=0.115.8" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.5" },

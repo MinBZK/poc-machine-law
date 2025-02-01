@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional
 
 import pandas as pd
 
+from claims.application import ClaimsManager
 from .engine import RulesEngine, AbstractServiceProvider
 from .logging_config import IndentLogger
 from .utils import RuleResolver
@@ -126,10 +127,11 @@ class RuleService:
 
 
 class Services(AbstractServiceProvider):
-    def __init__(self, reference_date: str):
+    def __init__(self, reference_date: str, manager: ClaimsManager = None):
         self.resolver = RuleResolver()
         self.services = {service: RuleService(service, self) for service in self.resolver.get_service_laws()}
         self.root_reference_date = reference_date
+        self.manager = manager
 
     def get_discoverable_service_laws(self):
         return self.resolver.get_discoverable_service_laws()
