@@ -112,11 +112,10 @@ PROFILES = {
             }
         }
     },
-    "999993654": {
+    "999993654": {  # Maria Pietersen
         "name": "Maria Pietersen",
         "description": "AOW-gerechtigde met volledige opbouw, gehuwd, partner nog geen AOW-leeftijd",
         "sources": {
-            # Similar complete data structure...
             "RvIG": {
                 "personen": [{
                     "bsn": "999993654",
@@ -129,6 +128,14 @@ PROFILES = {
                     "bsn": "999993654",
                     "partnerschap_type": "HUWELIJK",
                     "partner_bsn": "999993655"
+                }],
+                "verblijfplaats": [{
+                    "bsn": "999993654",
+                    "straat": "Kalverstraat",
+                    "huisnummer": "1",
+                    "postcode": "1012NX",
+                    "woonplaats": "Amsterdam",
+                    "type": "WOONADRES"
                 }]
             },
             "SVB": {
@@ -144,17 +151,25 @@ PROFILES = {
                 }]
             },
             "BELASTINGDIENST": {
-                "inkomen": [{
+                "box1": [{
                     "bsn": "999993654",
-                    "box1": 0,
-                    "box2": 0,
-                    "box3": 0,
-                    "buitenlands": 0
+                    "loon_uit_dienstbetrekking": 0,
+                    "uitkeringen_en_pensioenen": 0,
+                    "winst_uit_onderneming": 0,
+                    "resultaat_overige_werkzaamheden": 0,
+                    "eigen_woning": 0
                 }],
                 "box2": [{
                     "bsn": "999993654",
                     "dividend": 0,
                     "vervreemding_aandelen": 0
+                }],
+                "box3": [{
+                    "bsn": "999993654",
+                    "spaargeld": 0,
+                    "beleggingen": 0,
+                    "onroerend_goed": 0,
+                    "schulden": 0
                 }],
                 "buitenlands_inkomen": [{
                     "bsn": "999993654",
@@ -198,13 +213,6 @@ PROFILES = {
                     "type": "BRIEFADRES"
                 }]
             },
-            "GEMEENTE_AMSTERDAM": {
-                "werk_en_re_integratie": [{
-                    "bsn": "999993655",
-                    "arbeidsvermogen": "VOLLEDIG",
-                    "re_integratie_traject": "Werkstage"
-                }]
-            },
             "BELASTINGDIENST": {
                 "box1": [{
                     "bsn": "999993655",
@@ -213,6 +221,49 @@ PROFILES = {
                     "winst_uit_onderneming": 0,
                     "resultaat_overige_werkzaamheden": 0,
                     "eigen_woning": 0
+                }],
+                "box2": [{
+                    "bsn": "999993655",
+                    "dividend": 0,
+                    "vervreemding_aandelen": 0
+                }],
+                "box3": [{
+                    "bsn": "999993655",
+                    "spaargeld": 0,
+                    "beleggingen": 0,
+                    "onroerend_goed": 0,
+                    "schulden": 0
+                }],
+                "buitenlands_inkomen": [{
+                    "bsn": "999993655",
+                    "bedrag": 0,
+                    "land": "GEEN"
+                }]
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [{
+                    "bsn": "999993655",
+                    "arbeidsvermogen": "VOLLEDIG",
+                    "re_integratie_traject": "Werkstage",
+                    "ontheffing_reden": None,
+                    "ontheffing_einddatum": None
+                }]
+            },
+            "RVZ": {
+                "verzekeringen": [{
+                    "bsn": "999993655",
+                    "polis_status": "ACTIEF",
+                    "verdrag_status": "GEEN",
+                    "zorg_type": "BASIS"
+                }]
+            },
+            "IND": {
+                "verblijfsvergunningen": [{
+                    "bsn": "999993655",
+                    "type": "ONBEPAALDE_TIJD_REGULIER",
+                    "status": "VERLEEND",
+                    "ingangsdatum": "2015-01-01",
+                    "einddatum": None
                 }]
             }
         }
