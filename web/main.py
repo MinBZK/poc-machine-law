@@ -1,4 +1,6 @@
 # web/main.py
+import locale
+
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -8,6 +10,9 @@ from datetime import datetime
 
 from web.routers import laws
 from web.services.profiles import get_profile_data, get_all_profiles
+
+# Set Dutch locale
+locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
 
 app = FastAPI(title="Burger.nl")
 

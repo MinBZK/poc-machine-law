@@ -1,4 +1,6 @@
 # web/routers/laws.py
+import locale
+
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
@@ -11,6 +13,9 @@ from web.services.profiles import get_profile_data
 router = APIRouter(prefix="/laws", tags=["laws"])
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
+# Set Dutch locale if not already set
+if locale.getlocale(locale.LC_TIME)[0] != 'nl_NL':
+    locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
 TODAY = datetime.today().strftime("%Y-%m-%d")
 FORMATTED_DATE = datetime.today().strftime("%-d %B %Y")
 
