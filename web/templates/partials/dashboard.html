@@ -21,7 +21,7 @@
             <div>
                 <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
                 <div class="text-sm text-gray-600 mt-1">
-                    BSN: {{ bsn }} | Geboortedatum: {{ profile.sources.RvIG.personen[0].geboortedatum }}
+                    BSN: {{ bsn }} | Geboortedatum: {{ profile.sources.RvIG.personen[0].geboortedatum|format_date }}
                 </div>
             </div>
             <button

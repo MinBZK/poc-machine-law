@@ -104,6 +104,7 @@ class RuleContext:
     overwrite_input: Dict[str, Any] = field(default_factory=dict)
     outputs: Dict[str, Any] = field(default_factory=dict)
     calculation_date: Optional[str] = None
+    resolved_paths: Dict[str, Any] = field(default_factory=dict)
 
     def track_access(self, path: str):
         """Track accessed data paths"""
@@ -121,6 +122,12 @@ class RuleContext:
             self.path.pop()
 
     async def resolve_value(self, path: str) -> Any:
+        value = await self._resolve_value(path)
+        if isinstance(path, str):
+            self.resolved_paths[path] = value
+        return value
+
+    async def _resolve_value(self, path: str) -> Any:
         """Resolve a value from definitions, services, or sources"""
 
         with logger.indent_block(f"Resolving {path}"):
@@ -480,9 +487,7 @@ class RulesEngine:
         requirements_node.result = requirements_met
         context.pop_path()
 
-        input_values = dict(context.values_cache)
         output_values = {}
-
         if requirements_met:
             # Get required actions including dependencies in order
             required_actions = self.get_required_actions(requested_output, self.actions)
@@ -497,7 +502,7 @@ class RulesEngine:
             logger.warning(f"No output values computed for {calculation_date} {requested_output}")
 
         return {
-            'input': input_values,
+            'input': context.resolved_paths,
             'output': output_values,
             'requirements_met': requirements_met,
             'path': root

@@ -1,33 +1,19 @@
 # web/main.py
-import locale
-from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 from machine.service import Services
-from web.dependencies import FORMATTED_DATE, get_services
+from web.dependencies import FORMATTED_DATE, get_services, STATIC_DIR, templates
 from web.routers import laws
 from web.services.profiles import get_profile_data, get_all_profiles
 
-# Set Dutch locale
-locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
-
 app = FastAPI(title="Burger.nl")
-
-# Setup paths
-BASE_DIR = Path(__file__).resolve().parent
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
 
 # Mount static directory if it exists
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
-# Setup templates
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # Include routers
 app.include_router(laws.router)

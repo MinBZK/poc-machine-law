@@ -1,18 +1,15 @@
 # web/routers/laws.py
 
-from pathlib import Path
 from urllib.parse import unquote
 
 import pandas as pd
 from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi.templating import Jinja2Templates
 
 from machine.service import Services
-from web.dependencies import TODAY, FORMATTED_DATE, get_services
+from web.dependencies import TODAY, FORMATTED_DATE, get_services, templates
 from web.services.profiles import get_profile_data
 
 router = APIRouter(prefix="/laws", tags=["laws"])
-templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
 
 
 @router.get("/profile/")
@@ -80,6 +77,7 @@ async def execute_law(
             "service": service,
             "rule_spec": rule_spec,
             "result": result.output,
+            "input": result.input,
             "requirements_met": result.requirements_met
         }
     )
