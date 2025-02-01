@@ -369,6 +369,41 @@ PROFILES = {
                 }]
             }
         }
+    },
+    "999993659": {
+        "name": "Anna Schmidt",
+        "description": "Duitse student zonder stemrecht voor de Tweede Kamer",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [{
+                    "bsn": "999993659",
+                    "geboortedatum": "1990-01-01",
+                    "verblijfsadres": "Amsterdam",
+                    "land_verblijf": "NEDERLAND",
+                    "nationaliteit": "DUITS"
+                }],
+                "relaties": [{
+                    "bsn": "999993659",
+                    "partnerschap_type": "GEEN",
+                    "partner_bsn": None
+                }],
+                "verblijfplaats": [{
+                    "bsn": "999993659",
+                    "straat": "Kalverstraat",
+                    "huisnummer": "1",
+                    "postcode": "1012NX",
+                    "woonplaats": "Amsterdam",
+                    "type": "WOONADRES"
+                }]
+            },
+            "DUO": {
+                "inschrijvingen": [{
+                    "bsn": "999993659",
+                    "onderwijstype": "WO"
+                }]
+            }
+        }
     }
 }
 
