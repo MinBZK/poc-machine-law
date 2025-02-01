@@ -1,0 +1,26 @@
+<!-- templates/macros/logos.html -->
+{% macro org_logo(law) %}
+    {% if law == "zorgtoeslag" %}
+    <div class="w-16 h-16">
+        <img src="/static/logos/TOESLAGEN.png" alt="Toeslagen logo" class="h-full w-auto object-contain"/>
+    </div>
+    {% elif law == "aow" %}
+    <div class="w-16 h-16">
+        <img src="/static/logos/SVB.png" alt="SVB logo" class="h-full w-auto object-contain"/>
+    </div>
+    {% elif law == "bijstand" %}
+    <div class="w-16 h-16">
+        <img src="/static/logos/GEMEENTE_AMSTERDAM.png" alt="Gemeente Amsterdam logo" class="h-full w-auto object-contain"/>
+    </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro law_title(law) %}
+    {% if law == "zorgtoeslag" %}
+    Zorgtoeslag
+    {% elif law == "aow" %}
+    AOW Pensioen
+    {% elif law == "bijstand" %}
+    Bijstand
+    {% endif %}
+{% endmacro %}

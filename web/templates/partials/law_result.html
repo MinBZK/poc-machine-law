@@ -1,35 +1,29 @@
 <!-- templates/partials/law_result.html -->
+{% from "macros/logos.html" import org_logo, law_title %}
+
 <div class="min-h-[16rem] bg-white rounded-lg shadow">
     {% if error %}
     <div class="p-6">
         <div class="flex items-start justify-between">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {% if law == "zorgtoeslag" %}
-                    Zorgtoeslag
-                    {% elif law == "aow" %}
-                    AOW Pensioen
-                    {% elif law == "bijstand" %}
-                    Bijstand
-                    {% endif %}
+                    {{ law_title(law) }}
                 </h3>
                 <p class="text-red-600">Er is een fout opgetreden bij het berekenen</p>
             </div>
+            <div class="p-2">{{ org_logo(law) }}</div>
         </div>
     </div>
 
     {% elif requirements_met %}
     <div class="p-6 flex flex-col h-full">
         <div class="flex-grow">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                {% if law == "zorgtoeslag" %}
-                Zorgtoeslag
-                {% elif law == "aow" %}
-                AOW Pensioen
-                {% elif law == "bijstand" %}
-                Bijstand
-                {% endif %}
-            </h3>
+            <div class="flex items-start justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    {{ law_title(law) }}
+                </h3>
+                <div class="-mt-2 -mr-2">{{ org_logo(law) }}</div>
+            </div>
 
             {% if law == "zorgtoeslag" and result.is_verzekerde_zorgtoeslag %}
             <p class="text-gray-600">Uw jaarlijkse zorgtoeslag</p>
@@ -88,18 +82,13 @@
         <div class="flex items-start justify-between">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {% if law == "zorgtoeslag" %}
-                    Zorgtoeslag
-                    {% elif law == "aow" %}
-                    AOW Pensioen
-                    {% elif law == "bijstand" %}
-                    Bijstand
-                    {% endif %}
+                    {{ law_title(law) }}
                 </h3>
                 <p class="text-gray-600">
                     U komt niet in aanmerking
                 </p>
             </div>
+            <div class="-mt-2 -mr-2">{{ org_logo(law) }}</div>
         </div>
     </div>
     {% endif %}
