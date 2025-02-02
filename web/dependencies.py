@@ -18,11 +18,12 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
 manager = ClaimsManager()
+services = Services(TODAY, manager)
 
 
 async def get_services():
     """Dependency to get Services instance"""
-    return Services(TODAY, manager)
+    return services
 
 
 def setup_jinja_env(directory: str) -> Jinja2Templates:
