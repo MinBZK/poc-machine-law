@@ -41,4 +41,20 @@ async def root(request: Request, bsn: str = "999993653",
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import uvicorn
+    from multiprocessing import cpu_count
+
+    # Use half the available CPU cores (a common practice)
+    n_workers = cpu_count() // 2
+
+    # Ensure at least 1 worker
+    n_workers = max(n_workers, 1)
+
+    config = uvicorn.Config(
+        app=app,
+        host="0.0.0.0",
+        port=8000,
+        workers=n_workers
+    )
+    server = uvicorn.Server(config)
+    server.run()
