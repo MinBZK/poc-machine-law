@@ -1,12 +1,11 @@
 # web/routers/admin.py
-from fastapi import APIRouter, Request, Depends, HTTPException
 from typing import Dict, List
 
+from fastapi import APIRouter, Form
 from starlette.responses import RedirectResponse
 
-from machine.service import Services
-from web.dependencies import get_services, templates
 from claims.aggregate import ClaimStatus, Claim
+from machine.service import Services
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -24,7 +23,6 @@ def group_claims_by_status(claims: List[Claim]) -> Dict[ClaimStatus, List[Claim]
 
 # web/routers/admin.py
 from fastapi import APIRouter, Request, Depends, HTTPException
-from typing import Dict, List
 from web.dependencies import get_services, templates
 from claims.aggregate import ClaimStatus
 
@@ -74,16 +72,29 @@ async def admin_dashboard(
 async def move_claim(
         request: Request,
         claim_id: str,
-        new_status: str,
+        new_status: str = Form(...),  # This explicitly expects form data
         services: Services = Depends(get_services)
 ):
     """Handle claim movement between status lanes"""
-    claim = services.manager.move_claim(claim_id, ClaimStatus[new_status])
-    return templates.TemplateResponse(
-        "admin/partials/claim_card.html",
-        {"request": request, "claim": claim},
-        headers={"HX-Trigger": "claimMoved"}
-    )
+    print(f"Moving claim {claim_id} to status {new_status}")  # Debug print
+    try:
+        claim = services.manager.get_claim_by_id(claim_id)
+
+        claim.status = ClaimStatus[new_status]
+        services.manager.save(claim)
+
+        # Return the updated card
+        return templates.TemplateResponse(
+            "admin/partials/claim_card.html",
+            {
+                "request": request,
+                "claim": claim,
+                "status": new_status  # Include the status for the hidden input
+            }
+        )
+    except Exception as e:
+        print(f"Error moving claim: {e}")  # Debug print
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/lanes/{service}/{law}/{status}")
@@ -119,7 +130,7 @@ async def view_claim(
         services: Services = Depends(get_services)
 ):
     """View details of a specific claim"""
-    claim = services.manager.repository.get(claim_id)
+    claim = services.manager.get_claim_by_id(claim_id)
     if not claim:
         raise HTTPException(status_code=404, detail="Claim not found")
 

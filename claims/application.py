@@ -26,9 +26,9 @@ class ClaimsManager(Application):
         self._claim_index[key] = claim.id
 
     def submit_claim(self, subject_id: str, law: str, service: str,
-                     ruleset_uuid: UUID, details: Dict) -> str:
+                     rulespec_uuid: UUID, details: Dict) -> str:
         """Submit a new claim"""
-        claim = Claim(subject_id, law, service, ruleset_uuid, details)
+        claim = Claim(subject_id, law, service, rulespec_uuid, details)
         self.save(claim)
         self._index_claim(claim)
         return claim.id
@@ -41,8 +41,8 @@ class ClaimsManager(Application):
 
         if not decision and appeal_window_days is not None:
             claim.add_meta_claim('appeal_window', appeal_window_days, verifier_id)
-        elif not decision and str(claim.ruleset_uuid) in self.ruleset_rules:
-            rule = self.ruleset_rules[str(claim.ruleset_uuid)].get('appeal_window')
+        elif not decision and str(claim.rulespec_uuid) in self.ruleset_rules:
+            rule = self.ruleset_rules[str(claim.rulespec_uuid)].get('appeal_window')
             if rule:
                 claim.add_meta_claim('appeal_window', rule['value'], rule['authority'])
 
@@ -123,6 +123,12 @@ class ClaimsManager(Application):
                 claims.append(claim)
         return claims
 
+    def get_claim_by_id(self, claim_id: str) -> Optional[Claim]:
+        """Get claim for a specific claim"""
+        if isinstance(claim_id, str):
+            claim_id = UUID(claim_id)
+        return self.repository.get(claim_id)
+
 
 # Usage example:
 def main():
@@ -138,7 +144,7 @@ def main():
         subject_id="123456789",
         law="housing_act_2024",
         service="housing_assistance",
-        ruleset_uuid=ruleset_id,
+        rulespec_uuid=ruleset_id,
         details={
             "monthly_income": 2500,
             "rent_amount": 1200,

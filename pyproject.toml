@@ -13,6 +13,7 @@ dependencies = [
     "jsonschema>=4.23.0",
     "pandas>=2.2.3",
     "pydantic>=2.10.5",
+    "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "uvicorn>=0.34.0",

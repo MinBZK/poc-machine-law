@@ -137,7 +137,7 @@ async def submit_claim(
         subject_id=bsn,
         law=law,
         service=service,
-        ruleset_uuid=rule_spec.get('id'),
+        rulespec_uuid=rule_spec.get('uuid'),
         details={
             "calculation_date": TODAY,
             "calculated_amount": result.output.get("hoogte_toeslag") if "hoogte_toeslag" in result.output else None,

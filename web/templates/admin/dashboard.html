@@ -1,4 +1,4 @@
-{# templates/admin/dashboard.html #}
+{% from "macros/logos.html" import org_logo %}
 {% extends "admin/base.html" %}
 
 {% block content %}
@@ -6,8 +6,9 @@
     {# Top navigation bar #}
     <div class="bg-white shadow">
         <div class="px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Claims Dashboard</h1>
-
+            <h1 class="text-2xl font-bold">Dashboard - {{ current_service|replace('_', ' ')|replace('/', ' ')|title
+                }}</h1>
+            <div class="-mt-2 -mr-2">{{ org_logo(current_service) }}</div>
             {# Service selector #}
             <div class="relative">
                 <select
@@ -36,7 +37,7 @@
         {% for law in service_laws %}
         <div class="mb-8 bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold">{{ law }}</h2>
+                <h2 class="text-xl font-semibold">{{ law|replace('_', ' ')|replace('/', ' ')|title }}</h2>
             </div>
 
             <div class="p-6">

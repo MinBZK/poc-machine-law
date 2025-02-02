@@ -26,11 +26,11 @@ class Evidence:
 
 class Claim(Aggregate):
     @event('ClaimSubmitted')
-    def __init__(self, subject_id: str, law: str, service: str, ruleset_uuid: UUID, details: Dict):
+    def __init__(self, subject_id: str, law: str, service: str, rulespec_uuid: UUID, details: Dict):
         self.subject_id = subject_id
         self.law = law
         self.service = service
-        self.ruleset_uuid = ruleset_uuid
+        self.rulespec_uuid = rulespec_uuid
         self.details = details
         self.status = ClaimStatus.SUBMITTED
         self.submitted_at = datetime.now()

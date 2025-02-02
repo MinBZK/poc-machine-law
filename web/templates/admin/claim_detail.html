@@ -1,4 +1,3 @@
-{# templates/admin/claim_detail.html #}
 {% extends "admin/base.html" %}
 
 {% block content %}
@@ -12,8 +11,9 @@
                 <p><strong>BSN:</strong> {{ claim.subject_id }}</p>
                 <p><strong>Law:</strong> {{ claim.law }}</p>
                 <p><strong>Service:</strong> {{ claim.service }}</p>
+                <p><strong>Rulespec UUID:</strong> {{ claim.rulespec_uuid }}</p>
                 <p><strong>Status:</strong> {{ claim.status.value }}</p>
-                <p><strong>Submitted:</strong> {{ claim.submitted_at|format_date }}</p>
+                <p><strong>Submitted:</strong> {{ claim.submitted_at }}</p>
             </div>
         </div>
 
