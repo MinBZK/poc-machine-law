@@ -2,10 +2,13 @@
 
 {% block tile_content %}
 {% if result.pension_amount %}
-<p class="text-gray-600">Uw maandelijkse AOW pensioen</p>
-<p class="text-4xl font-bold text-blue-600 mt-2">
-    € {{ "%.2f"|format(result.pension_amount / 100) }}
-</p>
+<div>
+    <h4 class="text-sm font-medium text-gray-500 mb-1">Uw AOW pensioen is waarschijnlijk</h4>
+    <div class="flex items-baseline space-x-2">
+        <span class="text-4xl font-bold text-blue-600"> € {{ "%.2f"|format(result.pension_amount / 100) }}</span>
+        <span class="text-gray-500">per maand</span>
+    </div>
+</div>
 {% if result.get('pension_percentage') %}
 <p class="text-sm text-gray-600 mt-2">
     Opbouw: {{ result.pension_percentage }}%

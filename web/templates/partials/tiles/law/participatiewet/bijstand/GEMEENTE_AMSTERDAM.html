@@ -1,14 +1,14 @@
 {% extends "partials/tiles/base_tile.html" %}
 
 {% block tile_content %}
-<p class="text-gray-600">Uw maandelijkse bijstandsuitkering</p>
-{% if result.benefit_amount %}
-<p class="text-4xl font-bold text-purple-600 mt-2">
-    € {{ "%.2f"|format(result.benefit_amount / 100) }}
-</p>
-{% endif %}
+<div>
+    <h4 class="text-sm font-medium text-gray-500 mb-1">Uw bijstandsuitkering is waarschijnlijk</h4>
+    <div class="flex items-baseline space-x-2">
+        <span class="text-4xl font-bold text-purple-600">€ {{ "%.2f"|format(result.benefit_amount / 100) }}</span>
+        <span class="text-gray-500">per maand</span>
+    </div>
+</div>
 {% endblock %}
-
 
 {% block submit_button %}
 <button
@@ -17,4 +17,17 @@
         class="w-full px-6 py-3 bg-purple-600 text-white text-center rounded-md hover:bg-purple-700 transition-colors">
     Bijstand aanvragen
 </button>
+{% endblock %}
+
+{% block submitted_status %}
+<p class="text-sm text-gray-600 text-center">
+    Heeft u vragen? Bel 14 020 of kijk op <a href="https://amsterdam.nl/bijstand">amsterdam.nl/bijstand</a>.
+</p>
+{% endblock %}
+
+
+{% block not_eligible_questions %}
+<p class="text-sm text-gray-600 text-center">
+    Heeft u vragen? Bel 14 020 of kijk op <a href="https://amsterdam.nl/bijstand">amsterdam.nl/bijstand</a>.
+</p>
 {% endblock %}

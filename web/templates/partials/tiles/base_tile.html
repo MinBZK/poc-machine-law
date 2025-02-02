@@ -1,9 +1,9 @@
 {% from "macros/logos.html" import org_logo %}
 
 <div class="law-result-card min-h-64 bg-white rounded-lg shadow">
-    {% if error %}
-    <div class="p-6">
-        <div class="flex items-start justify-between">
+    <div class="p-6 flex flex-col h-full">
+        {% if error %}
+        <div class="flex-grow space-y-6">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">
                     {{ rule_spec.name }}
@@ -12,73 +12,91 @@
             </div>
             <div class="p-2">{{ org_logo(service) }}</div>
         </div>
-    </div>
-
-    {% elif requirements_met %}
-    <div class="p-6 flex flex-col h-full">
-        <div class="flex-grow">
+        {% elif requirements_met %}
+        <div class="flex-grow space-y-6">
             <div class="flex items-start justify-between">
-                <h3 class="text-lg font-semibold text-gray-900">
-                    {{ rule_spec.name }}
-                </h3>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        {{ rule_spec.name }}
+                    </h3>
+                    {% if current_claim %}
+                    <div class="mt-2">
+                        {% include "partials/tiles/components/claim_status_badge.html" %}
+                    </div>
+                    {% endif %}
+                </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
 
-            {% if current_claim %}
-            <div class="mb-4">
-                {% include "partials/tiles/components/claim_status_badge.html" %}
-            </div>
-            {% endif %}
-
             {% block tile_content %}{% endblock %}
+
+            {% include "partials/tiles/components/next_steps.html" %}
         </div>
 
         <div class="mt-6">
             {% block actions %}
-                {% if not current_claim %}
-                    {% block submit_button %}
-                    <button
-                        hx-post="/laws/submit-claim?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
-                        hx-target="closest div.law-result-card"
-                        class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
-                        Aanvragen
-                    </button>
-                    {% endblock %}
-                {% elif current_claim.status.value == 'SUBMITTED' %}
-                    {% block submitted_status %}
-                    <p class="text-sm text-gray-600 text-center">Uw aanvraag wordt beoordeeld</p>
-                    {% endblock %}
-                {% elif current_claim.status.value == 'APPROVED' %}
-                    {% block approved_status %}
-                    <p class="text-sm text-green-600 text-center">Uw aanvraag is goedgekeurd</p>
-                    {% endblock %}
-                {% elif current_claim.status.value == 'DENIED' and current_claim.can_appeal() %}
-                    {% block appeal_button %}
-                    <button
+            {% if not current_claim %}
+            {% block submit_button %}
+            <button
+                    hx-post="/laws/submit-claim?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                    hx-target="closest div.law-result-card"
+                    class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
+                Aanvragen
+            </button>
+            {% endblock %}
+            {% elif current_claim.status.value == 'SUBMITTED' %}
+            {% block submitted_status %}
+            <p class="text-sm text-gray-600 text-center">
+                Heeft u vragen? Klik hier, of bel 1234.
+            </p>
+            {% endblock %}
+            {% elif current_claim.status.value == 'APPROVED' %}
+            {% block approved_status %}
+            <p class="text-sm text-green-600 text-center">Uw aanvraag is goedgekeurd</p>
+            {% endblock %}
+            {% elif current_claim.status.value == 'DENIED' and current_claim.can_appeal() %}
+            {% block appeal_button %}
+            <div class="space-y-4">
+                <button
                         hx-post="/laws/submit-appeal?claim_id={{ current_claim.id }}"
                         hx-target="closest div.min-h-[16rem]"
                         class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
-                        In bezwaar gaan
-                    </button>
-                    {% endblock %}
+                    In bezwaar gaan
+                </button>
+                {% if current_claim.meta_claims.get('appeal_window') %}
+                <p class="text-xs text-gray-600 text-center">
+                    U kunt binnen {{ current_claim.meta_claims.appeal_window.value }} dagen bezwaar maken tegen deze
+                    beslissing
+                </p>
                 {% endif %}
+            </div>
+            {% endblock %}
+            {% endif %}
             {% endblock %}
         </div>
-    </div>
-
-    {% else %}
-    <div class="p-6">
-        <div class="flex items-start justify-between">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {{ rule_spec.name }}
-                </h3>
-                <p class="text-gray-600">
-                    U komt niet in aanmerking
-                </p>
+        {% else %}
+        <div class="flex-grow space-y-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        {{ rule_spec.name }}
+                    </h3>
+                    <h4 class="text-sm font-medium text-gray-500 mb-1">
+                        U komt niet in aanmerking
+                    </h4>
+                </div>
+                <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
-            <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
         </div>
+
+        <div class="mt-6">
+            {% block not_eligible_questions %}
+            <p class="text-sm text-gray-600 text-center">
+                Heeft u vragen? Klik hier, of bel 1234.
+            </p>
+            {% endblock %}
+        </div>
+
+        {% endif %}
     </div>
-    {% endif %}
 </div>

@@ -1,23 +1,26 @@
 {% extends "partials/tiles/base_tile.html" %}
 
 {% block tile_content %}
-<p class="text-gray-600">
-    Voor de verkiezingen van <strong>{{ input['$ELECTION_DATE']|format_date }}</strong> heeft u
-</p>
-{% if result.has_voting_rights %}
-<p class="text-4xl font-bold text-pink-600 mt-2">
-    STEMRECHT
-</p>
-{% else %}
-<p class="text-4xl font-bold text-pink-600 mt-2">
-    GEEN stemrecht
-</p>
+<div>
+    <h4 class="text-sm font-medium text-gray-500 mb-1">
+        Voor de verkiezingen van <strong>{{input['$ELECTION_DATE']|format_date }}</strong> heeft u
+    </h4>
+    <div class="flex items-baseline space-x-2">
+        {% if result.has_voting_rights %}
+        <p class="text-4xl font-bold text-pink-600 mt-2">
+            STEMRECHT
+        </p>
+        {% else %}
+        <p class="text-4xl font-bold text-pink-600 mt-2">
+            GEEN stemrecht
+        </p>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
 
 {% block actions %}
-<a href="https://www.kiesraad.nl/actueel/verkiezingen"
-   class="inline-block w-full px-6 py-3 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors">
-    Meer informatie over de verkiezingen
-</a>
+<p class="text-sm text-gray-600 text-center">
+    <a href="https://www.kiesraad.nl/actueel/verkiezingen">Meer informatie over de verkiezingen</a>
+</p>
 {% endblock %}

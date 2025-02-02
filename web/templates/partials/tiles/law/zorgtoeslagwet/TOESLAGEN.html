@@ -1,10 +1,13 @@
 {% extends "partials/tiles/base_tile.html" %}
 
 {% block tile_content %}
-<p class="text-gray-600">Uw jaarlijkse zorgtoeslag</p>
-<p class="text-4xl font-bold text-green-600 mt-2">
-    € {{ "%.2f"|format(result.hoogte_toeslag / 100) }}
-</p>
+<div>
+    <h4 class="text-sm font-medium text-gray-500 mb-1">Uw zorgtoeslag is waarschijnlijk</h4>
+    <div class="flex items-baseline space-x-2">
+        <span class="text-4xl font-bold text-green-600"> € {{ "%.2f"|format(result.hoogte_toeslag / 100) }}</span>
+        <span class="text-gray-500">per jaar</span>
+    </div>
+</div>
 {% endblock %}
 
 {% block submit_button %}
