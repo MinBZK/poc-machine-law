@@ -1,13 +1,29 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from urllib.parse import unquote
 import pandas as pd
-from uuid import uuid4
+from pathlib import Path
 
 from machine.service import Services
 from web.dependencies import TODAY, FORMATTED_DATE, get_services, templates
 from web.services.profiles import get_profile_data
 
 router = APIRouter(prefix="/laws", tags=["laws"])
+
+
+def get_tile_template(service: str, law: str) -> str:
+    """
+    Get the appropriate tile template for the service and law.
+    Falls back to a generic template if no specific template exists.
+    """
+    specific_template = f"partials/tiles/law/{law}/{service}.html"
+
+    # We'll let Jinja handle the template existence check
+    # If the specific template doesn't exist, it will raise a TemplateNotFound exception
+    try:
+        templates.get_template(specific_template)
+        return specific_template
+    except:
+        return "partials/tiles/fallback_tile.html"
 
 
 @router.get("/profile/")
@@ -31,19 +47,23 @@ async def switch_profile(request: Request, bsn: str = "999993653"):
 async def evaluate_law(bsn, law, service, services):
     # Decode the law path
     law = unquote(law)
+
     # Get the rule specification
     rule_spec = services.resolver.get_rule_spec(law, TODAY, service)
     if not rule_spec:
         raise HTTPException(status_code=400, detail="Invalid law specified")
+
     # Get profile data for the BSN
     profile_data = get_profile_data(bsn)
     if not profile_data:
         raise HTTPException(status_code=404, detail="Profile not found")
+
     # Load source data into services
     for service_name, tables in profile_data["sources"].items():
         for table_name, data in tables.items():
             df = pd.DataFrame(data)
             services.set_source_dataframe(service_name, table_name, df)
+
     # Execute the law
     result = await services.evaluate(
         service,
@@ -62,13 +82,31 @@ async def execute_law(
         bsn: str,
         services: Services = Depends(get_services)
 ):
-    law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+    """Execute a law and render its result using the appropriate template"""
+    try:
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+    except Exception as e:
+        # Return error state using the same template
+        return templates.TemplateResponse(
+            get_tile_template(service, law),
+            {
+                "request": request,
+                "bsn": bsn,
+                "law": law,
+                "service": service,
+                "rule_spec": {"name": law.split('/')[-1].replace('_', ' ').title()},
+                "error": True
+            }
+        )
 
-    # Check if there's an existing claim for this law/service/BSN combination
+    # Check if there's an existing claim
     existing_claims = services.manager.get_claim(law, service, bsn)
 
+    # Get the appropriate template for this law
+    template_path = get_tile_template(service, law)
+
     return templates.TemplateResponse(
-        "partials/law_result.html",
+        template_path,
         {
             "bsn": bsn,
             "request": request,
@@ -108,9 +146,12 @@ async def submit_claim(
         }
     )
 
-    # Return the updated law result partial with the new claim
+    # Get the appropriate template for this law
+    template_path = get_tile_template(service, law)
+
+    # Return the updated law result with the new claim
     return templates.TemplateResponse(
-        "partials/law_result.html",
+        template_path,
         {
             "bsn": bsn,
             "request": request,
