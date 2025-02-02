@@ -31,7 +31,12 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
     def format_date(date_str: str) -> str:
         if not date_str:
             return ""
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+
+        if isinstance(date_str, str):
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        elif isinstance(date_str, datetime):
+            date_obj = date_str
+
         return date_obj.strftime("%-d %B %Y")
 
     templates.env.filters["format_date"] = format_date

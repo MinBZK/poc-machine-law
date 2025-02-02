@@ -1,0 +1,69 @@
+{# templates/admin/dashboard.html #}
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    {# Top navigation bar #}
+    <div class="bg-white shadow">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Claims Dashboard</h1>
+
+            {# Service selector #}
+            <div class="relative">
+                <select
+                        class="appearance-none bg-white border rounded-md py-2 pl-4 pr-10 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onchange="window.location.href = '/admin/' + this.value">
+                    {% for service_name in available_services %}
+                    <option value="{{ service_name }}"
+                            {% if service_name== current_service %}selected{% endif %}>
+                        {{ service_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="absolute right-3 top-3 pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clip-rule="evenodd"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Main content #}
+    <div class="p-6">
+        {% for law in service_laws %}
+        <div class="mb-8 bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold">{{ law }}</h2>
+            </div>
+
+            <div class="p-6">
+                <div class="flex gap-4 overflow-x-auto pb-4">
+                    {% for status in ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'DENIED', 'APPEALED'] %}
+                    <div class="w-64 flex-shrink-0">
+                        <div class="bg-gray-50 p-2 rounded-t border border-gray-200">
+                            <h4 class="font-medium">{{ status|replace('_', ' ')|title }}</h4>
+                            <div class="text-sm text-gray-600">
+                                {{ service_claims[law][status]|length }} claims
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-2 min-h-64 border-x border-b border-gray-200 rounded-b"
+                             hx-get="/admin/lanes/{{ current_service }}/{{ law }}/{{ status }}"
+                             hx-trigger="load, claimMoved from:body"
+                             hx-ext="sortable"
+                             sortable="true"
+                             sortable-group="claims-{{ current_service }}-{{ law }}"
+                             sortable-drop="/admin/claims/{claim_id}/move?new_status={{ status }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

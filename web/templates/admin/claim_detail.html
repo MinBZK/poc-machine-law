@@ -1,0 +1,46 @@
+{# templates/admin/claim_detail.html #}
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="p-6">
+    <h1 class="text-2xl font-bold mb-6">Claim Details</h1>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="mb-4">
+            <h2 class="text-lg font-semibold">Basic Information</h2>
+            <div class="mt-2">
+                <p><strong>BSN:</strong> {{ claim.subject_id }}</p>
+                <p><strong>Law:</strong> {{ claim.law }}</p>
+                <p><strong>Service:</strong> {{ claim.service }}</p>
+                <p><strong>Status:</strong> {{ claim.status.value }}</p>
+                <p><strong>Submitted:</strong> {{ claim.submitted_at|format_date }}</p>
+            </div>
+        </div>
+
+        {% if claim.decisions %}
+        <div class="mb-4">
+            <h2 class="text-lg font-semibold">Decisions</h2>
+            <div class="mt-2">
+                {% for decision in claim.decisions %}
+                <div class="mb-2 p-3 bg-gray-50 rounded">
+                    <p><strong>Verifier:</strong> {{ decision.verifier_id }}</p>
+                    <p><strong>Decision:</strong> {{ "Approved" if decision.decision else "Denied" }}</p>
+                    <p><strong>Reason:</strong> {{ decision.reason }}</p>
+                    <p><strong>Date:</strong> {{ decision.verified_at|format_date }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if claim.details %}
+        <div class="mb-4">
+            <h2 class="text-lg font-semibold">Details</h2>
+            <div class="mt-2">
+                <pre class="bg-gray-50 p-3 rounded">{{ claim.details|tojson(indent=2) }}</pre>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

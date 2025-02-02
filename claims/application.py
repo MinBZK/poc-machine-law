@@ -88,6 +88,41 @@ class ClaimsManager(Application):
             'status': claim.status
         }
 
+    def move_claim(self, claim_id: str, new_status: ClaimStatus) -> Claim:
+        """Move a claim to a new status"""
+        claim = self.repository.get(claim_id)
+
+        # Add any necessary validation logic here
+        if new_status == ClaimStatus.UNDER_REVIEW and claim.status != ClaimStatus.SUBMITTED:
+            raise ValueError("Only submitted claims can be moved to review")
+
+        claim.status = new_status
+        self.save(claim)
+        return claim
+
+    def get_claims_by_law_and_status(
+            self,
+            law: str,
+            service: str,
+            status: ClaimStatus
+    ) -> List[Claim]:
+        """Get claims for a specific law and status"""
+        return [
+            claim for claim in self.get_claims_by_law(law, service)
+            if claim.status == status
+        ]
+
+    def get_claims_by_law(self, law: str, service: str) -> List[Claim]:
+        """Get all claims for a specific law and service combination"""
+        claims = []
+        print(f"Looking for claims with law={law}, service={service}")  # Debug print
+        print(f"Current index: {self._claim_index}")  # Debug print
+        for key, claim_id in self._claim_index.items():
+            claim = self.repository.get(claim_id)
+            if claim.law == law and claim.service == service:
+                claims.append(claim)
+        return claims
+
 
 # Usage example:
 def main():

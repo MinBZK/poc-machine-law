@@ -1,11 +1,11 @@
 # web/main.py
 
-import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 
 from machine.service import Services
 from web.dependencies import FORMATTED_DATE, get_services, STATIC_DIR, templates
+from web.routers import admin
 from web.routers import laws
 from web.services.profiles import get_profile_data, get_all_profiles
 
@@ -17,6 +17,7 @@ if STATIC_DIR.exists():
 
 # Include routers
 app.include_router(laws.router)
+app.include_router(admin.router)
 
 
 @app.get("/")
@@ -54,7 +55,8 @@ if __name__ == "__main__":
         app=app,
         host="0.0.0.0",
         port=8000,
-        workers=n_workers
+        workers=n_workers,
+        reload=True,
     )
     server = uvicorn.Server(config)
     server.run()
