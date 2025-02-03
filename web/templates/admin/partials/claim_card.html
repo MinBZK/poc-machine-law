@@ -1,19 +1,24 @@
 {# templates/admin/partials/claim_card.html #}
-<div class="mb-2 p-3 bg-white border rounded shadow-sm hover:bg-gray-50 cursor-move"
-     data-claim-id="{{ claim.id }}">
-    <div class="font-medium">BSN: {{ claim.subject_id }}</div>
-    <div class="text-sm text-gray-600">
-        Submitted: {{ claim.submitted_at|format_date }}
+<form class="mb-2"
+      hx-post="/admin/claims/{{ claim.id }}/move"
+      hx-swap="outerHTML">
+    <input type="hidden" name="new_status" value="{{ status }}">
+    <div class="p-3 bg-white border rounded shadow-sm hover:bg-gray-50 cursor-move"
+         data-claim-id="{{ claim.id }}">
+        <div class="font-medium">BSN: {{ claim.subject_id }}</div>
+        <div class="text-sm text-gray-600">
+            Submitted: {{ claim.submitted_at|format_date }}
+        </div>
+        {% if claim.decisions %}
+        <div class="mt-2 text-sm">
+            Latest decision: {{ claim.decisions[-1].reason }}
+        </div>
+        {% endif %}
+        <div class="mt-2">
+            <a href="/admin/claims/{{ claim.id }}"
+               class="text-sm text-blue-600 hover:underline">
+                View Details
+            </a>
+        </div>
     </div>
-    {% if claim.decisions %}
-    <div class="mt-2 text-sm">
-        Latest decision: {{ claim.decisions[-1].reason }}
-    </div>
-    {% endif %}
-    <div class="mt-2">
-        <a href="/admin/claims/{{ claim.id }}"
-           class="text-sm text-blue-600 hover:underline">
-            View Details
-        </a>
-    </div>
-</div>
+</form>

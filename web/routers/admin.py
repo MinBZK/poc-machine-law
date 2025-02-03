@@ -72,24 +72,31 @@ async def admin_dashboard(
 async def move_claim(
         request: Request,
         claim_id: str,
-        new_status: str = Form(...),  # This explicitly expects form data
+        new_status: str = Form(...),
         services: Services = Depends(get_services)
 ):
     """Handle claim movement between status lanes"""
     print(f"Moving claim {claim_id} to status {new_status}")  # Debug print
     try:
-        claim = services.manager.get_claim_by_id(claim_id)
 
-        claim.status = ClaimStatus[new_status]
-        services.manager.save(claim)
+        try:
+            new_status_enum = ClaimStatus(new_status)
+        except KeyError:
+            raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
 
-        # Return the updated card
+        # Use the move_claim method from ClaimsManager
+        try:
+            claim = services.manager.move_claim(claim_id, new_status_enum)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # Return just the updated card
         return templates.TemplateResponse(
             "admin/partials/claim_card.html",
             {
                 "request": request,
                 "claim": claim,
-                "status": new_status  # Include the status for the hidden input
+                "status": new_status
             }
         )
     except Exception as e:
@@ -106,21 +113,25 @@ async def get_lane_claims(
         services: Services = Depends(get_services)
 ):
     """Get claims for a specific lane"""
-    storage_law = f"{law.lower()}wet" if law == "ZORGTOESLAG" else law.lower()
-    claims = services.manager.get_claims_by_law(storage_law, service)
-    grouped_claims = group_claims_by_status(claims)
-    lane_claims = grouped_claims.get(status, [])
+    try:
+        storage_law = f"{law.lower()}wet" if law == "ZORGTOESLAG" else law.lower()
+        claims = services.manager.get_claims_by_law(storage_law, service)
+        grouped_claims = group_claims_by_status(claims)
+        lane_claims = grouped_claims.get(status, [])
 
-    return templates.TemplateResponse(
-        "admin/partials/lane_content.html",
-        {
-            "request": request,
-            "claims": lane_claims,
-            "status": status,
-            "service": service,
-            "law": law
-        }
-    )
+        return templates.TemplateResponse(
+            "admin/partials/lane_content.html",
+            {
+                "request": request,
+                "claims": lane_claims,
+                "status": status,
+                "service": service,
+                "law": law
+            }
+        )
+    except Exception as e:
+        print(f"Error getting lane claims: {e}")  # Debug print
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/claims/{claim_id}")

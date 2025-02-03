@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/sortable.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .htmx-swapping {
@@ -21,9 +21,44 @@
         .dragging {
             opacity: 0.5;
         }
+
+        .sortable-ghost {
+            opacity: 0.5;
+            background: #f8fafc;
+        }
+
+        .sortable-drag {
+            background: white;
+        }
+
+        .lane {
+            min-height: 100px;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
 {% block content %}{% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Sortable on all lanes
+        document.querySelectorAll('.lane').forEach(function (lane) {
+            new Sortable(lane, {
+                group: 'claims',
+                animation: 150,
+                draggable: 'form',  // Make the form draggable
+                onEnd: function (evt) {
+                    const form = evt.item;  // The form is now the dragged item
+                    const newStatus = evt.to.getAttribute('data-status');
+                    const statusInput = form.querySelector('input[name="new_status"]');
+                    if (statusInput && newStatus) {
+                        statusInput.value = newStatus;
+                        htmx.trigger(form, 'submit');
+                    }
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>
