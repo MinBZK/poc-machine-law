@@ -137,6 +137,10 @@ async def get_lane_claims(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+import json
+from datetime import datetime
+
+
 @router.get("/claims/{claim_id}")
 async def view_claim(
         request: Request,
@@ -147,6 +151,44 @@ async def view_claim(
     claim = services.manager.get_claim_by_id(claim_id)
     if not claim:
         raise HTTPException(status_code=404, detail="Claim not found")
+
+    # Get events for the claim
+    notification_log = services.manager.notification_log
+    events = []
+
+    # Get notifications in batches of 10 (the section size limit)
+    start = 1
+    while True:
+        try:
+            notifications = notification_log.select(start=start, limit=10)
+            if not notifications:
+                break
+
+            for notification in notifications:
+                if notification.originator_id == claim.id:
+                    # Decode the state from bytes to JSON
+                    state_data = json.loads(notification.state.decode('utf-8'))
+
+                    # Extract timestamp from state if available
+                    timestamp = state_data.get('timestamp', {}).get('_data_', None)
+                    if timestamp:
+                        timestamp = datetime.fromisoformat(timestamp)
+
+                    events.append({
+                        'timestamp': timestamp or str(notification.originator_version),
+                        'event_type': notification.topic.split('.')[-1],  # Get just the event name
+                        'data': {k: v for k, v in state_data.items()
+                                 if k not in ['timestamp', 'originator_topic']}  # Filter out metadata
+                    })
+
+            start += 10
+        except ValueError:
+            # We've reached the end of the notifications
+            break
+
+    # Sort events by timestamp
+    events.sort(key=lambda x: str(x['timestamp']))
+    claim.events = events
 
     return templates.TemplateResponse(
         "admin/claim_detail.html",

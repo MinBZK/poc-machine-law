@@ -12,7 +12,7 @@
                 <p><strong>Law:</strong> {{ claim.law }}</p>
                 <p><strong>Service:</strong> {{ claim.service }}</p>
                 <p><strong>Rulespec UUID:</strong> {{ claim.rulespec_uuid }}</p>
-                <p><strong>Status:</strong> {{ claim.status.value }}</p>
+                <p><strong>Status:</strong> {{ claim.status }}</p>
                 <p><strong>Submitted:</strong> {{ claim.submitted_at }}</p>
             </div>
         </div>
@@ -38,6 +38,29 @@
             <h2 class="text-lg font-semibold">Details</h2>
             <div class="mt-2">
                 <pre class="bg-gray-50 p-3 rounded">{{ claim.details|tojson(indent=2) }}</pre>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if claim.events %}
+        <div class="mb-4">
+            <h2 class="text-lg font-semibold">Event History</h2>
+            <div class="mt-2 divide-y divide-gray-200">
+                {% for event in claim.events %}
+                <div class="py-3">
+                    <div class="flex items-center">
+                        <div class="w-32 flex-shrink-0">
+                            <span class="text-sm text-gray-500">{{ event.timestamp|format_date }}</span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-medium">{{ event.event_type }}</p>
+                            {% if event.data %}
+                            <pre class="mt-1 text-sm bg-gray-50 p-2 rounded">{{ event.data|tojson(indent=2) }}</pre>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
         {% endif %}
