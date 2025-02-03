@@ -44,17 +44,17 @@
                 Aanvragen
             </button>
             {% endblock %}
-            {% elif current_claim.status.value == 'SUBMITTED' %}
+            {% elif current_claim.status == 'SUBMITTED' %}
             {% block submitted_status %}
             <p class="text-sm text-gray-600 text-center">
                 Heeft u vragen? Klik hier, of bel 1234.
             </p>
             {% endblock %}
-            {% elif current_claim.status.value == 'APPROVED' %}
+            {% elif current_claim.status == 'APPROVED' %}
             {% block approved_status %}
             <p class="text-sm text-green-600 text-center">Uw aanvraag is goedgekeurd</p>
             {% endblock %}
-            {% elif current_claim.status.value == 'DENIED' and current_claim.can_appeal() %}
+            {% elif current_claim.status == 'DENIED' and current_claim.can_appeal() %}
             {% block appeal_button %}
             <div class="space-y-4">
                 <button

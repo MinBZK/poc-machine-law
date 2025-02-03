@@ -10,14 +10,17 @@ from machine.service import Services
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-def group_claims_by_status(claims: List[Claim]) -> Dict[ClaimStatus, List[Claim]]:
-    """
-    Groups claims by their status.
-    Returns a dict where each key is a ClaimStatus and value is a list of claims.
-    """
-    grouped = {status.value: [] for status in ClaimStatus}  # Initialize empty list for each status
+def group_claims_by_status(claims):
+    from claims.aggregate import ClaimStatus, get_status_value
+
+    # Initialize with all possible statuses
+    grouped = {status.value: [] for status in ClaimStatus}
+
     for claim in claims:
-        grouped[claim.status.value].append(claim)
+        # Use the helper function to get status value consistently
+        status_value = get_status_value(claim.status)
+        grouped[status_value].append(claim)
+
     return grouped
 
 

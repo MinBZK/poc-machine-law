@@ -1,18 +1,18 @@
 <div class="flex items-center space-x-3">
     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-        {% if current_claim.status.value == 'SUBMITTED' %}
+        {% if current_claim.status == 'SUBMITTED' %}
             bg-blue-100 text-blue-800
-        {% elif current_claim.status.value == 'UNDER_REVIEW' %}
+        {% elif current_claim.status == 'UNDER_REVIEW' %}
             bg-yellow-100 text-yellow-800
-        {% elif current_claim.status.value == 'APPROVED' %}
+        {% elif current_claim.status == 'APPROVED' %}
             bg-green-100 text-green-800
-        {% elif current_claim.status.value == 'DENIED' %}
+        {% elif current_claim.status == 'DENIED' %}
             bg-red-100 text-red-800
-        {% elif current_claim.status.value == 'APPEALED' %}
+        {% elif current_claim.status == 'APPEALED' %}
             bg-purple-100 text-purple-800
         {% endif %}
     ">
-        {{ current_claim.status.value|replace('_', ' ')|title }}
+        {{ current_claim.status|replace('_', ' ')|title }}
     </span>
 
     {% if current_claim.submitted_at %}

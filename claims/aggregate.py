@@ -1,12 +1,14 @@
-from eventsourcing.domain import Aggregate, event
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional, Dict, List
-from dataclasses import dataclass
+from typing import Optional, Dict
 from uuid import UUID
 
+from eventsourcing.domain import Aggregate, event
+from eventsourcing.persistence import Transcoding
 
-class ClaimStatus(Enum):
+
+class ClaimStatus(str, Enum):
     SUBMITTED = "SUBMITTED"
     UNDER_REVIEW = "UNDER_REVIEW"
     APPROVED = "APPROVED"
@@ -14,6 +16,36 @@ class ClaimStatus(Enum):
     APPEALED = "APPEALED"
     APPEAL_APPROVED = "APPEAL_APPROVED"
     APPEAL_DENIED = "APPEAL_DENIED"
+
+
+class ClaimStatusTranscoding(Transcoding):
+    @staticmethod
+    def can_handle(obj: object) -> bool:
+        return isinstance(obj, (ClaimStatus, str))
+
+    @staticmethod
+    def encode(obj: ClaimStatus) -> str:
+        if isinstance(obj, str):
+            return obj
+        return obj.value
+
+    @staticmethod
+    def decode(data: str) -> str:  # Changed to return str instead of ClaimStatus
+        if isinstance(data, ClaimStatus):
+            return data.value
+        return data  # Keep it as a string
+
+
+# Register the transcoding
+Transcoding.register(ClaimStatusTranscoding)
+
+
+# Helper function for consistent status access
+def get_status_value(status) -> str:
+    """Get string value of status regardless of type"""
+    if isinstance(status, ClaimStatus):
+        return status.value
+    return status
 
 
 @dataclass
@@ -73,6 +105,11 @@ class Claim(Aggregate):
             'reason': reason,
             'verified_at': datetime.now()
         })
+
+    @event('StatusChanged')
+    def change_status(self, new_status: ClaimStatus):
+        """Change the status of a claim"""
+        self.status = new_status
 
     @event('MetaClaimAdded')
     def add_meta_claim(self, claim_type: str, value: any, authority: str, additional_info: Optional[Dict] = None):

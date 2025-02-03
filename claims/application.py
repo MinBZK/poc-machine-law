@@ -52,37 +52,37 @@ class ClaimsManager(Application):
         """Get claim for specific law, service and subject combination"""
         key = self._index_key(law, service, subject_id)
         claim_id = self._claim_index.get(key)
-        return self.repository.get(claim_id) if claim_id else None
+        return self.get_claim_by_id(claim_id) if claim_id else None
 
     def submit_appeal(self, claim_id: str, reason: str, new_evidence: Optional[Dict] = None):
         """Submit an appeal for a denied claim"""
-        claim = self.repository.get(claim_id)
+        claim = self.get_claim_by_id(claim_id)
         claim.submit_appeal(reason, new_evidence)
         self.save(claim)
 
     def verify_appeal(self, claim_id: str, verifier_id: str, decision: bool, reason: str):
         """Verify an appeal"""
-        claim = self.repository.get(claim_id)
+        claim = self.get_claim_by_id(claim_id)
         claim.verify_appeal(verifier_id, decision, reason)
         self.save(claim)
 
     def add_meta_claim(self, claim_id: str, claim_type: str, value: any,
                        authority: str, additional_info: Optional[Dict] = None):
         """Add a meta claim to a specific claim"""
-        claim = self.repository.get(claim_id)
+        claim = self.get_claim_by_id(claim_id)
         claim.add_meta_claim(claim_type, value, authority, additional_info)
         self.save(claim)
 
     def add_evidence(self, claim_id: str, document_id: str,
                      document_type: str, description: str):
         """Add evidence to a claim"""
-        claim = self.repository.get(claim_id)
+        claim = self.get_claim_by_id(claim_id)
         claim.add_evidence(document_id, document_type, description)
         self.save(claim)
 
     def check_appeal_eligibility(self, claim_id: str) -> Dict:
         """Check if a claim can be appealed"""
-        claim = self.repository.get(claim_id)
+        claim = self.get_claim_by_id(claim_id)
         return {
             'eligible': claim.can_appeal(),
             'status': claim.status
@@ -90,13 +90,14 @@ class ClaimsManager(Application):
 
     def move_claim(self, claim_id: str, new_status: ClaimStatus) -> Claim:
         """Move a claim to a new status"""
-        claim = self.repository.get(claim_id)
+        claim = self.get_claim_by_id(claim_id)
 
-        # Add any necessary validation logic here
-        if new_status == ClaimStatus.UNDER_REVIEW and claim.status != ClaimStatus.SUBMITTED:
-            raise ValueError("Only submitted claims can be moved to review")
+        # # Add any necessary validation logic here
+        # if new_status == ClaimStatus.UNDER_REVIEW and claim.status != ClaimStatus.SUBMITTED:
+        #     raise ValueError("Only submitted claims can be moved to review")
 
-        claim.status = new_status
+        claim.change_status(new_status)
+
         self.save(claim)
         return claim
 
@@ -118,7 +119,7 @@ class ClaimsManager(Application):
         print(f"Looking for claims with law={law}, service={service}")  # Debug print
         print(f"Current index: {self._claim_index}")  # Debug print
         for key, claim_id in self._claim_index.items():
-            claim = self.repository.get(claim_id)
+            claim = self.get_claim_by_id(claim_id)
             if claim.law == law and claim.service == service:
                 claims.append(claim)
         return claims
