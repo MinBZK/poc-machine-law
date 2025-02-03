@@ -177,17 +177,14 @@ class RuleContext:
                 return self.outputs[path]
 
             # Check overwrite data
-            service_field_key = None
             if path in self.property_specs:
                 spec = self.property_specs[path]
                 service_ref = spec.get('service_reference', {})
-                if service_ref:
-                    service_field_key = f"@{service_ref['service']}.{service_ref['field']}"
-
-            if service_field_key and service_field_key in self.overwrite_input:
-                value = self.overwrite_input[service_field_key]
-                logger.debug(f"Resolving from OVERWRITE: {value}")
-                return value
+                if service_ref and service_ref['service'] in self.overwrite_input \
+                        and service_ref['field'] in self.overwrite_input[service_ref['service']]:
+                    value = self.overwrite_input[service_ref['service']][service_ref['field']]
+                    logger.debug(f"Resolving from OVERWRITE: {value}")
+                    return value
 
             # Check sources
             if path in self.property_specs:
@@ -522,11 +519,11 @@ class RulesEngine:
                 spec for spec in self.spec.get('properties', {}).get('output', [])
                 if spec.get('name') == output_name
             ), {})
-            # Check for overwrite using service name
-            service_path = f"@{self.service_name}.{output_name}"
-            if service_path in context.overwrite_input:
-                raw_result = context.overwrite_input[service_path]
-                logger.debug(f"Resolving value {service_path} from OVERWRITE {raw_result}")
+
+            if self.service_name in context.overwrite_input and output_name in context.overwrite_input[
+                self.service_name]:
+                raw_result = context.overwrite_input[self.service_name][output_name]
+                logger.debug(f"Resolving value {self.service_name}/{output_name} from OVERWRITE {raw_result}")
             elif 'value' in action:
                 raw_result = await self._evaluate_value(action['value'], context)
             else:

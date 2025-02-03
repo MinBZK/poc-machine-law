@@ -19,14 +19,6 @@ def parse_value(value: str) -> Any:
     except ValueError:
         pass
 
-    # # Try to parse date
-    # if '-' in value and len(value) == 10:
-    #     try:
-    #         from datetime import datetime
-    #         return datetime.strptime(value, '%Y-%m-%d').date()
-    #     except ValueError:
-    #         pass
-
     # Return as string for other cases
     return value
 
