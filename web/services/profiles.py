@@ -1,4 +1,3 @@
-# web/services/profiles.py
 from typing import Dict, Any, Optional
 
 # Global service data that applies to all profiles
@@ -17,7 +16,6 @@ GLOBAL_SERVICES = {
     }
 }
 
-# Profile data extracted from feature files
 PROFILES = {
     "999993653": {
         "name": "Jan Jansen",

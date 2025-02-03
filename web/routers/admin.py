@@ -1,11 +1,13 @@
-# web/routers/admin.py
-from typing import Dict, List
+import json
+from datetime import datetime
 
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import Form
 from starlette.responses import RedirectResponse
 
-from claims.aggregate import ClaimStatus, Claim
+from claims.aggregate import ClaimStatus
 from machine.service import Services
+from web.dependencies import get_services, templates
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -22,14 +24,6 @@ def group_claims_by_status(claims):
         grouped[status_value].append(claim)
 
     return grouped
-
-
-# web/routers/admin.py
-from fastapi import APIRouter, Request, Depends, HTTPException
-from web.dependencies import get_services, templates
-from claims.aggregate import ClaimStatus
-
-router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 @router.get("/")
@@ -105,40 +99,6 @@ async def move_claim(
     except Exception as e:
         print(f"Error moving claim: {e}")  # Debug print
         raise HTTPException(status_code=400, detail=str(e))
-
-
-@router.get("/lanes/{service}/{law}/{status}")
-async def get_lane_claims(
-        request: Request,
-        service: str,
-        law: str,
-        status: str,
-        services: Services = Depends(get_services)
-):
-    """Get claims for a specific lane"""
-    try:
-        storage_law = f"{law.lower()}wet" if law == "ZORGTOESLAG" else law.lower()
-        claims = services.manager.get_claims_by_law(storage_law, service)
-        grouped_claims = group_claims_by_status(claims)
-        lane_claims = grouped_claims.get(status, [])
-
-        return templates.TemplateResponse(
-            "admin/partials/lane_content.html",
-            {
-                "request": request,
-                "claims": lane_claims,
-                "status": status,
-                "service": service,
-                "law": law
-            }
-        )
-    except Exception as e:
-        print(f"Error getting lane claims: {e}")  # Debug print
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-import json
-from datetime import datetime
 
 
 @router.get("/claims/{claim_id}")

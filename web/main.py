@@ -1,5 +1,3 @@
-# web/main.py
-
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 

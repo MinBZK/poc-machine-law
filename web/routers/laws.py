@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
 from urllib.parse import unquote
+
 import pandas as pd
-from pathlib import Path
+from fastapi import APIRouter, Request, Depends, HTTPException
 
 from machine.service import Services
 from web.dependencies import TODAY, FORMATTED_DATE, get_services, templates
@@ -45,9 +45,6 @@ async def switch_profile(request: Request, bsn: str = "999993653"):
 
 
 async def evaluate_law(bsn, law, service, services):
-    # Decode the law path
-    law = unquote(law)
-
     # Get the rule specification
     rule_spec = services.resolver.get_rule_spec(law, TODAY, service)
     if not rule_spec:
@@ -84,6 +81,7 @@ async def execute_law(
 ):
     """Execute a law and render its result using the appropriate template"""
     try:
+        law = unquote(law)
         law, result, rule_spec = await evaluate_law(bsn, law, service, services)
     except Exception as e:
         # Return error state using the same template
@@ -130,6 +128,7 @@ async def submit_claim(
         services: Services = Depends(get_services)
 ):
     """Submit a new claim for a law"""
+    law = unquote(law)
     law, result, rule_spec = await evaluate_law(bsn, law, service, services)
 
     # Create a new claim
