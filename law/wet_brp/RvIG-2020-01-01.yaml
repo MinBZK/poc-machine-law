@@ -312,7 +312,8 @@ actions:
   - output: "has_partner"
     subject: "$PARTNER_TYPE"
     operation: IN
-    values: "$VALID_PARTNER_TYPES"
+    values: 
+      - "$VALID_PARTNER_TYPES"
     reference: "Wet BRP Art. 1.7"
 
   - output: "living_situation"
@@ -333,12 +334,14 @@ actions:
   - output: "has_dutch_nationality"
     subject: "$NATIONALITY"
     operation: IN
-    values: "$DUTCH_NATIONALITIES"
+    values: 
+      - "$DUTCH_NATIONALITIES"
 
   - output: "has_fixed_address"
     operation: IN
     subject: "$ADDRESS.type"
-    values: "$FIXED_ADDRESS_TYPES"
+    values: 
+      - "$FIXED_ADDRESS_TYPES"
 
   - output: "residence_address"
     operation: IF
@@ -380,7 +383,8 @@ actions:
       - test:
           subject: "$ADDRESS.type"
           operation: IN
-          values: "$POSTAL_ADDRESS_TYPES"
+          values: 
+            - "$POSTAL_ADDRESS_TYPES"
         then:
           operation: CONCAT
           values:

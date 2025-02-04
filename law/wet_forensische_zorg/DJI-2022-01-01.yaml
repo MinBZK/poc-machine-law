@@ -83,7 +83,9 @@ actions:
     values:
       - operation: IN
         subject: "$CARE_TYPE"
-        values: "$FORENSIC_CARE_TYPES"
+        values: 
+          - "$FORENSIC_CARE_TYPES"
       - operation: IN
         subject: "$LEGAL_BASIS"
-        values: "$VALID_LEGAL_TITLES"
+        values: 
+          - "$VALID_LEGAL_TITLES"

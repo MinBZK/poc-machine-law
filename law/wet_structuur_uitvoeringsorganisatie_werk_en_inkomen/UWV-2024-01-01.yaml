@@ -55,7 +55,8 @@ properties:
             type: "string"
             value:
               operation: IN
-              values: "$VALID_BENEFIT_TYPES"
+              values: 
+                - "$VALID_BENEFIT_TYPES"
 
   output:
     - name: "insured_years"
