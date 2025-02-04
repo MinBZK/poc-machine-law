@@ -6,7 +6,7 @@ valid_from: 2025-01-01
 service: "TOESLAGEN"
 description: >
   Berekeningsregels voor het bepalen van het recht op en de hoogte van de zorgtoeslag volgens artikel 2
-  van de Wet op de zorgtoeslag, geldend voor het jaar 2025. Dit jaar wordt de studiefinanciering meegenomen als
+  van de Wet op de zorgtoeslag, geldend  voor het jaar 2025. Dit jaar wordt de studiefinanciering meegenomen als
   inkomen (studiefinanciering is een gift geworden).
 
 references:

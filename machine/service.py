@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 import pandas as pd
 
 from claims.application import ClaimsManager
-from .engine import RulesEngine, AbstractServiceProvider
+from .engine import RulesEngine, AbstractServiceProvider, PathNode
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -18,6 +18,7 @@ class RuleResult:
     output: Dict[str, Any]
     requirements_met: bool
     input: Dict[str, Any]
+    path: Optional[PathNode] = None  # Add path to RuleResult
 
     @classmethod
     def from_engine_result(cls, result: Dict[str, Any]) -> 'RuleResult':
@@ -29,6 +30,7 @@ class RuleResult:
             },
             requirements_met=result.get('requirements_met', False),
             input=result.get('input', {}),
+            path=result.get('path')  # Include path in result
         )
 
 

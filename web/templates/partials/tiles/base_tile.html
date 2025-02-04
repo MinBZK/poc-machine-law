@@ -1,18 +1,20 @@
+<!-- Modified version of base_tile.html with improved button styling -->
 {% from "macros/logos.html" import org_logo %}
 
-<div class="law-result-card min-h-64 bg-white rounded-lg shadow">
+{# Define color map for services #}
+{% set color_map = {
+'TOESLAGEN': 'green',
+'GEMEENTE_AMSTERDAM': 'purple',
+'KIESRAAD': 'blue',
+'SVB': 'blue'
+} %}
+
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     x-data="{ showExplanation: false }"
+     @close-explanation.window="showExplanation = false"
+     id="tile-{{ law|replace('/', '-') }}">
     <div class="p-6 flex flex-col h-full">
-        {% if error %}
-        <div class="flex-grow space-y-6">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                    {{ rule_spec.name }}
-                </h3>
-                <p class="text-red-600">Er is een fout opgetreden bij het berekenen</p>
-            </div>
-            <div class="p-2">{{ org_logo(service) }}</div>
-        </div>
-        {% elif requirements_met %}
+        {% if requirements_met %}
         <div class="flex-grow space-y-6">
             <div class="flex items-start justify-between">
                 <div>
@@ -25,10 +27,39 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                <div class="flex items-start space-x-2">
+                    {{ org_logo(service) }}
+                </div>
             </div>
 
-            {% block tile_content %}{% endblock %}
+            {% block tile_content %}
+            <div class="space-y-4">
+                <div class="text-gray-600">
+                    {% if result and result.hoogte_toeslag is defined %}
+                    Uw {{ rule_spec.name|lower }} is waarschijnlijk
+                    <div class="text-2xl font-semibold text-{{ color_map.get(service, 'gray') }}-700 mt-1">
+                        € {{ "%.2f"|format(result.hoogte_toeslag/100) }}
+                        <span class="text-sm font-normal text-gray-500">per jaar</span>
+                    </div>
+                    {% elif result and result.amount is defined %}
+                    Uw {{ rule_spec.name|lower }} is waarschijnlijk
+                    <div class="text-2xl font-semibold text-{{ color_map.get(service, 'gray') }}-700 mt-1">
+                        € {{ "%.2f"|format(result.amount/100) }}
+                        <span class="text-sm font-normal text-gray-500">per maand</span>
+                    </div>
+                    {% endif %}
+
+                    {% if not current_claim %}
+                    <button
+                            hx-post="/laws/submit-claim?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                            hx-target="closest div.law-result-card"
+                            class="w-full mt-4 px-4 py-2.5 bg-{{ color_map.get(service, 'blue') }}-100 hover:bg-{{ color_map.get(service, 'blue') }}-200 text-{{ color_map.get(service, 'blue') }}-700 font-medium text-sm rounded-md transition-colors">
+                        {{ rule_spec.name }} aanvragen
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endblock %}
 
             {% include "partials/tiles/components/next_steps.html" %}
         </div>
@@ -83,7 +114,16 @@
                     </h3>
                     <h4 class="text-sm font-medium text-gray-500 mb-1">
                         U komt niet in aanmerking
+                        <button
+                                @click="showExplanation = true"
+                                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600"
+                                hx-get="/laws/explain-path?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                                hx-target="#explanation-panel-{{ law|replace('/', '-') }}"
+                                hx-swap="innerHTML">
+                            waarom?
+                        </button>
                     </h4>
+
                 </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
@@ -98,5 +138,8 @@
         </div>
 
         {% endif %}
+    </div>
+    <div id="explanation-panel-{{ law|replace('/', '-') }}"
+         @click.outside="showExplanation = false">
     </div>
 </div>

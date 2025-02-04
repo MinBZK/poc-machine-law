@@ -1,8 +1,10 @@
+import json
 from urllib.parse import unquote
 
 import pandas as pd
 from fastapi import APIRouter, Request, Depends, HTTPException
 
+from explain.llm_service import llm_service
 from machine.service import Services
 from web.dependencies import TODAY, FORMATTED_DATE, get_services, templates
 from web.services.profiles import get_profile_data
@@ -163,3 +165,77 @@ async def submit_claim(
             "current_claim": services.manager.repository.get(claim_id)
         }
     )
+
+
+def node_to_dict(node):
+    """Convert PathNode to serializable dict"""
+    if node is None:
+        return None
+    return {
+        "type": node.type,
+        "name": node.name,
+        "result": str(node.result),
+        "details": {k: str(v) for k, v in node.details.items()},
+        "children": [node_to_dict(child) for child in node.children]
+    }
+
+
+@router.get("/explain-path")
+async def explain_path(
+        request: Request,
+        service: str,
+        law: str,
+        bsn: str,
+        services: Services = Depends(get_services)
+):
+    """Get a citizen-friendly explanation of the rule evaluation path"""
+    try:
+        law = unquote(law)
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+
+        # Convert path and rule_spec to JSON strings
+        path_dict = node_to_dict(result.path)
+        path_json = json.dumps(path_dict, ensure_ascii=False, indent=2)
+
+        # Filter relevant parts of rule_spec
+        relevant_spec = {
+            "name": rule_spec.get("name"),
+            "description": rule_spec.get("description"),
+            "properties": {
+                "input": rule_spec.get("properties", {}).get("input", []),
+                "output": rule_spec.get("properties", {}).get("output", []),
+                "parameters": rule_spec.get("properties", {}).get("parameters", []),
+                "definitions": rule_spec.get("properties", {}).get("definitions", [])
+            },
+            "requirements": rule_spec.get("requirements"),
+            "actions": rule_spec.get("actions"),
+        }
+        rule_spec_json = json.dumps(relevant_spec, ensure_ascii=False, indent=2)
+
+        # Get explanation from LLM
+        explanation = llm_service.generate_explanation(path_json, rule_spec_json)
+
+        return templates.TemplateResponse(
+            "partials/tiles/components/path_explanation.html",
+            {
+                "request": request,
+                "explanation": explanation,
+                "service": service,
+                "law": law,
+                "rule_spec": rule_spec,
+                "input": result.input,
+                "result": result.output,
+                "requirements_met": result.requirements_met
+            }
+        )
+    except Exception as e:
+        print(f"Error in explain_path: {e}")
+        return templates.TemplateResponse(
+            "partials/tiles/components/path_explanation.html",
+            {
+                "request": request,
+                "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                "service": service,
+                "law": law
+            }
+        )
