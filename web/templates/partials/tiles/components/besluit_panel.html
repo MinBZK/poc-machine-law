@@ -1,0 +1,28 @@
+<div id="besluit-pdf-viewer"
+     class="fixed right-0 top-0 h-full w-full md:w-1/2 bg-white shadow-xl transform translate-x-full transition-transform duration-200 ease-in-out z-50"
+     x-data="{ open: false }"
+     x-show="open"
+     @open-besluit-pdf.window="open = true"
+     @close-besluit-pdf.window="open = false"
+     x-transition>
+
+    <div class="h-full flex flex-col">
+        <!-- Header -->
+        <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-lg font-semibold">Besluitbrief</h3>
+            <button @click="open = false" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- PDF Viewer -->
+        <div class="flex-1 overflow-hidden">
+            <iframe x-bind:src="$el.getAttribute('data-pdf-url')"
+                   class="w-full h-full"
+                   data-pdf-url="">
+            </iframe>
+        </div>
+    </div>
+</div>

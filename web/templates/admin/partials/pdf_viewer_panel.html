@@ -1,0 +1,19 @@
+<div x-show="showPdf"
+     class="fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300"
+     @click.away="showPdf = false">
+    <div class="h-full flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Besluit bekijken</h3>
+            <button @click="showPdf = false" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="flex-1 p-4">
+            <embed src="/admin/claims/{{ claim.id }}/besluit-preview"
+                   type="application/pdf"
+                   class="w-full h-full border rounded-lg"/>
+        </div>
+    </div>
+</div>
