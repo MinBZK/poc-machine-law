@@ -1,144 +1,121 @@
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional, Dict
-from uuid import UUID
+from enum import Enum
+from typing import Dict, List
 
 from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
 
 
-class ClaimStatus(str, Enum):
+class CaseStatus(str, Enum):
     SUBMITTED = "SUBMITTED"
-    UNDER_REVIEW = "UNDER_REVIEW"
-    APPROVED = "APPROVED"
-    DENIED = "DENIED"
+    DECIDED = "DECIDED"
+    IN_REVIEW = "IN_REVIEW"
     APPEALED = "APPEALED"
-    APPEAL_APPROVED = "APPEAL_APPROVED"
-    APPEAL_DENIED = "APPEAL_DENIED"
 
 
 class ClaimStatusTranscoding(Transcoding):
     @staticmethod
     def can_handle(obj: object) -> bool:
-        return isinstance(obj, (ClaimStatus, str))
+        return isinstance(obj, (CaseStatus, str))
 
     @staticmethod
-    def encode(obj: ClaimStatus) -> str:
+    def encode(obj: CaseStatus) -> str:
         if isinstance(obj, str):
             return obj
         return obj.value
 
     @staticmethod
-    def decode(data: str) -> str:  # Changed to return str instead of ClaimStatus
-        if isinstance(data, ClaimStatus):
+    def decode(data: str) -> str:
+        if isinstance(data, CaseStatus):
             return data.value
         return data  # Keep it as a string
 
 
-# Register the transcoding
 Transcoding.register(ClaimStatusTranscoding)
 
 
 # Helper function for consistent status access
 def get_status_value(status) -> str:
     """Get string value of status regardless of type"""
-    if isinstance(status, ClaimStatus):
+    if isinstance(status, CaseStatus):
         return status.value
     return status
 
 
-@dataclass
-class Evidence:
-    document_id: str
-    document_type: str
-    uploaded_at: datetime
-    description: str
-
-
-class Claim(Aggregate):
-    @event('ClaimSubmitted')
-    def __init__(self, subject_id: str, law: str, service: str, rulespec_uuid: UUID, details: Dict):
-        self.subject_id = subject_id
+class ServiceCase(Aggregate):
+    @event('Submitted')
+    def __init__(self,
+                 bsn: str,
+                 service_type: str,
+                 law: str,
+                 parameters: Dict,
+                 claimed_result: Dict,
+                 rulespec_uuid: str):
+        self.bsn = bsn
+        self.service_type = service_type
         self.law = law
-        self.service = service
         self.rulespec_uuid = rulespec_uuid
-        self.details = details
-        self.status = ClaimStatus.SUBMITTED
-        self.submitted_at = datetime.now()
-        self.decisions = []
-        self.appeals = []
-        self.meta_claims = {}
-        self.evidence = []
 
-    @event('ClaimVerified')
-    def verify(self, verifier_id: str, decision: bool, reason: str):
-        self.status = ClaimStatus.APPROVED if decision else ClaimStatus.DENIED
-        self.decisions.append({
-            'verifier_id': verifier_id,
-            'decision': decision,
-            'reason': reason,
-            'verified_at': datetime.now()
-        })
+        self.claimed_result = claimed_result
+        self.verified_result = None
+        self.parameters = parameters
+        self.disputed_parameters = None
+        self.evidence = None
+        self.reason = None
+        self.verifier_id = None
 
-    @event('AppealSubmitted')
-    def submit_appeal(self, reason: str, new_evidence: Optional[Dict] = None):
-        if self.status != ClaimStatus.DENIED:
-            raise ValueError("Can only appeal denied claims")
+        self.approved = None
+        self.status = CaseStatus.SUBMITTED
 
-        if not self.can_appeal():
-            raise ValueError("Appeal window has expired")
+    @event('AutomaticallyDecided')
+    def add_automatic_decision(self,
+                               verified_result: Dict,
+                               parameters: Dict,
+                               approved: bool):
+        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.APPEALED]:
+            raise ValueError("Can only automatically decide on submitted cases or appeals")
+        self.verified_result = verified_result
+        self.parameters = parameters
+        self.status = CaseStatus.DECIDED
+        self.approved = approved
 
-        self.status = ClaimStatus.APPEALED
-        self.appeals.append({
-            'reason': reason,
-            'new_evidence': new_evidence,
-            'submitted_at': datetime.now()
-        })
+    @event('AddedToManualReview')
+    def add_to_manual_review(self,
+                             verifier_id: str,
+                             reason: str,
+                             claimed_result: Dict,
+                             verified_result: Dict):
+        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.APPEALED]:
+            raise ValueError("Can only add to review from submitted status or appeal")
+        self.status = CaseStatus.IN_REVIEW
+        self.verified_result = verified_result
+        self.claimed_result = claimed_result
+        self.reason = reason
+        self.verifier_id = verifier_id
 
-    @event('AppealVerified')
-    def verify_appeal(self, verifier_id: str, decision: bool, reason: str):
-        self.status = ClaimStatus.APPEAL_APPROVED if decision else ClaimStatus.APPEAL_DENIED
-        self.appeals[-1].update({
-            'verifier_id': verifier_id,
-            'decision': decision,
-            'reason': reason,
-            'verified_at': datetime.now()
-        })
+    @event('Decided')
+    def add_manual_decision(self,
+                            verified_result: Dict,
+                            reason: str,
+                            verifier_id: str, approved: bool):
+        if self.status not in [CaseStatus.IN_REVIEW, CaseStatus.APPEALED]:
+            raise ValueError("Can only manually decide on cases in review or appeals")
+        self.status = CaseStatus.DECIDED
+        self.approved = approved
+        self.reason = reason
+        self.verified_result = verified_result
+        self.verifier_id = verifier_id
 
-    @event('StatusChanged')
-    def change_status(self, new_status: ClaimStatus):
-        """Change the status of a claim"""
-        self.status = new_status
-
-    @event('MetaClaimAdded')
-    def add_meta_claim(self, claim_type: str, value: any, authority: str, additional_info: Optional[Dict] = None):
-        self.meta_claims[claim_type] = {
-            'type': claim_type,
-            'value': value,
-            'authority': authority,
-            'created_at': datetime.now(),
-            **(additional_info if additional_info else {})
-        }
-
-    @event('EvidenceAdded')
-    def add_evidence(self, document_id: str, document_type: str, description: str):
-        evidence = Evidence(
-            document_id=document_id,
-            document_type=document_type,
-            uploaded_at=datetime.now(),
-            description=description
-        )
-        self.evidence.append(evidence)
-
-    def can_appeal(self) -> bool:
-        if self.status != ClaimStatus.DENIED:
-            return False
-
-        if 'appeal_window' not in self.meta_claims:
-            return True  # No window specified means always possible
-
-        last_decision = self.decisions[-1]
-        appeal_window = self.meta_claims['appeal_window']
-        deadline = last_decision['verified_at'] + timedelta(days=appeal_window['value'])
-        return datetime.now() <= deadline
+    @event('Appealed')
+    def add_appeal(self,
+                   disputed_parameters: Dict,
+                   claimed_result: Dict,
+                   evidence: List[str],
+                   reason: str):
+        if self.status != CaseStatus.DECIDED:
+            raise ValueError("Can only appeal decided cases")
+        self.status = CaseStatus.APPEALED
+        self.claimed_result = claimed_result
+        self.reason = reason
+        self.evidence = evidence
+        self.disputed_parameters = disputed_parameters

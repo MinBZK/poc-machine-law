@@ -1,0 +1,74 @@
+{# templates/admin/partials/case_card.html #}
+<form class="mb-2"
+      hx-post="/admin/cases/{{ case.id }}/move"
+      hx-swap="outerHTML">
+    <input type="hidden" name="new_status" value="{{ status }}">
+    <div class="p-4 bg-white border rounded shadow-sm hover:bg-gray-50 cursor-move"
+         data-case-id="{{ case.id }}">
+        <div class="font-medium mb-2">BSN: {{ case.bsn }}</div>
+
+        {# Show the most recent event details #}
+        {% set latest_event = case.events[-1] if case.events else None %}
+        {% if latest_event %}
+        {% if latest_event.event_type == 'Submitted' %}
+        <div class="text-sm text-gray-600 mb-2">
+            <div class="font-medium">Claimed Results:</div>
+            {% for key, value in latest_event.data.claimed_result.items() %}
+            <div class="grid grid-cols-2 gap-1">
+                <span>{{ key|replace('_', ' ')|title }}:</span>
+                <span>{{ value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif latest_event.event_type in ['AutomaticallyDecided', 'Decided'] %}
+        <div class="text-sm text-gray-600 mb-2">
+            <div class="font-medium">Verified Results:</div>
+            {% for key, value in latest_event.data.verified_result.items() %}
+            <div class="grid grid-cols-2 gap-1">
+                <span>{{ key|replace('_', ' ')|title }}:</span>
+                <span>{{ value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <div class="flex items-center space-x-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                {% if case.status == 'SUBMITTED' %}
+                    bg-blue-100 text-blue-800">Ingediend
+                {% elif case.status == 'IN_REVIEW' %}
+                    bg-yellow-100 text-yellow-800">In behandeling
+                {% elif case.status == 'DECIDED' and case.approved%}
+                    bg-green-100 text-green-800">Toegekend
+                {% elif case.status == 'DECIDED' and not case.approved%}
+                    bg-red-100 text-red-800">Afgewezen
+                {% elif case.status == 'APPEALED' %}
+                    bg-purple-100 text-purple-800">In bezwaar gegaan
+                {% endif %}
+            </span>
+        </div>
+
+        {% if case.status == 'IN_REVIEW' %}
+        <div class="mt-3 space-y-2">
+            <button type="button"
+                    class="w-full px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                    onclick="approveCase('{{ case.id }}')">
+                Approve
+            </button>
+            <button type="button"
+                    class="w-full px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                    onclick="denyCase('{{ case.id }}')">
+                Deny
+            </button>
+        </div>
+        {% endif %}
+
+        <div class="mt-2">
+            <a href="/admin/cases/{{ case.id }}"
+               class="text-sm text-blue-600 hover:underline">
+                View Details
+            </a>
+        </div>
+    </div>
+</form>

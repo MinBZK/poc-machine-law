@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
-from claims.application import ClaimsManager
+from claims.application import ServiceCaseManager
 from machine.service import Services
 
 # Set Dutch locale
@@ -17,8 +17,14 @@ BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
-manager = ClaimsManager()
-services = Services(TODAY, manager)
+# First create services without manager
+services = Services(TODAY, manager=None)
+
+# Then create manager with the rules engine from services
+manager = ServiceCaseManager(rules_engine=services)
+
+# Update services with the manager
+services.manager = manager
 
 
 async def get_services():

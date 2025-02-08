@@ -1,34 +1,31 @@
+from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from starlette.responses import RedirectResponse
 import json
 from datetime import datetime
 
-from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi import Form
-from starlette.responses import RedirectResponse
-
-from claims.aggregate import ClaimStatus
+from claims.aggregate import CaseStatus
 from machine.service import Services
 from web.dependencies import get_services, templates
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-def group_claims_by_status(claims):
-    from claims.aggregate import ClaimStatus, get_status_value
-
+def group_cases_by_status(cases):
+    """Group cases by their current status"""
     # Initialize with all possible statuses
-    grouped = {status.value: [] for status in ClaimStatus}
+    grouped = {status.value: [] for status in CaseStatus}
 
-    for claim in claims:
-        # Use the helper function to get status value consistently
-        status_value = get_status_value(claim.status)
-        grouped[status_value].append(claim)
+    for case in cases:
+        grouped[case.status].append(case)
 
     return grouped
 
 
 @router.get("/")
-async def admin_redirect(request: Request, services: Services = Depends(get_services)
-                         ):
+async def admin_redirect(
+        request: Request,
+        services: Services = Depends(get_services)
+):
     """Redirect to first available service"""
     discoverable_laws = services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
@@ -45,13 +42,12 @@ async def admin_dashboard(
     discoverable_laws = services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
 
-    # Get claims for selected service
+    # Get cases for selected service
     service_laws = discoverable_laws.get(service, [])
-    service_claims = {}
+    service_cases = {}
     for law in service_laws:
-        claims = services.manager.get_claims_by_law(law, service)
-        print(f"Found {len(claims)} claims for {service}/{law}")  # Debug print
-        service_claims[law] = group_claims_by_status(claims)
+        cases = services.manager.get_cases_by_law(law, service)
+        service_cases[law] = group_cases_by_status(cases)
 
     return templates.TemplateResponse(
         "admin/dashboard.html",
@@ -60,63 +56,119 @@ async def admin_dashboard(
             "current_service": service,
             "available_services": available_services,
             "service_laws": service_laws,
-            "service_claims": service_claims,
+            "service_cases": service_cases,
         }
     )
 
 
-@router.post("/claims/{claim_id}/move")
-async def move_claim(
+@router.post("/cases/{case_id}/move")
+async def move_case(
         request: Request,
-        claim_id: str,
+        case_id: str,
         new_status: str = Form(...),
         services: Services = Depends(get_services)
 ):
-    """Handle claim movement between status lanes"""
-    print(f"Moving claim {claim_id} to status {new_status}")  # Debug print
+    """Handle case movement between status lanes"""
+    print(f"Moving case {case_id} to status {new_status}")  # Debug print
     try:
-
         try:
-            new_status_enum = ClaimStatus(new_status)
+            new_status_enum = CaseStatus(new_status)
         except KeyError:
             raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
 
-        # Use the move_claim method from ClaimsManager
-        try:
-            claim = services.manager.move_claim(claim_id, new_status_enum)
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+        case = services.manager.get_case_by_id(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+
+        # Based on the target status, call the appropriate method
+        if new_status_enum == CaseStatus.IN_REVIEW:
+            # Get latest results from events
+            events = services.manager.repository.events.get_domain_events(case.id)
+            latest_results = {}
+            for event in reversed(events):
+                if hasattr(event, 'claimed_result') and hasattr(event, 'verified_result'):
+                    latest_results = {
+                        'claimed_result': event.claimed_result,
+                        'verified_result': event.verified_result
+                    }
+                    break
+
+            case.add_to_manual_review(
+                verifier_id="ADMIN",  # TODO: Get from auth
+                reason="Manually moved to review",
+                claimed_result=latest_results.get('claimed_result', {}),
+                verified_result=latest_results.get('verified_result', {})
+            )
+        elif new_status_enum == CaseStatus.DECIDED:
+            case.add_manual_decision(
+                verified_result={},  # Would need the actual result
+                reasoning="Manually decided",
+                verifier_id="ADMIN"  # TODO: Get from auth
+            )
+        else:
+            raise HTTPException(status_code=400, detail=f"Cannot move to status {new_status}")
+
+        services.manager.save(case)
 
         # Return just the updated card
         return templates.TemplateResponse(
-            "admin/partials/claim_card.html",
+            "admin/partials/case_card.html",
             {
                 "request": request,
-                "claim": claim,
+                "case": case,
                 "status": new_status
             }
         )
     except Exception as e:
-        print(f"Error moving claim: {e}")  # Debug print
+        print(f"Error moving case: {e}")  # Debug print
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/claims/{claim_id}")
-async def view_claim(
+@router.post("/cases/{case_id}/complete-review")
+async def complete_review(
         request: Request,
-        claim_id: str,
+        case_id: str,
+        decision: bool = Form(...),
+        reasoning: str = Form(...),
         services: Services = Depends(get_services)
 ):
-    """View details of a specific claim"""
-    claim = services.manager.get_claim_by_id(claim_id)
-    if not claim:
-        raise HTTPException(status_code=404, detail="Claim not found")
+    """Complete manual review of a case"""
+    try:
+        case = services.manager.complete_manual_review(
+            case_id=case_id,
+            verifier_id="ADMIN",  # TODO: Get actual verifier from auth
+            approved=decision,
+            reasoning=reasoning
+        )
 
-    # Get events for the claim
+        return templates.TemplateResponse(
+            "admin/partials/case_card.html",
+            {
+                "request": request,
+                "case": case,
+                "status": case.status
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/cases/{case_id}")
+async def view_case(
+        request: Request,
+        case_id: str,
+        services: Services = Depends(get_services)
+):
+    """View details of a specific case"""
+    case = services.manager.get_case_by_id(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    # Get events for the case
     notification_log = services.manager.notification_log
     events = []
 
-    # Get notifications in batches of 10 (the section size limit)
+    # Get notifications in batches of 10
     start = 1
     while True:
         try:
@@ -125,35 +177,34 @@ async def view_claim(
                 break
 
             for notification in notifications:
-                if notification.originator_id == claim.id:
+                if notification.originator_id == case.id:
                     # Decode the state from bytes to JSON
                     state_data = json.loads(notification.state.decode('utf-8'))
 
-                    # Extract timestamp from state if available
+                    # Extract timestamp if available
                     timestamp = state_data.get('timestamp', {}).get('_data_', None)
                     if timestamp:
                         timestamp = datetime.fromisoformat(timestamp)
 
                     events.append({
                         'timestamp': timestamp or str(notification.originator_version),
-                        'event_type': notification.topic.split('.')[-1],  # Get just the event name
+                        'event_type': notification.topic.split('.')[-1],
                         'data': {k: v for k, v in state_data.items()
-                                 if k not in ['timestamp', 'originator_topic']}  # Filter out metadata
+                                 if k not in ['timestamp', 'originator_topic']}
                     })
 
             start += 10
         except ValueError:
-            # We've reached the end of the notifications
             break
 
     # Sort events by timestamp
     events.sort(key=lambda x: str(x['timestamp']))
-    claim.events = events
+    case.events = events
 
     return templates.TemplateResponse(
-        "admin/claim_detail.html",
+        "admin/case_detail.html",
         {
             "request": request,
-            "claim": claim
+            "case": case
         }
     )

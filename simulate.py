@@ -176,15 +176,10 @@ class LawSimulator:
             "study_grant": person["study_grant"] / 100
         }
 
-        zorgtoeslag = await self.services.evaluate(
-            "TOESLAGEN", "zorgtoeslagwet",
-            self.simulation_date, {"BSN": person["bsn"]}
-        )
+        zorgtoeslag = await self.services.evaluate("TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]},
+                                                   self.simulation_date)
 
-        aow = await self.services.evaluate(
-            "SVB", "algemene_ouderdomswet",
-            self.simulation_date, {"BSN": person["bsn"]}
-        )
+        aow = await self.services.evaluate("SVB", "algemene_ouderdomswet", {"BSN": person["bsn"]}, self.simulation_date)
 
         result.update({
             "zorgtoeslag_eligible": zorgtoeslag.requirements_met,

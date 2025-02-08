@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional
 
 import pandas as pd
 
-from claims.application import ClaimsManager
+from claims.application import ServiceCaseManager
 from .engine import RulesEngine, AbstractServiceProvider
 from .logging_config import IndentLogger
 from .utils import RuleResolver
@@ -18,9 +18,10 @@ class RuleResult:
     output: Dict[str, Any]
     requirements_met: bool
     input: Dict[str, Any]
+    rulespec_uuid: str
 
     @classmethod
-    def from_engine_result(cls, result: Dict[str, Any]) -> 'RuleResult':
+    def from_engine_result(cls, result: Dict[str, Any], rulespec_uuid: str) -> 'RuleResult':
         """Create RuleResult from engine evaluation result"""
         return cls(
             output={
@@ -29,6 +30,7 @@ class RuleResult:
             },
             requirements_met=result.get('requirements_met', False),
             input=result.get('input', {}),
+            rulespec_uuid=rulespec_uuid,
         )
 
 
@@ -101,7 +103,7 @@ class RuleService:
             calculation_date=reference_date,
             requested_output=requested_output,
         )
-        return RuleResult.from_engine_result(result)
+        return RuleResult.from_engine_result(result, engine.spec.get('uuid'))
 
     def get_rule_info(self, law: str, reference_date: str) -> Optional[Dict[str, Any]]:
         """
@@ -127,7 +129,7 @@ class RuleService:
 
 
 class Services(AbstractServiceProvider):
-    def __init__(self, reference_date: str, manager: ClaimsManager = None):
+    def __init__(self, reference_date: str, manager: ServiceCaseManager = None):
         self.resolver = RuleResolver()
         self.services = {service: RuleService(service, self) for service in self.resolver.get_service_laws()}
         self.root_reference_date = reference_date
@@ -140,15 +142,13 @@ class Services(AbstractServiceProvider):
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
 
-    async def evaluate(
-            self,
-            service: str,
-            law: str,
-            reference_date: str,
-            parameters: Dict[str, Any],
-            overwrite_input: Optional[Dict[str, Any]] = None,
-            requested_output: str = None
-    ) -> RuleResult:
+    async def evaluate(self, service: str,
+                       law: str,
+                       parameters: Dict[str, Any],
+                       reference_date: str = None,
+                       overwrite_input: Optional[Dict[str, Any]] = None,
+                       requested_output: str = None, ) -> RuleResult:
+        reference_date = reference_date or self.root_reference_date
         with logger.indent_block(f"{service}: {law} ({reference_date} {parameters} {requested_output})",
                                  double_line=True):
             return await self.services[service].evaluate(
@@ -168,5 +168,5 @@ class Services(AbstractServiceProvider):
             overwrite_input: Dict[str, Any],
             reference_date: str) -> Any:
         # reference_date = self.root_reference_date
-        result = await self.evaluate(service, law, reference_date, context, overwrite_input, requested_output=field)
+        result = await self.evaluate(service, law, context, reference_date, overwrite_input, requested_output=field)
         return result.output.get(field)

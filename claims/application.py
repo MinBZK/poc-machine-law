@@ -1,205 +1,215 @@
-from eventsourcing.application import Application
-from eventsourcing.domain import Aggregate, event
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Optional, Dict, List, Tuple
-from dataclasses import dataclass
+import random
+from decimal import Decimal
+from typing import Optional, List, Dict, Tuple
 from uuid import UUID
 
-from claims.aggregate import Claim, ClaimStatus
+from eventsourcing.application import Application
+
+from .aggregate import ServiceCase, CaseStatus
 
 
-class ClaimsManager(Application):
-    def __init__(self):
+class ServiceCaseManager(Application):
+    """
+    Application service for managing service cases.
+    Handles case submission, verification, decisions, and appeals.
+    """
+
+    SAMPLE_RATE = 0.50  # 10% sample rate
+
+    def __init__(self, rules_engine):
         super().__init__()
-        self.ruleset_rules = {}  # Default rules by ruleset
-        # Enkele index voor (law, service, bsn) -> claim_id
-        self._claim_index: Dict[Tuple[str, str, str], str] = {}
+        self.rules_engine = rules_engine
+        self._case_index: Dict[Tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
 
-    def _index_key(self, law: str, service: str, subject_id: str) -> Tuple[str, str, str]:
-        """Genereer een index key voor de combinatie van law, service en subject_id"""
-        return (law, service, subject_id)
+    def _index_key(self, bsn: str, service_type: str, law: str) -> Tuple[str, str, str]:
+        """Generate index key for the combination of bsn, service and law"""
+        return (bsn, service_type, law)
 
-    def _index_claim(self, claim: Claim):
-        """Voeg een claim toe aan de index"""
-        key = self._index_key(claim.law, claim.service, claim.subject_id)
-        self._claim_index[key] = claim.id
+    def _index_case(self, case: ServiceCase):
+        """Add case to index"""
+        key = self._index_key(case.bsn, case.service_type, case.law)
+        self._case_index[key] = str(case.id)
 
-    def submit_claim(self, subject_id: str, law: str, service: str,
-                     rulespec_uuid: UUID, details: Dict) -> str:
-        """Submit a new claim"""
-        claim = Claim(subject_id, law, service, rulespec_uuid, details)
-        self.save(claim)
-        self._index_claim(claim)
-        return claim.id
+    def _results_match(self, claimed_result: Dict, verified_result: Dict) -> bool:
+        """
+        Compare claimed and verified results to determine if they match.
+        For numeric values, uses a 1% tolerance.
+        For other values, requires exact match.
+        """
+        for key in verified_result:
+            if key not in claimed_result:
+                return False
 
-    def verify_claim(self, claim_id: str, verifier_id: str, decision: bool,
-                     reason: str, appeal_window_days: Optional[int] = None):
-        """Verify a claim and optionally set appeal window"""
-        claim = self.repository.get(claim_id)
-        claim.verify(verifier_id, decision, reason)
+            # For numeric values, compare with tolerance
+            if isinstance(verified_result[key], (int, float)):
+                if isinstance(claimed_result[key], (int, float)):
+                    if abs(verified_result[key] - claimed_result[key]) / verified_result[key] > Decimal('0.01'):
+                        return False
+                else:
+                    return False
+            # For other values, require exact match
+            elif verified_result[key] != claimed_result[key]:
+                return False
 
-        if not decision and appeal_window_days is not None:
-            claim.add_meta_claim('appeal_window', appeal_window_days, verifier_id)
-        elif not decision and str(claim.rulespec_uuid) in self.ruleset_rules:
-            rule = self.ruleset_rules[str(claim.rulespec_uuid)].get('appeal_window')
-            if rule:
-                claim.add_meta_claim('appeal_window', rule['value'], rule['authority'])
+        return True
 
-        self.save(claim)
+    async def submit_case(self,
+                          bsn: str,
+                          service_type: str,
+                          law: str,
+                          parameters: Dict,
+                          claimed_result: Dict) -> str:
+        """
+        Submit a new case and automatically process it if possible.
+        A case starts with the citizen's claimed result which is then verified.
+        """
 
-    def get_claim(self, law: str, service: str, subject_id: str) -> Optional[Claim]:
-        """Get claim for specific law, service and subject combination"""
-        key = self._index_key(law, service, subject_id)
-        claim_id = self._claim_index.get(key)
-        return self.get_claim_by_id(claim_id) if claim_id else None
+        result = await self.rules_engine.evaluate(service_type, law, parameters)
 
-    def submit_appeal(self, claim_id: str, reason: str, new_evidence: Optional[Dict] = None):
-        """Submit an appeal for a denied claim"""
-        claim = self.get_claim_by_id(claim_id)
-        claim.submit_appeal(reason, new_evidence)
-        self.save(claim)
+        # Create new case with citizen's claimed result
+        case = ServiceCase(
+            bsn=bsn,
+            service_type=service_type,
+            law=law,
+            parameters=parameters,
+            claimed_result=claimed_result,
+            rulespec_uuid = result.rulespec_uuid,
+        )
 
-    def verify_appeal(self, claim_id: str, verifier_id: str, decision: bool, reason: str):
-        """Verify an appeal"""
-        claim = self.get_claim_by_id(claim_id)
-        claim.verify_appeal(verifier_id, decision, reason)
-        self.save(claim)
+        # Verify using rules engine
+        verified_result = result.output
 
-    def add_meta_claim(self, claim_id: str, claim_type: str, value: any,
-                       authority: str, additional_info: Optional[Dict] = None):
-        """Add a meta claim to a specific claim"""
-        claim = self.get_claim_by_id(claim_id)
-        claim.add_meta_claim(claim_type, value, authority, additional_info)
-        self.save(claim)
+        # Check if results match and if manual review is needed
+        results_match = self._results_match(claimed_result, verified_result)
+        needs_manual_review = random.random() < self.SAMPLE_RATE
 
-    def add_evidence(self, claim_id: str, document_id: str,
-                     document_type: str, description: str):
-        """Add evidence to a claim"""
-        claim = self.get_claim_by_id(claim_id)
-        claim.add_evidence(document_id, document_type, description)
-        self.save(claim)
+        if results_match and not needs_manual_review:
+            # Automatic approval
+            case.add_automatic_decision(
+                verified_result=verified_result,
+                parameters=parameters,
+                approved=True,
+            )
+        else:
+            # Route to manual review with reason
+            reason = "Selected for manual review - " + (
+                "results differ" if not results_match
+                else "random sample check"
+            )
 
-    def check_appeal_eligibility(self, claim_id: str) -> Dict:
-        """Check if a claim can be appealed"""
-        claim = self.get_claim_by_id(claim_id)
-        return {
-            'eligible': claim.can_appeal(),
-            'status': claim.status
-        }
+            case.add_to_manual_review(
+                verifier_id="SYSTEM",
+                reason=reason,
+                claimed_result=claimed_result,
+                verified_result=verified_result,
+            )
 
-    def move_claim(self, claim_id: str, new_status: ClaimStatus) -> Claim:
-        """Move a claim to a new status"""
-        claim = self.get_claim_by_id(claim_id)
+        # Save and index
+        self.save(case)
+        self._index_case(case)
 
-        # # Add any necessary validation logic here
-        # if new_status == ClaimStatus.UNDER_REVIEW and claim.status != ClaimStatus.SUBMITTED:
-        #     raise ValueError("Only submitted claims can be moved to review")
+        return str(case.id)
 
-        claim.change_status(new_status)
+    def complete_manual_review(self,
+                               case_id: str,
+                               verifier_id: str,
+                               approved: bool,
+                               reasoning: str,
+                               override_result: Optional[Dict] = None) -> str:
+        """
+        Complete manual review of a case.
+        """
+        case = self.repository.get(case_id)
+        if case.status != CaseStatus.IN_REVIEW:
+            raise ValueError("Can only complete review for cases in review")
 
-        self.save(claim)
-        return claim
+        # Get the event stream to find review data
+        events = self.repository.events.get_domain_events(case.id)
+        review_data = None
 
-    def get_claims_by_law_and_status(
-            self,
-            law: str,
-            service: str,
-            status: ClaimStatus
-    ) -> List[Claim]:
-        """Get claims for a specific law and status"""
+        for event in reversed(events):
+            if event.topic.endswith('AddedToManualReview'):
+                review_data = event
+                break
+
+        if not review_data:
+            raise ValueError("No review data found in case history")
+
+        verified_result = override_result or review_data.verified_result
+
+        case.add_manual_decision(
+            verified_result=verified_result,
+            reasoning=reasoning,
+            verifier_id=verifier_id,
+            approved=approved,
+        )
+
+        self.save(case)
+        return str(case.id)
+
+    def appeal_case(self,
+                    case_id: str,
+                    disputed_parameters: Dict,
+                    evidence: List[str],
+                    reasoning: str,
+                    claimed_result: Dict) -> str:
+        """
+        Submit an appeal for a case with newly claimed result.
+        Appeals always go to manual review.
+        """
+        case = self.repository.get(case_id)
+
+        # First record the appeal with citizen's new claim
+        case.add_appeal(
+            disputed_parameters=disputed_parameters,
+            claimed_result=claimed_result,
+            evidence=evidence,
+            reasoning=reasoning
+        )
+
+        # Calculate verified result based on disputed parameters
+        result = self.rules_engine.evaluate(case.service_type, case.law, disputed_parameters)
+        verified_result = result.output
+
+        # Appeals always go to manual review
+        case.add_to_manual_review(
+            verifier_id="SYSTEM",
+            reason="Appeal requires manual review",
+            claimed_result=claimed_result,
+            verified_result=verified_result
+        )
+
+        self.save(case)
+        return str(case.id)
+
+    # Query methods
+
+    def get_case(self, bsn: str, service_type: str, law: str) -> Optional[ServiceCase]:
+        """Get case for specific bsn, service and law combination"""
+        key = self._index_key(bsn, service_type, law)
+        case_id = self._case_index.get(key)
+        return self.get_case_by_id(case_id) if case_id else None
+
+    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> List[ServiceCase]:
+        """Get all cases for a service in a particular status"""
         return [
-            claim for claim in self.get_claims_by_law(law, service)
-            if claim.status == status
+            self.repository.get(case_id)
+            for case_id in self._case_index.values()
+            if self.repository.get(case_id).service_type == service_type
+               and self.repository.get(case_id).status == status
         ]
 
-    def get_claims_by_law(self, law: str, service: str) -> List[Claim]:
-        """Get all claims for a specific law and service combination"""
-        claims = []
-        print(f"Looking for claims with law={law}, service={service}")  # Debug print
-        print(f"Current index: {self._claim_index}")  # Debug print
-        for key, claim_id in self._claim_index.items():
-            claim = self.get_claim_by_id(claim_id)
-            if claim.law == law and claim.service == service:
-                claims.append(claim)
-        return claims
+    def get_case_by_id(self, case_id: Optional[str]) -> Optional[ServiceCase]:
+        """Get case by ID"""
+        if not case_id:
+            return None
+        return self.repository.get(UUID(case_id))
 
-    def get_claim_by_id(self, claim_id: str) -> Optional[Claim]:
-        """Get claim for a specific claim"""
-        if isinstance(claim_id, str):
-            claim_id = UUID(claim_id)
-        return self.repository.get(claim_id)
-
-
-# Usage example:
-def main():
-    from uuid import uuid4
-
-    manager = ClaimsManager()
-
-    # Set default appeal window for a ruleset
-    ruleset_id = uuid4()
-
-    # Submit a new claim
-    claim_id = manager.submit_claim(
-        subject_id="123456789",
-        law="housing_act_2024",
-        service="housing_assistance",
-        rulespec_uuid=ruleset_id,
-        details={
-            "monthly_income": 2500,
-            "rent_amount": 1200,
-            "household_size": 3,
-            "address": "123 Main St"
-        }
-    )
-
-    # Add supporting evidence
-    manager.add_evidence(
-        claim_id=claim_id,
-        document_id="doc123",
-        document_type="income_statement",
-        description="Latest pay stubs"
-    )
-
-    # Add priority meta-claim
-    manager.add_meta_claim(
-        claim_id=claim_id,
-        claim_type="priority",
-        value="high",
-        authority="CLAIMS_DEPT",
-        additional_info={"reason": "Hardship case"}
-    )
-
-    # Deny the claim
-    manager.verify_claim(
-        claim_id=claim_id,
-        verifier_id="VERIFIER_001",
-        decision=False,
-        reason="Income exceeds threshold for household size"
-    )
-
-    # Check appeal eligibility
-    eligibility = manager.check_appeal_eligibility(claim_id)
-    if eligibility['eligible']:
-        # Submit appeal
-        manager.submit_appeal(
-            claim_id=claim_id,
-            reason="Recent job loss affects income calculation",
-            new_evidence={
-                "termination_letter": "doc456",
-                "new_income_statement": "doc789"
-            }
-        )
-
-        # Verify appeal
-        manager.verify_appeal(
-            claim_id=claim_id,
-            verifier_id="APPEALS_001",
-            decision=True,
-            reason="New circumstances warrant approval"
-        )
-
-
-if __name__ == "__main__":
-    main()
+    def get_cases_by_law(self, law: str, service_type: str) -> List[ServiceCase]:
+        """Get all cases for a specific law and service combination"""
+        cases = []
+        for key, case_id in self._case_index.items():
+            case = self.get_case_by_id(case_id)
+            if case.law == law and case.service_type == service_type:
+                cases.append(case)
+        return cases

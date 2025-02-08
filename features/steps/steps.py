@@ -59,13 +59,8 @@ def step_impl(context, date):
 @when('de {law} wordt uitgevoerd door {service}')
 def step_impl(context, law, service):
     context.result = asyncio.run(
-        context.services.evaluate(
-            service,
-            law=law,
-            reference_date=context.root_reference_date,
-            parameters=context.parameters,
-            overwrite_input=context.test_data
-        )
+        context.services.evaluate(service, law=law, parameters=context.parameters,
+                                  reference_date=context.root_reference_date, overwrite_input=context.test_data)
     )
 
 
