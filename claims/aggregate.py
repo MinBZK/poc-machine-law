@@ -108,14 +108,8 @@ class ServiceCase(Aggregate):
 
     @event('Appealed')
     def add_appeal(self,
-                   disputed_parameters: Dict,
-                   claimed_result: Dict,
-                   evidence: List[str],
                    reason: str):
         if self.status != CaseStatus.DECIDED:
             raise ValueError("Can only appeal decided cases")
         self.status = CaseStatus.APPEALED
-        self.claimed_result = claimed_result
         self.reason = reason
-        self.evidence = evidence
-        self.disputed_parameters = disputed_parameters

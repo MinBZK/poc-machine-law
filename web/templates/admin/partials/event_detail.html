@@ -7,9 +7,14 @@
             <p class="text-sm text-gray-600">{{ event.timestamp|format_date }}</p>
         </div>
     </div>
+    {% if event.data.reason %}
+    <div class="mt-2">
+        <h4 class="text-sm font-medium mb-1">Reason:</h4>
+        <p class="text-sm bg-white rounded p-2">{{ event.data.reason }}</p>
+    </div>
+    {% endif %}
 
     {% if event.event_type == 'Submitted' %}
-    <div class="mt-2">
         <h4 class="text-sm font-medium mb-1">Claimed Results:</h4>
         <div class="bg-white rounded p-2">
             {% for key, value in event.data.claimed_result.items() %}
@@ -22,10 +27,9 @@
     </div>
     {% elif event.event_type in ['AutomaticallyDecided', 'Decided'] %}
     <div class="mt-2">
-        {% if event.data.reason %}
-        <h4 class="text-sm font-medium mb-1">Reason:</h4>
-        <p class="text-sm bg-white rounded p-2">{{ event.data.reason }}</p>
-        {% endif %}
+        <h4 class="text-sm font-medium mb-1">Decision:</h4>
+        <p class="text-sm bg-white rounded p-2">{{ event.data.approved }}</p>
+
         <h4 class="text-sm font-medium mb-1">Verified Results:</h4>
         <div class="bg-white rounded p-2">
             {% for key, value in event.data.verified_result.items() %}
@@ -38,8 +42,6 @@
     </div>
     {% elif event.event_type == 'AddedToManualReview' %}
     <div class="mt-2">
-        <h4 class="text-sm font-medium mb-1">Reason:</h4>
-        <p class="text-sm bg-white rounded p-2">{{ event.data.reason }}</p>
         <div class="mt-2">
             <h4 class="text-sm font-medium mb-1">Results Comparison:</h4>
             <div class="bg-white rounded p-2">

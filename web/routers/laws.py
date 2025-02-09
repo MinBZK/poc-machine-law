@@ -1,7 +1,10 @@
+from operator import truediv
 from urllib.parse import unquote
 import pandas as pd
 from fastapi import APIRouter, Request, Depends, HTTPException, Form
 from typing import Optional
+
+from pydantic import BaseModel
 
 from machine.service import Services
 from web.dependencies import TODAY, FORMATTED_DATE, get_services, templates
@@ -141,25 +144,20 @@ async def appeal_case(
         service: str,
         law: str,
         bsn: str,
-        disputed_parameters: dict,
-        evidence: list,
-        reason: str,
+        reason: str = Form(...),  # Changed this line to use Form
         services: Services = Depends(get_services)
 ):
     """Submit an appeal for an existing case"""
     # First calculate the new result with disputed parameters
     law = unquote(law)
-    disputed_parameters.update({"BSN": bsn})  # Ensure BSN is included
-    result = await services.evaluate(service, law, disputed_parameters, TODAY)
 
     # Submit the appeal with new claimed result
     case_id = services.manager.appeal_case(
         case_id=case_id,
-        disputed_parameters=disputed_parameters,
-        evidence=evidence,
         reason=reason,
-        claimed_result=result.output
     )
+
+    law, result, rule_spec = await evaluate_law(bsn, law, service, services)
 
     template_path = get_tile_template(service, law)
 
@@ -170,6 +168,10 @@ async def appeal_case(
             "request": request,
             "law": law,
             "service": service,
+            "rule_spec": rule_spec,
+            "result": result.output,
+            "input": result.input,
+            "requirements_met": result.requirements_met,
             "current_case": services.manager.get_case_by_id(case_id)
         }
     )

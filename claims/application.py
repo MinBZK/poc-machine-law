@@ -120,8 +120,8 @@ class ServiceCaseManager(Application):
         Complete manual review of a case.
         """
         case = self.get_case_by_id(case_id)
-        if case.status != CaseStatus.IN_REVIEW:
-            raise ValueError("Can only complete review for cases in review")
+        if case.status not in [CaseStatus.IN_REVIEW, CaseStatus.APPEALED]:
+            raise ValueError("Can only complete review for cases in review or appeals")
 
         # Use current verified_result or override if provided
         verified_result = override_result or case.verified_result
@@ -138,10 +138,7 @@ class ServiceCaseManager(Application):
 
     def appeal_case(self,
                     case_id: str,
-                    disputed_parameters: Dict,
-                    evidence: List[str],
-                    reason: str,
-                    claimed_result: Dict) -> str:
+                    reason: str) -> str:
         """
         Submit an appeal for a case with newly claimed result.
         Appeals always go to manual review.
@@ -150,22 +147,7 @@ class ServiceCaseManager(Application):
 
         # First record the appeal with citizen's new claim
         case.add_appeal(
-            disputed_parameters=disputed_parameters,
-            claimed_result=claimed_result,
-            evidence=evidence,
             reason=reason
-        )
-
-        # Calculate verified result based on disputed parameters
-        result = self.rules_engine.evaluate(case.service, case.law, disputed_parameters)
-        verified_result = result.output
-
-        # Appeals always go to manual review
-        case.add_to_manual_review(
-            verifier_id="SYSTEM",
-            reason="Appeal requires manual review",
-            claimed_result=claimed_result,
-            verified_result=verified_result
         )
 
         self.save(case)

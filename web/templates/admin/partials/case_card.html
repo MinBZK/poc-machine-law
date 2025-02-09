@@ -9,7 +9,7 @@
              data-case-id="{{ case.id }}">
             <div class="font-medium mb-2">BSN: {{ case.bsn }}</div>
 
-            {% if case.status == 'IN_REVIEW' %}
+            {% if case.status in ['IN_REVIEW', 'APPEALED'] %}
             <div class="flex space-x-2">
                 <button type="button"
                         class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"

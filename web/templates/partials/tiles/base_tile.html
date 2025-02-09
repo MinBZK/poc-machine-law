@@ -72,13 +72,63 @@
                 Uw aanvraag wordt beoordeeld. Heeft u vragen? Klik hier, of bel 1234.
             </p>
             {% elif current_case.status == 'DECIDED' %}
-            <p class="text-sm text-gray-600 text-center">
-                {% if current_case and current_case.verified_result %}
-                Uw aanvraag is goedgekeurd
-                {% else %}
-                U kunt in bezwaar gaan tegen deze beslissing
-                {% endif %}
-            </p>
+            {% if current_case and current_case.approved %}
+            <p class="text-sm text-gray-600 text-center">Uw aanvraag is goedgekeurd</p>
+            {% else %}
+            <button type="button"
+                    onclick="showAppealDialog('{{ current_case.id }}')"
+                    class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
+                Ga in bezwaar
+            </button>
+
+            <!-- Appeal Dialog -->
+            <dialog id="appeal-dialog-{{ current_case.id }}"
+                    class="rounded-lg shadow-lg p-0 border-0 backdrop:bg-gray-500 backdrop:bg-opacity-50">
+                <div class="w-[32rem] m-8">
+                    <div class="px-6 py-4 border-b">
+                        <h3 class="text-xl font-semibold">Reden voor bezwaar</h3>
+                    </div>
+
+                    <div class="px-8 py-6">
+                        <form hx-post="/laws/appeal-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&case_id={{ current_case.id }}"
+                              hx-target="closest div.law-result-card">
+                            <label class="block text-lg mb-3">
+                                Geef een reden voor uw bezwaar:
+                            </label>
+                            <textarea
+                                    name="reason"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    rows="4"
+                                    required></textarea>
+
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <button type="button"
+                                        class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base"
+                                        onclick="closeAppealDialog('{{ current_case.id }}')">
+                                    Annuleren
+                                </button>
+                                <button type="submit"
+                                        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-base">
+                                    Bevestigen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
+
+            <script>
+                function showAppealDialog(caseId) {
+                    const dialog = document.getElementById(`appeal-dialog-${caseId}`);
+                    dialog.showModal();
+                }
+
+                function closeAppealDialog(caseId) {
+                    const dialog = document.getElementById(`appeal-dialog-${caseId}`);
+                    dialog.close();
+                }
+            </script>
+            {% endif %}
             {% endif %}
             {% endblock %}
         </div>
