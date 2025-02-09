@@ -102,7 +102,7 @@ async def move_case(
         elif new_status_enum == CaseStatus.DECIDED:
             case.add_manual_decision(
                 verified_result={},  # Would need the actual result
-                reasoning="Manually decided",
+                reason="Manually decided",
                 verifier_id="ADMIN"  # TODO: Get from auth
             )
         else:
@@ -129,28 +129,58 @@ async def complete_review(
         request: Request,
         case_id: str,
         decision: bool = Form(...),
-        reasoning: str = Form(...),
+        reason: str = Form(...),  # Note: changed from reasoning to match form
         services: Services = Depends(get_services)
 ):
     """Complete manual review of a case"""
     try:
-        case = services.manager.complete_manual_review(
+        case_id = services.manager.complete_manual_review(
             case_id=case_id,
-            verifier_id="ADMIN",  # TODO: Get actual verifier from auth
+            verifier_id="ADMIN",
             approved=decision,
-            reasoning=reasoning
+            reason=reason
         )
 
+        # Get the updated case
+        updated_case = services.manager.get_case_by_id(case_id)
+
+        # Check if request is from case detail page
+        is_detail_page = request.headers.get('HX-Current-URL', '').endswith(f'/cases/{case_id}')
+
+        if is_detail_page:
+            # Create a decision event object for the template
+            decision_event = {
+                'event_type': 'Decided',
+                'timestamp': datetime.now(),
+                'data': {
+                    'verified_result': updated_case.verified_result,
+                    'reason': reason
+                }
+            }
+
+            return templates.TemplateResponse(
+                "admin/partials/event_detail.html",
+                {
+                    "request": request,
+                    "event": decision_event,
+                    "is_first": True
+                }
+            )
+
+        # Return updated card for HTMX swap if not detail page
         return templates.TemplateResponse(
             "admin/partials/case_card.html",
             {
                 "request": request,
-                "case": case,
-                "status": case.status
+                "case": updated_case,
+                "status": updated_case.status
             }
         )
-    except Exception as e:
+
+    except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/cases/{case_id}")

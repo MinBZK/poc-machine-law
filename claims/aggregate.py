@@ -52,7 +52,7 @@ class ServiceCase(Aggregate):
                  claimed_result: Dict,
                  rulespec_uuid: str):
         self.bsn = bsn
-        self.service_type = service_type
+        self.service = service_type
         self.law = law
         self.rulespec_uuid = rulespec_uuid
 

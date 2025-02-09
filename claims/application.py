@@ -27,7 +27,7 @@ class ServiceCaseManager(Application):
 
     def _index_case(self, case: ServiceCase):
         """Add case to index"""
-        key = self._index_key(case.bsn, case.service_type, case.law)
+        key = self._index_key(case.bsn, case.service, case.law)
         self._case_index[key] = str(case.id)
 
     def _results_match(self, claimed_result: Dict, verified_result: Dict) -> bool:
@@ -73,7 +73,7 @@ class ServiceCaseManager(Application):
             law=law,
             parameters=parameters,
             claimed_result=claimed_result,
-            rulespec_uuid = result.rulespec_uuid,
+            rulespec_uuid=result.rulespec_uuid,
         )
 
         # Verify using rules engine
@@ -114,32 +114,21 @@ class ServiceCaseManager(Application):
                                case_id: str,
                                verifier_id: str,
                                approved: bool,
-                               reasoning: str,
+                               reason: str,
                                override_result: Optional[Dict] = None) -> str:
         """
         Complete manual review of a case.
         """
-        case = self.repository.get(case_id)
+        case = self.get_case_by_id(case_id)
         if case.status != CaseStatus.IN_REVIEW:
             raise ValueError("Can only complete review for cases in review")
 
-        # Get the event stream to find review data
-        events = self.repository.events.get_domain_events(case.id)
-        review_data = None
-
-        for event in reversed(events):
-            if event.topic.endswith('AddedToManualReview'):
-                review_data = event
-                break
-
-        if not review_data:
-            raise ValueError("No review data found in case history")
-
-        verified_result = override_result or review_data.verified_result
+        # Use current verified_result or override if provided
+        verified_result = override_result or case.verified_result
 
         case.add_manual_decision(
             verified_result=verified_result,
-            reasoning=reasoning,
+            reason=reason,
             verifier_id=verifier_id,
             approved=approved,
         )
@@ -151,24 +140,24 @@ class ServiceCaseManager(Application):
                     case_id: str,
                     disputed_parameters: Dict,
                     evidence: List[str],
-                    reasoning: str,
+                    reason: str,
                     claimed_result: Dict) -> str:
         """
         Submit an appeal for a case with newly claimed result.
         Appeals always go to manual review.
         """
-        case = self.repository.get(case_id)
+        case = self.get_case_by_id(case_id)
 
         # First record the appeal with citizen's new claim
         case.add_appeal(
             disputed_parameters=disputed_parameters,
             claimed_result=claimed_result,
             evidence=evidence,
-            reasoning=reasoning
+            reason=reason
         )
 
         # Calculate verified result based on disputed parameters
-        result = self.rules_engine.evaluate(case.service_type, case.law, disputed_parameters)
+        result = self.rules_engine.evaluate(case.service, case.law, disputed_parameters)
         verified_result = result.output
 
         # Appeals always go to manual review
@@ -193,9 +182,9 @@ class ServiceCaseManager(Application):
     def get_cases_by_status(self, service_type: str, status: CaseStatus) -> List[ServiceCase]:
         """Get all cases for a service in a particular status"""
         return [
-            self.repository.get(case_id)
+            self.get_case_by_id(case_id)
             for case_id in self._case_index.values()
-            if self.repository.get(case_id).service_type == service_type
+            if self.repository.get(case_id).service == service_type
                and self.repository.get(case_id).status == status
         ]
 
@@ -210,6 +199,6 @@ class ServiceCaseManager(Application):
         cases = []
         for key, case_id in self._case_index.items():
             case = self.get_case_by_id(case_id)
-            if case.law == law and case.service_type == service_type:
+            if case.law == law and case.service == service_type:
                 cases.append(case)
         return cases

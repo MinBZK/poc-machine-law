@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "admin/partials/event_detail.html" import render_event %}
 
 {% block content %}
 <div class="p-6">
@@ -39,103 +40,17 @@
             <h2 class="text-lg font-semibold mb-4">Event History</h2>
             <div class="space-y-4">
                 {% for event in case.events %}
-                <div class="border rounded-lg p-4 {% if loop.first %}bg-blue-50{% endif %}">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-medium">{{ event.event_type }}</h3>
-                            <p class="text-sm text-gray-600">{{ event.timestamp|format_date }}</p>
-                        </div>
-                    </div>
-
-                    {# Show event-specific details #}
-                    {% if event.event_type == 'Submitted' %}
-                    <div class="mt-2">
-                        <h4 class="text-sm font-medium mb-1">Claimed Results:</h4>
-                        <div class="bg-white rounded p-2">
-                            {% for key, value in event.data.claimed_result.items() %}
-                            <div class="grid grid-cols-2 gap-2 text-sm">
-                                <span>{{ key|title|replace('_', ' ') }}:</span>
-                                <span>{{ value }}</span>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% elif event.event_type in ['AutomaticallyDecided', 'Decided'] %}
-                    <div class="mt-2">
-                        <h4 class="text-sm font-medium mb-1">Verified Results:</h4>
-                        <div class="bg-white rounded p-2">
-                            {% for key, value in event.data.verified_result.items() %}
-                            <div class="grid grid-cols-2 gap-2 text-sm">
-                                <span>{{ key|title|replace('_', ' ') }}:</span>
-                                <span>{{ value }}</span>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% if event.data.reasoning %}
-                        <div class="mt-2">
-                            <h4 class="text-sm font-medium mb-1">Reasoning:</h4>
-                            <p class="text-sm bg-white rounded p-2">{{ event.data.reasoning }}</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% elif event.event_type == 'AddedToManualReview' %}
-                    <div class="mt-2">
-                        <h4 class="text-sm font-medium mb-1">Review Reason:</h4>
-                        <p class="text-sm bg-white rounded p-2">{{ event.data.reason }}</p>
-                        <div class="mt-2">
-                            <h4 class="text-sm font-medium mb-1">Results Comparison:</h4>
-                            <div class="bg-white rounded p-2">
-                                <div class="grid grid-cols-3 gap-2 text-sm font-medium">
-                                    <span>Field</span>
-                                    <span>Claimed</span>
-                                    <span>Verified</span>
-                                </div>
-                                {% for key, value in event.data.verified_result.items() %}
-                                <div class="grid grid-cols-3 gap-2 text-sm">
-                                    <span>{{ key|replace('_', ' ')|title }}</span>
-                                    <span>{{ event.data.claimed_result[key] }}</span>
-                                    <span>{{ value }}</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    {% elif event.event_type == 'Appealed' %}
-                    <div class="mt-2">
-                        <h4 class="text-sm font-medium mb-1">Appeal Reason:</h4>
-                        <p class="text-sm bg-white rounded p-2">{{ event.data.reasoning }}</p>
-                        {% if event.data.evidence %}
-                        <div class="mt-2">
-                            <h4 class="text-sm font-medium mb-1">Evidence:</h4>
-                            <ul class="list-disc list-inside text-sm">
-                                {% for item in event.data.evidence %}
-                                <li>{{ item }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
-                        <div class="mt-2">
-                            <h4 class="text-sm font-medium mb-1">Disputed Parameters:</h4>
-                            <div class="bg-white rounded p-2">
-                                {% for key, value in event.data.disputed_parameters.items() %}
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <span>{{ key|replace('_', ' ')|title }}:</span>
-                                    <span>{{ value }}</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
+                {{ render_event(event, is_first=loop.first) }}
                 {% endfor %}
             </div>
         </div>
 
         {% if case.status == 'IN_REVIEW' %}
-        <div class="mt-6 pt-6 border-t">
+        <div class="mt-6 pt-6 border-t" id="review-form-container">
             <h2 class="text-lg font-semibold mb-4">Review Actions</h2>
-            <form hx-post="/admin/cases/{{ case.id }}/complete-review" class="space-y-4">
+            <form hx-post="/admin/cases/{{ case.id }}/complete-review"
+                  hx-target="#review-form-container"
+                  class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">Decision</label>
                     <select name="decision" class="w-full border rounded-md p-2">
@@ -144,8 +59,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2">Reasoning</label>
-                    <textarea name="reasoning" class="w-full border rounded-md p-2" rows="3"></textarea>
+                    <label class="block text-sm font-medium mb-2">Reason</label>
+                    <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
                 </div>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                     Submit Review

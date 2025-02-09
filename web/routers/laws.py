@@ -143,7 +143,7 @@ async def appeal_case(
         bsn: str,
         disputed_parameters: dict,
         evidence: list,
-        reasoning: str,
+        reason: str,
         services: Services = Depends(get_services)
 ):
     """Submit an appeal for an existing case"""
@@ -157,7 +157,7 @@ async def appeal_case(
         case_id=case_id,
         disputed_parameters=disputed_parameters,
         evidence=evidence,
-        reasoning=reasoning,
+        reason=reason,
         claimed_result=result.output
     )
 

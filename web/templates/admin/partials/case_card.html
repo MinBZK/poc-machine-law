@@ -1,74 +1,106 @@
 {# templates/admin/partials/case_card.html #}
-<form class="mb-2"
-      hx-post="/admin/cases/{{ case.id }}/move"
-      hx-swap="outerHTML">
-    <input type="hidden" name="new_status" value="{{ status }}">
-    <div class="p-4 bg-white border rounded shadow-sm hover:bg-gray-50 cursor-move"
-         data-case-id="{{ case.id }}">
-        <div class="font-medium mb-2">BSN: {{ case.bsn }}</div>
+<div class="mb-2">
+    <!-- Move form -->
+    <form hx-post="/admin/cases/{{ case.id }}/move"
+          hx-swap="outerHTML"
+          class="mb-2">
+        <input type="hidden" name="new_status" value="{{ status }}">
+        <div class="p-4 bg-white border rounded shadow-sm hover:bg-gray-50 cursor-move"
+             data-case-id="{{ case.id }}">
+            <div class="font-medium mb-2">BSN: {{ case.bsn }}</div>
 
-        {# Show the most recent event details #}
-        {% set latest_event = case.events[-1] if case.events else None %}
-        {% if latest_event %}
-        {% if latest_event.event_type == 'Submitted' %}
-        <div class="text-sm text-gray-600 mb-2">
-            <div class="font-medium">Claimed Results:</div>
-            {% for key, value in latest_event.data.claimed_result.items() %}
-            <div class="grid grid-cols-2 gap-1">
-                <span>{{ key|replace('_', ' ')|title }}:</span>
-                <span>{{ value }}</span>
+            {% if case.status == 'IN_REVIEW' %}
+            <div class="flex space-x-2">
+                <button type="button"
+                        class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        onclick="showDialog('{{ case.id }}', true)">
+                    Approve
+                </button>
+                <button type="button"
+                        class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        onclick="showDialog('{{ case.id }}', false)">
+                    Deny
+                </button>
             </div>
-            {% endfor %}
-        </div>
-        {% elif latest_event.event_type in ['AutomaticallyDecided', 'Decided'] %}
-        <div class="text-sm text-gray-600 mb-2">
-            <div class="font-medium">Verified Results:</div>
-            {% for key, value in latest_event.data.verified_result.items() %}
-            <div class="grid grid-cols-2 gap-1">
-                <span>{{ key|replace('_', ' ')|title }}:</span>
-                <span>{{ value }}</span>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endif %}
+            {% endif %}
 
-        <div class="flex items-center space-x-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                {% if case.status == 'SUBMITTED' %}
-                    bg-blue-100 text-blue-800">Ingediend
-                {% elif case.status == 'IN_REVIEW' %}
-                    bg-yellow-100 text-yellow-800">In behandeling
-                {% elif case.status == 'DECIDED' and case.approved%}
-                    bg-green-100 text-green-800">Toegekend
-                {% elif case.status == 'DECIDED' and not case.approved%}
-                    bg-red-100 text-red-800">Afgewezen
-                {% elif case.status == 'APPEALED' %}
-                    bg-purple-100 text-purple-800">In bezwaar gegaan
-                {% endif %}
+            {% if case.status == 'DECIDED' %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                    {% if case.approved %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                {{ 'Toegekend' if case.approved else 'Afgewezen' }}
             </span>
-        </div>
+            {% endif %}
 
-        {% if case.status == 'IN_REVIEW' %}
-        <div class="mt-3 space-y-2">
-            <button type="button"
-                    class="w-full px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
-                    onclick="approveCase('{{ case.id }}')">
-                Approve
-            </button>
-            <button type="button"
-                    class="w-full px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-                    onclick="denyCase('{{ case.id }}')">
-                Deny
-            </button>
+            <div class="mt-2">
+                <a href="/admin/cases/{{ case.id }}"
+                   class="text-sm text-blue-600 hover:underline">
+                    View Details
+                </a>
+            </div>
         </div>
-        {% endif %}
+    </form>
 
-        <div class="mt-2">
-            <a href="/admin/cases/{{ case.id }}"
-               class="text-sm text-blue-600 hover:underline">
-                View Details
-            </a>
+    <!-- Dialog -->
+    <dialog id="decision-dialog-{{ case.id }}"
+            class="rounded-lg shadow-lg p-0 border-0 backdrop:bg-gray-500 backdrop:bg-opacity-50">
+        <div class="w-[32rem] m-8">
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-xl font-semibold" id="dialog-title-{{ case.id }}">Decision Reason</h3>
+            </div>
+
+            <div class="px-8 py-6">
+                <form hx-post="/admin/cases/{{ case.id }}/complete-review"
+                      hx-target="closest div.mb-2"
+                      hx-swap="outerHTML">
+                    <input type="hidden" name="decision" id="decision-input-{{ case.id }}">
+                    <label class="block text-lg mb-3">
+                        Please enter a reason:
+                    </label>
+                    <textarea
+                            name="reason"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            rows="4"
+                            required></textarea>
+
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button"
+                                class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base"
+                                onclick="closeDialog('{{ case.id }}')">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-5 py-2.5 text-white rounded-md text-base"
+                                id="confirm-btn-{{ case.id }}">
+                            Confirm
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-</form>
+    </dialog>
+</div>
+
+<script>
+    function showDialog(caseId, isApprove) {
+        const dialog = document.getElementById(`decision-dialog-${caseId}`);
+        const title = document.getElementById(`dialog-title-${caseId}`);
+        const confirmBtn = document.getElementById(`confirm-btn-${caseId}`);
+        const decisionInput = document.getElementById(`decision-input-${caseId}`);
+
+        // Set the decision value
+        decisionInput.value = isApprove;
+
+        // Set title and button style based on decision
+        title.textContent = isApprove ? 'Approve Case' : 'Deny Case';
+        confirmBtn.className = `px-5 py-2.5 text-white rounded-md text-base ${
+            isApprove ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+        }`;
+
+        dialog.showModal();
+    }
+
+    function closeDialog(caseId) {
+        const dialog = document.getElementById(`decision-dialog-${caseId}`);
+        dialog.close();
+    }
+</script>
