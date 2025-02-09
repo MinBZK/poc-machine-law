@@ -12,4 +12,9 @@
             bg-purple-100 text-purple-800">In bezwaar gegaan
         {% endif %}
     </span>
+    {% if current_case.modified_on %}
+    <span class="text-sm text-gray-400">
+        laatste wijziging {{ current_case.modified_on.strftime('%-d %B %Y') }}
+    </span>
+    {% endif %}
 </div>
