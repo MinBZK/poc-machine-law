@@ -3,7 +3,7 @@ from starlette.responses import RedirectResponse
 import json
 from datetime import datetime
 
-from claims.aggregate import CaseStatus
+from machine.events.aggregate import CaseStatus
 from machine.service import Services
 from web.dependencies import get_services, templates
 
