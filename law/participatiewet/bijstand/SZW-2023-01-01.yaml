@@ -263,7 +263,7 @@ requirements:
             value: true
           - operation: IN
             subject: "$RESIDENCE_PERMIT_TYPE"
-            values: 
+            values:
               - "$VALID_RESIDENCE_PERMITS"
 
       # Woonplaats Nederland
@@ -333,7 +333,7 @@ actions:
         then:
           operation: IN
           subject: "$HOUSEHOLD_MEMBERS"
-          values: 
+          values:
             - "$KOSTENDELERSNORM_FACTORS"
       - else:
           operation: IF

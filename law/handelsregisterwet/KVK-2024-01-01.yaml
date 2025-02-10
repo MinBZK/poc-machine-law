@@ -85,20 +85,20 @@ actions:
         values:
           - operation: IN
             subject: "$REGISTRATIONS.rechtsvorm"
-            values: 
+            values:
               - "$ENTREPRENEUR_FORMS"
           - operation: IN
             subject: "$REGISTRATIONS.status"
-            values: 
+            values:
               - "$ACTIVE_STATUSES"
       # Check functie bij andere onderneming
       - operation: AND
         values:
           - operation: IN
             subject: "$POSITIONS.functie"
-            values: 
+            values:
               - "$ENTREPRENEUR_POSITIONS"
           - operation: IN
             subject: "$POSITIONS.status"
-            values: 
+            values:
               - "$ACTIVE_STATUSES"

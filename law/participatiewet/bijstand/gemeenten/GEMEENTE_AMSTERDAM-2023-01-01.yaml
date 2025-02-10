@@ -194,13 +194,13 @@ requirements:
             value: true
           - operation: IN
             subject: "$POSTAL_ADDRESS"
-            values: 
+            values:
               - "$VALID_POSTAL_ADDRESSES"
       # Arbeidsverplichting check
       - or:
           - operation: IN
             subject: "$WORK_CAPABILITY.arbeidsvermogen"
-            values: 
+            values:
               - "$FULL_EXEMPTION_REASONS"
           - operation: NOT_NULL
             subject: "$WORK_CAPABILITY.re_integratie_traject"
@@ -271,7 +271,7 @@ actions:
               value: false
             - operation: IN
               subject: "$POSTAL_ADDRESS"
-              values: 
+              values:
                 - "$VALID_POSTAL_ADDRESSES"
         then: "$HOUSING_ASSISTANCE_AMOUNT"
       - else: 0
