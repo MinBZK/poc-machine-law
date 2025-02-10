@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 import pandas as pd
 
 from machine.events.application import ServiceCaseManager
-from .engine import RulesEngine, AbstractServiceProvider
+from .engine import RulesEngine, AbstractServiceProvider, PathNode
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -19,6 +19,7 @@ class RuleResult:
     requirements_met: bool
     input: Dict[str, Any]
     rulespec_uuid: str
+    path: Optional[PathNode] = None
 
     @classmethod
     def from_engine_result(cls, result: Dict[str, Any], rulespec_uuid: str) -> 'RuleResult':
@@ -31,6 +32,7 @@ class RuleResult:
             requirements_met=result.get('requirements_met', False),
             input=result.get('input', {}),
             rulespec_uuid=rulespec_uuid,
+            path=result.get('path')
         )
 
 
