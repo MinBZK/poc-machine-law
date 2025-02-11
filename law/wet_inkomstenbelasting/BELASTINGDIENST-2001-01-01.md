@@ -5,21 +5,21 @@ Geldig vanaf: 2001-01-01
 Objecttype: Natuurlijk persoon
 - Heeft de persoon een fiscaal partner <span style="color:green">Has partner</span> uit het <span style="color:yellow"> RvIG </span> op basis van <span style="color:pink"> wet_brp </span>
 - Heeft de persoon een fiscaal partner <span style="color:green">Partner bsn</span> uit het <span style="color:yellow"> RvIG </span> op basis van <span style="color:pink"> wet_brp </span>
-- <span style="color:green">Box1 income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Box2 income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Box3 income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Foreign income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Net worth</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Partner box1 income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Partner box2 income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Partner box3 income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Partner foreign income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Partner income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Combined net worth</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Assets</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Business income</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Monthly income</span> amount (eurocent precisie: 0 minimum: 0) 
+- <span style="color:green">Box1 income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Box2 income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Box3 income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Foreign income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Net worth</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Partner box1 income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Partner box2 income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Partner box3 income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Partner foreign income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Partner income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Combined net worth</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Assets</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Business income</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Monthly income</span> amount (eurocent precisie: 0 minimum: 0)
 
 ## Parameters ##
 - Parameter <span style="color:green">BOX3_RENDEMENT</span> : 0.0674
@@ -80,13 +80,13 @@ Regel bepaal/bereken partner box1 income
 Geldig vanaf: 2001-01-01
 
 
-	
-  - als 
-  
-  
-  
+
+  - als
+
+
+
     dan <span style="color:green">$PARTNER_BOX1_EMPLOYMENT</span> plus <span style="color:green">$PARTNER_BOX1_BENEFITS</span> plus <span style="color:green">$PARTNER_BOX1_BUSINESS</span> plus <span style="color:green">$PARTNER_BOX1_OTHER_WORK</span> plus <span style="color:green">$PARTNER_BOX1_HOME</span>
-  
+
 
   - anders <span style="color:green">0</span>
 
@@ -98,13 +98,13 @@ Regel bepaal/bereken partner box2 income
 Geldig vanaf: 2001-01-01
 
 
-	
-  - als 
-  
-  
-  
+
+  - als
+
+
+
     dan <span style="color:green">$PARTNER_BOX2_DIVIDEND</span> plus <span style="color:green">$PARTNER_BOX2_SHARES</span>
-  
+
 
   - anders <span style="color:green">0</span>
 
@@ -120,7 +120,7 @@ De <span style="color: green">partner_box3_income</span> is
  maximaal <span style="color:green">0</span>
  keer <span style="color:green">$BOX3_RENDEMENT</span>
 
-- 
+-
 
 
 Regel bepaal/bereken partner income
@@ -174,5 +174,3 @@ Geldig vanaf: 2001-01-01
 
 	<span style="color:green">$box1_income</span> plus <span style="color:green">$box2_income</span> plus <span style="color:green">$box3_income</span>
  delen door <span style="color:green">12</span>
-
-

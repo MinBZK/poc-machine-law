@@ -16,7 +16,7 @@ Objecttype: Natuurlijk persoon
 - Partnerinkomen <span style="color:green">Partner income</span> uit het <span style="color:yellow"> UWV </span> op basis van <span style="color:pink"> wet_inkomstenbelasting </span>
 - Partner studiefinanciering <span style="color:green">Partner study grant</span> uit het <span style="color:yellow"> DUO </span> op basis van <span style="color:pink"> wet_studiefinanciering </span>
 - <span style="color:green">Is verzekerde zorgtoeslag</span> boolean
-- <span style="color:green">Hoogte toeslag</span> amount (eurocent precisie: 0 minimum: 0) 
+- <span style="color:green">Hoogte toeslag</span> amount (eurocent precisie: 0 minimum: 0)
 
 ## Parameters ##
 - Parameter <span style="color:green">AFBOUWPERCENTAGE_BOVEN_DREMPEL</span> : 0.1367
@@ -43,70 +43,68 @@ De <span style="color: green">hoogte_toeslag</span> is
 - Indien <span style="color:green">$HAS_PARTNER</span> onwaar is dan
   - als <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span>
    groter dan <span style="color:green">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-  
-  
-  
+
+
+
     dan <span style="color:green">0</span>
 
-  - als <span style="color:green">$NET_WORTH</span> groter dan 
+  - als <span style="color:green">$NET_WORTH</span> groter dan
   	<span style="color:green">$VERMOGENSGRENS_ALLEENSTAANDE</span>
-  
-  
-  
+
+
+
     dan <span style="color:green">0</span>
 
   - anders <span style="color:green">$STANDAARDPREMIE_2025</span> min <span style="color:green">$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND</span> keer <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span>
    minimaal <span style="color:green">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-  
-   plus 
+
+   plus
     - als <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span>
      groter dan <span style="color:green">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-    
-    
-    
+
+
+
       dan <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span>
      min <span style="color:green">$DREMPELINKOMEN_ALLEENSTAANDE</span>
      keer <span style="color:green">$AFBOUWPERCENTAGE_BOVEN_DREMPEL</span>
-    
-  
+
+
     - anders <span style="color:green">0</span>
-  
-  
-  
+
+
+
 
 - Indien <span style="color:green">$HAS_PARTNER</span> waar is dan
   - als <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span> plus <span style="color:green">$PARTNER_INCOME</span> plus <span style="color:green">$PARTNER_STUDY_GRANT</span>
    groter dan <span style="color:green">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-  
-  
-  
+
+
+
     dan <span style="color:green">0</span>
 
-  - als <span style="color:green">$COMBINED_NET_WORTH</span> groter dan 
+  - als <span style="color:green">$COMBINED_NET_WORTH</span> groter dan
   	<span style="color:green">$VERMOGENSGRENS_TOESLAGPARTNER</span>
-  
-  
-  
+
+
+
     dan <span style="color:green">0</span>
 
   - anders <span style="color:green">$STANDAARDPREMIE_2025</span> keer <span style="color:green">2</span>
    min <span style="color:green">$PERCENTAGE_DREMPELINKOMEN_MET_PARTNER</span> keer <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span> plus <span style="color:green">$PARTNER_INCOME</span> plus <span style="color:green">$PARTNER_STUDY_GRANT</span>
    minimaal <span style="color:green">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-  
-   plus 
+
+   plus
     - als <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span> plus <span style="color:green">$PARTNER_INCOME</span> plus <span style="color:green">$PARTNER_STUDY_GRANT</span>
      groter dan <span style="color:green">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-    
-    
-    
+
+
+
       dan <span style="color:green">$INCOME</span> plus <span style="color:green">$STUDY_GRANT</span> plus <span style="color:green">$PARTNER_INCOME</span> plus <span style="color:green">$PARTNER_STUDY_GRANT</span>
      min <span style="color:green">$DREMPELINKOMEN_TOESLAGPARTNER</span>
      keer <span style="color:green">$AFBOUWPERCENTAGE_BOVEN_DREMPEL</span>
-    
-  
+
+
     - anders <span style="color:green">0</span>
-  
-  
-  
+
 
 

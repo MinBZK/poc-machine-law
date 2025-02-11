@@ -55,7 +55,7 @@ properties:
             type: "string"
             value:
               operation: IN
-              values: 
+              values:
                 - "$VALID_BENEFIT_TYPES"
 
   output:

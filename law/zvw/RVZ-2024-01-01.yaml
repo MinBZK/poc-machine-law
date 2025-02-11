@@ -99,7 +99,7 @@ actions:
         subject: "$INSURANCE_POLICY"
       - operation: IN
         subject: "$INSURANCE_POLICY"
-        values: 
+        values:
           - "$ACTIVE_POLICY_STATUSES"
 
   - output: "has_act_insurance"
@@ -109,7 +109,7 @@ actions:
         subject: "$TREATY_REGISTRATION"
       - operation: IN
         subject: "$RESIDENCE_COUNTRY"
-        values: 
+        values:
           - "$VALID_TREATY_COUNTRIES"
       - operation: EQUALS
         subject: "$TREATY_REGISTRATION"

@@ -12,9 +12,9 @@ Objecttype: Natuurlijk persoon
 - Is ondernemer/ZZP-er <span style="color:green">Is entrepreneur</span> uit het <span style="color:yellow"> KVK </span> op basis van <span style="color:pink"> handelsregisterwet </span>
 - Inkomsten uit onderneming <span style="color:green">Business income</span> uit het <span style="color:yellow"> BELASTINGDIENST </span> op basis van <span style="color:pink"> wet_inkomstenbelasting </span>
 - <span style="color:green">Is eligible</span> boolean
-- <span style="color:green">Benefit amount</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Housing assistance</span> amount (eurocent precisie: 0 minimum: 0) 
-- <span style="color:green">Startup assistance</span> amount (eurocent precisie: 0 minimum: 0) 
+- <span style="color:green">Benefit amount</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Housing assistance</span> amount (eurocent precisie: 0 minimum: 0)
+- <span style="color:green">Startup assistance</span> amount (eurocent precisie: 0 minimum: 0)
 
 ## Parameters ##
 - Parameter <span style="color:green">FULL_EXEMPTION_REASONS</span> : [MEDISCH_VOLLEDIG MANTELZORG_VOLLEDIG SOCIALE_OMSTANDIGHEDEN_VOLLEDIG]
@@ -39,33 +39,33 @@ Geldig vanaf: 2024-01-01
 
 
 	<span style="color:green">$NATIONAL_BASE_AMOUNT</span> keer <span style="color:green">$KOSTENDELERSNORM</span>
- plus 
+ plus
   - als <span style="color:green">$AGE</span> minder dan of gelijk aan <span style="color:green">$YOUTH_MAX_AGE</span>
-   en <span style="color:green">$HAS_FIXED_ADDRESS</span> gelijk aan 
+   en <span style="color:green">$HAS_FIXED_ADDRESS</span> gelijk aan
   	<span style="color:green">true</span>
-  
-  
-  
-  
+
+
+
+
     dan <span style="color:green">$YOUTH_SUPPLEMENT</span>
 
   - anders <span style="color:green">0</span>
- plus 
-  - als <span style="color:green">$IS_ENTREPRENEUR</span> gelijk aan 
+ plus
+  - als <span style="color:green">$IS_ENTREPRENEUR</span> gelijk aan
   	<span style="color:green">true</span>
    en <span style="color:green">$BUSINESS_INCOME</span> groter dan <span style="color:green">0</span>
-  
-  
-  
-  
+
+
+
+
     dan <span style="color:green">$BUSINESS_INCOME</span> keer <span style="color:green">$ZZP_INCOME_DISREGARD_PERCENTAGE</span>
-  
+
 
   - anders <span style="color:green">0</span>
- plus 
+ plus
   - als <span style="color:green"><no value></span>
-  
-  
+
+
     dan <span style="color:green">$RE_INTEGRATION_SUPPLEMENT</span>
 
   - anders <span style="color:green">0</span>
@@ -78,7 +78,7 @@ Regel bepaal/bereken housing assistance
 Geldig vanaf: 2024-01-01
 De <span style="color: green">housing_assistance</span> is
 -  dan<span style="color:green">$HOUSING_ASSISTANCE_AMOUNT</span>
-- 
+-
 
 
 Regel bepaal/bereken startup assistance
@@ -86,5 +86,4 @@ Regel bepaal/bereken startup assistance
 Geldig vanaf: 2024-01-01
 De <span style="color: green">startup_assistance</span> is
 -  dan<span style="color:green">$STARTUP_ASSISTANCE_MAX</span>
-- 
-
+-

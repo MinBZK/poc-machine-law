@@ -84,17 +84,17 @@ actions:
           values:
             - operation: IN
               subject: "$PERMIT_DATA.type"
-              values: 
+              values:
                 - "$PERMANENT_TYPES"
             - operation: IN
               subject: "$PERMIT_DATA.status"
-              values: 
+              values:
                 - "$VALID_PERMIT_STATUSES"
         then: "PERMANENT"
       - test:
           operation: IN
           subject: "$EU_REGISTRATION.type"
-          values: 
+          values:
             - "$EU_TYPES"
         then: "EU"
       - test:
@@ -102,7 +102,7 @@ actions:
           values:
             - subject: "$PERMIT_DATA.status"
               operation: IN
-              values: 
+              values:
                 - "$VALID_PERMIT_STATUSES"
             - operation: LESS_OR_EQUAL
               values:
