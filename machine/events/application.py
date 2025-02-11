@@ -1,25 +1,60 @@
+import asyncio
 import random
 from decimal import Decimal
 from typing import Optional, List, Dict, Tuple
 from uuid import UUID
 
 from eventsourcing.application import Application
+from eventsourcing.dispatch import singledispatchmethod
+from eventsourcing.system import ProcessApplication
 
 from .aggregate import ServiceCase, CaseStatus
+
+
+class RuleProcessor(ProcessApplication):
+    def __init__(self, rules_engine, **kwargs):
+        super().__init__(**kwargs)
+        self.rules_engine = rules_engine
+
+    @singledispatchmethod
+    def policy(self, domain_event, process_event):
+        """Sync policy that processes events"""
+        pass
+
+    @policy.register(ServiceCase.Objected)
+    @policy.register(ServiceCase.AutomaticallyDecided)
+    @policy.register(ServiceCase.Decided)
+    def _(self, domain_event, process_event):
+        try:
+            # Create a new event loop in a new thread
+            def run_async():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                return loop.run_until_complete(self.rules_engine.apply_rules(domain_event))
+
+            # Run in a separate thread
+            import threading
+            thread = threading.Thread(target=run_async)
+            thread.start()
+            thread.join()  # Wait for completion
+
+        except Exception as e:
+            print(f"Error processing rules: {e}")
 
 
 class ServiceCaseManager(Application):
     """
     Application service for managing service cases.
-    Handles case submission, verification, decisions, and appeals.
+    Handles case submission, verification, decisions, and objections.
     """
 
     SAMPLE_RATE = 0.50  # 10% sample rate
 
-    def __init__(self, rules_engine):
-        super().__init__()
+    def __init__(self, rules_engine, **kwargs):
+        super().__init__(**kwargs)
         self.rules_engine = rules_engine
         self._case_index: Dict[Tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
+        # self.follow()
 
     def _index_key(self, bsn: str, service_type: str, law: str) -> Tuple[str, str, str]:
         """Generate index key for the combination of bsn, service and law"""
@@ -85,7 +120,7 @@ class ServiceCaseManager(Application):
 
         if results_match and not needs_manual_review:
             # Automatic approval
-            case.add_automatic_decision(
+            case.decide_automatically(
                 verified_result=verified_result,
                 parameters=parameters,
                 approved=True,
@@ -97,7 +132,7 @@ class ServiceCaseManager(Application):
                 else "random sample check"
             )
 
-            case.add_to_manual_review(
+            case.select_for_manual_review(
                 verifier_id="SYSTEM",
                 reason=reason,
                 claimed_result=claimed_result,
@@ -120,13 +155,13 @@ class ServiceCaseManager(Application):
         Complete manual review of a case.
         """
         case = self.get_case_by_id(case_id)
-        if case.status not in [CaseStatus.IN_REVIEW, CaseStatus.APPEALED]:
-            raise ValueError("Can only complete review for cases in review or appeals")
+        if case.status not in [CaseStatus.IN_REVIEW, CaseStatus.OBJECTED]:
+            raise ValueError("Can only complete review for cases in review or objections")
 
         # Use current verified_result or override if provided
         verified_result = override_result or case.verified_result
 
-        case.add_manual_decision(
+        case.decide(
             verified_result=verified_result,
             reason=reason,
             verifier_id=verifier_id,
@@ -136,19 +171,69 @@ class ServiceCaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def appeal_case(self,
+    def objection_case(self,
                     case_id: str,
                     reason: str) -> str:
         """
-        Submit an appeal for a case with newly claimed result.
+        Submit an objection for a case with newly claimed result.
         Appeals always go to manual review.
         """
         case = self.get_case_by_id(case_id)
 
-        # First record the appeal with citizen's new claim
-        case.add_appeal(
+        # First record the objection with citizen's new claim
+        case.object(
             reason=reason
         )
+
+        self.save(case)
+        return str(case.id)
+
+    def determine_objection_status(self,
+                                   case_id: str,
+                                   possible: Optional[bool] = None,  # bezwaar_mogelijk
+                                   not_possible_reason: Optional[str] = None,  # reden_niet_mogelijk
+                                   objection_period: Optional[int] = None,  # bezwaartermijn
+                                   decision_period: Optional[int] = None,  # beslistermijn
+                                   extension_period: Optional[int] = None) -> str:  # verdagingstermijn
+        """
+        Determine the objection status, possibility and periods based on rules/law.
+        All parameters are optional.
+        Time periods are in weeks.
+
+        Args:
+            case_id: ID of the case
+            possible: Whether objection is possible (bezwaar_mogelijk)
+            not_possible_reason: Reason why objection is not possible (reden_niet_mogelijk)
+            objection_period: Weeks allowed for filing objection (bezwaartermijn)
+            decision_period: Weeks allowed for decision (beslistermijn)
+            extension_period: Possible extension period in weeks (verdagingstermijn)
+        """
+        case = self.get_case_by_id(case_id)
+
+        case.determine_objection_status(
+            possible=possible,
+            not_possible_reason=not_possible_reason,
+            objection_period=objection_period,
+            decision_period=decision_period,
+            extension_period=extension_period
+        )
+
+        self.save(case)
+        return str(case.id)
+
+    def determine_objection_admissibility(self,
+                                          case_id: str,
+                                          admissible: Optional[bool] = None) -> str:
+        """
+        Determine whether an objection is admissible (ontvankelijk)
+
+        Args:
+            case_id: ID of the case
+            admissible: Whether the objection is admissible (ontvankelijk)
+        """
+        case = self.get_case_by_id(case_id)
+
+        case.determine_objection_admissibility(admissible=admissible)
 
         self.save(case)
         return str(case.id)

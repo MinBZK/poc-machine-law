@@ -1,6 +1,6 @@
 from enum import Enum
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
@@ -10,7 +10,7 @@ class CaseStatus(str, Enum):
     SUBMITTED = "SUBMITTED"
     DECIDED = "DECIDED"
     IN_REVIEW = "IN_REVIEW"
-    APPEALED = "APPEALED"
+    OBJECTED = "OBJECTED"
 
 
 class ClaimStatusTranscoding(Transcoding):
@@ -63,30 +63,31 @@ class ServiceCase(Aggregate):
         self.evidence = None
         self.reason = None
         self.verifier_id = None
+        self.objection_status = None
 
         self.approved = None
         self.status = CaseStatus.SUBMITTED
 
     @event('AutomaticallyDecided')
-    def add_automatic_decision(self,
-                               verified_result: Dict,
-                               parameters: Dict,
-                               approved: bool):
-        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.APPEALED]:
-            raise ValueError("Can only automatically decide on submitted cases or appeals")
+    def decide_automatically(self,
+                             verified_result: Dict,
+                             parameters: Dict,
+                             approved: bool):
+        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.OBJECTED]:
+            raise ValueError("Can only automatically decide on submitted cases or objections")
         self.verified_result = verified_result
         self.parameters = parameters
         self.status = CaseStatus.DECIDED
         self.approved = approved
 
     @event('AddedToManualReview')
-    def add_to_manual_review(self,
-                             verifier_id: str,
-                             reason: str,
-                             claimed_result: Dict,
-                             verified_result: Dict):
-        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.APPEALED]:
-            raise ValueError("Can only add to review from submitted status or appeal")
+    def select_for_manual_review(self,
+                                 verifier_id: str,
+                                 reason: str,
+                                 claimed_result: Dict,
+                                 verified_result: Dict):
+        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.OBJECTED]:
+            raise ValueError("Can only add to review from submitted status or objection")
         self.status = CaseStatus.IN_REVIEW
         self.verified_result = verified_result
         self.claimed_result = claimed_result
@@ -94,22 +95,56 @@ class ServiceCase(Aggregate):
         self.verifier_id = verifier_id
 
     @event('Decided')
-    def add_manual_decision(self,
-                            verified_result: Dict,
-                            reason: str,
-                            verifier_id: str, approved: bool):
-        if self.status not in [CaseStatus.IN_REVIEW, CaseStatus.APPEALED]:
-            raise ValueError("Can only manually decide on cases in review or appeals")
+    def decide(self,
+               verified_result: Dict,
+               reason: str,
+               verifier_id: str, approved: bool):
+        if self.status not in [CaseStatus.IN_REVIEW, CaseStatus.OBJECTED]:
+            raise ValueError("Can only manually decide on cases in review or objections")
         self.status = CaseStatus.DECIDED
         self.approved = approved
         self.reason = reason
         self.verified_result = verified_result
         self.verifier_id = verifier_id
 
-    @event('Appealed')
-    def add_appeal(self,
-                   reason: str):
+    @event('Objected')
+    def object(self,
+               reason: str):
         if self.status != CaseStatus.DECIDED:
-            raise ValueError("Can only appeal decided cases")
-        self.status = CaseStatus.APPEALED
+            raise ValueError("Can only objection decided cases")
+        self.status = CaseStatus.OBJECTED
         self.reason = reason
+
+    @event('ObjectionStatusDetermined')
+    def determine_objection_status(self,
+                                   possible: Optional[bool] = None,  # bezwaar_mogelijk
+                                   not_possible_reason: Optional[str] = None,  # reden_niet_mogelijk
+                                   objection_period: Optional[int] = None,  # bezwaartermijn in weeks
+                                   decision_period: Optional[int] = None,  # beslistermijn in weeks
+                                   extension_period: Optional[int] = None):  # verdagingstermijn in weeks
+        """Determine the objection status and periods"""
+        if not hasattr(self, 'objection_status') or self.objection_status is None:
+            self.objection_status = {}
+
+        updates = {}
+        if possible is not None:
+            updates["possible"] = possible
+        if not_possible_reason is not None:
+            updates["not_possible_reason"] = not_possible_reason
+        if objection_period is not None:
+            updates["objection_period"] = objection_period
+        if decision_period is not None:
+            updates["decision_period"] = decision_period
+        if extension_period is not None:
+            updates["extension_period"] = extension_period
+
+        self.objection_status.update(updates)
+
+    @event('ObjectionAdmissibilityDetermined')
+    def determine_objection_admissibility(self, admissible: Optional[bool] = None):
+        """Determine whether an objection is admissible (ontvankelijk)"""
+        if not hasattr(self, 'objection_status') or self.objection_status is None:
+            self.objection_status = {}
+
+        if admissible is not None:
+            self.objection_status["admissible"] = admissible

@@ -31,7 +31,7 @@
 
             <div class="p-6">
                 <div class="flex gap-4 overflow-x-auto pb-4">
-                    {% for status in ['SUBMITTED', 'IN_REVIEW', 'DECIDED', 'APPEALED'] %}
+                    {% for status in ['SUBMITTED', 'IN_REVIEW', 'DECIDED', 'OBJECTED'] %}
                     <div class="w-72 flex-shrink-0">
                         <div class="bg-gray-50 p-2 rounded-t border border-gray-200">
                             <h4 class="font-medium">{{ status|replace('_', ' ')|title }}</h4>

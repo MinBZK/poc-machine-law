@@ -1,6 +1,9 @@
 uuid: a70a061f-7a6d-404d-81f1-b77bbc7863a7
 name: AOW-uitkering
 law: algemene_ouderdomswet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
 discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "SVB"

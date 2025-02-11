@@ -2,8 +2,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
+import pandas as pd
 import yaml
 
 BASE_DIR = "law"
@@ -12,12 +13,16 @@ BASE_DIR = "law"
 @dataclass
 class RuleSpec:
     path: str
+    decision_type: str
+    law_type: str
+    legal_character: str
     uuid: str
     name: str
     law: str
     valid_from: datetime
     service: str
     discoverable: str
+    properties: Dict[str, Any]
 
     @classmethod
     def from_yaml(cls, path: str) -> 'RuleSpec':
@@ -27,13 +32,17 @@ class RuleSpec:
 
         return cls(
             path=path,
+            decision_type=data.get('decision_type', ''),
+            law_type=data.get('law_type', ''),
+            legal_character=data.get('legal_character', ''),
             uuid=data.get('uuid', ''),
             name=data.get('name', ''),
             law=data.get('law', ''),
             discoverable=data.get('discoverable', ''),
             valid_from=data.get('valid_from') if isinstance(data.get('valid_from'), datetime) else datetime.combine(
                 data.get('valid_from'), datetime.min.time()),
-            service=data.get('service', '')
+            service=data.get('service', ''),
+            properties=data.get('properties', {})
         )
 
 
@@ -99,6 +108,24 @@ class RuleResolver:
 
         with open(rule.path, 'r') as f:
             return yaml.safe_load(f)
+
+    def rules_dataframe(self) -> pd.DataFrame:
+        """Convert the list of RuleSpec objects into a pandas DataFrame."""
+        rules_data = [{
+            'path': rule.path,
+            'decision_type': rule.decision_type,
+            'legal_character': rule.legal_character,
+            'law_type': rule.law_type,
+            'uuid': rule.uuid,
+            'name': rule.name,
+            'law': rule.law,
+            'valid_from': rule.valid_from,
+            'service': rule.service,
+            'discoverable': rule.discoverable,
+            **{f'prop_{k}': v for k, v in rule.properties.items()}
+        } for rule in self.rules]
+
+        return pd.DataFrame(rules_data)
 
 
 if __name__ == "__main__":

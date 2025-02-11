@@ -1,73 +1,239 @@
 {% extends "admin/base.html" %}
 {% from "admin/partials/event_detail.html" import render_event %}
+{% from "macros/logos.html" import org_logo %}
 
 {% block content %}
-<div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">Case Details</h1>
+<div class="min-h-screen bg-gray-50">
+    {# Top navigation bar #}
+    <div class="bg-white shadow">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Zaakdetails</h1>
+            <div class="-mt-2 -mr-2">{{ org_logo(case.service) }}</div>
+        </div>
+    </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
-        <div class="mb-6">
-            <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <p class="text-sm text-gray-600">BSN</p>
-                    <p class="font-medium">{{ case.bsn }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Service</p>
-                    <p class="font-medium">{{ case.service_type }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Law</p>
-                    <p class="font-medium">{{ case.law }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Rulespec</p>
-                    <p class="font-medium">{{ case.rulespec_uuid }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Status</p>
-                    <p class="font-medium">{{ case.status }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Approved</p>
-                    <p class="font-medium">{{ case.approved }}</p>
+    <div class="p-6">
+        <div class="bg-white shadow rounded-lg">
+            <!-- Basis informatie -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold mb-4">Basis Informatie</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">BSN</p>
+                        <p class="font-medium">{{ case.bsn }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Dienst</p>
+                        <p class="font-medium">{{ case.service }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Wet</p>
+                        <p class="font-medium">{{ case.law }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Regelspecificatie</p>
+                        <p class="font-medium">{{ case.rulespec_uuid }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Status</p>
+                        <p class="font-medium">{{ case.status }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Goedgekeurd</p>
+                        <p class="font-medium">{% if case.approved %}Ja{% elif case.approved is sameas false %}Nee{%
+                            else %}Nog niet bepaald{% endif %}</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="mb-6">
-            <h2 class="text-lg font-semibold mb-4">Event History</h2>
-            <div class="space-y-4">
-                {% for event in case.events %}
-                {{ render_event(event, is_first=loop.first) }}
-                {% endfor %}
+            <!-- Bezwaarstatus -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold mb-4">Bezwaarstatus</h2>
+                {% if case.objection_status %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Bezwaar mogelijk</p>
+                        <p class="font-medium">{% if case.objection_status.possible %}Ja{% else %}Nee{% endif %}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Reden bezwaar niet mogelijk</p>
+                        <p class="font-medium">{{ case.objection_status.not_possible_reason }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Bezwaartermijn</p>
+                        <p class="font-medium">{{ case.objection_status.objection_period }} weken</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Beslistermijn</p>
+                        <p class="font-medium">{{ case.objection_status.decision_period }} weken</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Verdagingstermijn</p>
+                        <p class="font-medium">{{ case.objection_status.extension_period }} weken</p>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-gray-500">Bezwaarstatus wordt door de AWB bepaald als er een besluit is.</p>
+                {% endif %}
             </div>
-        </div>
 
-        {% if case.status == 'IN_REVIEW' %}
-        <div class="mt-6 pt-6 border-t" id="review-form-container">
-            <h2 class="text-lg font-semibold mb-4">Review Actions</h2>
-            <form hx-post="/admin/cases/{{ case.id }}/complete-review"
-                  hx-target="#review-form-container"
-                  class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Decision</label>
-                    <select name="decision" class="w-full border rounded-md p-2">
-                        <option value="true">Approve</option>
-                        <option value="false">Deny</option>
-                    </select>
+            <!-- Resultaten -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold mb-4">Resultaten</h2>
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- Geclaimde resultaten -->
+                    <div>
+                        <h3 class="text-md font-medium mb-2">Geclaimde Resultaten</h3>
+                        {% if case.claimed_result %}
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="grid grid-cols-2 gap-4">
+                                {% for key, value in case.claimed_result.items() %}
+                                <div class="{% if value is mapping %}col-span-2{% endif %}">
+                                    <p class="text-sm text-gray-600">{{ key|replace('$', '')|title|replace('_', ' ')
+                                        }}</p>
+                                    {% if value is mapping %}
+                                    <div class="mt-2 bg-white bg-opacity-75 p-4 rounded-md grid grid-cols-2 gap-4">
+                                        {% for sub_key, sub_value in value.items() %}
+                                        <div>
+                                            <p class="text-sm text-gray-600">{{ sub_key|replace('$',
+                                                '')|title|replace('_', ' ') }}</p>
+                                            <p class="font-medium">{{ sub_value }}</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% elif value is sequence and value is not string %}
+                                    <div class="font-medium">
+                                        <ul class="list-disc list-inside">
+                                            {% for item in value %}
+                                            <li>{{ item }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% else %}
+                                    <p class="font-medium">{{ value }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-gray-500">Geen geclaimde resultaten</p>
+                        {% endif %}
+                    </div>
+                    <!-- Geverifieerde resultaten -->
+                    <div>
+                        <h3 class="text-md font-medium mb-2">Geverifieerde Resultaten</h3>
+                        {% if case.verified_result %}
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="grid grid-cols-2 gap-4">
+                                {% for key, value in case.verified_result.items() %}
+                                <div class="{% if value is mapping %}col-span-2{% endif %}">
+                                    <p class="text-sm text-gray-600">{{ key|replace('$', '')|title|replace('_', ' ')
+                                        }}</p>
+                                    {% if value is mapping %}
+                                    <div class="mt-2 bg-white bg-opacity-75 p-4 rounded-md grid grid-cols-2 gap-4">
+                                        {% for sub_key, sub_value in value.items() %}
+                                        <div>
+                                            <p class="text-sm text-gray-600">{{ sub_key|replace('$',
+                                                '')|title|replace('_', ' ') }}</p>
+                                            <p class="font-medium">{{ sub_value }}</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% elif value is sequence and value is not string %}
+                                    <div class="font-medium">
+                                        <ul class="list-disc list-inside">
+                                            {% for item in value %}
+                                            <li>{{ item }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% else %}
+                                    <p class="font-medium">{{ value }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-gray-500">Geen geverifieerde resultaten</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Reason</label>
-                    <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
+            </div>
+
+            <!-- Parameters -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold mb-4">Gegevens</h2>
+                {% if case.parameters %}
+                <div class="grid grid-cols-2 gap-4">
+                    {% for key, value in case.parameters.items() %}
+                    <div class="{% if value is mapping %}col-span-2{% endif %}">
+                        <p class="text-sm text-gray-600">{{ key|replace('$', '')|title|replace('_', ' ') }}</p>
+                        {% if value is mapping %}
+                        <div class="mt-2 bg-gray-50 p-4 rounded-md grid grid-cols-2 gap-4">
+                            {% for sub_key, sub_value in value.items() %}
+                            <div>
+                                <p class="text-sm text-gray-600">{{ sub_key|replace('$', '')|title|replace('_', ' ')
+                                    }}</p>
+                                <p class="font-medium">{{ sub_value }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% elif value is sequence and value is not string %}
+                        <div class="font-medium">
+                            <ul class="list-disc list-inside">
+                                {% for item in value %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% else %}
+                        <p class="font-medium">{{ value }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                    Submit Review
-                </button>
-            </form>
+                {% else %}
+                <p class="text-gray-500">Geen gegevens beschikbaar</p>
+                {% endif %}
+            </div>
+
+            <!-- Gebeurtenissen -->
+            <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
+                <h2 class="text-lg font-semibold mb-6">Gebeurtenissen</h2>
+                <div class="space-y-6">
+                    {% for event in case.events %}
+                    {{ render_event(event) }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Beoordeling Formulier -->
+            {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
+            <div class="p-6" id="review-form-container">
+                <h2 class="text-lg font-semibold mb-4">Beoordelingsacties</h2>
+                <form hx-post="/admin/cases/{{ case.id }}/complete-review"
+                      hx-target="#review-form-container"
+                      class="space-y-4 max-w-lg">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Beslissing</label>
+                        <select name="decision" class="w-full border rounded-md p-2">
+                            <option value="true">Goedkeuren</option>
+                            <option value="false">Afwijzen</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Reden</label>
+                        <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Beoordeling Indienen
+                    </button>
+                </form>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

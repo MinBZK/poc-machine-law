@@ -8,7 +8,7 @@
             bg-green-100 text-green-800">Toegekend
         {% elif current_case.status == 'DECIDED' and not current_case.approved%}
             bg-red-100 text-red-800">Afgewezen
-        {% elif current_case.status == 'APPEALED' %}
+        {% elif current_case.status == 'OBJECTED' %}
             bg-purple-100 text-purple-800">In bezwaar gegaan
         {% endif %}
     </span>

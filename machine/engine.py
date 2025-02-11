@@ -158,10 +158,17 @@ class RuleContext:
                     value = await self.resolve_value(f"${root}")
                     for p in rest.split("."):
                         if value is None:
-                            logger.warning(f"Could not resolve value ${path}: None")
+                            logger.warning(f"Value is None, could not resolve value ${path}: None")
                             node.result = None
                             return None
-                        value = value.get(p)
+                        if isinstance(value, dict):
+                            value = value.get(p)
+                        elif hasattr(value, p):
+                            value = getattr(value, p)
+                        else:
+                            logger.warning(f"Value is not dict or not object, could not resolve value ${path}: None")
+                            node.result = None
+                            return None
 
                     logger.debug(f"Resolved value ${path}: {value}")
                     node.result = value
@@ -206,10 +213,19 @@ class RuleContext:
                 if path in self.property_specs:
                     spec = self.property_specs[path]
                     source_ref = spec.get('source_reference', {})
-                    if source_ref and self.sources:
-                        table = source_ref.get('table')
-                        if table in self.sources:
-                            result = await self._resolve_from_source(source_ref, table)
+                    if source_ref:
+                        df = None
+                        table = None
+                        if source_ref.get('source_type') == 'laws':
+                            table = 'laws'
+                            df = self.service_provider.resolver.rules_dataframe()
+                        elif self.sources and 'table' in source_ref:
+                            table = source_ref.get('table')
+                            if table in self.sources:
+                                df = self.sources[table]
+
+                        if df is not None:
+                            result = await self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
                             return result
@@ -275,9 +291,7 @@ class RuleContext:
         self.values_cache[cache_key] = value
         return value
 
-    async def _resolve_from_source(self, source_ref, table):
-        df = self.sources[table]
-
+    async def _resolve_from_source(self, source_ref, table, df):
         # Filter
         if 'select_on' in source_ref:
             for select_on in source_ref['select_on']:
@@ -819,18 +833,20 @@ class RulesEngine:
                 'arithmetic_type': op_type
             })
 
-        elif op_type == 'IN':
-            with logger.indent_block(f"IN"):
+        elif op_type in ['IN', 'NOT_IN']:
+            with logger.indent_block(op_type):
 
                 subject = await self._evaluate_value(operation['subject'], context)
                 allowed_values = await self._evaluate_value(operation.get('values', []), context)
                 result = subject in (allowed_values if isinstance(allowed_values, list) else [allowed_values])
+                if op_type == 'NOT_IN':
+                    result = not result
 
             node.details.update({
                 'subject_value': subject,
                 'allowed_values': allowed_values
             })
-            logger.debug(f"Result {subject} IN {allowed_values}: {result}")
+            logger.debug(f"Result {subject} {op_type} {allowed_values}: {result}")
 
         elif op_type == 'NOT_NULL':
             subject = await self._evaluate_value(operation['subject'], context)

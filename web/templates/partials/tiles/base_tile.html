@@ -86,7 +86,7 @@
             </button>
 
             <!-- Appeal Dialog -->
-            <dialog id="appeal-dialog-{{ current_case.id }}"
+            <dialog id="objection-dialog-{{ current_case.id }}"
                     class="rounded-lg shadow-lg p-0 border-0 backdrop:bg-gray-500 backdrop:bg-opacity-50">
                 <div class="w-[32rem] m-8">
                     <div class="px-6 py-4 border-b">
@@ -94,7 +94,7 @@
                     </div>
 
                     <div class="px-8 py-6">
-                        <form hx-post="/laws/appeal-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&case_id={{ current_case.id }}"
+                        <form hx-post="/laws/objection-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&case_id={{ current_case.id }}"
                               hx-target="closest div.law-result-card">
                             <label class="block text-lg mb-3">
                                 Geef een reden voor uw bezwaar:
@@ -123,12 +123,12 @@
 
             <script>
                 function showAppealDialog(caseId) {
-                    const dialog = document.getElementById(`appeal-dialog-${caseId}`);
+                    const dialog = document.getElementById(`objection-dialog-${caseId}`);
                     dialog.showModal();
                 }
 
                 function closeAppealDialog(caseId) {
-                    const dialog = document.getElementById(`appeal-dialog-${caseId}`);
+                    const dialog = document.getElementById(`objection-dialog-${caseId}`);
                     dialog.close();
                 }
             </script>

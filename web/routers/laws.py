@@ -106,6 +106,7 @@ async def submit_case(
 ):
     """Submit a new case"""
     law = unquote(law)
+
     law, result, rule_spec = await evaluate_law(bsn, law, service, services)
 
     # Submit the case with citizen's claimed result (from execution)
@@ -116,12 +117,11 @@ async def submit_case(
         parameters=result.input,
         claimed_result=result.output  # The citizen claims the calculated result
     )
-
-    template_path = get_tile_template(service, law)
+    case = services.manager.get_case_by_id(case_id)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(
-        template_path,
+        get_tile_template(service, law),
         {
             "bsn": bsn,
             "request": request,
@@ -131,13 +131,13 @@ async def submit_case(
             "result": result.output,
             "input": result.input,
             "requirements_met": result.requirements_met,
-            "current_case": services.manager.get_case_by_id(case_id)
+            "current_case": case,
         }
     )
 
 
-@router.post("/appeal-case")
-async def appeal_case(
+@router.post("/objection-case")
+async def objection_case(
         request: Request,
         case_id: str,
         service: str,
@@ -146,12 +146,12 @@ async def appeal_case(
         reason: str = Form(...),  # Changed this line to use Form
         services: Services = Depends(get_services)
 ):
-    """Submit an appeal for an existing case"""
+    """Submit an objection for an existing case"""
     # First calculate the new result with disputed parameters
     law = unquote(law)
 
-    # Submit the appeal with new claimed result
-    case_id = services.manager.appeal_case(
+    # Submit the objection with new claimed result
+    case_id = services.manager.objection_case(
         case_id=case_id,
         reason=reason,
     )

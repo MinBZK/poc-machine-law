@@ -270,7 +270,7 @@ def step_impl(context, status):
 @when('de beoordelaar de aanvraag afwijst met reden "{reason}"')
 def step_impl(context, reason):
     case = context.services.manager.get_case_by_id(context.case_id)
-    case.add_manual_decision(
+    case.decide(
         verified_result=context.result.output,
         reason=reason,
         verifier_id="BEOORDELAAR",
@@ -290,14 +290,14 @@ def step_impl(context):
 @when('de burger bezwaar maakt met reden "{reason}"')
 def step_impl(context, reason):
     case = context.services.manager.get_case_by_id(context.case_id)
-    case.add_appeal(reason=reason)
+    case.object(reason=reason)
     context.services.manager.save(case)
 
 
 @when('de beoordelaar het bezwaar toewijst met reden "{reason}"')
 def step_impl(context, reason):
     case = context.services.manager.get_case_by_id(context.case_id)
-    case.add_manual_decision(
+    case.decide(
         verified_result=context.result.output,
         reason=reason,
         verifier_id="BEOORDELAAR",

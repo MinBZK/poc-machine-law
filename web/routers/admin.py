@@ -93,14 +93,14 @@ async def move_case(
                     }
                     break
 
-            case.add_to_manual_review(
+            case.select_for_manual_review(
                 verifier_id="ADMIN",  # TODO: Get from auth
                 reason="Manually moved to review",
                 claimed_result=latest_results.get('claimed_result', {}),
                 verified_result=latest_results.get('verified_result', {})
             )
         elif new_status_enum == CaseStatus.DECIDED:
-            case.add_manual_decision(
+            case.decide(
                 verified_result={},  # Would need the actual result
                 reason="Manually decided",
                 verifier_id="ADMIN"  # TODO: Get from auth

@@ -1,6 +1,9 @@
 uuid: 7d6e5f4c-9876-4f0f-bbbb-123456789def
 name: Bijstand Gemeente Amsterdam
 law: participatiewet/bijstand
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
 discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "GEMEENTE_AMSTERDAM"

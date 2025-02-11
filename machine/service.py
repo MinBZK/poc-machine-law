@@ -1,10 +1,12 @@
+import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import pandas as pd
+from eventsourcing.system import System, SingleThreadedRunner
 
-from machine.events.application import ServiceCaseManager
+from machine.events.application import ServiceCaseManager, RuleProcessor
 from .engine import RulesEngine, AbstractServiceProvider, PathNode
 from .logging_config import IndentLogger
 from .utils import RuleResolver
@@ -133,9 +135,31 @@ class RuleService:
 class Services(AbstractServiceProvider):
     def __init__(self, reference_date: str):
         self.resolver = RuleResolver()
-        self.services = {service: RuleService(service, self) for service in self.resolver.get_service_laws()}
+        self.services = {service: RuleService(service, self)
+                         for service in self.resolver.get_service_laws()}
         self.root_reference_date = reference_date
-        self.manager = ServiceCaseManager(rules_engine=self)
+
+        outer_self = self
+
+        class WrappedProcessor(RuleProcessor):
+            def __init__(self, env=None, **kwargs):
+                super().__init__(rules_engine=outer_self, env=env, **kwargs)
+
+        class WrappedManager(ServiceCaseManager):
+            def __init__(self, env=None, **kwargs):  # env parameter toevoegen
+                super().__init__(rules_engine=outer_self, env=env, **kwargs)
+
+        system = System(pipes=[[
+            WrappedManager,
+            WrappedProcessor
+        ]])
+
+        self.runner = SingleThreadedRunner(system)
+        self.runner.start()
+        self.manager = self.runner.get(WrappedManager)
+
+    def __exit__(self):
+        self.runner.stop()
 
     def get_discoverable_service_laws(self):
         return self.resolver.get_discoverable_service_laws()
@@ -172,3 +196,42 @@ class Services(AbstractServiceProvider):
         # reference_date = self.root_reference_date
         result = await self.evaluate(service, law, context, reference_date, overwrite_input, requested_output=field)
         return result.output.get(field)
+
+    async def apply_rules(self, event) -> None:
+        for rule in self.resolver.rules:
+            applies = rule.properties.get('applies', [])
+
+            for apply in applies:
+                if self._matches_event(event, apply):
+                    aggregate_id = str(event.originator_id)
+                    aggregate = self.manager.get_case_by_id(aggregate_id)
+                    parameters = {apply["name"]: aggregate}
+                    result = await self.evaluate(rule.service, rule.law, parameters)
+
+                    # Apply updates back to aggregate
+                    for update in apply.get('update', []):
+                        mapping = {
+                            name: result.output.get(value[1:])  # Strip $ from value
+                            for name, value in update['mapping'].items()
+                        }
+                        # Apply directly on the event via method
+                        method = getattr(self.manager, update['method'])
+                        aggregate_id = method(aggregate_id, **mapping)
+                        return aggregate_id
+
+    @staticmethod
+    def _matches_event(event, applies):
+        """Check if event matches the applies spec"""
+        if applies['aggregate'] != event.__class__.__qualname__.split('.')[0]:
+            return False
+
+        event_type = event.__class__.__name__
+
+        for event_spec in applies['events']:
+            if event_spec['type'].lower() == event_type.lower():
+                for key, filter_value in event_spec.get('filter', {}).items():
+                    value = getattr(event, key)
+                    if value != filter_value:
+                        return False
+                return True
+        return False

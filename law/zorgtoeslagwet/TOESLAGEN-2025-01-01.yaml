@@ -1,6 +1,9 @@
 uuid: 4d8c7237-b930-4f0f-aaa3-624ba035e449
 name: Zorgtoeslag
 law: zorgtoeslagwet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
 discoverable: "CITIZEN"
 valid_from: 2025-01-01
 service: "TOESLAGEN"

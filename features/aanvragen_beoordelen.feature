@@ -47,7 +47,7 @@ Feature: Aanvraag Zorgtoeslag
     Then wordt de aanvraag toegevoegd aan handmatige beoordeling
     When de beoordelaar de aanvraag afwijst met reden "Inkomen niet correct opgegeven"
     And de burger bezwaar maakt met reden "Inkomen is wel correct, zie bijgevoegde jaaropgave"
-    Then is de status "APPEALED"
+    Then is de status "OBJECTED"
     When de beoordelaar het bezwaar toewijst met reden "Inkomen correct na controle jaaropgave"
     Then is de status "DECIDED"
     And is de aanvraag toegekend
