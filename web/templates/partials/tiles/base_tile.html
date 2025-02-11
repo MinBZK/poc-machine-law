@@ -1,6 +1,10 @@
 {% from "macros/logos.html" import org_logo %}
 
-<div class="law-result-card min-h-64 bg-white rounded-lg shadow">
+
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     x-data="{ showExplanation: false }"
+     @close-explanation.window="showExplanation = false"
+     id="tile-{{ law|replace('/', '-') }}">
     <div class="p-6 flex flex-col h-full">
         {% if error %}
         <div class="flex-grow space-y-6">
@@ -141,11 +145,23 @@
                     </h3>
                     <h4 class="text-sm font-medium text-gray-500 mb-1">
                         U komt niet in aanmerking
+                        <button
+                                @click="showExplanation = true"
+                                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600"
+                                hx-get="/laws/explain-path?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                                hx-target="#explanation-panel-{{ law|replace('/', '-') }}"
+                                hx-swap="innerHTML">
+                            waarom?
+                        </button>
                     </h4>
+
                 </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
         </div>
         {% endif %}
+    </div>
+    <div id="explanation-panel-{{ law|replace('/', '-') }}"
+         @click.outside="showExplanation = false">
     </div>
 </div>

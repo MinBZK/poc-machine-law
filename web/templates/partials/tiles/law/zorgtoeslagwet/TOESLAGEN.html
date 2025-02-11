@@ -2,10 +2,18 @@
 
 {% block tile_content %}
 <div>
-    <h4 class="text-sm font-medium text-gray-500 mb-1">Uw zorgtoeslag is waarschijnlijk</h4>
-    <div class="flex items-baseline space-x-2">
-        <span class="text-4xl font-bold text-green-600"> € {{ "%.2f"|format(result.hoogte_toeslag / 100) }}</span>
-        <span class="text-gray-500">per jaar</span>
+    <h4 class="text-sm font-medium text-gray-600 mb-2">Uw zorgtoeslag is waarschijnlijk</h4>
+    <div class="flex items-baseline">
+        <span class="text-4xl font-bold text-green-600">€ {{ "%.2f"|format(result.hoogte_toeslag / 100) }}</span>
+        <span class="ml-2 text-gray-600">per jaar</span>
+        <button
+                @click="showExplanation = true"
+                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600"
+                hx-get="/laws/explain-path?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                hx-target="#explanation-panel-{{ law|replace('/', '-') }}"
+                hx-swap="innerHTML">
+            waarom?
+        </button>
     </div>
 </div>
 {% endblock %}
@@ -20,5 +28,7 @@
 {% endblock %}
 
 {% block approved_status %}
-<p class="text-sm text-green-600 text-center">Uw aanvraag is goedgekeurd, uw zorgtoeslag zal maandelijks worden uitgekeerd.</p>
+<p class="text-sm text-green-600 text-center">
+    Uw aanvraag is goedgekeurd, uw zorgtoeslag zal maandelijks worden uitgekeerd.
+</p>
 {% endblock %}

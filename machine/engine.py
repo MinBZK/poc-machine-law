@@ -129,85 +129,107 @@ class RuleContext:
 
     async def _resolve_value(self, path: str) -> Any:
         """Resolve a value from definitions, services, or sources"""
+        node = PathNode(
+            type='resolve',
+            name=f"Resolving value: {path}",
+            result=None,
+            details={'path': path}
+        )
+        self.add_to_path(node)
 
-        with logger.indent_block(f"Resolving {path}"):
+        try:
+            with logger.indent_block(f"Resolving {path}"):
+                if not isinstance(path, str) or not path.startswith('$'):
+                    node.result = path
+                    return path
 
-            if not isinstance(path, str) or not path.startswith('$'):
-                return path
+                path = path[1:]  # Remove $ prefix
+                self.track_access(path)
 
-            path = path[1:]  # Remove $ prefix
-            self.track_access(path)
-
-            # Resolve dates
-            value = await self._resolve_date(path)
-            if value is not None:
-                logger.debug(f"Resolved date ${path}: {value}")
-                return value
-
-            if "." in path:
-                root, rest = path.split(".", 1)
-                value = await self.resolve_value(f"${root}")
-                for p in rest.split("."):
-                    if value is None:
-                        logger.warning(f"Could not resolve value ${path}: None")
-                        return None
-                    value = value.get(p)
-
-                logger.debug(f"Resolved value ${path}: {value}")
-                return value
-
-            # Check local scope first
-            if path in self.local:
-                logger.debug(f"Resolving from LOCAL: {self.local[path]}")
-                return self.local[path]
-
-            # Check definitions first
-            if path in self.definitions:
-                logger.debug(f"Resolving from DEFINITION: {self.definitions[path]}")
-                return self.definitions[path]
-
-            # Check parameters
-            if path in self.parameters:
-                logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
-                return self.parameters[path]
-
-            # Check outputs
-            if path in self.outputs:
-                logger.debug(f"Resolving from previous OUTPUT: {self.outputs[path]}")
-                return self.outputs[path]
-
-            # Check overwrite data
-            if path in self.property_specs:
-                spec = self.property_specs[path]
-                service_ref = spec.get('service_reference', {})
-                if service_ref and service_ref['service'] in self.overwrite_input \
-                        and service_ref['field'] in self.overwrite_input[service_ref['service']]:
-                    value = self.overwrite_input[service_ref['service']][service_ref['field']]
-                    logger.debug(f"Resolving from OVERWRITE: {value}")
+                # Resolve dates
+                value = await self._resolve_date(path)
+                if value is not None:
+                    logger.debug(f"Resolved date ${path}: {value}")
+                    node.result = value
                     return value
 
-            # Check sources
-            if path in self.property_specs:
-                spec = self.property_specs[path]
-                source_ref = spec.get('source_reference', {})
-                if source_ref and self.sources:
-                    table = source_ref.get('table')
-                    if table in self.sources:
-                        result = await self._resolve_from_source(source_ref, table)
-                        logger.debug(f"Resolving from SOURCE {table}: {result}")
-                        return result
+                if "." in path:
+                    root, rest = path.split(".", 1)
+                    value = await self.resolve_value(f"${root}")
+                    for p in rest.split("."):
+                        if value is None:
+                            logger.warning(f"Could not resolve value ${path}: None")
+                            node.result = None
+                            return None
+                        value = value.get(p)
 
-            # Check services
-            if path in self.property_specs:
-                spec = self.property_specs[path]
-                service_ref = spec.get('service_reference', {})
-                if service_ref and self.service_provider:
-                    value = await self._resolve_from_service(path, service_ref, spec)
-                    logger.debug(
-                        f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}")
+                    logger.debug(f"Resolved value ${path}: {value}")
+                    node.result = value
                     return value
-            logger.warning(f"Could not resolve value for {path}")
-            return None
+
+                # Check local scope first
+                if path in self.local:
+                    logger.debug(f"Resolving from LOCAL: {self.local[path]}")
+                    node.result = self.local[path]
+                    return self.local[path]
+
+                # Check definitions
+                if path in self.definitions:
+                    logger.debug(f"Resolving from DEFINITION: {self.definitions[path]}")
+                    node.result = self.definitions[path]
+                    return self.definitions[path]
+
+                # Check parameters
+                if path in self.parameters:
+                    logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
+                    node.result = self.parameters[path]
+                    return self.parameters[path]
+
+                # Check outputs
+                if path in self.outputs:
+                    logger.debug(f"Resolving from previous OUTPUT: {self.outputs[path]}")
+                    node.result = self.outputs[path]
+                    return self.outputs[path]
+
+                # Check overwrite data
+                if path in self.property_specs:
+                    spec = self.property_specs[path]
+                    service_ref = spec.get('service_reference', {})
+                    if service_ref and service_ref['service'] in self.overwrite_input \
+                            and service_ref['field'] in self.overwrite_input[service_ref['service']]:
+                        value = self.overwrite_input[service_ref['service']][service_ref['field']]
+                        logger.debug(f"Resolving from OVERWRITE: {value}")
+                        node.result = value
+                        return value
+
+                # Check sources
+                if path in self.property_specs:
+                    spec = self.property_specs[path]
+                    source_ref = spec.get('source_reference', {})
+                    if source_ref and self.sources:
+                        table = source_ref.get('table')
+                        if table in self.sources:
+                            result = await self._resolve_from_source(source_ref, table)
+                            logger.debug(f"Resolving from SOURCE {table}: {result}")
+                            node.result = result
+                            return result
+
+                # Check services
+                if path in self.property_specs:
+                    spec = self.property_specs[path]
+                    service_ref = spec.get('service_reference', {})
+                    if service_ref and self.service_provider:
+                        value = await self._resolve_from_service(path, service_ref, spec)
+                        logger.debug(
+                            f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}")
+                        node.result = value
+                        return value
+
+                logger.warning(f"Could not resolve value for {path}")
+                node.result = None
+                return None
+        finally:
+            self.pop_path()
 
     async def _resolve_date(self, path):
         if path == "calculation_date":
@@ -455,9 +477,7 @@ class RulesEngine:
                        overwrite_input: Optional[Dict[str, Any]] = None,
                        sources: Dict[str, pd.DataFrame] = None,
                        calculation_date=None, requested_output: str = None) -> Dict[str, Any]:
-        """Evaluate rules using service context and sources
-        :param calculation_date:
-        """
+        """Evaluate rules using service context and sources"""
         parameters = parameters or {}
         for p in self.parameter_specs:
             if p['required'] and not p['name'] in parameters:
@@ -480,9 +500,11 @@ class RulesEngine:
         # Check requirements
         requirements_node = PathNode(type='requirements', name='Check all requirements', result=None)
         context.add_to_path(requirements_node)
-        requirements_met = await self._evaluate_requirements(self.requirements, context)
-        requirements_node.result = requirements_met
-        context.pop_path()
+        try:
+            requirements_met = await self._evaluate_requirements(self.requirements, context)
+            requirements_node.result = requirements_met
+        finally:
+            context.pop_path()
 
         output_values = {}
         if requirements_met:
@@ -493,7 +515,6 @@ class RulesEngine:
                 output_def, output_name = await self._evaluate_action(action, context)
                 context.outputs[output_name] = output_def['value']
                 output_values[output_name] = output_def
-                context.pop_path()
 
         if not output_values:
             logger.warning(f"No output values computed for {calculation_date} {requested_output}")
