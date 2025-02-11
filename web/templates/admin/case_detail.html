@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+{% from "admin/partials/event_detail.html" import render_event %}
+
+{% block content %}
+<div class="p-6">
+    <h1 class="text-2xl font-bold mb-6">Case Details</h1>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">BSN</p>
+                    <p class="font-medium">{{ case.bsn }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Service</p>
+                    <p class="font-medium">{{ case.service_type }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Law</p>
+                    <p class="font-medium">{{ case.law }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Rulespec</p>
+                    <p class="font-medium">{{ case.rulespec_uuid }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Status</p>
+                    <p class="font-medium">{{ case.status }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Approved</p>
+                    <p class="font-medium">{{ case.approved }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold mb-4">Event History</h2>
+            <div class="space-y-4">
+                {% for event in case.events %}
+                {{ render_event(event, is_first=loop.first) }}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if case.status == 'IN_REVIEW' %}
+        <div class="mt-6 pt-6 border-t" id="review-form-container">
+            <h2 class="text-lg font-semibold mb-4">Review Actions</h2>
+            <form hx-post="/admin/cases/{{ case.id }}/complete-review"
+                  hx-target="#review-form-container"
+                  class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Decision</label>
+                    <select name="decision" class="w-full border rounded-md p-2">
+                        <option value="true">Approve</option>
+                        <option value="false">Deny</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Reason</label>
+                    <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

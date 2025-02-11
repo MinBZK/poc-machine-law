@@ -1,10 +1,12 @@
+import json
 from urllib.parse import unquote
 
 import pandas as pd
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends, HTTPException, Form
 
+from explain.llm_service import llm_service
 from machine.service import Services
-from web.dependencies import TODAY, FORMATTED_DATE, get_services, templates
+from web.dependencies import TODAY, get_services, templates
 from web.services.profiles import get_profile_data
 
 router = APIRouter(prefix="/laws", tags=["laws"])
@@ -17,8 +19,6 @@ def get_tile_template(service: str, law: str) -> str:
     """
     specific_template = f"partials/tiles/law/{law}/{service}.html"
 
-    # We'll let Jinja handle the template existence check
-    # If the specific template doesn't exist, it will raise a TemplateNotFound exception
     try:
         templates.get_template(specific_template)
         return specific_template
@@ -26,25 +26,8 @@ def get_tile_template(service: str, law: str) -> str:
         return "partials/tiles/fallback_tile.html"
 
 
-@router.get("/profile/")
-async def switch_profile(request: Request, bsn: str = "999993653"):
-    """Handle profile switching"""
-    profile = get_profile_data(bsn)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    return templates.TemplateResponse(
-        "partials/dashboard.html",
-        {
-            "request": request,
-            "profile": profile,
-            "bsn": bsn,
-            "formatted_date": FORMATTED_DATE
-        }
-    )
-
-
-async def evaluate_law(bsn, law, service, services):
+async def evaluate_law(bsn: str, law: str, service: str, services: Services):
+    """Evaluate a law for a given BSN"""
     # Get the rule specification
     rule_spec = services.resolver.get_rule_spec(law, TODAY, service)
     if not rule_spec:
@@ -62,12 +45,7 @@ async def evaluate_law(bsn, law, service, services):
             services.set_source_dataframe(service_name, table_name, df)
 
     # Execute the law
-    result = await services.evaluate(
-        service,
-        law=law,
-        reference_date=TODAY,
-        parameters={"BSN": bsn}
-    )
+    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY)
     return law, result, rule_spec
 
 
@@ -79,12 +57,11 @@ async def execute_law(
         bsn: str,
         services: Services = Depends(get_services)
 ):
-    """Execute a law and render its result using the appropriate template"""
+    """Execute a law and render its result"""
     try:
         law = unquote(law)
         law, result, rule_spec = await evaluate_law(bsn, law, service, services)
     except Exception as e:
-        # Return error state using the same template
         return templates.TemplateResponse(
             get_tile_template(service, law),
             {
@@ -97,10 +74,10 @@ async def execute_law(
             }
         )
 
-    # Check if there's an existing claim
-    existing_claims = services.manager.get_claim(law, service, bsn)
+    # Check if there's an existing case
+    existing_case = services.manager.get_case(bsn, service, law)
 
-    # Get the appropriate template for this law
+    # Get the appropriate template
     template_path = get_tile_template(service, law)
 
     return templates.TemplateResponse(
@@ -114,41 +91,35 @@ async def execute_law(
             "result": result.output,
             "input": result.input,
             "requirements_met": result.requirements_met,
-            "current_claim": existing_claims
+            "current_case": existing_case
         }
     )
 
 
-@router.post("/submit-claim")
-async def submit_claim(
+@router.post("/submit-case")
+async def submit_case(
         request: Request,
         service: str,
         law: str,
         bsn: str,
         services: Services = Depends(get_services)
 ):
-    """Submit a new claim for a law"""
+    """Submit a new case"""
     law = unquote(law)
     law, result, rule_spec = await evaluate_law(bsn, law, service, services)
 
-    # Create a new claim
-    claim_id = services.manager.submit_claim(
-        subject_id=bsn,
+    # Submit the case with citizen's claimed result (from execution)
+    case_id = await services.manager.submit_case(
+        bsn=bsn,
+        service_type=service,
         law=law,
-        service=service,
-        rulespec_uuid=rule_spec.get('uuid'),
-        details={
-            "calculation_date": TODAY,
-            "calculated_amount": result.output.get("hoogte_toeslag") if "hoogte_toeslag" in result.output else None,
-            "requirements_met": result.requirements_met,
-            "input_parameters": result.input
-        }
+        parameters=result.input,
+        claimed_result=result.output  # The citizen claims the calculated result
     )
 
-    # Get the appropriate template for this law
     template_path = get_tile_template(service, law)
 
-    # Return the updated law result with the new claim
+    # Return the updated law result with the new case
     return templates.TemplateResponse(
         template_path,
         {
@@ -160,6 +131,120 @@ async def submit_claim(
             "result": result.output,
             "input": result.input,
             "requirements_met": result.requirements_met,
-            "current_claim": services.manager.repository.get(claim_id)
+            "current_case": services.manager.get_case_by_id(case_id)
         }
     )
+
+
+@router.post("/appeal-case")
+async def appeal_case(
+        request: Request,
+        case_id: str,
+        service: str,
+        law: str,
+        bsn: str,
+        reason: str = Form(...),  # Changed this line to use Form
+        services: Services = Depends(get_services)
+):
+    """Submit an appeal for an existing case"""
+    # First calculate the new result with disputed parameters
+    law = unquote(law)
+
+    # Submit the appeal with new claimed result
+    case_id = services.manager.appeal_case(
+        case_id=case_id,
+        reason=reason,
+    )
+
+    law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+
+    template_path = get_tile_template(service, law)
+
+    return templates.TemplateResponse(
+        template_path,
+        {
+            "bsn": bsn,
+            "request": request,
+            "law": law,
+            "service": service,
+            "rule_spec": rule_spec,
+            "result": result.output,
+            "input": result.input,
+            "requirements_met": result.requirements_met,
+            "current_case": services.manager.get_case_by_id(case_id)
+        }
+    )
+
+
+def node_to_dict(node):
+    """Convert PathNode to serializable dict"""
+    if node is None:
+        return None
+    return {
+        "type": node.type,
+        "name": node.name,
+        "result": str(node.result),
+        "details": {k: str(v) for k, v in node.details.items()},
+        "children": [node_to_dict(child) for child in node.children]
+    }
+
+
+@router.get("/explain-path")
+async def explain_path(
+        request: Request,
+        service: str,
+        law: str,
+        bsn: str,
+        services: Services = Depends(get_services)
+):
+    """Get a citizen-friendly explanation of the rule evaluation path"""
+    try:
+        law = unquote(law)
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+
+        # Convert path and rule_spec to JSON strings
+        path_dict = node_to_dict(result.path)
+        path_json = json.dumps(path_dict, ensure_ascii=False, indent=2)
+
+        # Filter relevant parts of rule_spec
+        relevant_spec = {
+            "name": rule_spec.get("name"),
+            "description": rule_spec.get("description"),
+            "properties": {
+                "input": rule_spec.get("properties", {}).get("input", []),
+                "output": rule_spec.get("properties", {}).get("output", []),
+                "parameters": rule_spec.get("properties", {}).get("parameters", []),
+                "definitions": rule_spec.get("properties", {}).get("definitions", [])
+            },
+            "requirements": rule_spec.get("requirements"),
+            "actions": rule_spec.get("actions"),
+        }
+        rule_spec_json = json.dumps(relevant_spec, ensure_ascii=False, indent=2)
+
+        # Get explanation from LLM
+        explanation = llm_service.generate_explanation(path_json, rule_spec_json)
+
+        return templates.TemplateResponse(
+            "partials/tiles/components/path_explanation.html",
+            {
+                "request": request,
+                "explanation": explanation,
+                "service": service,
+                "law": law,
+                "rule_spec": rule_spec,
+                "input": result.input,
+                "result": result.output,
+                "requirements_met": result.requirements_met
+            }
+        )
+    except Exception as e:
+        print(f"Error in explain_path: {e}")
+        return templates.TemplateResponse(
+            "partials/tiles/components/path_explanation.html",
+            {
+                "request": request,
+                "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                "service": service,
+                "law": law
+            }
+        )

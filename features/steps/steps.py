@@ -3,8 +3,7 @@ from typing import Any
 from unittest import TestCase
 
 import pandas as pd
-from behave import given
-from behave import when, then
+from behave import given, when, then
 
 from machine.service import Services
 
@@ -59,14 +58,11 @@ def step_impl(context, date):
 @when('de {law} wordt uitgevoerd door {service}')
 def step_impl(context, law, service):
     context.result = asyncio.run(
-        context.services.evaluate(
-            service,
-            law=law,
-            reference_date=context.root_reference_date,
-            parameters=context.parameters,
-            overwrite_input=context.test_data
-        )
+        context.services.evaluate(service, law=law, parameters=context.parameters,
+                                  reference_date=context.root_reference_date, overwrite_input=context.test_data)
     )
+    context.service = service
+    context.law = law
 
 
 @then('heeft de persoon recht op zorgtoeslag')
@@ -225,3 +221,93 @@ def step_impl(context, amount):
 def step_impl(context, amount):
     actual_amount = context.result.output['startup_assistance']
     compare_euro_amount(actual_amount, amount)
+
+
+@given('alle aanvragen worden beoordeeld')
+def step_impl(context):
+    context.services.manager.SAMPLE_RATE = 1.0
+
+
+@when('de persoon dit aanvraagt')
+def step_impl(context):
+    # Case indienen met de uitkomst van de vorige berekening
+    case_id = asyncio.run(
+        context.services.manager.submit_case(
+            bsn=context.parameters['BSN'],
+            service_type=context.service,
+            law=context.law,
+            parameters=context.result.input,
+            claimed_result=context.result.output
+        )
+    )
+
+    # Case ID opslaan voor volgende stappen
+    context.case_id = case_id
+
+
+@then('wordt de aanvraag toegevoegd aan handmatige beoordeling')
+def step_impl(context):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertIsNotNone(case, "Expected case to exist")
+    assertions.assertEqual(
+        case.status,
+        'IN_REVIEW',
+        "Expected case to be in review"
+    )
+
+
+@then('is de status "{status}"')
+def step_impl(context, status):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertIsNotNone(case, "Expected case to exist")
+    assertions.assertEqual(
+        case.status,
+        status,
+        f"Expected status to be {status}, but was {case.status}"
+    )
+
+
+@when('de beoordelaar de aanvraag afwijst met reden "{reason}"')
+def step_impl(context, reason):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    case.add_manual_decision(
+        verified_result=context.result.output,
+        reason=reason,
+        verifier_id="BEOORDELAAR",
+        approved=False
+    )
+    context.services.manager.save(case)
+
+
+@then('is de aanvraag afgewezen')
+def step_impl(context):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertIsNotNone(case, "Expected case to exist")
+    assertions.assertEqual(case.status, 'DECIDED', "Expected case to be decided")
+    assertions.assertFalse(case.approved, "Expected case to be rejected")
+
+
+@when('de burger bezwaar maakt met reden "{reason}"')
+def step_impl(context, reason):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    case.add_appeal(reason=reason)
+    context.services.manager.save(case)
+
+
+@when('de beoordelaar het bezwaar toewijst met reden "{reason}"')
+def step_impl(context, reason):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    case.add_manual_decision(
+        verified_result=context.result.output,
+        reason=reason,
+        verifier_id="BEOORDELAAR",
+        approved=True
+    )
+    context.services.manager.save(case)
+
+
+@then('is de aanvraag toegekend')
+def step_impl(context):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertEqual(case.status, 'DECIDED', "Expected case to be decided")
+    assertions.assertTrue(case.approved, "Expected case to be approved")

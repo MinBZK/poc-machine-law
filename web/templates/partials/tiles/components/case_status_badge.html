@@ -1,0 +1,20 @@
+<div class="flex items-center space-x-3">
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        {% if current_case.status == 'SUBMITTED' %}
+            bg-blue-100 text-blue-800">Ingediend
+        {% elif current_case.status == 'IN_REVIEW' %}
+            bg-yellow-100 text-yellow-800">In behandeling
+        {% elif current_case.status == 'DECIDED' and current_case.approved%}
+            bg-green-100 text-green-800">Toegekend
+        {% elif current_case.status == 'DECIDED' and not current_case.approved%}
+            bg-red-100 text-red-800">Afgewezen
+        {% elif current_case.status == 'APPEALED' %}
+            bg-purple-100 text-purple-800">In bezwaar gegaan
+        {% endif %}
+    </span>
+    {% if current_case.modified_on %}
+    <span class="text-sm text-gray-400">
+        laatste wijziging {{ current_case.modified_on.strftime('%-d %B %Y') }}
+    </span>
+    {% endif %}
+</div>

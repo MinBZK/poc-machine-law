@@ -1,6 +1,10 @@
 {% from "macros/logos.html" import org_logo %}
 
-<div class="law-result-card min-h-64 bg-white rounded-lg shadow">
+
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     x-data="{ showExplanation: false }"
+     @close-explanation.window="showExplanation = false"
+     id="tile-{{ law|replace('/', '-') }}">
     <div class="p-6 flex flex-col h-full">
         {% if error %}
         <div class="flex-grow space-y-6">
@@ -19,9 +23,9 @@
                     <h3 class="text-lg font-semibold text-gray-900">
                         {{ rule_spec.name }}
                     </h3>
-                    {% if current_claim %}
+                    {% if current_case %}
                     <div class="mt-2">
-                        {% include "partials/tiles/components/claim_status_badge.html" %}
+                        {% include "partials/tiles/components/case_status_badge.html" %}
                     </div>
                     {% endif %}
                 </div>
@@ -29,48 +33,106 @@
             </div>
 
             {% block tile_content %}{% endblock %}
+            <div class="space-y-4">
+                {# If there's a case, show comparison between claimed and verified #}
+                {% if current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.verified_result
+                %}
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium mb-2">Vergelijking</h4>
+                    <div class="space-y-2">
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div>Veld</div>
+                            <div>Aangevraagd</div>
+                            <div>Vastgesteld</div>
+                        </div>
+                        {% for key, value in current_case.verified_result.items() %}
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div>{{ key|replace('_', ' ')|title }}</div>
+                            <div>{{ current_case.claimed_result[key] }}</div>
+                            <div>{{ value }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
 
             {% include "partials/tiles/components/next_steps.html" %}
         </div>
 
         <div class="mt-6">
             {% block actions %}
-            {% if not current_claim %}
-            {% block submit_button %}
-            <button
-                    hx-post="/laws/submit-claim?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
-                    hx-target="closest div.law-result-card"
-                    class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
-                Aanvragen
-            </button>
-            {% endblock %}
-            {% elif current_claim.status == 'SUBMITTED' %}
-            {% block submitted_status %}
-            <p class="text-sm text-gray-600 text-center">
-                Heeft u vragen? Klik hier, of bel 1234.
-            </p>
-            {% endblock %}
-            {% elif current_claim.status == 'APPROVED' %}
-            {% block approved_status %}
-            <p class="text-sm text-green-600 text-center">Uw aanvraag is goedgekeurd</p>
-            {% endblock %}
-            {% elif current_claim.status == 'DENIED' and current_claim.can_appeal() %}
-            {% block appeal_button %}
-            <div class="space-y-4">
-                <button
-                        hx-post="/laws/submit-appeal?claim_id={{ current_claim.id }}"
-                        hx-target="closest div.min-h-[16rem]"
-                        class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
-                    In bezwaar gaan
+            {% if not current_case %}
+            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                  hx-target="closest div.law-result-card">
+                <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+                <button type="submit"
+                        class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
+                    Aanvragen
                 </button>
-                {% if current_claim.meta_claims.get('appeal_window') %}
-                <p class="text-xs text-gray-600 text-center">
-                    U kunt binnen {{ current_claim.meta_claims.appeal_window.value }} dagen bezwaar maken tegen deze
-                    beslissing
-                </p>
-                {% endif %}
-            </div>
-            {% endblock %}
+            </form>
+            {% elif current_case.status == 'SUBMITTED' %}
+            <p class="text-sm text-gray-600 text-center">
+                Uw aanvraag wordt beoordeeld. Heeft u vragen? Klik hier, of bel 1234.
+            </p>
+            {% elif current_case.status == 'DECIDED' %}
+            {% if current_case and current_case.approved %}
+            <p class="text-sm text-gray-600 text-center">Uw aanvraag is goedgekeurd</p>
+            {% else %}
+            <button type="button"
+                    onclick="showAppealDialog('{{ current_case.id }}')"
+                    class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
+                Ga in bezwaar
+            </button>
+
+            <!-- Appeal Dialog -->
+            <dialog id="appeal-dialog-{{ current_case.id }}"
+                    class="rounded-lg shadow-lg p-0 border-0 backdrop:bg-gray-500 backdrop:bg-opacity-50">
+                <div class="w-[32rem] m-8">
+                    <div class="px-6 py-4 border-b">
+                        <h3 class="text-xl font-semibold">Reden voor bezwaar</h3>
+                    </div>
+
+                    <div class="px-8 py-6">
+                        <form hx-post="/laws/appeal-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&case_id={{ current_case.id }}"
+                              hx-target="closest div.law-result-card">
+                            <label class="block text-lg mb-3">
+                                Geef een reden voor uw bezwaar:
+                            </label>
+                            <textarea
+                                    name="reason"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    rows="4"
+                                    required></textarea>
+
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <button type="button"
+                                        class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base"
+                                        onclick="closeAppealDialog('{{ current_case.id }}')">
+                                    Annuleren
+                                </button>
+                                <button type="submit"
+                                        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-base">
+                                    Bevestigen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
+
+            <script>
+                function showAppealDialog(caseId) {
+                    const dialog = document.getElementById(`appeal-dialog-${caseId}`);
+                    dialog.showModal();
+                }
+
+                function closeAppealDialog(caseId) {
+                    const dialog = document.getElementById(`appeal-dialog-${caseId}`);
+                    dialog.close();
+                }
+            </script>
+            {% endif %}
             {% endif %}
             {% endblock %}
         </div>
@@ -83,20 +145,23 @@
                     </h3>
                     <h4 class="text-sm font-medium text-gray-500 mb-1">
                         U komt niet in aanmerking
+                        <button
+                                @click="showExplanation = true"
+                                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600"
+                                hx-get="/laws/explain-path?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                                hx-target="#explanation-panel-{{ law|replace('/', '-') }}"
+                                hx-swap="innerHTML">
+                            waarom?
+                        </button>
                     </h4>
+
                 </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
         </div>
-
-        <div class="mt-6">
-            {% block not_eligible_questions %}
-            <p class="text-sm text-gray-600 text-center">
-                Heeft u vragen? Klik hier, of bel 1234.
-            </p>
-            {% endblock %}
-        </div>
-
         {% endif %}
+    </div>
+    <div id="explanation-panel-{{ law|replace('/', '-') }}"
+         @click.outside="showExplanation = false">
     </div>
 </div>
