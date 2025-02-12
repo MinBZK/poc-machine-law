@@ -148,3 +148,15 @@ class ServiceCase(Aggregate):
 
         if admissible is not None:
             self.objection_status["admissible"] = admissible
+
+    def can_object(self) -> bool:
+        """
+        Check if objection is possible for this case.
+        Returns False if:
+        - objection_status is not set
+        - possible flag is not set
+        - possible flag is explicitly set to False
+        """
+        if not hasattr(self, 'objection_status') or self.objection_status is None:
+            return False
+        return bool(self.objection_status.get('possible', False))

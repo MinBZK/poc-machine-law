@@ -172,8 +172,8 @@ class ServiceCaseManager(Application):
         return str(case.id)
 
     def objection_case(self,
-                    case_id: str,
-                    reason: str) -> str:
+                       case_id: str,
+                       reason: str) -> str:
         """
         Submit an objection for a case with newly claimed result.
         Appeals always go to manual review.
@@ -239,6 +239,9 @@ class ServiceCaseManager(Application):
         return str(case.id)
 
     # Query methods
+
+    def can_object(self, case_id: str) -> bool:
+        return self.get_case_by_id(case_id).can_object()
 
     def get_case(self, bsn: str, service_type: str, law: str) -> Optional[ServiceCase]:
         """Get case for specific bsn, service and law combination"""
