@@ -5,7 +5,7 @@ import anthropic
 
 
 class LLMService:
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
     @lru_cache(maxsize=1000)  # Cache responses to avoid repeated calls

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, Form
-from starlette.responses import RedirectResponse
 from datetime import datetime
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from starlette.responses import RedirectResponse
 
 from machine.events.aggregate import CaseStatus
 from machine.service import Services
@@ -29,9 +30,7 @@ async def admin_redirect(request: Request, services: Services = Depends(get_serv
 
 
 @router.get("/{service}")
-async def admin_dashboard(
-    request: Request, service: str, services: Services = Depends(get_services)
-):
+async def admin_dashboard(request: Request, service: str, services: Services = Depends(get_services)):
     """Main admin dashboard view"""
     discoverable_laws = services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
@@ -80,9 +79,7 @@ async def move_case(
             events = services.manager.repository.events.get_domain_events(case.id)
             latest_results = {}
             for event in reversed(events):
-                if hasattr(event, "claimed_result") and hasattr(
-                    event, "verified_result"
-                ):
+                if hasattr(event, "claimed_result") and hasattr(event, "verified_result"):
                     latest_results = {
                         "claimed_result": event.claimed_result,
                         "verified_result": event.verified_result,
@@ -102,9 +99,7 @@ async def move_case(
                 verifier_id="ADMIN",  # TODO: Get from auth
             )
         else:
-            raise HTTPException(
-                status_code=400, detail=f"Cannot move to status {new_status}"
-            )
+            raise HTTPException(status_code=400, detail=f"Cannot move to status {new_status}")
 
         services.manager.save(case)
 
@@ -136,9 +131,7 @@ async def complete_review(
         updated_case = services.manager.get_case_by_id(case_id)
 
         # Check if request is from case detail page
-        is_detail_page = request.headers.get("HX-Current-URL", "").endswith(
-            f"/cases/{case_id}"
-        )
+        is_detail_page = request.headers.get("HX-Current-URL", "").endswith(f"/cases/{case_id}")
 
         if is_detail_page:
             # Create a decision event object for the template
@@ -169,9 +162,7 @@ async def complete_review(
 
 
 @router.get("/cases/{case_id}")
-async def view_case(
-    request: Request, case_id: str, services: Services = Depends(get_services)
-):
+async def view_case(request: Request, case_id: str, services: Services = Depends(get_services)):
     """View details of a specific case"""
     case = services.manager.get_case_by_id(case_id)
     if not case:
@@ -179,6 +170,4 @@ async def view_case(
 
     case.events = services.manager.get_events(case.id)
 
-    return templates.TemplateResponse(
-        "admin/case_detail.html", {"request": request, "case": case}
-    )
+    return templates.TemplateResponse("admin/case_detail.html", {"request": request, "case": case})

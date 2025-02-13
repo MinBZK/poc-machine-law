@@ -1,6 +1,5 @@
 import logging
 from contextlib import contextmanager
-from typing import Optional
 
 
 class GlobalIndent:
@@ -13,14 +12,14 @@ class GlobalIndent:
     _double_lines = set()
 
     @classmethod
-    def increase(cls, double_line: bool = False):
+    def increase(cls, double_line: bool = False) -> None:
         cls._level += 1
         cls._active_branches.add(cls._level - 1)
         if double_line:
             cls._double_lines.add(cls._level - 1)
 
     @classmethod
-    def decrease(cls):
+    def decrease(cls) -> None:
         if cls._level > 0:
             # No longer active - will show end corner
             cls._active_branches.discard(cls._level - 1)
@@ -36,21 +35,13 @@ class GlobalIndent:
         # For all levels except current, show pipe only if level is still active
         for i in range(cls._level - 1):
             if i in cls._active_branches:
-                chars = (
-                    cls._tree_chars_double
-                    if i in cls._double_lines
-                    else cls._tree_chars_single
-                )
+                chars = cls._tree_chars_double if i in cls._double_lines else cls._tree_chars_single
                 parts.append(f"{chars['pipe']}   ")
             else:
                 parts.append("    ")
 
         # For current level, use leaf if not active (end of block)
-        chars = (
-            cls._tree_chars_double
-            if (cls._level - 1) in cls._double_lines
-            else cls._tree_chars_single
-        )
+        chars = cls._tree_chars_double if (cls._level - 1) in cls._double_lines else cls._tree_chars_single
         is_end = (cls._level - 1) not in cls._active_branches
         parts.append(chars["leaf"] if is_end else chars["branch"])
         return "".join(parts)
@@ -59,19 +50,19 @@ class GlobalIndent:
 class IndentLogger:
     """Logger wrapper that handles indentation using global state"""
 
-    def __init__(self, logger: logging.Logger):
+    def __init__(self, logger: logging.Logger) -> None:
         self._logger = logger
 
-    def debug(self, msg: str, *args, **kwargs):
+    def debug(self, msg: str, *args, **kwargs) -> None:
         self._logger.debug(f"{self.indent}{msg}", *args, **kwargs)
 
-    def info(self, msg: str, *args, **kwargs):
+    def info(self, msg: str, *args, **kwargs) -> None:
         self._logger.info(f"{self.indent}{msg}", *args, **kwargs)
 
-    def warning(self, msg: str, *args, **kwargs):
+    def warning(self, msg: str, *args, **kwargs) -> None:
         self._logger.warning(f"{self.indent}{msg}", *args, **kwargs)
 
-    def error(self, msg: str, *args, **kwargs):
+    def error(self, msg: str, *args, **kwargs) -> None:
         self._logger.error(f"{self.indent}{msg}", *args, **kwargs)
 
     @property
@@ -79,9 +70,7 @@ class IndentLogger:
         return GlobalIndent.get_indent()
 
     @contextmanager
-    def indent_block(
-        self, initial_message: Optional[str] = None, double_line: bool = False
-    ):
+    def indent_block(self, initial_message: str | None = None, double_line: bool = False):
         """Context manager for handling indentation blocks"""
         if initial_message:
             self.debug(initial_message)
@@ -92,13 +81,11 @@ class IndentLogger:
             GlobalIndent.decrease()
 
 
-def configure_logging(level: Optional[str] = None):
+def configure_logging(level: str | None = None):
     """Configure logging with the specified level"""
 
     # Create formatters
-    detailed_formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     simple_formatter = logging.Formatter("%(levelname)8s %(message)s")
 
     # Create console handler
@@ -122,7 +109,7 @@ def configure_logging(level: Optional[str] = None):
     }
 
     # Configure each logger
-    for name, logger in loggers.items():
+    for _name, logger in loggers.items():
         logger.setLevel(log_level)
         logger.propagate = False  # Prevent duplicate logging
         logger.addHandler(console_handler)

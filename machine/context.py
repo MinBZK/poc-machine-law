@@ -2,7 +2,7 @@ import logging
 from copy import copy
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, Union, Any, Dict, List, Set
+from typing import Any
 
 import pandas as pd
 
@@ -15,11 +15,11 @@ logger = IndentLogger(logging.getLogger("service"))
 class TypeSpec:
     """Specification for value types"""
 
-    type: Optional[str] = None
-    unit: Optional[str] = None
-    precision: Optional[int] = None
-    min: Optional[Union[int, float]] = None
-    max: Optional[Union[int, float]] = None
+    type: str | None = None
+    unit: str | None = None
+    precision: int | None = None
+    min: int | float | None = None
+    max: int | float | None = None
 
     def enforce(self, value: Any) -> Any:
         """Enforce type specifications on a value"""
@@ -40,7 +40,7 @@ class TypeSpec:
             except ValueError:
                 return value
 
-        if not isinstance(value, (int, float)):
+        if not isinstance(value, int | float):
             return value
 
         # Apply min/max constraints
@@ -67,40 +67,40 @@ class PathNode:
     type: str
     name: str
     result: Any
-    details: Dict[str, Any] = field(default_factory=dict)
-    children: List["PathNode"] = field(default_factory=list)
+    details: dict[str, Any] = field(default_factory=dict)
+    children: list["PathNode"] = field(default_factory=list)
 
 
 @dataclass
 class RuleContext:
     """Context for rule evaluation"""
 
-    definitions: Dict[str, Any]
-    service_provider: Optional[Any]
-    parameters: Dict[str, Any]
-    property_specs: Dict[str, Dict[str, Any]]
-    output_specs: Dict[str, TypeSpec]
-    sources: Dict[str, pd.DataFrame]
-    local: Dict[str, Any] = field(default_factory=dict)
-    accessed_paths: Set[str] = field(default_factory=set)
-    values_cache: Dict[str, Any] = field(default_factory=dict)
-    path: List[PathNode] = field(default_factory=list)
-    overwrite_input: Dict[str, Any] = field(default_factory=dict)
-    outputs: Dict[str, Any] = field(default_factory=dict)
-    calculation_date: Optional[str] = None
-    resolved_paths: Dict[str, Any] = field(default_factory=dict)
+    definitions: dict[str, Any]
+    service_provider: Any | None
+    parameters: dict[str, Any]
+    property_specs: dict[str, dict[str, Any]]
+    output_specs: dict[str, TypeSpec]
+    sources: dict[str, pd.DataFrame]
+    local: dict[str, Any] = field(default_factory=dict)
+    accessed_paths: set[str] = field(default_factory=set)
+    values_cache: dict[str, Any] = field(default_factory=dict)
+    path: list[PathNode] = field(default_factory=list)
+    overwrite_input: dict[str, Any] = field(default_factory=dict)
+    outputs: dict[str, Any] = field(default_factory=dict)
+    calculation_date: str | None = None
+    resolved_paths: dict[str, Any] = field(default_factory=dict)
 
-    def track_access(self, path: str):
+    def track_access(self, path: str) -> None:
         """Track accessed data paths"""
         self.accessed_paths.add(path)
 
-    def add_to_path(self, node: PathNode):
+    def add_to_path(self, node: PathNode) -> None:
         """Add node to evaluation path"""
         if self.path:
             self.path[-1].children.append(node)
         self.path.append(node)
 
-    def pop_path(self):
+    def pop_path(self) -> None:
         """Remove last node from path"""
         if self.path:
             self.path.pop()
@@ -142,9 +142,7 @@ class RuleContext:
                     value = await self.resolve_value(f"${root}")
                     for p in rest.split("."):
                         if value is None:
-                            logger.warning(
-                                f"Value is None, could not resolve value ${path}: None"
-                            )
+                            logger.warning(f"Value is None, could not resolve value ${path}: None")
                             node.result = None
                             return None
                         if isinstance(value, dict):
@@ -152,9 +150,7 @@ class RuleContext:
                         elif hasattr(value, p):
                             value = getattr(value, p)
                         else:
-                            logger.warning(
-                                f"Value is not dict or not object, could not resolve value ${path}: None"
-                            )
+                            logger.warning(f"Value is not dict or not object, could not resolve value ${path}: None")
                             node.result = None
                             return None
 
@@ -182,9 +178,7 @@ class RuleContext:
 
                 # Check outputs
                 if path in self.outputs:
-                    logger.debug(
-                        f"Resolving from previous OUTPUT: {self.outputs[path]}"
-                    )
+                    logger.debug(f"Resolving from previous OUTPUT: {self.outputs[path]}")
                     node.result = self.outputs[path]
                     return self.outputs[path]
 
@@ -195,12 +189,9 @@ class RuleContext:
                     if (
                         service_ref
                         and service_ref["service"] in self.overwrite_input
-                        and service_ref["field"]
-                        in self.overwrite_input[service_ref["service"]]
+                        and service_ref["field"] in self.overwrite_input[service_ref["service"]]
                     ):
-                        value = self.overwrite_input[service_ref["service"]][
-                            service_ref["field"]
-                        ]
+                        value = self.overwrite_input[service_ref["service"]][service_ref["field"]]
                         logger.debug(f"Resolving from OVERWRITE: {value}")
                         node.result = value
                         return value
@@ -225,9 +216,7 @@ class RuleContext:
                                 df = self.sources[table]
 
                         if df is not None:
-                            result = await self._resolve_from_source(
-                                source_ref, table, df
-                            )
+                            result = await self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
                             return result
@@ -237,9 +226,7 @@ class RuleContext:
                     spec = self.property_specs[path]
                     service_ref = spec.get("service_reference", {})
                     if service_ref and self.service_provider:
-                        value = await self._resolve_from_service(
-                            path, service_ref, spec
-                        )
+                        value = await self._resolve_from_service(path, service_ref, spec)
                         logger.debug(
                             f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}"
                         )
@@ -260,9 +247,7 @@ class RuleContext:
             return calc_date.replace(month=1, day=1).isoformat()
         if path == "prev_january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
-            return calc_date.replace(
-                month=1, day=1, year=calc_date.year - 1
-            ).isoformat()
+            return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
         if path == "year":
             return self.calculation_date[:4]
         return None
@@ -270,12 +255,7 @@ class RuleContext:
     async def _resolve_from_service(self, path, service_ref, spec):
         parameters = copy(self.parameters)
         if "parameters" in service_ref:
-            parameters.update(
-                {
-                    p["name"]: await self.resolve_value(p["reference"])
-                    for p in service_ref["parameters"]
-                }
-            )
+            parameters.update({p["name"]: await self.resolve_value(p["reference"]) for p in service_ref["parameters"]})
 
         reference_date = self.calculation_date
         if "temporal" in spec and "reference" in spec["temporal"]:
@@ -284,14 +264,10 @@ class RuleContext:
         # Check cache
         cache_key = f"{path}({','.join([f'{k}:{v}' for k, v in sorted(parameters.items())])},{reference_date})"
         if cache_key in self.values_cache:
-            logger.debug(
-                f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}"
-            )
+            logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
             return self.values_cache[cache_key]
 
-        logger.debug(
-            f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})"
-        )
+        logger.debug(f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})")
 
         result = await self.service_provider.evaluate(
             service_ref["service"],
@@ -311,11 +287,7 @@ class RuleContext:
             for select_on in source_ref["select_on"]:
                 value = await self.resolve_value(select_on["value"])
 
-                if (
-                    isinstance(value, dict)
-                    and "operation" in value
-                    and value["operation"] == "IN"
-                ):
+                if isinstance(value, dict) and "operation" in value and value["operation"] == "IN":
                     allowed_values = await self.resolve_value(value["values"])
                     df = df[df[select_on["name"]].isin(allowed_values)]
                 else:
@@ -328,9 +300,7 @@ class RuleContext:
         if fields:
             missing_fields = [f for f in fields if f not in df.columns]
             if missing_fields:
-                logger.warning(
-                    f"Fields {missing_fields} not found in source for table {table}"
-                )
+                logger.warning(f"Fields {missing_fields} not found in source for table {table}")
             existing_fields = [f for f in fields if f in df.columns]
             result = df[existing_fields].to_dict("records")
         elif field:

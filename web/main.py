@@ -1,11 +1,10 @@
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 
 from machine.service import Services
-from web.dependencies import FORMATTED_DATE, get_services, STATIC_DIR, templates
-from web.routers import admin
-from web.routers import laws
-from web.services.profiles import get_profile_data, get_all_profiles
+from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_services, templates
+from web.routers import admin, laws
+from web.services.profiles import get_all_profiles, get_profile_data
 
 app = FastAPI(title="Burger.nl")
 
@@ -19,9 +18,7 @@ app.include_router(admin.router)
 
 
 @app.get("/")
-async def root(
-    request: Request, bsn: str = "999993653", services: Services = Depends(get_services)
-):
+async def root(request: Request, bsn: str = "999993653", services: Services = Depends(get_services)):
     """Render the main dashboard page"""
     profile = get_profile_data(bsn)
     if not profile:
@@ -41,8 +38,9 @@ async def root(
 
 
 if __name__ == "__main__":
-    import uvicorn
     from multiprocessing import cpu_count
+
+    import uvicorn
 
     # Use half the available CPU cores (a common practice)
     n_workers = cpu_count() // 2

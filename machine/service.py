@@ -1,13 +1,14 @@
 import logging
 from dataclasses import dataclass
-from typing import Dict, Any, Optional
+from typing import Any
 
 import pandas as pd
-from eventsourcing.system import System, SingleThreadedRunner
+from eventsourcing.system import SingleThreadedRunner, System
 
-from machine.events.application import ServiceCaseManager, RuleProcessor
-from .engine import RulesEngine
+from machine.events.application import RuleProcessor, ServiceCaseManager
+
 from .context import PathNode
+from .engine import RulesEngine
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -18,22 +19,17 @@ logger = IndentLogger(logging.getLogger("service"))
 class RuleResult:
     """Result from rule execution containing output values and metadata"""
 
-    output: Dict[str, Any]
+    output: dict[str, Any]
     requirements_met: bool
-    input: Dict[str, Any]
+    input: dict[str, Any]
     rulespec_uuid: str
-    path: Optional[PathNode] = None
+    path: PathNode | None = None
 
     @classmethod
-    def from_engine_result(
-        cls, result: Dict[str, Any], rulespec_uuid: str
-    ) -> "RuleResult":
+    def from_engine_result(cls, result: dict[str, Any], rulespec_uuid: str) -> "RuleResult":
         """Create RuleResult from engine evaluation result"""
         return cls(
-            output={
-                name: data.get("value")
-                for name, data in result.get("output", {}).items()
-            },
+            output={name: data.get("value") for name, data in result.get("output", {}).items()},
             requirements_met=result.get("requirements_met", False),
             input=result.get("input", {}),
             rulespec_uuid=rulespec_uuid,
@@ -44,7 +40,7 @@ class RuleResult:
 class RuleService:
     """Interface for executing business rules for a specific service"""
 
-    def __init__(self, service_name: str, services):
+    def __init__(self, service_name: str, services) -> None:
         """
         Initialize service for specific business rules
 
@@ -55,8 +51,8 @@ class RuleService:
         self.service_name = service_name
         self.services = services
         self.resolver = RuleResolver()
-        self._engines: Dict[str, Dict[str, RulesEngine]] = {}
-        self.source_dataframes: Dict[str, pd.DataFrame] = {}
+        self._engines: dict[str, dict[str, RulesEngine]] = {}
+        self.source_dataframes: dict[str, pd.DataFrame] = {}
 
     def _get_engine(self, law: str, reference_date: str) -> RulesEngine:
         """Get or create RulesEngine instance for given law and date"""
@@ -64,21 +60,14 @@ class RuleService:
             self._engines[law] = {}
 
         if reference_date not in self._engines[law]:
-            spec = self.resolver.get_rule_spec(
-                law, reference_date, service=self.service_name
-            )
+            spec = self.resolver.get_rule_spec(law, reference_date, service=self.service_name)
             if not spec:
-                raise ValueError(
-                    f"No rules found for law '{law}' at date '{reference_date}'"
-                )
+                raise ValueError(f"No rules found for law '{law}' at date '{reference_date}'")
             if spec.get("service") != self.service_name:
                 raise ValueError(
-                    f"Rule spec service '{spec.get('service')}' does not match "
-                    f"service '{self.service_name}'"
+                    f"Rule spec service '{spec.get('service')}' does not match service '{self.service_name}'"
                 )
-            self._engines[law][reference_date] = RulesEngine(
-                spec=spec, service_provider=self.services
-            )
+            self._engines[law][reference_date] = RulesEngine(spec=spec, service_provider=self.services)
 
         return self._engines[law][reference_date]
 
@@ -86,9 +75,9 @@ class RuleService:
         self,
         law: str,
         reference_date: str,
-        parameters: Dict[str, Any],
-        overwrite_input: Optional[Dict[str, Any]] = None,
-        requested_output: str = None,
+        parameters: dict[str, Any],
+        overwrite_input: dict[str, Any] | None = None,
+        requested_output: str | None = None,
     ) -> RuleResult:
         """
         Evaluate rules for given law and reference date
@@ -113,7 +102,7 @@ class RuleService:
         )
         return RuleResult.from_engine_result(result, engine.spec.get("uuid"))
 
-    def get_rule_info(self, law: str, reference_date: str) -> Optional[Dict[str, Any]]:
+    def get_rule_info(self, law: str, reference_date: str) -> dict[str, Any] | None:
         """
         Get metadata about the rule that would be applied for given law and date
 
@@ -131,28 +120,25 @@ class RuleService:
             return None
         return None
 
-    def set_source_dataframe(self, table: str, df: pd.DataFrame):
+    def set_source_dataframe(self, table: str, df: pd.DataFrame) -> None:
         """Set a source DataFrame"""
         self.source_dataframes[table] = df
 
 
 class Services:
-    def __init__(self, reference_date: str):
+    def __init__(self, reference_date: str) -> None:
         self.resolver = RuleResolver()
-        self.services = {
-            service: RuleService(service, self)
-            for service in self.resolver.get_service_laws()
-        }
+        self.services = {service: RuleService(service, self) for service in self.resolver.get_service_laws()}
         self.root_reference_date = reference_date
 
         outer_self = self
 
         class WrappedProcessor(RuleProcessor):
-            def __init__(self, env=None, **kwargs):
+            def __init__(self, env=None, **kwargs) -> None:
                 super().__init__(rules_engine=outer_self, env=env, **kwargs)
 
         class WrappedManager(ServiceCaseManager):
-            def __init__(self, env=None, **kwargs):  # env parameter toevoegen
+            def __init__(self, env=None, **kwargs) -> None:  # env parameter toevoegen
                 super().__init__(rules_engine=outer_self, env=env, **kwargs)
 
         system = System(pipes=[[WrappedManager, WrappedProcessor]])
@@ -167,7 +153,7 @@ class Services:
     def get_discoverable_service_laws(self):
         return self.resolver.get_discoverable_service_laws()
 
-    def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame):
+    def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
 
@@ -175,10 +161,10 @@ class Services:
         self,
         service: str,
         law: str,
-        parameters: Dict[str, Any],
-        reference_date: str = None,
-        overwrite_input: Optional[Dict[str, Any]] = None,
-        requested_output: str = None,
+        parameters: dict[str, Any],
+        reference_date: str | None = None,
+        overwrite_input: dict[str, Any] | None = None,
+        requested_output: str | None = None,
     ) -> RuleResult:
         reference_date = reference_date or self.root_reference_date
         with logger.indent_block(
@@ -216,7 +202,7 @@ class Services:
                         return aggregate_id
 
     @staticmethod
-    def _matches_event(event, applies):
+    def _matches_event(event, applies) -> bool:
         """Check if event matches the applies spec"""
         if applies["aggregate"] != event.__class__.__qualname__.split(".")[0]:
             return False

@@ -1,11 +1,9 @@
-from typing import Dict, Any, Optional
+from typing import Any
 
 # Global service data that applies to all profiles
 GLOBAL_SERVICES = {
     "CBS": {"levensverwachting": [{"jaar": 2025, "verwachting_65": 20.5}]},
-    "KIESRAAD": {
-        "verkiezingen": [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-05-05"}]
-    },
+    "KIESRAAD": {"verkiezingen": [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-05-05"}]},
 }
 
 PROFILES = {
@@ -63,9 +61,7 @@ PROFILES = {
                         "eigen_woning": 0,
                     }
                 ],
-                "box2": [
-                    {"bsn": "999993653", "dividend": 0, "vervreemding_aandelen": 0}
-                ],
+                "box2": [{"bsn": "999993653", "dividend": 0, "vervreemding_aandelen": 0}],
                 "box3": [
                     {
                         "bsn": "999993653",
@@ -75,26 +71,14 @@ PROFILES = {
                         "schulden": 0,
                     }
                 ],
-                "buitenlands_inkomen": [
-                    {"bsn": "999993653", "bedrag": 0, "land": "GEEN"}
-                ],
+                "buitenlands_inkomen": [{"bsn": "999993653", "bedrag": 0, "land": "GEEN"}],
             },
             "DUO": {
-                "inschrijvingen": [
-                    {"bsn": "999993653", "onderwijssoort": "MBO", "niveau": 4}
-                ],
-                "studiefinanciering": [
-                    {"bsn": "999993653", "aantal_studerende_broers_zussen": 0}
-                ],
+                "inschrijvingen": [{"bsn": "999993653", "onderwijssoort": "MBO", "niveau": 4}],
+                "studiefinanciering": [{"bsn": "999993653", "aantal_studerende_broers_zussen": 0}],
             },
-            "DJI": {
-                "detenties": [
-                    {"bsn": "999993653", "status": "VRIJ", "inrichting_type": "GEEN"}
-                ]
-            },
-            "SVB": {
-                "verzekerde_tijdvakken": [{"bsn": "999993653", "woonperiodes": 35}]
-            },
+            "DJI": {"detenties": [{"bsn": "999993653", "status": "VRIJ", "inrichting_type": "GEEN"}]},
+            "SVB": {"verzekerde_tijdvakken": [{"bsn": "999993653", "woonperiodes": 35}]},
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [
                     {
@@ -150,9 +134,7 @@ PROFILES = {
                     }
                 ],
             },
-            "SVB": {
-                "verzekerde_tijdvakken": [{"bsn": "999993654", "woonperiodes": 50}]
-            },
+            "SVB": {"verzekerde_tijdvakken": [{"bsn": "999993654", "woonperiodes": 50}]},
             "BELASTINGDIENST": {
                 "box1": [
                     {
@@ -164,9 +146,7 @@ PROFILES = {
                         "eigen_woning": 0,
                     }
                 ],
-                "box2": [
-                    {"bsn": "999993654", "dividend": 0, "vervreemding_aandelen": 0}
-                ],
+                "box2": [{"bsn": "999993654", "dividend": 0, "vervreemding_aandelen": 0}],
                 "box3": [
                     {
                         "bsn": "999993654",
@@ -176,9 +156,7 @@ PROFILES = {
                         "schulden": 0,
                     }
                 ],
-                "buitenlands_inkomen": [
-                    {"bsn": "999993654", "bedrag": 0, "land": "GEEN"}
-                ],
+                "buitenlands_inkomen": [{"bsn": "999993654", "bedrag": 0, "land": "GEEN"}],
             },
             "RVZ": {
                 "verzekeringen": [
@@ -388,9 +366,7 @@ PROFILES = {
             },
             "DUO": {
                 "inschrijvingen": [{"bsn": "999993658", "onderwijstype": "WO"}],
-                "studiefinanciering": [
-                    {"bsn": "999993658", "aantal_studerend_gezin": 0}
-                ],
+                "studiefinanciering": [{"bsn": "999993658", "aantal_studerend_gezin": 0}],
             },
         },
     },
@@ -433,11 +409,11 @@ PROFILES = {
 }
 
 
-def get_profile_data(bsn: str) -> Optional[Dict[str, Any]]:
+def get_profile_data(bsn: str) -> dict[str, Any] | None:
     """Get profile data for a specific BSN"""
     return PROFILES.get(bsn)
 
 
-def get_all_profiles() -> Dict[str, Dict[str, Any]]:
+def get_all_profiles() -> dict[str, dict[str, Any]]:
     """Get all available profiles"""
     return PROFILES

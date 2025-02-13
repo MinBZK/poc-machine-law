@@ -2,7 +2,8 @@ import json
 from urllib.parse import unquote
 
 import pandas as pd
-from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from jinja2 import TemplateNotFound
 
 from explain.llm_service import llm_service
 from machine.service import Services
@@ -22,7 +23,7 @@ def get_tile_template(service: str, law: str) -> str:
     try:
         templates.get_template(specific_template)
         return specific_template
-    except:
+    except TemplateNotFound:
         return "partials/tiles/fallback_tile.html"
 
 
@@ -45,9 +46,7 @@ async def evaluate_law(bsn: str, law: str, service: str, services: Services):
             services.set_source_dataframe(service_name, table_name, df)
 
     # Execute the law
-    result = await services.evaluate(
-        service, law=law, parameters={"BSN": bsn}, reference_date=TODAY
-    )
+    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY)
     return law, result, rule_spec
 
 

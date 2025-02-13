@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Dict, Optional
 
 from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
@@ -15,7 +14,7 @@ class CaseStatus(str, Enum):
 class ClaimStatusTranscoding(Transcoding):
     @staticmethod
     def can_handle(obj: object) -> bool:
-        return isinstance(obj, (CaseStatus, str))
+        return isinstance(obj, CaseStatus | str)
 
     @staticmethod
     def encode(obj: CaseStatus) -> str:
@@ -48,10 +47,10 @@ class ServiceCase(Aggregate):
         bsn: str,
         service_type: str,
         law: str,
-        parameters: Dict,
-        claimed_result: Dict,
+        parameters: dict,
+        claimed_result: dict,
         rulespec_uuid: str,
-    ):
+    ) -> None:
         self.bsn = bsn
         self.service = service_type
         self.law = law
@@ -70,13 +69,9 @@ class ServiceCase(Aggregate):
         self.status = CaseStatus.SUBMITTED
 
     @event("AutomaticallyDecided")
-    def decide_automatically(
-        self, verified_result: Dict, parameters: Dict, approved: bool
-    ):
+    def decide_automatically(self, verified_result: dict, parameters: dict, approved: bool) -> None:
         if self.status not in [CaseStatus.SUBMITTED, CaseStatus.OBJECTED]:
-            raise ValueError(
-                "Can only automatically decide on submitted cases or objections"
-            )
+            raise ValueError("Can only automatically decide on submitted cases or objections")
         self.verified_result = verified_result
         self.parameters = parameters
         self.status = CaseStatus.DECIDED
@@ -84,12 +79,10 @@ class ServiceCase(Aggregate):
 
     @event("AddedToManualReview")
     def select_for_manual_review(
-        self, verifier_id: str, reason: str, claimed_result: Dict, verified_result: Dict
-    ):
+        self, verifier_id: str, reason: str, claimed_result: dict, verified_result: dict
+    ) -> None:
         if self.status not in [CaseStatus.SUBMITTED, CaseStatus.OBJECTED]:
-            raise ValueError(
-                "Can only add to review from submitted status or objection"
-            )
+            raise ValueError("Can only add to review from submitted status or objection")
         self.status = CaseStatus.IN_REVIEW
         self.verified_result = verified_result
         self.claimed_result = claimed_result
@@ -97,13 +90,9 @@ class ServiceCase(Aggregate):
         self.verifier_id = verifier_id
 
     @event("Decided")
-    def decide(
-        self, verified_result: Dict, reason: str, verifier_id: str, approved: bool
-    ):
+    def decide(self, verified_result: dict, reason: str, verifier_id: str, approved: bool) -> None:
         if self.status not in [CaseStatus.IN_REVIEW, CaseStatus.OBJECTED]:
-            raise ValueError(
-                "Can only manually decide on cases in review or objections"
-            )
+            raise ValueError("Can only manually decide on cases in review or objections")
         self.status = CaseStatus.DECIDED
         self.approved = approved
         self.reason = reason
@@ -111,7 +100,7 @@ class ServiceCase(Aggregate):
         self.verifier_id = verifier_id
 
     @event("Objected")
-    def object(self, reason: str):
+    def object(self, reason: str) -> None:
         if self.status != CaseStatus.DECIDED:
             raise ValueError("Can only objection decided cases")
         self.status = CaseStatus.OBJECTED
@@ -120,12 +109,12 @@ class ServiceCase(Aggregate):
     @event("ObjectionStatusDetermined")
     def determine_objection_status(
         self,
-        possible: Optional[bool] = None,  # bezwaar_mogelijk
-        not_possible_reason: Optional[str] = None,  # reden_niet_mogelijk
-        objection_period: Optional[int] = None,  # bezwaartermijn in weeks
-        decision_period: Optional[int] = None,  # beslistermijn in weeks
-        extension_period: Optional[int] = None,
-    ):  # verdagingstermijn in weeks
+        possible: bool | None = None,  # bezwaar_mogelijk
+        not_possible_reason: str | None = None,  # reden_niet_mogelijk
+        objection_period: int | None = None,  # bezwaartermijn in weeks
+        decision_period: int | None = None,  # beslistermijn in weeks
+        extension_period: int | None = None,
+    ) -> None:  # verdagingstermijn in weeks
         """Determine the objection status and periods"""
         if not hasattr(self, "objection_status") or self.objection_status is None:
             self.objection_status = {}
@@ -145,7 +134,7 @@ class ServiceCase(Aggregate):
         self.objection_status.update(updates)
 
     @event("ObjectionAdmissibilityDetermined")
-    def determine_objection_admissibility(self, admissible: Optional[bool] = None):
+    def determine_objection_admissibility(self, admissible: bool | None = None) -> None:
         """Determine whether an objection is admissible (ontvankelijk)"""
         if not hasattr(self, "objection_status") or self.objection_status is None:
             self.objection_status = {}

@@ -2,7 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Any
 
 import pandas as pd
 import yaml
@@ -22,12 +22,12 @@ class RuleSpec:
     valid_from: datetime
     service: str
     discoverable: str
-    properties: Dict[str, Any]
+    properties: dict[str, Any]
 
     @classmethod
     def from_yaml(cls, path: str) -> "RuleSpec":
         """Create RuleSpec from a YAML file path"""
-        with open(path, "r") as f:
+        with open(path) as f:
             data = yaml.safe_load(f)
 
         return cls(
@@ -48,17 +48,15 @@ class RuleSpec:
 
 
 class RuleResolver:
-    def __init__(self):
+    def __init__(self) -> None:
         self.rules_dir = Path(BASE_DIR)
-        self.rules: List[RuleSpec] = []
+        self.rules: list[RuleSpec] = []
         self._load_rules()
 
-    def _load_rules(self):
+    def _load_rules(self) -> None:
         """Load all rule specifications from the rules directory"""
         # Use Path.rglob to find all .yaml and .yml files recursively
-        yaml_files = list(self.rules_dir.rglob("*.yaml")) + list(
-            self.rules_dir.rglob("*.yml")
-        )
+        yaml_files = list(self.rules_dir.rglob("*.yaml")) + list(self.rules_dir.rglob("*.yml"))
 
         for path in yaml_files:
             try:
@@ -72,9 +70,7 @@ class RuleResolver:
         for rule in self.rules:
             self.laws_by_service[rule.service].add(rule.law)
             if rule.discoverable:
-                self.discoverable_laws_by_service[rule.discoverable][rule.service].add(
-                    rule.law
-                )
+                self.discoverable_laws_by_service[rule.discoverable][rule.service].add(rule.law)
 
     def get_service_laws(self):
         return self.laws_by_service
@@ -82,9 +78,7 @@ class RuleResolver:
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
         return self.discoverable_laws_by_service[discoverable_by]
 
-    def find_rule(
-        self, law: str, reference_date: str, service: str = None
-    ) -> Optional[RuleSpec]:
+    def find_rule(self, law: str, reference_date: str, service: str | None = None) -> RuleSpec | None:
         """Find the applicable rule for a given law and reference date"""
         ref_date = datetime.strptime(reference_date, "%Y-%m-%d")
 
@@ -102,20 +96,18 @@ class RuleResolver:
         valid_rules = [r for r in law_rules if r.valid_from <= ref_date]
 
         if not valid_rules:
-            raise ValueError(
-                f"No valid rules found for law {law} at date {reference_date}"
-            )
+            raise ValueError(f"No valid rules found for law {law} at date {reference_date}")
 
         # Return the most recently valid rule
         return max(valid_rules, key=lambda r: r.valid_from)
 
-    def get_rule_spec(self, law: str, reference_date: str, service: str = None) -> dict:
+    def get_rule_spec(self, law: str, reference_date: str, service: str | None = None) -> dict:
         """Get the rule specification as a dictionary"""
         rule = self.find_rule(law, reference_date, service)
         if not rule:
             raise ValueError(f"No rule found for {law} at {reference_date}")
 
-        with open(rule.path, "r") as f:
+        with open(rule.path) as f:
             return yaml.safe_load(f)
 
     def rules_dataframe(self) -> pd.DataFrame:

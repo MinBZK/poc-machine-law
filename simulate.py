@@ -1,7 +1,8 @@
 import asyncio
+import itertools
 import logging
 import random
-from datetime import datetime, date
+from datetime import date, datetime
 
 import numpy as np
 import pandas as pd
@@ -12,7 +13,7 @@ logging.basicConfig(level=logging.ERROR)
 
 
 class LawSimulator:
-    def __init__(self, simulation_date="2025-03-01"):
+    def __init__(self, simulation_date="2025-03-01") -> None:
         self.simulation_date = simulation_date
         self.services = Services(simulation_date)
         self.results = []
@@ -31,9 +32,7 @@ class LawSimulator:
             random.randint(1, 12),
             random.randint(1, 28),
         )
-        age = (
-            datetime.strptime(self.simulation_date, "%Y-%m-%d").date() - birth_date
-        ).days // 365
+        age = (datetime.strptime(self.simulation_date, "%Y-%m-%d").date() - birth_date).days // 365
 
         # Also store study status for consistency
         is_student = age < 30 and random.random() < 0.6
@@ -42,14 +41,8 @@ class LawSimulator:
             "bsn": self.generate_bsn(),
             "birth_date": birth_date,
             "age": age,
-            "annual_income": min(
-                max(int(np.random.lognormal(mean=10.8, sigma=0.4)), 0), 200000
-            )
-            * 100,
-            "net_worth": min(
-                max(int(np.random.lognormal(mean=11, sigma=1)), 0), 1000000
-            )
-            * 100,
+            "annual_income": min(max(int(np.random.lognormal(mean=10.8, sigma=0.4)), 0), 200000) * 100,
+            "net_worth": min(max(int(np.random.lognormal(mean=11, sigma=1)), 0), 1000000) * 100,
             "work_years": min(max(0, (age - 15) * random.uniform(0.5, 0.9)), 50),
             "residence_years": min(max(0, (age - 15) * random.uniform(0.8, 1.0)), 50),
             "is_student": is_student,
@@ -114,22 +107,17 @@ class LawSimulator:
                 for p in people
             ],
             ("BELASTINGDIENST", "vermogen"): [
-                {"bsn": p["bsn"], "bezittingen": p["net_worth"], "schulden": 0}
-                for p in people
+                {"bsn": p["bsn"], "bezittingen": p["net_worth"], "schulden": 0} for p in people
             ],
             ("UWV", "dienstverbanden"): [
                 {
                     "bsn": p["bsn"],
                     "start_date": p["birth_date"].isoformat(),
-                    "end_date": datetime.strptime(self.simulation_date, "%Y-%m-%d")
-                    .date()
-                    .isoformat(),
+                    "end_date": datetime.strptime(self.simulation_date, "%Y-%m-%d").date().isoformat(),
                 }
                 for p in people
             ],
-            ("SVB", "verzekerde_tijdvakken"): [
-                {"bsn": p["bsn"], "woonperiodes": p["residence_years"]} for p in people
-            ],
+            ("SVB", "verzekerde_tijdvakken"): [{"bsn": p["bsn"], "woonperiodes": p["residence_years"]} for p in people],
             ("RVZ", "verzekeringen"): [
                 {
                     "bsn": p["bsn"],
@@ -137,27 +125,18 @@ class LawSimulator:
                 }
                 for p in people
             ],
-            ("RVZ", "verdragsverzekeringen"): [
-                {"bsn": p["bsn"], "registratie": "INACTIEF"} for p in people
-            ],
-            ("DJI", "detenties"): [
-                {"bsn": p["bsn"], "status": "VRIJ", "inrichting_type": "GEEN"}
-                for p in people
-            ],
+            ("RVZ", "verdragsverzekeringen"): [{"bsn": p["bsn"], "registratie": "INACTIEF"} for p in people],
+            ("DJI", "detenties"): [{"bsn": p["bsn"], "status": "VRIJ", "inrichting_type": "GEEN"} for p in people],
             ("DJI", "forensische_zorg"): [
-                {"bsn": p["bsn"], "zorgtype": "GEEN", "juridische_titel": "GEEN"}
-                for p in people
+                {"bsn": p["bsn"], "zorgtype": "GEEN", "juridische_titel": "GEEN"} for p in people
             ],
             ("DUO", "inschrijvingen"): [
-                {"bsn": p["bsn"], "onderwijstype": "HBO" if p["is_student"] else "GEEN"}
-                for p in people
+                {"bsn": p["bsn"], "onderwijstype": "HBO" if p["is_student"] else "GEEN"} for p in people
             ],
             ("DUO", "studiefinanciering"): [
                 {
                     "bsn": p["bsn"],
-                    "aantal_studerend_gezin": random.randint(0, 3)
-                    if p["age"] < 30
-                    else 0,
+                    "aantal_studerend_gezin": random.randint(0, 3) if p["age"] < 30 else 0,
                 }
                 for p in people
             ],
@@ -169,7 +148,7 @@ class LawSimulator:
 
         return people
 
-    async def simulate_person(self, person):
+    async def simulate_person(self, person) -> None:
         has_partner = bool(person["partner_bsn"])
 
         result = {
@@ -188,9 +167,7 @@ class LawSimulator:
             "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, self.simulation_date
         )
 
-        aow = await self.services.evaluate(
-            "SVB", "algemene_ouderdomswet", {"BSN": person["bsn"]}, self.simulation_date
-        )
+        aow = await self.services.evaluate("SVB", "algemene_ouderdomswet", {"BSN": person["bsn"]}, self.simulation_date)
 
         result.update(
             {
@@ -214,7 +191,7 @@ class LawSimulator:
         return pd.DataFrame(self.results)
 
 
-async def main():
+async def main() -> None:
     simulator = LawSimulator()
     results = await simulator.run_simulation(num_people=1000)
     results.to_csv("simulation_results.csv", index=False)
@@ -235,14 +212,13 @@ async def main():
     eligible = results[results["zorgtoeslag_eligible"]]
     print(f"Eligible: {(len(eligible) / len(results) * 100):.1f}%")
     print(f"Average amount: €{eligible['zorgtoeslag_amount'].mean():.2f}")
-    print(
-        f"Amount range: €{eligible['zorgtoeslag_amount'].min():.2f}-€{eligible['zorgtoeslag_amount'].max():.2f}"
-    )
+    print(f"Amount range: €{eligible['zorgtoeslag_amount'].min():.2f}-€{eligible['zorgtoeslag_amount'].max():.2f}")
     print("By income quartile (eligible %):")
     for i, (lower, upper) in enumerate(
         zip(
             results["income"].quantile([0, 0.25, 0.5, 0.75]),
             results["income"].quantile([0.25, 0.5, 0.75, 1.0]),
+            strict=False,
         )
     ):
         quartile = results[(results["income"] >= lower) & (results["income"] < upper)]
@@ -257,7 +233,7 @@ async def main():
     print("By age group (eligible %):")
     age_bins = [0, 50, 60, 65, 67, 150]
     age_labels = ["<50", "50-60", "60-65", "65-67", "67+"]
-    for i, (lower, upper) in enumerate(zip(age_bins[:-1], age_bins[1:])):
+    for i, (lower, upper) in enumerate(itertools.pairwise(age_bins)):
         group = results[(results["age"] >= lower) & (results["age"] < upper)]
         if len(group) > 0:
             pct = group["aow_eligible"].mean() * 100

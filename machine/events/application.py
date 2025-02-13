@@ -3,38 +3,34 @@ import json
 import random
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List, Dict, Tuple
 from uuid import UUID
 
 from eventsourcing.application import Application
 from eventsourcing.dispatch import singledispatchmethod
 from eventsourcing.system import ProcessApplication
 
-from .aggregate import ServiceCase, CaseStatus
+from .aggregate import CaseStatus, ServiceCase
 
 
 class RuleProcessor(ProcessApplication):
-    def __init__(self, rules_engine, **kwargs):
+    def __init__(self, rules_engine, **kwargs) -> None:
         super().__init__(**kwargs)
         self.rules_engine = rules_engine
 
     @singledispatchmethod
-    def policy(self, domain_event, process_event):
+    def policy(self, domain_event, process_event) -> None:
         """Sync policy that processes events"""
-        pass
 
     @policy.register(ServiceCase.Objected)
     @policy.register(ServiceCase.AutomaticallyDecided)
     @policy.register(ServiceCase.Decided)
-    def _(self, domain_event, process_event):
+    def _(self, domain_event, process_event) -> None:
         try:
             # Create a new event loop in a new thread
             def run_async():
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                return loop.run_until_complete(
-                    self.rules_engine.apply_rules(domain_event)
-                )
+                return loop.run_until_complete(self.rules_engine.apply_rules(domain_event))
 
             # Run in a separate thread
             import threading
@@ -55,24 +51,22 @@ class ServiceCaseManager(Application):
 
     SAMPLE_RATE = 0.50  # 10% sample rate
 
-    def __init__(self, rules_engine, **kwargs):
+    def __init__(self, rules_engine, **kwargs) -> None:
         super().__init__(**kwargs)
         self.rules_engine = rules_engine
-        self._case_index: Dict[
-            Tuple[str, str, str], str
-        ] = {}  # (bsn, service, law) -> case_id
+        self._case_index: dict[tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
         # self.follow()
 
-    def _index_key(self, bsn: str, service_type: str, law: str) -> Tuple[str, str, str]:
+    def _index_key(self, bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
         """Generate index key for the combination of bsn, service and law"""
         return (bsn, service_type, law)
 
-    def _index_case(self, case: ServiceCase):
+    def _index_case(self, case: ServiceCase) -> None:
         """Add case to index"""
         key = self._index_key(case.bsn, case.service, case.law)
         self._case_index[key] = str(case.id)
 
-    def _results_match(self, claimed_result: Dict, verified_result: Dict) -> bool:
+    def _results_match(self, claimed_result: dict, verified_result: dict) -> bool:
         """
         Compare claimed and verified results to determine if they match.
         For numeric values, uses a 1% tolerance.
@@ -83,11 +77,9 @@ class ServiceCaseManager(Application):
                 return False
 
             # For numeric values, compare with tolerance
-            if isinstance(verified_result[key], (int, float)):
-                if isinstance(claimed_result[key], (int, float)):
-                    if abs(
-                        verified_result[key] - claimed_result[key]
-                    ) / verified_result[key] > Decimal("0.01"):
+            if isinstance(verified_result[key], int | float):
+                if isinstance(claimed_result[key], int | float):
+                    if abs(verified_result[key] - claimed_result[key]) / verified_result[key] > Decimal("0.01"):
                         return False
                 else:
                     return False
@@ -102,8 +94,8 @@ class ServiceCaseManager(Application):
         bsn: str,
         service_type: str,
         law: str,
-        parameters: Dict,
-        claimed_result: Dict,
+        parameters: dict,
+        claimed_result: dict,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
@@ -161,16 +153,14 @@ class ServiceCaseManager(Application):
         verifier_id: str,
         approved: bool,
         reason: str,
-        override_result: Optional[Dict] = None,
+        override_result: dict | None = None,
     ) -> str:
         """
         Complete manual review of a case.
         """
         case = self.get_case_by_id(case_id)
         if case.status not in [CaseStatus.IN_REVIEW, CaseStatus.OBJECTED]:
-            raise ValueError(
-                "Can only complete review for cases in review or objections"
-            )
+            raise ValueError("Can only complete review for cases in review or objections")
 
         # Use current verified_result or override if provided
         verified_result = override_result or case.verified_result
@@ -201,11 +191,11 @@ class ServiceCaseManager(Application):
     def determine_objection_status(
         self,
         case_id: str,
-        possible: Optional[bool] = None,  # bezwaar_mogelijk
-        not_possible_reason: Optional[str] = None,  # reden_niet_mogelijk
-        objection_period: Optional[int] = None,  # bezwaartermijn
-        decision_period: Optional[int] = None,  # beslistermijn
-        extension_period: Optional[int] = None,
+        possible: bool | None = None,  # bezwaar_mogelijk
+        not_possible_reason: str | None = None,  # reden_niet_mogelijk
+        objection_period: int | None = None,  # bezwaartermijn
+        decision_period: int | None = None,  # beslistermijn
+        extension_period: int | None = None,
     ) -> str:  # verdagingstermijn
         """
         Determine the objection status, possibility and periods based on rules/law.
@@ -233,9 +223,7 @@ class ServiceCaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def determine_objection_admissibility(
-        self, case_id: str, admissible: Optional[bool] = None
-    ) -> str:
+    def determine_objection_admissibility(self, case_id: str, admissible: bool | None = None) -> str:
         """
         Determine whether an objection is admissible (ontvankelijk)
 
@@ -255,33 +243,30 @@ class ServiceCaseManager(Application):
     def can_object(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_object()
 
-    def get_case(self, bsn: str, service_type: str, law: str) -> Optional[ServiceCase]:
+    def get_case(self, bsn: str, service_type: str, law: str) -> ServiceCase | None:
         """Get case for specific bsn, service and law combination"""
         key = self._index_key(bsn, service_type, law)
         case_id = self._case_index.get(key)
         return self.get_case_by_id(case_id) if case_id else None
 
-    def get_cases_by_status(
-        self, service_type: str, status: CaseStatus
-    ) -> List[ServiceCase]:
+    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> list[ServiceCase]:
         """Get all cases for a service in a particular status"""
         return [
             self.get_case_by_id(case_id)
             for case_id in self._case_index.values()
-            if self.repository.get(case_id).service == service_type
-            and self.repository.get(case_id).status == status
+            if self.repository.get(case_id).service == service_type and self.repository.get(case_id).status == status
         ]
 
-    def get_case_by_id(self, case_id: Optional[str]) -> Optional[ServiceCase]:
+    def get_case_by_id(self, case_id: str | None) -> ServiceCase | None:
         """Get case by ID"""
         if not case_id:
             return None
         return self.repository.get(UUID(case_id))
 
-    def get_cases_by_law(self, law: str, service_type: str) -> List[ServiceCase]:
+    def get_cases_by_law(self, law: str, service_type: str) -> list[ServiceCase]:
         """Get all cases for a specific law and service combination"""
         cases = []
-        for key, case_id in self._case_index.items():
+        for _key, case_id in self._case_index.items():
             case = self.get_case_by_id(case_id)
             if case.law == law and case.service == service_type:
                 cases.append(case)
@@ -313,14 +298,9 @@ class ServiceCaseManager(Application):
                     events.append(
                         {
                             "case_id": notification.originator_id,
-                            "timestamp": timestamp
-                            or str(notification.originator_version),
+                            "timestamp": timestamp or str(notification.originator_version),
                             "event_type": notification.topic.split(".")[-1],
-                            "data": {
-                                k: v
-                                for k, v in state_data.items()
-                                if k not in ["timestamp", "originator_topic"]
-                            },
+                            "data": {k: v for k, v in state_data.items() if k not in ["timestamp", "originator_topic"]},
                         }
                     )
 

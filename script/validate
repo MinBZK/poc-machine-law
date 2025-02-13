@@ -30,9 +30,7 @@ def validate_schema(schema_file: Path, yaml_file: Path) -> None:
         validate(instance=data, schema=schema)
         print(f"Schema validation of '{yaml_file}' against '{schema_file}' successful.")
     except jsonschema.exceptions.ValidationError as err:
-        print(
-            f"Schema validation error in '{yaml_file}' against '{schema_file}': {err.message}"
-        )
+        print(f"Schema validation error in '{yaml_file}' against '{schema_file}': {err.message}")
         sys.exit(1)
 
 
@@ -45,9 +43,7 @@ def collect_service_references(data: dict) -> Set[Tuple[str, str, str]]:
     for field in input_fields:
         service_ref = field.get("service_reference")
         if service_ref:
-            references.add(
-                (service_ref["service"], service_ref["law"], service_ref["field"])
-            )
+            references.add((service_ref["service"], service_ref["law"], service_ref["field"]))
 
     return references
 
