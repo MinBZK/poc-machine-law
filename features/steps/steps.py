@@ -294,14 +294,15 @@ def step_impl(context, reason):
     context.services.manager.save(case)
 
 
-@when('de beoordelaar het bezwaar toewijst met reden "{reason}"')
-def step_impl(context, reason):
+@when('de beoordelaar het bezwaar {approve} met reden "{reason}"')
+def step_impl(context, approve, reason):
+    approve = approve.lower() == 'toewijst'
     case = context.services.manager.get_case_by_id(context.case_id)
     case.decide(
         verified_result=context.result.output,
         reason=reason,
         verifier_id="BEOORDELAAR",
-        approved=True
+        approved=approve
     )
     context.services.manager.save(case)
 
@@ -311,3 +312,14 @@ def step_impl(context):
     case = context.services.manager.get_case_by_id(context.case_id)
     assertions.assertEqual(case.status, 'DECIDED', "Expected case to be decided")
     assertions.assertTrue(case.approved, "Expected case to be approved")
+
+
+@then("kan de burger in bezwaar gaan")
+def step_impl(context):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertTrue(case.can_object(), "Expected case to be objectable")
+
+@then("kan de burger niet in bezwaar gaan")
+def step_impl(context):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertFalse(case.can_object(), "Expected case not to be objectable")
