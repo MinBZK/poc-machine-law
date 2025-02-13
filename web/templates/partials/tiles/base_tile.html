@@ -33,6 +33,7 @@
             </div>
 
             {% block tile_content %}{% endblock %}
+
             <div class="space-y-4">
                 {# If there's a case, show comparison between claimed and verified #}
                 {% if current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.verified_result
@@ -57,37 +58,66 @@
                 {% endif %}
             </div>
 
-            {% include "partials/tiles/components/next_steps.html" %}
         </div>
 
         <div class="mt-6">
             {% block actions %}
             {% if not current_case %}
+
             <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
                   hx-target="closest div.law-result-card"
                   hx-swap="outerHTML">
                 <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+                {% block submit_button %}
                 <button type="submit"
                         class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
                     Aanvragen
                 </button>
+                {% endblock %}
             </form>
             {% elif current_case.status == 'SUBMITTED' %}
             <p class="text-sm text-gray-600 text-center">
                 Uw aanvraag wordt beoordeeld. Heeft u vragen? Klik hier, of bel 1234.
             </p>
+            {% elif current_case.status == 'IN_REVIEW' %}
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h4 class="font-medium text-blue-900 mb-2">Wat gebeurt er nu?</h4>
+                <ol class="space-y-3 text-sm text-blue-800">
+                    <li class="flex items-start">
+                        <span class="font-medium mr-2">1.</span>
+                        <span>Een medewerker bekijkt uw aanvraag binnen 5 werkdagen</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="font-medium mr-2">2.</span>
+                        <span>U krijgt mogelijk een uitnodiging voor een gesprek</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="font-medium mr-2">3.</span>
+                        <span>Binnen 6 weken ontvangt u bericht over uw aanvraag</span>
+                    </li>
+                </ol>
+            </div>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600 text-center">
+                    Heeft u vragen? Klik hier, of bel 1234.
+                </p>
+            </div>
             {% elif current_case.status == 'DECIDED' %}
             {% if current_case and current_case.approved %}
+            {% block approved_status %}
             <p class="text-sm text-gray-600 text-center">Uw aanvraag is goedgekeurd</p>
+            {% endblock %}
             {% elif not current_case.can_object() %}
-            <p class="text-sm text-red-600 text-center">Uw aanvraag is afgekeurd, maar u kunt niet in bezwaar want {{ current_case.objection_status.not_possible_reason }}.</p>
+            <p class="text-sm text-red-600 text-center">Uw aanvraag is afgekeurd, maar u kunt niet in bezwaar want {{
+                current_case.objection_status.not_possible_reason }}.</p>
             {% elif current_case.can_object() %}
             <button type="button"
                     onclick="showAppealDialog('{{ current_case.id }}')"
                     class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
                 Ga in bezwaar
             </button>
-            <p class="text-sm text-gray-600 text-center">U kunt tot {{ current_case.objection_status.objection_period }} weken na het besluit in bezwaar gaan.</p>
+            <p class="text-sm text-gray-600 text-center">U kunt tot {{ current_case.objection_status.objection_period }}
+                weken na het besluit in bezwaar gaan.</p>
 
             <!-- Appeal Dialog -->
             <dialog id="objection-dialog-{{ current_case.id }}"

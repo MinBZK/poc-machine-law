@@ -7,7 +7,8 @@ import pandas as pd
 from eventsourcing.system import System, SingleThreadedRunner
 
 from machine.events.application import ServiceCaseManager, RuleProcessor
-from .engine import RulesEngine, AbstractServiceProvider, PathNode
+from .engine import RulesEngine
+from .context import PathNode
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -132,7 +133,7 @@ class RuleService:
         self.source_dataframes[table] = df
 
 
-class Services(AbstractServiceProvider):
+class Services:
     def __init__(self, reference_date: str):
         self.resolver = RuleResolver()
         self.services = {service: RuleService(service, self)
@@ -184,18 +185,6 @@ class Services(AbstractServiceProvider):
                 overwrite_input=overwrite_input,
                 requested_output=requested_output,
             )
-
-    async def get_value(
-            self,
-            service: str,
-            law: str,
-            field: str,
-            context: Dict[str, Any],
-            overwrite_input: Dict[str, Any],
-            reference_date: str) -> Any:
-        # reference_date = self.root_reference_date
-        result = await self.evaluate(service, law, context, reference_date, overwrite_input, requested_output=field)
-        return result.output.get(field)
 
     async def apply_rules(self, event) -> None:
         for rule in self.resolver.rules:

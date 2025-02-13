@@ -30,10 +30,14 @@
 {% endblock %}
 
 {% block submit_button %}
-<button
-        hx-post="/laws/submit-claim?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
-        hx-target="closest div.law-result-card"
-        class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
+<button class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
     AOW aanvragen
 </button>
+{% endblock %}
+
+
+{% block approved_status %}
+<p class="text-sm text-green-600 text-center">
+    Uw aanvraag is goedgekeurd, uw AOW zal maandelijks worden uitgekeerd.
+</p>
 {% endblock %}
