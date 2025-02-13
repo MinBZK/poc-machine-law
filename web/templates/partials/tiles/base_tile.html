@@ -141,7 +141,7 @@
                                         <button type="button"
                                                 onclick="showAppealDialog('{{ current_case.id }}')"
                                                 class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
-                                            Ga in beroep
+                                            Ga in beroep bij {{ current_case.appeal_status.competent_court|replace('_', ' ')|title }}
                                         </button>
                                     </div>
                                 {% else %}

@@ -159,14 +159,12 @@ properties:
       - "BELEIDSREGEL"
       - "VOORBEREIDINGSBESLUIT"
       - "ANDERE_HANDELING"
-
     REQUIRED_LEGAL_CHARACTER:
       - "BESCHIKKING"
       - "BESLUIT_VAN_ALGEMENE_STREKKING"
-
     DEFAULT_TERMIJN_BEROEP_WEKEN: 6
-
     DEFAULT_COURT_TYPE: "RECHTBANK"
+    DEFAULT_COURT: "RECHTBANK_DEN_HAAG"
 
 actions:
   # Bepaal eerst type rechter op basis van wet
@@ -187,7 +185,7 @@ actions:
           operation: EQUALS
           subject: "$LAW.name"
           value: "vreemdelingenwet"
-        then: "RECHTBANK_DEN_HAAG"
+        then: "$DEFAULT_COURT"
       - test:
           operation: EQUALS
           subject: "$LAW.name"
@@ -210,12 +208,12 @@ actions:
                 operation: NOT_NULL
                 subject: "$ADDRESS"
               then: "$JURISDICTION.rechtbank"
-            - else: "RECHTBANK_DEN_HAAG"
+            - else: "$DEFAULT_COURT"
       - test:
           operation: EQUALS
           subject: "$type_rechter"
-          value: "RECHTBANK_DEN_HAAG"
-        then: "RECHTBANK_DEN_HAAG"
+          value: "$DEFAULT_COURT"
+        then: "$DEFAULT_COURT"
       - test:
           operation: EQUALS
           subject: "$type_rechter"

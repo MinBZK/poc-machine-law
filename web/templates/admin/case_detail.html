@@ -77,6 +77,45 @@
                 {% endif %}
             </div>
 
+            <!-- Beroepstatus -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold mb-4">Beroepstatus</h2>
+                {% if case.appeal_status %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Beroep mogelijk</p>
+                        <p class="font-medium">{% if case.appeal_status.possible %}Ja{% else %}Nee{% endif %}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Reden beroep niet mogelijk</p>
+                        <p class="font-medium">{{ case.appeal_status.not_possible_reason }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Beroepstermijn</p>
+                        <p class="font-medium">{{ case.appeal_status.appeal_period }} weken</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Direct beroep mogelijk</p>
+                        <p class="font-medium">{% if case.appeal_status.direct_appeal %}Ja{% else %}Nee{% endif %}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Reden direct beroep</p>
+                        <p class="font-medium">{{ case.appeal_status.direct_appeal_reason }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Bevoegde rechtbank</p>
+                        <p class="font-medium">{{ case.appeal_status.competent_court }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Type rechter</p>
+                        <p class="font-medium">{{ case.appeal_status.court_type }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-gray-500">Beroepstatus wordt door de AWB bepaald als er een besluit op bezwaar is.</p>
+                {% endif %}
+            </div>
+
             <!-- Resultaten -->
             <div class="p-6 border-b border-gray-200">
                 <h2 class="text-lg font-semibold mb-4">Resultaten</h2>
