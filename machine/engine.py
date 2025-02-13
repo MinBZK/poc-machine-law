@@ -15,14 +15,14 @@ class RulesEngine:
 
     def __init__(self, spec: Dict[str, Any], service_provider: Optional[Any] = None):
         self.spec = spec
-        self.service_name = spec.get('service')
-        self.law = spec.get('../law')
-        self.requirements = spec.get('requirements', [])
-        self.actions = spec.get('actions', [])
-        self.parameter_specs = spec.get('properties', {}).get('parameters', {})
-        self.property_specs = self._build_property_specs(spec.get('properties', {}))
-        self.output_specs = self._build_output_specs(spec.get('properties', {}))
-        self.definitions = spec.get('properties', {}).get('definitions', {})
+        self.service_name = spec.get("service")
+        self.law = spec.get("../law")
+        self.requirements = spec.get("requirements", [])
+        self.actions = spec.get("actions", [])
+        self.parameter_specs = spec.get("properties", {}).get("parameters", {})
+        self.property_specs = self._build_property_specs(spec.get("properties", {}))
+        self.output_specs = self._build_output_specs(spec.get("properties", {}))
+        self.definitions = spec.get("properties", {}).get("definitions", {})
         self.service_provider = service_provider
 
     @staticmethod
@@ -31,14 +31,14 @@ class RulesEngine:
         specs = {}
 
         # Add input properties
-        for prop in properties.get('input', []):
-            if 'name' in prop:
-                specs[prop['name']] = prop
+        for prop in properties.get("input", []):
+            if "name" in prop:
+                specs[prop["name"]] = prop
 
         # Add source properties
-        for source in properties.get('sources', []):
-            if 'name' in source:
-                specs[source['name']] = source
+        for source in properties.get("sources", []):
+            if "name" in source:
+                specs[source["name"]] = source
 
         return specs
 
@@ -46,15 +46,15 @@ class RulesEngine:
     def _build_output_specs(properties: Dict[str, Any]) -> Dict[str, TypeSpec]:
         """Build mapping of output names to their type specifications"""
         specs = {}
-        for output in properties.get('output', []):
-            if 'name' in output:
-                type_spec = output.get('type_spec', {})
-                specs[output['name']] = TypeSpec(
-                    type=output.get('type'),
-                    unit=type_spec.get('unit'),
-                    precision=type_spec.get('precision'),
-                    min=type_spec.get('min'),
-                    max=type_spec.get('max')
+        for output in properties.get("output", []):
+            if "name" in output:
+                type_spec = output.get("type_spec", {})
+                specs[output["name"]] = TypeSpec(
+                    type=output.get("type"),
+                    unit=type_spec.get("unit"),
+                    precision=type_spec.get("precision"),
+                    min=type_spec.get("min"),
+                    max=type_spec.get("max"),
                 )
         return specs
 
@@ -114,7 +114,7 @@ class RulesEngine:
 
         def traverse(obj):
             if isinstance(obj, str):
-                if obj.startswith('$'):
+                if obj.startswith("$"):
                     value = obj[1:]  # Remove $ prefix
                     if value.islower():  # Output reference
                         deps.add(value)
@@ -138,7 +138,7 @@ class RulesEngine:
         dependencies = {}
         action_by_output = {}
         for action in actions:
-            output = action['output']
+            output = action["output"]
             action_by_output[output] = action
             dependencies[output] = RulesEngine.analyze_dependencies(action)
 
@@ -154,11 +154,13 @@ class RulesEngine:
             to_process.update(deps - required)
 
         # Get execution order via topological sort
-        ordered_outputs = RulesEngine.topological_sort({
-            output: deps
-            for output, deps in dependencies.items()
-            if output in required
-        })
+        ordered_outputs = RulesEngine.topological_sort(
+            {
+                output: deps
+                for output, deps in dependencies.items()
+                if output in required
+            }
+        )
 
         # Return actions in dependency order
         return [
@@ -167,18 +169,24 @@ class RulesEngine:
             if output in action_by_output
         ]
 
-    async def evaluate(self, parameters: Optional[Dict[str, Any]] = None,
-                       overwrite_input: Optional[Dict[str, Any]] = None,
-                       sources: Dict[str, pd.DataFrame] = None,
-                       calculation_date=None, requested_output: str = None) -> Dict[str, Any]:
+    async def evaluate(
+        self,
+        parameters: Optional[Dict[str, Any]] = None,
+        overwrite_input: Optional[Dict[str, Any]] = None,
+        sources: Dict[str, pd.DataFrame] = None,
+        calculation_date=None,
+        requested_output: str = None,
+    ) -> Dict[str, Any]:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
         for p in self.parameter_specs:
-            if p['required'] and not p['name'] in parameters:
+            if p["required"] and p["name"] not in parameters:
                 logger.warning(f"Required parameter {p} not found in {parameters}")
 
-        logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
-        root = PathNode(type='root', name='evaluation', result=None)
+        logger.debug(
+            f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})"
+        )
+        root = PathNode(type="root", name="evaluation", result=None)
         context = RuleContext(
             definitions=self.definitions,
             service_provider=self.service_provider,
@@ -192,10 +200,14 @@ class RulesEngine:
         )
 
         # Check requirements
-        requirements_node = PathNode(type='requirements', name='Check all requirements', result=None)
+        requirements_node = PathNode(
+            type="requirements", name="Check all requirements", result=None
+        )
         context.add_to_path(requirements_node)
         try:
-            requirements_met = await self._evaluate_requirements(self.requirements, context)
+            requirements_met = await self._evaluate_requirements(
+                self.requirements, context
+            )
             requirements_node.result = requirements_met
         finally:
             context.pop_path()
@@ -207,40 +219,50 @@ class RulesEngine:
 
             for action in required_actions:
                 output_def, output_name = await self._evaluate_action(action, context)
-                context.outputs[output_name] = output_def['value']
+                context.outputs[output_name] = output_def["value"]
                 output_values[output_name] = output_def
 
         if not output_values:
-            logger.warning(f"No output values computed for {calculation_date} {requested_output}")
+            logger.warning(
+                f"No output values computed for {calculation_date} {requested_output}"
+            )
 
         return {
-            'input': context.resolved_paths,
-            'output': output_values,
-            'requirements_met': requirements_met,
-            'path': root
+            "input": context.resolved_paths,
+            "output": output_values,
+            "requirements_met": requirements_met,
+            "path": root,
         }
 
     async def _evaluate_action(self, action, context):
         with logger.indent_block(f"Computing {action.get('output', '')}"):
             action_node = PathNode(
-                type='action',
+                type="action",
                 name=f"Evaluate action for {action.get('output', '')}",
-                result=None
+                result=None,
             )
             context.add_to_path(action_node)
-            output_name = action['output']
+            output_name = action["output"]
             # Find output specification
-            output_spec = next((
-                spec for spec in self.spec.get('properties', {}).get('output', [])
-                if spec.get('name') == output_name
-            ), {})
+            output_spec = next(
+                (
+                    spec
+                    for spec in self.spec.get("properties", {}).get("output", [])
+                    if spec.get("name") == output_name
+                ),
+                {},
+            )
 
-            if self.service_name in context.overwrite_input and output_name in context.overwrite_input[
-                self.service_name]:
+            if (
+                self.service_name in context.overwrite_input
+                and output_name in context.overwrite_input[self.service_name]
+            ):
                 raw_result = context.overwrite_input[self.service_name][output_name]
-                logger.debug(f"Resolving value {self.service_name}/{output_name} from OVERWRITE {raw_result}")
-            elif 'value' in action:
-                raw_result = await self._evaluate_value(action['value'], context)
+                logger.debug(
+                    f"Resolving value {self.service_name}/{output_name} from OVERWRITE {raw_result}"
+                )
+            elif "value" in action:
+                raw_result = await self._evaluate_value(action["value"], context)
             else:
                 raw_result = await self._evaluate_operation(action, context)
             result = self._enforce_output_type(output_name, raw_result)
@@ -248,19 +270,21 @@ class RulesEngine:
         logger.debug(f"Result of {action.get('output', '')}: {result}")
         # Build output with metadata
         output_def = {
-            'value': result,
-            'type': output_spec.get('type', 'unknown'),
-            'description': output_spec.get('description', '')
+            "value": result,
+            "type": output_spec.get("type", "unknown"),
+            "description": output_spec.get("description", ""),
         }
         # Add type_spec if present
-        if 'type_spec' in output_spec:
-            output_def['type_spec'] = output_spec['type_spec']
+        if "type_spec" in output_spec:
+            output_def["type_spec"] = output_spec["type_spec"]
         # Add temporal if present
-        if 'temporal' in output_spec:
-            output_def['temporal'] = output_spec['temporal']
+        if "temporal" in output_spec:
+            output_def["temporal"] = output_spec["temporal"]
         return output_def, output_name
 
-    async def _evaluate_requirements(self, requirements: list, context: RuleContext) -> bool:
+    async def _evaluate_requirements(
+        self, requirements: list, context: RuleContext
+    ) -> bool:
         """Evaluate all requirements"""
         if not requirements:
             logger.debug("No requirements found")
@@ -268,27 +292,33 @@ class RulesEngine:
 
         for req in requirements:
             with logger.indent_block(f"Requirements {req}"):
-                node = PathNode(type='requirement',
-                                name='Check ALL conditions' if 'all' in req else 'Check OR conditions' if 'or' in req else 'Test condition',
-                                result=None)
+                node = PathNode(
+                    type="requirement",
+                    name="Check ALL conditions"
+                    if "all" in req
+                    else "Check OR conditions"
+                    if "or" in req
+                    else "Test condition",
+                    result=None,
+                )
                 context.add_to_path(node)
 
-                if 'all' in req:
+                if "all" in req:
                     results = []
-                    for r in req['all']:
+                    for r in req["all"]:
                         result = await self._evaluate_requirements([r], context)
                         results.append(result)
                     result = all(results)
-                elif 'or' in req:
+                elif "or" in req:
                     results = []
-                    for r in req['or']:
+                    for r in req["or"]:
                         result = await self._evaluate_requirements([r], context)
                         results.append(result)
                     result = any(results)
                 else:
                     result = await self._evaluate_operation(req, context)
 
-            logger.debug(f"Requirement met" if result else f"Requirement NOT met")
+            logger.debug("Requirement met" if result else "Requirement NOT met")
 
             node.result = result
             context.pop_path()
@@ -298,38 +328,42 @@ class RulesEngine:
 
         return True
 
-    async def _evaluate_if_operation(self, operation: Dict[str, Any], context: RuleContext) -> Any:
+    async def _evaluate_if_operation(
+        self, operation: Dict[str, Any], context: RuleContext
+    ) -> Any:
         """Evaluate an IF operation"""
-        if_node = PathNode(type='operation',
-                           name='IF conditions',
-                           result=None,
-                           details={'condition_results': []})
+        if_node = PathNode(
+            type="operation",
+            name="IF conditions",
+            result=None,
+            details={"condition_results": []},
+        )
         context.add_to_path(if_node)
 
         result = 0
-        conditions = operation.get('conditions', [])
+        conditions = operation.get("conditions", [])
 
         for i, condition in enumerate(conditions):
             condition_result = {
-                'condition_index': i,
-                'type': 'test' if 'test' in condition else 'else'
+                "condition_index": i,
+                "type": "test" if "test" in condition else "else",
             }
 
-            if 'test' in condition:
-                test_result = await self._evaluate_operation(condition['test'], context)
-                condition_result['test_result'] = test_result
+            if "test" in condition:
+                test_result = await self._evaluate_operation(condition["test"], context)
+                condition_result["test_result"] = test_result
                 if test_result:
-                    result = await self._evaluate_value(condition['then'], context)
-                    condition_result['then_value'] = result
-                    if_node.details['condition_results'].append(condition_result)
+                    result = await self._evaluate_value(condition["then"], context)
+                    condition_result["then_value"] = result
+                    if_node.details["condition_results"].append(condition_result)
                     break
-            elif 'else' in condition:
-                result = await self._evaluate_value(condition['else'], context)
-                condition_result['else_value'] = result
-                if_node.details['condition_results'].append(condition_result)
+            elif "else" in condition:
+                result = await self._evaluate_value(condition["else"], context)
+                condition_result["else_value"] = result
+                if_node.details["condition_results"].append(condition_result)
                 break
 
-            if_node.details['condition_results'].append(condition_result)
+            if_node.details["condition_results"].append(condition_result)
 
         if_node.result = result
         context.pop_path()
@@ -337,9 +371,9 @@ class RulesEngine:
 
     async def _evaluate_foreach(self, operation, context):
         """Handle FOREACH operation"""
-        combine = operation.get('combine')
+        combine = operation.get("combine")
 
-        array_data = await self._evaluate_value(operation['subject'], context)
+        array_data = await self._evaluate_value(operation["subject"], context)
         if not array_data:
             logger.warning("No data found to run FOREACH on")
             return self._evaluate_aggregate_ops(combine, [])
@@ -353,7 +387,9 @@ class RulesEngine:
                 with logger.indent_block(f"Item {item}"):
                     item_context = copy(context)
                     item_context.local = item
-                    result = await self._evaluate_value(operation['value'][0], item_context)
+                    result = await self._evaluate_value(
+                        operation["value"][0], item_context
+                    )
                     values.extend(result if isinstance(result, list) else [result])
             logger.debug(f"Foreach values: {values}")
             result = self._evaluate_aggregate_ops(combine, values)
@@ -361,34 +397,34 @@ class RulesEngine:
         return result
 
     COMPARISON_OPS = {
-        'EQUALS': operator.eq,
-        'NOT_EQUALS': operator.ne,
-        'GREATER_THAN': operator.gt,
-        'LESS_THAN': operator.lt,
-        'GREATER_OR_EQUAL': operator.ge,
-        'LESS_OR_EQUAL': operator.le,
+        "EQUALS": operator.eq,
+        "NOT_EQUALS": operator.ne,
+        "GREATER_THAN": operator.gt,
+        "LESS_THAN": operator.lt,
+        "GREATER_OR_EQUAL": operator.ge,
+        "LESS_OR_EQUAL": operator.le,
     }
 
     AGGREGATE_OPS = {
-        'OR': any,
-        'AND': all,
-        'MIN': min,
-        'MAX': max,
-        'ADD': sum,
-        'CONCAT': lambda vals: ''.join(str(x) for x in vals),
-        'MULTIPLY': lambda vals: functools.reduce(
+        "OR": any,
+        "AND": all,
+        "MIN": min,
+        "MAX": max,
+        "ADD": sum,
+        "CONCAT": lambda vals: "".join(str(x) for x in vals),
+        "MULTIPLY": lambda vals: functools.reduce(
             lambda x, y: int(x * y) if isinstance(y, int) and y < 1 else x * y,
             vals[1:],
-            vals[0]
+            vals[0],
         ),
-        'SUBTRACT': lambda vals: functools.reduce(operator.sub, vals[1:], vals[0]),
-        'DIVIDE': lambda vals: (
+        "SUBTRACT": lambda vals: functools.reduce(operator.sub, vals[1:], vals[0]),
+        "DIVIDE": lambda vals: (
             functools.reduce(
-                lambda x, y: x / y if y != 0 else 0,
-                vals[1:],
-                float(vals[0])
-            ) if 0 not in vals[1:] else 0
-        )
+                lambda x, y: x / y if y != 0 else 0, vals[1:], float(vals[0])
+            )
+            if 0 not in vals[1:]
+            else 0
+        ),
     }
 
     @staticmethod
@@ -397,10 +433,14 @@ class RulesEngine:
         filtered_values = [v for v in values if v is not None]
 
         if not filtered_values:
-            logger.warning(f"No values found (or they where None), returning 0 for {op}({values})")
+            logger.warning(
+                f"No values found (or they where None), returning 0 for {op}({values})"
+            )
             return 0
         elif len(filtered_values) < len(values):
-            logger.warning(f"Dropped {len(values) - len(filtered_values)} values because they where None")
+            logger.warning(
+                f"Dropped {len(values) - len(filtered_values)} values because they where None"
+            )
 
         result = RulesEngine.AGGREGATE_OPS[op](filtered_values)
         logger.debug(f"Compute {op}({filtered_values}) = {result}")
@@ -427,10 +467,9 @@ class RulesEngine:
     def _evaluate_date_operation(op: str, values: List[Any], unit: str) -> int:
         """Handle date-specific operations"""
         result = None
-        if op == 'SUBTRACT_DATE':
-
+        if op == "SUBTRACT_DATE":
             if len(values) != 2:
-                logger.warning(f"Warning: SUBTRACT_DATE requires exactly 2 values")
+                logger.warning("Warning: SUBTRACT_DATE requires exactly 2 values")
                 return 0
 
             end_date, start_date = values
@@ -442,33 +481,43 @@ class RulesEngine:
 
             delta = end_date - start_date
 
-            if unit == 'days':
+            if unit == "days":
                 result = delta.days
-            elif unit == 'years':
-                result = (end_date.year - start_date.year -
-                          ((end_date.month, end_date.day) <
-                           (start_date.month, start_date.day)))
-            elif unit == 'months':
-                result = ((end_date.year - start_date.year) * 12 +
-                          end_date.month - start_date.month)
+            elif unit == "years":
+                result = (
+                    end_date.year
+                    - start_date.year
+                    - (
+                        (end_date.month, end_date.day)
+                        < (start_date.month, start_date.day)
+                    )
+                )
+            elif unit == "months":
+                result = (
+                    (end_date.year - start_date.year) * 12
+                    + end_date.month
+                    - start_date.month
+                )
             else:
                 logger.warning(f"Warning: Unknown date unit {unit}")
             logger.debug(f"Compute {op}({values}, {unit}) = {result}")
 
         if result is None:
-            logger.warning(f"Warning: date operation resulted in None")
+            logger.warning("Warning: date operation resulted in None")
 
         return result
 
-    async def _evaluate_operation(self, operation: Dict[str, Any], context: RuleContext) -> Any:
+    async def _evaluate_operation(
+        self, operation: Dict[str, Any], context: RuleContext
+    ) -> Any:
         """Evaluate an operation or condition"""
 
         if not isinstance(operation, dict):
             node = PathNode(
-                type='value',
+                type="value",
                 name="Direct value evaluation",
                 result=None,
-                details={'raw_value': operation}
+                details={"raw_value": operation},
             )
             context.add_to_path(node)
             result = await self._evaluate_value(operation, context)
@@ -477,134 +526,149 @@ class RulesEngine:
             return result
 
         # Direct value assignment - no operation needed
-        if 'value' in operation and not operation.get('operation'):
+        if "value" in operation and not operation.get("operation"):
             node = PathNode(
-                type='direct_value',
+                type="direct_value",
                 name="Direct value assignment",
                 result=None,
-                details={'raw_value': operation['value']}
+                details={"raw_value": operation["value"]},
             )
             context.add_to_path(node)
-            result = await self._evaluate_value(operation['value'], context)
+            result = await self._evaluate_value(operation["value"], context)
             node.result = result
             context.pop_path()
             return result
 
-        op_type = operation.get('operation')
+        op_type = operation.get("operation")
         node = PathNode(
-            type='operation',
+            type="operation",
             name=f"Operation: {op_type}",
             result=None,
-            details={'operation_type': op_type}
+            details={"operation_type": op_type},
         )
         context.add_to_path(node)
 
         if op_type is None:
-            logger.warning(f"Operation type is None (or missing).")
+            logger.warning("Operation type is None (or missing).")
             result = None
 
-        elif op_type == 'IF':
+        elif op_type == "IF":
             result = await self._evaluate_if_operation(operation, context)
 
-        elif op_type == 'FOREACH':
+        elif op_type == "FOREACH":
             result = await self._evaluate_foreach(operation, context)
-            node.details.update({
-                'raw_values': operation['value'],
-                'arithmetic_type': op_type
-            })
+            node.details.update(
+                {"raw_values": operation["value"], "arithmetic_type": op_type}
+            )
 
-        elif op_type in ['IN', 'NOT_IN']:
+        elif op_type in ["IN", "NOT_IN"]:
             with logger.indent_block(op_type):
-
-                subject = await self._evaluate_value(operation['subject'], context)
-                allowed_values = await self._evaluate_value(operation.get('values', []), context)
-                result = subject in (allowed_values if isinstance(allowed_values, list) else [allowed_values])
-                if op_type == 'NOT_IN':
+                subject = await self._evaluate_value(operation["subject"], context)
+                allowed_values = await self._evaluate_value(
+                    operation.get("values", []), context
+                )
+                result = subject in (
+                    allowed_values
+                    if isinstance(allowed_values, list)
+                    else [allowed_values]
+                )
+                if op_type == "NOT_IN":
                     result = not result
 
-            node.details.update({
-                'subject_value': subject,
-                'allowed_values': allowed_values
-            })
+            node.details.update(
+                {"subject_value": subject, "allowed_values": allowed_values}
+            )
             logger.debug(f"Result {subject} {op_type} {allowed_values}: {result}")
 
-        elif op_type == 'NOT_NULL':
-            subject = await self._evaluate_value(operation['subject'], context)
+        elif op_type == "NOT_NULL":
+            subject = await self._evaluate_value(operation["subject"], context)
             result = subject is not None
-            node.details['subject_value'] = subject
+            node.details["subject_value"] = subject
 
-        elif op_type == 'AND':
-            with logger.indent_block(f"AND"):
+        elif op_type == "AND":
+            with logger.indent_block("AND"):
                 values = []
-                for v in operation['values']:
+                for v in operation["values"]:
                     r = await self._evaluate_value(v, context)
                     values.append(r)
                     if not bool(r):
-                        logger.debug(f"False value found in an AND, no need to compute the rest, breaking.")
+                        logger.debug(
+                            "False value found in an AND, no need to compute the rest, breaking."
+                        )
                         break
                 result = all(bool(v) for v in values)
 
-            node.details['evaluated_values'] = values
+            node.details["evaluated_values"] = values
             logger.debug(f"Result {[v for v in values]} AND: {result}")
 
-        elif op_type == 'OR':
-            with logger.indent_block(f"OR"):
+        elif op_type == "OR":
+            with logger.indent_block("OR"):
                 values = []
-                for v in operation['values']:
+                for v in operation["values"]:
                     r = await self._evaluate_value(v, context)
                     values.append(r)
                     if bool(r):
-                        logger.debug(f"True value found in an OR, no need to compute the other, breaking.")
+                        logger.debug(
+                            "True value found in an OR, no need to compute the other, breaking."
+                        )
                         break
                 result = any(bool(v) for v in values)
-            node.details['evaluated_values'] = values
+            node.details["evaluated_values"] = values
             logger.debug(f"Result {[v for v in values]} OR: {result}")
 
-        elif '_DATE' in op_type:
-            values = [await self._evaluate_value(v, context) for v in operation['values']]
-            unit = operation.get('unit', 'days')
+        elif "_DATE" in op_type:
+            values = [
+                await self._evaluate_value(v, context) for v in operation["values"]
+            ]
+            unit = operation.get("unit", "days")
             result = self._evaluate_date_operation(op_type, values, unit)
-            node.details.update({
-                'evaluated_values': values,
-                'unit': unit
-            })
-
+            node.details.update({"evaluated_values": values, "unit": unit})
 
         elif op_type in self.COMPARISON_OPS:
             subject = None
             value = None
 
-            if 'subject' in operation:
-                subject = await self._evaluate_value(operation['subject'], context)
-                value = await self._evaluate_value(operation['value'], context)
+            if "subject" in operation:
+                subject = await self._evaluate_value(operation["subject"], context)
+                value = await self._evaluate_value(operation["value"], context)
 
-            elif 'values' in operation:
-                values = [await self._evaluate_value(v, context) for v in operation['values']]
+            elif "values" in operation:
+                values = [
+                    await self._evaluate_value(v, context) for v in operation["values"]
+                ]
                 subject = values[0]
                 value = values[1]
             else:
-                logger.warning(f"Comparison operation expects two values or subject/value.")
+                logger.warning(
+                    "Comparison operation expects two values or subject/value."
+                )
 
             result = self._evaluate_comparison(op_type, subject, value)
 
-            node.details.update({
-                'subject_value': subject,
-                'comparison_value': value,
-                'comparison_type': op_type
-            })
+            node.details.update(
+                {
+                    "subject_value": subject,
+                    "comparison_value": value,
+                    "comparison_type": op_type,
+                }
+            )
 
-        elif op_type in self.AGGREGATE_OPS and 'values' in operation:
-            values = [await self._evaluate_value(v, context) for v in operation['values']]
+        elif op_type in self.AGGREGATE_OPS and "values" in operation:
+            values = [
+                await self._evaluate_value(v, context) for v in operation["values"]
+            ]
             result = self._evaluate_aggregate_ops(op_type, values)
-            node.details.update({
-                'raw_values': operation['values'],
-                'evaluated_values': values,
-                'arithmetic_type': op_type
-            })
+            node.details.update(
+                {
+                    "raw_values": operation["values"],
+                    "evaluated_values": values,
+                    "arithmetic_type": op_type,
+                }
+            )
 
         else:
             result = None
-            node.details['error'] = 'Invalid operation format'
+            node.details["error"] = "Invalid operation format"
             logger.warning(f"Not matched to any operation {op_type}")
 
         node.result = result
@@ -615,7 +679,7 @@ class RulesEngine:
         """Evaluate a value which might be a number, operation, or reference"""
         if isinstance(value, (int, float, bool, date, datetime)):
             return value
-        elif isinstance(value, dict) and 'operation' in value:
+        elif isinstance(value, dict) and "operation" in value:
             return await self._evaluate_operation(value, context)
         else:
             return await context.resolve_value(value)

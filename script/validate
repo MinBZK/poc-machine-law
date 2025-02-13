@@ -30,7 +30,9 @@ def validate_schema(schema_file: Path, yaml_file: Path) -> None:
         validate(instance=data, schema=schema)
         print(f"Schema validation of '{yaml_file}' against '{schema_file}' successful.")
     except jsonschema.exceptions.ValidationError as err:
-        print(f"Schema validation error in '{yaml_file}' against '{schema_file}': {err.message}")
+        print(
+            f"Schema validation error in '{yaml_file}' against '{schema_file}': {err.message}"
+        )
         sys.exit(1)
 
 
@@ -39,15 +41,13 @@ def collect_service_references(data: dict) -> Set[Tuple[str, str, str]]:
     references = set()
 
     # Process input fields
-    input_fields = data.get('properties', {}).get('input', [])
+    input_fields = data.get("properties", {}).get("input", [])
     for field in input_fields:
-        service_ref = field.get('service_reference')
+        service_ref = field.get("service_reference")
         if service_ref:
-            references.add((
-                service_ref['service'],
-                service_ref['law'],
-                service_ref['field']
-            ))
+            references.add(
+                (service_ref["service"], service_ref["law"], service_ref["field"])
+            )
 
     return references
 
@@ -57,19 +57,15 @@ def collect_service_outputs(data: dict) -> Set[Tuple[str, str, str]]:
     outputs = set()
 
     # Get the service and law from the file metadata
-    service = data.get('service')
-    law = data.get('law')
+    service = data.get("service")
+    law = data.get("law")
     if not service or not law:
         return outputs
 
     # Process output fields
-    output_fields = data.get('properties', {}).get('output', [])
+    output_fields = data.get("properties", {}).get("output", [])
     for field in output_fields:
-        outputs.add((
-            service,
-            law,
-            field['name']
-        ))
+        outputs.add((service, law, field["name"]))
 
     return outputs
 
@@ -112,22 +108,22 @@ def collect_defined_variables(data: dict) -> Set[str]:
     """Collect all defined variables from inputs, sources, definitions, and parameters."""
     variables = set()
 
-    properties = data.get('properties', {})
+    properties = data.get("properties", {})
 
     # Add parameters
-    for param in properties.get('parameters', []):
-        variables.add(param['name'])
+    for param in properties.get("parameters", []):
+        variables.add(param["name"])
 
     # Add inputs
-    for inp in properties.get('input', []):
-        variables.add(inp['name'])
+    for inp in properties.get("input", []):
+        variables.add(inp["name"])
 
     # Add sources
-    for source in properties.get('sources', []):
-        variables.add(source['name'])
+    for source in properties.get("sources", []):
+        variables.add(source["name"])
 
     # Add definitions
-    for def_name in properties.get('definitions', {}).keys():
+    for def_name in properties.get("definitions", {}).keys():
         variables.add(def_name)
 
     return variables
@@ -137,7 +133,7 @@ def find_variables_in_string(s: str) -> Set[str]:
     """Find all $VARIABLE references in a string."""
     if not isinstance(s, str):
         return set()
-    return {word for word in s.split() if word.startswith('$') and word.isupper()}
+    return {word for word in s.split() if word.startswith("$") and word.isupper()}
 
 
 def find_variables_in_dict(d: dict) -> Set[str]:
@@ -168,9 +164,9 @@ def validate_variable_definitions(yaml_files: List[Path]) -> None:
         referenced = find_variables_in_dict(data)
 
         # calculation_date is implicitly defined
-        referenced.discard('$calculation_date')
+        referenced.discard("$calculation_date")
 
-        undefined = {v.replace('$', '') for v in referenced} - defined
+        undefined = {v.replace("$", "") for v in referenced} - defined
 
         if undefined:
             print(f"\nUndefined variables in {file_path}:")
@@ -188,7 +184,7 @@ def main():
     schema = "schema.json"
 
     # Find all YAML files
-    yaml_files = list(BASE_DIR.rglob('*.yaml')) + list(BASE_DIR.rglob('*.yml'))
+    yaml_files = list(BASE_DIR.rglob("*.yaml")) + list(BASE_DIR.rglob("*.yml"))
 
     # First validate all files against the schema
     for f in yaml_files:
@@ -197,6 +193,7 @@ def main():
     # Then validate service references
     validate_service_references(yaml_files)
     validate_variable_definitions(yaml_files)
+
 
 if __name__ == "__main__":
     main()

@@ -32,10 +32,13 @@ class RuleProcessor(ProcessApplication):
             def run_async():
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                return loop.run_until_complete(self.rules_engine.apply_rules(domain_event))
+                return loop.run_until_complete(
+                    self.rules_engine.apply_rules(domain_event)
+                )
 
             # Run in a separate thread
             import threading
+
             thread = threading.Thread(target=run_async)
             thread.start()
             thread.join()  # Wait for completion
@@ -55,7 +58,9 @@ class ServiceCaseManager(Application):
     def __init__(self, rules_engine, **kwargs):
         super().__init__(**kwargs)
         self.rules_engine = rules_engine
-        self._case_index: Dict[Tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
+        self._case_index: Dict[
+            Tuple[str, str, str], str
+        ] = {}  # (bsn, service, law) -> case_id
         # self.follow()
 
     def _index_key(self, bsn: str, service_type: str, law: str) -> Tuple[str, str, str]:
@@ -80,7 +85,9 @@ class ServiceCaseManager(Application):
             # For numeric values, compare with tolerance
             if isinstance(verified_result[key], (int, float)):
                 if isinstance(claimed_result[key], (int, float)):
-                    if abs(verified_result[key] - claimed_result[key]) / verified_result[key] > Decimal('0.01'):
+                    if abs(
+                        verified_result[key] - claimed_result[key]
+                    ) / verified_result[key] > Decimal("0.01"):
                         return False
                 else:
                     return False
@@ -90,12 +97,14 @@ class ServiceCaseManager(Application):
 
         return True
 
-    async def submit_case(self,
-                          bsn: str,
-                          service_type: str,
-                          law: str,
-                          parameters: Dict,
-                          claimed_result: Dict) -> str:
+    async def submit_case(
+        self,
+        bsn: str,
+        service_type: str,
+        law: str,
+        parameters: Dict,
+        claimed_result: Dict,
+    ) -> str:
         """
         Submit a new case and automatically process it if possible.
         A case starts with the citizen's claimed result which is then verified.
@@ -130,8 +139,7 @@ class ServiceCaseManager(Application):
         else:
             # Route to manual review with reason
             reason = "Selected for manual review - " + (
-                "results differ" if not results_match
-                else "random sample check"
+                "results differ" if not results_match else "random sample check"
             )
 
             case.select_for_manual_review(
@@ -147,18 +155,22 @@ class ServiceCaseManager(Application):
 
         return str(case.id)
 
-    def complete_manual_review(self,
-                               case_id: str,
-                               verifier_id: str,
-                               approved: bool,
-                               reason: str,
-                               override_result: Optional[Dict] = None) -> str:
+    def complete_manual_review(
+        self,
+        case_id: str,
+        verifier_id: str,
+        approved: bool,
+        reason: str,
+        override_result: Optional[Dict] = None,
+    ) -> str:
         """
         Complete manual review of a case.
         """
         case = self.get_case_by_id(case_id)
         if case.status not in [CaseStatus.IN_REVIEW, CaseStatus.OBJECTED]:
-            raise ValueError("Can only complete review for cases in review or objections")
+            raise ValueError(
+                "Can only complete review for cases in review or objections"
+            )
 
         # Use current verified_result or override if provided
         verified_result = override_result or case.verified_result
@@ -173,9 +185,7 @@ class ServiceCaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def objection_case(self,
-                       case_id: str,
-                       reason: str) -> str:
+    def objection_case(self, case_id: str, reason: str) -> str:
         """
         Submit an objection for a case with newly claimed result.
         Appeals always go to manual review.
@@ -183,20 +193,20 @@ class ServiceCaseManager(Application):
         case = self.get_case_by_id(case_id)
 
         # First record the objection with citizen's new claim
-        case.object(
-            reason=reason
-        )
+        case.object(reason=reason)
 
         self.save(case)
         return str(case.id)
 
-    def determine_objection_status(self,
-                                   case_id: str,
-                                   possible: Optional[bool] = None,  # bezwaar_mogelijk
-                                   not_possible_reason: Optional[str] = None,  # reden_niet_mogelijk
-                                   objection_period: Optional[int] = None,  # bezwaartermijn
-                                   decision_period: Optional[int] = None,  # beslistermijn
-                                   extension_period: Optional[int] = None) -> str:  # verdagingstermijn
+    def determine_objection_status(
+        self,
+        case_id: str,
+        possible: Optional[bool] = None,  # bezwaar_mogelijk
+        not_possible_reason: Optional[str] = None,  # reden_niet_mogelijk
+        objection_period: Optional[int] = None,  # bezwaartermijn
+        decision_period: Optional[int] = None,  # beslistermijn
+        extension_period: Optional[int] = None,
+    ) -> str:  # verdagingstermijn
         """
         Determine the objection status, possibility and periods based on rules/law.
         All parameters are optional.
@@ -217,15 +227,15 @@ class ServiceCaseManager(Application):
             not_possible_reason=not_possible_reason,
             objection_period=objection_period,
             decision_period=decision_period,
-            extension_period=extension_period
+            extension_period=extension_period,
         )
 
         self.save(case)
         return str(case.id)
 
-    def determine_objection_admissibility(self,
-                                          case_id: str,
-                                          admissible: Optional[bool] = None) -> str:
+    def determine_objection_admissibility(
+        self, case_id: str, admissible: Optional[bool] = None
+    ) -> str:
         """
         Determine whether an objection is admissible (ontvankelijk)
 
@@ -251,13 +261,15 @@ class ServiceCaseManager(Application):
         case_id = self._case_index.get(key)
         return self.get_case_by_id(case_id) if case_id else None
 
-    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> List[ServiceCase]:
+    def get_cases_by_status(
+        self, service_type: str, status: CaseStatus
+    ) -> List[ServiceCase]:
         """Get all cases for a service in a particular status"""
         return [
             self.get_case_by_id(case_id)
             for case_id in self._case_index.values()
             if self.repository.get(case_id).service == service_type
-               and self.repository.get(case_id).status == status
+            and self.repository.get(case_id).status == status
         ]
 
     def get_case_by_id(self, case_id: Optional[str]) -> Optional[ServiceCase]:
@@ -291,25 +303,31 @@ class ServiceCaseManager(Application):
                         continue
 
                     # Decode the state from bytes to JSON
-                    state_data = json.loads(notification.state.decode('utf-8'))
+                    state_data = json.loads(notification.state.decode("utf-8"))
 
                     # Extract timestamp if available
-                    timestamp = state_data.get('timestamp', {}).get('_data_', None)
+                    timestamp = state_data.get("timestamp", {}).get("_data_", None)
                     if timestamp:
                         timestamp = datetime.fromisoformat(timestamp)
 
-                    events.append({
-                        'case_id': notification.originator_id,
-                        'timestamp': timestamp or str(notification.originator_version),
-                        'event_type': notification.topic.split('.')[-1],
-                        'data': {k: v for k, v in state_data.items()
-                                 if k not in ['timestamp', 'originator_topic']}
-                    })
+                    events.append(
+                        {
+                            "case_id": notification.originator_id,
+                            "timestamp": timestamp
+                            or str(notification.originator_version),
+                            "event_type": notification.topic.split(".")[-1],
+                            "data": {
+                                k: v
+                                for k, v in state_data.items()
+                                if k not in ["timestamp", "originator_topic"]
+                            },
+                        }
+                    )
 
                 start += 10
             except ValueError:
                 break
 
-        events.sort(key=lambda x: str(x['timestamp']))
+        events.sort(key=lambda x: str(x["timestamp"]))
 
         return events

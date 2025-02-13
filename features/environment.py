@@ -4,7 +4,7 @@ from eventsourcing.utils import clear_topic_cache
 
 
 def before_all(context):
-    log_level = context.config.userdata.get('log_level', 'DEBUG')
+    log_level = context.config.userdata.get("log_level", "DEBUG")
     context.loggers = configure_logging(log_level)
 
 

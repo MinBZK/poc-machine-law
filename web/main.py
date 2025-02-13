@@ -19,8 +19,9 @@ app.include_router(admin.router)
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "999993653",
-               services: Services = Depends(get_services)):
+async def root(
+    request: Request, bsn: str = "999993653", services: Services = Depends(get_services)
+):
     """Render the main dashboard page"""
     profile = get_profile_data(bsn)
     if not profile:
@@ -34,8 +35,8 @@ async def root(request: Request, bsn: str = "999993653",
             "bsn": bsn,
             "formatted_date": FORMATTED_DATE,
             "all_profiles": get_all_profiles(),
-            "discoverable_service_laws": services.get_discoverable_service_laws()
-        }
+            "discoverable_service_laws": services.get_discoverable_service_laws(),
+        },
     )
 
 

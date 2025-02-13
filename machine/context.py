@@ -8,12 +8,13 @@ import pandas as pd
 
 from machine.logging_config import IndentLogger
 
-logger = IndentLogger(logging.getLogger('service'))
+logger = IndentLogger(logging.getLogger("service"))
 
 
 @dataclass
 class TypeSpec:
     """Specification for value types"""
+
     type: Optional[str] = None
     unit: Optional[str] = None
     precision: Optional[int] = None
@@ -53,7 +54,7 @@ class TypeSpec:
             value = round(value, self.precision)
 
         # Convert to int for cent units
-        if self.unit == 'eurocent':
+        if self.unit == "eurocent":
             value = int(value)
 
         return value
@@ -62,16 +63,18 @@ class TypeSpec:
 @dataclass
 class PathNode:
     """Node for tracking evaluation path"""
+
     type: str
     name: str
     result: Any
     details: Dict[str, Any] = field(default_factory=dict)
-    children: List['PathNode'] = field(default_factory=list)
+    children: List["PathNode"] = field(default_factory=list)
 
 
 @dataclass
 class RuleContext:
     """Context for rule evaluation"""
+
     definitions: Dict[str, Any]
     service_provider: Optional[Any]
     parameters: Dict[str, Any]
@@ -111,16 +114,16 @@ class RuleContext:
     async def _resolve_value(self, path: str) -> Any:
         """Resolve a value from definitions, services, or sources"""
         node = PathNode(
-            type='resolve',
+            type="resolve",
             name=f"Resolving value: {path}",
             result=None,
-            details={'path': path}
+            details={"path": path},
         )
         self.add_to_path(node)
 
         try:
             with logger.indent_block(f"Resolving {path}"):
-                if not isinstance(path, str) or not path.startswith('$'):
+                if not isinstance(path, str) or not path.startswith("$"):
                     node.result = path
                     return path
 
@@ -139,7 +142,9 @@ class RuleContext:
                     value = await self.resolve_value(f"${root}")
                     for p in rest.split("."):
                         if value is None:
-                            logger.warning(f"Value is None, could not resolve value ${path}: None")
+                            logger.warning(
+                                f"Value is None, could not resolve value ${path}: None"
+                            )
                             node.result = None
                             return None
                         if isinstance(value, dict):
@@ -147,7 +152,9 @@ class RuleContext:
                         elif hasattr(value, p):
                             value = getattr(value, p)
                         else:
-                            logger.warning(f"Value is not dict or not object, could not resolve value ${path}: None")
+                            logger.warning(
+                                f"Value is not dict or not object, could not resolve value ${path}: None"
+                            )
                             node.result = None
                             return None
 
@@ -175,17 +182,25 @@ class RuleContext:
 
                 # Check outputs
                 if path in self.outputs:
-                    logger.debug(f"Resolving from previous OUTPUT: {self.outputs[path]}")
+                    logger.debug(
+                        f"Resolving from previous OUTPUT: {self.outputs[path]}"
+                    )
                     node.result = self.outputs[path]
                     return self.outputs[path]
 
                 # Check overwrite data
                 if path in self.property_specs:
                     spec = self.property_specs[path]
-                    service_ref = spec.get('service_reference', {})
-                    if service_ref and service_ref['service'] in self.overwrite_input \
-                            and service_ref['field'] in self.overwrite_input[service_ref['service']]:
-                        value = self.overwrite_input[service_ref['service']][service_ref['field']]
+                    service_ref = spec.get("service_reference", {})
+                    if (
+                        service_ref
+                        and service_ref["service"] in self.overwrite_input
+                        and service_ref["field"]
+                        in self.overwrite_input[service_ref["service"]]
+                    ):
+                        value = self.overwrite_input[service_ref["service"]][
+                            service_ref["field"]
+                        ]
                         logger.debug(f"Resolving from OVERWRITE: {value}")
                         node.result = value
                         return value
@@ -193,24 +208,26 @@ class RuleContext:
                 # Check sources
                 if path in self.property_specs:
                     spec = self.property_specs[path]
-                    source_ref = spec.get('source_reference', {})
+                    source_ref = spec.get("source_reference", {})
                     if source_ref:
                         df = None
                         table = None
-                        if source_ref.get('source_type') == 'laws':
-                            table = 'laws'
+                        if source_ref.get("source_type") == "laws":
+                            table = "laws"
                             df = self.service_provider.resolver.rules_dataframe()
-                        if source_ref.get('source_type') == 'events':
-                            table = 'events'
+                        if source_ref.get("source_type") == "events":
+                            table = "events"
                             events = self.service_provider.manager.get_events()
                             df = pd.DataFrame(events)
-                        elif self.sources and 'table' in source_ref:
-                            table = source_ref.get('table')
+                        elif self.sources and "table" in source_ref:
+                            table = source_ref.get("table")
                             if table in self.sources:
                                 df = self.sources[table]
 
                         if df is not None:
-                            result = await self._resolve_from_source(source_ref, table, df)
+                            result = await self._resolve_from_source(
+                                source_ref, table, df
+                            )
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
                             return result
@@ -218,11 +235,14 @@ class RuleContext:
                 # Check services
                 if path in self.property_specs:
                     spec = self.property_specs[path]
-                    service_ref = spec.get('service_reference', {})
+                    service_ref = spec.get("service_reference", {})
                     if service_ref and self.service_provider:
-                        value = await self._resolve_from_service(path, service_ref, spec)
+                        value = await self._resolve_from_service(
+                            path, service_ref, spec
+                        )
                         logger.debug(
-                            f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}")
+                            f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}"
+                        )
                         node.result = value
                         return value
 
@@ -240,71 +260,86 @@ class RuleContext:
             return calc_date.replace(month=1, day=1).isoformat()
         if path == "prev_january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
-            return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
+            return calc_date.replace(
+                month=1, day=1, year=calc_date.year - 1
+            ).isoformat()
         if path == "year":
             return self.calculation_date[:4]
         return None
 
     async def _resolve_from_service(self, path, service_ref, spec):
         parameters = copy(self.parameters)
-        if 'parameters' in service_ref:
-            parameters.update({p['name']: await self.resolve_value(p['reference'])
-                               for p in service_ref['parameters']})
+        if "parameters" in service_ref:
+            parameters.update(
+                {
+                    p["name"]: await self.resolve_value(p["reference"])
+                    for p in service_ref["parameters"]
+                }
+            )
 
         reference_date = self.calculation_date
-        if 'temporal' in spec and 'reference' in spec['temporal']:
-            reference_date = await self.resolve_value(spec['temporal']['reference'])
+        if "temporal" in spec and "reference" in spec["temporal"]:
+            reference_date = await self.resolve_value(spec["temporal"]["reference"])
 
         # Check cache
-        cache_key = f"{path}({",".join([f"{k}:{v}" for k, v in sorted(parameters.items())])},{reference_date})"
+        cache_key = f"{path}({','.join([f'{k}:{v}' for k, v in sorted(parameters.items())])},{reference_date})"
         if cache_key in self.values_cache:
-            logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
+            logger.debug(
+                f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}"
+            )
             return self.values_cache[cache_key]
 
         logger.debug(
-            f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})")
+            f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})"
+        )
 
         result = await self.service_provider.evaluate(
-            service_ref['service'],
-            service_ref['law'],
+            service_ref["service"],
+            service_ref["law"],
             parameters,
             reference_date,
             self.overwrite_input,
-            requested_output=service_ref['field'])
+            requested_output=service_ref["field"],
+        )
 
-        value = result.output.get(service_ref['field'])
+        value = result.output.get(service_ref["field"])
         self.values_cache[cache_key] = value
         return value
 
-
     async def _resolve_from_source(self, source_ref, table, df):
-        if 'select_on' in source_ref:
-            for select_on in source_ref['select_on']:
-                value = await self.resolve_value(select_on['value'])
+        if "select_on" in source_ref:
+            for select_on in source_ref["select_on"]:
+                value = await self.resolve_value(select_on["value"])
 
-                if isinstance(value, dict) and 'operation' in value and value['operation'] == 'IN':
-                    allowed_values = await self.resolve_value(value['values'])
-                    df = df[df[select_on['name']].isin(allowed_values)]
+                if (
+                    isinstance(value, dict)
+                    and "operation" in value
+                    and value["operation"] == "IN"
+                ):
+                    allowed_values = await self.resolve_value(value["values"])
+                    df = df[df[select_on["name"]].isin(allowed_values)]
                 else:
-                    df = df[df[select_on['name']] == value]
+                    df = df[df[select_on["name"]] == value]
 
         # Get specified fields
-        fields = source_ref.get('fields', [])
-        field = source_ref.get('field')
+        fields = source_ref.get("fields", [])
+        field = source_ref.get("field")
 
         if fields:
             missing_fields = [f for f in fields if f not in df.columns]
             if missing_fields:
-                logger.warning(f"Fields {missing_fields} not found in source for table {table}")
+                logger.warning(
+                    f"Fields {missing_fields} not found in source for table {table}"
+                )
             existing_fields = [f for f in fields if f in df.columns]
-            result = df[existing_fields].to_dict('records')
+            result = df[existing_fields].to_dict("records")
         elif field:
             if field not in df.columns:
                 logger.warning(f"Field {field} not found in source for table {table}")
                 return None
             result = df[field].tolist()
         else:
-            result = df.to_dict('records')
+            result = df.to_dict("records")
 
         if result is None:
             return None
