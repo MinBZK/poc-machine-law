@@ -34,6 +34,8 @@ properties:
             appeal_period: "$beroepstermijn"
             direct_appeal: "$direct_beroep"
             direct_appeal_reason: "$reden_direct_beroep"
+            competent_court: "$bevoegde_rechtbank"
+            court_type: "$type_rechter"
 
   sources:
     - name: "LAW"
@@ -51,13 +53,48 @@ properties:
           "valid_from",
           "legal_character",
           "voorbereidingsprocedure",
-          "beroepstermijn_weken"
+          "beroepstermijn_weken",
+          "competent_court"
         ]
         select_on:
           - name: "uuid"
             description: "UUID van de wet"
             type: "string"
             value: "$CASE.rulespec_uuid"
+
+    - name: "ADDRESS"
+      description: "Woonadres van de persoon"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "woonplaats"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$CASE.bsn"
+
+    - name: "JURISDICTION"
+      description: "Mapping van gemeentes naar rechtbank arrondissementen"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "reference_data"
+        table: "jurisdicties"
+        fields: [
+          "gemeente",
+          "arrondissement",
+          "rechtbank"
+        ]
+        select_on:
+          - name: "gemeente"
+            description: "Gemeente waar persoon woont"
+            type: "string"
+            value: "$ADDRESS"
 
     - name: "EVENTS"
       description: "De gebeurtenissen rondom deze zaak"
@@ -106,6 +143,16 @@ properties:
       type: "string"
       required: false
 
+    - name: "bevoegde_rechtbank"
+      description: "De rechtbank die bevoegd is voor het beroep"
+      type: "string"
+      required: false
+
+    - name: "type_rechter"
+      description: "Het type rechter (rechtbank/hof/etc)"
+      type: "string"
+      required: false
+
   definitions:
     EXCLUDED_DECISION_TYPES:
       - "ALGEMEEN_VERBINDEND_VOORSCHRIFT"
@@ -119,7 +166,62 @@ properties:
 
     DEFAULT_TERMIJN_BEROEP_WEKEN: 6
 
+    DEFAULT_COURT_TYPE: "RECHTBANK"
+
 actions:
+  # Bepaal eerst type rechter op basis van wet
+  - output: "type_rechter"
+    operation: IF
+    conditions:
+      - test:
+          operation: EQUALS
+          subject: "$LAW.name"
+          value: "wet_studiefinanciering"
+        then: "CENTRALE_RAAD_VAN_BEROEP"
+      - test:
+          operation: EQUALS
+          subject: "$LAW.name"
+          value: "wet_inkomstenbelasting"
+        then: "GERECHTSHOF"
+      - test:
+          operation: EQUALS
+          subject: "$LAW.name"
+          value: "vreemdelingenwet"
+        then: "RECHTBANK_DEN_HAAG"
+      - test:
+          operation: EQUALS
+          subject: "$LAW.name"
+          value: "wet_marktordening_gezondheidszorg"
+        then: "COLLEGE_VAN_BEROEP_BEDRIJFSLEVEN"
+      - else: "$DEFAULT_COURT_TYPE"
+
+  # Bepaal specifieke rechtbank als het type RECHTBANK is
+  - output: "bevoegde_rechtbank"
+    operation: IF
+    conditions:
+      - test:
+          operation: EQUALS
+          subject: "$type_rechter"
+          value: "RECHTBANK"
+        then:
+          operation: IF
+          conditions:
+            - test:
+                operation: NOT_NULL
+                subject: "$ADDRESS"
+              then: "$JURISDICTION.rechtbank"
+            - else: "RECHTBANK_DEN_HAAG"
+      - test:
+          operation: EQUALS
+          subject: "$type_rechter"
+          value: "RECHTBANK_DEN_HAAG"
+        then: "RECHTBANK_DEN_HAAG"
+      - test:
+          operation: EQUALS
+          subject: "$type_rechter"
+          value: "GERECHTSHOF"
+        then: "$LAW.competent_court"
+      - else: "$type_rechter"
   - output: "beroep_mogelijk"
     operation: AND
     values:

@@ -55,7 +55,7 @@ Feature: Aanvraag Zorgtoeslag
     And is het toeslagbedrag "1811.28" euro
 
 
-  Scenario: Burger gaat in bezwaar en krijgt geen gelijk
+  Scenario: Burger gaat in bezwaar, krijgt geen gelijk, en kan in beroep gaan
     Given de volgende RvIG personen gegevens:
       | bsn       | geboortedatum | verblijfsadres | land_verblijf |
       | 999993653 | 1998-01-01    | Amsterdam      | NEDERLAND     |
@@ -68,6 +68,12 @@ Feature: Aanvraag Zorgtoeslag
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 999993653 | 20000                     | 0                         | 0                     | 0                               | 0            |
+    And de volgende RvIG verblijfplaats gegevens:
+      | bsn       | straat       | huisnummer | postcode | woonplaats | type      |
+      | 999993653 | Kalverstraat | 1          | 1012NX   | Amsterdam  | WOONADRES |
+    And de volgende JenV jurisdicties gegevens:
+      | gemeente  | arrondissement | rechtbank           |
+      | Amsterdam | AMSTERDAM      | RECHTBANK_AMSTERDAM |
     When de zorgtoeslagwet wordt uitgevoerd door TOESLAGEN
     And de persoon dit aanvraagt
     Then wordt de aanvraag toegevoegd aan handmatige beoordeling
@@ -77,4 +83,4 @@ Feature: Aanvraag Zorgtoeslag
     And de beoordelaar het bezwaar afwijst met reden "Inkomen nog steeds niet correct na controle jaaropgave"
     Then is de aanvraag afgewezen
     And kan de burger niet in bezwaar gaan met reden "er is al eerder bezwaar gemaakt tegen dit besluit"
-    And kan de burger in beroep gaan
+    And kan de burger in beroep gaan bij RECHTBANK_AMSTERDAM

@@ -162,6 +162,8 @@ class ServiceCase(Aggregate):
         appeal_period: int | None = None,  # beroepstermijn in weeks
         direct_appeal: bool | None = None,  # direct beroep mogelijk
         direct_appeal_reason: str | None = None,  # reden voor direct beroep
+        competent_court: str | None = None,  # bevoegde rechtbank
+        court_type: str | None = None,  # type rechter
     ) -> None:
         """Determine the appeal status and periods for a case"""
         if not hasattr(self, "appeal_status") or self.appeal_status is None:
@@ -178,6 +180,10 @@ class ServiceCase(Aggregate):
             updates["direct_appeal"] = direct_appeal
         if direct_appeal_reason is not None:
             updates["direct_appeal_reason"] = direct_appeal_reason
+        if competent_court is not None:
+            updates["competent_court"] = competent_court
+        if court_type is not None:
+            updates["court_type"] = court_type
 
         self.appeal_status.update(updates)
 

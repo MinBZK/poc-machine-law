@@ -4,8 +4,21 @@ from typing import Any
 GLOBAL_SERVICES = {
     "CBS": {"levensverwachting": [{"jaar": 2025, "verwachting_65": 20.5}]},
     "KIESRAAD": {"verkiezingen": [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-05-05"}]},
+    "JenV": {
+        "jurisdicties": [
+            {"gemeente": "AMSTERDAM", "arrondissement": "AMSTERDAM", "rechtbank": "RECHTBANK_AMSTERDAM"},
+            {"gemeente": "AMSTELVEEN", "arrondissement": "AMSTERDAM", "rechtbank": "RECHTBANK_AMSTERDAM"},
+            {"gemeente": "HAARLEM", "arrondissement": "NOORD-HOLLAND", "rechtbank": "RECHTBANK_NOORD_HOLLAND"},
+            {"gemeente": "ALKMAAR", "arrondissement": "NOORD-HOLLAND", "rechtbank": "RECHTBANK_NOORD_HOLLAND"},
+            {"gemeente": "ROTTERDAM", "arrondissement": "ROTTERDAM", "rechtbank": "RECHTBANK_ROTTERDAM"},
+            {"gemeente": "UTRECHT", "arrondissement": "MIDDEN-NEDERLAND", "rechtbank": "RECHTBANK_MIDDEN_NEDERLAND"},
+            {"gemeente": "DEN HAAG", "arrondissement": "DEN HAAG", "rechtbank": "RECHTBANK_DEN_HAAG"},
+            {"gemeente": "GRONINGEN", "arrondissement": "NOORD-NEDERLAND", "rechtbank": "RECHTBANK_NOORD_NEDERLAND"},
+            {"gemeente": "MAASTRICHT", "arrondissement": "LIMBURG", "rechtbank": "RECHTBANK_LIMBURG"},
+            {"gemeente": "ARNHEM", "arrondissement": "GELDERLAND", "rechtbank": "RECHTBANK_GELDERLAND"},
+        ]
+    },
 }
-
 PROFILES = {
     "999993653": {
         "name": "Jan Jansen",

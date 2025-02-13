@@ -246,6 +246,8 @@ class ServiceCaseManager(Application):
         appeal_period: int | None = None,  # beroepstermijn
         direct_appeal: bool | None = None,  # direct beroep mogelijk
         direct_appeal_reason: str | None = None,  # reden voor direct beroep
+        competent_court: str | None = None,  # bevoegde rechtbank
+        court_type: str | None = None,  # type rechter
     ) -> str:
         """
         Determine the appeal status, possibility and periods based on rules/law.
@@ -259,6 +261,8 @@ class ServiceCaseManager(Application):
             appeal_period: Weeks allowed for filing appeal (beroepstermijn)
             direct_appeal: Whether direct appeal is possible (direct beroep)
             direct_appeal_reason: Reason why direct appeal is possible (reden direct beroep)
+            competent_court: The court that has jurisdiction (bevoegde rechtbank)
+            court_type: The type of court (type rechter)
         """
         case = self.get_case_by_id(case_id)
 
@@ -268,6 +272,8 @@ class ServiceCaseManager(Application):
             appeal_period=appeal_period,
             direct_appeal=direct_appeal,
             direct_appeal_reason=direct_appeal_reason,
+            competent_court=competent_court,
+            court_type=court_type,
         )
 
         self.save(case)

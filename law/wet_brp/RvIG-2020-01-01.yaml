@@ -265,6 +265,13 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
+    - name: "woonplaats"
+      description: "Woonplaats"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
     - name: "household_size"
       description: "Aantal personen in huishouden"
       type: "number"
@@ -392,3 +399,6 @@ actions:
             - " "
             - "$ADDRESS.woonplaats"
       - else: null
+
+  - output: "woonplaats"
+    value: "$ADDRESS.woonplaats"
