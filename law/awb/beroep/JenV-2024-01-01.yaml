@@ -1,0 +1,239 @@
+uuid: awb-beroep-basis-2024
+name: Algemene wet bestuursrecht - Beroepmogelijkheid en Termijnen
+law: awb/beroep
+valid_from: 2024-01-01
+service: "JenV"
+description: >
+  Bepaalt of beroep mogelijk is tegen een besluit en wat de geldende termijnen zijn
+  volgens de Algemene wet bestuursrecht, met inachtneming van specifieke wetgeving.
+
+references:
+  - law: "Algemene wet bestuursrecht"
+    article: "7:1"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+  - law: "Algemene wet bestuursrecht"
+    article: "8:1"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+  - law: "Algemene wet bestuursrecht"
+    article: "6:7"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk6_Afdeling6.2_Artikel6:7"
+
+properties:
+  applies:
+    - name: "CASE"
+      aggregate: "ServiceCase"
+      events:
+        - type: "Decided"
+          filter:
+            approved: false
+      update:
+        - method: "determine_appeal_status"
+          mapping:
+            possible: "$beroep_mogelijk"
+            not_possible_reason: "$reden_niet_mogelijk"
+            appeal_period: "$beroepstermijn"
+            direct_appeal: "$direct_beroep"
+            direct_appeal_reason: "$reden_direct_beroep"
+
+  sources:
+    - name: "LAW"
+      description: "De wet waar dit besluit op gebaseerd is"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "laws"
+        table: "laws"
+        fields: [
+          "decision_type",
+          "name",
+          "valid_from",
+          "legal_character",
+          "voorbereidingsprocedure",
+          "beroepstermijn_weken"
+        ]
+        select_on:
+          - name: "uuid"
+            description: "UUID van de wet"
+            type: "string"
+            value: "$CASE.rulespec_uuid"
+
+    - name: "EVENTS"
+      description: "De gebeurtenissen rondom deze zaak"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "events"
+        table: "events"
+        fields: [
+          "case_id",
+          "event_type",
+          "approved"
+        ]
+        select_on:
+          - name: "case_id"
+            description: "Zaak identifier"
+            type: "string"
+            value: "$CASE.id"
+
+  output:
+    - name: "beroep_mogelijk"
+      description: "Is beroep mogelijk tegen dit besluit"
+      type: "boolean"
+
+    - name: "reden_niet_mogelijk"
+      description: "Reden waarom geen beroep mogelijk is"
+      type: "string"
+      required: false
+
+    - name: "beroepstermijn"
+      description: "Termijn voor het indienen van beroep (standaard artikel 6:7 Awb)"
+      type: "number"
+      type_spec:
+        unit: "weeks"
+        precision: 0
+        min: 0
+
+    - name: "direct_beroep"
+      description: "Is direct beroep mogelijk zonder bezwaar"
+      type: "boolean"
+
+    - name: "reden_direct_beroep"
+      description: "Reden waarom direct beroep mogelijk is"
+      type: "string"
+      required: false
+
+  definitions:
+    EXCLUDED_DECISION_TYPES:
+      - "ALGEMEEN_VERBINDEND_VOORSCHRIFT"
+      - "BELEIDSREGEL"
+      - "VOORBEREIDINGSBESLUIT"
+      - "ANDERE_HANDELING"
+
+    REQUIRED_LEGAL_CHARACTER:
+      - "BESCHIKKING"
+      - "BESLUIT_VAN_ALGEMENE_STREKKING"
+
+    DEFAULT_TERMIJN_BEROEP_WEKEN: 6
+
+actions:
+  - output: "beroep_mogelijk"
+    operation: AND
+    values:
+      - operation: NOT_IN
+        subject: "$LAW.decision_type"
+        values: "$EXCLUDED_DECISION_TYPES"
+      - operation: IN
+        subject: "$LAW.legal_character"
+        values: "$REQUIRED_LEGAL_CHARACTER"
+      # Of direct beroep, of bezwaar is afgewezen
+      - operation: OR
+        values:
+          - operation: EQUALS
+            subject: "$LAW.voorbereidingsprocedure"
+            value: "UITGEBREID"
+          - operation: AND
+            values:
+              # Check dat er bezwaar is gemaakt
+              - operation: GREATER_THAN
+                values:
+                  - operation: FOREACH
+                    subject: "$EVENTS"
+                    combine: ADD
+                    value:
+                      - operation: EQUALS
+                        subject: "$event_type"
+                        value: "Objected"
+                  - 0
+              # Check huidige status en approved
+              - operation: AND
+                values:
+                  - operation: EQUALS
+                    subject: "$CASE.status"
+                    value: "DECIDED"
+                  - operation: EQUALS
+                    subject: "$CASE.approved"
+                    value: false
+
+  - output: "reden_niet_mogelijk"
+    operation: IF
+    conditions:
+      - test:
+          operation: IN
+          subject: "$LAW.decision_type"
+          values: "$EXCLUDED_DECISION_TYPES"
+        then: "tegen dit type besluit is geen beroep mogelijk"
+      - test:
+          operation: NOT_IN
+          subject: "$LAW.legal_character"
+          values: "$REQUIRED_LEGAL_CHARACTER"
+        then: "dit is geen besluit in de zin van de AWB"
+      # Check of er bezwaar is als er geen direct beroep mogelijk is
+      - test:
+          operation: AND
+          values:
+            - operation: NOT_EQUALS
+              subject: "$LAW.voorbereidingsprocedure"
+              value: "UITGEBREID"
+            - operation: EQUALS
+              values:
+                - operation: FOREACH
+                  subject: "$EVENTS"
+                  combine: ADD
+                  value:
+                    - operation: EQUALS
+                      subject: "$event_type"
+                      value: "Objected"
+                - 0
+        then: "er moet eerst bezwaar worden gemaakt"
+      # Check of er een afwijzende beslissing is op het bezwaar
+      - test:
+          operation: AND
+          values:
+            - operation: GREATER_THAN
+              values:
+                - operation: FOREACH
+                  subject: "$EVENTS"
+                  combine: ADD
+                  value:
+                    - operation: EQUALS
+                      subject: "$event_type"
+                      value: "Objected"
+                - 0
+            - operation: OR
+              values:
+                - operation: NOT_EQUALS
+                  subject: "$CASE.status"
+                  value: "DECIDED"
+                - operation: NOT_EQUALS
+                  subject: "$CASE.approved"
+                  value: false
+        then: "er is nog geen afwijzende beslissing op bezwaar"
+      - else: null
+
+  - output: "beroepstermijn"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$LAW.beroepstermijn_weken"
+          operation: NOT_NULL
+        then: "$LAW.beroepstermijn_weken"
+      - else: "$DEFAULT_TERMIJN_BEROEP_WEKEN"
+
+  - output: "direct_beroep"
+    operation: EQUALS
+    subject: "$LAW.voorbereidingsprocedure"
+    value: "UITGEBREID"
+
+  - output: "reden_direct_beroep"
+    operation: IF
+    conditions:
+      - test:
+          operation: EQUALS
+          subject: "$LAW.voorbereidingsprocedure"
+          value: "UITGEBREID"
+        then: "besluit is voorbereid met uitgebreide procedure"
+      - else: null

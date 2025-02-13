@@ -108,8 +108,21 @@
             <p class="text-sm text-gray-600 text-center">Uw aanvraag is goedgekeurd</p>
             {% endblock %}
             {% elif not current_case.can_object() %}
-            <p class="text-sm text-red-600 text-center">Uw aanvraag is afgekeurd, maar u kunt niet in bezwaar want {{
-                current_case.objection_status.not_possible_reason }}.</p>
+                <p class="text-sm text-red-600 text-center">Uw aanvraag is afgekeurd, maar u kunt niet in bezwaar want {{
+                    current_case.objection_status.not_possible_reason }}.</p>
+                {% if current_case.can_appeal() %}
+                <p class="text-sm text-red-600 text-center">U kunt wel in beroep gaan.</p>
+                <button type="button"
+                        onclick="showAppealDialog('{{ current_case.id }}')"
+                        class="w-full px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
+                    Ga in beroep
+                </button>
+                <p class="text-sm text-gray-600 text-center">U kunt tot {{ current_case.appeal_status.appeal_period }}
+                    weken na het besluit in beroep gaan.</p>
+                {% else %}
+                <p class="text-sm text-red-600 text-center">U kunt ook niet in beroep gaan want {{
+                    current_case.appeal_status.not_possible_reason }}.</p>
+                {% endif %}
             {% elif current_case.can_object() %}
             <button type="button"
                     onclick="showAppealDialog('{{ current_case.id }}')"

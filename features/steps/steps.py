@@ -329,3 +329,9 @@ def step_impl(context, reason):
         case.objection_status.get("not_possible_reason"),
         "Expected reasons to match",
     )
+
+
+@then("kan de burger in beroep gaan")
+def step_impl(context):
+    case = context.services.manager.get_case_by_id(context.case_id)
+    assertions.assertTrue(case.can_appeal(), "Expected to be able to appeal")

@@ -153,3 +153,42 @@ class ServiceCase(Aggregate):
         if not hasattr(self, "objection_status") or self.objection_status is None:
             return False
         return bool(self.objection_status.get("possible", False))
+
+    @event("AppealStatusDetermined")
+    def determine_appeal_status(
+        self,
+        possible: bool | None = None,  # beroep_mogelijk
+        not_possible_reason: str | None = None,  # reden_niet_mogelijk
+        appeal_period: int | None = None,  # beroepstermijn in weeks
+        direct_appeal: bool | None = None,  # direct beroep mogelijk
+        direct_appeal_reason: str | None = None,  # reden voor direct beroep
+    ) -> None:
+        """Determine the appeal status and periods for a case"""
+        if not hasattr(self, "appeal_status") or self.appeal_status is None:
+            self.appeal_status = {}
+
+        updates = {}
+        if possible is not None:
+            updates["possible"] = possible
+        if not_possible_reason is not None:
+            updates["not_possible_reason"] = not_possible_reason
+        if appeal_period is not None:
+            updates["appeal_period"] = appeal_period
+        if direct_appeal is not None:
+            updates["direct_appeal"] = direct_appeal
+        if direct_appeal_reason is not None:
+            updates["direct_appeal_reason"] = direct_appeal_reason
+
+        self.appeal_status.update(updates)
+
+    def can_appeal(self) -> bool:
+        """
+        Check if appeal is possible for this case.
+        Returns False if:
+        - appeal_status is not set
+        - possible flag is not set
+        - possible flag is explicitly set to False
+        """
+        if not hasattr(self, "appeal_status") or self.appeal_status is None:
+            return False
+        return bool(self.appeal_status.get("possible", False))

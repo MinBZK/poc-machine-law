@@ -77,3 +77,4 @@ Feature: Aanvraag Zorgtoeslag
     And de beoordelaar het bezwaar afwijst met reden "Inkomen nog steeds niet correct na controle jaaropgave"
     Then is de aanvraag afgewezen
     And kan de burger niet in bezwaar gaan met reden "er is al eerder bezwaar gemaakt tegen dit besluit"
+    And kan de burger in beroep gaan

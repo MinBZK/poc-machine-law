@@ -198,8 +198,7 @@ class Services:
                         }
                         # Apply directly on the event via method
                         method = getattr(self.manager, update["method"])
-                        aggregate_id = method(aggregate_id, **mapping)
-                        return aggregate_id
+                        method(aggregate_id, **mapping)
 
     @staticmethod
     def _matches_event(event, applies) -> bool:

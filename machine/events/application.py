@@ -238,7 +238,44 @@ class ServiceCaseManager(Application):
         self.save(case)
         return str(case.id)
 
+    def determine_appeal_status(
+        self,
+        case_id: str,
+        possible: bool | None = None,  # beroep_mogelijk
+        not_possible_reason: str | None = None,  # reden_niet_mogelijk
+        appeal_period: int | None = None,  # beroepstermijn
+        direct_appeal: bool | None = None,  # direct beroep mogelijk
+        direct_appeal_reason: str | None = None,  # reden voor direct beroep
+    ) -> str:
+        """
+        Determine the appeal status, possibility and periods based on rules/law.
+        All parameters are optional.
+        Time periods are in weeks.
+
+        Args:
+            case_id: ID of the case
+            possible: Whether appeal is possible (beroep_mogelijk)
+            not_possible_reason: Reason why appeal is not possible (reden_niet_mogelijk)
+            appeal_period: Weeks allowed for filing appeal (beroepstermijn)
+            direct_appeal: Whether direct appeal is possible (direct beroep)
+            direct_appeal_reason: Reason why direct appeal is possible (reden direct beroep)
+        """
+        case = self.get_case_by_id(case_id)
+
+        case.determine_appeal_status(
+            possible=possible,
+            not_possible_reason=not_possible_reason,
+            appeal_period=appeal_period,
+            direct_appeal=direct_appeal,
+            direct_appeal_reason=direct_appeal_reason,
+        )
+
+        self.save(case)
+        return str(case.id)
+
     # Query methods
+    def can_appeal(self, case_id: str) -> bool:
+        return self.get_case_by_id(case_id).can_appeal()
 
     def can_object(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_object()
