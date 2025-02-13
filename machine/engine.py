@@ -219,6 +219,10 @@ class RuleContext:
                         if source_ref.get('source_type') == 'laws':
                             table = 'laws'
                             df = self.service_provider.resolver.rules_dataframe()
+                        if source_ref.get('source_type') == 'events':
+                            table = 'events'
+                            events = self.service_provider.manager.get_events()
+                            df = pd.DataFrame(events)
                         elif self.sources and 'table' in source_ref:
                             table = source_ref.get('table')
                             if table in self.sources:

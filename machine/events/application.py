@@ -1,5 +1,7 @@
 import asyncio
+import json
 import random
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional, List, Dict, Tuple
 from uuid import UUID
@@ -272,3 +274,42 @@ class ServiceCaseManager(Application):
             if case.law == law and case.service == service_type:
                 cases.append(case)
         return cases
+
+    def get_events(self, case_id=None):
+        notification_log = self.notification_log
+        events = []
+
+        start = 1
+        while True:
+            try:
+                notifications = notification_log.select(start=start, limit=10)
+                if not notifications:
+                    break
+
+                for notification in notifications:
+                    if case_id is not None and notification.originator_id != case_id:
+                        continue
+
+                    # Decode the state from bytes to JSON
+                    state_data = json.loads(notification.state.decode('utf-8'))
+
+                    # Extract timestamp if available
+                    timestamp = state_data.get('timestamp', {}).get('_data_', None)
+                    if timestamp:
+                        timestamp = datetime.fromisoformat(timestamp)
+
+                    events.append({
+                        'case_id': notification.originator_id,
+                        'timestamp': timestamp or str(notification.originator_version),
+                        'event_type': notification.topic.split('.')[-1],
+                        'data': {k: v for k, v in state_data.items()
+                                 if k not in ['timestamp', 'originator_topic']}
+                    })
+
+                start += 10
+            except ValueError:
+                break
+
+        events.sort(key=lambda x: str(x['timestamp']))
+
+        return events
