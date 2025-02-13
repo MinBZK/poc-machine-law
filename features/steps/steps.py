@@ -319,7 +319,9 @@ def step_impl(context):
     case = context.services.manager.get_case_by_id(context.case_id)
     assertions.assertTrue(case.can_object(), "Expected case to be objectable")
 
-@then("kan de burger niet in bezwaar gaan")
-def step_impl(context):
+
+@then('kan de burger niet in bezwaar gaan met reden "{reason}"')
+def step_impl(context, reason):
     case = context.services.manager.get_case_by_id(context.case_id)
     assertions.assertFalse(case.can_object(), "Expected case not to be objectable")
+    assertions.assertEqual(reason, case.objection_status.get("not_possible_reason"), "Expected reasons to match")

@@ -74,8 +74,6 @@ Feature: Aanvraag Zorgtoeslag
     When de beoordelaar de aanvraag afwijst met reden "Inkomen niet correct opgegeven"
     Then kan de burger in bezwaar gaan
     When de burger bezwaar maakt met reden "Inkomen is wel correct, zie bijgevoegde jaaropgave"
-    Then is de status "OBJECTED"
-    When de beoordelaar het bezwaar afwijst met reden "Inkomen nog steeds niet correct na controle jaaropgave"
-    Then is de status "DECIDED"
-    And is de aanvraag afgewezen
-    And kan de burger niet in bezwaar gaan
+    And de beoordelaar het bezwaar afwijst met reden "Inkomen nog steeds niet correct na controle jaaropgave"
+    Then is de aanvraag afgewezen
+    And kan de burger niet in bezwaar gaan met reden "er is al eerder bezwaar gemaakt tegen dit besluit"

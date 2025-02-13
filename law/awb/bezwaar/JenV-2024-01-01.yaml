@@ -63,6 +63,25 @@ properties:
             type: "string"
             value: "$CASE.rulespec_uuid"
 
+    - name: "EVENTS"
+      description: "De gebeurtenissen rondom deze zaak"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "events"
+        table: "events"
+        fields: [
+          "case_id",
+          "event_type"
+        ]
+        select_on:
+          - name: "case_id"
+            description: "Zaak identifier"
+            type: "string"
+            value: "$CASE.id"
+
   output:
     - name: "bezwaar_mogelijk"
       description: "Is bezwaar mogelijk tegen dit besluit"
@@ -122,6 +141,16 @@ actions:
       - operation: IN
         subject: "$LAW.legal_character"
         values: "$REQUIRED_LEGAL_CHARACTER"
+      - operation: EQUALS
+        values:
+          - operation: FOREACH
+            subject: "$EVENTS"
+            combine: ADD
+            value:
+              - operation: EQUALS
+                subject: "$event_type"
+                value: "Objected"
+          - 0
 
   - output: "reden_niet_mogelijk"
     operation: IF
@@ -130,12 +159,24 @@ actions:
           operation: IN
           subject: "$LAW.decision_type"
           values: "$EXCLUDED_DECISION_TYPES"
-        then: "Tegen dit type besluit is geen bezwaar mogelijk"
+        then: "tegen dit type besluit is geen bezwaar mogelijk"
       - test:
           operation: NOT_IN
           subject: "$LAW.legal_character"
           values: "$REQUIRED_LEGAL_CHARACTER"
-        then: "Dit is geen besluit in de zin van de Awb"
+        then: "dit is geen besluit in de zin van de AWB"
+      - test:
+          operation: NOT_EQUALS
+          values:
+            - operation: FOREACH
+              subject: "$EVENTS"
+              combine: ADD
+              value:
+                - operation: EQUALS
+                  subject: "$event_type"
+                  value: "Objected"
+            - 0
+        then: "er is al eerder bezwaar gemaakt tegen dit besluit"
       - else: null
 
   - output: "bezwaartermijn"
