@@ -183,7 +183,7 @@
                             <span class="text-sm font-medium text-gray-500">U komt niet in aanmerking</span>
                             <button @click="showExplanation = true"
                                     class="ml-3 text-sm text-gray-400 hover:text-gray-900 underline"
-                                    hx-get="/laws/explain-path?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                                    hx-get="/laws/explain-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
                                     hx-target="#explanation-panel-{{ law|replace('/', '-') }}"
                                     hx-swap="innerHTML">
                                 waarom?

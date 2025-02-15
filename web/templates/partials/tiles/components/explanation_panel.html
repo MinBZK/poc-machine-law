@@ -1,6 +1,6 @@
 {% from "macros/logos.html" import org_logo %}
 
-<div class="fixed inset-y-0 right-0 w-1/3 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 overflow-y-auto"
+<div class="fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 overflow-y-auto"
      x-data="{ show: true, showTechnical: false }"
      x-show="show"
      x-init="$nextTick(() => { show = true })"
@@ -63,13 +63,79 @@
         </div>
 
         <!-- Burger-friendly explanation -->
-        <div class="space-y-2">
-            <h4 class="font-medium text-gray-900">Uitleg berekening</h4>
-            {% if error %}
-            <p class="text-red-600">{{ error }}</p>
-            {% else %}
-            <p class="text-sm text-gray-600">{{ explanation }}</p>
-            {% endif %}
+        <div
+                hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                hx-trigger="load"
+                hx-swap="outerHTML"
+                class="h-full bg-white rounded-lg shadow"
+        >
+            {% include "partials/loading.html" %}
+        </div>
+
+        <div class="max-w-7xl mx-auto">
+   {% macro render_value(value) %}
+    {% if value is none %}
+        <span class="text-gray-400">-</span>
+    {% elif value is boolean %}
+        {{ 'Ja' if value else 'Nee' }}
+    {% elif value is number %}
+        {% if value % 1 != 0 %}
+            {{ '%.5f'|format(value) }}
+        {% else %}
+            {{ value }}
+        {% endif %}
+    {% else %}
+        {{ value }}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_node(node) %}
+    {% if node.type == 'service_evaluation' %}
+        <div x-data="{ open: false }" class=" text-sm leading-5">
+            <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer"
+                 @click="open = !open">
+                <div class="min-w-0 flex items-center">
+                    <svg :class="{'rotate-90': open}"
+                         class="transform transition-transform duration-200 w-4 h-4 text-gray-500 mr-1"
+                         viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M7.293 4.707a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z"
+                              clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-green-600">Dit is het resultaat van een berekening door {{ node.details.service|replace('_', ' ')|title }} van de  {{ node.details.law|replace('_', ' ')|title }}</span>
+                </div>
+            </div>
+            <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
+                {%- if node.children -%}
+                    {%- for child in node.children recursive -%}
+                        {% if child.type == 'resolve' and child.details.path %}
+                            <div class=" text-sm leading-5 py-0.5">
+                                <span class="text-gray-600">{{ child.details.path[1:]|title|replace('_', ' ') }}: </span>
+                                <span class="ml-2 text-blue-600">{{ render_value(child.result) }}</span>
+                            </div>
+                        {% endif %}
+                        {{ loop(child.children) }}
+                    {%- endfor -%}
+                {%- endif -%}
+            </div>
+        </div>
+    {% elif node.type == 'resolve' and node.details.path %}
+        <div class=" text-sm leading-5 py-0.5">
+            <span class="text-gray-600">{{ node.details.path[1:]|title|replace('_', ' ') }}: </span>
+            <span class="ml-2 text-blue-600">{{ render_value(node.result) }}</span>
+        </div>
+    {% endif %}
+
+    {%- if node.children -%}
+        {%- for child in node.children -%}
+            {{ render_node(child) }}
+        {%- endfor -%}
+    {%- endif -%}
+{% endmacro %}
+
+<div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
+    {{ render_node(path) }}
+</div>
         </div>
 
         <!-- Collapsible Technical Section -->
@@ -105,16 +171,10 @@
                     <div class="space-y-2">
                         {% for key, value in input.items() %}
                         <div class="text-sm">
-                            <span class="text-gray-600">{{ key }}: </span>
+                            <span class="text-gray-600">{{ key[1:]|title|replace('_', ' ')   }}: </span>
                             <span class="font-medium">
                                 {% if value is boolean %}
                                     {{ 'Ja' if value else 'Nee' }}
-                                {% elif value is number %}
-                                    {% if 'euro' in key.lower() or 'income' in key.lower() or 'toeslag' in key.lower() %}
-                                        €{{ '%.2f'|format(value/100) }}
-                                    {% else %}
-                                        {{ value }}
-                                    {% endif %}
                                 {% else %}
                                     {{ value }}
                                 {% endif %}
@@ -136,4 +196,5 @@
             </div>
         </div>
     </div>
+
 </div>

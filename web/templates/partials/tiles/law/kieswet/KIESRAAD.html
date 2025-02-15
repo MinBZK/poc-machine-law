@@ -18,7 +18,7 @@
         <button
                 @click="showExplanation = true"
                 class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600"
-                hx-get="/laws/explain-path?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                hx-get="/laws/explain-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
                 hx-target="#explanation-panel-{{ law|replace('/', '-') }}"
                 hx-swap="innerHTML">
             waarom?

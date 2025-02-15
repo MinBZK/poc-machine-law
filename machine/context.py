@@ -269,18 +269,42 @@ class RuleContext:
 
         logger.debug(f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})")
 
-        result = await self.service_provider.evaluate(
-            service_ref["service"],
-            service_ref["law"],
-            parameters,
-            reference_date,
-            self.overwrite_input,
-            requested_output=service_ref["field"],
+        # Create service evaluation node
+        service_node = PathNode(
+            type="service_evaluation",
+            name=f"Service call: {service_ref['service']}.{service_ref['law']}",
+            result=None,
+            details={
+                "service": service_ref["service"],
+                "law": service_ref["law"],
+                "field": service_ref["field"],
+                "reference_date": reference_date,
+                "parameters": parameters,
+                "path": path,
+            },
         )
+        self.add_to_path(service_node)
 
-        value = result.output.get(service_ref["field"])
-        self.values_cache[cache_key] = value
-        return value
+        try:
+            result = await self.service_provider.evaluate(
+                service_ref["service"],
+                service_ref["law"],
+                parameters,
+                reference_date,
+                self.overwrite_input,
+                requested_output=service_ref["field"],
+            )
+
+            value = result.output.get(service_ref["field"])
+            self.values_cache[cache_key] = value
+
+            # Update the service node with the result and add child path
+            service_node.result = value
+            service_node.children.append(result.path)
+
+            return value
+        finally:
+            self.pop_path()
 
     async def _resolve_from_source(self, source_ref, table, df):
         if "select_on" in source_ref:

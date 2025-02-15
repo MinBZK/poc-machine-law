@@ -190,8 +190,48 @@ def node_to_dict(node):
     }
 
 
-@router.get("/explain-path")
-async def explain_path(
+@router.get("/explain-panel")
+async def explain_panel(
+    request: Request,
+    service: str,
+    law: str,
+    bsn: str,
+    services: Services = Depends(get_services),
+):
+    """Get an explanation panel"""
+    try:
+        law = unquote(law)
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+
+        return templates.TemplateResponse(
+            "partials/tiles/components/explanation_panel.html",
+            {
+                "request": request,
+                "service": service,
+                "law": law,
+                "rule_spec": rule_spec,
+                "input": result.input,
+                "result": result.output,
+                "requirements_met": result.requirements_met,
+                "path": result.path,
+                "bsn": bsn,
+            },
+        )
+    except Exception as e:
+        print(f"Error in explain_path: {e}")
+        return templates.TemplateResponse(
+            "partials/tiles/components/explanation_panel.html",
+            {
+                "request": request,
+                "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                "service": service,
+                "law": law,
+            },
+        )
+
+
+@router.get("/explanation")
+async def explanation(
     request: Request,
     service: str,
     law: str,
@@ -226,26 +266,18 @@ async def explain_path(
         explanation = llm_service.generate_explanation(path_json, rule_spec_json)
 
         return templates.TemplateResponse(
-            "partials/tiles/components/path_explanation.html",
+            "partials/tiles/components/explanation.html",
             {
                 "request": request,
                 "explanation": explanation,
-                "service": service,
-                "law": law,
-                "rule_spec": rule_spec,
-                "input": result.input,
-                "result": result.output,
-                "requirements_met": result.requirements_met,
             },
         )
     except Exception as e:
         print(f"Error in explain_path: {e}")
         return templates.TemplateResponse(
-            "partials/tiles/components/path_explanation.html",
+            "partials/tiles/components/explanation.html",
             {
                 "request": request,
                 "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
-                "service": service,
-                "law": law,
             },
         )
