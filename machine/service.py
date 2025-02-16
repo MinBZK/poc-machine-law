@@ -5,10 +5,12 @@ from typing import Any
 import pandas as pd
 from eventsourcing.system import SingleThreadedRunner, System
 
-from machine.events.application import RuleProcessor, ServiceCaseManager
-
 from .context import PathNode
 from .engine import RulesEngine
+from .events.case.application import CaseManager
+from .events.case.processor import CaseProcessor
+from .events.claim.application import ClaimManager
+from .events.claim.processor import ClaimProcessor
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -133,19 +135,31 @@ class Services:
 
         outer_self = self
 
-        class WrappedProcessor(RuleProcessor):
+        class WrappedCaseProcessor(CaseProcessor):
             def __init__(self, env=None, **kwargs) -> None:
                 super().__init__(rules_engine=outer_self, env=env, **kwargs)
 
-        class WrappedManager(ServiceCaseManager):
-            def __init__(self, env=None, **kwargs) -> None:  # env parameter toevoegen
+        class WrappedCaseManager(CaseManager):
+            def __init__(self, env=None, **kwargs) -> None:
                 super().__init__(rules_engine=outer_self, env=env, **kwargs)
 
-        system = System(pipes=[[WrappedManager, WrappedProcessor]])
+        class WrappedClaimManager(ClaimManager):
+            def __init__(self, env=None, **kwargs) -> None:
+                super().__init__(rules_engine=outer_self, env=env, **kwargs)
+
+        class WrappedClaimProcessor(ClaimProcessor):
+            def __init__(self, env=None, **kwargs) -> None:
+                super().__init__(rules_engine=outer_self, env=env, **kwargs)
+
+        system = System(
+            pipes=[[WrappedCaseManager, WrappedCaseProcessor], [WrappedClaimManager, WrappedClaimProcessor]]
+        )
 
         self.runner = SingleThreadedRunner(system)
         self.runner.start()
-        self.manager = self.runner.get(WrappedManager)
+
+        self.case_manager = self.runner.get(WrappedCaseManager)
+        self.claim_manager = self.runner.get(WrappedClaimManager)
 
     def __exit__(self):
         self.runner.stop()
@@ -186,7 +200,7 @@ class Services:
             for apply in applies:
                 if self._matches_event(event, apply):
                     aggregate_id = str(event.originator_id)
-                    aggregate = self.manager.get_case_by_id(aggregate_id)
+                    aggregate = self.case_manager.get_case_by_id(aggregate_id)
                     parameters = {apply["name"]: aggregate}
                     result = await self.evaluate(rule.service, rule.law, parameters)
 
@@ -197,7 +211,7 @@ class Services:
                             for name, value in update["mapping"].items()
                         }
                         # Apply directly on the event via method
-                        method = getattr(self.manager, update["method"])
+                        method = getattr(self.case_manager, update["method"])
                         method(aggregate_id, **mapping)
 
     @staticmethod

@@ -1,4 +1,3 @@
-import asyncio
 import json
 import random
 from datetime import datetime
@@ -6,44 +5,11 @@ from decimal import Decimal
 from uuid import UUID
 
 from eventsourcing.application import Application
-from eventsourcing.dispatch import singledispatchmethod
-from eventsourcing.system import ProcessApplication
 
-from .aggregate import CaseStatus, ServiceCase
+from .aggregate import Case, CaseStatus
 
 
-class RuleProcessor(ProcessApplication):
-    def __init__(self, rules_engine, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.rules_engine = rules_engine
-
-    @singledispatchmethod
-    def policy(self, domain_event, process_event) -> None:
-        """Sync policy that processes events"""
-
-    @policy.register(ServiceCase.Objected)
-    @policy.register(ServiceCase.AutomaticallyDecided)
-    @policy.register(ServiceCase.Decided)
-    def _(self, domain_event, process_event) -> None:
-        try:
-            # Create a new event loop in a new thread
-            def run_async():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                return loop.run_until_complete(self.rules_engine.apply_rules(domain_event))
-
-            # Run in a separate thread
-            import threading
-
-            thread = threading.Thread(target=run_async)
-            thread.start()
-            thread.join()  # Wait for completion
-
-        except Exception as e:
-            print(f"Error processing rules: {e}")
-
-
-class ServiceCaseManager(Application):
+class CaseManager(Application):
     """
     Application service for managing service cases.
     Handles case submission, verification, decisions, and objections.
@@ -61,7 +27,7 @@ class ServiceCaseManager(Application):
         """Generate index key for the combination of bsn, service and law"""
         return (bsn, service_type, law)
 
-    def _index_case(self, case: ServiceCase) -> None:
+    def _index_case(self, case: Case) -> None:
         """Add case to index"""
         key = self._index_key(case.bsn, case.service, case.law)
         self._case_index[key] = str(case.id)
@@ -105,7 +71,7 @@ class ServiceCaseManager(Application):
         result = await self.rules_engine.evaluate(service_type, law, parameters)
 
         # Create new case with citizen's claimed result
-        case = ServiceCase(
+        case = Case(
             bsn=bsn,
             service_type=service_type,
             law=law,
@@ -286,13 +252,13 @@ class ServiceCaseManager(Application):
     def can_object(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_object()
 
-    def get_case(self, bsn: str, service_type: str, law: str) -> ServiceCase | None:
+    def get_case(self, bsn: str, service_type: str, law: str) -> Case | None:
         """Get case for specific bsn, service and law combination"""
         key = self._index_key(bsn, service_type, law)
         case_id = self._case_index.get(key)
         return self.get_case_by_id(case_id) if case_id else None
 
-    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> list[ServiceCase]:
+    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> list[Case]:
         """Get all cases for a service in a particular status"""
         return [
             self.get_case_by_id(case_id)
@@ -300,13 +266,13 @@ class ServiceCaseManager(Application):
             if self.repository.get(case_id).service == service_type and self.repository.get(case_id).status == status
         ]
 
-    def get_case_by_id(self, case_id: str | None) -> ServiceCase | None:
+    def get_case_by_id(self, case_id: str | None) -> Case | None:
         """Get case by ID"""
         if not case_id:
             return None
         return self.repository.get(UUID(case_id))
 
-    def get_cases_by_law(self, law: str, service_type: str) -> list[ServiceCase]:
+    def get_cases_by_law(self, law: str, service_type: str) -> list[Case]:
         """Get all cases for a specific law and service combination"""
         cases = []
         for _key, case_id in self._case_index.items():

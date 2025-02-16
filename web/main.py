@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 
 from machine.service import Services
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_services, templates
-from web.routers import admin, laws
+from web.routers import admin, edit, laws
 from web.services.profiles import get_all_profiles, get_profile_data
 
 app = FastAPI(title="Burger.nl")
@@ -15,6 +15,7 @@ if STATIC_DIR.exists():
 # Include routers
 app.include_router(laws.router)
 app.include_router(admin.router)
+app.include_router(edit.router)
 
 
 @app.get("/")

@@ -77,7 +77,7 @@ async def execute_law(
         )
 
     # Check if there's an existing case
-    existing_case = services.manager.get_case(bsn, service, law)
+    existing_case = services.case_manager.get_case(bsn, service, law)
 
     # Get the appropriate template
     template_path = get_tile_template(service, law)
@@ -112,14 +112,14 @@ async def submit_case(
     law, result, rule_spec = await evaluate_law(bsn, law, service, services)
 
     # Submit the case with citizen's claimed result (from execution)
-    case_id = await services.manager.submit_case(
+    case_id = await services.case_manager.submit_case(
         bsn=bsn,
         service_type=service,
         law=law,
         parameters=result.input,
         claimed_result=result.output,  # The citizen claims the calculated result
     )
-    case = services.manager.get_case_by_id(case_id)
+    case = services.case_manager.get_case_by_id(case_id)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(
@@ -153,7 +153,7 @@ async def objection_case(
     law = unquote(law)
 
     # Submit the objection with new claimed result
-    case_id = services.manager.objection_case(
+    case_id = services.case_manager.objection_case(
         case_id=case_id,
         reason=reason,
     )
@@ -173,7 +173,7 @@ async def objection_case(
             "result": result.output,
             "input": result.input,
             "requirements_met": result.requirements_met,
-            "current_case": services.manager.get_case_by_id(case_id),
+            "current_case": services.case_manager.get_case_by_id(case_id),
         },
     )
 
@@ -204,6 +204,8 @@ async def explain_panel(
         law = unquote(law)
         law, result, rule_spec = await evaluate_law(bsn, law, service, services)
         flat_path = flatten_path_nodes(result.path)
+        existing_case = services.case_manager.get_case(bsn, service, law)
+
         return templates.TemplateResponse(
             "partials/tiles/components/explanation_panel.html",
             {
@@ -216,6 +218,7 @@ async def explain_panel(
                 "requirements_met": result.requirements_met,
                 "path": flat_path,
                 "bsn": bsn,
+                "current_case": existing_case,
             },
         )
     except Exception as e:

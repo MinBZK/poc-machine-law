@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from machine.events.claim.aggregate import Claim
 from machine.logging_config import IndentLogger
 
 logger = IndentLogger(logging.getLogger("service"))
@@ -144,6 +145,8 @@ class RuleContext:
     outputs: dict[str, Any] = field(default_factory=dict)
     calculation_date: str | None = None
     resolved_paths: dict[str, Any] = field(default_factory=dict)
+    service_name: str | None = None
+    claims: dict[str:Claim] = None
 
     def track_access(self, path: str) -> None:
         """Track accessed data paths"""
@@ -213,7 +216,15 @@ class RuleContext:
                     node.result = value
                     return value
 
-                # Check local scope first
+                # Claims first
+                if isinstance(self.claims, dict) and path in self.claims:
+                    claim = self.claims.get(path)
+                    value = claim.new_value
+                    logger.debug(f"Resolving from CLAIM: {value}")
+                    node.result = value
+                    return value
+
+                # Check local scope
                 if path in self.local:
                     logger.debug(f"Resolving from LOCAL: {self.local[path]}")
                     node.result = self.local[path]
@@ -263,7 +274,7 @@ class RuleContext:
                             df = self.service_provider.resolver.rules_dataframe()
                         if source_ref.get("source_type") == "events":
                             table = "events"
-                            events = self.service_provider.manager.get_events()
+                            events = self.service_provider.case_manager.get_events()
                             df = pd.DataFrame(events)
                         elif self.sources and "table" in source_ref:
                             table = source_ref.get("table")

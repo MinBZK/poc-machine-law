@@ -32,15 +32,7 @@ class ClaimStatusTranscoding(Transcoding):
 Transcoding.register(ClaimStatusTranscoding)
 
 
-# Helper function for consistent status access
-def get_status_value(status) -> str:
-    """Get string value of status regardless of type"""
-    if isinstance(status, CaseStatus):
-        return status.value
-    return status
-
-
-class ServiceCase(Aggregate):
+class Case(Aggregate):
     @event("Submitted")
     def __init__(
         self,

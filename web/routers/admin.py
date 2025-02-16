@@ -3,9 +3,11 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
-from machine.events.aggregate import CaseStatus
+from machine.context import flatten_path_nodes
+from machine.events.case.aggregate import CaseStatus
 from machine.service import Services
 from web.dependencies import get_services, templates
+from web.routers.laws import evaluate_law
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -39,7 +41,7 @@ async def admin_dashboard(request: Request, service: str, services: Services = D
     service_laws = discoverable_laws.get(service, [])
     service_cases = {}
     for law in service_laws:
-        cases = services.manager.get_cases_by_law(law, service)
+        cases = services.case_manager.get_cases_by_law(law, service)
         service_cases[law] = group_cases_by_status(cases)
 
     return templates.TemplateResponse(
@@ -69,14 +71,14 @@ async def move_case(
         except KeyError:
             raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
 
-        case = services.manager.get_case_by_id(case_id)
+        case = services.case_manager.get_case_by_id(case_id)
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
 
         # Based on the target status, call the appropriate method
         if new_status_enum == CaseStatus.IN_REVIEW:
             # Get latest results from events
-            events = services.manager.repository.events.get_domain_events(case.id)
+            events = services.case_manager.repository.events.get_domain_events(case.id)
             latest_results = {}
             for event in reversed(events):
                 if hasattr(event, "claimed_result") and hasattr(event, "verified_result"):
@@ -101,7 +103,7 @@ async def move_case(
         else:
             raise HTTPException(status_code=400, detail=f"Cannot move to status {new_status}")
 
-        services.manager.save(case)
+        services.case_manager.save(case)
 
         # Return just the updated card
         return templates.TemplateResponse(
@@ -123,12 +125,12 @@ async def complete_review(
 ):
     """Complete manual review of a case"""
     try:
-        case_id = services.manager.complete_manual_review(
+        case_id = services.case_manager.complete_manual_review(
             case_id=case_id, verifier_id="ADMIN", approved=decision, reason=reason
         )
 
         # Get the updated case
-        updated_case = services.manager.get_case_by_id(case_id)
+        updated_case = services.case_manager.get_case_by_id(case_id)
 
         # Check if request is from case detail page
         is_detail_page = request.headers.get("HX-Current-URL", "").endswith(f"/cases/{case_id}")
@@ -164,10 +166,11 @@ async def complete_review(
 @router.get("/cases/{case_id}")
 async def view_case(request: Request, case_id: str, services: Services = Depends(get_services)):
     """View details of a specific case"""
-    case = services.manager.get_case_by_id(case_id)
+    case = services.case_manager.get_case_by_id(case_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
-    case.events = services.manager.get_events(case.id)
-
-    return templates.TemplateResponse("admin/case_detail.html", {"request": request, "case": case})
+    case.events = services.case_manager.get_events(case.id)
+    law, result, rule_spec = await evaluate_law(case.bsn, case.law, case.service, services)
+    flat_path = flatten_path_nodes(result.path)
+    return templates.TemplateResponse("admin/case_detail.html", {"request": request, "case": case, "path": flat_path})

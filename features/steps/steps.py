@@ -231,14 +231,14 @@ def step_impl(context, amount):
 
 @given("alle aanvragen worden beoordeeld")
 def step_impl(context):
-    context.services.manager.SAMPLE_RATE = 1.0
+    context.services.case_manager.SAMPLE_RATE = 1.0
 
 
 @when("de persoon dit aanvraagt")
 def step_impl(context):
     # Case indienen met de uitkomst van de vorige berekening
     case_id = asyncio.run(
-        context.services.manager.submit_case(
+        context.services.case_manager.submit_case(
             bsn=context.parameters["BSN"],
             service_type=context.service,
             law=context.law,
@@ -253,14 +253,14 @@ def step_impl(context):
 
 @then("wordt de aanvraag toegevoegd aan handmatige beoordeling")
 def step_impl(context):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertIsNotNone(case, "Expected case to exist")
     assertions.assertEqual(case.status, "IN_REVIEW", "Expected case to be in review")
 
 
 @then('is de status "{status}"')
 def step_impl(context, status):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertIsNotNone(case, "Expected case to exist")
     assertions.assertEqual(
         case.status, status, f"Expected status to be {status}, but was {case.status}"
@@ -269,19 +269,19 @@ def step_impl(context, status):
 
 @when('de beoordelaar de aanvraag afwijst met reden "{reason}"')
 def step_impl(context, reason):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     case.decide(
         verified_result=context.result.output,
         reason=reason,
         verifier_id="BEOORDELAAR",
         approved=False,
     )
-    context.services.manager.save(case)
+    context.services.case_manager.save(case)
 
 
 @then("is de aanvraag afgewezen")
 def step_impl(context):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertIsNotNone(case, "Expected case to exist")
     assertions.assertEqual(case.status, "DECIDED", "Expected case to be decided")
     assertions.assertFalse(case.approved, "Expected case to be rejected")
@@ -289,40 +289,40 @@ def step_impl(context):
 
 @when('de burger bezwaar maakt met reden "{reason}"')
 def step_impl(context, reason):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     case.object(reason=reason)
-    context.services.manager.save(case)
+    context.services.case_manager.save(case)
 
 
 @when('de beoordelaar het bezwaar {approve} met reden "{reason}"')
 def step_impl(context, approve, reason):
     approve = approve.lower() == "toewijst"
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     case.decide(
         verified_result=context.result.output,
         reason=reason,
         verifier_id="BEOORDELAAR",
         approved=approve,
     )
-    context.services.manager.save(case)
+    context.services.case_manager.save(case)
 
 
 @then("is de aanvraag toegekend")
 def step_impl(context):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertEqual(case.status, "DECIDED", "Expected case to be decided")
     assertions.assertTrue(case.approved, "Expected case to be approved")
 
 
 @then("kan de burger in bezwaar gaan")
 def step_impl(context):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertTrue(case.can_object(), "Expected case to be objectable")
 
 
 @then('kan de burger niet in bezwaar gaan met reden "{reason}"')
 def step_impl(context, reason):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertFalse(case.can_object(), "Expected case not to be objectable")
     assertions.assertEqual(
         reason,
@@ -333,7 +333,7 @@ def step_impl(context, reason):
 
 @then("kan de burger in beroep gaan bij {competent_court}")
 def step_impl(context, competent_court):
-    case = context.services.manager.get_case_by_id(context.case_id)
+    case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertTrue(case.can_appeal(), "Expected to be able to appeal")
     assertions.assertEqual(
         competent_court,

@@ -16,7 +16,7 @@ class RulesEngine:
     def __init__(self, spec: dict[str, Any], service_provider: Any | None = None) -> None:
         self.spec = spec
         self.service_name = spec.get("service")
-        self.law = spec.get("../law")
+        self.law = spec.get("law")
         self.requirements = spec.get("requirements", [])
         self.actions = spec.get("actions", [])
         self.parameter_specs = spec.get("properties", {}).get("parameters", {})
@@ -177,6 +177,12 @@ class RulesEngine:
 
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
         root = PathNode(type="root", name="evaluation", result=None)
+
+        claims = None
+        if "BSN" in parameters:
+            bsn = parameters["BSN"]
+            claims = self.service_provider.claim_manager.get_claim_by_bsn_service_law(bsn, self.service_name, self.law)
+
         context = RuleContext(
             definitions=self.definitions,
             service_provider=self.service_provider,
@@ -187,6 +193,8 @@ class RulesEngine:
             path=[root],
             overwrite_input=overwrite_input or {},
             calculation_date=calculation_date,
+            service_name=self.service_name,
+            claims=claims,
         )
 
         # Check requirements

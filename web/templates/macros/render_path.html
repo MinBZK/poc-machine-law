@@ -1,0 +1,133 @@
+{% macro render_value(key, value, case_id, service, law, bsn) %}
+{% if value is none or value is undefined %}
+<span class="text-gray-400">-</span>
+{% else %}
+<button
+        class="text-blue-600 hover:text-blue-800 cursor-pointer"
+        hx-get="/edit/edit-form"
+        hx-target="#edit-form-container"
+        hx-vals='{
+        "case_id": "{{ case_id }}",
+        "service": "{{ service }}",
+        "key": "{{ key }}",
+        "value": {{ value|tojson }},
+        "law": "{{ law }}",
+        "bsn": "{{ bsn }}"
+    }'
+        type="button">
+    {% if value is mapping and value.result is defined %}
+    {% set display_value = value.result %}
+    {% else %}
+    {% set display_value = value %}
+    {% endif %}
+    {% if display_value is boolean %}
+    {{ 'Ja' if display_value else 'Nee' }}
+    {% elif display_value is number %}
+    {% if display_value % 1 != 0 %}
+    {{ '%.5f'|format(display_value) }}
+    {% else %}
+    {{ display_value }}
+    {% endif %}
+    {% elif display_value is sequence and display_value is not string %}
+    {{ display_value|join(', ') }}
+    {% else %}
+    {{ display_value }}
+    {% endif %}
+</button>
+{% endif %}
+{% endmacro %}
+
+{% macro render_node(key, node, case_id, service, law, bsn) %}
+{% if node is mapping and ('service' in node or 'children' in node) %}
+<div x-data="{ open: false }" class="text-sm leading-5">
+    <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
+         @click="open = !open">
+        <div class="text-sm leading-5 py-0.5">
+            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
+            <span class="ml-2">{% if node.result is defined %}{{ render_value(key, node.result, case_id, service, law, bsn) }}{% else %}{{ render_value(key, node, case_id, service, law, bsn) }}{% endif %}</span>
+        </div>
+        <div class="min-w-0 flex items-center">
+            <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
+                 class="transform transition-transform duration-200 w-4 h-4 text-gray-500 mr-1 rotate-90"
+                 viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                      d="M7.293 4.707a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"/>
+            </svg>
+            <span class="text-green-600">
+            {% if node.law %}
+                Resultaat van het uitrekenen {{ node.law|replace('_', ' ')|title }}
+            {% else %}
+                {{ key|title|replace('_', ' ') }}
+            {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
+        {% if node.children %}
+        {% for child_key, child_node in node.children|dictsort %}
+        {{ render_node(child_key, child_node, case_id, node.service, law, bsn) }}
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="text-sm leading-5 py-0.5">
+    <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
+    <span class="ml-2">{{ render_value(key, node.result, case_id, service, law, bsn) }}</span>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro render_path(path, case_id, service, law, bsn) %}
+<!-- Alpine.js store for managing dialog state -->
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('editDialog', {
+            isOpen: false,
+            service: null,
+            caseId: null,
+            key: null,
+            value: null,
+            bsn: null,
+            law: null,
+
+            open(data) {
+                console.log('Opening dialog with:', data);
+                this.caseId = data.caseId;
+                this.service = data.service;
+                this.key = data.key;
+                this.value = data.value;
+                this.law = data.law;
+                this.bsn = data.bsn;
+                this.isOpen = true;
+            },
+
+            close() {
+                this.isOpen = false;
+                this.service = null;
+                this.caseId = null;
+                this.key = null;
+                this.value = null;
+                this.law = null;
+                this.bsn = null;
+            }
+        })
+    });
+    document.addEventListener('htmx:afterOnLoad', function (evt) {
+        if (evt.detail.triggerSpec && evt.detail.triggerSpec.includes('edit-dialog-closed')) {
+            Alpine.store('editDialog').close();
+        }
+    });
+</script>
+
+<div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
+    {% for key, node in path|dictsort %}
+    {{ render_node(key, node, case_id, service, law, bsn) }}
+    {% endfor %}
+</div>
+
+<div id="edit-form-container"></div>
+
+{% endmacro %}

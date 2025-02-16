@@ -1,6 +1,7 @@
 {% extends "admin/base.html" %}
 {% from "admin/partials/event_detail.html" import render_event %}
 {% from "macros/logos.html" import org_logo %}
+{% from "macros/render_path.html" import render_path %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
@@ -202,40 +203,9 @@
             </div>
 
             <!-- Parameters -->
-            <div class="p-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold mb-4">Gegevens</h2>
-                {% if case.parameters %}
-                <div class="grid grid-cols-2 gap-4">
-                    {% for key, value in case.parameters.items() %}
-                    <div class="{% if value is mapping %}col-span-2{% endif %}">
-                        <p class="text-sm text-gray-600">{{ key|replace('$', '')|title|replace('_', ' ') }}</p>
-                        {% if value is mapping %}
-                        <div class="mt-2 bg-gray-50 p-4 rounded-md grid grid-cols-2 gap-4">
-                            {% for sub_key, sub_value in value.items() %}
-                            <div>
-                                <p class="text-sm text-gray-600">{{ sub_key|replace('$', '')|title|replace('_', ' ')
-                                    }}</p>
-                                <p class="font-medium">{{ sub_value }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% elif value is sequence and value is not string %}
-                        <div class="font-medium">
-                            <ul class="list-disc list-inside">
-                                {% for item in value %}
-                                <li>{{ item }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% else %}
-                        <p class="font-medium">{{ value }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-gray-500">Geen gegevens beschikbaar</p>
-                {% endif %}
+            <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
+            <h2 class="text-lg font-semibold mb-6">Gebruikte gegevens</h2>
+            {{ render_path(path, case.id|string, case.service, case.law, case.bsn) }}
             </div>
 
             <!-- Gebeurtenissen -->

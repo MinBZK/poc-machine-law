@@ -21,7 +21,7 @@ references:
 properties:
   applies:
     - name: "CASE"
-      aggregate: "ServiceCase"
+      aggregate: "Case"
       events:
         - type: "Decided"
           filter:
