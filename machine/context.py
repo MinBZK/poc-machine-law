@@ -71,6 +71,61 @@ class PathNode:
     children: list["PathNode"] = field(default_factory=list)
 
 
+def flatten_path_nodes(root):
+    def is_path_node(obj):
+        return isinstance(obj, PathNode)
+
+    # Iterative flattening approach
+    flattened = {}
+    stack = [(root, None)]
+
+    while stack:
+        node, service_parent = stack.pop()
+
+        if not is_path_node(node):
+            continue
+
+        path = node.details.get("path")
+        if isinstance(path, str) and path.startswith("$"):
+            path = path[1:]
+
+        # Handle resolve nodes
+        if node.type == "resolve" and path and isinstance(path, str):
+            resolve_entry = {
+                "result": node.result,
+            }
+
+            if service_parent and path not in service_parent.setdefault("children", {}):
+                service_parent.setdefault("children", {})[path] = resolve_entry
+            elif path not in flattened:
+                flattened[path] = resolve_entry
+
+        # Handle service_evaluation nodes
+        elif node.type == "service_evaluation" and path and isinstance(path, str):
+            service_entry = {
+                "result": node.result,
+                "service": node.details.get("service"),
+                "law": node.details.get("law"),
+                "children": {},
+            }
+
+            if service_parent:
+                service_parent.setdefault("children", {})[path] = service_entry
+            else:
+                flattened[path] = service_entry
+
+            # Prepare to process children with this service_evaluation as parent
+            for child in reversed(node.children):
+                stack.append((child, service_entry))
+            continue
+
+        # Add children to the stack for further processing
+        for child in reversed(node.children):
+            stack.append((child, service_parent))
+
+    return flattened
+
+
 @dataclass
 class RuleContext:
     """Context for rule evaluation"""

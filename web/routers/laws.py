@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from jinja2 import TemplateNotFound
 
 from explain.llm_service import llm_service
+from machine.context import flatten_path_nodes
 from machine.service import Services
 from web.dependencies import TODAY, get_services, templates
 from web.services.profiles import get_profile_data
@@ -202,7 +203,7 @@ async def explain_panel(
     try:
         law = unquote(law)
         law, result, rule_spec = await evaluate_law(bsn, law, service, services)
-
+        flat_path = flatten_path_nodes(result.path)
         return templates.TemplateResponse(
             "partials/tiles/components/explanation_panel.html",
             {
@@ -213,7 +214,7 @@ async def explain_panel(
                 "input": result.input,
                 "result": result.output,
                 "requirements_met": result.requirements_met,
-                "path": result.path,
+                "path": flat_path,
                 "bsn": bsn,
             },
         )
