@@ -372,3 +372,22 @@ def step_impl(context):
         bsn=context.parameters["BSN"]
     )
     context.claim_id = claim_id
+
+@then("heeft de persoon recht op huurtoeslag")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    assertions.assertTrue(
+        context.result.requirements_met,
+        "Persoon heeft toch geen recht op huurtoeslag",
+    )
+
+
+@step("met een kale huur {rent} en servicekosten {service_costs}")
+def step_impl(context, rent, service_costs):
+    """
+    :type context: behave.runner.Context
+    """
+    context.parameters["RENT_AMOUNT"] = int(rent)
+    context.parameters["SERVICE_COSTS"] = int(service_costs)
