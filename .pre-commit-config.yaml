@@ -13,12 +13,12 @@ repos:
       - id: check-toml
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.4
+    rev: v0.9.6
     hooks:
       - id: ruff
       - id: ruff-format
   - repo: https://github.com/djlint/djLint
-    rev: v1.36.1
+    rev: v1.36.4
     hooks:
       - id: djlint-reformat-jinja
   - repo: local
