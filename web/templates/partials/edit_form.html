@@ -72,7 +72,21 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="reason" class="block text-sm font-medium text-gray-700">Reden voor wijziging</label>
+                    <label for="hardheidsclausule" class="block text-sm font-medium text-gray-700">Hardheidsclausule</label>
+                    <select id="hardheidsclausule" name="hardheidsclausule"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        <option value="">Selecteer een hardheidsclausule</option>
+                        <option value="Awb Art. 4:84">Awb Art. 4:84 - Inherente afwijkingsbevoegdheid bestuursorgaan</option>
+                        <option value="Participatiewet Art. 18">Participatiewet Art. 18 - Bijzondere bijstand</option>
+                        <option value="Wmo 2015 Art. 2.3.5">Wmo 2015 Art. 2.3.5 - Maatwerkvoorziening</option>
+                        <option value="Belastingwet Art. 63">Belastingwet Art. 63 - Hardheidsclausule Belastingen</option>
+                        <option value="Jeugdwet Art. 2.3">Jeugdwet Art. 2.3 - Maatwerkvoorziening jeugdhulp</option>
+                        <option value="Anders">Anders - Andere specifieke hardheidsclausule</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="reason" class="block text-sm font-medium text-gray-700">Motivatie voor wijziging</label>
                     <textarea id="reason" name="reason" rows="3"
                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                               required></textarea>
