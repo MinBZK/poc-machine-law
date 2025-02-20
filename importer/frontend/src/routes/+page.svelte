@@ -89,6 +89,8 @@
 </main>
 
 <style lang="postcss">
+  @reference "tailwindcss/theme";
+
   .message {
     @apply mb-3 max-w-[75%] self-start whitespace-pre-line rounded-md bg-white px-3 py-2;
 
