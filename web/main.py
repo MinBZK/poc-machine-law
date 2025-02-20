@@ -1,5 +1,11 @@
+# At the top of web/main.py
+import sys
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
+
+sys.path.append(str(Path(__file__).parent.parent))
 
 from machine.service import Services
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_services, templates

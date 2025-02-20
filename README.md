@@ -123,6 +123,14 @@ Run simulaties:
 uv run simulate.py
 ```
 
+Run de burger interface:
+```bash
+uv run web/main.py
+```
+
+Dit zou een interface hier http://0.0.0.0:8000 en hier http://0.0.0.0:8000/admin op moeten leveren.
+
+
 
 ## 📂 Repository structuur
 
