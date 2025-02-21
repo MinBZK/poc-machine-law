@@ -12,8 +12,7 @@ import pprint
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 import uvicorn
-
-# import uuid
+import uuid
 
 # Set up the state
 from langgraph.graph import MessagesState, START
@@ -39,15 +38,26 @@ class State(TypedDict):
 workflow = StateGraph(state_schema=State)
 
 
-def ask_law(state: State) -> Dict:
+def ask_law(state: State, config: Dict) -> Dict:
     print("----> ask_law")
+
+    thread_id = config["configurable"]["thread_id"]
 
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
     asyncio.get_event_loop().create_task(
-        manager.broadcast(msg)
-    )  # TODO: do not broadcast to all clients, but only the one from the config
+        manager.send_message(msg, thread_id)
+    )
     return {"messages": [AIMessage(msg)]}  # Note: we reset the messages
+
+
+def ask_human(state: State) -> Dict:
+    print("----> ask_human")
+
+    location = interrupt("Please provide your location:")
+    print("----> resumed:", location)
+    state["messages"].append(HumanMessage(location))
+    return {"messages": state["messages"]}
 
 
 def retrieve_law_url(state: State) -> Dict:
@@ -57,11 +67,13 @@ def retrieve_law_url(state: State) -> Dict:
 
 # Add nodes
 workflow.add_node("ask_law", ask_law)
+workflow.add_node("ask_human", ask_human)
 workflow.add_node("retrieve_law_url", retrieve_law_url)
 
 # Add edges
 workflow.set_entry_point("ask_law")
-workflow.add_edge("ask_law", "retrieve_law_url")
+workflow.add_edge("ask_law", "ask_human")
+workflow.add_edge("ask_human", "retrieve_law_url")
 
 
 # Initialize memory to persist state between graph runs
@@ -70,12 +82,10 @@ checkpointer = MemorySaver()
 # Compile the graph
 graph = workflow.compile(
     checkpointer,
-    interrupt_before=[
-        "retrieve_law_url", # IMPROVE: use interrupt_after instead
-    ],
+    # interrupt_before=[
+    #     "retrieve_law_url", # IMPROVE: use interrupt_after instead?
+    # ],
 )
-
-config = {"configurable": {"thread_id": "1"}}  # IMPROVE: thread_id not hardcoded
 
 # Initialize a FastAPI web server
 app = FastAPI()
@@ -88,22 +98,28 @@ async def get():
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: Dict[uuid.UUID, WebSocket] = {}
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        # Generate a thread ID
-        # thread_id = str(uuid.uuid4())
-        self.active_connections.append(websocket)
-        graph.invoke({"messages": []}, config)
+        thread_id = uuid.uuid4()
+        self.active_connections[thread_id] = websocket
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        # Invoke the graph
+        graph.invoke({"messages": []}, {"configurable": {"thread_id": thread_id}})
+
+        return thread_id
+
+    def disconnect(self, thread_id: uuid.UUID):
+        if thread_id in self.active_connections:
+            del self.active_connections[thread_id]
 
     async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            print("--> sending message")
-            await connection.send_text(message)
+        for websocket in self.active_connections.values():
+            await websocket.send_text(message)
+
+    async def send_message(self, message: str, thread_id: uuid.UUID):
+        await self.active_connections[thread_id].send_text(message)
 
 
 manager = ConnectionManager()
@@ -111,7 +127,8 @@ manager = ConnectionManager()
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+    thread_id = await manager.connect(websocket)
+
     try:
         while True:
             user_input = await websocket.receive_text()
@@ -121,8 +138,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
             for event in graph.stream(
                 # {"messages": [HumanMessage(user_input)]},
-                Command(resume={"data": user_input}),
-                config,
+                Command(resume=user_input),
+                {"configurable": {"thread_id": thread_id}},
                 stream_mode="values",
             ):
                 # In case of an AI message, send it back to the client
@@ -130,12 +147,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 msg = event["messages"][-1]
                 if isinstance(msg, AIMessage):
                     await websocket.send_text(msg.content)
+
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        manager.disconnect(thread_id)
+
     except Exception as e:
         print(f"Error: {pprint.pformat(e)}")
+
     finally:
-        manager.disconnect(websocket)
+        manager.disconnect(thread_id)
 
 
 def main():

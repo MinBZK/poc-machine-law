@@ -58,6 +58,46 @@
     {#each messages as message}
       <div class="message" class:own={message.isOwn}>{message.content}</div>
     {/each}
+
+    <div class="self-start">
+      <button
+        on:click={() => {
+          input = 'Ja';
+          handleSubmit();
+        }}
+        class="inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
+        type="button"
+        ><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
+          ><path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m5 12l5 5L20 7"
+          /></svg
+        > Ja</button
+      >
+
+      <button
+        on:click={() => {
+          input = 'Nee';
+          handleSubmit();
+        }}
+        class="inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
+        type="button"
+        ><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
+          ><path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M18 6L6 18M6 6l12 12"
+          /></svg
+        > Nee</button
+      >
+    </div>
   </div>
 
   <form class="mt-auto flex" on:submit|preventDefault={handleSubmit}>
