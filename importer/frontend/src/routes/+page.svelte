@@ -10,6 +10,8 @@
   let messages: Message[] = [];
   let input = '';
 
+  let quickReplies: string[] = [];
+
   // Initialize WebSocket connection
   const socket = new WebSocket('ws://localhost:8000/ws');
 
@@ -20,14 +22,20 @@
 
   // Listen for messages
   socket.addEventListener('message', function (event) {
+    // Parse the event data
+    const data = JSON.parse(event.data) as { content: string; quick_replies: string[] };
+
     messages = [
       ...messages,
       {
-        content: event.data,
+        content: data.content,
         isOwn: false,
         timestamp: new Date(),
       },
     ]; // Note: instead of messages.push(...) to trigger Svelte reactivity, also below
+
+    // If the message contains quick replies, show them
+    quickReplies = data.quick_replies || [];
   });
 
   // Submit handler
@@ -60,43 +68,41 @@
     {/each}
 
     <div class="self-start">
-      <button
-        on:click={() => {
-          input = 'Ja';
-          handleSubmit();
-        }}
-        class="inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
-        type="button"
-        ><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
-          ><path
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m5 12l5 5L20 7"
-          /></svg
-        > Ja</button
-      >
-
-      <button
-        on:click={() => {
-          input = 'Nee';
-          handleSubmit();
-        }}
-        class="inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
-        type="button"
-        ><svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
-          ><path
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M18 6L6 18M6 6l12 12"
-          /></svg
-        > Nee</button
-      >
+      {#each quickReplies as quickReply}
+        <button
+          on:click={() => {
+            input = quickReply;
+            handleSubmit();
+          }}
+          class="mr-1.5 inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
+          type="button"
+        >
+          {#if quickReply === 'Ja'}
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
+              ><path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m5 12l5 5L20 7"
+              /></svg
+            >
+          {:else if quickReply === 'Nee'}
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
+              ><path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M18 6L6 18M6 6l12 12"
+              /></svg
+            >
+          {/if}
+          {quickReply}</button
+        >
+      {/each}
     </div>
   </div>
 

@@ -13,6 +13,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 import uvicorn
 import uuid
+import json
 
 # Set up the state
 from langgraph.graph import MessagesState, START
@@ -34,6 +35,11 @@ class State(TypedDict):
     law_url_approved: Optional[bool]  # Can be True, False, or None
 
 
+class WebSocketMessage(TypedDict):
+    content: str
+    quick_replies: List[str]
+
+
 # Initialize the graph
 workflow = StateGraph(state_schema=State)
 
@@ -46,17 +52,28 @@ def ask_law(state: State, config: Dict) -> Dict:
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
     asyncio.get_event_loop().create_task(
-        manager.send_message(msg, thread_id)
+        manager.send_message(WebSocketMessage(content=msg), thread_id)
     )
     return {"messages": [AIMessage(msg)]}  # Note: we reset the messages
 
 
-def ask_human(state: State) -> Dict:
+def ask_human(state: State, config: Dict) -> Dict:
     print("----> ask_human")
 
-    location = interrupt("Please provide your location:")
-    print("----> resumed:", location)
-    state["messages"].append(HumanMessage(location))
+    thread_id = config["configurable"]["thread_id"]
+
+    asyncio.get_event_loop().create_task(
+        manager.send_message(
+            WebSocketMessage(
+                content="Ben je het hiermee eens?", quick_replies=["Ja", "Nee"]
+            ),
+            thread_id,
+        )
+    )
+
+    resp = interrupt("ask_human")
+    print("----> resumed:", resp)
+    state["messages"].append(HumanMessage(resp))
     return {"messages": state["messages"]}
 
 
@@ -114,12 +131,12 @@ class ConnectionManager:
         if thread_id in self.active_connections:
             del self.active_connections[thread_id]
 
-    async def broadcast(self, message: str):
+    async def broadcast(self, message: WebSocketMessage):
         for websocket in self.active_connections.values():
             await websocket.send_text(message)
 
-    async def send_message(self, message: str, thread_id: uuid.UUID):
-        await self.active_connections[thread_id].send_text(message)
+    async def send_message(self, message: WebSocketMessage, thread_id: uuid.UUID):
+        await self.active_connections[thread_id].send_text(json.dumps(message))
 
 
 manager = ConnectionManager()
@@ -146,7 +163,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 # pprint.pprint(event["messages"])
                 msg = event["messages"][-1]
                 if isinstance(msg, AIMessage):
-                    await websocket.send_text(msg.content)
+                    await manager.send_message(
+                        WebSocketMessage(content=msg.content),
+                        thread_id,
+                    )
 
     except WebSocketDisconnect:
         manager.disconnect(thread_id)
