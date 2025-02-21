@@ -13,13 +13,43 @@
   ],
   "properties": {
     "uuid": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
     },
     "name": {
       "type": "string"
     },
     "law": {
       "type": "string"
+    },
+    "law_type": {
+      "type": "string",
+      "enum": [
+        "FORMELE_WET"
+      ]
+    },
+    "legal_character": {
+      "type": "string",
+      "enum": [
+        "BESCHIKKING",
+        "BESLUIT_VAN_ALGEMENE_STREKKING"
+      ]
+    },
+    "decision_type": {
+      "type": "string",
+      "enum": [
+        "TOEKENNING",
+        "ALGEMEEN_VERBINDEND_VOORSCHRIFT",
+        "BELEIDSREGEL",
+        "VOORBEREIDINGSBESLUIT",
+        "ANDERE_HANDELING"
+      ]
+    },
+    "discoverable": {
+      "type": "string",
+      "enum": [
+        "CITIZEN"
+      ]
     },
     "valid_from": {
       "type": "string",
@@ -59,37 +89,25 @@
         "parameters": {
           "type": "array",
           "items": {
-            "allOf": [
-              {
-                "$ref": "#/definitions/dataField"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "required": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            ]
+            "$ref": "#/definitions/parameterField"
           }
         },
         "sources": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/dataField"
+            "$ref": "#/definitions/sourceField"
           }
         },
         "input": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/dataField"
+            "$ref": "#/definitions/inputField"
           }
         },
         "output": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/dataField"
+            "$ref": "#/definitions/outputField"
           }
         },
         "definitions": {
@@ -97,112 +115,10 @@
           "additionalProperties": true
         }
       }
-    },
-    "requirements": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true
-      }
-    },
-    "actions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "output"
-        ],
-        "properties": {
-          "output": {
-            "type": "string"
-          },
-          "operation": {
-            "type": "string"
-          },
-          "value": {
-            "type": [
-              "string",
-              "number",
-              "object",
-              "array",
-              "boolean"
-            ]
-          },
-          "values": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "array",
-                "items": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "object"
-                    },
-                    {
-                      "type": "array"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          "conditions": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "test": {
-                  "type": "object",
-                  "additionalProperties": true
-                },
-                "then": {
-                  "type": [
-                    "string",
-                    "number",
-                    "object",
-                    "array",
-                    "boolean",
-                    "null"
-                  ]
-                },
-                "else": {
-                  "type": [
-                    "string",
-                    "number",
-                    "object",
-                    "array",
-                    "boolean",
-                    "null"
-                  ]
-                }
-              },
-              "additionalProperties": true
-            }
-          },
-          "reference": {
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": true
-      }
     }
   },
   "definitions": {
-    "dataField": {
+    "baseField": {
       "type": "object",
       "required": [
         "name",
@@ -232,10 +148,17 @@
           "type": "object",
           "properties": {
             "unit": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "eurocent",
+                "years",
+                "weeks",
+                "months"
+              ]
             },
             "precision": {
-              "type": "number"
+              "type": "number",
+              "minimum": 0
             },
             "min": {
               "type": "number"
@@ -266,12 +189,19 @@
                 "continuous"
               ]
             },
-            "reference_date": {
-              "type": "string",
-              "enum": [
-                "$january_first",
-                "$prev_january_first",
-                "$calculation_date"
+            "reference": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "$calculation_date",
+                    "$prev_january_first",
+                    "$january_first"
+                  ]
+                },
+                {
+                  "$ref": "#/definitions/variableReference"
+                }
               ]
             },
             "immutable_after": {
@@ -279,122 +209,479 @@
               "pattern": "^P[0-9]+[YMD]$"
             }
           }
+        }
+      }
+    },
+    "variableReference": {
+      "type": "string",
+      "pattern": "^\\$[A-Z_][A-Z0-9_]*(?:\\.[A-Z_][A-Z0-9_]*)*$"
+    },
+    "parameterField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
         },
-        "service_reference": {
-          "type": "object",
-          "required": [
-            "service",
-            "field",
-            "law"
-          ],
+        {
           "properties": {
-            "service": {
-              "type": "string"
-            },
-            "field": {
-              "type": "string"
-            },
-            "law": {
-              "type": "string"
-            },
-            "parameters": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "reference"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "reference": {
-                    "type": "string"
-                  }
-                }
-              }
+            "required": {
+              "type": "boolean"
             }
           }
+        }
+      ]
+    },
+    "sourceField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
         },
-        "source_reference": {
-          "type": "object",
-          "required": [
-            "table",
-            "select_on"
-          ],
+        {
           "properties": {
-            "table": {
-              "type": "string"
+            "source_reference": {
+              "$ref": "#/definitions/sourceReference"
             },
-            "field": {
-              "type": "string"
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "select_on": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "description",
-                  "type"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "object",
-                        "required": [
-                          "operation",
-                          "values"
-                        ],
-                        "properties": {
-                          "operation": {
-                            "type": "string"
-                          },
-                          "values": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
+            "service_reference": {
+              "$ref": "#/definitions/serviceReference"
             }
           },
           "oneOf": [
             {
               "required": [
-                "field"
+                "source_reference"
               ]
             },
             {
               "required": [
-                "fields"
+                "service_reference"
               ]
             }
           ]
         }
+      ]
+    },
+    "inputField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
+        },
+        {
+          "properties": {
+            "service_reference": {
+              "$ref": "#/definitions/serviceReference"
+            }
+          },
+          "required": [
+            "service_reference"
+          ]
+        }
+      ]
+    },
+    "outputField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/baseField"
+        },
+        {
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      ]
+    },
+    "sourceReference": {
+      "type": "object",
+      "required": [
+        "table",
+        "select_on"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string"
+        },
+        "table": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "select_on": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "description",
+              "type",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/valueOperation"
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
+    },
+    "serviceReference": {
+      "type": "object",
+      "required": [
+        "service",
+        "field",
+        "law"
+      ],
+      "properties": {
+        "service": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "law": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "reference"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string",
+                "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "valueOperation": {
+      "type": "object",
+      "required": [
+        "operation"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "ADD",
+            "SUBTRACT",
+            "MULTIPLY",
+            "DIVIDE",
+            "IN",
+            "NOT_IN",
+            "EQUALS",
+            "NOT_EQUALS"
+          ]
+        },
+        "values": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/variableReference"
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/variableReference"
+                  },
+                  {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "operation": {
+      "type": "object",
+      "required": [
+        "operation"
+      ],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "ADD",
+            "SUBTRACT",
+            "MULTIPLY",
+            "DIVIDE",
+            "MIN",
+            "MAX",
+            "AND",
+            "OR",
+            "NOT",
+            "EQUALS",
+            "NOT_EQUALS",
+            "GREATER_THAN",
+            "LESS_THAN",
+            "GREATER_OR_EQUAL",
+            "LESS_OR_EQUAL",
+            "IN",
+            "NOT_IN",
+            "CONCAT",
+            "IF",
+            "FOREACH",
+            "SUBTRACT_DATE"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          }
+        },
+        "subject": {
+          "$ref": "#/definitions/variableReference"
+        },
+        "value": {
+          "$ref": "#/definitions/operationValue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "operationValue": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/variableReference"
+        },
+        {
+          "type": [
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "type": "string",
+          "not": {
+            "pattern": "^\\$"
+          }
+        },
+        {
+          "$ref": "#/definitions/operation"
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "required": [
+        "output"
+      ],
+      "properties": {
+        "output": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/operationValue"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "ADD",
+            "SUBTRACT",
+            "MULTIPLY",
+            "DIVIDE",
+            "MIN",
+            "MAX",
+            "AND",
+            "OR",
+            "NOT",
+            "EQUALS",
+            "NOT_EQUALS",
+            "GREATER_THAN",
+            "LESS_THAN",
+            "GREATER_OR_EQUAL",
+            "LESS_OR_EQUAL",
+            "IN",
+            "NOT_IN",
+            "CONCAT",
+            "IF",
+            "FOREACH",
+            "SUBTRACT_DATE"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operationValue"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "test": {
+                "$ref": "#/definitions/operation"
+              },
+              "then": {
+                "$ref": "#/definitions/operationValue"
+              },
+              "else": {
+                "$ref": "#/definitions/operationValue"
+              }
+            },
+            "required": [
+              "test",
+              "then"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "requirement": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/requirement"
+              }
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/requirement"
+              }
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "or": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/requirement"
+              }
+            }
+          },
+          "required": [
+            "or"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "operation": {
+              "type": "string",
+              "enum": [
+                "EQUALS",
+                "NOT_EQUALS",
+                "GREATER_THAN",
+                "LESS_THAN",
+                "GREATER_OR_EQUAL",
+                "LESS_OR_EQUAL",
+                "IN",
+                "NOT_IN",
+                "NOT_NULL"
+              ]
+            },
+            "subject": {
+              "$ref": "#/definitions/variableReference"
+            },
+            "value": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/variableReference"
+                },
+                {
+                  "type": [
+                    "number",
+                    "boolean"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "not": {
+                    "pattern": "^\\$"
+                  }
+                }
+              ]
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/variableReference"
+                  },
+                  {
+                    "type": [
+                      "number",
+                      "boolean"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\$"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "required": [
+            "operation"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   }
 }
