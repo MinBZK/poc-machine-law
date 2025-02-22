@@ -92,7 +92,7 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
     return {"messages": state["messages"], "law": resp}
 
 
-def handle_law_confirmation(state: State, config: Dict) -> Dict:
+def handle_law_confirmation(state: State) -> Dict:
     print("----> handle_law_confirmation")
 
     resp = interrupt("handle_law_confirmation")
@@ -102,28 +102,40 @@ def handle_law_confirmation(state: State, config: Dict) -> Dict:
     if resp.lower() in ("ja", "j"):
         is_approved = True
 
-    thread_id = config["configurable"]["thread_id"]
+    return {"law_url_approved": is_approved}
 
-    asyncio.get_event_loop().create_task(
-        manager.send_message(
-            WebSocketMessage(content=f"Goedgekeurd: {is_approved}"),
-            thread_id,
-        )
-    )
 
-    state["messages"].append(HumanMessage(resp))
-    return {"messages": state["messages"]}
+def continuing(state: State, config: Dict) -> Dict:
+    print("----> continuing")
+
+    # TODO: reset quick replies
+
+    return {}
+
+
+def continue_after_law_confirmation(state: State) -> str:
+    print("----> continue_after_law_confirmation")
+
+    if state["law_url_approved"]:
+        return "continuing"
+
+    # Else: ask the law name again
+    return "ask_law"
 
 
 # Add nodes
 workflow.add_node("ask_law", ask_law)
 workflow.add_node("ask_law_confirmation", ask_law_confirmation)
 workflow.add_node("handle_law_confirmation", handle_law_confirmation)
+workflow.add_node("continuing", continuing)
 
 # Add edges
 workflow.set_entry_point("ask_law")
 workflow.add_edge("ask_law", "ask_law_confirmation")
 workflow.add_edge("ask_law_confirmation", "handle_law_confirmation")
+workflow.add_conditional_edges(
+    "handle_law_confirmation", continue_after_law_confirmation
+)
 
 
 # Initialize memory to persist state between graph runs

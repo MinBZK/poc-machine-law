@@ -9,6 +9,7 @@
 
   let messages: Message[] = [];
   let input = '';
+  let inputElement: HTMLInputElement;
 
   let quickReplies: string[] = [];
 
@@ -52,6 +53,8 @@
       ];
       input = '';
     }
+
+    inputElement.focus();
   }
 </script>
 
@@ -108,6 +111,7 @@
 
   <form class="mt-auto flex" on:submit|preventDefault={handleSubmit}>
     <input
+      bind:this={inputElement}
       bind:value={input}
       use:focusElement
       class="mr-2 block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-800 focus:border-blue-500 focus:ring-blue-500"
