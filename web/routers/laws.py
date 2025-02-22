@@ -28,7 +28,7 @@ def get_tile_template(service: str, law: str) -> str:
         return "partials/tiles/fallback_tile.html"
 
 
-async def evaluate_law(bsn: str, law: str, service: str, services: Services):
+async def evaluate_law(bsn: str, law: str, service: str, services: Services, approved: bool = True):
     """Evaluate a law for a given BSN"""
     # Get the rule specification
     rule_spec = services.resolver.get_rule_spec(law, TODAY, service)
@@ -47,7 +47,7 @@ async def evaluate_law(bsn: str, law: str, service: str, services: Services):
             services.set_source_dataframe(service_name, table_name, df)
 
     # Execute the law
-    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY, approved=True)
+    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY, approved=approved)
     return law, result, rule_spec
 
 
@@ -191,65 +191,19 @@ def node_to_dict(node):
     }
 
 
-@router.get("/explain-panel")
-async def explain_panel(
-    request: Request,
-    service: str,
-    law: str,
-    bsn: str,
-    services: Services = Depends(get_services),
-):
-    """Get an explanation panel"""
-    try:
-        law = unquote(law)
-        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
-        flat_path = flatten_path_nodes(result.path)
-        existing_case = services.case_manager.get_case(bsn, service, law)
-
-        claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
-        claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
-
-        return templates.TemplateResponse(
-            "partials/tiles/components/explanation_panel.html",
-            {
-                "request": request,
-                "service": service,
-                "law": law,
-                "rule_spec": rule_spec,
-                "input": result.input,
-                "result": result.output,
-                "requirements_met": result.requirements_met,
-                "path": flat_path,
-                "bsn": bsn,
-                "current_case": existing_case,
-                "claim_map": claim_map,
-            },
-        )
-    except Exception as e:
-        print(f"Error in explain_path: {e}")
-        return templates.TemplateResponse(
-            "partials/tiles/components/explanation_panel.html",
-            {
-                "request": request,
-                "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
-                "service": service,
-                "law": law,
-            },
-        )
-
-
 @router.get("/explanation")
 async def explanation(
     request: Request,
     service: str,
     law: str,
     bsn: str,
+    approved: bool = False,  # Add this parameter
     services: Services = Depends(get_services),
 ):
     """Get a citizen-friendly explanation of the rule evaluation path"""
     try:
         law = unquote(law)
-        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=approved)
 
         # Convert path and rule_spec to JSON strings
         path_dict = node_to_dict(result.path)
@@ -287,5 +241,53 @@ async def explanation(
             {
                 "request": request,
                 "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+            },
+        )
+
+
+@router.get("/application-panel")
+async def application_panel(
+    request: Request,
+    service: str,
+    law: str,
+    bsn: str,
+    approved: bool = False,
+    services: Services = Depends(get_services),
+):
+    """Get the application panel with tabs"""
+    try:
+        law = unquote(law)
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=approved)
+        flat_path = flatten_path_nodes(result.path)
+        existing_case = services.case_manager.get_case(bsn, service, law)
+
+        claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
+        claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+
+        return templates.TemplateResponse(
+            "partials/tiles/components/application_panel.html",
+            {
+                "request": request,
+                "service": service,
+                "law": law,
+                "rule_spec": rule_spec,
+                "input": result.input,
+                "result": result.output,
+                "requirements_met": result.requirements_met,
+                "path": flat_path,
+                "bsn": bsn,
+                "current_case": existing_case,
+                "claim_map": claim_map,
+            },
+        )
+    except Exception as e:
+        print(f"Error in application panel: {e}")
+        return templates.TemplateResponse(
+            "partials/tiles/components/application_panel.html",
+            {
+                "request": request,
+                "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
+                "service": service,
+                "law": law,
             },
         )
