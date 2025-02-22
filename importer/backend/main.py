@@ -36,6 +36,7 @@ retriever = TavilySearchAPIRetriever(
 class State(TypedDict):
     messages: Annotated[list, add_messages]
     law: str
+    should_retry: bool
     law_url: str
     law_url_approved: Optional[bool]  # Can be True, False, or None
 
@@ -60,18 +61,34 @@ def ask_law(state: State, config: Dict) -> Dict:
         manager.send_message(WebSocketMessage(content=msg), thread_id)
     )
 
-    return {"messages": []}  # Note: we reset the messages
+    resp = interrupt("ask_law")
+
+    return {"messages": [], "law": resp}  # Note: we reset the messages
+
+
+def check_law_input(state: State, config: Dict) -> Dict:
+    print("----> check_law_input")
+
+    if not state.get("law") or len(state["law"]) < 4:
+        thread_id = config["configurable"]["thread_id"]
+        asyncio.get_event_loop().create_task(
+            manager.send_message(
+                WebSocketMessage(
+                    content="De wetnaam moet minimaal 4 karakters bevatten."
+                ),
+                thread_id,
+            )
+        )
+        return {"should_retry": True}
+
+    return {"should_retry": False}
 
 
 def ask_law_confirmation(state: State, config: Dict) -> Dict:
     print("----> ask_law_confirmation")
 
-    resp = interrupt("ask_law_confirmation")
-
-    # TODO: ensure that the search query is at least 4 characters long, otherwise send an error message and ask again
-
     # Find the law URL
-    docs = retriever.invoke(resp)
+    docs = retriever.invoke(state["law"])
 
     pprint.pprint(docs)
     url = docs[0].metadata["source"]  # IMPROVE: handle the case where no docs are found
@@ -88,8 +105,7 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
         )
     )
 
-    state["messages"].append(HumanMessage(resp))
-    return {"messages": state["messages"], "law": resp}
+    return {"law_url": url}
 
 
 def handle_law_confirmation(state: State) -> Dict:
@@ -125,13 +141,18 @@ def continue_after_law_confirmation(state: State) -> str:
 
 # Add nodes
 workflow.add_node("ask_law", ask_law)
+workflow.add_node("check_law_input", check_law_input)
 workflow.add_node("ask_law_confirmation", ask_law_confirmation)
 workflow.add_node("handle_law_confirmation", handle_law_confirmation)
 workflow.add_node("continuing", continuing)
 
 # Add edges
 workflow.set_entry_point("ask_law")
-workflow.add_edge("ask_law", "ask_law_confirmation")
+workflow.add_edge("ask_law", "check_law_input")
+workflow.add_conditional_edges(
+    "check_law_input",
+    lambda state: "ask_law" if state["should_retry"] else "ask_law_confirmation",
+)
 workflow.add_edge("ask_law_confirmation", "handle_law_confirmation")
 workflow.add_conditional_edges(
     "handle_law_confirmation", continue_after_law_confirmation
@@ -144,9 +165,7 @@ checkpointer = MemorySaver()
 # Compile the graph
 graph = workflow.compile(
     checkpointer,
-    # interrupt_before=[
-    #     "retrieve_law_url", # IMPROVE: use interrupt_after instead?
-    # ],
+    # interrupt_after=["ask_law", "handle_law_confirmation"]
 )
 
 # Initialize a FastAPI web server

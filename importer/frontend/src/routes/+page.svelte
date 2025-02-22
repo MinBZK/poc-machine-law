@@ -1,5 +1,6 @@
 <script lang="ts">
   import { focusElement } from '$lib';
+  import { tick } from 'svelte';
 
   type Message = {
     content: string;
@@ -9,6 +10,7 @@
 
   let messages: Message[] = [];
   let input = '';
+  let messagesContainer: HTMLDivElement;
   let inputElement: HTMLInputElement;
 
   let quickReplies: string[] = [];
@@ -37,6 +39,10 @@
 
     // If the message contains quick replies, show them
     quickReplies = data.quick_replies || [];
+
+    tick().then(() => {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
   });
 
   // Submit handler
@@ -65,7 +71,10 @@
 <main class="fixed left-0 top-0 flex h-full w-full flex-col px-6 py-4">
   <h1 class="mb-2 text-2xl">⚡️ Machine law importer</h1>
 
-  <div class="mb-2 flex flex-grow flex-col overflow-y-auto rounded-md bg-gray-100 p-4">
+  <div
+    bind:this={messagesContainer}
+    class="mb-2 flex flex-grow flex-col overflow-y-auto scroll-smooth rounded-md bg-gray-100 p-4"
+  >
     {#each messages as message}
       <div class="message" class:own={message.isOwn}>{message.content}</div>
     {/each}
