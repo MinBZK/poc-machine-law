@@ -85,17 +85,44 @@
             show_approve=False, claimant="CITIZEN") }}
         </div>
 
-        <!-- Submit Form -->
-        <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
-              hx-target="closest div.law-result-card"
-              hx-swap="outerHTML"
-              class="mb-6">
-            <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
-            <button type="submit"
-                    class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
-                Bevestig aanvraag
-            </button>
-        </form>
+<!-- Submit Form -->
+        <div x-data="{ isChecked: false }" class="space-y-4">
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+                <div class="flex items-center">
+                    <input
+                        type="checkbox"
+                        id="declaration-checkbox"
+                        x-model="isChecked"
+                        class="mr-3 rounded text-blue-600 focus:ring-blue-500"
+                    >
+                    <label for="declaration-checkbox" class="font-medium">
+                        Ik verklaar dat mijn gegevens correct en volledig zijn
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 ml-7">
+                    Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.
+                </p>
+            </div>
+            <form
+                hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                hx-target="closest div.law-result-card"
+                hx-swap="outerHTML"
+                class="mb-6"
+            >
+                <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+                <button
+                    type="submit"
+                    :disabled="!isChecked"
+                    :class="{
+                        'bg-blue-600 hover:bg-blue-700': isChecked,
+                        'bg-gray-400 cursor-not-allowed': !isChecked
+                    }"
+                    class="w-full px-6 py-3 text-white text-center rounded-md transition-colors"
+                >
+                    Bevestig aanvraag
+                </button>
+            </form>
+        </div>
 
         <!-- Explanation Section -->
         <div class="border-t pt-4">
@@ -159,11 +186,13 @@
                  x-transition:leave-end="opacity-0 transform -translate-y-2"
                  class="mt-4 space-y-4">
                 <div class="space-y-2">
-                    <h5 class="font-medium text-gray-900 text-sm">Details</h5>
+
                     <div class="text-xs text-gray-500 space-y-1">
                         <div>Wet: {{ law }}</div>
                         <div>Service: {{ service }}</div>
-                        <div>Versie: {{ rule_spec.valid_from }}</div>
+                        <div>Geldig vanaf: {{ rule_spec.valid_from }}</div>
+                        <div>Versie: {{ rule_spec.uuid }}</div>
+
                     </div>
                 </div>
             </div>
