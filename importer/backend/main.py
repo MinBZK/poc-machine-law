@@ -27,6 +27,11 @@ import asyncio
 
 model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, max_retries=2)
 
+# Retriever to find the specified law online
+retriever = TavilySearchAPIRetriever(
+    k=1, include_domains=["wetten.overheid.nl"]
+)  # Limit to 1 result
+
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
@@ -54,43 +59,71 @@ def ask_law(state: State, config: Dict) -> Dict:
     asyncio.get_event_loop().create_task(
         manager.send_message(WebSocketMessage(content=msg), thread_id)
     )
-    return {"messages": [AIMessage(msg)]}  # Note: we reset the messages
+
+    return {"messages": []}  # Note: we reset the messages
 
 
-def ask_human(state: State, config: Dict) -> Dict:
-    print("----> ask_human")
+def ask_law_confirmation(state: State, config: Dict) -> Dict:
+    print("----> ask_law_confirmation")
+
+    resp = interrupt("ask_law_confirmation")
+
+    # TODO: ensure that the search query is at least 4 characters long, otherwise send an error message and ask again
+
+    # Find the law URL
+    docs = retriever.invoke(resp)
+
+    pprint.pprint(docs)
+    url = docs[0].metadata["source"]  # IMPROVE: handle the case where no docs are found
 
     thread_id = config["configurable"]["thread_id"]
 
     asyncio.get_event_loop().create_task(
         manager.send_message(
             WebSocketMessage(
-                content="Ben je het hiermee eens?", quick_replies=["Ja", "Nee"]
+                content=f"De URL is {url}\n\nIs dit de wet die je bedoelt?",
+                quick_replies=["Ja", "Nee"],
             ),
             thread_id,
         )
     )
 
-    resp = interrupt("ask_human")
-    print("----> resumed:", resp)
+    state["messages"].append(HumanMessage(resp))
+    return {"messages": state["messages"], "law": resp}
+
+
+def handle_law_confirmation(state: State, config: Dict) -> Dict:
+    print("----> handle_law_confirmation")
+
+    resp = interrupt("handle_law_confirmation")
+
+    # Parse the response
+    is_approved = False
+    if resp.lower() in ("ja", "j"):
+        is_approved = True
+
+    thread_id = config["configurable"]["thread_id"]
+
+    asyncio.get_event_loop().create_task(
+        manager.send_message(
+            WebSocketMessage(content=f"Goedgekeurd: {is_approved}"),
+            thread_id,
+        )
+    )
+
     state["messages"].append(HumanMessage(resp))
     return {"messages": state["messages"]}
 
 
-def retrieve_law_url(state: State) -> Dict:
-    print("----> retrieve_law_url")
-    pprint.pprint(state)
-
-
 # Add nodes
 workflow.add_node("ask_law", ask_law)
-workflow.add_node("ask_human", ask_human)
-workflow.add_node("retrieve_law_url", retrieve_law_url)
+workflow.add_node("ask_law_confirmation", ask_law_confirmation)
+workflow.add_node("handle_law_confirmation", handle_law_confirmation)
 
 # Add edges
 workflow.set_entry_point("ask_law")
-workflow.add_edge("ask_law", "ask_human")
-workflow.add_edge("ask_human", "retrieve_law_url")
+workflow.add_edge("ask_law", "ask_law_confirmation")
+workflow.add_edge("ask_law_confirmation", "handle_law_confirmation")
 
 
 # Initialize memory to persist state between graph runs
@@ -136,7 +169,8 @@ class ConnectionManager:
             await websocket.send_text(message)
 
     async def send_message(self, message: WebSocketMessage, thread_id: uuid.UUID):
-        await self.active_connections[thread_id].send_text(json.dumps(message))
+        if thread_id in self.active_connections:
+            await self.active_connections[thread_id].send_text(json.dumps(message))
 
 
 manager = ConnectionManager()
@@ -161,12 +195,13 @@ async def websocket_endpoint(websocket: WebSocket):
             ):
                 # In case of an AI message, send it back to the client
                 # pprint.pprint(event["messages"])
-                msg = event["messages"][-1]
-                if isinstance(msg, AIMessage):
-                    await manager.send_message(
-                        WebSocketMessage(content=msg.content),
-                        thread_id,
-                    )
+                if event["messages"]:
+                    msg = event["messages"][-1]
+                    if isinstance(msg, AIMessage):
+                        await manager.send_message(
+                            WebSocketMessage(content=msg.content),
+                            thread_id,
+                        )
 
     except WebSocketDisconnect:
         manager.disconnect(thread_id)
