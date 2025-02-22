@@ -23,6 +23,7 @@ class ClaimProcessor(ProcessApplication):
     def policy(self, domain_event, process_event) -> None:
         """Sync policy that processes events"""
 
+    @policy.register(Claim.Created)
     @policy.register(Claim.Approved)
     async def handle_claim_approved(self, domain_event, process_event) -> None:
         """

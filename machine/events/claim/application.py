@@ -19,6 +19,7 @@ class ClaimManager(Application):
         self._service_index: dict[str, list[str]] = {}  # service -> [claim_ids]
         self._case_index: dict[str, list[str]] = {}  # case_id -> [claim_ids]
         self._claimant_index: dict[str, list[str]] = {}  # claimant -> [claim_ids]
+        self._bsn_index: dict[str, list[str]] = {}  # claimant -> [claim_ids]
         self._status_index: dict[ClaimStatus, list[str]] = {status: [] for status in ClaimStatus}
         self._bsn_service_law_index: dict[tuple[str, str, str], dict[str, str]] = {}  # (service, key) -> claim_id
 
@@ -41,6 +42,11 @@ class ClaimManager(Application):
         if claim.claimant not in self._claimant_index:
             self._claimant_index[claim.claimant] = []
         self._claimant_index[claim.claimant].append(claim_id)
+
+        # BSN index
+        if claim.bsn not in self._bsn_index:
+            self._bsn_index[claim.bsn] = []
+        self._bsn_index[claim.bsn].append(claim_id)
 
         # Status index
         self._status_index[claim.status].append(claim_id)
@@ -127,27 +133,48 @@ class ClaimManager(Application):
         """Get claim by ID"""
         return self.repository.get(UUID(claim_id))
 
-    def get_claims_by_service(self, service: str) -> list[Claim]:
-        """Get all claims for a service"""
-        return [self.get_claim(claim_id) for claim_id in self._service_index.get(service, [])]
-
-    def get_claims_by_case(self, case_id: str) -> list[Claim]:
-        """Get all claims for a case"""
-        return [self.get_claim(claim_id) for claim_id in self._case_index.get(case_id, [])]
-
-    def get_claims_by_claimant(self, claimant: str) -> list[Claim]:
-        """Get all claims made by a claimant"""
-        return [self.get_claim(claim_id) for claim_id in self._claimant_index.get(claimant, [])]
-
-    def get_claims_by_status(self, status: ClaimStatus) -> list[Claim]:
-        """Get all claims with a specific status"""
-        return [self.get_claim(claim_id) for claim_id in self._status_index.get(status, [])]
-
-    def get_claim_by_bsn_service_law(self, bsn: str, service: str, law: str) -> dict[str:Claim] | None:
+    @staticmethod
+    def _filter_claims_by_approved(claims: list[Claim], approved: bool) -> list[Claim]:
         """
-        Get a dictionary with claims
+        Helper method to filter claims based on approved parameter.
+
+        Args:
+            claims: List of claims to filter
+            approved: If True, only return approved claims. If False, return approved and submitted claims.
         """
+        if approved:
+            return [claim for claim in claims if claim.status == ClaimStatus.APPROVED]
+        return [claim for claim in claims if claim.status in (ClaimStatus.APPROVED, ClaimStatus.PENDING)]
+
+    def get_claims_by_service(self, service: str, approved: bool = False) -> list[Claim]:
+        """Get all claims for a service, filtered by status"""
+        claims = [self.get_claim(claim_id) for claim_id in self._service_index.get(service, [])]
+        return self._filter_claims_by_approved(claims, approved)
+
+    def get_claims_by_case(self, case_id: str, approved: bool = False) -> list[Claim]:
+        """Get all claims for a case, filtered by status"""
+        claims = [self.get_claim(claim_id) for claim_id in self._case_index.get(case_id, [])]
+        return self._filter_claims_by_approved(claims, approved)
+
+    def get_claims_by_claimant(self, claimant: str, approved: bool = False) -> list[Claim]:
+        """Get all claims made by a claimant, filtered by status"""
+        claims = [self.get_claim(claim_id) for claim_id in self._claimant_index.get(claimant, [])]
+        return self._filter_claims_by_approved(claims, approved)
+
+    def get_claims_by_bsn(self, bsn: str, approved: bool = False) -> list[Claim]:
+        """Get all claims for a BSN, filtered by status"""
+        claims = [self.get_claim(claim_id) for claim_id in self._bsn_index.get(bsn, [])]
+        return self._filter_claims_by_approved(claims, approved)
+
+    def get_claim_by_bsn_service_law(
+        self, bsn: str, service: str, law: str, approved: bool = False
+    ) -> dict[str:Claim] | None:
+        """Get a dictionary with claims filtered by status"""
         key_index = self._bsn_service_law_index.get((bsn, service, law))
-        if key_index:
-            return {key: self.get_claim(claim_id) for key, claim_id in key_index.items()}
-        return None
+        if not key_index:
+            return None
+        claims = {key: self.get_claim(claim_id) for key, claim_id in key_index.items()}
+        filtered_claims = {
+            key: claim for key, claim in claims.items() if claim in self._filter_claims_by_approved([claim], approved)
+        }
+        return filtered_claims if filtered_claims else None

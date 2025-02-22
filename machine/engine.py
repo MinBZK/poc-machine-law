@@ -168,6 +168,7 @@ class RulesEngine:
         sources: dict[str, pd.DataFrame] | None = None,
         calculation_date=None,
         requested_output: str | None = None,
+        approved: bool = False,
     ) -> dict[str, Any]:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}

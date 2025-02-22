@@ -60,8 +60,6 @@ class Claim(Aggregate):
     @event("Approved")
     def approve(self, verified_by: str, verified_value: Any) -> None:
         """Approve the claim with potentially adjusted value"""
-        if self.status != ClaimStatus.PENDING:
-            raise ValueError("Can only approve pending claims")
         self.status = ClaimStatus.APPROVED
         self.verified_by = verified_by
         self.verified_value = verified_value
@@ -70,8 +68,6 @@ class Claim(Aggregate):
     @event("Rejected")
     def reject(self, rejected_by: str, rejection_reason: str) -> None:
         """Reject the claim with a reason"""
-        if self.status != ClaimStatus.PENDING:
-            raise ValueError("Can only reject pending claims")
         self.status = ClaimStatus.REJECTED
         self.rejected_by = rejected_by
         self.rejection_reason = rejection_reason

@@ -205,7 +205,7 @@
             <!-- Parameters -->
             <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
             <h2 class="text-lg font-semibold mb-6">Gebruikte gegevens</h2>
-            {{ render_path(path, case.id|string, case.service, case.law, case.bsn) }}
+            {{ render_path(path, case.id|string, case.service, case.law, case.bsn, claim_map) }}
             </div>
 
             <!-- Gebeurtenissen -->

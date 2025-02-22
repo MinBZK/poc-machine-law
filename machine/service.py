@@ -80,6 +80,7 @@ class RuleService:
         parameters: dict[str, Any],
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
+        approved: bool = False,
     ) -> RuleResult:
         """
         Evaluate rules for given law and reference date
@@ -101,6 +102,7 @@ class RuleService:
             sources=self.source_dataframes,
             calculation_date=reference_date,
             requested_output=requested_output,
+            approved=approved,
         )
         return RuleResult.from_engine_result(result, engine.spec.get("uuid"))
 
@@ -179,6 +181,7 @@ class Services:
         reference_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
+        approved: bool = False,
     ) -> RuleResult:
         reference_date = reference_date or self.root_reference_date
         with logger.indent_block(
@@ -191,6 +194,7 @@ class Services:
                 parameters=parameters,
                 overwrite_input=overwrite_input,
                 requested_output=requested_output,
+                approved=approved,
             )
 
     async def apply_rules(self, event) -> None:

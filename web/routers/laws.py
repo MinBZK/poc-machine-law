@@ -47,7 +47,7 @@ async def evaluate_law(bsn: str, law: str, service: str, services: Services):
             services.set_source_dataframe(service_name, table_name, df)
 
     # Execute the law
-    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY)
+    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY, approved=True)
     return law, result, rule_spec
 
 

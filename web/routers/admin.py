@@ -173,4 +173,8 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
     case.events = services.case_manager.get_events(case.id)
     law, result, rule_spec = await evaluate_law(case.bsn, case.law, case.service, services)
     flat_path = flatten_path_nodes(result.path)
-    return templates.TemplateResponse("admin/case_detail.html", {"request": request, "case": case, "path": flat_path})
+    claims = services.claim_manager.get_claims_by_bsn(case.bsn, approved=True)
+    claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+    return templates.TemplateResponse(
+        "admin/case_detail.html", {"request": request, "case": case, "path": flat_path, "claim_map": claim_map}
+    )

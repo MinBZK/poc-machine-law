@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse
 
 from machine.service import Services
@@ -99,3 +99,40 @@ async def update_value(
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed"
     return response
+
+
+@router.post("/drop-claim", response_class=HTMLResponse)
+async def drop_claim(
+    request: Request,
+    claim_id: str = Form(...),
+    reason: str = Form(...),
+    services: Services = Depends(get_services),
+):
+    """Handle dropping a claim by rejecting it"""
+    try:
+        services.claim_manager.reject_claim(
+            claim_id=claim_id,
+            rejected_by="USER",  # You might want to get this from auth
+            rejection_reason=f"Claim dropped: {reason}",
+        )
+
+        response = templates.TemplateResponse("partials/claim_dropped.html", {"request": request})
+        response.headers["HX-Trigger"] = "edit-dialog-closed"
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/drop-claim-form", response_class=HTMLResponse)
+async def get_drop_claim_form(
+    request: Request,
+    claim_id: str,
+):
+    """Return the drop claim form HTML"""
+    return templates.TemplateResponse(
+        "partials/drop_claim_form.html",
+        {
+            "request": request,
+            "claim_id": claim_id,
+        },
+    )

@@ -1,9 +1,9 @@
-{% macro render_value(key, value, case_id, service, law, bsn) %}
+{% macro render_value(key, value, case_id, service, law, bsn, claim_map) %}
 {% if value is none or value is undefined %}
 <span class="text-gray-400">-</span>
 {% else %}
 <button
-        class="text-blue-600 hover:text-blue-800 cursor-pointer"
+        class="group inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 cursor-pointer rounded px-1 hover:bg-blue-50"
         hx-get="/edit/edit-form"
         hx-target="#edit-form-container"
         hx-vals='{
@@ -33,18 +33,35 @@
     {% else %}
     {{ display_value }}
     {% endif %}
+    <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24"
+         stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+    </svg>
 </button>
+{% if (service, law, key) in claim_map %}
+<button
+        class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+        hx-get="/edit/drop-claim-form"
+        hx-target="#edit-form-container"
+        hx-vals='{
+            "claim_id": "{{ claim_map[(service, law, key)].id }}"
+        }'
+>
+    Verwijder wijziging
+</button>
+{% endif %}
 {% endif %}
 {% endmacro %}
 
-{% macro render_node(key, node, case_id, service, law, bsn) %}
+{% macro render_node(key, node, case_id, service, law, bsn, claim_map) %}
 {% if node is mapping and ('service' in node or 'children' in node) %}
 <div x-data="{ open: false }" class="text-sm leading-5">
     <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
          @click="open = !open">
         <div class="text-sm leading-5 py-0.5">
             <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
-            <span class="ml-2">{% if node.result is defined %}{{ render_value(key, node.result, case_id, service, law, bsn) }}{% else %}{{ render_value(key, node, case_id, service, law, bsn) }}{% endif %}</span>
+            <span class="ml-2">{% if node.result is defined %}{{ render_value(key, node.result, case_id, service, law, bsn, claim_map) }}{% else %}{{ render_value(key, node, case_id, service, law, bsn, claim_map) }}{% endif %}</span>
         </div>
         <div class="min-w-0 flex items-center">
             <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
@@ -67,7 +84,7 @@
     <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
         {% if node.children %}
         {% for child_key, child_node in node.children|dictsort %}
-        {{ render_node(child_key, child_node, case_id, node.service, law, bsn) }}
+        {{ render_node(child_key, child_node, case_id, node.service, law, bsn, claim_map) }}
         {% endfor %}
         {% endif %}
     </div>
@@ -75,12 +92,12 @@
 {% else %}
 <div class="text-sm leading-5 py-0.5">
     <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
-    <span class="ml-2">{{ render_value(key, node.result, case_id, service, law, bsn) }}</span>
+    <span class="ml-2">{{ render_value(key, node.result, case_id, service, law, bsn, claim_map) }}</span>
 </div>
 {% endif %}
 {% endmacro %}
 
-{% macro render_path(path, case_id, service, law, bsn) %}
+{% macro render_path(path, case_id, service, law, bsn, claim_map) %}
 <!-- Alpine.js store for managing dialog state -->
 <script>
     document.addEventListener('alpine:init', () => {
@@ -124,7 +141,7 @@
 
 <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
     {% for key, node in path|dictsort %}
-    {{ render_node(key, node, case_id, service, law, bsn) }}
+    {{ render_node(key, node, case_id, service, law, bsn, claim_map) }}
     {% endfor %}
 </div>
 
