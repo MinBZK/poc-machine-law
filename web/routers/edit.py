@@ -18,7 +18,7 @@ async def get_edit_form(
     value: str,
     law: str,
     bsn: str,
-    show_auto_approve: bool = False,
+    show_approve: bool = False,
     services: Services = Depends(get_services),
 ):
     """Return the edit form HTML"""
@@ -56,7 +56,7 @@ async def get_edit_form(
             "value": parsed_value,
             "law": law,
             "bsn": bsn,
-            "show_auto_approve": show_auto_approve,
+            "show_approve": show_approve,
             "claim_data": claim_data,
         },
     )

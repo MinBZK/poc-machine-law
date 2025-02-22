@@ -75,7 +75,7 @@
 
         <h4 class="font-medium text-gray-900">Gebruikte gegevens</h4>
         <div class="max-w-7xl mx-auto">
-            {{ render_path(path, current_case.id|string, service, law, bsn) }}
+            {{ render_path(path, current_case.id|string, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") }}
         </div>
 
         <!-- Collapsible Technical Section -->

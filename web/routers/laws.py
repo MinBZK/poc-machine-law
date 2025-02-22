@@ -206,6 +206,9 @@ async def explain_panel(
         flat_path = flatten_path_nodes(result.path)
         existing_case = services.case_manager.get_case(bsn, service, law)
 
+        claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
+        claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+
         return templates.TemplateResponse(
             "partials/tiles/components/explanation_panel.html",
             {
@@ -219,6 +222,7 @@ async def explain_panel(
                 "path": flat_path,
                 "bsn": bsn,
                 "current_case": existing_case,
+                "claim_map": claim_map,
             },
         )
     except Exception as e:

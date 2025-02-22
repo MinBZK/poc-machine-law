@@ -55,7 +55,7 @@
                     <span x-text="{
                         'PENDING': '(in behandeling)',
                         'APPROVED': '(goedgekeurd)',
-                        'REJECTED': '(afgewezen)'
+                        'REJECTED': '(ingetrokken)'
                     }[status]"></span>.<br />
                     <span>Met dit formulier wijzigt u de bestaande claim en wordt deze opnieuw in behandeling genomen.</span>
                 </p>
@@ -168,7 +168,7 @@
                     <p class="mt-2 text-sm text-gray-500">Upload hier eventueel bewijsmateriaal voor de wijziging</p>
                 </div>
 
-                {% if show_auto_approve %}
+                {% if show_approve %}
                 <div class="border-t pt-4">
                     <label class="inline-flex items-center">
                         <input type="checkbox" id="auto_approve" name="auto_approve"
