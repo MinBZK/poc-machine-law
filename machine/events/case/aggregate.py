@@ -11,7 +11,7 @@ class CaseStatus(str, Enum):
     OBJECTED = "OBJECTED"
 
 
-class ClaimStatusTranscoding(Transcoding):
+class CaseStatusTranscoding(Transcoding):
     @staticmethod
     def can_handle(obj: object) -> bool:
         return isinstance(obj, CaseStatus | str)
@@ -29,7 +29,7 @@ class ClaimStatusTranscoding(Transcoding):
         return data  # Keep it as a string
 
 
-Transcoding.register(ClaimStatusTranscoding)
+Transcoding.register(CaseStatusTranscoding)
 
 
 class Case(Aggregate):
@@ -43,6 +43,7 @@ class Case(Aggregate):
         claimed_result: dict,
         rulespec_uuid: str,
     ) -> None:
+        self.claim_ids = None
         self.bsn = bsn
         self.service = service_type
         self.law = law
@@ -190,3 +191,26 @@ class Case(Aggregate):
         if not hasattr(self, "appeal_status") or self.appeal_status is None:
             return False
         return bool(self.appeal_status.get("possible", False))
+
+    @event("ClaimCreated")
+    def add_claim(self, claim_id: str) -> None:
+        """Record when a new claim is created for this case"""
+        if not hasattr(self, "claim_ids") or self.claim_ids is None:
+            self.claim_ids = set()
+        self.claim_ids.add(claim_id)
+
+    @event("ClaimApproved")
+    def approve_claim(self, claim_id: str) -> None:
+        """Record when a claim is approved"""
+        if not hasattr(self, "claim_ids") or self.claim_ids is None:
+            self.claim_ids = set()
+        if claim_id not in self.claim_ids:
+            self.claim_ids.add(claim_id)
+
+    @event("ClaimRejected")
+    def reject_claim(self, claim_id: str) -> None:
+        """Record when a claim is rejected"""
+        if not hasattr(self, "claim_ids") or self.claim_ids is None:
+            self.claim_ids = set()
+        if claim_id not in self.claim_ids:
+            self.claim_ids.add(claim_id)

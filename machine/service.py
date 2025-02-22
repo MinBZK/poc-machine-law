@@ -163,6 +163,8 @@ class Services:
         self.case_manager = self.runner.get(WrappedCaseManager)
         self.claim_manager = self.runner.get(WrappedClaimManager)
 
+        self.claim_manager._case_manager = self.case_manager
+
     def __exit__(self):
         self.runner.stop()
 

@@ -57,6 +57,41 @@ class Claim(Aggregate):
         self.status = ClaimStatus.PENDING
         self.created_at = datetime.now()
 
+    @event("Reset")
+    def reset(
+        self,
+        service: str,
+        key: str,
+        new_value: Any,
+        reason: str,
+        claimant: str,
+        law: str,
+        bsn: str,
+        case_id: str | None = None,
+        old_value: Any | None = None,
+        evidence_path: str | None = None,
+    ) -> None:
+        self.service = service
+        self.key = key
+        self.old_value = old_value
+        self.new_value = new_value
+        self.reason = reason
+        self.evidence_path = evidence_path
+        self.claimant = claimant
+        self.case_id = case_id
+        self.law = law
+        self.bsn = bsn
+        self.status = ClaimStatus.PENDING
+        self.created_at = datetime.now()
+
+    @event("AutoApproved")
+    def auto_approve(self, verified_by: str, verified_value: Any) -> None:
+        """Approve the claim with potentially adjusted value"""
+        self.status = ClaimStatus.APPROVED
+        self.verified_by = verified_by
+        self.verified_value = verified_value
+        self.verified_at = datetime.now()
+
     @event("Approved")
     def approve(self, verified_by: str, verified_value: Any) -> None:
         """Approve the claim with potentially adjusted value"""

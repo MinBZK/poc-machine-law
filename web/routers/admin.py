@@ -173,8 +173,33 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
     case.events = services.case_manager.get_events(case.id)
     law, result, rule_spec = await evaluate_law(case.bsn, case.law, case.service, services)
     flat_path = flatten_path_nodes(result.path)
-    claims = services.claim_manager.get_claims_by_bsn(case.bsn, approved=True)
+    claims = services.claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
+    claim_ids = {claim.id: claim for claim in claims}
     claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
     return templates.TemplateResponse(
-        "admin/case_detail.html", {"request": request, "case": case, "path": flat_path, "claim_map": claim_map}
+        "admin/case_detail.html",
+        {
+            "request": request,
+            "case": case,
+            "path": flat_path,
+            "claim_map": claim_map,
+            "claim_ids": claim_ids,
+        },
+    )
+
+
+@router.get("/claims/{claim_id}")
+async def view_claim(request: Request, claim_id: str, services: Services = Depends(get_services)):
+    """View details of a specific claim"""
+    claim = services.claim_manager.get_claim(claim_id)
+    if not claim:
+        raise HTTPException(status_code=404, detail="Claim not found")
+
+    # Get related case if it exists
+    related_case = None
+    if claim.case_id:
+        related_case = services.case_manager.get_case_by_id(claim.case_id)
+
+    return templates.TemplateResponse(
+        "admin/claim_detail.html", {"request": request, "claim": claim, "related_case": related_case}
     )

@@ -1,4 +1,4 @@
-{% macro render_value(key, value, case_id, service, law, bsn, claim_map) %}
+{% macro render_value(key, value, case_id, service, law, bsn, claim_map, show_auto_approve, claimant) %}
 {% if value is none or value is undefined %}
 <span class="text-gray-400">-</span>
 {% else %}
@@ -12,7 +12,9 @@
         "key": "{{ key }}",
         "value": {{ value|tojson }},
         "law": "{{ law }}",
-        "bsn": "{{ bsn }}"
+        "bsn": "{{ bsn }}",
+        "show_auto_approve": {{ show_auto_approve|default(false)|tojson }},
+        "claimant": "{{ claimant }}"
     }'
         type="button">
     {% if value is mapping and value.result is defined %}
@@ -39,29 +41,78 @@
               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
     </svg>
 </button>
+
+
 {% if (service, law, key) in claim_map %}
-<button
-        class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-        hx-get="/edit/drop-claim-form"
-        hx-target="#edit-form-container"
-        hx-vals='{
-            "claim_id": "{{ claim_map[(service, law, key)].id }}"
-        }'
->
-    Verwijder wijziging
-</button>
+{% set claim = claim_map[(service, law, key)] %}
+<span class="text-gray-500 text-xs">→</span>
+<span class="text-gray-800 text-xs">{{ claim.new_value }}</span>
+{% if claim.status == "PENDING" %}
+<div class="ml-2 inline-flex items-center gap-1">
+    <div class="inline-flex gap-1 ml-2">
+        <button
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200"
+                hx-post="/edit/approve-claim"
+                hx-target="#edit-form-container"
+                hx-vals='{
+                    "claim_id": "{{ claim.id }}"
+                }'
+        >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Goedkeuren
+        </button>
+        <button
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200"
+                hx-get="/edit/reject-claim-form"
+                hx-target="#edit-form-container"
+                hx-vals='{
+                    "claim_id": "{{ claim.id }}"
+                }'
+        >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Afwijzen
+        </button>
+    </div>
+</div>
+{% elif claim.status == "APPROVED" %}
+<div class="ml-2 inline-flex gap-1">
+    <button
+            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
+                hx-get="/edit/reject-claim-form"
+            hx-target="#edit-form-container"
+            hx-vals='{
+                "claim_id": "{{ claim.id }}"
+            }'
+    >
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+            Afwijzen
+    </button>
+</div>
+{% elif claim.status == "REJECTED" %}
+<div class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+    <span>Afgewezen</span>
+</div>
 {% endif %}
+{% endif %}
+
+
 {% endif %}
 {% endmacro %}
 
-{% macro render_node(key, node, case_id, service, law, bsn, claim_map) %}
+{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_auto_approve, claimant) %}
 {% if node is mapping and ('service' in node or 'children' in node) %}
 <div x-data="{ open: false }" class="text-sm leading-5">
     <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
          @click="open = !open">
         <div class="text-sm leading-5 py-0.5">
             <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
-            <span class="ml-2">{% if node.result is defined %}{{ render_value(key, node.result, case_id, service, law, bsn, claim_map) }}{% else %}{{ render_value(key, node, case_id, service, law, bsn, claim_map) }}{% endif %}</span>
+            <span class="ml-2">{% if node.result is defined %}{{ render_value(key, node.result, case_id, service, law, bsn, claim_map, show_auto_approve, claimant) }}{% else %}{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_auto_approve, claimant) }}{% endif %}</span>
         </div>
         <div class="min-w-0 flex items-center">
             <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
@@ -84,7 +135,7 @@
     <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
         {% if node.children %}
         {% for child_key, child_node in node.children|dictsort %}
-        {{ render_node(child_key, child_node, case_id, node.service, law, bsn, claim_map) }}
+        {{ render_node(child_key, child_node, case_id, node.service, law, bsn, claim_map, show_auto_approve, claimant) }}
         {% endfor %}
         {% endif %}
     </div>
@@ -92,12 +143,12 @@
 {% else %}
 <div class="text-sm leading-5 py-0.5">
     <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
-    <span class="ml-2">{{ render_value(key, node.result, case_id, service, law, bsn, claim_map) }}</span>
+    <span class="ml-2">{{ render_value(key, node.result, case_id, service, law, bsn, claim_map, show_auto_approve, claimant) }}</span>
 </div>
 {% endif %}
 {% endmacro %}
 
-{% macro render_path(path, case_id, service, law, bsn, claim_map) %}
+{% macro render_path(path, case_id, service, law, bsn, claim_map, show_auto_approve=False, claimant="CITIZEN") %}
 <!-- Alpine.js store for managing dialog state -->
 <script>
     document.addEventListener('alpine:init', () => {
@@ -141,7 +192,7 @@
 
 <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
     {% for key, node in path|dictsort %}
-    {{ render_node(key, node, case_id, service, law, bsn, claim_map) }}
+    {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_auto_approve, claimant) }}
     {% endfor %}
 </div>
 
