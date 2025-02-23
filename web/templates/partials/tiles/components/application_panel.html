@@ -109,7 +109,7 @@
                     </p>
                 </div>
                 <form
-                        hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
+                        hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
                         hx-target="closest div.law-result-card"
                         hx-swap="outerHTML"
                         class="mb-6"

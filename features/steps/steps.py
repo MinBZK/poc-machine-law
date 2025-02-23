@@ -244,6 +244,7 @@ def step_impl(context):
             law=context.law,
             parameters=context.result.input,
             claimed_result=context.result.output,
+            approved_claims_only=True
         )
     )
 

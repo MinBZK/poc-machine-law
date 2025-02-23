@@ -62,7 +62,7 @@ async def execute_law(
     """Execute a law and render its result"""
     try:
         law = unquote(law)
-        law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+        law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=False)
     except Exception:
         return templates.TemplateResponse(
             get_tile_template(service, law),
@@ -104,20 +104,21 @@ async def submit_case(
     service: str,
     law: str,
     bsn: str,
+    approved: bool = False,
     services: Services = Depends(get_services),
 ):
     """Submit a new case"""
     law = unquote(law)
 
-    law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+    law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=approved)
 
-    # Submit the case with citizen's claimed result (from execution)
     case_id = await services.case_manager.submit_case(
         bsn=bsn,
         service_type=service,
         law=law,
         parameters=result.input,
-        claimed_result=result.output,  # The citizen claims the calculated result
+        claimed_result=result.output,
+        approved_claims_only=approved,
     )
     case = services.case_manager.get_case_by_id(case_id)
 
