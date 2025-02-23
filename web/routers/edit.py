@@ -149,14 +149,14 @@ async def reject_claim(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/reject-claim-form", response_class=HTMLResponse)
+@router.get("/reject_claim_form", response_class=HTMLResponse)
 async def get_reject_claim_form(
     request: Request,
     claim_id: str,
 ):
     """Return the drop claim form HTML"""
     return templates.TemplateResponse(
-        "partials/reject-claim-form.html",
+        "partials/reject_claim_form.html",
         {
             "request": request,
             "claim_id": claim_id,

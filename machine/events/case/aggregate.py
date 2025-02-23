@@ -41,7 +41,9 @@ class Case(Aggregate):
         law: str,
         parameters: dict,
         claimed_result: dict,
+        verified_result: dict,
         rulespec_uuid: str,
+        approved_claims_only: bool,
     ) -> None:
         self.claim_ids = None
         self.bsn = bsn
@@ -49,8 +51,9 @@ class Case(Aggregate):
         self.law = law
         self.rulespec_uuid = rulespec_uuid
 
+        self.approved_claims_only = approved_claims_only
         self.claimed_result = claimed_result
-        self.verified_result = None
+        self.verified_result = verified_result
         self.parameters = parameters
         self.disputed_parameters = None
         self.evidence = None
@@ -60,6 +63,26 @@ class Case(Aggregate):
 
         self.approved = None
         self.status = CaseStatus.SUBMITTED
+
+    @event("Reset")
+    def reset(
+        self,
+        parameters: dict,
+        claimed_result: dict,
+        verified_result: dict,
+        approved_claims_only: bool,
+    ) -> None:
+        """Reset a case with new parameters and results"""
+        self.approved_claims_only = approved_claims_only
+        self.claimed_result = claimed_result
+        self.verified_result = verified_result
+        self.parameters = parameters
+        self.disputed_parameters = None
+        self.evidence = None
+        self.reason = None
+        self.verifier_id = None
+        self.status = CaseStatus.SUBMITTED
+        self.approved = None
 
     @event("AutomaticallyDecided")
     def decide_automatically(self, verified_result: dict, parameters: dict, approved: bool) -> None:

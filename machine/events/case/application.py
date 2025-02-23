@@ -38,6 +38,10 @@ class CaseManager(Application):
         For numeric values, uses a 1% tolerance.
         For other values, requires exact match.
         """
+        # First check that both dictionaries have the same keys
+        if set(claimed_result.keys()) != set(verified_result.keys()):
+            return False
+
         for key in verified_result:
             if key not in claimed_result:
                 return False
@@ -62,26 +66,39 @@ class CaseManager(Application):
         law: str,
         parameters: dict,
         claimed_result: dict,
+        approved_claims_only: bool,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
         A case starts with the citizen's claimed result which is then verified.
         """
 
-        result = await self.rules_engine.evaluate(service_type, law, parameters)
-
-        # Create new case with citizen's claimed result
-        case = Case(
-            bsn=bsn,
-            service_type=service_type,
-            law=law,
-            parameters=parameters,
-            claimed_result=claimed_result,
-            rulespec_uuid=result.rulespec_uuid,
-        )
+        result = await self.rules_engine.evaluate(service_type, law, parameters, approved=True)
 
         # Verify using rules engine
         verified_result = result.output
+
+        case = self.get_case(bsn, service_type, law)
+        if case is None:
+            # Create new case with citizen's claimed result
+            case = Case(
+                bsn=bsn,
+                service_type=service_type,
+                law=law,
+                parameters=parameters,
+                claimed_result=claimed_result,
+                verified_result=verified_result,
+                rulespec_uuid=result.rulespec_uuid,
+                approved_claims_only=approved_claims_only,
+            )
+        else:
+            # Reset existing case with new parameters and results
+            case.reset(
+                parameters=parameters,
+                claimed_result=claimed_result,
+                verified_result=verified_result,
+                approved_claims_only=approved_claims_only,
+            )
 
         # Check if results match and if manual review is needed
         results_match = self._results_match(claimed_result, verified_result)
