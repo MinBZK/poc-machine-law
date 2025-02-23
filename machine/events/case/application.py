@@ -23,7 +23,8 @@ class CaseManager(Application):
         self._case_index: dict[tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
         # self.follow()
 
-    def _index_key(self, bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
+    @staticmethod
+    def _index_key(bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
         """Generate index key for the combination of bsn, service and law"""
         return (bsn, service_type, law)
 
@@ -32,10 +33,11 @@ class CaseManager(Application):
         key = self._index_key(case.bsn, case.service, case.law)
         self._case_index[key] = str(case.id)
 
-    def _results_match(self, claimed_result: dict, verified_result: dict) -> bool:
+    @staticmethod
+    def _results_match(claimed_result: dict, verified_result: dict) -> bool:
         """
         Compare claimed and verified results to determine if they match.
-        For numeric values, uses a 1% tolerance.
+        For numeric values, uses a 1% tolerance, with special handling for zero values.
         For other values, requires exact match.
         """
         # First check that both dictionaries have the same keys
@@ -48,11 +50,17 @@ class CaseManager(Application):
 
             # For numeric values, compare with tolerance
             if isinstance(verified_result[key], int | float):
-                if isinstance(claimed_result[key], int | float):
-                    if abs(verified_result[key] - claimed_result[key]) / verified_result[key] > Decimal("0.01"):
+                if not isinstance(claimed_result[key], int | float):
+                    return False
+
+                # Handle zero values specially
+                if verified_result[key] == 0:
+                    if claimed_result[key] != 0:
                         return False
                 else:
-                    return False
+                    # Use relative difference for non-zero values
+                    if abs(verified_result[key] - claimed_result[key]) / abs(verified_result[key]) > Decimal("0.01"):
+                        return False
             # For other values, require exact match
             elif verified_result[key] != claimed_result[key]:
                 return False
@@ -79,6 +87,8 @@ class CaseManager(Application):
         verified_result = result.output
 
         case = self.get_case(bsn, service_type, law)
+
+        needs_manual_review = True
         if case is None:
             # Create new case with citizen's claimed result
             case = Case(
@@ -91,6 +101,7 @@ class CaseManager(Application):
                 rulespec_uuid=result.rulespec_uuid,
                 approved_claims_only=approved_claims_only,
             )
+            needs_manual_review = random.random() < self.SAMPLE_RATE
         else:
             # Reset existing case with new parameters and results
             case.reset(
@@ -102,7 +113,6 @@ class CaseManager(Application):
 
         # Check if results match and if manual review is needed
         results_match = self._results_match(claimed_result, verified_result)
-        needs_manual_review = random.random() < self.SAMPLE_RATE
 
         if results_match and not needs_manual_review:
             # Automatic approval

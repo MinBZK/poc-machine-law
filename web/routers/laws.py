@@ -46,9 +46,11 @@ async def evaluate_law(bsn: str, law: str, service: str, services: Services, app
             df = pd.DataFrame(data)
             services.set_source_dataframe(service_name, table_name, df)
 
+    parameters = {"BSN": bsn}
+
     # Execute the law
-    result = await services.evaluate(service, law=law, parameters={"BSN": bsn}, reference_date=TODAY, approved=approved)
-    return law, result, rule_spec
+    result = await services.evaluate(service, law=law, parameters=parameters, reference_date=TODAY, approved=approved)
+    return law, result, rule_spec, parameters
 
 
 @router.get("/execute")
@@ -62,7 +64,7 @@ async def execute_law(
     """Execute a law and render its result"""
     try:
         law = unquote(law)
-        law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=False)
+        law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=False)
     except Exception:
         return templates.TemplateResponse(
             get_tile_template(service, law),
@@ -110,13 +112,13 @@ async def submit_case(
     """Submit a new case"""
     law = unquote(law)
 
-    law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=approved)
+    law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
 
     case_id = await services.case_manager.submit_case(
         bsn=bsn,
         service_type=service,
         law=law,
-        parameters=result.input,
+        parameters=parameters,
         claimed_result=result.output,
         approved_claims_only=approved,
     )
@@ -159,7 +161,7 @@ async def objection_case(
         reason=reason,
     )
 
-    law, result, rule_spec = await evaluate_law(bsn, law, service, services)
+    law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services)
 
     template_path = get_tile_template(service, law)
 
@@ -204,7 +206,7 @@ async def explanation(
     """Get a citizen-friendly explanation of the rule evaluation path"""
     try:
         law = unquote(law)
-        law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=approved)
+        law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
 
         # Convert path and rule_spec to JSON strings
         path_dict = node_to_dict(result.path)
@@ -258,7 +260,7 @@ async def application_panel(
     """Get the application panel with tabs"""
     try:
         law = unquote(law)
-        law, result, rule_spec = await evaluate_law(bsn, law, service, services, approved=approved)
+        law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
         flat_path = flatten_path_nodes(result.path)
         existing_case = services.case_manager.get_case(bsn, service, law)
 

@@ -171,7 +171,7 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
         raise HTTPException(status_code=404, detail="Case not found")
 
     case.events = services.case_manager.get_events(case.id)
-    law, result, rule_spec = await evaluate_law(case.bsn, case.law, case.service, services)
+    law, result, rule_spec, parameters = await evaluate_law(case.bsn, case.law, case.service, services)
     flat_path = flatten_path_nodes(result.path)
     claims = services.claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
     claim_ids = {claim.id: claim for claim in claims}

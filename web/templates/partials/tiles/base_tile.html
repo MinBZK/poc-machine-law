@@ -44,34 +44,6 @@
             <!-- Main Content -->
             <div class="space-y-6">
                 {% block tile_content %}{% endblock %}
-
-                {# If there's a case, show comparison between claimed and verified #}
-                {% if current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.verified_result
-                %}
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-3">Vergelijking</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                            <tr class="text-sm text-gray-600">
-                                <th class="text-left py-2">Veld</th>
-                                <th class="text-left py-2">Aangevraagd</th>
-                                <th class="text-left py-2">Vastgesteld</th>
-                            </tr>
-                            </thead>
-                            <tbody class="text-sm">
-                            {% for key, value in current_case.verified_result.items() %}
-                            <tr class="border-t border-gray-200">
-                                <td class="py-2">{{ key|replace('_', ' ')|title }}</td>
-                                <td class="py-2">{{ current_case.claimed_result[key] }}</td>
-                                <td class="py-2">{{ value }}</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
 
