@@ -60,7 +60,7 @@
                 }'
         >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
             Goedkeuren
         </button>
@@ -74,7 +74,7 @@
                 }'
         >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
             Intrekken
         </button>
@@ -84,16 +84,16 @@
 <div class="ml-2 inline-flex gap-1">
     <button
             class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
-                hx-get="/edit/reject_claim_form"
+            hx-get="/edit/reject_claim_form"
             hx-target="#edit-form-container"
             hx-vals='{
                 "claim_id": "{{ claim.id }}"
             }'
     >
         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
-            Intrekken
+        Intrekken
     </button>
 </div>
 {% elif claim.status == "REJECTED" %}
