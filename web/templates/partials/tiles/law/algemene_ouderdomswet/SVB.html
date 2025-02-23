@@ -1,32 +1,7 @@
 {% extends "partials/tiles/base_tile.html" %}
 
 {% block tile_content %}
-{% if result.pension_amount %}
-<div>
-    <h4 class="text-sm font-medium text-gray-500 mb-1">Uw AOW pensioen is waarschijnlijk</h4>
-    <div class="flex items-baseline space-x-2">
-        <span class="text-4xl font-bold text-blue-600"> € {{ "%.2f"|format(result.pension_amount / 100) }}</span>
-        <span class="text-gray-500">per maand</span>
-    <button
-        @click="showApplicationPanel = true"
-        hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
-        hx-target="#application-panel-{{ law|replace('/', '-') }}"
-        hx-swap="innerHTML"
-        class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600">
-        waarom?
-    </button>
-    </div>
-</div>
-{% if result.get('pension_percentage') %}
-<p class="text-sm text-gray-600 mt-2">
-    Opbouw: {{ result.pension_percentage }}%
-</p>
-{% endif %}
-{% else %}
-<p class="text-gray-600">
-    U bereikt de AOW-leeftijd op {{ result.aow_date|format_date }}
-</p>
-{% endif %}
+{% include "partials/tiles/law/algemene_ouderdomswet/SVB/computation.html" %}
 {% endblock %}
 
 {% block submit_button %}
