@@ -147,6 +147,7 @@ class RuleContext:
     resolved_paths: dict[str, Any] = field(default_factory=dict)
     service_name: str | None = None
     claims: dict[str:Claim] = None
+    approved: bool | None = True
 
     def track_access(self, path: str) -> None:
         """Track accessed data paths"""
@@ -359,6 +360,7 @@ class RuleContext:
                 reference_date,
                 self.overwrite_input,
                 requested_output=service_ref["field"],
+                approved=self.approved,
             )
 
             value = result.output.get(service_ref["field"])

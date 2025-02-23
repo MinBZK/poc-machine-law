@@ -198,6 +198,7 @@ class RulesEngine:
             calculation_date=calculation_date,
             service_name=self.service_name,
             claims=claims,
+            approved=approved,
         )
 
         # Check requirements

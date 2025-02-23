@@ -11,7 +11,7 @@
         "service": "{{ service }}",
         "key": "{{ key }}",
         "value": {{ value|tojson }},
-        "law": "{{ law }}",
+        "law": "{{ law|urlencode }}",
         "bsn": "{{ bsn }}",
         "show_approve": {{ show_approve|default(false)|tojson }},
         "claimant": "{{ claimant }}"
@@ -137,7 +137,7 @@
     <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
         {% if node.children %}
         {% for child_key, child_node in node.children|dictsort %}
-        {{ render_node(child_key, child_node, case_id, node.service, law, bsn, claim_map, show_approve, claimant) }}
+        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant) }}
         {% endfor %}
         {% endif %}
     </div>

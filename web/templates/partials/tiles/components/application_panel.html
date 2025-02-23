@@ -134,11 +134,13 @@
                      x-transition:leave-start="opacity-100 transform translate-y-0"
                      x-transition:leave-end="opacity-0 transform -translate-y-2"
                      class="mt-4">
-                    <div id="explanation-content"
-                         hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+                    <div hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
                          hx-trigger="intersect once"
-                         hx-swap="innerHTML">
-                        {% include "partials/loading.html" %}
+                         hx-swap="innerHTML"
+                         hx-target="#explanation-content">
+                        <div id="explanation-content">
+                            {% include "partials/loading.html" %}
+                        </div>
                     </div>
                 </div>
             </div>
