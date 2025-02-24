@@ -3,7 +3,6 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
-from machine.context import flatten_path_nodes
 from machine.events.case.aggregate import CaseStatus
 from machine.service import Services
 from web.dependencies import get_services, templates
@@ -172,7 +171,7 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
 
     case.events = services.case_manager.get_events(case.id)
     law, result, rule_spec, parameters = await evaluate_law(case.bsn, case.law, case.service, services)
-    flat_path = flatten_path_nodes(result.path)
+    value_tree = services.extract_value_tree(result.path)
     claims = services.claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
     claim_ids = {claim.id: claim for claim in claims}
     claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
@@ -181,7 +180,7 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
         {
             "request": request,
             "case": case,
-            "path": flat_path,
+            "path": value_tree,
             "claim_map": claim_map,
             "claim_ids": claim_ids,
         },

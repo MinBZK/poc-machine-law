@@ -32,6 +32,7 @@ properties:
 
   sources:
     - name: "RENT_AMOUNT"
+      required: true
       description: "Kale huurprijs"
       type: "amount"
       type_spec:
@@ -43,9 +44,9 @@ properties:
         period_type: "month"
       source_reference:
         source_type: "claim"
-        required: true
 
     - name: "SERVICE_COSTS"
+      required: true
       description: "Servicekosten"
       type: "amount"
       type_spec:
@@ -57,9 +58,9 @@ properties:
         period_type: "month"
       source_reference:
         source_type: "claim"
-        required: true
 
     - name: "ELIGIBLE_SERVICE_COSTS"
+      required: true
       description: "In aanmerking komende servicekosten"
       type: "amount"
       type_spec:
@@ -71,8 +72,6 @@ properties:
         period_type: "month"
       source_reference:
         source_type: "claim"
-        required: true
-
 
   input:
     - name: "HOUSEHOLD_MEMBERS"
@@ -259,6 +258,9 @@ properties:
     SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP: 0.65          # 65%
     SUBSIDIEPERCENTAGE_BOVEN_AFTOP: 0.40                     # 40%
     MINIMUM_BASISHUUR_PERCENTAGE: 0.0486                      # 4,86% van inkomen
+    MAX_SERVICE_COSTS: 4800  # 48,00 euro
+    KIND_VRIJSTELLING: 543200  # 5.432,00 euro (kind vrijstellingsbedrag)
+    LEEFTIJDSGRENS_KIND_INKOMEN: 23  # Leeftijdsgrens voor kind inkomen
 
 requirements:
   - all:
@@ -379,18 +381,18 @@ requirements:
               values:
                 - "$INCOME"
                 - "$INKOMENSGRENS_ALLEENSTAANDE"
-
       # Huurtoets
       - operation: LESS_THAN
         values:
           - operation: ADD
             values:
               - "$RENT_AMOUNT"
-          - operation: MIN
-            values:
-              - "$ELIGIBLE_SERVICE_COSTS"
-              - "$MAX_SERVICE_COSTS"
+              - operation: MIN
+                values:
+                  - "$ELIGIBLE_SERVICE_COSTS"
+                  - "$MAX_SERVICE_COSTS"
           - "$MAXIMALE_HUURGRENS"
+
 
 actions:
   - output: "is_eligible"
@@ -427,20 +429,16 @@ actions:
         values:
           - operation: MIN
             values:
-              - operation: SUBTRACT
-                values:
-                  - operation: MIN
-                    values:
-                      - "$base_rent"
-                      - "$KWALITEITSKORTINGSGRENS"
-                  - 0
+              - "$base_rent"
+              - "$KWALITEITSKORTINGSGRENS"
           - "$SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS"
 
       # Deel tussen kwaliteitskortingsgrens en aftoppingsgrens (65%)
       - operation: MULTIPLY
         values:
-          - operation: MIN
+          - operation: MAX
             values:
+              - 0
               - operation: SUBTRACT
                 values:
                   - operation: MIN
@@ -461,16 +459,19 @@ actions:
       # Deel boven aftoppingsgrens (40%)
       - operation: MULTIPLY
         values:
-          - operation: SUBTRACT
+          - operation: MAX
             values:
-              - "$base_rent"
-              - operation: IF
-                conditions:
-                  - test:
-                      operation: LESS_OR_EQUAL
-                      values:
-                        - "$HOUSEHOLD_SIZE"
-                        - 2
-                    then: "$AFTOPPINGSGRENS_1_2"
-                  - else: "$AFTOPPINGSGRENS_3_PLUS"
+              - 0
+              - operation: SUBTRACT
+                values:
+                  - "$base_rent"
+                  - operation: IF
+                    conditions:
+                      - test:
+                          operation: LESS_OR_EQUAL
+                          values:
+                            - "$HOUSEHOLD_SIZE"
+                            - 2
+                        then: "$AFTOPPINGSGRENS_1_2"
+                      - else: "$AFTOPPINGSGRENS_3_PLUS"
           - "$SUBSIDIEPERCENTAGE_BOVEN_AFTOP"

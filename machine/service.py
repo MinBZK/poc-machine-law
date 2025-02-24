@@ -168,6 +168,64 @@ class Services:
     def __exit__(self):
         self.runner.stop()
 
+    @staticmethod
+    def extract_value_tree(root):
+        flattened = {}
+        stack = [(root, None)]
+
+        while stack:
+            node, service_parent = stack.pop()
+
+            if not isinstance(node, PathNode):
+                continue
+
+            path = node.details.get("path")
+            if isinstance(path, str) and path.startswith("$"):
+                path = path[1:]
+
+            # Handle resolve nodes
+            if (
+                node.type == "resolve"
+                and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM", "NONE"}
+                and path
+                and isinstance(path, str)
+            ):
+                resolve_entry = {
+                    "result": node.result,
+                    "required": node.required,
+                }
+
+                if service_parent and path not in service_parent.setdefault("children", {}):
+                    service_parent.setdefault("children", {})[path] = resolve_entry
+                elif path not in flattened:
+                    flattened[path] = resolve_entry
+
+            # Handle service_evaluation nodes
+            elif node.type == "service_evaluation" and path and isinstance(path, str):
+                service_entry = {
+                    "result": node.result,
+                    "required": node.required,
+                    "service": node.details.get("service"),
+                    "law": node.details.get("law"),
+                    "children": {},
+                }
+
+                if service_parent:
+                    service_parent.setdefault("children", {})[path] = service_entry
+                else:
+                    flattened[path] = service_entry
+
+                # Prepare to process children with this service_evaluation as parent
+                for child in reversed(node.children):
+                    stack.append((child, service_entry))
+                continue
+
+            # Add children to the stack for further processing
+            for child in reversed(node.children):
+                stack.append((child, service_parent))
+
+        return flattened
+
     def get_discoverable_service_laws(self):
         return self.resolver.get_discoverable_service_laws()
 

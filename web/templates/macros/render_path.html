@@ -1,170 +1,154 @@
-{% macro render_value(key, value, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
-
-<button
-        class="group inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 cursor-pointer rounded px-1 hover:bg-blue-50"
-        hx-get="/edit/edit-form"
-        hx-target="#edit-form-container"
-        hx-vals='{
-        "case_id": "{{ case_id }}",
-        "service": "{{ service }}",
-        "key": "{{ key }}",
-        "value": {{ value|tojson }},
-        "law": "{{ law }}",
-        "bsn": "{{ bsn }}",
-        "show_approve": {{ show_approve|default(false)|tojson }},
-        "claimant": "{{ claimant }}"
-    }'
-        type="button">
-    {% if value is none or value is undefined %}
-        <span class="text-gray-400">-</span>
-        {% else %}
-    {% if value is mapping and value.result is defined %}
-        {% set display_value = value.result %}
+{% macro render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+    {% if node is mapping and node.result is defined %}
+        {% set display_value = node.result %}
     {% else %}
-        {% set display_value = value %}
+        {% set display_value = node %}
     {% endif %}
-
-    {% if display_value is boolean %}
-        {{ 'Ja' if display_value else 'Nee' }}
-    {% elif display_value is number %}
-        {% if display_value % 1 != 0 %}
-            {{ '%.5f'|format(display_value) }}
-        {% else %}
-            {{ display_value }}
-        {% endif %}
-    {% elif display_value is mapping  %}
-            {% for key, val in display_value.items() %}
-                {% if val is mapping %}
-                    {{ key }}: {% for subkey, subval in val.items() %}{{ subkey }}: {{ subval }}{% if not loop.last %}, {% endif %}{% endfor %}
-                {% else %}
-                    {{ key }}: {{ val }}
-                {% endif %}
-                {% if not loop.last %}, {% endif %}
-            {% endfor %}
-    {% elif display_value is sequence and display_value is not string %}
-        {{ display_value|join(', ') }}
+    {% if node.required is defined and node.required %}
+        {% set color = "red" %}
     {% else %}
-        {{ display_value }}
+        {% set color = "blue" %}
     {% endif %}
-    {% endif %}
-
-    <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24"
-         stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-    </svg>
-</button>
-
-
-{% if (service, law, key) in claim_map %}
-{% set claim = claim_map[(service, law, key)] %}
-<span class="text-gray-500 text-xs">→</span>
-<span class="text-gray-800 text-xs">{{ claim.new_value }}</span>
-{% if claim.status == "PENDING" %}
-<div class="ml-2 inline-flex items-center gap-1">
-    <div class="inline-flex gap-1 ml-2">
-        {% if show_approve %}
-        <button
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200"
-                hx-post="/edit/approve-claim"
-                hx-target="#edit-form-container"
-                hx-vals='{
-                    "claim_id": "{{ claim.id }}"
-                }'
-        >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Goedkeuren
-        </button>
-        {% endif %}
-        <button
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200"
-                hx-get="/edit/reject_claim_form"
-                hx-target="#edit-form-container"
-                hx-vals='{
-                    "claim_id": "{{ claim.id }}"
-                }'
-        >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            Intrekken
-        </button>
-    </div>
-</div>
-{% elif claim.status == "APPROVED" %}
-<div class="ml-2 inline-flex gap-1">
-    <button
-            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
-            hx-get="/edit/reject_claim_form"
+    <button class="group inline-flex items-center gap-1 text-{{- color -}}-600 hover:text-{{- color -}}-800 cursor-pointer rounded px-1 hover:bg-{{- color -}}-50"
+            hx-get="/edit/edit-form"
             hx-target="#edit-form-container"
-            hx-vals='{
-                "claim_id": "{{ claim.id }}"
-            }'
-    >
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-        Intrekken
-    </button>
-</div>
-{% elif claim.status == "REJECTED" %}
-<div class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-    <span>Ingetrokken</span>
-</div>
-{% endif %}
-{% endif %}
-
-
-{% endmacro %}
-
-{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
-{% if node is mapping and ('service' in node and 'children' in node and node.children) %}
-<div x-data="{ open: false }" class="text-sm leading-5">
-    <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
-         @click="open = !open">
-        <div class="text-sm leading-5 py-0.5">
-            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
-            <span class="ml-2">{% if node.result is defined %}{{ render_value(key, node.result, case_id, service, law, bsn, claim_map, show_approve, claimant) }}{% else %}{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}{% endif %}</span>
-        </div>
-        <div class="min-w-0 flex items-center">
-            <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
-                 class="transform transition-transform duration-200 w-4 h-4 text-gray-500 mr-1 rotate-90"
-                 viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                         d="M7.293 4.707a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z"
-                      clip-rule="evenodd"/>
-            </svg>
-            <span class="text-green-600">
-            {% if node.law %}
-                Resultaat van het uitrekenen {{ node.law|replace('_', ' ')|title }}
+            hx-vals='{ "case_id": "{{ case_id }}", "service": "{{ service }}", "key": "{{ key }}", "value": {{ display_value|tojson }}, "law": "{{ law }}", "bsn": "{{ bsn }}", "show_approve": {{ show_approve|default(false) |tojson }}, "claimant": "{{ claimant }}" }'
+            type="button">
+        {% if display_value is none or display_value is undefined %}
+            {% if node.required is defined and node.required %}
+                BENODIGD GEGEVEN
             {% else %}
-                {{ key|title|replace('_', ' ') }}
+                Ontbrekend gegeven
             {% endif %}
-            </span>
-        </div>
-    </div>
-
-    <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
-        {% if node.children %}
-        {% for child_key, child_node in node.children|dictsort %}
-        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant) }}
-        {% endfor %}
+        {% else %}
+            {% if display_value is boolean %}
+                {{ 'Ja' if display_value else 'Nee' }}
+            {% elif display_value is number %}
+                {% if display_value % 1 != 0 %}
+                    {{ '%.5f'|format(display_value) }}
+                {% else %}
+                    {{ display_value }}
+                {% endif %}
+            {% elif display_value is mapping %}
+                {% for key, val in display_value.items() %}
+                    {% if val is mapping %}
+                        {{ key }}:
+                        {% for subkey, subval in val.items() %}
+                            {{ subkey }}: {{ subval }}
+                            {% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {{ key }}: {{ val }}
+                    {% endif %}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            {% elif display_value is sequence and display_value is not string %}
+                {{ display_value|join(", ") }}
+            {% else %}
+                {{ display_value }}
+            {% endif %}
         {% endif %}
-    </div>
-</div>
-{% else %}
-<div class="text-sm leading-5 py-0.5">
-    <span class="text-gray-600">{{ key|title|replace('_', ' ') }}: </span>
-    <span class="ml-2">{{ render_value(key, node.result, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
-</div>
-{% endif %}
+        <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-{{- color -}}-400 transition-colors"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+    </button>
+    {% if (service, law, key) in claim_map %}
+        {% set claim = claim_map[(service, law, key)] %}
+        <span class="text-gray-500 text-xs">→</span>
+        <span class="text-gray-800 text-xs">{{ claim.new_value }}</span>
+        {% if claim.status == "PENDING" %}
+            <div class="ml-2 inline-flex items-center gap-1">
+                <div class="inline-flex gap-1 ml-2">
+                    {% if show_approve %}
+                        <button class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200"
+                                hx-post="/edit/approve-claim"
+                                hx-target="#edit-form-container"
+                                hx-vals='{ "claim_id": "{{ claim.id }}" }'>
+                            <svg class="w-3.5 h-3.5"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Goedkeuren
+                        </button>
+                    {% endif %}
+                    <button class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200"
+                            hx-get="/edit/reject_claim_form"
+                            hx-target="#edit-form-container"
+                            hx-vals='{ "claim_id": "{{ claim.id }}" }'>
+                        <svg class="w-3.5 h-3.5"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Intrekken
+                    </button>
+                </div>
+            </div>
+        {% elif claim.status == "APPROVED" %}
+            <div class="ml-2 inline-flex gap-1">
+                <button class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        hx-get="/edit/reject_claim_form"
+                        hx-target="#edit-form-container"
+                        hx-vals='{ "claim_id": "{{ claim.id }}" }'>
+                    <svg class="w-3.5 h-3.5"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Intrekken
+                </button>
+            </div>
+        {% elif claim.status == "REJECTED" %}
+            <div class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                <span>Ingetrokken</span>
+            </div>
+        {% endif %}
+    {% endif %}
 {% endmacro %}
-
+{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+    {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
+        <div x-data="{ open: false }" class="text-sm leading-5">
+            <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
+                 @click="open = !open">
+                <div class="text-sm leading-5 py-0.5">
+                    <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+                    <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                </div>
+                <div class="min-w-0 flex items-center">
+                    <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
+                         class="transform transition-transform duration-200 w-4 h-4 text-gray-500 mr-1 rotate-90"
+                         viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 4.707a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-green-600">Resultaat van het uitrekenen {{ node.law|replace('_', ' ') |title }}</span>
+                </div>
+            </div>
+            <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
+                {% if node.children %}
+                    {% for child_key, child_node in node.children.items() %}
+                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant) }}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="text-sm leading-5 py-0.5">
+            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+            <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+        </div>
+    {% endif %}
+{% endmacro %}
 {% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
-<!-- Alpine.js store for managing dialog state -->
-<script>
+    <!-- Alpine.js store for managing dialog state -->
+    <script>
     document.addEventListener('alpine:init', () => {
         Alpine.store('editDialog', {
             isOpen: false,
@@ -202,14 +186,11 @@
             Alpine.store('editDialog').close();
         }
     });
-</script>
-
-<div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
-    {% for key, node in path|dictsort %}
-    {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
-    {% endfor %}
-</div>
-
-<div id="edit-form-container"></div>
-
+    </script>
+    <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
+        {% for key, node in path.items() %}
+            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+        {% endfor %}
+    </div>
+    <div id="edit-form-container"></div>
 {% endmacro %}
