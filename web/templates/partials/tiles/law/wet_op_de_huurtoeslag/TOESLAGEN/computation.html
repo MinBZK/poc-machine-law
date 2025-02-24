@@ -1,19 +1,18 @@
 <div>
     {% if result.is_eligible %}
-    <h4 class="text-sm font-medium text-gray-600 mb-2">Uw huurtoeslag is waarschijnlijk</h4>
-    <div class="flex items-baseline">
-        <span class="text-4xl font-bold text-indigo-600">€ {{ "%.2f"|format(result.subsidy_amount / 100) }}</span>
-        <span class="ml-2 text-gray-600">per maand</span>
-        <button
-                @click="showApplicationPanel = true"
-                hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
-                hx-target="#application-panel-{{ law|replace('/', '-') }}"
-                hx-swap="innerHTML"
-                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600">
-            waarom?
-        </button>
-    </div>
+        <h4 class="text-sm font-medium text-gray-600 mb-2">Uw huurtoeslag is waarschijnlijk</h4>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-indigo-600">€ {{ "%.2f"|format(result.subsidy_amount / 100) }}</span>
+            <span class="ml-2 text-gray-600">per maand</span>
+            <button @click="showApplicationPanel = true"
+                    hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                    hx-target="#application-panel-{{ law|replace('/', '-') }}"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600">
+                waarom?
+            </button>
+        </div>
     {% else %}
-    <h4 class="text-sm font-medium text-gray-500 mb-1">U krijgt waarschijnlijk geen huurtoeslag.</h4>
+        <h4 class="text-sm font-medium text-gray-500 mb-1">U krijgt waarschijnlijk geen huurtoeslag.</h4>
     {% endif %}
 </div>
