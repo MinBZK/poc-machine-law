@@ -2,7 +2,7 @@
 {% from "macros/render_path.html" import render_path %}
 <div id="application-panel">
     <div class="fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 overflow-y-auto"
-         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get('default_tab') == 'explanation' else 'false' }} }"
+         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }} }"
          x-show="show"
          x-init="$nextTick(() => { show = true })"
          @click.away="$dispatch('close-panel')"
@@ -16,29 +16,25 @@
          x-transition:leave="transition ease-in duration-300"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="translate-x-full"
-         style="display: none;">
-
+         style="display: none">
         <div class="p-6 space-y-6">
             <!-- Header with close button -->
             <div class="flex justify-between items-start">
                 <div class="flex items-center space-x-3">
-                    {% if service %}
-                    {{ org_logo(service) }}
-                    {% endif %}
+                    {% if service %}{{ org_logo(service) }}{% endif %}
                     <h3 class="text-lg font-semibold">{{ rule_spec.name if rule_spec else 'Loading...' }}</h3>
                 </div>
-                <button @click="show = false; $dispatch('close-panel')" class="text-gray-500 hover:text-gray-700">
+                <button @click="show = false; $dispatch('close-panel')"
+                        class="text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-
             <!-- Description -->
             <div class="space-y-2">
                 <p class="text-sm text-gray-600">{{ rule_spec.description }}</p>
             </div>
-
             <!-- Toggle voor herberekenen - direct voor Result Summary -->
             <div class="border-b pb-4 mb-4">
                 <div class="flex items-center justify-between">
@@ -47,85 +43,62 @@
                         <input type="checkbox"
                                class="sr-only peer"
                                {% if request.query_params.get('approved', 'false') == 'false' %}checked{% endif %}
-                        hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn
-                        }}&approved={{ 'true' if request.query_params.get('approved', 'false') == 'false' else 'false'
-                        }}"
-                        hx-target="#application-panel"
-                        hx-swap="innerHTML"
-                        hx-trigger="change">
-                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                               hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ 'true' if request.query_params.get('approved', 'false') == 'false' else 'false' }}"
+                               hx-target="#application-panel"
+                               hx-swap="innerHTML"
+                               hx-trigger="change">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                        </div>
                     </label>
                 </div>
             </div>
-
             <!-- Result Summary -->
             {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
             {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
-
             <!-- Used Data -->
             <div class="pt-6">
                 <h4 class="font-medium text-gray-900 mb-4">Gebruikte gegevens</h4>
                 {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
-                show_approve=False, claimant="CITIZEN") }}
+                                show_approve=False, claimant="CITIZEN") }}
             </div>
-
             <!-- Submit Form -->
             <div x-data="{ isChecked: false }" class="space-y-4">
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
                     <div class="flex items-center">
-                        <input
-                                type="checkbox"
-                                id="declaration-checkbox"
-                                x-model="isChecked"
-                                class="mr-3 rounded text-blue-600 focus:ring-blue-500"
-                        >
-                        <label for="declaration-checkbox" class="font-medium">
-                            Ik verklaar dat mijn gegevens correct en volledig zijn
-                        </label>
+                        <input type="checkbox"
+                               id="declaration-checkbox"
+                               x-model="isChecked"
+                               class="mr-3 rounded text-blue-600 focus:ring-blue-500">
+                        <label for="declaration-checkbox" class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</label>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2 ml-7">
-                        Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.
-                    </p>
+                    <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
                 </div>
-                <form
-                        hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
-                        hx-target="closest div.law-result-card"
-                        hx-swap="outerHTML"
-                        class="mb-6"
-                >
+                <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+                      hx-target="closest div.law-result-card"
+                      hx-swap="outerHTML"
+                      class="mb-6">
                     <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
-                    <button
-                            type="submit"
+                    <button type="submit"
                             :disabled="!isChecked"
-                            :class="{
-                        'bg-blue-600 hover:bg-blue-700': isChecked,
-                        'bg-gray-400 cursor-not-allowed': !isChecked
-                    }"
-                            class="w-full px-6 py-3 text-white text-center rounded-md transition-colors"
-                    >
+                            :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                            class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
                         Bevestig aanvraag
                     </button>
                 </form>
             </div>
-
             <!-- Explanation Section -->
             <div class="border-t pt-4">
-                <button
-                        @click="showExplanation = !showExplanation"
-                        class="flex items-center justify-between w-full text-left"
-                >
+                <button @click="showExplanation = !showExplanation"
+                        class="flex items-center justify-between w-full text-left">
                     <span class="text-sm font-medium text-gray-900">Uitleg</span>
-                    <svg
-                            class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
-                            :class="{ 'rotate-180': showExplanation }"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
+                         :class="{ 'rotate-180': showExplanation }"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-
                 <div x-show="showExplanation"
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -138,31 +111,23 @@
                          hx-trigger="intersect once"
                          hx-swap="innerHTML"
                          hx-target="#explanation-content">
-                        <div id="explanation-content">
-                            {% include "partials/loading.html" %}
-                        </div>
+                        <div id="explanation-content">{% include "partials/loading.html" %}</div>
                     </div>
                 </div>
             </div>
-
             <!-- Technical Details Section -->
             <div class="border-t pt-4">
-                <button
-                        @click="showTechnical = !showTechnical"
-                        class="flex items-center justify-between w-full text-left"
-                >
+                <button @click="showTechnical = !showTechnical"
+                        class="flex items-center justify-between w-full text-left">
                     <span class="text-sm font-medium text-gray-900">Technische details</span>
-                    <svg
-                            class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
-                            :class="{ 'rotate-180': showTechnical }"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
+                         :class="{ 'rotate-180': showTechnical }"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-
                 <div x-show="showTechnical"
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -172,13 +137,11 @@
                      x-transition:leave-end="opacity-0 transform -translate-y-2"
                      class="mt-4 space-y-4">
                     <div class="space-y-2">
-
                         <div class="text-xs text-gray-500 space-y-1">
                             <div>Wet: {{ law }}</div>
                             <div>Service: {{ service }}</div>
                             <div>Geldig vanaf: {{ rule_spec.valid_from }}</div>
                             <div>Versie: {{ rule_spec.uuid }}</div>
-
                         </div>
                     </div>
                 </div>
