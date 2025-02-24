@@ -26,8 +26,8 @@ properties:
       type: "string"
       required: true
 
+  sources:
     - name: "RENT_AMOUNT"
-      required: true
       description: "Kale huurprijs"
       type: "amount"
       type_spec:
@@ -37,9 +37,11 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      source_reference:
+        source_type: "claim"
+        required: true
 
     - name: "SERVICE_COSTS"
-      required: true
       description: "Servicekosten"
       type: "amount"
       type_spec:
@@ -49,6 +51,9 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      source_reference:
+        source_type: "claim"
+        required: true
 
   input:
     - name: "HOUSEHOLD_MEMBERS"
@@ -249,6 +254,12 @@ properties:
 
 requirements:
   - all:
+      # User input has to exist!
+      - subject: "$RENT_AMOUNT"
+        operation: NOT_NULL
+      - subject: "$SERVICE_COSTS"
+        operation: NOT_NULL
+
       # Leeftijdseis
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
@@ -365,7 +376,7 @@ requirements:
           - operation: ADD
             values:
               - "$RENT_AMOUNT"
-              - operation: MIN
+          - operation: MIN
             values:
               - "$ELIGIBLE_SERVICE_COSTS"
               - "$MAX_SERVICE_COSTS"
