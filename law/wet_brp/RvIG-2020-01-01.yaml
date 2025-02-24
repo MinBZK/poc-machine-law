@@ -282,14 +282,14 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
-        
+
     - name: "household_members"
       description: "Lijst met gegevens van medebewoners"
       type: "array"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
-        
+
     - name: "children"
       description: "Lijst met gegevens van kinderen"
       type: "array"
@@ -417,7 +417,7 @@ actions:
 
   - output: "woonplaats"
     value: "$ADDRESS.woonplaats"
-    
+
   - output: "household_members"
     operation: IF
     conditions:
@@ -425,10 +425,10 @@ actions:
           subject: "$HOUSEHOLD"
           operation: NOT_NULL
         then: "$HOUSEHOLD"
-      - else: 
+      - else:
           value: null  # Leeg resultaat
     reference: "Wet BRP Art. 2.4"
-    
+
   - output: "children"
     operation: IF
     conditions:
@@ -449,6 +449,6 @@ actions:
                     - 18
                 then: "$item"  # Voeg dit item toe als kind
               - else: null     # Anders niets toevoegen
-      - else: 
+      - else:
           value: null  # Leeg resultaat
     reference: "Wet BRP Art. 1.6"
