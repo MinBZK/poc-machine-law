@@ -18,22 +18,32 @@
     }'
         type="button">
     {% if value is mapping and value.result is defined %}
-    {% set display_value = value.result %}
+        {% set display_value = value.result %}
     {% else %}
-    {% set display_value = value %}
+        {% set display_value = value %}
     {% endif %}
+
     {% if display_value is boolean %}
-    {{ 'Ja' if display_value else 'Nee' }}
+        {{ 'Ja' if display_value else 'Nee' }}
     {% elif display_value is number %}
-    {% if display_value % 1 != 0 %}
-    {{ '%.5f'|format(display_value) }}
-    {% else %}
-    {{ display_value }}
-    {% endif %}
+        {% if display_value % 1 != 0 %}
+            {{ '%.5f'|format(display_value) }}
+        {% else %}
+            {{ display_value }}
+        {% endif %}
+    {% elif display_value is mapping  %}
+            {% for key, val in display_value.items() %}
+                {% if val is mapping %}
+                    {{ key }}: {% for subkey, subval in val.items() %}{{ subkey }}: {{ subval }}{% if not loop.last %}, {% endif %}{% endfor %}
+                {% else %}
+                    {{ key }}: {{ val }}
+                {% endif %}
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
     {% elif display_value is sequence and display_value is not string %}
-    {{ display_value|join(', ') }}
+        {{ display_value|join(', ') }}
     {% else %}
-    {{ display_value }}
+        {{ display_value }}
     {% endif %}
     <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24"
          stroke="currentColor">
@@ -108,7 +118,7 @@
 {% endmacro %}
 
 {% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
-{% if node is mapping and ('service' in node or 'children' in node) %}
+{% if node is mapping and ('service' in node and 'children' in node and node.children) %}
 <div x-data="{ open: false }" class="text-sm leading-5">
     <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
          @click="open = !open">
