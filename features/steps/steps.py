@@ -58,8 +58,7 @@ def step_impl(context, date):
     context.parameters["ELECTION_DATE"] = date
 
 
-@when("de {law} wordt uitgevoerd door {service}")
-def step_impl(context, law, service):
+def evaluate_law(context, service, law, approved=True):
     context.result = asyncio.run(
         context.services.evaluate(
             service,
@@ -67,10 +66,21 @@ def step_impl(context, law, service):
             parameters=context.parameters,
             reference_date=context.root_reference_date,
             overwrite_input=context.test_data,
+            approved=approved
         )
     )
     context.service = service
     context.law = law
+
+
+@when("de {law} wordt uitgevoerd door {service} met wijzigingen")
+def step_impl(context, law, service):
+    evaluate_law(context, service, law, approved=False)
+
+
+@when("de {law} wordt uitgevoerd door {service}")
+def step_impl(context, law, service):
+    evaluate_law(context, service, law)
 
 
 @then("heeft de persoon recht op zorgtoeslag")
@@ -341,3 +351,24 @@ def step_impl(context, competent_court):
         case.appeal_status.get("competent_court"),
         "Expected another competent court",
     )
+
+
+@when("de burger een wijziging indient")
+def step_impl(context):
+    """Submit a claim for data change"""
+    if not context.table:
+        raise ValueError("No table provided for claim")
+
+    row = context.table[0]  # We expect one row with the claim details
+    claim_id = context.services.claim_manager.submit_claim(
+        service=row["service"],
+        key=row["key"],
+        new_value=row["nieuwe_waarde"],
+        reason=row["reden"],
+        claimant="BURGER",
+        case_id=None,
+        evidence_path=row.get("bewijs"),
+        law=row["law"],
+        bsn=context.parameters["BSN"]
+    )
+    context.claim_id = claim_id
