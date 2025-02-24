@@ -97,6 +97,33 @@ Vooralsnog zijn deze wetten geïmplementeerd in `machine law` (met behulp van ee
 - [Hoofdwet](law/algemene_ouderdomswet/SVB-2024-01-01.yaml) - Berekening AOW-uitkering
 - [Leeftijdsbepaling](law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml) - Bepaling AOW-leeftijd
 
+### Huurtoeslag
+
+- [Hoofdwet](law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml) - Berekening huurtoeslag
+
+### Participatiewet (Bijstand)
+
+- [Landelijke regels](law/participatiewet/bijstand/SZW-2023-01-01.yaml) - Beoordeling bijstandsrecht (SZW)
+- [Gemeente Amsterdam](law/participatiewet/bijstand/gemeenten/GEMEENTE_AMSTERDAM-2023-01-01.yaml) - Lokale bijstandsregels
+
+### Bestuursrecht (AWB)
+
+- [Bezwaarprocedure](law/awb/bezwaar/JenV-2024-01-01.yaml) - Regels voor bezwaar
+- [Beroepsprocedure](law/awb/beroep/JenV-2024-01-01.yaml) - Regels voor beroep
+
+### Kieswet
+
+- [Hoofdwet](law/kieswet/KIESRAAD-2024-01-01.yaml) - Bepaling kiesrecht
+
+### Overige Wetten
+
+- [Handelsregisterwet](law/handelsregisterwet/KVK-2024-01-01.yaml) - KVK-registratie
+- [Vreemdelingenwet](law/vreemdelingenwet/IND-2024-01-01.yaml) - Verblijfsvergunningen
+- [Penitentiaire Beginselenwet](law/penitentiaire_beginselenwet/DJI-2022-01-01.yaml) - Detentieregels
+- [Wet Forensische Zorg](law/wet_forensische_zorg/DJI-2022-01-01.yaml) - Forensische zorg
+- [Wet Studiefinanciering](law/wet_studiefinanciering/DUO-2024-01-01.yaml) - Studiefinanciering
+- [Wetboek van Strafrecht](law/wetboek_van_strafrecht/JUSTID-2023-01-01.yaml) - Strafbepalingen
+
 ### Ondersteunende Wetten
 
 - [Wet BRP](law/wet_brp/RvIG-2020-01-01.yaml) - Persoonsgegevens
