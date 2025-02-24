@@ -3,6 +3,7 @@
   import { tick } from 'svelte';
 
   type Message = {
+    id: string;
     content: string;
     isOwn: boolean;
     timestamp: Date;
@@ -26,16 +27,23 @@
   // Listen for messages
   socket.addEventListener('message', function (event) {
     // Parse the event data
-    const data = JSON.parse(event.data) as { content: string; quick_replies: string[] };
+    const data = JSON.parse(event.data) as { id: string; content: string; quick_replies: string[] };
 
-    messages = [
-      ...messages,
-      {
-        content: data.content,
-        isOwn: false,
-        timestamp: new Date(),
-      },
-    ]; // Note: instead of messages.push(...) to trigger Svelte reactivity, also below
+    // If the message ID equals the ID of the previous message, append it to the previous message
+    if (messages.length && messages[messages.length - 1].id === data.id) {
+      messages[messages.length - 1].content += `${data.content}`; // IMPROVE: also look at earlier messages, since the user may post a message in between?
+      messages = [...messages];
+    } else {
+      messages = [
+        ...messages,
+        {
+          id: data.id,
+          content: data.content,
+          isOwn: false,
+          timestamp: new Date(),
+        },
+      ]; // Note: instead of messages.push(...) to trigger Svelte reactivity, also below
+    }
 
     // If the message contains quick replies, show them
     quickReplies = data.quick_replies || [];
@@ -52,6 +60,7 @@
       messages = [
         ...messages,
         {
+          id: '',
           content: input,
           isOwn: true,
           timestamp: new Date(),

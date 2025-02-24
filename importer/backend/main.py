@@ -34,6 +34,7 @@ class State(TypedDict):
 
 
 class WebSocketMessage(TypedDict):
+    id: str
     content: str
     quick_replies: List[str]
 
@@ -50,7 +51,9 @@ def ask_law(state: State, config: Dict) -> Dict:
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
     asyncio.get_event_loop().create_task(
-        manager.send_message(WebSocketMessage(content=msg), thread_id)
+        manager.send_message(
+            WebSocketMessage(id=str(uuid.UUID), content=msg), thread_id
+        )
     )
 
     return {"messages": []}  # Note: we reset the messages
@@ -65,7 +68,10 @@ def check_law_input(state: State, config: Dict) -> Dict:
         thread_id = config["configurable"]["thread_id"]
         asyncio.get_event_loop().create_task(
             manager.send_message(
-                WebSocketMessage(content="De wetnaam moet minimaal 4 tekens bevatten."),
+                WebSocketMessage(
+                    id=str(uuid.UUID),
+                    content="De wetnaam moet minimaal 4 tekens bevatten.",
+                ),
                 thread_id,
             )
         )
@@ -85,10 +91,11 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
 
     thread_id = config["configurable"]["thread_id"]
 
-    asyncio.get_event_loop().create_task(
+    asyncio.run(
         manager.send_message(
             WebSocketMessage(
-                content=f"Is dit de wet die je bedoelt? \n\n{metadata["title"]}\n{url}",
+                id=str(uuid.UUID),
+                content=f"Is dit de wet die je bedoelt?\n\n{metadata["title"]}\n{url}",
                 quick_replies=["Ja", "Nee"],
             ),
             thread_id,
@@ -140,6 +147,10 @@ def process_law(state: State, config: Dict) -> Dict:
 
     content = "\n\n".join(doc.page_content for doc in docs)
 
+    # Clip the law content to 100 characters for testing purposes. TODO: remove this
+    if len(content) > 100:
+        content = content[:100]
+
     # Add a human message to process the law
     result = model.invoke(analyize_law_prompt.format_messages(content=content))
 
@@ -149,9 +160,10 @@ def process_law(state: State, config: Dict) -> Dict:
 def process_law_feedback(state: State, config: Dict) -> Dict:
     print("----> process_law_feedback")
 
-    resp = interrupt("process_law_feedback")
+    user_input = interrupt("process_law_feedback")
+    state["messages"].append(HumanMessage(user_input))
 
-    return {"messages": [model.invoke([HumanMessage(resp)])]}
+    return {"messages": model.invoke(state["messages"])}
 
 
 # Add nodes
@@ -161,6 +173,7 @@ workflow.add_node("ask_law_confirmation", ask_law_confirmation)
 workflow.add_node("handle_law_confirmation", handle_law_confirmation)
 workflow.add_node("process_law", process_law)
 workflow.add_node("process_law_feedback", process_law_feedback)
+
 
 # Add edges
 workflow.set_entry_point("ask_law")
@@ -191,6 +204,7 @@ workflow.add_conditional_edges(
 )
 
 workflow.add_edge("process_law", "process_law_feedback")
+workflow.add_edge("process_law_feedback", "process_law_feedback")
 
 
 # Initialize memory to persist state between graph runs. IMPROVE: store persistently in Postgres
@@ -252,20 +266,15 @@ async def websocket_endpoint(websocket: WebSocket):
             # Process the received data through the workflow
             print("message received:", user_input)
 
-            for event in graph.stream(
+            for chunk, _ in graph.stream(
                 Command(resume=user_input),
                 {"configurable": {"thread_id": thread_id}},
-                stream_mode="values",
+                stream_mode="messages",
             ):
-                # In case of an AI message, send it back to the client
-                # pprint.pprint(event["messages"])
-                if event["messages"]:
-                    msg = event["messages"][-1]
-                    if isinstance(msg, AIMessage):
-                        await manager.send_message(
-                            WebSocketMessage(content=msg.content),
-                            thread_id,
-                        )
+                await manager.send_message(
+                    WebSocketMessage(id=chunk.id, content=chunk.content),
+                    thread_id,
+                )
 
     except WebSocketDisconnect:
         manager.disconnect(thread_id)
