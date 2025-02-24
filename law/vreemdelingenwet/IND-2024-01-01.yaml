@@ -1,4 +1,5 @@
-uuid: 2e3f4a5b-8765-4f0f-cccc-345678901234
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: af0fed0d-ee11-48f3-b629-07becda4b7e9
 name: Bepalen verblijfsstatus
 law: vreemdelingenwet
 valid_from: 2024-01-01

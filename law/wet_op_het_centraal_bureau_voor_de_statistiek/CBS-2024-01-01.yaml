@@ -1,4 +1,5 @@
-uuid: 7512d6f1-89d4-4c49-b999-480ac3a4a722
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: bfc4ce3d-1c52-4fb8-ad96-4f1b9d836c4a
 name: Bepalen levensverwachting 2025
 law: wet_op_het_centraal_bureau_voor_de_statistiek
 valid_from: 2024-01-01

@@ -1,0 +1,488 @@
+uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
+name: Huurtoeslag
+law: wet_op_de_huurtoeslag
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2025-01-01
+service: "TOESLAGEN"
+description: >
+  Regels voor het bepalen van het recht op en de hoogte van de huurtoeslag volgens
+  de Wet op de huurtoeslag en de Algemene wet inkomensafhankelijke regelingen (AWIR),
+  geldend voor het jaar 2025.
+
+references:
+  - law: "Wet op de huurtoeslag"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel2"
+  - law: "Algemene wet inkomensafhankelijke regelingen"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+  - law: "Algemene wet inkomensafhankelijke regelingen"
+    article: "5"
+    url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel5"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "RENT_AMOUNT"
+      required: true
+      description: "Kale huurprijs"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+
+    - name: "SERVICE_COSTS"
+      required: true
+      description: "Servicekosten"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+
+    - name: "ELIGIBLE_SERVICE_COSTS"
+      required: true
+      description: "In aanmerking komende servicekosten"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+
+  input:
+    - name: "HOUSEHOLD_MEMBERS"
+      description: "Gegevens medebewoners"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "household_members"
+        law: "wet_brp"
+
+    - name: "CHILDREN"
+      description: "Gegevens kinderen"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "children"
+        law: "wet_brp"
+
+    - name: "PARTNER_BSN"
+      description: "BSN van de partner"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
+
+    - name: "PARTNER_ADDRESS"
+      description: "Woonadres van de partner"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "residence_address"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "AGE"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "HAS_PARTNER"
+      description: "Heeft de persoon een partner"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "has_partner"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "HOUSEHOLD_SIZE"
+      description: "Aantal personen in huishouden"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "household_size"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "RESIDENCE_ADDRESS"
+      description: "Woonadres"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "residence_address"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "INCOME"
+      description: "Toetsingsinkomen"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "PARTNER_INCOME"
+      description: "Toetsingsinkomen partner"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "partner_income"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "NET_WORTH"
+      description: "Vermogen"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "net_worth"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "COMBINED_NET_WORTH"
+      description: "Gezamenlijk vermogen met partner"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "combined_net_worth"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+  output:
+    - name: "is_eligible"
+      description: "Voldoet aan voorwaarden voor wet_op_de_huurtoeslag"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "base_rent"
+      description: "Basishuur (na aftrek minimale eigen bijdrage)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "subsidy_amount"
+      description: "Hoogte van de wet_op_de_huurtoeslag"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+  definitions:
+    MINIMUM_AGE: 18
+    KWALITEITSKORTINGSGRENS: 47720  # 477,20 euro
+    AFTOPPINGSGRENS_1_2: 68296      # 682,96 euro (1-2 personen)
+    AFTOPPINGSGRENS_3_PLUS: 73193   # 731,93 euro (3 of meer personen)
+    MAXIMALE_HUURGRENS: 88571       # 885,71 euro
+    VERMOGENSGRENS_ALLEENSTAANDE: 3695200   # 36.952 euro
+    VERMOGENSGRENS_PARTNERS: 7390400        # 73.904 euro
+    INKOMENSGRENS_ALLEENSTAANDE: 4400000    # 44.000 euro
+    INKOMENSGRENS_PARTNERS: 5400000         # 54.000 euro
+    SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS: 1.00    # 100%
+    SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP: 0.65          # 65%
+    SUBSIDIEPERCENTAGE_BOVEN_AFTOP: 0.40                     # 40%
+    MINIMUM_BASISHUUR_PERCENTAGE: 0.0486                      # 4,86% van inkomen
+    MAX_SERVICE_COSTS: 4800  # 48,00 euro
+    KIND_VRIJSTELLING: 543200  # 5.432,00 euro (kind vrijstellingsbedrag)
+    LEEFTIJDSGRENS_KIND_INKOMEN: 23  # Leeftijdsgrens voor kind inkomen
+
+requirements:
+  - all:
+      # User input has to exist!
+      - subject: "$RENT_AMOUNT"
+        operation: NOT_NULL
+      - subject: "$SERVICE_COSTS"
+        operation: NOT_NULL
+      - subject: "$ELIGIBLE_SERVICE_COSTS"
+        operation: NOT_NULL
+
+      # Leeftijdseis
+      - subject: "$AGE"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_AGE"
+
+      # Toetsingsinkomen inclusief medebewoners en vrijstellingen kinderen
+      - operation: LESS_THAN
+        values:
+          - operation: ADD
+            values:
+              - "$INCOME"
+              - "$PARTNER_INCOME"
+              # Tel inkomen medebewoners mee (21+ volledig, onder 21 met vrijstelling)
+              - operation: FOREACH
+                subject: "$HOUSEHOLD_MEMBERS"
+                combine: "ADD"
+                value:
+                  operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_OR_EQUAL
+                        values:
+                          - "$age"
+                          - 21
+                      then: "$income"
+                    - else:
+                        operation: SUBTRACT
+                        values:
+                          - "$income"
+                          - "$KIND_VRIJSTELLING"
+              # Tel inkomen kinderen mee minus vrijstelling
+              - operation: FOREACH
+                subject: "$CHILDREN"
+                combine: "ADD"
+                value:
+                  operation: IF
+                  conditions:
+                    - test:
+                        operation: LESS_THAN
+                        values:
+                          - "$age"
+                          - "$LEEFTIJDSGRENS_KIND_INKOMEN"
+                      then:
+                        operation: SUBTRACT
+                        values:
+                          - "$income"
+                          - "$KIND_VRIJSTELLING"
+                    - else: "$income"
+          - operation: IF
+            conditions:
+              - test:
+                  subject: "$HAS_PARTNER"
+                  operation: EQUALS
+                  value: true
+                then: "$INKOMENSGRENS_PARTNERS"
+              - else: "$INKOMENSGRENS_ALLEENSTAANDE"
+
+      # Partners moeten op hetzelfde adres wonen (wet op huurtoeslag)
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$HAS_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: EQUALS
+              values:
+                - "$RESIDENCE_ADDRESS"
+                - "$PARTNER_ADDRESS"
+          - else: true
+
+      # Vermogenstoets inclusief vermogen minderjarige kinderen
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$HAS_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: LESS_THAN
+              values:
+                - "$COMBINED_NET_WORTH"
+                - "$VERMOGENSGRENS_PARTNERS"
+          - else:
+              operation: LESS_THAN
+              values:
+                - "$NET_WORTH"
+                - "$VERMOGENSGRENS_ALLEENSTAANDE"
+
+      # Inkomenstoets
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$HAS_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: LESS_THAN
+              values:
+                - operation: ADD
+                  values:
+                    - "$INCOME"
+                    - "$PARTNER_INCOME"
+                - "$INKOMENSGRENS_PARTNERS"
+          - else:
+              operation: LESS_THAN
+              values:
+                - "$INCOME"
+                - "$INKOMENSGRENS_ALLEENSTAANDE"
+      # Huurtoets
+      - operation: LESS_THAN
+        values:
+          - operation: ADD
+            values:
+              - "$RENT_AMOUNT"
+              - operation: MIN
+                values:
+                  - "$ELIGIBLE_SERVICE_COSTS"
+                  - "$MAX_SERVICE_COSTS"
+          - "$MAXIMALE_HUURGRENS"
+
+
+actions:
+  - output: "is_eligible"
+    value: true
+
+  - output: "base_rent"
+    operation: SUBTRACT
+    values:
+      - operation: ADD
+        values:
+          - "$RENT_AMOUNT"
+          - "$SERVICE_COSTS"
+      - operation: MULTIPLY
+        values:
+          - operation: IF
+            conditions:
+              - test:
+                  subject: "$HAS_PARTNER"
+                  operation: EQUALS
+                  value: true
+                then:
+                  operation: ADD
+                  values:
+                    - "$INCOME"
+                    - "$PARTNER_INCOME"
+              - else: "$INCOME"
+          - "$MINIMUM_BASISHUUR_PERCENTAGE"
+
+  - output: "subsidy_amount"
+    operation: ADD
+    values:
+      # Deel onder kwaliteitskortingsgrens (100%)
+      - operation: MULTIPLY
+        values:
+          - operation: MIN
+            values:
+              - "$base_rent"
+              - "$KWALITEITSKORTINGSGRENS"
+          - "$SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS"
+
+      # Deel tussen kwaliteitskortingsgrens en aftoppingsgrens (65%)
+      - operation: MULTIPLY
+        values:
+          - operation: MAX
+            values:
+              - 0
+              - operation: SUBTRACT
+                values:
+                  - operation: MIN
+                    values:
+                      - "$base_rent"
+                      - operation: IF
+                        conditions:
+                          - test:
+                              operation: LESS_OR_EQUAL
+                              values:
+                                - "$HOUSEHOLD_SIZE"
+                                - 2
+                            then: "$AFTOPPINGSGRENS_1_2"
+                          - else: "$AFTOPPINGSGRENS_3_PLUS"
+                  - "$KWALITEITSKORTINGSGRENS"
+          - "$SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP"
+
+      # Deel boven aftoppingsgrens (40%)
+      - operation: MULTIPLY
+        values:
+          - operation: MAX
+            values:
+              - 0
+              - operation: SUBTRACT
+                values:
+                  - "$base_rent"
+                  - operation: IF
+                    conditions:
+                      - test:
+                          operation: LESS_OR_EQUAL
+                          values:
+                            - "$HOUSEHOLD_SIZE"
+                            - 2
+                        then: "$AFTOPPINGSGRENS_1_2"
+                      - else: "$AFTOPPINGSGRENS_3_PLUS"
+          - "$SUBSIDIEPERCENTAGE_BOVEN_AFTOP"

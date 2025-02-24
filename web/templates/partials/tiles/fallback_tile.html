@@ -1,20 +1,19 @@
 {% extends "partials/tiles/base_tile.html" %}
-
 {% block tile_content %}
-<p class="text-gray-600">
-    {% if result %}
-        {% for key, value in result.items() %}
-            {% if value is not none and value is not mapping %}
-                <div class="mb-2">
-                    <span class="font-medium">{{ key|replace('_', ' ')|title }}:</span>
-                    {% if value is boolean %}
-                        {{ 'Ja' if value else 'Nee' }}
-                    {% else %}
-                        {{ value }}
-                    {% endif %}
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-</p>
+    <p class="text-gray-600">
+        {% if result %}
+            {% for key, value in result.items() %}
+                {% if value is not none and value is not mapping %}
+                    <div class="mb-2">
+                        <span class="font-medium">{{ key|replace('_', ' ') |title }}:</span>
+                        {% if value is boolean %}
+                            {{ 'Ja' if value else 'Nee' }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </p>
 {% endblock %}

@@ -1,4 +1,5 @@
-uuid: 8f7e6d5c-4321-4f0f-bbbb-987654321abc
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
 name: Bepalen persoonsgegevens BRP
 law: wet_brp
 valid_from: 2020-01-01
@@ -265,12 +266,33 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
+    - name: "woonplaats"
+      description: "Woonplaats"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
     - name: "household_size"
       description: "Aantal personen in huishouden"
       type: "number"
       type_spec:
         precision: 0
         min: 1
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "household_members"
+      description: "Lijst met gegevens van medebewoners"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "children"
+      description: "Lijst met gegevens van kinderen"
+      type: "array"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
@@ -396,3 +418,41 @@ actions:
             - " "
             - "$ADDRESS.woonplaats"
       - else: null
+
+  - output: "woonplaats"
+    value: "$ADDRESS.woonplaats"
+
+  - output: "household_members"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HOUSEHOLD"
+          operation: NOT_NULL
+        then: "$HOUSEHOLD"
+      - else:
+          value: null  # Leeg resultaat
+    reference: "Wet BRP Art. 2.4"
+
+  - output: "children"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HOUSEHOLD"
+          operation: NOT_NULL
+        then:
+          operation: FOREACH  # Gebruik FOREACH voor filtering
+          subject: "$HOUSEHOLD"
+          combine: "ADD"      # Combineer resultaten in een array
+          value:
+            operation: IF
+            conditions:
+              - test:
+                  operation: LESS_THAN
+                  values:
+                    - "$age"
+                    - 18
+                then: "$item"  # Voeg dit item toe als kind
+              - else: null     # Anders niets toevoegen
+      - else:
+          value: null  # Leeg resultaat
+    reference: "Wet BRP Art. 1.6"

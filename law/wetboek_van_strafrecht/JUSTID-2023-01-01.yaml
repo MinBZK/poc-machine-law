@@ -1,4 +1,5 @@
-uuid: b2a1c3d4-5678-4f0f-eeee-123456789abc
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: 41ffa9a4-89a6-4fed-acc7-6b4fdb2e56ce
 name: Bepalen uitsluiting kiesrecht
 law: wetboek_van_strafrecht
 valid_from: 2023-01-01

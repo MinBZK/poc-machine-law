@@ -1,71 +1,76 @@
 <!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger.nl</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
-</head>
-<body class="min-h-screen bg-gray-50">
-<!-- Header -->
-<header class="bg-blue-900 text-white">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center py-4">
-            <div class="flex items-center space-x-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24">
-                    <path fill="white"
-                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/>
-                </svg>
-                <h1 class="text-2xl font-semibold">Burger.nl</h1>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Burger.nl</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+    </head>
+    <body class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-blue-900 text-white">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-8 h-8"
+                             viewBox="0 0 24 24">
+                            <path fill="white" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
+                        </svg>
+                        <h1 class="text-2xl font-semibold">Burger.nl</h1>
+                    </div>
+                    <!-- User Switcher -->
+                    <div class="flex items-center space-x-4">
+                        <select class="bg-white text-gray-900 px-4 py-2 rounded w-96"
+                                onchange="window.location.href='/?bsn=' + this.value">
+                            {% for bsn_key, profile_data in all_profiles.items() %}
+                                <option value="{{ bsn_key }}" {% if bsn== bsn_key %}selected{% endif %}>
+                                    {{ profile_data.name }} - {{ profile_data.description }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
             </div>
-
-            <!-- User Switcher -->
-            <div class="flex items-center space-x-4">
-                <select class="bg-white text-gray-900 px-4 py-2 rounded w-96"
-                        onchange="window.location.href='/?bsn=' + this.value">
-                    {% for bsn_key, profile_data in all_profiles.items() %}
-                    <option value="{{ bsn_key }}" {% if bsn== bsn_key %}selected{% endif %}>
-                        {{ profile_data.name }} - {{ profile_data.description }}
-                    </option>
-                    {% endfor %}
-                </select>
+        </header>
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <div id="dashboard-content">
+                {% block content %}{% endblock %}
             </div>
-        </div>
-    </div>
-</header>
-
-<!-- Main Content -->
-<main class="container mx-auto px-4 py-8">
-    <div id="dashboard-content">
-        {% block content %}{% endblock %}
-    </div>
-</main>
-
-<!-- Footer -->
-<footer class="bg-gray-100 border-t mt-12">
-    <div class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-                <h4 class="font-semibold text-gray-900 mb-4">Demo Implementatie</h4>
-                <p class="text-gray-600">Deze demo laat zien hoe wetten als code werken</p>
+        </main>
+        <!-- Footer -->
+        <footer class="bg-gray-100 border-t mt-12">
+            <div class="container mx-auto px-4 py-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Demo Implementatie</h4>
+                        <p class="text-gray-600">Deze demo laat zien hoe wetten als code werken</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Beschikbare Wetten</h4>
+                        <ul class="space-y-2">
+                            <li>
+                                <span class="text-gray-600">Zorgtoeslag</span>
+                            </li>
+                            <li>
+                                <span class="text-gray-600">AOW</span>
+                            </li>
+                            <li>
+                                <span class="text-gray-600">Bijstand</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Brongegevens</h4>
+                        <p class="text-gray-600">Gegevens in deze demo zijn fictief</p>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h4 class="font-semibold text-gray-900 mb-4">Beschikbare Wetten</h4>
-                <ul class="space-y-2">
-                    <li><span class="text-gray-600">Zorgtoeslag</span></li>
-                    <li><span class="text-gray-600">AOW</span></li>
-                    <li><span class="text-gray-600">Bijstand</span></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-semibold text-gray-900 mb-4">Brongegevens</h4>
-                <p class="text-gray-600">Gegevens in deze demo zijn fictief</p>
-            </div>
-        </div>
-    </div>
-</footer>
-</body>
+        </footer>
+    </body>
 </html>

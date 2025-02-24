@@ -5,10 +5,8 @@ import anthropic
 
 
 class LLMService:
-    def __init__(self):
-        self.client = anthropic.Anthropic(
-            api_key=os.getenv("ANTHROPIC_API_KEY")
-        )
+    def __init__(self) -> None:
+        self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
     @lru_cache(maxsize=1000)  # Cache responses to avoid repeated calls
     def generate_explanation(self, path_json: str, rule_spec_json: str) -> str:
@@ -32,18 +30,12 @@ Het moet een PARAGRAAF zijn die ik in een brief aan de burger kan sturen (dus ni
 Graag vriendelijk en behulpzaam.
 """
 
-
             message = self.client.messages.create(
                 model="claude-3-sonnet-20240229",
                 max_tokens=1000,
                 temperature=0,
                 system="Je bent een behulpzame overheidsmedewerker die burgers uitlegt hoe hun aanvraag is beoordeeld. Je geeft altijd korte, duidelijke uitleg in begrijpelijk Nederlands.",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
+                messages=[{"role": "user", "content": prompt}],
             )
 
             return message.content[0].text

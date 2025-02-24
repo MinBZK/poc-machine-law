@@ -123,6 +123,14 @@ Run simulaties:
 uv run simulate.py
 ```
 
+Run de burger interface:
+```bash
+uv run web/main.py
+```
+
+Dit zou een interface hier http://0.0.0.0:8000 en hier http://0.0.0.0:8000/admin op moeten leveren.
+
+
 
 ## 📂 Repository structuur
 
@@ -135,10 +143,11 @@ In willekeurige volgorde:
 
 - ~~📅 Implementatie van referentiedatums~~
 - ~~📚 Toevoegen van meer wetten naast de zorgtoeslagwet~~
-- ⚖️ Onderzoeken hoe algemene wetten (zoals bezwaarrecht) hierin passen
+- ~~⚖️ Onderzoeken hoe algemene wetten (zoals bezwaarrecht) hierin passen~~
+- ~~👥 Verbeteren van uitlegbaarheid naar burgers~~
+- 🙋 Hardheid-by-design
 - 🔧 Ontwikkelen van tools om wetten om te zetten
 - 🔍 Detectie van deadlocks/loops in wetgeving
-- 👥 Verbeteren van uitlegbaarheid naar burgers
 
 ## 🤝 Bijdragen
 

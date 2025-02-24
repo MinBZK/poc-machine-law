@@ -19,3 +19,22 @@ dependencies = [
     "requests>=2.32.3",
     "uvicorn>=0.34.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.6",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+exclude = ["features/steps/steps.py", "script"]
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = ["I", "SIM", "UP", "F", "LOG", "PIE", "PT", "W"]
+fixable = ["ALL"]
+task-tags = ["TODO"]
+ignore = ["TRY003"]

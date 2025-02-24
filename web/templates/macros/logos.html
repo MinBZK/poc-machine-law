@@ -1,6 +1,8 @@
 <!-- templates/macros/logos.html -->
 {% macro org_logo(service) %}
-<div class="w-16 h-16">
-    <img src="/static/logos/{{ service }}.png" alt="{{ service }} logo" class="h-full w-auto object-contain"/>
-</div>
+    <div class="w-16 h-16">
+        <img src="/static/logos/{{ service }}.png"
+             alt="{{ service }} logo"
+             class="h-full w-auto object-contain" />
+    </div>
 {% endmacro %}
