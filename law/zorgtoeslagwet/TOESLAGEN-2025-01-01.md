@@ -105,6 +105,3 @@ De <span style="color: green">hoogte_toeslag</span> is
 
 
     - anders <span style="color:green">0</span>
-
-
-
