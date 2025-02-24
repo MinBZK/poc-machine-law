@@ -58,6 +58,7 @@
         },
       ];
       input = '';
+      quickReplies = [];
     }
 
     inputElement.focus();

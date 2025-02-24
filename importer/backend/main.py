@@ -61,15 +61,15 @@ def ask_law(state: State, config: Dict) -> Dict:
         manager.send_message(WebSocketMessage(content=msg), thread_id)
     )
 
-    resp = interrupt("ask_law")
-
-    return {"messages": [], "law": resp}  # Note: we reset the messages
+    return {"messages": []}  # Note: we reset the messages
 
 
 def check_law_input(state: State, config: Dict) -> Dict:
     print("----> check_law_input")
 
-    if not state.get("law") or len(state["law"]) < 4:
+    resp = interrupt("check_law_input")
+
+    if len(resp) < 4:
         thread_id = config["configurable"]["thread_id"]
         asyncio.get_event_loop().create_task(
             manager.send_message(
@@ -79,9 +79,9 @@ def check_law_input(state: State, config: Dict) -> Dict:
                 thread_id,
             )
         )
-        return {"should_retry": True}
+        return {"should_retry": True, "law": resp}
 
-    return {"should_retry": False}
+    return {"should_retry": False, "law": resp}
 
 
 def ask_law_confirmation(state: State, config: Dict) -> Dict:
@@ -90,15 +90,15 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
     # Find the law URL
     docs = retriever.invoke(state["law"])
 
-    pprint.pprint(docs)
-    url = docs[0].metadata["source"]  # IMPROVE: handle the case where no docs are found
+    metadata = docs[0].metadata
+    url = metadata["source"]  # IMPROVE: handle the case where no docs are found
 
     thread_id = config["configurable"]["thread_id"]
 
     asyncio.get_event_loop().create_task(
         manager.send_message(
             WebSocketMessage(
-                content=f"De URL is {url}\n\nIs dit de wet die je bedoelt?",
+                content=f"Is dit de wet die je bedoelt? \n\n{metadata["title"]}\n{url}",
                 quick_replies=["Ja", "Nee"],
             ),
             thread_id,
@@ -124,19 +124,7 @@ def handle_law_confirmation(state: State) -> Dict:
 def continuing(state: State, config: Dict) -> Dict:
     print("----> continuing")
 
-    # TODO: reset quick replies
-
     return {}
-
-
-def continue_after_law_confirmation(state: State) -> str:
-    print("----> continue_after_law_confirmation")
-
-    if state["law_url_approved"]:
-        return "continuing"
-
-    # Else: ask the law name again
-    return "ask_law"
 
 
 # Add nodes
@@ -155,7 +143,8 @@ workflow.add_conditional_edges(
 )
 workflow.add_edge("ask_law_confirmation", "handle_law_confirmation")
 workflow.add_conditional_edges(
-    "handle_law_confirmation", continue_after_law_confirmation
+    "handle_law_confirmation",
+    lambda state: "continuing" if state["law_url_approved"] else "ask_law",
 )
 
 
