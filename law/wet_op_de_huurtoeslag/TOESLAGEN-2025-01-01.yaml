@@ -95,6 +95,17 @@ properties:
         service: "RvIG"
         field: "children"
         law: "wet_brp"
+        
+    - name: "PARTNER_BSN"
+      description: "BSN van de partner"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
 
     - name: "PARTNER_ADDRESS"
       description: "Woonadres van de partner"

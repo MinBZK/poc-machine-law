@@ -282,6 +282,20 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+        
+    - name: "household_members"
+      description: "Lijst met gegevens van medebewoners"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+        
+    - name: "children"
+      description: "Lijst met gegevens van kinderen"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
 
   definitions:
     DUTCH_NATIONALITIES:
@@ -403,3 +417,38 @@ actions:
 
   - output: "woonplaats"
     value: "$ADDRESS.woonplaats"
+    
+  - output: "household_members"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HOUSEHOLD"
+          operation: NOT_NULL
+        then: "$HOUSEHOLD"
+      - else: 
+          value: null  # Leeg resultaat
+    reference: "Wet BRP Art. 2.4"
+    
+  - output: "children"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HOUSEHOLD"
+          operation: NOT_NULL
+        then:
+          operation: FOREACH  # Gebruik FOREACH voor filtering
+          subject: "$HOUSEHOLD"
+          combine: "ADD"      # Combineer resultaten in een array
+          value:
+            operation: IF
+            conditions:
+              - test:
+                  operation: LESS_THAN
+                  values:
+                    - "$age"
+                    - 18
+                then: "$item"  # Voeg dit item toe als kind
+              - else: null     # Anders niets toevoegen
+      - else: 
+          value: null  # Leeg resultaat
+    reference: "Wet BRP Art. 1.6"
