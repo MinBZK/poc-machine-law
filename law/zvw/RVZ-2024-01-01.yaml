@@ -1,4 +1,5 @@
-uuid: 8e7f6d5c-4321-4f0f-iiii-901234567890
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: aba2b8fa-4b34-420f-883a-e78da326a8f4
 name: Bepalen verzekeringsstatus 2024
 law: zvw
 valid_from: 2024-01-01

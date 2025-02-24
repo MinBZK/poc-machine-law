@@ -1,0 +1,208 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: b6679cca-4555-44b4-9b8f-caa6886b74a0
+name: Algemene wet bestuursrecht - Bezwaarmogelijkheid en Termijnen
+law: awb/bezwaar
+valid_from: 2024-01-01
+service: "JenV"
+description: >
+  Bepaalt of bezwaar mogelijk is tegen een besluit en wat de geldende termijnen zijn
+  volgens de Algemene wet bestuursrecht, met inachtneming van specifieke wetgeving.
+
+references:
+  - law: "Algemene wet bestuursrecht"
+    article: "1:3"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk1_Titeldeel1.1_Artikel1:3"
+  - law: "Algemene wet bestuursrecht"
+    article: "6:7"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk6_Afdeling6.2_Artikel6:7"
+  - law: "Algemene wet bestuursrecht"
+    article: "7:10"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.2_Artikel7:10"
+  - law: "Algemene wet bestuursrecht"
+    article: "8:1"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+
+properties:
+  applies:
+    - name: "CASE"
+      aggregate: "Case"
+      events:
+        - type: "Decided"
+          filter:
+            approved: false
+      update:
+        - method: "determine_objection_status"
+          mapping:
+            possible: "$bezwaar_mogelijk"
+            not_possible_reason: "$reden_niet_mogelijk"
+            objection_period: "$bezwaartermijn"
+            decision_period: "$beslistermijn"
+            extension_period: "$verdagingstermijn"
+
+  sources:
+    - name: "LAW"
+      description: "De wet waar dit besluit op gebaseerd is"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "laws"
+        table: "laws"
+        fields: [
+          "decision_type",
+          "name",
+          "valid_from",
+          "legal_character",
+          "bezwaartermijn_weken",
+          "beslistermijn_weken",
+          "verdagingstermijn_weken"
+        ]
+        select_on:
+          - name: "uuid"
+            description: "UUID van de wet"
+            type: "string"
+            value: "$CASE.rulespec_uuid"
+
+    - name: "EVENTS"
+      description: "De gebeurtenissen rondom deze zaak"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "events"
+        table: "events"
+        fields: [
+          "case_id",
+          "event_type"
+        ]
+        select_on:
+          - name: "case_id"
+            description: "Zaak identifier"
+            type: "string"
+            value: "$CASE.id"
+
+  output:
+    - name: "bezwaar_mogelijk"
+      description: "Is bezwaar mogelijk tegen dit besluit"
+      type: "boolean"
+
+    - name: "reden_niet_mogelijk"
+      description: "Reden waarom geen bezwaar mogelijk is"
+      type: "string"
+      required: false
+
+    - name: "bezwaartermijn"
+      description: "Termijn voor het indienen van bezwaar (standaard artikel 6:7 Awb, tenzij anders bepaald)"
+      type: "number"
+      type_spec:
+        unit: "weeks"
+        precision: 0
+        min: 0
+
+    - name: "beslistermijn"
+      description: "Termijn voor beslissing op bezwaar (standaard artikel 7:10 lid 1 Awb, tenzij anders bepaald)"
+      type: "number"
+      type_spec:
+        unit: "weeks"
+        precision: 0
+        min: 0
+
+    - name: "verdagingstermijn"
+      description: "Mogelijke verdaging van beslistermijn (standaard artikel 7:10 lid 3 Awb, tenzij anders bepaald)"
+      type: "number"
+      type_spec:
+        unit: "weeks"
+        precision: 0
+        min: 0
+
+  definitions:
+    EXCLUDED_DECISION_TYPES:
+      - "ALGEMEEN_VERBINDEND_VOORSCHRIFT"
+      - "BELEIDSREGEL"
+      - "VOORBEREIDINGSBESLUIT"
+      - "ANDERE_HANDELING"
+
+    REQUIRED_LEGAL_CHARACTER:
+      - "BESCHIKKING"
+      - "BESLUIT_VAN_ALGEMENE_STREKKING"
+
+    DEFAULT_TERMIJN_BEZWAAR_WEKEN: 6
+    DEFAULT_TERMIJN_BESLISSING_WEKEN: 6
+    DEFAULT_TERMIJN_VERDAGING_WEKEN: 6
+
+actions:
+  - output: "bezwaar_mogelijk"
+    operation: AND
+    values:
+      - operation: NOT_IN
+        subject: "$LAW.decision_type"
+        values: "$EXCLUDED_DECISION_TYPES"
+      - operation: IN
+        subject: "$LAW.legal_character"
+        values: "$REQUIRED_LEGAL_CHARACTER"
+      - operation: EQUALS
+        values:
+          - operation: FOREACH
+            subject: "$EVENTS"
+            combine: ADD
+            value:
+              - operation: EQUALS
+                subject: "$event_type"
+                value: "Objected"
+          - 0
+
+  - output: "reden_niet_mogelijk"
+    operation: IF
+    conditions:
+      - test:
+          operation: IN
+          subject: "$LAW.decision_type"
+          values: "$EXCLUDED_DECISION_TYPES"
+        then: "tegen dit type besluit is geen bezwaar mogelijk"
+      - test:
+          operation: NOT_IN
+          subject: "$LAW.legal_character"
+          values: "$REQUIRED_LEGAL_CHARACTER"
+        then: "dit is geen besluit in de zin van de AWB"
+      - test:
+          operation: NOT_EQUALS
+          values:
+            - operation: FOREACH
+              subject: "$EVENTS"
+              combine: ADD
+              value:
+                - operation: EQUALS
+                  subject: "$event_type"
+                  value: "Objected"
+            - 0
+        then: "er is al eerder bezwaar gemaakt tegen dit besluit"
+      - else: null
+
+  - output: "bezwaartermijn"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$LAW.bezwaartermijn_weken"
+          operation: NOT_NULL
+        then: "$LAW.bezwaartermijn_weken"
+      - else: "$DEFAULT_TERMIJN_BEZWAAR_WEKEN"
+
+  - output: "beslistermijn"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$LAW.beslistermijn_weken"
+          operation: NOT_NULL
+        then: "$LAW.beslistermijn_weken"
+      - else: "$DEFAULT_TERMIJN_BESLISSING_WEKEN"
+
+  - output: "verdagingstermijn"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$LAW.verdagingstermijn_weken"
+          operation: NOT_NULL
+        then: "$LAW.verdagingstermijn_weken"
+      - else: "$DEFAULT_TERMIJN_VERDAGING_WEKEN"

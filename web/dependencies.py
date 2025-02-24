@@ -4,11 +4,10 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
-from machine.events.application import ServiceCaseManager
 from machine.service import Services
 
 # Set Dutch locale
-locale.setlocale(locale.LC_TIME, 'nl_NL.UTF-8')
+locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
 TODAY = datetime.today().strftime("%Y-%m-%d")
 FORMATTED_DATE = datetime.today().strftime("%-d %B %Y")
 
