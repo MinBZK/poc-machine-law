@@ -94,7 +94,7 @@ def flatten_path_nodes(root):
         # Handle resolve nodes
         if (
             node.type == "resolve"
-            and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM"}
+            and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM", "NONE"}
             and path
             and isinstance(path, str)
         ):

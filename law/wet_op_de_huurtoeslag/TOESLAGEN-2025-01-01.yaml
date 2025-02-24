@@ -1,6 +1,10 @@
-uuid: 1a2b3c4d-5e6f-7g8h-9i0j-k1l2m3n4o5p6
+uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
 name: Huurtoeslag
 law: wet_op_de_huurtoeslag
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
 valid_from: 2025-01-01
 service: "TOESLAGEN"
 description: >
@@ -8,7 +12,7 @@ description: >
   de Wet op de huurtoeslag en de Algemene wet inkomensafhankelijke regelingen (AWIR),
   geldend voor het jaar 2025.
 
-  references:
+references:
   - law: "Wet op de huurtoeslag"
     article: "2"
     url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel2"
@@ -54,6 +58,21 @@ properties:
       source_reference:
         source_type: "claim"
         required: true
+
+    - name: "ELIGIBLE_SERVICE_COSTS"
+      description: "In aanmerking komende servicekosten"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+        required: true
+
 
   input:
     - name: "HOUSEHOLD_MEMBERS"
@@ -166,17 +185,6 @@ properties:
         type: "period"
         period_type: "year"
 
-    - name: "ELIGIBLE_SERVICE_COSTS"
-      description: "In aanmerking komende servicekosten"
-      type: "amount"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "month"
-
     - name: "NET_WORTH"
       description: "Vermogen"
       type: "amount"
@@ -258,6 +266,8 @@ requirements:
       - subject: "$RENT_AMOUNT"
         operation: NOT_NULL
       - subject: "$SERVICE_COSTS"
+        operation: NOT_NULL
+      - subject: "$ELIGIBLE_SERVICE_COSTS"
         operation: NOT_NULL
 
       # Leeftijdseis

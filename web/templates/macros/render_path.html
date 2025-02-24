@@ -1,7 +1,5 @@
 {% macro render_value(key, value, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
-{% if value is none or value is undefined %}
-<span class="text-gray-400">-</span>
-{% else %}
+
 <button
         class="group inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 cursor-pointer rounded px-1 hover:bg-blue-50"
         hx-get="/edit/edit-form"
@@ -17,6 +15,9 @@
         "claimant": "{{ claimant }}"
     }'
         type="button">
+    {% if value is none or value is undefined %}
+        <span class="text-gray-400">-</span>
+        {% else %}
     {% if value is mapping and value.result is defined %}
         {% set display_value = value.result %}
     {% else %}
@@ -45,6 +46,8 @@
     {% else %}
         {{ display_value }}
     {% endif %}
+    {% endif %}
+
     <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24"
          stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -114,7 +117,6 @@
 {% endif %}
 
 
-{% endif %}
 {% endmacro %}
 
 {% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
@@ -131,7 +133,7 @@
                  class="transform transition-transform duration-200 w-4 h-4 text-gray-500 mr-1 rotate-90"
                  viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd"
-                      d="M7.293 4.707a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z"
+                         d="M7.293 4.707a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L10.586 10 7.293 6.707a1 1 0 010-1.414z"
                       clip-rule="evenodd"/>
             </svg>
             <span class="text-green-600">

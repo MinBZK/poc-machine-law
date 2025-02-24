@@ -2,6 +2,7 @@
      id="edit-modal"
      x-data='{
         value: {{ value|tojson }},
+        newValueType: null,
         {% if claim_data %}
         newValue: {{ claim_data.new_value|tojson }},
         reason: {{ claim_data.reason|tojson }},
@@ -131,6 +132,45 @@
                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                        required>
                             </template>
+
+                            <template x-if="value === null || value === undefined">
+                                        <div>
+                                            <select id="new-value-type" name="new_value_type"
+                                                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                    x-model="newValueType">
+                                                <option value="">Kies een type</option>
+                                                <option value="string">Tekst</option>
+                                                <option value="number">Getal</option>
+                                                <option value="boolean">Ja/Nee</option>
+                                                <option value="date">Datum</option>
+                                            </select>
+
+                                            <div class="mt-2">
+                                                <template x-if="newValueType === 'string'">
+                                                    <input type="text" name="new_value"
+                                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                           required>
+                                                </template>
+                                                <template x-if="newValueType === 'number'">
+                                                    <input type="number" name="new_value"
+                                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                           required>
+                                                </template>
+                                                <template x-if="newValueType === 'boolean'">
+                                                    <select name="new_value"
+                                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                        <option value="true">Ja</option>
+                                                        <option value="false">Nee</option>
+                                                    </select>
+                                                </template>
+                                                <template x-if="newValueType === 'date'">
+                                                    <input type="date" name="new_value"
+                                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                           required>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
                         </div>
                     </div>
                 </div>
