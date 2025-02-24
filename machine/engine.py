@@ -373,7 +373,10 @@ class RulesEngine:
                 with logger.indent_block(f"Item {item}"):
                     item_context = copy(context)
                     item_context.local = item
-                    result = await self._evaluate_value(operation["value"][0], item_context)
+                    value_to_evaluate = (
+                        operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
+                    )
+                    result = await self._evaluate_value(value_to_evaluate, item_context)
                     values.extend(result if isinstance(result, list) else [result])
             logger.debug(f"Foreach values: {values}")
             result = self._evaluate_aggregate_ops(combine, values)

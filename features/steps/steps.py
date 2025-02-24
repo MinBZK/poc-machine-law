@@ -31,7 +31,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar"} else parse_value(v)
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn"} else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)
@@ -372,3 +372,30 @@ def step_impl(context):
         bsn=context.parameters["BSN"]
     )
     context.claim_id = claim_id
+
+
+@then("heeft de persoon recht op huurtoeslag")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    assertions.assertTrue(
+        context.result.requirements_met,
+        "Persoon heeft toch geen recht op huurtoeslag",
+    )
+
+
+@given("met een kale huur {rent} en servicekosten {service_costs} waarvan {eligible_service_costs} meetellen")
+def step_impl(context, rent, service_costs, eligible_service_costs):
+    """
+    :type context: behave.runner.Context
+    """
+    context.parameters["RENT_AMOUNT"] = int(rent) * 100
+    context.parameters["SERVICE_COSTS"] = int(service_costs) * 100
+    context.parameters["ELIGIBLE_SERVICE_COSTS"] = int(eligible_service_costs) * 100
+
+
+@then('is de huurtoeslag "{amount}" euro')
+def step_impl(context, amount):
+    actual_amount = context.result.output["subsidy_amount"]
+    compare_euro_amount(actual_amount, amount)

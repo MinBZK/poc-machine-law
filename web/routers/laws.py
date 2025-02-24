@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from jinja2 import TemplateNotFound
 
 from explain.llm_service import llm_service
-from machine.context import flatten_path_nodes
 from machine.service import Services
 from web.dependencies import TODAY, get_services, templates
 from web.services.profiles import get_profile_data
@@ -261,7 +260,7 @@ async def application_panel(
     try:
         law = unquote(law)
         law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
-        flat_path = flatten_path_nodes(result.path)
+        value_tree = services.extract_value_tree(result.path)
         existing_case = services.case_manager.get_case(bsn, service, law)
 
         claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
@@ -277,7 +276,7 @@ async def application_panel(
                 "input": result.input,
                 "result": result.output,
                 "requirements_met": result.requirements_met,
-                "path": flat_path,
+                "path": value_tree,
                 "bsn": bsn,
                 "current_case": existing_case,
                 "claim_map": claim_map,

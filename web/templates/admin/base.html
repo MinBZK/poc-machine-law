@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Claims Admin</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
+    <head>
+        <title>Claims Admin</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <style>
         .htmx-swapping {
             opacity: 0;
             transition: opacity 0.5s ease-out;
@@ -43,12 +43,11 @@
         .htmx-request .htmx-indicator {
             display: inline;
         }
-    </style>
-</head>
-<body class="bg-gray-50">
-{% block content %}{% endblock %}
-
-<script>
+        </style>
+    </head>
+    <body class="bg-gray-50">
+        {% block content %}{% endblock %}
+        <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize Sortable on all lanes
         document.querySelectorAll('.lane').forEach(function (lane) {
@@ -68,6 +67,6 @@
             });
         });
     });
-</script>
-</body>
+        </script>
+    </body>
 </html>

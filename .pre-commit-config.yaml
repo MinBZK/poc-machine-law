@@ -21,6 +21,8 @@ repos:
     rev: v1.36.4
     hooks:
       - id: djlint-reformat-jinja
+        types_or: [ "html" ]
+
   - repo: local
     hooks:
       - id: validate-schema
