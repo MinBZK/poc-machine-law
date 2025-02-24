@@ -68,6 +68,7 @@ class PathNode:
     type: str
     name: str
     result: Any
+    resolve_type: str = None
     details: dict[str, Any] = field(default_factory=dict)
     children: list["PathNode"] = field(default_factory=list)
 
@@ -91,7 +92,12 @@ def flatten_path_nodes(root):
             path = path[1:]
 
         # Handle resolve nodes
-        if node.type == "resolve" and path and isinstance(path, str):
+        if (
+            node.type == "resolve"
+            and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM"}
+            and path
+            and isinstance(path, str)
+        ):
             resolve_entry = {
                 "result": node.result,
             }
@@ -223,30 +229,35 @@ class RuleContext:
                     value = claim.new_value
                     logger.debug(f"Resolving from CLAIM: {value}")
                     node.result = value
+                    node.resolve_type = "CLAIM"
                     return value
 
                 # Check local scope
                 if path in self.local:
                     logger.debug(f"Resolving from LOCAL: {self.local[path]}")
                     node.result = self.local[path]
+                    node.resolve_type = "LOCAL"
                     return self.local[path]
 
                 # Check definitions
                 if path in self.definitions:
                     logger.debug(f"Resolving from DEFINITION: {self.definitions[path]}")
                     node.result = self.definitions[path]
+                    node.resolve_type = "DEFINITION"
                     return self.definitions[path]
 
                 # Check parameters
                 if path in self.parameters:
                     logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
                     node.result = self.parameters[path]
+                    node.resolve_type = "PARAMETER"
                     return self.parameters[path]
 
                 # Check outputs
                 if path in self.outputs:
                     logger.debug(f"Resolving from previous OUTPUT: {self.outputs[path]}")
                     node.result = self.outputs[path]
+                    node.resolve_type = "OUTPUT"
                     return self.outputs[path]
 
                 # Check overwrite data
@@ -261,6 +272,7 @@ class RuleContext:
                         value = self.overwrite_input[service_ref["service"]][service_ref["field"]]
                         logger.debug(f"Resolving from OVERWRITE: {value}")
                         node.result = value
+                        node.resolve_type = "OVERWRITE"
                         return value
 
                 # Check sources
@@ -286,6 +298,7 @@ class RuleContext:
                             result = await self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
+                            node.resolve_type = "SOURCE"
                             return result
 
                 # Check services
@@ -298,10 +311,12 @@ class RuleContext:
                             f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}"
                         )
                         node.result = value
+                        node.resolve_type = "SERVICE"
                         return value
 
                 logger.warning(f"Could not resolve value for {path}")
                 node.result = None
+                node.resolve_type = "NONE"
                 return None
         finally:
             self.pop_path()
