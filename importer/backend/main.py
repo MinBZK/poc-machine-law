@@ -1,27 +1,19 @@
 from langchain_anthropic import ChatAnthropic
 from langchain_community.retrievers import TavilySearchAPIRetriever
 from langchain_community.document_loaders import WebBaseLoader
-from langgraph.graph import END, StateGraph, MessagesState
-from typing import Dict, Optional, TypedDict, Annotated, List
+from langgraph.graph import StateGraph
+from typing import Dict, Literal, Optional, TypedDict, Annotated, List
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage
-from IPython.display import Image, display, HTML
 import pprint
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 import uvicorn
 import uuid
 import json
-
-# Set up the state
-from langgraph.graph import MessagesState, START
 from langgraph.types import Command, interrupt
-
-# from langchain_core.tools import tool
-# from langgraph.prebuilt import ToolNode
-# from pydantic import BaseModel
 import asyncio
 
 
@@ -73,9 +65,7 @@ def check_law_input(state: State, config: Dict) -> Dict:
         thread_id = config["configurable"]["thread_id"]
         asyncio.get_event_loop().create_task(
             manager.send_message(
-                WebSocketMessage(
-                    content="De wetnaam moet minimaal 4 karakters bevatten."
-                ),
+                WebSocketMessage(content="De wetnaam moet minimaal 4 tekens bevatten."),
                 thread_id,
             )
         )
@@ -121,10 +111,47 @@ def handle_law_confirmation(state: State) -> Dict:
     return {"law_url_approved": is_approved}
 
 
-def continuing(state: State, config: Dict) -> Dict:
-    print("----> continuing")
+analyize_law_prompt = ChatPromptTemplate(
+    [
+        (
+            "user",
+            [
+                {
+                    "text": "Vat de volgende wettekst samen in 10 woorden.",
+                },
+                {
+                    "type": "document",
+                    "title": "wettekst",
+                    "text": "{content}",
+                },
+            ],
+        ),
+    ]
+)
 
-    return {}
+
+def process_law(state: State, config: Dict) -> Dict:
+    print("----> process_law")
+
+    # Fetch the law content
+    docs = WebBaseLoader(  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
+        state["law_url"]
+    ).load()
+
+    content = "\n\n".join(doc.page_content for doc in docs)
+
+    # Add a human message to process the law
+    result = model.invoke(analyize_law_prompt.format_messages(content=content))
+
+    return {"messages": [result]}
+
+
+def process_law_feedback(state: State, config: Dict) -> Dict:
+    print("----> process_law_feedback")
+
+    resp = interrupt("process_law_feedback")
+
+    return {"messages": [model.invoke([HumanMessage(resp)])]}
 
 
 # Add nodes
@@ -132,23 +159,41 @@ workflow.add_node("ask_law", ask_law)
 workflow.add_node("check_law_input", check_law_input)
 workflow.add_node("ask_law_confirmation", ask_law_confirmation)
 workflow.add_node("handle_law_confirmation", handle_law_confirmation)
-workflow.add_node("continuing", continuing)
+workflow.add_node("process_law", process_law)
+workflow.add_node("process_law_feedback", process_law_feedback)
 
 # Add edges
 workflow.set_entry_point("ask_law")
 workflow.add_edge("ask_law", "check_law_input")
+
+
+def should_retry_law_input(
+    state: State,
+) -> Literal[
+    "ask_law", "ask_law_confirmation"
+]:  # Note: instead of a lambda function, in order to use type hints for the workflow graph, also below
+    return "ask_law" if state["should_retry"] else "ask_law_confirmation"
+
+
 workflow.add_conditional_edges(
     "check_law_input",
-    lambda state: "ask_law" if state["should_retry"] else "ask_law_confirmation",
+    should_retry_law_input,
 )
 workflow.add_edge("ask_law_confirmation", "handle_law_confirmation")
+
+
+def handle_law_confirmation_result(state: State) -> Literal["process_law", "ask_law"]:
+    return "process_law" if state["law_url_approved"] else "ask_law"
+
+
 workflow.add_conditional_edges(
-    "handle_law_confirmation",
-    lambda state: "continuing" if state["law_url_approved"] else "ask_law",
+    "handle_law_confirmation", handle_law_confirmation_result
 )
 
+workflow.add_edge("process_law", "process_law_feedback")
 
-# Initialize memory to persist state between graph runs
+
+# Initialize memory to persist state between graph runs. IMPROVE: store persistently in Postgres
 checkpointer = MemorySaver()
 
 # Compile the graph
@@ -208,7 +253,6 @@ async def websocket_endpoint(websocket: WebSocket):
             print("message received:", user_input)
 
             for event in graph.stream(
-                # {"messages": [HumanMessage(user_input)]},
                 Command(resume=user_input),
                 {"configurable": {"thread_id": thread_id}},
                 stream_mode="values",
