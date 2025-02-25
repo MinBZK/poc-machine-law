@@ -1,6 +1,7 @@
 <script lang="ts">
   import { focusElement } from '$lib';
   import { tick } from 'svelte';
+  import Markdown from 'svelte-exmarkdown';
 
   type Message = {
     id: string;
@@ -57,6 +58,7 @@
   function handleSubmit() {
     if (input && socket.readyState === WebSocket.OPEN) {
       socket.send(input);
+
       messages = [
         ...messages,
         {
@@ -68,6 +70,10 @@
       ];
       input = '';
       quickReplies = [];
+
+      tick().then(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      });
     }
 
     inputElement.focus();
@@ -86,7 +92,11 @@
     class="mb-2 flex flex-grow flex-col overflow-y-auto scroll-smooth rounded-md bg-gray-100 p-4"
   >
     {#each messages as message}
-      <div class="message" class:own={message.isOwn}>{message.content}</div>
+      {#if message.isOwn}
+        <div class="message own">{message.content}</div>
+      {:else}
+        <div class="message"><Markdown md={message.content} /></div>
+      {/if}
     {/each}
 
     <div class="self-start">
@@ -166,5 +176,13 @@
     &.own {
       @apply self-end bg-green-100;
     }
+  }
+
+  :global(.message a) {
+    @apply text-blue-600 underline hover:text-blue-800 hover:no-underline;
+  }
+
+  :global(.message pre) {
+    @apply rounded-sm bg-gray-800 px-3 py-2 text-sm text-white;
   }
 </style>

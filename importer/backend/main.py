@@ -100,7 +100,7 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
-                content=f"Is dit de wet die je bedoelt?\n\n{metadata["title"]}\n{url}",
+                content=f"Is dit de wet die je bedoelt?\n\n{metadata["title"]}\n[{url}]({url})",
                 quick_replies=["Ja", "Nee"],
             ),
             thread_id,
@@ -151,7 +151,7 @@ def process_law(state: State, config: Dict) -> Dict:
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
-                content="De wettekst wordt nu opgehaald en geanalyseerd, dit kan even duren.",
+                content="De wettekst wordt nu opgehaald en geanalyseerd, dit kan even duren…",
                 quick_replies=[],
             ),
             thread_id,
