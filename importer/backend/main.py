@@ -123,13 +123,45 @@ def handle_law_confirmation(state: State) -> Dict:
     return {"law_url_approved": is_approved}
 
 
+def fetch_and_format_data(url: str) -> str:
+    docs = WebBaseLoader(
+        url
+    ).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
 analyize_law_prompt = ChatPromptTemplate(
     [
         (
             "user",
             [
                 {
-                    "text": "Zet de volgende wettekst om naar YAML-formaat:",
+                    "type": "text",
+                    "text": "Ik heb deze wetten zo gemodelleerd in YAML.",
+                },
+                {
+                    "type": "document",
+                    "title": "voorbeeld 1",
+                    "text": fetch_and_format_data(
+                        "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/zvw/RVZ-2024-01-01.yaml"
+                    ),
+                },
+                {
+                    "type": "document",
+                    "title": "voorbeeld 2",
+                    "text": fetch_and_format_data(
+                        "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/handelsregisterwet/KVK-2024-01-01.yaml"
+                    ),
+                },
+            ],
+        ),
+        (
+            "user",
+            [
+                {
+                    "type": "text",
+                    # "text": "Zet de volgende wettekst om naar YAML-formaat:",
+                    "text": "Ik wil nu hetzelfde doen voor de volgende wettekst. Analyseer de wet grondig! Dan wil ik graag eerst stap voor stap zien wat de wet doet. Wie het uitvoert. Waar de wet van afhankelijk is. En dan graag per uitvoeringsorganisatie een YAML file precies zoals de voorbeelden (verzin geen nieuwe velden/operations/...).",
                 },
                 {
                     "type": "document",
@@ -159,11 +191,7 @@ def process_law(state: State, config: Dict) -> Dict:
     )
 
     # Fetch the law content
-    docs = WebBaseLoader(  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
-        state["law_url"]
-    ).load()
-
-    content = "\n\n".join(doc.page_content for doc in docs)
+    content = fetch_and_format_data(state["law_url"])
 
     # Clip the law content to 100 characters for testing purposes. TODO: remove this
     if len(content) > 100:
