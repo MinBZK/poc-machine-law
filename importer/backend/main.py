@@ -15,6 +15,7 @@ import uuid
 import json
 from langgraph.types import Command, interrupt
 import asyncio
+import nest_asyncio
 
 
 model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, max_retries=2)
@@ -42,6 +43,10 @@ class WebSocketMessage(TypedDict):
 # Initialize the graph
 workflow = StateGraph(state_schema=State)
 
+# Get the event loop and enable nesting, see https://pypi.org/project/nest-asyncio/
+nest_asyncio.apply()
+loop = asyncio.get_event_loop()
+
 
 def ask_law(state: State, config: Dict) -> Dict:
     print("----> ask_law")
@@ -50,9 +55,9 @@ def ask_law(state: State, config: Dict) -> Dict:
 
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
-    asyncio.get_event_loop().create_task(
+    loop.run_until_complete(
         manager.send_message(
-            WebSocketMessage(id=str(uuid.UUID), content=msg), thread_id
+            WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id
         )
     )
 
@@ -66,10 +71,10 @@ def check_law_input(state: State, config: Dict) -> Dict:
 
     if len(resp) < 4:
         thread_id = config["configurable"]["thread_id"]
-        asyncio.get_event_loop().create_task(
+        loop.run_until_complete(
             manager.send_message(
                 WebSocketMessage(
-                    id=str(uuid.UUID),
+                    id=str(uuid.uuid4()),
                     content="De wetnaam moet minimaal 4 tekens bevatten.",
                 ),
                 thread_id,
@@ -91,10 +96,10 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
 
     thread_id = config["configurable"]["thread_id"]
 
-    asyncio.run(
+    loop.run_until_complete(
         manager.send_message(
             WebSocketMessage(
-                id=str(uuid.UUID),
+                id=str(uuid.uuid4()),
                 content=f"Is dit de wet die je bedoelt?\n\n{metadata["title"]}\n{url}",
                 quick_replies=["Ja", "Nee"],
             ),
@@ -124,7 +129,7 @@ analyize_law_prompt = ChatPromptTemplate(
             "user",
             [
                 {
-                    "text": "Vat de volgende wettekst samen in 10 woorden.",
+                    "text": "Zet de volgende wettekst om naar YAML-formaat:",
                 },
                 {
                     "type": "document",
@@ -139,6 +144,19 @@ analyize_law_prompt = ChatPromptTemplate(
 
 def process_law(state: State, config: Dict) -> Dict:
     print("----> process_law")
+
+    thread_id = config["configurable"]["thread_id"]
+
+    loop.run_until_complete(
+        manager.send_message(
+            WebSocketMessage(
+                id=str(uuid.uuid4()),
+                content="De wettekst wordt nu opgehaald en geanalyseerd, dit kan even duren.",
+                quick_replies=[],
+            ),
+            thread_id,
+        )
+    )
 
     # Fetch the law content
     docs = WebBaseLoader(  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
