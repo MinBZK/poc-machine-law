@@ -1,4 +1,5 @@
 import json
+import re
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse
@@ -183,3 +184,104 @@ async def approve_claim(
         return response
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/update-missing-values", response_class=HTMLResponse)
+async def update_missing_values(
+    request: Request,
+    case_id: str = Form(None),
+    service: str = Form(...),
+    law: str = Form(...),
+    bsn: str = Form(...),
+    reason: str = Form(...),
+    claimant: str = Form(...),
+    services: Services = Depends(get_services),
+):
+    """Handle the bulk update of missing required values - multi value version"""
+
+    # Get form data
+    form_data = await request.form()
+
+    # Extract keys, values and types as lists
+    keys_list = []
+    values_list = []
+    types_list = []
+
+    # Process form data with array-style naming
+    key_pattern = r"keys\[(\d+)\]"
+    value_pattern = r"values\[(\d+)\]"
+    type_pattern = r"types\[(\d+)\]"
+
+    key_dict = {}
+    value_dict = {}
+    type_dict = {}
+
+    for key, value in form_data.items():
+        key_match = re.match(key_pattern, key)
+        if key_match:
+            index = int(key_match.group(1))
+            key_dict[index] = value
+            continue
+
+        value_match = re.match(value_pattern, key)
+        if value_match:
+            index = int(value_match.group(1))
+            value_dict[index] = value
+            continue
+
+        type_match = re.match(type_pattern, key)
+        if type_match:
+            index = int(type_match.group(1))
+            type_dict[index] = value
+            continue
+
+    # Sort by index
+    max_index = max(set(key_dict.keys()) | set(value_dict.keys()) | set(type_dict.keys()))
+
+    for i in range(max_index + 1):
+        if i in key_dict and i in value_dict and i in type_dict:
+            keys_list.append(key_dict[i])
+            values_list.append(value_dict[i])
+            types_list.append(type_dict[i])
+
+    # Process each value with its proper type
+    for i, (key, value, type_name) in enumerate(zip(keys_list, values_list, types_list)):
+        parsed_value = value
+        try:
+            # Parse value based on type
+            if type_name == "boolean":
+                parsed_value = value.lower() == "true"
+            elif type_name == "number":
+                parsed_value = float(value) if "." in value else int(value)
+            elif type_name == "date" and len(value.split("-")) == 3:
+                try:
+                    from datetime import date
+
+                    year, month, day = map(int, value.split("-"))
+                    parsed_value = date(year, month, day).isoformat()
+                except ValueError:
+                    pass
+        except (ValueError, TypeError):
+            # If parsing fails, keep as string
+            pass
+
+        # Submit each claim individually
+        services.claim_manager.submit_claim(
+            service=service,
+            key=key,
+            new_value=parsed_value,
+            reason=f"{reason} (bulk update)",
+            claimant=claimant,
+            case_id=case_id,
+            evidence_path=None,
+            law=law,
+            bsn=bsn,
+            auto_approve=False,
+        )
+
+    response = templates.TemplateResponse(
+        "partials/edit_success.html",
+        {"request": request, "key": "Benodigde gegevens", "new_value": "Bijgewerkt", "claim_id": None},
+    )
+    response.headers["HX-Trigger"] = "edit-dialog-closed, reload-page"
+    return response

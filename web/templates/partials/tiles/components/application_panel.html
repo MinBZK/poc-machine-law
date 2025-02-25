@@ -1,8 +1,8 @@
 {% from "macros/logos.html" import org_logo %}
-{% from "macros/render_path.html" import render_path %}
+{% from "macros/render_path.html" import render_path, render_missing_required_form %}
 <div id="application-panel">
     <div class="fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 overflow-y-auto"
-         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }} }"
+         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }}, showUsedData: false }"
          x-show="show"
          x-init="$nextTick(() => { show = true })"
          @click.away="$dispatch('close-panel')"
@@ -55,11 +55,33 @@
             <!-- Result Summary -->
             {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
             {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
+            <!-- Missing Required Data Form -->
+            {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                        show_approve=False, claimant="CITIZEN") }}
             <!-- Used Data -->
-            <div class="pt-6">
-                <h4 class="font-medium text-gray-900 mb-4">Gebruikte gegevens</h4>
-                {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
-                                show_approve=False, claimant="CITIZEN") }}
+            <div class="border-t pt-4">
+                <button @click="showUsedData = !showUsedData"
+                        class="flex items-center justify-between w-full text-left">
+                    <span class="text-sm font-medium text-gray-900">Gebruikte gegevens</span>
+                    <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
+                         :class="{ 'rotate-180': showUsedData }"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div x-show="showUsedData"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform -translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 transform translate-y-0"
+                     x-transition:leave-end="opacity-0 transform -translate-y-2"
+                     class="mt-4">
+                    {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                                        show_approve=False, claimant="CITIZEN") }}
+                </div>
             </div>
             <!-- Submit Form -->
             <div x-data="{ isChecked: false }" class="space-y-4">

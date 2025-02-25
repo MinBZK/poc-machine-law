@@ -190,10 +190,7 @@ class Services:
                 and path
                 and isinstance(path, str)
             ):
-                resolve_entry = {
-                    "result": node.result,
-                    "required": node.required,
-                }
+                resolve_entry = {"result": node.result, "required": node.required, "details": node.details}
 
                 if service_parent and path not in service_parent.setdefault("children", {}):
                     service_parent.setdefault("children", {})[path] = resolve_entry
@@ -208,6 +205,7 @@ class Services:
                     "service": node.details.get("service"),
                     "law": node.details.get("law"),
                     "children": {},
+                    "details": node.details,
                 }
 
                 if service_parent:

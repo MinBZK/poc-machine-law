@@ -171,6 +171,16 @@ class RuleContext:
                     logger.debug(f"Resolving from CLAIM: {value}")
                     node.result = value
                     node.resolve_type = "CLAIM"
+
+                    # Add type information for claims as well
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        if "type" in spec:
+                            node.details["type"] = spec["type"]
+                        if "type_spec" in spec:
+                            node.details["type_spec"] = spec["type_spec"]
+                        node.required = bool(spec.get("required", False))
+
                     return value
 
                 # Check local scope
@@ -241,6 +251,13 @@ class RuleContext:
                             node.result = result
                             node.resolve_type = "SOURCE"
                             node.required = bool(spec.get("required", False))
+
+                            # Add type information to the node
+                            if "type" in spec:
+                                node.details["type"] = spec["type"]
+                            if "type_spec" in spec:
+                                node.details["type_spec"] = spec["type_spec"]
+
                             return result
 
                 # Check services
@@ -255,6 +272,13 @@ class RuleContext:
                         node.result = value
                         node.resolve_type = "SERVICE"
                         node.required = bool(spec.get("required", False))
+
+                        # Add type information to the node
+                        if "type" in spec:
+                            node.details["type"] = spec["type"]
+                        if "type_spec" in spec:
+                            node.details["type_spec"] = spec["type_spec"]
+
                         return value
 
                 logger.warning(f"Could not resolve value for {path}")
@@ -264,6 +288,10 @@ class RuleContext:
                 if path in self.property_specs:
                     spec = self.property_specs[path]
                     node.required = bool(spec.get("required", False))
+                    if "type" in spec:
+                        node.details["type"] = spec["type"]
+                    if "type_spec" in spec:
+                        node.details["type_spec"] = spec["type_spec"]
 
                 return None
         finally:
