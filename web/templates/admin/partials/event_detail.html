@@ -10,7 +10,7 @@
 
 {# Bepaal kleur voor Decided op basis van approved #}
 {% if event.event_type == 'Decided' or event.event_type == 'AutomaticallyDecided' %}
-    {% if event.approved %}
+    {% if event.data.approved %}
         {% set color_class = 'bg-emerald-50 border-emerald-200' %}
     {% else %}
         {% set color_class = 'bg-red-50 border-red-200' %}

@@ -1,0 +1,23 @@
+            <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-medium text-blue-900 mb-2">Berekend resultaat</h4>
+                {% if result %}
+                {% for key, value in result.items() %}
+                <div class="text-sm mb-2">
+                    <span class="text-gray-600">{{ key|replace('_', ' ')|title }}: </span>
+                    <span class="font-medium">
+                    {% if value is boolean %}
+                        {{ 'Ja' if value else 'Nee' }}
+                    {% elif value is number %}
+                        {% if 'euro' in key.lower() or 'toeslag' in key.lower() %}
+                            €{{ '%.2f'|format(value/100) }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </span>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>

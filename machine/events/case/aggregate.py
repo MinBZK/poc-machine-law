@@ -11,7 +11,7 @@ class CaseStatus(str, Enum):
     OBJECTED = "OBJECTED"
 
 
-class ClaimStatusTranscoding(Transcoding):
+class CaseStatusTranscoding(Transcoding):
     @staticmethod
     def can_handle(obj: object) -> bool:
         return isinstance(obj, CaseStatus | str)
@@ -29,18 +29,10 @@ class ClaimStatusTranscoding(Transcoding):
         return data  # Keep it as a string
 
 
-Transcoding.register(ClaimStatusTranscoding)
+Transcoding.register(CaseStatusTranscoding)
 
 
-# Helper function for consistent status access
-def get_status_value(status) -> str:
-    """Get string value of status regardless of type"""
-    if isinstance(status, CaseStatus):
-        return status.value
-    return status
-
-
-class ServiceCase(Aggregate):
+class Case(Aggregate):
     @event("Submitted")
     def __init__(
         self,
@@ -49,15 +41,19 @@ class ServiceCase(Aggregate):
         law: str,
         parameters: dict,
         claimed_result: dict,
+        verified_result: dict,
         rulespec_uuid: str,
+        approved_claims_only: bool,
     ) -> None:
+        self.claim_ids = None
         self.bsn = bsn
         self.service = service_type
         self.law = law
         self.rulespec_uuid = rulespec_uuid
 
+        self.approved_claims_only = approved_claims_only
         self.claimed_result = claimed_result
-        self.verified_result = None
+        self.verified_result = verified_result
         self.parameters = parameters
         self.disputed_parameters = None
         self.evidence = None
@@ -67,6 +63,26 @@ class ServiceCase(Aggregate):
 
         self.approved = None
         self.status = CaseStatus.SUBMITTED
+
+    @event("Reset")
+    def reset(
+        self,
+        parameters: dict,
+        claimed_result: dict,
+        verified_result: dict,
+        approved_claims_only: bool,
+    ) -> None:
+        """Reset a case with new parameters and results"""
+        self.approved_claims_only = approved_claims_only
+        self.claimed_result = claimed_result
+        self.verified_result = verified_result
+        self.parameters = parameters
+        self.disputed_parameters = None
+        self.evidence = None
+        self.reason = None
+        self.verifier_id = None
+        self.status = CaseStatus.SUBMITTED
+        self.approved = None
 
     @event("AutomaticallyDecided")
     def decide_automatically(self, verified_result: dict, parameters: dict, approved: bool) -> None:
@@ -198,3 +214,26 @@ class ServiceCase(Aggregate):
         if not hasattr(self, "appeal_status") or self.appeal_status is None:
             return False
         return bool(self.appeal_status.get("possible", False))
+
+    @event("ClaimCreated")
+    def add_claim(self, claim_id: str) -> None:
+        """Record when a new claim is created for this case"""
+        if not hasattr(self, "claim_ids") or self.claim_ids is None:
+            self.claim_ids = set()
+        self.claim_ids.add(claim_id)
+
+    @event("ClaimApproved")
+    def approve_claim(self, claim_id: str) -> None:
+        """Record when a claim is approved"""
+        if not hasattr(self, "claim_ids") or self.claim_ids is None:
+            self.claim_ids = set()
+        if claim_id not in self.claim_ids:
+            self.claim_ids.add(claim_id)
+
+    @event("ClaimRejected")
+    def reject_claim(self, claim_id: str) -> None:
+        """Record when a claim is rejected"""
+        if not hasattr(self, "claim_ids") or self.claim_ids is None:
+            self.claim_ids = set()
+        if claim_id not in self.claim_ids:
+            self.claim_ids.add(claim_id)

@@ -1,4 +1,3 @@
-import asyncio
 import json
 import random
 from datetime import datetime
@@ -6,44 +5,11 @@ from decimal import Decimal
 from uuid import UUID
 
 from eventsourcing.application import Application
-from eventsourcing.dispatch import singledispatchmethod
-from eventsourcing.system import ProcessApplication
 
-from .aggregate import CaseStatus, ServiceCase
+from .aggregate import Case, CaseStatus
 
 
-class RuleProcessor(ProcessApplication):
-    def __init__(self, rules_engine, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.rules_engine = rules_engine
-
-    @singledispatchmethod
-    def policy(self, domain_event, process_event) -> None:
-        """Sync policy that processes events"""
-
-    @policy.register(ServiceCase.Objected)
-    @policy.register(ServiceCase.AutomaticallyDecided)
-    @policy.register(ServiceCase.Decided)
-    def _(self, domain_event, process_event) -> None:
-        try:
-            # Create a new event loop in a new thread
-            def run_async():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                return loop.run_until_complete(self.rules_engine.apply_rules(domain_event))
-
-            # Run in a separate thread
-            import threading
-
-            thread = threading.Thread(target=run_async)
-            thread.start()
-            thread.join()  # Wait for completion
-
-        except Exception as e:
-            print(f"Error processing rules: {e}")
-
-
-class ServiceCaseManager(Application):
+class CaseManager(Application):
     """
     Application service for managing service cases.
     Handles case submission, verification, decisions, and objections.
@@ -57,32 +23,44 @@ class ServiceCaseManager(Application):
         self._case_index: dict[tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
         # self.follow()
 
-    def _index_key(self, bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
+    @staticmethod
+    def _index_key(bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
         """Generate index key for the combination of bsn, service and law"""
         return (bsn, service_type, law)
 
-    def _index_case(self, case: ServiceCase) -> None:
+    def _index_case(self, case: Case) -> None:
         """Add case to index"""
         key = self._index_key(case.bsn, case.service, case.law)
         self._case_index[key] = str(case.id)
 
-    def _results_match(self, claimed_result: dict, verified_result: dict) -> bool:
+    @staticmethod
+    def _results_match(claimed_result: dict, verified_result: dict) -> bool:
         """
         Compare claimed and verified results to determine if they match.
-        For numeric values, uses a 1% tolerance.
+        For numeric values, uses a 1% tolerance, with special handling for zero values.
         For other values, requires exact match.
         """
+        # First check that both dictionaries have the same keys
+        if set(claimed_result.keys()) != set(verified_result.keys()):
+            return False
+
         for key in verified_result:
             if key not in claimed_result:
                 return False
 
             # For numeric values, compare with tolerance
             if isinstance(verified_result[key], int | float):
-                if isinstance(claimed_result[key], int | float):
-                    if abs(verified_result[key] - claimed_result[key]) / verified_result[key] > Decimal("0.01"):
+                if not isinstance(claimed_result[key], int | float):
+                    return False
+
+                # Handle zero values specially
+                if verified_result[key] == 0:
+                    if claimed_result[key] != 0:
                         return False
                 else:
-                    return False
+                    # Use relative difference for non-zero values
+                    if abs(verified_result[key] - claimed_result[key]) / abs(verified_result[key]) > Decimal("0.01"):
+                        return False
             # For other values, require exact match
             elif verified_result[key] != claimed_result[key]:
                 return False
@@ -96,30 +74,45 @@ class ServiceCaseManager(Application):
         law: str,
         parameters: dict,
         claimed_result: dict,
+        approved_claims_only: bool,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
         A case starts with the citizen's claimed result which is then verified.
         """
 
-        result = await self.rules_engine.evaluate(service_type, law, parameters)
-
-        # Create new case with citizen's claimed result
-        case = ServiceCase(
-            bsn=bsn,
-            service_type=service_type,
-            law=law,
-            parameters=parameters,
-            claimed_result=claimed_result,
-            rulespec_uuid=result.rulespec_uuid,
-        )
+        result = await self.rules_engine.evaluate(service_type, law, parameters, approved=True)
 
         # Verify using rules engine
         verified_result = result.output
 
+        case = self.get_case(bsn, service_type, law)
+
+        needs_manual_review = True
+        if case is None:
+            # Create new case with citizen's claimed result
+            case = Case(
+                bsn=bsn,
+                service_type=service_type,
+                law=law,
+                parameters=parameters,
+                claimed_result=claimed_result,
+                verified_result=verified_result,
+                rulespec_uuid=result.rulespec_uuid,
+                approved_claims_only=approved_claims_only,
+            )
+            needs_manual_review = random.random() < self.SAMPLE_RATE
+        else:
+            # Reset existing case with new parameters and results
+            case.reset(
+                parameters=parameters,
+                claimed_result=claimed_result,
+                verified_result=verified_result,
+                approved_claims_only=approved_claims_only,
+            )
+
         # Check if results match and if manual review is needed
         results_match = self._results_match(claimed_result, verified_result)
-        needs_manual_review = random.random() < self.SAMPLE_RATE
 
         if results_match and not needs_manual_review:
             # Automatic approval
@@ -286,13 +279,13 @@ class ServiceCaseManager(Application):
     def can_object(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_object()
 
-    def get_case(self, bsn: str, service_type: str, law: str) -> ServiceCase | None:
+    def get_case(self, bsn: str, service_type: str, law: str) -> Case | None:
         """Get case for specific bsn, service and law combination"""
         key = self._index_key(bsn, service_type, law)
         case_id = self._case_index.get(key)
         return self.get_case_by_id(case_id) if case_id else None
 
-    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> list[ServiceCase]:
+    def get_cases_by_status(self, service_type: str, status: CaseStatus) -> list[Case]:
         """Get all cases for a service in a particular status"""
         return [
             self.get_case_by_id(case_id)
@@ -300,13 +293,13 @@ class ServiceCaseManager(Application):
             if self.repository.get(case_id).service == service_type and self.repository.get(case_id).status == status
         ]
 
-    def get_case_by_id(self, case_id: str | None) -> ServiceCase | None:
+    def get_case_by_id(self, case_id: str | None) -> Case | None:
         """Get case by ID"""
         if not case_id:
             return None
         return self.repository.get(UUID(case_id))
 
-    def get_cases_by_law(self, law: str, service_type: str) -> list[ServiceCase]:
+    def get_cases_by_law(self, law: str, service_type: str) -> list[Case]:
         """Get all cases for a specific law and service combination"""
         cases = []
         for _key, case_id in self._case_index.items():

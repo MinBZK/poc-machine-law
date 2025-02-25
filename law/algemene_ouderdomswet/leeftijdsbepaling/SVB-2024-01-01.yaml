@@ -1,4 +1,5 @@
-uuid: 17bd2695-7805-49a4-8789-a8fe395022cd
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.1/schema.json
+uuid: 47fa262a-b8f7-43bf-a5dd-5f9b2d2c1228
 name: Bepalen AOW-leeftijd 2025
 law: algemene_ouderdomswet/leeftijdsbepaling
 valid_from: 2024-01-01

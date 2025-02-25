@@ -1,4 +1,5 @@
-uuid: awb-beroep-basis-2024
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.1/schema.json
+uuid: c4fda809-15f2-454a-9e9b-f645b905ca12
 name: Algemene wet bestuursrecht - Beroepmogelijkheid en Termijnen
 law: awb/beroep
 valid_from: 2024-01-01
@@ -21,7 +22,7 @@ references:
 properties:
   applies:
     - name: "CASE"
-      aggregate: "ServiceCase"
+      aggregate: "Case"
       events:
         - type: "Decided"
           filter:

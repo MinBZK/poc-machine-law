@@ -1,4 +1,5 @@
-uuid: 8f7e6d5c-4321-4f0f-bbbb-987654321abc
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.1/schema.json
+uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
 name: Bepalen persoonsgegevens BRP
 law: wet_brp
 valid_from: 2020-01-01

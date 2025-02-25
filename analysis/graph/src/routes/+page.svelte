@@ -17,10 +17,10 @@
 
   // Define the paths to the YAML files
   const filePaths = [
-    '/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml',
+    '/law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml',
     '/law/wet_inkomstenbelasting/UWV-2020-01-01.yaml',
     '/law/zvw/RVZ-2024-01-01.yaml',
-    '/law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml',
+    '/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml',
   ];
 
   const nodes = writable<Node[]>([]);
@@ -55,15 +55,13 @@
           id: lawID,
           type: 'default',
           data: { label: data.name }, // Algorithm name
-          position: { x: i++ * 520, y: 0 },
-          width: 490,
+          position: { x: i++ * 400, y: 0 },
+          width: 340,
           height:
             Math.max(
-              data.properties.sources?.length || 0,
-              data.properties.input?.length || 0,
-              data.properties.output?.length || 0,
-            ) *
-              50 +
+              ((data.properties.sources?.length || 0) + (data.properties.input?.length || 0)) * 50 + 70,
+              (data.properties.output?.length || 0) * 50,
+            ) +
             120,
           class: 'root',
         });
@@ -106,7 +104,7 @@
           id: inputsID,
           type: 'default',
           data: { label: 'Input' },
-          position: { x: 170, y: 60 },
+          position: { x: 10, y: j * 50 + 130 },
           width: 150,
           height: (data.properties.input?.length || 0) * 50 + 50,
           parentId: lawID,
@@ -156,7 +154,7 @@
           id: outputsID,
           type: 'default',
           data: { label: 'Output' },
-          position: { x: 330, y: 60 },
+          position: { x: 180, y: 60 },
           width: 150,
           height: (data.properties.output?.length || 0) * 50 + 50,
           parentId: lawID,
@@ -209,6 +207,7 @@ This means that the parent container needs a height to render the flow.
     proOptions={{
       hideAttribution: true,
     }}
+    minZoom={0.2}
   >
     <Controls showLock={false} />
     <Background variant={BackgroundVariant.Dots} />

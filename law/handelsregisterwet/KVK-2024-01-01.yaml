@@ -1,4 +1,5 @@
-uuid: 1d2e3f4a-7654-4f0f-dddd-234567890123
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.1/schema.json
+uuid: 8b59ef92-03f8-4294-bce9-4eaac01ba0ed
 name: Bepalen ondernemerschap
 law: handelsregisterwet
 valid_from: 2024-01-01

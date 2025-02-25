@@ -6,6 +6,7 @@ from typing import Any
 
 import pandas as pd
 
+from machine.events.claim.aggregate import Claim
 from machine.logging_config import IndentLogger
 
 logger = IndentLogger(logging.getLogger("service"))
@@ -67,6 +68,7 @@ class PathNode:
     type: str
     name: str
     result: Any
+    resolve_type: str = None
     details: dict[str, Any] = field(default_factory=dict)
     children: list["PathNode"] = field(default_factory=list)
 
@@ -90,7 +92,12 @@ def flatten_path_nodes(root):
             path = path[1:]
 
         # Handle resolve nodes
-        if node.type == "resolve" and path and isinstance(path, str):
+        if (
+            node.type == "resolve"
+            and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM"}
+            and path
+            and isinstance(path, str)
+        ):
             resolve_entry = {
                 "result": node.result,
             }
@@ -144,6 +151,9 @@ class RuleContext:
     outputs: dict[str, Any] = field(default_factory=dict)
     calculation_date: str | None = None
     resolved_paths: dict[str, Any] = field(default_factory=dict)
+    service_name: str | None = None
+    claims: dict[str:Claim] = None
+    approved: bool | None = True
 
     def track_access(self, path: str) -> None:
         """Track accessed data paths"""
@@ -213,28 +223,41 @@ class RuleContext:
                     node.result = value
                     return value
 
-                # Check local scope first
+                # Claims first
+                if isinstance(self.claims, dict) and path in self.claims:
+                    claim = self.claims.get(path)
+                    value = claim.new_value
+                    logger.debug(f"Resolving from CLAIM: {value}")
+                    node.result = value
+                    node.resolve_type = "CLAIM"
+                    return value
+
+                # Check local scope
                 if path in self.local:
                     logger.debug(f"Resolving from LOCAL: {self.local[path]}")
                     node.result = self.local[path]
+                    node.resolve_type = "LOCAL"
                     return self.local[path]
 
                 # Check definitions
                 if path in self.definitions:
                     logger.debug(f"Resolving from DEFINITION: {self.definitions[path]}")
                     node.result = self.definitions[path]
+                    node.resolve_type = "DEFINITION"
                     return self.definitions[path]
 
                 # Check parameters
                 if path in self.parameters:
                     logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
                     node.result = self.parameters[path]
+                    node.resolve_type = "PARAMETER"
                     return self.parameters[path]
 
                 # Check outputs
                 if path in self.outputs:
                     logger.debug(f"Resolving from previous OUTPUT: {self.outputs[path]}")
                     node.result = self.outputs[path]
+                    node.resolve_type = "OUTPUT"
                     return self.outputs[path]
 
                 # Check overwrite data
@@ -249,6 +272,7 @@ class RuleContext:
                         value = self.overwrite_input[service_ref["service"]][service_ref["field"]]
                         logger.debug(f"Resolving from OVERWRITE: {value}")
                         node.result = value
+                        node.resolve_type = "OVERWRITE"
                         return value
 
                 # Check sources
@@ -263,7 +287,7 @@ class RuleContext:
                             df = self.service_provider.resolver.rules_dataframe()
                         if source_ref.get("source_type") == "events":
                             table = "events"
-                            events = self.service_provider.manager.get_events()
+                            events = self.service_provider.case_manager.get_events()
                             df = pd.DataFrame(events)
                         elif self.sources and "table" in source_ref:
                             table = source_ref.get("table")
@@ -274,6 +298,7 @@ class RuleContext:
                             result = await self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
+                            node.resolve_type = "SOURCE"
                             return result
 
                 # Check services
@@ -286,10 +311,12 @@ class RuleContext:
                             f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}"
                         )
                         node.result = value
+                        node.resolve_type = "SERVICE"
                         return value
 
                 logger.warning(f"Could not resolve value for {path}")
                 node.result = None
+                node.resolve_type = "NONE"
                 return None
         finally:
             self.pop_path()
@@ -348,6 +375,7 @@ class RuleContext:
                 reference_date,
                 self.overwrite_input,
                 requested_output=service_ref["field"],
+                approved=self.approved,
             )
 
             value = result.output.get(service_ref["field"])

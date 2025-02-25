@@ -1,4 +1,5 @@
-uuid: 4d8c7237-b930-4f0f-aaa3-624ba035e449
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.1/schema.json
+uuid: b87fbf5e-98d7-45a5-b82c-04ef64bae452
 name: Zorgtoeslag
 law: zorgtoeslagwet
 law_type: "FORMELE_WET"
