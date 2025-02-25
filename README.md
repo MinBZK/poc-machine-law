@@ -133,10 +133,19 @@ Vooralsnog zijn deze wetten geïmplementeerd in `machine law` (met behulp van ee
 
 ## 🚀 Aan de slag
 
-Installeer eerst [uv](https://github.com/astral-sh/uv?tab=readme-ov-file#installation), installeer dan dependencies:
+Clone deze repository:
 ```bash
 git clone git@github.com:MinBZK/poc-machine-law.git
 cd poc-machine-law
+```
+
+Installeer `uv` volgens de [documentatie](https://github.com/astral-sh/uv?tab=readme-ov-file#installation) of maak gebruik van [asdf](https://asdf-vm.com/) (zodat de juiste versie van `uv` wordt gebruikt):
+```bash
+asdf install
+```
+
+Installeer alle dependencies:
+```bash
 uv sync
 ```
 
