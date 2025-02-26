@@ -1,4 +1,6 @@
 from datetime import datetime
+import os
+import sys
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
@@ -7,6 +9,7 @@ from machine.events.case.aggregate import CaseStatus
 from machine.service import Services
 from web.dependencies import get_services, templates
 from web.routers.laws import evaluate_law
+import pprint
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -28,6 +31,23 @@ async def admin_redirect(request: Request, services: Services = Depends(get_serv
     discoverable_laws = services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
     return RedirectResponse(f"/admin/{available_services[0]}")
+
+
+@router.get("/reset")
+async def reset(request: Request, services: Services = Depends(get_services)):
+    """Reset the state of the application"""
+
+    # Restart the application. Note: the state of the application is stored in such a complicated way that it is easier to just restart the application
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+    # TODO: split into GET and POST methods
+
+    return templates.TemplateResponse(
+        "admin/reset.html",
+        {
+            "request": request,
+        },
+    )
 
 
 @router.get("/{service}")
