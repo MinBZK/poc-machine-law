@@ -43,6 +43,16 @@
                 {% block content %}{% endblock %}
             </div>
         </main>
+        <!-- Shared Application Panel -->
+        <div id="shared-application-panel"></div>
+        <script>
+            // Global ESC key handler for closing the panel
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.dispatchEvent(new CustomEvent('close-panel'));
+                }
+            });
+        </script>
         <!-- Footer -->
         <footer class="bg-gray-100 border-t mt-12">
             <div class="container mx-auto px-4 py-8">

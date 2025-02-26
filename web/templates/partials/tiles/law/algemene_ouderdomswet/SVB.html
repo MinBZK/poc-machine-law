@@ -9,9 +9,8 @@
                     U vroeg eerder € {{ "%.2f"|format(current_case.claimed_result.pension_amount / 100) }} AOW aan.
                 </p>
                 <button type="button"
-                        @click="showApplicationPanel = true"
                         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
-                        hx-target="#application-panel-{{ law|replace('/', '-') }}"
+                        hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors">
                     Vraag opnieuw aan
@@ -21,9 +20,8 @@
     {% endif %}
 {% endblock %}
 {% block submit_button %}
-    <button @click="showApplicationPanel = true"
-            hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
-            hx-target="#application-panel-{{ law|replace('/', '-') }}"
+    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+            hx-target="#shared-application-panel"
             hx-swap="innerHTML"
             class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors">
         AOW aanvragen
