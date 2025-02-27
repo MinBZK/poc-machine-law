@@ -10,18 +10,20 @@
 
     {# Main content #}
     <div class="container mx-auto px-4 py-8">
-        <form action="/admin/reset" method="post" class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
+        <form hx-post="/admin/reset" hx-trigger="submit"
+            hx-on::after-request="var btn = document.getElementById('reset-submit'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.href = '/admin', 7000)"
+            class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
             <h1 class="text-gray-900 text-3xl font-semibold mb-5">Reset de applicatie-state</h1>
 
             <p class="mb-5">Dit zal de applicatie-state resetten naar de initiële staat. Weet je zeker dat je dit wilt
                 doen?
             </p>
 
-            <p class="mb-5">Dit betekent dat alle data die je hebt ingevoerd zal worden verwijderd. Dit kan niet worden
-                ongedaan gemaakt.</p>
+            <p class="mb-5">Dit betekent dat alle data die je hebt ingevoerd zal worden verwijderd. Dit kan niet
+                ongedaan worden gemaakt.</p>
 
-            <button
-                class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3"
+            <button id="reset-submit"
+                class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 disabled:bg-red-400"
                 type="submit"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 -ml-1" viewBox="0 0 24 24">
                     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2">
