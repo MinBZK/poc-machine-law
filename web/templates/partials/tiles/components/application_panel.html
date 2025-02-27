@@ -94,14 +94,17 @@
                     <div x-data="{ isChecked: false }"
                          class="space-y-4 border-t border-blue-200 pt-4">
                         <div class="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
-                            <div class="flex items-center">
-                                <input type="checkbox"
-                                       id="declaration-checkbox"
-                                       x-model="isChecked"
-                                       class="mr-3 rounded text-blue-600 focus:ring-blue-500">
-                                <label for="declaration-checkbox" class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</label>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
+                            <label for="declaration-checkbox" class="cursor-pointer block">
+                                <div class="flex items-center">
+                                    <input type="checkbox"
+                                           id="declaration-checkbox"
+                                           x-model="isChecked"
+                                           class="mr-3 rounded text-blue-600 focus:ring-blue-500"
+                                           autofocus>
+                                    <span class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
+                            </label>
                         </div>
                         <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
                               hx-target="#tile-{{ law|replace('/', '-') }}"

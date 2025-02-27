@@ -220,7 +220,8 @@
                                                        placeholder="0.00"
                                                        required
                                                        oninput=" document.getElementById('value-{{ item.key }}').value = Math.round(parseFloat(this.value || 0) * 100); "
-                                                       onchange="this.value = Number(this.value).toFixed(2);">
+                                                       onchange="this.value = Number(this.value).toFixed(2);"
+                                                       {% if loop.first %}autofocus{% endif %}>
                                                 <input type="hidden"
                                                        id="value-{{ item.key }}"
                                                        name="values[{{ loop.index0 }}]"
@@ -235,6 +236,7 @@
                                                {% if item.node.details.type_spec and item.node.details.type_spec.min is defined %}min="{{ item.node.details.type_spec.min }}"{% endif %}
                                                {% if item.node.details.type_spec and item.node.details.type_spec.max is defined %}max="{{ item.node.details.type_spec.max }}"{% endif %}
                                                {% if item.node.details.type_spec and item.node.details.type_spec.step is defined %}step="{{ item.node.details.type_spec.step }}"{% endif %}
+                                               {% if loop.first %}autofocus{% endif %}
                                                required>
                                     {% endif %}
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="number">
@@ -243,6 +245,7 @@
                                            id="value-{{ item.key }}"
                                            name="values[{{ loop.index0 }}]"
                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           {% if loop.first %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="date">
                                 {% else %}
@@ -250,6 +253,7 @@
                                            id="value-{{ item.key }}"
                                            name="values[{{ loop.index0 }}]"
                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           {% if loop.first %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="string">
                                 {% endif %}
