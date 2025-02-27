@@ -21,9 +21,7 @@ import nest_asyncio
 model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, max_retries=2)
 
 # Retriever to find the specified law online
-retriever = TavilySearchAPIRetriever(
-    k=1, include_domains=["wetten.overheid.nl"]
-)  # Limit to 1 result
+retriever = TavilySearchAPIRetriever(k=1, include_domains=["wetten.overheid.nl"])  # Limit to 1 result
 
 
 class State(TypedDict):
@@ -55,11 +53,7 @@ def ask_law(state: State, config: Dict) -> Dict:
 
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
-    loop.run_until_complete(
-        manager.send_message(
-            WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id
-        )
-    )
+    loop.run_until_complete(manager.send_message(WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id))
 
     return {"messages": []}  # Note: we reset the messages
 
@@ -100,7 +94,7 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
-                content=f"Is dit de wet die je bedoelt?\n\n{metadata["title"]}\n[{url}]({url})",
+                content=f"Is dit de wet die je bedoelt?\n\n{metadata['title']}\n[{url}]({url})",
                 quick_replies=["Ja", "Nee"],
             ),
             thread_id,
@@ -124,9 +118,7 @@ def handle_law_confirmation(state: State) -> Dict:
 
 
 def fetch_and_format_data(url: str) -> str:
-    docs = WebBaseLoader(
-        url
-    ).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
+    docs = WebBaseLoader(url).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
     return "\n\n".join(doc.page_content for doc in docs)
 
 
@@ -245,9 +237,7 @@ def handle_law_confirmation_result(state: State) -> Literal["process_law", "ask_
     return "process_law" if state["law_url_approved"] else "ask_law"
 
 
-workflow.add_conditional_edges(
-    "handle_law_confirmation", handle_law_confirmation_result
-)
+workflow.add_conditional_edges("handle_law_confirmation", handle_law_confirmation_result)
 
 workflow.add_edge("process_law", "process_law_feedback")
 workflow.add_edge("process_law_feedback", "process_law_feedback")
