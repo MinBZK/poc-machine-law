@@ -328,18 +328,26 @@ class RuleContext:
         logger.debug(f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})")
 
         # Create service evaluation node
+        details = {
+            "service": service_ref["service"],
+            "law": service_ref["law"],
+            "field": service_ref["field"],
+            "reference_date": reference_date,
+            "parameters": parameters,
+            "path": path,
+        }
+
+        # Copy type information from spec to details
+        if "type" in spec:
+            details["type"] = spec["type"]
+        if "type_spec" in spec:
+            details["type_spec"] = spec["type_spec"]
+
         service_node = PathNode(
             type="service_evaluation",
             name=f"Service call: {service_ref['service']}.{service_ref['law']}",
             result=None,
-            details={
-                "service": service_ref["service"],
-                "law": service_ref["law"],
-                "field": service_ref["field"],
-                "reference_date": reference_date,
-                "parameters": parameters,
-                "path": path,
-            },
+            details=details,
         )
         self.add_to_path(service_node)
 
