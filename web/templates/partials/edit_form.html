@@ -1,7 +1,7 @@
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="edit-modal" x-data='{ value: {{ value|tojson }}, newValueType: null,
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[100]" id="edit-modal" x-data='{ value: {{ value|tojson }}, newValueType: null,
     {% if claim_data %}
         newValue: {{ claim_data.new_value|tojson }}, reason: {{ claim_data.reason|tojson }}, autoApprove: {{ claim_data.auto_approve|tojson }}, status: {{ claim_data.status|tojson }}, selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, {% else %} newValue: {{ value|tojson }}, reason: "", autoApprove: false, status: null, selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, {% endif %} formatDate(dateStr) { if (!dateStr) return ""; const date = new Date(dateStr); return date.toISOString().split("T")[0]; } }'>
-        <div class="relative top-20 mx-auto p-6 border w-[800px] shadow-lg rounded-lg bg-white">
+        <div class="relative top-20 mx-auto p-6 border w-[800px] shadow-lg rounded-lg bg-white z-[100]">
             <!-- Header -->
             <div class="mb-6">
                 <h3 class="text-xl font-semibold text-gray-900">Waarde wijzigen voor {{ key|title|replace('_', ' ') }}</h3>
