@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc-machine-law
+  template:
+    metadata:
+      labels:
+        app: poc-machine-law
+    spec:
+      imagePullSecrets:
+        - name: digilab-image-registry
+      containers:
+      - name: poc-machine-law
+        image: poc:latest
+        ports:
+          - containerPort: 8000
