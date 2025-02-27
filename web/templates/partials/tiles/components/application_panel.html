@@ -37,80 +37,88 @@
         <!-- Scrollable content -->
         <div class="overflow-y-auto flex-grow">
             <div class="p-6 space-y-6">
-                <!-- Toggle voor herberekenen - direct voor Result Summary -->
-                <div class="border-b pb-4 mb-4">
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-base font-medium text-gray-900">Reken met eigen aanpassingen in gegevens</h4>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   class="sr-only peer"
-                                   {% if request.query_params.get('approved', 'false') == 'false' %}checked{% endif %}
-                                   hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ 'true' if request.query_params.get('approved', 'false') == 'false' else 'false' }}"
-                                   hx-target="#application-panel"
-                                   hx-swap="innerHTML"
-                                   hx-trigger="change">
-                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
-                            </div>
-                        </label>
+                <!-- Start of Aanvraag Form Section -->
+                <div class="border border-blue-200 rounded-lg p-5 mb-6 bg-blue-50/30">
+                    <div class="border-b border-blue-200 pb-4 mb-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-base font-medium text-gray-900">Reken met eigen aanpassingen in gegevens</h4>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox"
+                                       class="sr-only peer"
+                                       {% if request.query_params.get('approved', 'false') == 'false' %}checked{% endif %}
+                                       hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ 'true' if request.query_params.get('approved', 'false') == 'false' else 'false' }}"
+                                       hx-target="#application-panel"
+                                       hx-swap="innerHTML"
+                                       hx-trigger="change">
+                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <!-- Result Summary -->
-                {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
-                {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
-                <!-- Missing Required Data Form -->
-                {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
-                                show_approve=False, claimant="CITIZEN") }}
-                <!-- Used Data -->
-                <div class="border-t pt-4">
-                    <button @click="showUsedData = !showUsedData"
-                            class="flex items-center justify-between w-full text-left">
-                        <span class="text-sm font-medium text-gray-900">Gebruikte gegevens</span>
-                        <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
-                             :class="{ 'rotate-180': showUsedData }"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <div x-show="showUsedData"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 transform -translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100 transform translate-y-0"
-                         x-transition:leave-end="opacity-0 transform -translate-y-2"
-                         class="mt-4">
-                        {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                    <!-- Result Summary -->
+                    <div class="mb-4">
+                        {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
+                        {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
+                    </div>
+                    <!-- Missing Required Data Form -->
+                    <div class="mb-4">
+                        {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
                                                 show_approve=False, claimant="CITIZEN") }}
                     </div>
-                </div>
-                <!-- Submit Form -->
-                <div x-data="{ isChecked: false }" class="space-y-4">
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
-                        <div class="flex items-center">
-                            <input type="checkbox"
-                                   id="declaration-checkbox"
-                                   x-model="isChecked"
-                                   class="mr-3 rounded text-blue-600 focus:ring-blue-500">
-                            <label for="declaration-checkbox" class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</label>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
-                    </div>
-                    <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
-                          hx-target="#tile-{{ law|replace('/', '-') }}"
-                          hx-swap="outerHTML"
-                          hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
-                          class="mb-6">
-                        <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
-                        <button type="submit"
-                                :disabled="!isChecked"
-                                :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
-                                class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
-                            Bevestig aanvraag
+                    <!-- Used Data -->
+                    <div class="border-t border-blue-200 pt-4 mb-4">
+                        <button @click="showUsedData = !showUsedData"
+                                class="flex items-center justify-between w-full text-left">
+                            <span class="text-sm font-medium text-gray-900">Gebruikte gegevens</span>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
+                                 :class="{ 'rotate-180': showUsedData }"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
-                    </form>
+                        <div x-show="showUsedData"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 transform -translate-y-2"
+                             x-transition:enter-end="opacity-100 transform translate-y-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 transform translate-y-0"
+                             x-transition:leave-end="opacity-0 transform -translate-y-2"
+                             class="mt-4">
+                            {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                                                        show_approve=False, claimant="CITIZEN") }}
+                        </div>
+                    </div>
+                    <!-- Submit Form -->
+                    <div x-data="{ isChecked: false }"
+                         class="space-y-4 border-t border-blue-200 pt-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+                            <div class="flex items-center">
+                                <input type="checkbox"
+                                       id="declaration-checkbox"
+                                       x-model="isChecked"
+                                       class="mr-3 rounded text-blue-600 focus:ring-blue-500">
+                                <label for="declaration-checkbox" class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</label>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
+                        </div>
+                        <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+                              hx-target="#tile-{{ law|replace('/', '-') }}"
+                              hx-swap="outerHTML"
+                              hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                              class="mb-2">
+                            <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+                            <button type="submit"
+                                    :disabled="!isChecked"
+                                    :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                                    class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
+                                Bevestig aanvraag
+                            </button>
+                        </form>
+                    </div>
                 </div>
+                <!-- End of Aanvraag Form Section -->
                 <!-- Explanation Section -->
                 <div class="border-t pt-4">
                     <button @click="showExplanation = !showExplanation"
