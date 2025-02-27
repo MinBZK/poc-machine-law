@@ -1,19 +1,37 @@
 {% extends "admin/base.html" %}
 {% block content %}
-<form action="/admin/reset" method="post" class="container mx-auto p-6">
-    <h1 class="text-3xl font-semibold mb-3">Reset de applicatie-state</h1>
+<div class="min-h-screen bg-gray-50">
+    {# Top navigation bar #}
+    <div class="bg-white shadow">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Dashboard</h1>
+        </div>
+    </div>
 
-    <p class="mb-5">Dit zal de applicatie-state resetten naar de initiële staat. Weet je zeker dat je dit wilt doen?</p>
+    {# Main content #}
+    <div class="container mx-auto px-4 py-8">
+        <form action="/admin/reset" method="post" class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
+            <h1 class="text-gray-900 text-3xl font-semibold mb-5">Reset de applicatie-state</h1>
 
-    <p class="mb-5">Dit betekent dat alle data die je hebt ingevoerd zal worden verwijderd.</p>
+            <p class="mb-5">Dit zal de applicatie-state resetten naar de initiële staat. Weet je zeker dat je dit wilt
+                doen?
+            </p>
 
-    <button
-        class="inline-flex items-center px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors"
-        type="submit"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 -ml-1" viewBox="0 0 24 24">
-            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
-                <path d="M20 4v5h-5" />
-            </g>
-        </svg> Reset state</button>
-</form>
+            <p class="mb-5">Dit betekent dat alle data die je hebt ingevoerd zal worden verwijderd. Dit kan niet worden
+                ongedaan gemaakt.</p>
+
+            <button
+                class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3"
+                type="submit"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 -ml-1" viewBox="0 0 24 24">
+                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2">
+                        <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
+                        <path d="M20 4v5h-5" />
+                    </g>
+                </svg> Reset state</button>
+            of <a class="text-blue-600 underline hover:text-blue-700 hover:no-underline" href="/admin">ga terug naar het
+                dashboard</a>.
+        </form>
+    </div>
+</div>
 {% endblock %}
