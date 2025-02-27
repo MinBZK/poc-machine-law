@@ -35,12 +35,7 @@ async def admin_redirect(request: Request, services: Services = Depends(get_serv
 
 @router.get("/reset")
 async def reset(request: Request, services: Services = Depends(get_services)):
-    """Reset the state of the application"""
-
-    # Restart the application. Note: the state of the application is stored in such a complicated way that it is easier to just restart the application
-    os.execl(sys.executable, sys.executable, *sys.argv)
-
-    # TODO: split into GET and POST methods
+    """Show a button to reset the state of the application"""
 
     return templates.TemplateResponse(
         "admin/reset.html",
@@ -48,6 +43,14 @@ async def reset(request: Request, services: Services = Depends(get_services)):
             "request": request,
         },
     )
+
+
+@router.post("/reset")
+async def reset(request: Request, services: Services = Depends(get_services)):
+    """Reset the state of the application"""
+
+    # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 @router.get("/{service}")
