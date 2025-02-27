@@ -19,3 +19,8 @@
 - Error handling: specific exceptions, contextual logging, fallback values
 - YAML: structured hierarchies with explicit types for law definitions
 - Architecture: modular, service-oriented with event-driven components
+
+## Git Workflow
+- NEVER amend commits that failed to go through - make new commits instead
+- Run pre-commit hooks before committing to catch formatting issues
+- Always check git status before committing to make sure you're working with the latest changes
