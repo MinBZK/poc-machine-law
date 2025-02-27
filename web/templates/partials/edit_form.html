@@ -1,6 +1,8 @@
 <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[100]" id="edit-modal" x-data='{ value: {{ value|tojson }}, newValueType: null,
     {% if claim_data %}
-        newValue: {{ claim_data.new_value|tojson }}, reason: {{ claim_data.reason|tojson }}, autoApprove: {{ claim_data.auto_approve|tojson }}, status: {{ claim_data.status|tojson }}, selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, {% else %} newValue: {{ value|tojson }}, reason: "", autoApprove: false, status: null, selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, {% endif %} formatDate(dateStr) { if (!dateStr) return ""; const date = new Date(dateStr); return date.toISOString().split("T")[0]; } }'>
+        newValue: {{ claim_data.new_value|tojson }}, reason: {{ claim_data.reason|tojson }}, autoApprove: {{ claim_data.auto_approve|tojson }}, status: {{ claim_data.status|tojson }},
+    {% else %}
+        newValue: {{ value|tojson }}, reason: "", autoApprove: false, status: null, {% endif %} selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, hasDetails: {{ (details is defined and details)|tojson }}, details: {% if details %}{{ details|tojson }}{% else %}null{% endif %}, isEurocent: function() { return this.hasDetails && this.details && this.details.type === "amount" && this.details.type_spec && this.details.type_spec.unit === "eurocent"; }, displayValue: function(val) { if (this.isEurocent() && typeof val === "number") { return (val / 100).toFixed(2); } return val; }, parseValue: function(val) { if (this.isEurocent() && !isNaN(parseFloat(val))) { return Math.round(parseFloat(val) * 100); } return val; }, formatDate(dateStr) { if (!dateStr) return ""; const date = new Date(dateStr); return date.toISOString().split("T")[0]; } }'>
         <div class="relative top-20 mx-auto p-6 border w-[800px] shadow-lg rounded-lg bg-white z-[100]">
             <!-- Header -->
             <div class="mb-6">
@@ -51,7 +53,13 @@
                                         <span x-text="new Date(value).toLocaleDateString('nl-NL')"></span>
                                     </div>
                                 </template>
-                                <template x-if="typeof value === 'string' && isNaN(Date.parse(value)) || typeof value === 'number'">
+                                <template x-if="isEurocent() && typeof value === 'number'">
+                                    <div class="text-gray-900 font-medium">
+                                        <span class="text-gray-500 mr-1">€</span>
+                                        <span x-text="displayValue(value)"></span>
+                                    </div>
+                                </template>
+                                <template x-if="(typeof value === 'string' && isNaN(Date.parse(value))) || (typeof value === 'number' && !isEurocent())">
                                     <div class="text-gray-900 font-medium">
                                         <span x-text="value"></span>
                                     </div>
@@ -79,7 +87,24 @@
                                            x-model="newValue"
                                            required>
                                 </template>
-                                <template x-if="typeof value === 'number'">
+                                <template x-if="isEurocent() && typeof value === 'number'">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-gray-700">€</span>
+                                        <div class="w-full">
+                                            <input type="number"
+                                                   id="display-new-value"
+                                                   class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                   step="0.01"
+                                                   placeholder="0.00"
+                                                   :value="displayValue(newValue)"
+                                                   @input="newValue = parseValue($event.target.value)"
+                                                   @change="$event.target.value = parseFloat($event.target.value).toFixed(2)"
+                                                   required>
+                                            <input type="hidden" id="new-value" name="new_value" :value="newValue">
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="typeof value === 'number' && !isEurocent()">
                                     <input type="number"
                                            id="new-value"
                                            name="new_value"
@@ -97,41 +122,107 @@
                                 </template>
                                 <template x-if="value === null || value === undefined">
                                     <div>
-                                        <select id="new-value-type"
-                                                name="new_value_type"
-                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                                x-model="newValueType">
-                                            <option value="">Kies een type</option>
-                                            <option value="string">Tekst</option>
-                                            <option value="number">Getal</option>
-                                            <option value="boolean">Ja/Nee</option>
-                                            <option value="date">Datum</option>
-                                        </select>
+                                        <template x-if="hasDetails && details && details.type">
+                                            <input type="hidden" name="new_value_type" :value="details.type">
+                                        </template>
+                                        <template x-if="!(hasDetails && details && details.type)">
+                                            <select id="new-value-type"
+                                                    name="new_value_type"
+                                                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                    x-model="newValueType">
+                                                <option value="">Kies een type</option>
+                                                <option value="string">Tekst</option>
+                                                <option value="number">Getal</option>
+                                                <option value="boolean">Ja/Nee</option>
+                                                <option value="date">Datum</option>
+                                                <option value="amount">Bedrag</option>
+                                            </select>
+                                        </template>
                                         <div class="mt-2">
-                                            <template x-if="newValueType === 'string'">
-                                                <input type="text"
-                                                       name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                                       required>
+                                            <!-- When we have detail info about amount in eurocent -->
+                                            <template x-if="hasDetails && details && details.type === 'amount' && details.type_spec && details.type_spec.unit === 'eurocent'">
+                                                <div class="flex items-center">
+                                                    <span class="mr-2 text-gray-700">€</span>
+                                                    <div class="w-full">
+                                                        <input type="number"
+                                                               id="display-new-value-missing"
+                                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               step="0.01"
+                                                               placeholder="0.00"
+                                                               @input="newValue = parseValue($event.target.value)"
+                                                               @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
+                                                               required>
+                                                        <input type="hidden" id="new-value" name="new_value" :value="newValue">
+                                                    </div>
+                                                </div>
                                             </template>
-                                            <template x-if="newValueType === 'number'">
-                                                <input type="number"
-                                                       name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                                       required>
-                                            </template>
-                                            <template x-if="newValueType === 'boolean'">
+                                            <!-- When we have other type detail info -->
+                                            <template x-if="hasDetails && details && details.type === 'boolean'">
                                                 <select name="new_value"
                                                         class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                                     <option value="true">Ja</option>
                                                     <option value="false">Nee</option>
                                                 </select>
                                             </template>
-                                            <template x-if="newValueType === 'date'">
+                                            <template x-if="hasDetails && details && details.type === 'date'">
                                                 <input type="date"
                                                        name="new_value"
                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
+                                            </template>
+                                            <template x-if="hasDetails && details && details.type === 'number' && !(details.type === 'amount' && details.type_spec && details.type_spec.unit === 'eurocent')">
+                                                <input type="number"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="hasDetails && details && details.type === 'string'">
+                                                <input type="text"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <!-- Fall back to user selected type when no details available -->
+                                            <template x-if="!hasDetails && newValueType === 'string'">
+                                                <input type="text"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'number'">
+                                                <input type="number"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'boolean'">
+                                                <select name="new_value"
+                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                    <option value="true">Ja</option>
+                                                    <option value="false">Nee</option>
+                                                </select>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'date'">
+                                                <input type="date"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'amount'">
+                                                <div class="flex items-center">
+                                                    <span class="mr-2 text-gray-700">€</span>
+                                                    <div class="w-full">
+                                                        <input type="number"
+                                                               id="display-new-value-amount"
+                                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               step="0.01"
+                                                               placeholder="0.00"
+                                                               @input="newValue = Math.round(parseFloat($event.target.value || 0) * 100)"
+                                                               @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
+                                                               required>
+                                                        <input type="hidden" id="new-value" name="new_value" :value="newValue">
+                                                    </div>
+                                                </div>
                                             </template>
                                         </div>
                                     </div>

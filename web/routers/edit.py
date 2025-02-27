@@ -20,6 +20,8 @@ async def get_edit_form(
     law: str,
     bsn: str,
     show_approve: bool = False,
+    has_details: bool = False,
+    details: str = None,
     services: Services = Depends(get_services),
 ):
     """Return the edit form HTML"""
@@ -27,6 +29,14 @@ async def get_edit_form(
         parsed_value = json.loads(value)
     except json.JSONDecodeError:
         parsed_value = value
+
+    # Parse details if present
+    parsed_details = None
+    if has_details and details:
+        try:
+            parsed_details = json.loads(details)
+        except json.JSONDecodeError:
+            parsed_details = None
 
     # Try to get existing claim by bsn, service, law and key
     claim_data = None
@@ -59,6 +69,7 @@ async def get_edit_form(
             "bsn": bsn,
             "show_approve": show_approve,
             "claim_data": claim_data,
+            "details": parsed_details,
         },
     )
 
@@ -74,8 +85,8 @@ async def update_value(
     law: str = Form(...),
     bsn: str = Form(...),
     evidence: UploadFile = File(None),
-    claimant: str = Form(...),  # Add this
-    auto_approve: bool = Form(False),  # Add this
+    claimant: str = Form(...),
+    auto_approve: bool = Form(False),
     services: Services = Depends(get_services),
 ):
     """Handle the value update by creating a claim"""
@@ -85,7 +96,9 @@ async def update_value(
         if new_value.lower() in ("true", "false"):
             parsed_value = new_value.lower() == "true"
         # Try parsing as number
-        elif new_value.replace(".", "", 1).isdigit():
+        elif new_value.replace(".", "", 1).isdigit() or (
+            new_value.startswith("-") and new_value[1:].replace(".", "", 1).isdigit()
+        ):
             parsed_value = float(new_value) if "." in new_value else int(new_value)
         # Try parsing as date
         elif new_value and len(new_value.split("-")) == 3:
@@ -100,6 +113,9 @@ async def update_value(
     except (json.JSONDecodeError, ValueError):
         # If parsing fails, keep original string value
         pass
+
+    # Note: No special handling needed for eurocent here, as the frontend already converts
+    # the display value (e.g., €10.50) to the actual value in cents (1050) before submission
 
     evidence_path = None
     if evidence:
