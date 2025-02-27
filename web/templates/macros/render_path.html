@@ -24,28 +24,13 @@
             {% if display_value is boolean %}
                 {{ 'Ja' if display_value else 'Nee' }}
             {% elif display_value is number %}
-                <span class="group relative">
-                    {% if (node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent') or
-                        (node.details and node.details.path and node.details.path|string in ["INCOME", "income", "STUDY_GRANT", "study_grant", "amount", "toeslag", "toeslagen", "salary", "uitkering", "normhuur", "fee", "tax", "benefit", "allowance", "pension", "bedrag", "grant"]) %}
-                        €{{ '%.2f'|format(display_value / 100) }}
-                    {% elif display_value % 1 != 0 %}
-                        {{ '%.5f'|format(display_value) }}
-                    {% else %}
-                        {{ display_value }}
-                    {% endif %}
-                    <span class="hidden group-hover:block absolute z-50 bottom-full left-0 bg-black text-white text-xs p-1 rounded opacity-90 whitespace-pre"
-                          style="min-width: 200px;
-                                 margin-bottom: 3px">
-                        <b>Value:</b> {{ display_value }}
-                        <br>
-                        <b>Details:</b>
-                        {% if node.details %}
-                            {{ node.details|tojson }}
-                        {% else %}
-                            No details
-                        {% endif %}
-                    </span>
-                </span>
+                {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                    €{{ '%.2f'|format(display_value / 100) }}
+                {% elif display_value % 1 != 0 %}
+                    {{ '%.5f'|format(display_value) }}
+                {% else %}
+                    {{ display_value }}
+                {% endif %}
             {% elif display_value is mapping %}
                 {% for key, val in display_value.items() %}
                     {% if val is mapping %}
