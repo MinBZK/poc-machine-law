@@ -26,6 +26,7 @@ class RuleResult:
     input: dict[str, Any]
     rulespec_uuid: str
     path: PathNode | None = None
+    missing_required: bool = False
 
     @classmethod
     def from_engine_result(cls, result: dict[str, Any], rulespec_uuid: str) -> "RuleResult":
@@ -36,6 +37,7 @@ class RuleResult:
             input=result.get("input", {}),
             rulespec_uuid=rulespec_uuid,
             path=result.get("path"),
+            missing_required=result.get("missing_required", False),
         )
 
 

@@ -94,6 +94,7 @@ async def execute_law(
             "result": result.output,
             "input": result.input,
             "requirements_met": result.requirements_met,
+            "missing_required": result.missing_required,
             "current_case": existing_case,
         },
     )

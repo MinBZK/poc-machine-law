@@ -95,6 +95,7 @@ class RuleContext:
     service_name: str | None = None
     claims: dict[str:Claim] = None
     approved: bool | None = True
+    missing_required: bool | None = False
 
     def track_access(self, path: str) -> None:
         """Track accessed data paths"""
@@ -288,6 +289,9 @@ class RuleContext:
                 if path in self.property_specs:
                     spec = self.property_specs[path]
                     node.required = bool(spec.get("required", False))
+                    if node.required:
+                        self.missing_required = True
+
                     if "type" in spec:
                         node.details["type"] = spec["type"]
                     if "type_spec" in spec:
@@ -368,6 +372,8 @@ class RuleContext:
             # Update the service node with the result and add child path
             service_node.result = value
             service_node.children.append(result.path)
+
+            self.missing_required = self.missing_required or result.missing_required
 
             return value
         finally:

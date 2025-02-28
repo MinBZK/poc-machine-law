@@ -228,6 +228,7 @@ class RulesEngine:
             "output": output_values,
             "requirements_met": requirements_met,
             "path": root,
+            "missing_required": context.missing_required,
         }
 
     async def _evaluate_action(self, action, context):
