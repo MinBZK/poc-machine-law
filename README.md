@@ -149,9 +149,19 @@ Installeer alle dependencies:
 uv sync
 ```
 
-Run features:
+Run behavior tests:
 ```bash
 uv run behave features --no-capture -v --define log_level=DEBUG
+```
+
+Run Playwright UI tests (after installing dependencies):
+```bash
+# Install Playwright
+uv pip install pytest pytest-playwright
+playwright install
+
+# Run tests
+pytest tests/playwright
 ```
 
 Run simulaties:

@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+# Check if the server is already running
+if ! curl -s http://0.0.0.0:8000 > /dev/null; then
+    echo "ERROR: Web server is not running. Please start it first with:"
+    echo "uv run web/main.py"
+    exit 1
+fi
+
+# Check which test variant to run
+if [ "$1" == "--simple" ]; then
+    echo "Running simplest Playwright test (no navigation)..."
+    uv run pytest tests/playwright/test_basic.py::test_simple -v
+elif [ "$1" == "--basic" ]; then
+    echo "Running basic Playwright test..."
+    # Run with verbose output
+    uv run pytest tests/playwright/test_basic.py::test_homepage_loads -v
+elif [ "$1" == "--panel" ]; then
+    echo "Running simple application panel test..."
+    uv run pytest tests/playwright/test_application_panel_simple.py -v
+elif [ "$1" == "--headed" ]; then
+    echo "Running Playwright tests with browser visible..."
+    uv run pytest tests/playwright --headed
+else
+    echo "Running Playwright tests in headless mode..."
+    uv run pytest tests/playwright
+fi
