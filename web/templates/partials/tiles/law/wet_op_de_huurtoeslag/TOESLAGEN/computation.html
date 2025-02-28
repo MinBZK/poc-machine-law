@@ -11,6 +11,10 @@
                 waarom?
             </button>
         </div>
+    {% elif missing_required %}
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.
+        </h4>
     {% else %}
         <h4 class="text-sm font-medium text-gray-500 mb-1">U krijgt waarschijnlijk geen huurtoeslag.</h4>
     {% endif %}

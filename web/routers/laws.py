@@ -281,6 +281,7 @@ async def application_panel(
                 "bsn": bsn,
                 "current_case": existing_case,
                 "claim_map": claim_map,
+                "missing_required": result.missing_required,
             },
         )
     except Exception as e:
