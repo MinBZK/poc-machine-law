@@ -1,4 +1,4 @@
-name: Docker Build Validation
+name: Docker Build Validation with Kaniko
 
 on:
   pull_request:
@@ -11,8 +11,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Kaniko build (no push)
-      uses: aevea/action-kaniko@v0.10.0
+    - name: Kaniko build
+      uses: docker/setup-qemu-action@v3
       with:
-        no_push: true
-        build_file: Dockerfile
+        platforms: amd64
+
+    - name: Run Kaniko build
+      uses: int128/kaniko-action@v1
+      with:
+        push: false
+        dockerfile: Dockerfile
+        context: .
