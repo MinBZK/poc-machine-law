@@ -1,11 +1,48 @@
 #!/bin/bash
 set -e
 
+# Set up variables
+SERVER_PID=""
+SERVER_STARTED=false
+
+# Function to clean up resources on exit
+cleanup() {
+    # Kill the server if we started it
+    if [ "$SERVER_STARTED" = true ] && [ ! -z "$SERVER_PID" ]; then
+        echo "Stopping web server (PID: $SERVER_PID)..."
+        kill $SERVER_PID
+        wait $SERVER_PID 2>/dev/null || true
+        echo "Web server stopped."
+    fi
+    exit ${1:-0}
+}
+
+# Set up trap for clean exit
+trap 'cleanup' EXIT
+trap 'cleanup 1' INT TERM
+
 # Check if the server is already running
-if ! curl -s http://0.0.0.0:8000 > /dev/null; then
-    echo "ERROR: Web server is not running. Please start it first with:"
-    echo "uv run web/main.py"
-    exit 1
+if ! curl -s http://localhost:8000 > /dev/null; then
+    echo "Starting web server..."
+    uv run web/main.py > /tmp/web-server.log 2>&1 &
+    SERVER_PID=$!
+    SERVER_STARTED=true
+
+    # Wait for server to start (up to 10 seconds)
+    for i in {1..20}; do
+        if curl -s http://localhost:8000 > /dev/null; then
+            echo "Web server started successfully."
+            break
+        fi
+        if [ $i -eq 20 ]; then
+            echo "ERROR: Web server failed to start in time. Check /tmp/web-server.log for details."
+            cleanup 1
+        fi
+        echo "Waiting for server to start... ($i/20)"
+        sleep 0.5
+    done
+else
+    echo "Using existing web server."
 fi
 
 # Default to all browsers if none specified

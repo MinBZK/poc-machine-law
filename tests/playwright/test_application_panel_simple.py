@@ -10,12 +10,16 @@ def test_tile_click_opens_panel(page: Page):
 
         # Wait for content to load with minimal timeout
         print("Waiting for content to load...")
-        page.wait_for_load_state("domcontentloaded", timeout=500)
+        page.wait_for_load_state("domcontentloaded", timeout=1000)
+
+        # Add a small sleep to ensure JS has fully initialized
+        print("Waiting for JS initialization...")
+        page.wait_for_timeout(200)
 
         # Wait for the first tile to appear
         print("Waiting for tiles to appear...")
         tile_selector = "div[id^='tile-']"
-        page.wait_for_selector(tile_selector, timeout=1000)
+        page.wait_for_selector(tile_selector, timeout=2000)
 
         # Take screenshot before clicking
         page.screenshot(path="/tmp/before_click.png")

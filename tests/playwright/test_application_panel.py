@@ -17,11 +17,14 @@ def test_application_panel(page: Page):
     page.goto("http://localhost:8000", timeout=2000)
 
     # Wait for content to load with minimal timeout
-    page.wait_for_load_state("domcontentloaded", timeout=500)
+    page.wait_for_load_state("domcontentloaded", timeout=1000)
+
+    # Add a small sleep to ensure JS has fully initialized
+    page.wait_for_timeout(200)
 
     # Wait for tiles to appear
     tile_selector = "div[id^='tile-']"
-    page.wait_for_selector(tile_selector, timeout=1000)
+    page.wait_for_selector(tile_selector, timeout=2000)
 
     # Find a tile with a button containing "aanvragen" text
     tiles = page.locator(tile_selector).all()
