@@ -4,7 +4,7 @@ import pytest
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
 
 # Constants
-BASE_URL = "http://0.0.0.0:8000"
+BASE_URL = "http://localhost:8000"
 
 
 @pytest.fixture(scope="session")
@@ -31,7 +31,12 @@ def playwright() -> Generator[Playwright, None, None]:
 @pytest.fixture(scope="session")
 def browser(playwright: Playwright, browser_name: str) -> Generator[Browser, None, None]:
     """Create a browser instance."""
-    browser = playwright[browser_name].launch(headless=True)
+    # Launch with faster options
+    browser = playwright[browser_name].launch(
+        headless=True,
+        # Speed up browser startup
+        args=["--disable-dev-shm-usage", "--no-sandbox"],
+    )
     yield browser
     browser.close()
 

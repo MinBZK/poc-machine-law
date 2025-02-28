@@ -4,18 +4,18 @@ from playwright.sync_api import Page
 def test_tile_click_opens_panel(page: Page):
     """Test that clicking on a tile opens the application panel."""
     try:
-        # Navigate to homepage
+        # Navigate to homepage with minimal timeout - application is very fast
         print("Navigating to homepage...")
-        page.goto("http://0.0.0.0:8000", timeout=30000)
+        page.goto("http://localhost:8000", timeout=2000)
 
-        # Wait for content to load
+        # Wait for content to load with minimal timeout
         print("Waiting for content to load...")
-        page.wait_for_load_state("domcontentloaded")
+        page.wait_for_load_state("domcontentloaded", timeout=500)
 
         # Wait for the first tile to appear
         print("Waiting for tiles to appear...")
         tile_selector = "div[id^='tile-']"
-        page.wait_for_selector(tile_selector, timeout=10000)
+        page.wait_for_selector(tile_selector, timeout=1000)
 
         # Take screenshot before clicking
         page.screenshot(path="/tmp/before_click.png")
@@ -74,84 +74,67 @@ def test_tile_click_opens_panel(page: Page):
         page.screenshot(path="/tmp/after_click.png")
         print("Screenshot saved to /tmp/after_click.png")
 
-        # Search for the panel by different methods
-        # Method 1: Try waiting for panel with transform completed
+        # Search for the panel - go directly to Method 2 which works reliably
         try:
-            print("Method 1: Waiting for panel with transform completed...")
-            # Wait for panel element to be in the DOM and visible
-            panel_selector = "#application-panel > div:not([x-transition\\:enter-start])"
-            panel = page.wait_for_selector(panel_selector, timeout=10000)
-            print("Panel found!")
-            # Take success screenshot
-            page.screenshot(path="/tmp/method1_success.png")
-            assert panel.is_visible(), "Panel should be visible (Method 1)"
-            print("Method 1 succeeded! Panel is visible.")
-            print("Test completed successfully!")
-            # Don't return, just let the test complete successfully
-        except Exception as e:
-            print(f"Method 1 failed: {e}")
-
-        # Method 2: Wait for any element in the panel to be visible
-        try:
-            print("Method 2: Waiting for elements inside the panel...")
+            print("Waiting for elements inside the panel...")
+            # Find close button in panel with short timeout
             close_button = page.wait_for_selector(
-                "#application-panel button svg path[d*='M6 18L18 6M6 6l12 12']", timeout=10000
+                "#application-panel button svg path[d*='M6 18L18 6M6 6l12 12']", timeout=2000
             )
             print("Close button found in panel!")
             # Take success screenshot
-            page.screenshot(path="/tmp/method2_success.png")
-            assert close_button.is_visible(), "Close button should be visible (Method 2)"
-            print("Method 2 succeeded! Close button is visible.")
+            page.screenshot(path="/tmp/panel_success.png")
+            assert close_button.is_visible(), "Close button should be visible"
+            print("Success! Panel is visible with close button.")
             print("Test completed successfully!")
             return
         except Exception as e:
-            print(f"Method 2 failed: {e}")
+            print(f"Failed to find close button: {e}")
 
-        # Method 3: Manual approach with timeout
+        # Fallback method: Manual approach with very short timeout
         try:
-            print("Method 3: Manual wait approach...")
-            # Wait 3 seconds for animation to complete
-            page.wait_for_timeout(3000)
+            print("Fallback: Manual wait approach...")
+            # Wait just a bit for animation to complete
+            page.wait_for_timeout(500)
 
             panel = page.locator("#application-panel")
             is_visible = panel.is_visible()
             print(f"Panel visible after timeout: {is_visible}")
 
             if is_visible:
-                print("Panel is visible after timeout!")
+                print("Panel is visible after short timeout!")
                 # Take success screenshot
-                page.screenshot(path="/tmp/method3_success.png")
-                assert is_visible, "Panel should be visible (Method 3)"
-                print("Method 3 succeeded! Panel is visible after timeout.")
+                page.screenshot(path="/tmp/fallback_success.png")
+                assert is_visible, "Panel should be visible"
+                print("Fallback succeeded! Panel is visible.")
                 print("Test completed successfully!")
                 return
         except Exception as e:
-            print(f"Method 3 failed: {e}")
+            print(f"Fallback method failed: {e}")
 
-        # Method 4: Evaluate visibility via JavaScript
+        # Last resort: JavaScript check
         try:
-            print("Method 4: Using JavaScript visibility check...")
-            is_visible_js = page.evaluate("""() => {
+            print("Last resort: JavaScript visibility check...")
+            is_visible_js = page.evaluate(
+                """() => {
                 const panel = document.querySelector('#application-panel');
                 if (!panel) return false;
                 const style = window.getComputedStyle(panel);
-                const isVisible = style.display !== 'none' &&
-                                  style.visibility !== 'hidden' &&
-                                  style.opacity !== '0';
-                return isVisible;
-            }""")
+                return style.display !== 'none' &&
+                       style.visibility !== 'hidden' &&
+                       style.opacity !== '0';
+            }""",
+                timeout=1000,
+            )
 
             print(f"JS visibility check result: {is_visible_js}")
             if is_visible_js:
                 print("Panel is visible according to JavaScript!")
-                # Take success screenshot
-                page.screenshot(path="/tmp/method4_success.png")
-                assert is_visible_js, "Panel should be visible (Method 4)"
-                print("Method 4 succeeded! Panel is visible according to JavaScript.")
+                assert is_visible_js, "Panel should be visible"
                 print("Test completed successfully!")
                 return
         except Exception as e:
-            print(f"Method 4 failed: {e}")
+            print(f"JavaScript check failed: {e}")
 
         # Take screenshot showing the current state
         page.screenshot(path="/tmp/panel_not_visible.png")

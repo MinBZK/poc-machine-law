@@ -11,9 +11,9 @@ def test_simple(page: Page):
 def test_homepage_loads(page: Page):
     """Basic test to verify the homepage loads correctly."""
     try:
-        # Navigate to the homepage with debug logging
+        # Navigate to the homepage with minimal timeout - application is very fast
         print("Navigating to homepage...")
-        page.goto("http://0.0.0.0:8000", timeout=30000)
+        page.goto("http://localhost:8000", timeout=2000)
 
         # Take a screenshot for debugging
         print("Taking screenshot...")
@@ -24,7 +24,7 @@ def test_homepage_loads(page: Page):
         print(f"Page URL: {page.url}")
 
         # Simple assertion that we loaded something
-        assert "0.0.0.0:8000" in page.url
+        assert "localhost:8000" in page.url
         print("Test completed successfully")
     except Exception as e:
         # Log any errors

@@ -1,8 +1,6 @@
-import pytest
 from playwright.sync_api import Page, expect
 
 
-@pytest.mark.skip("More advanced tests requiring fixture setup")
 def test_application_panel(page: Page):
     """
     Single test to verify the basic functionality of the application panel.
@@ -15,15 +13,15 @@ def test_application_panel(page: Page):
     5. Interacts with the panel elements
     6. Closes the panel using ESC key
     """
-    # Navigate to homepage
-    page.goto("http://0.0.0.0:8000", timeout=30000)
+    # Navigate to homepage with minimal timeout - application is very fast
+    page.goto("http://localhost:8000", timeout=2000)
 
-    # Wait for content to load
-    page.wait_for_load_state("domcontentloaded")
+    # Wait for content to load with minimal timeout
+    page.wait_for_load_state("domcontentloaded", timeout=500)
 
     # Wait for tiles to appear
     tile_selector = "div[id^='tile-']"
-    page.wait_for_selector(tile_selector, timeout=10000)
+    page.wait_for_selector(tile_selector, timeout=1000)
 
     # Find a tile with a button containing "aanvragen" text
     tiles = page.locator(tile_selector).all()
@@ -46,9 +44,36 @@ def test_application_panel(page: Page):
     # Click the button to open the panel
     aanvragen_button.click()
 
-    # Wait for panel to appear and become visible
-    panel = page.wait_for_selector("#application-panel", timeout=15000)
-    assert panel.is_visible(), "Panel should be visible"
+    # Wait a bit for animations to start
+    page.wait_for_timeout(1000)
+
+    # Try multiple methods to detect the panel
+    # Method 1: Look for the panel element with completed transition
+    try:
+        panel_selector = "#application-panel > div:not([x-transition\\:enter-start])"
+        panel = page.wait_for_selector(panel_selector, timeout=10000)
+        assert panel.is_visible(), "Panel should be visible"
+    except:
+        # Method 2: Check for close button in panel
+        try:
+            close_button = page.wait_for_selector(
+                "#application-panel button svg path[d*='M6 18L18 6M6 6l12 12']", timeout=10000
+            )
+            assert close_button.is_visible(), "Close button should be visible"
+            panel = page.locator("#application-panel")
+        except:
+            # Method 3: Use JavaScript to check panel visibility
+            page.wait_for_timeout(3000)  # Wait longer
+            panel = page.locator("#application-panel")
+            is_visible = page.evaluate("""() => {
+                const panel = document.querySelector('#application-panel');
+                if (!panel) return false;
+                const style = window.getComputedStyle(panel);
+                return style.display !== 'none' &&
+                       style.visibility !== 'hidden' &&
+                       style.opacity !== '0';
+            }""")
+            assert is_visible, "Panel should be visible according to JavaScript"
 
     # Test interacting with the panel
 

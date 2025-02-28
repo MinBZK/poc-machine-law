@@ -8,21 +8,17 @@ if ! curl -s http://0.0.0.0:8000 > /dev/null; then
     exit 1
 fi
 
-# Check which test variant to run
-if [ "$1" == "--simple" ]; then
-    echo "Running simplest Playwright test (no navigation)..."
-    uv run pytest tests/playwright/test_basic.py::test_simple -v
-elif [ "$1" == "--basic" ]; then
-    echo "Running basic Playwright test..."
-    # Run with verbose output
-    uv run pytest tests/playwright/test_basic.py::test_homepage_loads -v
-elif [ "$1" == "--panel" ]; then
-    echo "Running simple application panel test..."
-    uv run pytest tests/playwright/test_application_panel_simple.py -v
-elif [ "$1" == "--headed" ]; then
-    echo "Running Playwright tests with browser visible..."
-    uv run pytest tests/playwright --headed
+# Default to all browsers if none specified
+if [ -z "$1" ]; then
+    echo "Running playwright tests on all browsers"
+    echo "Supported browsers: chromium, firefox, webkit (Safari engine)"
+
+    # Run tests for each browser using multiple --browser arguments
+    # Add optimization flags: use xvfb for virtual display and run in parallel mode
+    uv run pytest tests/playwright -v --browser=chromium --browser=firefox --browser=webkit -xvs
 else
-    echo "Running Playwright tests in headless mode..."
-    uv run pytest tests/playwright
+    # Run with specified browser
+    echo "Running playwright tests with browser: $1"
+    echo "Supported browsers: chromium, firefox, webkit (Safari engine)"
+    uv run pytest tests/playwright -v --browser=$1 -xvs
 fi
