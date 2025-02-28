@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Run behavior tests with Behave
 uv run behave features

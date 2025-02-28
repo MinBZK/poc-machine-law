@@ -151,17 +151,16 @@ uv sync
 
 Run behavior tests:
 ```bash
-uv run behave features --no-capture -v --define log_level=DEBUG
+script/test-behaviour
 ```
 
-Run Playwright UI tests (after installing dependencies):
+Run UI tests
 ```bash
 # Install Playwright
-uv pip install pytest pytest-playwright
 playwright install
 
 # Run tests
-pytest tests/playwright
+script/test-ui
 ```
 
 Run simulaties:
