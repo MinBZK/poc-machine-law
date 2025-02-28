@@ -7,9 +7,27 @@ from fastapi.templating import Jinja2Templates
 from machine.service import Services
 
 # Set Dutch locale
-locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
+try:
+    locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
+except locale.Error:
+    # Fallback for CI environments where Dutch locale might not be installed
+    try:
+        locale.setlocale(locale.LC_TIME, "nl_NL")
+    except locale.Error:
+        try:
+            # Try C.UTF-8 which is often available in Docker/CI
+            locale.setlocale(locale.LC_TIME, "C.UTF-8")
+        except locale.Error:
+            # If all else fails, use system default
+            locale.setlocale(locale.LC_TIME, "")
+            print("WARNING: Could not set Dutch locale, using system default")
+
 TODAY = datetime.today().strftime("%Y-%m-%d")
-FORMATTED_DATE = datetime.today().strftime("%-d %B %Y")
+try:
+    FORMATTED_DATE = datetime.today().strftime("%-d %B %Y")
+except ValueError:
+    # Windows uses %#d instead of %-d
+    FORMATTED_DATE = datetime.today().strftime("%d %B %Y")
 
 # Setup paths
 BASE_DIR = Path(__file__).resolve().parent
