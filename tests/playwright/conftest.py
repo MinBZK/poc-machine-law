@@ -31,12 +31,18 @@ def playwright() -> Generator[Playwright, None, None]:
 @pytest.fixture(scope="session")
 def browser(playwright: Playwright, browser_name: str) -> Generator[Browser, None, None]:
     """Create a browser instance."""
-    # Launch with faster options
-    browser = playwright[browser_name].launch(
-        headless=True,
-        # Speed up browser startup
-        args=["--disable-dev-shm-usage", "--no-sandbox"],
-    )
+    # Configure browser launch options
+    launch_options = {
+        "headless": True,
+    }
+
+    # Browser-specific arguments
+    if browser_name in ["chromium", "firefox"]:
+        # These options are only supported in Chromium and Firefox
+        launch_options["args"] = ["--disable-dev-shm-usage", "--no-sandbox"]
+
+    # Launch the browser with appropriate options
+    browser = playwright[browser_name].launch(**launch_options)
     yield browser
     browser.close()
 
