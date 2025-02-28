@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# Don't use 'set -e' here as we want to handle errors manually
 
 # Set up variables
 SERVER_PID=""
@@ -44,13 +44,13 @@ if ! curl -s http://localhost:8000 > /dev/null; then
         cleanup 1
     fi
 
-    # Wait for server to start (up to 10 seconds)
-    for i in {1..20}; do
+    # Wait for server to start (up to 25 seconds)
+    for i in {1..50}; do
         if curl -s http://localhost:8000 > /dev/null; then
             echo "Web server started successfully."
             break
         fi
-        if [ $i -eq 20 ]; then
+        if [ $i -eq 50 ]; then
             echo "ERROR: Web server failed to start in time."
             echo "=== WEB SERVER LOG ==="
             cat /tmp/web-server.log || echo "Could not read web server log"
@@ -65,7 +65,7 @@ if ! curl -s http://localhost:8000 > /dev/null; then
             uv --version || echo "uv version check failed"
             cleanup 1
         fi
-        echo "Waiting for server to start... ($i/20)"
+        echo "Waiting for server to start... ($i/50)"
         sleep 0.5
     done
 else
@@ -80,9 +80,17 @@ if [ -z "$1" ]; then
     # Run tests for each browser using multiple --browser arguments
     # Add optimization flags: use xvfb for virtual display and run in parallel mode
     uv run pytest tests/playwright -v --browser=chromium --browser=firefox --browser=webkit -xvs
+    TEST_EXIT_CODE=$?
 else
     # Run with specified browser
     echo "Running playwright tests with browser: $1"
     echo "Supported browsers: chromium, firefox, webkit (Safari engine)"
     uv run pytest tests/playwright -v --browser=$1 -xvs
+    TEST_EXIT_CODE=$?
+fi
+
+# Exit with the test exit code
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+    echo "ERROR: One or more browser tests failed with exit code: $TEST_EXIT_CODE"
+    exit $TEST_EXIT_CODE
 fi
