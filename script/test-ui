@@ -24,9 +24,25 @@ trap 'cleanup 1' INT TERM
 # Check if the server is already running
 if ! curl -s http://localhost:8000 > /dev/null; then
     echo "Starting web server..."
-    uv run web/main.py > /tmp/web-server.log 2>&1 &
+    # Ensure web server log directory exists
+    mkdir -p /tmp
+    echo "$(date): Starting web server with command: uv run web/main.py" > /tmp/web-server.log
+
+    # Run web server with verbose output and check if it starts successfully
+    (uv run web/main.py >> /tmp/web-server.log 2>&1) &
     SERVER_PID=$!
+    echo "Server started with PID: $SERVER_PID" >> /tmp/web-server.log
     SERVER_STARTED=true
+
+    # Wait a moment to catch immediate failures
+    sleep 1
+    if ! ps -p $SERVER_PID > /dev/null; then
+        echo "ERROR: Web server process died immediately after starting"
+        echo "=== WEB SERVER LOG ==="
+        cat /tmp/web-server.log
+        echo "====================="
+        cleanup 1
+    fi
 
     # Wait for server to start (up to 10 seconds)
     for i in {1..20}; do
@@ -35,7 +51,18 @@ if ! curl -s http://localhost:8000 > /dev/null; then
             break
         fi
         if [ $i -eq 20 ]; then
-            echo "ERROR: Web server failed to start in time. Check /tmp/web-server.log for details."
+            echo "ERROR: Web server failed to start in time."
+            echo "=== WEB SERVER LOG ==="
+            cat /tmp/web-server.log || echo "Could not read web server log"
+            echo "====================="
+            echo "INFO: Checking server process status..."
+            ps -p $SERVER_PID || echo "Server process not found"
+            echo "INFO: Checking available memory..."
+            free -h || echo "Memory info not available"
+            echo "INFO: Checking Python version..."
+            python --version || echo "Python version check failed"
+            echo "INFO: Checking uv version..."
+            uv --version || echo "uv version check failed"
             cleanup 1
         fi
         echo "Waiting for server to start... ($i/20)"
