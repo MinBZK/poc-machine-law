@@ -305,12 +305,24 @@ class RulesEngine:
                     for r in req["all"]:
                         result = await self._evaluate_requirements([r], context)
                         results.append(result)
+                        if not bool(result):
+                            logger.debug("False value found in an ALL, no need to compute the rest, breaking.")
+                            break
+                        if context.missing_required:
+                            logger.warning("Missing required values, breaking")
+                            break
                     result = all(results)
                 elif "or" in req:
                     results = []
                     for r in req["or"]:
                         result = await self._evaluate_requirements([r], context)
                         results.append(result)
+                        if bool(result):
+                            logger.debug("True value found in an OR, no need to compute the rest, breaking.")
+                            break
+                        if context.missing_required:
+                            logger.warning("Missing required values, breaking")
+                            break
                     result = any(results)
                 else:
                     result = await self._evaluate_operation(req, context)
