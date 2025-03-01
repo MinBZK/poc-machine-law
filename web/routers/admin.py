@@ -1,8 +1,10 @@
 import os
 import sys
+import tempfile
+import subprocess
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, BackgroundTasks, Response
 from starlette.responses import RedirectResponse
 
 from machine.events.case.aggregate import CaseStatus
@@ -10,7 +12,16 @@ from machine.service import Services
 from web.dependencies import get_services, templates
 from web.routers.laws import evaluate_law
 
+
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+def cleanup_files(*paths):
+    """Delete temporary files securely."""
+    for path in paths:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
 
 
 def group_cases_by_status(cases):
@@ -182,6 +193,57 @@ async def complete_review(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/cases/{case_id}/download-decision")
+async def download_decision(case_id: str, services: Services = Depends(get_services), background_tasks: BackgroundTasks = BackgroundTasks()):
+    case = services.case_manager.get_case_by_id(case_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    if case.status != CaseStatus.DECIDED:
+        raise HTTPException(status_code=400, detail="Case is not yet decided")
+
+    template_path = "templates/documents/decision.typ"
+    try:
+        with open(template_path, "r", encoding="utf-8") as f:
+            template = f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="Template file not found")
+
+    replacements = {
+        "{ case_id }": case_id or "N/A",
+        "{ bsn }": case.bsn or "N/A",
+        "{ service }": case.service or "N/A",
+        "{ law }": case.law or "N/A",
+        "{ decision }": "Toegekend" if case.approved else "Afgewezen",
+        "{ reason }": case.reason or "Geen reden opgegeven",
+        "{ date }": datetime.now().strftime("%d-%m-%Y"),
+    }
+    filled_template = template
+    for placeholder, value in replacements.items():
+        filled_template = filled_template.replace(placeholder, str(value))
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_typ_path = os.path.join(tmp_dir, "decision.typ")
+        tmp_pdf_path = os.path.join(tmp_dir, "decision.pdf")
+
+        with open(tmp_typ_path, "w", encoding="utf-8") as f:
+            f.write(filled_template)
+
+        try:
+            subprocess.run(["typst", "compile", tmp_typ_path, tmp_pdf_path], check=True)
+        except subprocess.CalledProcessError as e:
+            raise HTTPException(status_code=500, detail=f"PDF generation failed: {e.stderr}")
+
+        with open(tmp_pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+
+        background_tasks.add_task(cleanup_files, tmp_typ_path, tmp_pdf_path)
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=decision_{case_id}.pdf"}
+        )
 
 
 @router.get("/cases/{case_id}")
