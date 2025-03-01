@@ -353,25 +353,28 @@ def step_impl(context, competent_court):
     )
 
 
-@when("de burger een wijziging indient")
-def step_impl(context):
+@when("de burger {chance} indient")
+def step_impl(context, chance):
     """Submit a claim for data change"""
     if not context.table:
-        raise ValueError("No table provided for claim")
+        raise ValueError("No table provided for claims")
 
-    row = context.table[0]  # We expect one row with the claim details
-    claim_id = context.services.claim_manager.submit_claim(
-        service=row["service"],
-        key=row["key"],
-        new_value=row["nieuwe_waarde"],
-        reason=row["reden"],
-        claimant="BURGER",
-        case_id=None,
-        evidence_path=row.get("bewijs"),
-        law=row["law"],
-        bsn=context.parameters["BSN"]
-    )
-    context.claim_id = claim_id
+    if not hasattr(context, "claims"):
+        context.claims = []
+
+    for row in context.table:
+        claim_id = context.services.claim_manager.submit_claim(
+            service=row["service"],
+            key=row["key"],
+            new_value=parse_value(row["nieuwe_waarde"]),
+            reason=row["reden"],
+            claimant="BURGER",
+            case_id=None,
+            evidence_path=row.get("bewijs"),
+            law=row["law"],
+            bsn=context.parameters["BSN"]
+        )
+        context.claims.append(claim_id)
 
 
 @then("heeft de persoon recht op huurtoeslag")
@@ -385,17 +388,20 @@ def step_impl(context):
     )
 
 
-@given("met een kale huur {rent} en servicekosten {service_costs} waarvan {eligible_service_costs} meetellen")
-def step_impl(context, rent, service_costs, eligible_service_costs):
-    """
-    :type context: behave.runner.Context
-    """
-    context.parameters["RENT_AMOUNT"] = int(rent) * 100
-    context.parameters["SERVICE_COSTS"] = int(service_costs) * 100
-    context.parameters["ELIGIBLE_SERVICE_COSTS"] = int(eligible_service_costs) * 100
-
-
 @then('is de huurtoeslag "{amount}" euro')
 def step_impl(context, amount):
     actual_amount = context.result.output["subsidy_amount"]
     compare_euro_amount(actual_amount, amount)
+
+
+@then("ontbreken er verplichte gegevens")
+def step_impl(context):
+
+    assertions.assertTrue(context.result.missing_required,
+                          "Er zouden gegevens moeten ontbreken.")
+
+
+@then("ontbreken er geen verplichte gegevens")
+def step_impl(context):
+    assertions.assertFalse(context.result.missing_required,
+                          "Er zouden geen gegevens moeten ontbreken.")
