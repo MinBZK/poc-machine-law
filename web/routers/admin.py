@@ -15,6 +15,7 @@ from web.routers.laws import evaluate_law
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
 def cleanup_files(*paths):
     """Delete temporary files securely."""
     for path in paths:
@@ -196,7 +197,9 @@ async def complete_review(
 
 
 @router.get("/cases/{case_id}/download-decision")
-async def download_decision(case_id: str, services: Services = Depends(get_services), background_tasks: BackgroundTasks = BackgroundTasks()):
+async def download_decision(
+    case_id: str, services: Services = Depends(get_services), background_tasks: BackgroundTasks = BackgroundTasks()
+):
     case = services.case_manager.get_case_by_id(case_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
@@ -242,7 +245,7 @@ async def download_decision(case_id: str, services: Services = Depends(get_servi
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
-            headers={"Content-Disposition": f"attachment; filename=decision_{case_id}.pdf"}
+            headers={"Content-Disposition": f"attachment; filename=decision_{case_id}.pdf"},
         )
 
 
