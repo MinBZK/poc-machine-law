@@ -14,16 +14,8 @@ Feature: Berekening Huurtoeslag
     And de volgende RvIG relaties gegevens:
       | bsn       | partnerschap_type | partner_bsn |
       | 111111111 | GEEN              | null        |
-    When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then ontbreken er verplichte gegevens
-    When de burger deze gegevens indient
-      | service   | law                   | key                    | nieuwe_waarde | reden               | bewijs |
-      | TOESLAGEN | wet_op_de_huurtoeslag | RENT_AMOUNT            | 50000         | verplichte gegevens |        |
-      | TOESLAGEN | wet_op_de_huurtoeslag | SERVICE_COSTS          | 4000          | verplichte gegevens |        |
-      | TOESLAGEN | wet_op_de_huurtoeslag | ELIGIBLE_SERVICE_COSTS | 4000          | verplichte gegevens |        |
-    When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then ontbreken er geen verplichte gegevens
-    And is niet voldaan aan de voorwaarden
+    When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN
+    Then is niet voldaan aan de voorwaarden
 
   Scenario: Alleenstaande met laag inkomen en hogere huur
     Given een persoon met BSN "222222222"
@@ -38,13 +30,15 @@ Feature: Berekening Huurtoeslag
       | 222222222 | 1400000                   |
     When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then ontbreken er verplichte gegevens
+    And is niet voldaan aan de voorwaarden
     When de burger deze gegevens indient:
       | service   | law                   | key                    | nieuwe_waarde | reden               | bewijs |
       | TOESLAGEN | wet_op_de_huurtoeslag | RENT_AMOUNT            | 72000         | verplichte gegevens |        |
       | TOESLAGEN | wet_op_de_huurtoeslag | SERVICE_COSTS          | 5000          | verplichte gegevens |        |
       | TOESLAGEN | wet_op_de_huurtoeslag | ELIGIBLE_SERVICE_COSTS | 4800          | verplichte gegevens |        |
     When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then heeft de persoon recht op huurtoeslag
+    Then ontbreken er geen verplichte gegevens
+    And heeft de persoon recht op huurtoeslag
     And is de huurtoeslag "89.60" euro
 
   Scenario: Te hoog inkomen voor huurtoeslag
