@@ -275,14 +275,6 @@ properties:
 
 requirements:
   - all:
-      # User input has to exist!
-      - subject: "$RENT_AMOUNT"
-        operation: NOT_NULL
-      - subject: "$SERVICE_COSTS"
-        operation: NOT_NULL
-      - subject: "$ELIGIBLE_SERVICE_COSTS"
-        operation: NOT_NULL
-
       # Leeftijdseis
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
