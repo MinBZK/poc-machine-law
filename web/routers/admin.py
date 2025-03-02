@@ -1,10 +1,11 @@
+import contextlib
 import os
+import subprocess
 import sys
 import tempfile
-import subprocess
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, BackgroundTasks, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Request, Response
 from starlette.responses import RedirectResponse
 
 from machine.events.case.aggregate import CaseStatus
@@ -12,17 +13,14 @@ from machine.service import Services
 from web.dependencies import get_services, templates
 from web.routers.laws import evaluate_law
 
-
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 def cleanup_files(*paths):
     """Delete temporary files securely."""
     for path in paths:
-        try:
+        with contextlib.suppress(OSError):
             os.remove(path)
-        except OSError:
-            pass
 
 
 def group_cases_by_status(cases):
@@ -208,7 +206,7 @@ async def download_decision(
 
     template_path = "templates/documents/decision.typ"
     try:
-        with open(template_path, "r", encoding="utf-8") as f:
+        with open(template_path, encoding="utf-8") as f:
             template = f.read()
     except FileNotFoundError:
         raise HTTPException(status_code=500, detail="Template file not found")
