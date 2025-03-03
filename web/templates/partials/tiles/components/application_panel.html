@@ -2,7 +2,7 @@
 {% from "macros/render_path.html" import render_path, render_missing_required_form %}
 <div id="application-panel">
     <div class="fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 flex flex-col"
-         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }}, showUsedData: false }"
+         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }}, showUsedData: true }"
          x-show="show"
          x-init="$nextTick(() => { show = true })"
          @click.away="$dispatch('close-panel')"
