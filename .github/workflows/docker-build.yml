@@ -1,8 +1,10 @@
-name: Docker Build Validation with Kaniko
+name: Build image and push to GitHub Container Registry
 
 on:
-  pull_request:
-    branches: [ main ]
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,14 +13,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Kaniko build
-      uses: docker/setup-qemu-action@v3
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
       with:
-        platforms: amd64
+        registry: ghcr.io
+        username: ${{github.actor}}
+        password: ${{secrets.GITHUB_TOKEN}}
 
-    - name: Run Kaniko build
+    - name: Build and Push Image with Kaniko
       uses: int128/kaniko-action@v1
       with:
-        push: false
-        dockerfile: Dockerfile
-        context: .
+        push: true
+        tags: ghcr.io/${{ github.repository }}/poc:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+        cache: true
+        cache-ttl: 168h
+        cache-repository: ghcr.io/${{ github.repository }}/cache
