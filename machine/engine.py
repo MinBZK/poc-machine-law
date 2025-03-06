@@ -406,6 +406,8 @@ class RulesEngine:
                         operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
                     )
                     result = await self._evaluate_value(value_to_evaluate, item_context)
+                    context.missing_required = context.missing_required or item_context.missing_required
+                    context.path = item_context.path
                     values.extend(result if isinstance(result, list) else [result])
             logger.debug(f"Foreach values: {values}")
             result = self._evaluate_aggregate_ops(combine, values) if combine else values

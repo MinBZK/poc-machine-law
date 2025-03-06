@@ -197,21 +197,6 @@ properties:
             description: "Huisnummer van het adres van de persoon"
             type: "string"
 
-    - name: "CHILDREN_DATA"
-      description: "Gegevens over kinderen van de persoon"
-      type: "array"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        table: "relaties"
-        field: "kinderen"
-        select_on:
-          - name: "bsn"
-            description: "Burgerservicenummer van de persoon"
-            type: "string"
-            value: "$BSN"
-
   output:
     - name: "age"
       description: "Leeftijd van de persoon in jaren"

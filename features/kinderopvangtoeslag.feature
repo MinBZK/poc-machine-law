@@ -23,11 +23,15 @@ Feature: Berekening Kinderopvangtoeslag
     And de volgende UWV dienstverbanden gegevens:
       | bsn       | start_date | end_date   |
       | 888888888 | 2024-01-15 | 2024-01-30|
+    When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
+    Then ontbreken er verplichte gegevens
+    And is niet voldaan aan de voorwaarden
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                                                                                      | reden               | bewijs |
       | TOESLAGEN | wet_kinderopvang | CHILDCARE_KVK          | 12345678                                                                                                                                                                                           | verplichte gegevens |        |
       | TOESLAGEN | wet_kinderopvang | DECLARED_HOURS         | [{"kind_bsn": "111111111", "uren_per_jaar": 2000, "uurtarief": 850, "soort_opvang": "DAGOPVANG"}, {"kind_bsn": "222222222", "uren_per_jaar": 1500, "uurtarief": 900, "soort_opvang": "DAGOPVANG"}] | verplichte gegevens |        |
       | TOESLAGEN | wet_kinderopvang | EXPECTED_PARTNER_HOURS | 0                                                                                                                                                                                                  | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then heeft de persoon recht op kinderopvangtoeslag
+    Then ontbreken er geen verplichte gegevens
+    And heeft de persoon recht op kinderopvangtoeslag
     And is het toeslagbedrag "27200.00" euro

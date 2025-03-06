@@ -245,6 +245,8 @@ class RuleContext:
                         if df is not None:
                             result = await self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
+                            if table == "relaties":
+                                pass
                             node.result = result
                             node.resolve_type = "SOURCE"
                             node.required = bool(spec.get("required", False))
@@ -287,6 +289,7 @@ class RuleContext:
                     node.required = bool(spec.get("required", False))
                     if node.required:
                         self.missing_required = True
+                        logger.warning(f"This is a missing required value: {path}")
 
                     if "type" in spec:
                         node.details["type"] = spec["type"]

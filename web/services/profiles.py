@@ -20,86 +20,6 @@ GLOBAL_SERVICES = {
     },
 }
 PROFILES = {
-    "777777777": {
-        "name": "Fatima Al-Zahra",
-        "description": "Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor huurtoeslag",
-        "sources": {
-            **GLOBAL_SERVICES,
-            "RvIG": {
-                "personen": [
-                    {
-                        "bsn": "777777777",
-                        "geboortedatum": "1991-04-15",
-                        "verblijfsadres": "Utrecht",
-                        "land_verblijf": "NEDERLAND",
-                        "nationaliteit": "MAROKKAANS",
-                    }
-                ],
-                "relaties": [
-                    {
-                        "bsn": "777777777",
-                        "partnerschap_type": "GEEN",
-                        "partner_bsn": None,
-                    }
-                ],
-                "verblijfplaats": [
-                    {
-                        "bsn": "777777777",
-                        "straat": "Rooseveltlaan",
-                        "huisnummer": "42",
-                        "postcode": "3527AK",
-                        "woonplaats": "Utrecht",
-                        "type": "WOONADRES",
-                    }
-                ],
-            },
-            "RVZ": {
-                "verzekeringen": [
-                    {
-                        "bsn": "777777777",
-                        "polis_status": "ACTIEF",
-                        "verdrag_status": "GEEN",
-                        "zorg_type": "BASIS",
-                    }
-                ]
-            },
-            "BELASTINGDIENST": {
-                "box1": [
-                    {
-                        "bsn": "777777777",
-                        "loon_uit_dienstbetrekking": 1750000,
-                        "uitkeringen_en_pensioenen": 0,
-                        "winst_uit_onderneming": 0,
-                        "resultaat_overige_werkzaamheden": 25000,
-                        "eigen_woning": 0,
-                    }
-                ],
-                "box2": [{"bsn": "777777777", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
-                "box3": [
-                    {
-                        "bsn": "777777777",
-                        "spaargeld": 1200000,
-                        "beleggingen": 0,
-                        "onroerend_goed": 0,
-                        "schulden": 0,
-                    }
-                ],
-                "buitenlands_inkomen": [{"bsn": "777777777", "bedrag": 0, "land": "GEEN"}],
-                "aftrekposten": [{"bsn": "777777777", "persoonsgebonden_aftrek": 85000}],
-            },
-            "IND": {
-                "verblijfsvergunningen": [
-                    {
-                        "bsn": "777777777",
-                        "type": "ONBEPAALDE_TIJD_REGULIER",
-                        "status": "VERLEEND",
-                        "ingangsdatum": "2010-05-12",
-                        "einddatum": None,
-                    }
-                ]
-            },
-        },
-    },
     "999993653": {
         "name": "Jan Jansen",
         "description": "Jongere met part-time baan naast MBO opleiding, komt in aanmerking voor zorgtoeslag",
@@ -686,7 +606,7 @@ PROFILES = {
         },
     },
     "999993660": {
-        "name": "Lisa de Jong",
+        "name": "Sarah de Boer",
         "description": "Werkende ouder met jong kind, komt in aanmerking voor inkomensafhankelijke combinatiekorting",
         "sources": {
             **GLOBAL_SERVICES,
@@ -705,6 +625,7 @@ PROFILES = {
                         "bsn": "999993660",
                         "partnerschap_type": "GEEN",
                         "partner_bsn": None,
+                        "children": [{"bsn": "999993660"}, {"bsn": "222222222"}],
                     }
                 ],
                 "verblijfplaats": [
@@ -717,7 +638,9 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
-                "CHILDREN_DATA": [{"bsn": "999993660", "kinderen": [{"geboortedatum": "2020-01-01"}]}],
+                "children": [
+                    {"kind_bsn": "999993660", "geboortedatum": "2020-01-01", "naam": "Jonathan de Boer"},
+                ],
             },
             "BELASTINGDIENST": {
                 "box1": [
