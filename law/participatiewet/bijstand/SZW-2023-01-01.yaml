@@ -242,10 +242,10 @@ properties:
     ASSET_LIMIT_SINGLE: 750000  # 7500 euro
     ASSET_LIMIT_PARTNER: 1500000 # 15000 euro
     KOSTENDELERSNORM_FACTORS:
+      1: 1.00
       2: 0.50
       3: 0.43
       4: 0.40
-      5: 0.38
 
 requirements:
   - all:
@@ -325,22 +325,9 @@ actions:
       - test:
           operation: IN
           subject: "$HOUSEHOLD_MEMBERS"
-          values:
-            - 2
-            - 3
-            - 4
-            - 5
+          values: "$KOSTENDELERSNORM_FACTORS"
         then:
-          operation: IN
+          operation: GET
           subject: "$HOUSEHOLD_MEMBERS"
           values: "$KOSTENDELERSNORM_FACTORS"
-      - else:
-          operation: IF
-          conditions:
-            - test:
-                operation: GREATER_THAN
-                values:
-                  - "$HOUSEHOLD_MEMBERS"
-                  - 5
-              then: 0.38
-            - else: 1
+      - else: 0.38

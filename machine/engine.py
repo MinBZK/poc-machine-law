@@ -554,7 +554,10 @@ class RulesEngine:
             with logger.indent_block(op_type):
                 subject = await self._evaluate_value(operation["subject"], context)
                 allowed_values = await self._evaluate_value(operation.get("values", []), context)
-                result = subject in (allowed_values if isinstance(allowed_values, list) else [allowed_values])
+
+                result = subject in (
+                    allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
+                )
                 if op_type == "NOT_IN":
                     result = not result
 
@@ -634,6 +637,13 @@ class RulesEngine:
                     "arithmetic_type": op_type,
                 }
             )
+
+        elif op_type == "GET":
+            subject = await self._evaluate_value(operation["subject"], context)
+            values = await self._evaluate_value(operation.get("values", []), context)
+            result = values.get(subject)
+            node.details.update({"subject_value": subject, "allowed_values": values})
+            logger.debug(f"GET {subject} from {values}: {result}")
 
         else:
             result = None
