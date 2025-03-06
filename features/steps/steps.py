@@ -445,8 +445,7 @@ def step_impl(context, field, amount):
     assertions.assertEqual(
         actual_amount,
         expected_amount,
-        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent",
-        "Er zouden geen gegevens moeten ontbreken.")
+        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent")
 
 
 @then("heeft de persoon recht op kinderopvangtoeslag")
