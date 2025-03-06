@@ -98,7 +98,7 @@ properties:
             reference: "$BSN"
 
     - name: "POSTAL_ADDRESS"
-      description: "Postdres"
+      description: "Postadres"
       type: "string"
       service_reference:
         service: "RvIG"
