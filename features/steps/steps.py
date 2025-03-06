@@ -396,7 +396,6 @@ def step_impl(context, amount):
 
 @then("ontbreken er verplichte gegevens")
 def step_impl(context):
-
     assertions.assertTrue(context.result.missing_required,
                           "Er zouden gegevens moeten ontbreken.")
 
@@ -404,4 +403,15 @@ def step_impl(context):
 @then("ontbreken er geen verplichte gegevens")
 def step_impl(context):
     assertions.assertFalse(context.result.missing_required,
-                          "Er zouden geen gegevens moeten ontbreken.")
+                           "Er zouden geen gegevens moeten ontbreken.")
+
+
+@then('is het {field} "{amount}" eurocent')
+def step_impl(context, field, amount):
+    actual_amount = context.result.output[field]
+    expected_amount = int(amount)
+    assertions.assertEqual(
+        actual_amount,
+        expected_amount,
+        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent",
+    )
