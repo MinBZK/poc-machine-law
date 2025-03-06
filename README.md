@@ -1,7 +1,7 @@
 # 🤖 Machine-leesbare Wetgeving
 ![GitHub License](https://img.shields.io/github/license/minbzk/poc-machine-law)
 
-> Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wetgeving.  
+> Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wetgeving.
 
 De burger interface is hier gedeployed: https://ui.lac.apps.digilab.network
 
