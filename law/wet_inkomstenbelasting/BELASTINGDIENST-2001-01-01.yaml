@@ -1,18 +1,42 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
 uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
-name: Bepalen inkomens- en vermogensgegevens
+name: Berekening Inkomstenbelasting
 law: wet_inkomstenbelasting
 valid_from: 2001-01-01
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "AANSLAG"
+discoverable: "CITIZEN"
 service: "BELASTINGDIENST"
 description: >
-  Regels voor het bepalen van inkomen en vermogen volgens de Wet inkomstenbelasting 2001.
-  Omvat de drie boxen: werk en woning (box 1), aanmerkelijk belang (box 2),
-  en sparen en beleggen (box 3).
+  Regels voor het berekenen van de inkomstenbelasting volgens de Wet inkomstenbelasting.
+  De inkomstenbelasting wordt opgelegd op inkomen dat natuurlijke personen ontvangen,
+  onderverdeeld in drie 'boxen': box 1 (werk en woning), box 2 (aanmerkelijk belang),
+  en box 3 (sparen en beleggen). De wet regelt ook de berekening van heffingskortingen
+  die de te betalen belasting verminderen.
 
 references:
-  - law: "Wet inkomstenbelasting 2001"
+  - law: "Wet inkomstenbelasting"
     article: "2.3"
-    url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.3"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.3"
+  - law: "Wet inkomstenbelasting"
+    article: "2.10"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.10"
+  - law: "Wet inkomstenbelasting"
+    article: "2.12"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.12"
+  - law: "Wet inkomstenbelasting"
+    article: "2.13"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.13"
+  - law: "Wet inkomstenbelasting"
+    article: "8.10"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk8_Artikel8.10"
+  - law: "Wet inkomstenbelasting"
+    article: "8.11"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk8_Artikel8.11"
+  - law: "Wet inkomstenbelasting"
+    article: "8.14a"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk8_Artikel8.14a"
 
 properties:
   parameters:
@@ -217,6 +241,25 @@ properties:
       source_reference:
         table: "box3"
         field: "schulden"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    # Persoonsgebonden aftrek
+    - name: "PERSONAL_DEDUCTIONS"
+      description: "Persoonsgebonden aftrek"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "aftrekposten"
+        field: "persoonsgebonden_aftrek"
         select_on:
           - name: "bsn"
             description: "BSN nummer van de persoon"
@@ -443,9 +486,61 @@ properties:
             type: "string"
             value: "$PARTNER_BSN"
 
+    # Buitenlands inkomen
+    - name: "FOREIGN_INCOME"
+      description: "Niet in Nederland belastbaar inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "buitenlands"
+        field: "inkomen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
   input:
+    - name: "AGE"
+      description: "Leeftijd van de persoon"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "BIRTH_DATE"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "birth_date"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "RETIREMENT_AGE"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "retirement_age"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "BIRTH_DATE"
+            reference: "$BIRTH_DATE"
+
     - name: "HAS_PARTNER"
-      description: "Heeft de persoon een fiscaal partner"
+      description: "Heeft de persoon een fiscale partner"
       type: "boolean"
       service_reference:
         service: "RvIG"
@@ -454,12 +549,9 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
 
     - name: "PARTNER_BSN"
-      description: "Heeft de persoon een fiscaal partner"
+      description: "BSN van de fiscale partner"
       type: "string"
       service_reference:
         service: "RvIG"
@@ -468,33 +560,75 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
+
+    - name: "HAS_CHILDREN_UNDER_12"
+      description: "Heeft de persoon kinderen jonger dan 12 jaar"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "has_children_under_12"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
 
   output:
-    - name: "box1_income"
-      description: "Belastbaar inkomen box 1"
+    # Outputs for tax calculation
+    - name: "total_tax_due"
+      description: "Totaal verschuldigde inkomstenbelasting"
       type: "amount"
       type_spec:
         unit: "eurocent"
         precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box1_income"
+      description: "Belastbaar inkomen uit werk en woning (box 1)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box1_tax"
+      description: "Belasting box 1 (werk en woning)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       temporal:
         type: "period"
         period_type: "year"
 
     - name: "box2_income"
-      description: "Belastbaar inkomen box 2"
+      description: "Belastbaar inkomen uit aanmerkelijk belang (box 2)"
       type: "amount"
       type_spec:
         unit: "eurocent"
         precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box2_tax"
+      description: "Belasting box 2 (aanmerkelijk belang)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       temporal:
         type: "period"
         period_type: "year"
 
     - name: "box3_income"
-      description: "Belastbaar inkomen box 3"
+      description: "Belastbaar inkomen uit sparen en beleggen (box 3)"
       type: "amount"
       type_spec:
         unit: "eurocent"
@@ -503,6 +637,72 @@ properties:
         type: "period"
         period_type: "year"
 
+    - name: "box3_tax"
+      description: "Belasting box 3 (sparen en beleggen)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "general_tax_credit"
+      description: "Algemene heffingskorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "labor_tax_credit"
+      description: "Arbeidskorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "income_dependent_combination_credit"
+      description: "Inkomensafhankelijke combinatiekorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "total_tax_credits"
+      description: "Totaal aan heffingskortingen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "taxable_income"
+      description: "Verzamelinkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    # Additional outputs for other governmental services
     - name: "foreign_income"
       description: "Niet in Nederland belastbaar inkomen"
       type: "amount"
@@ -623,43 +823,461 @@ properties:
         type: "period"
         period_type: "month"
 
+
   definitions:
+    # Box 1 definities
+    BOX1_BRACKET1_LIMIT: 7457300  # €74.573
+    BOX1_BRACKET2_LIMIT: 11932700 # €119.327 (voor volledige tabel)
+    BOX1_RATE1: 0.3693  # 36,93%
+    BOX1_RATE2: 0.4953  # 49,53%
+
+    # Box 1 definities voor AOW-gerechtigden
+    BOX1_RATE1_AOW: 0.1975  # 19,75% (lager percentage vanwege geen AOW-premie)
+    BOX1_RATE2_AOW: 0.4953  # 49,53% (gelijk aan regulier tarief)
+
+    # Box 2 definities
+    BOX2_BRACKET1_LIMIT: 6700000  # €67.000
+    BOX2_RATE1: 0.245  # 24,5%
+    BOX2_RATE2: 0.33  # 33%
+
+    # Box 3 definities
+    BOX3_TAX_FREE_ALLOWANCE_SINGLE: 5772900  # €57.729
+    BOX3_TAX_FREE_ALLOWANCE_PARTNERS: 11545800  # €115.458
+    BOX3_DEEMED_RETURN_RATE: 0.06  # 6% fictief rendement
+    BOX3_TAX_RATE: 0.34  # 34% belastingtarief
     BOX3_RENDEMENT: 0.0674  # 6,74% rendement box 3
     HEFFINGSVRIJ_VERMOGEN: 5720000  # 57.200 euro voor 2025
 
+    # Heffingskortingen definities
+    GENERAL_TAX_CREDIT_MAX: 310400  # €3.104
+    GENERAL_TAX_CREDIT_REDUCTION_START: 2466800  # €24.668
+    GENERAL_TAX_CREDIT_REDUCTION_RATE: 0.06578  # 6,578%
+    GENERAL_TAX_CREDIT_ZERO_POINT: 7243000  # €72.430
+
+    # Heffingskortingen definities voor AOW-gerechtigden
+    GENERAL_TAX_CREDIT_MAX_AOW: 165800  # €1.658 (lager vanwege geen AOW-premie)
+    GENERAL_TAX_CREDIT_REDUCTION_RATE_AOW: 0.03427  # 3,427% (lager vanwege geen AOW-premie)
+
+    LABOR_TAX_CREDIT_MAX: 446400  # €4.464
+    LABOR_TAX_CREDIT_REDUCTION_START: 4081200  # €40.812
+    LABOR_TAX_CREDIT_REDUCTION_RATE: 0.06510  # 6,51%
+    LABOR_TAX_CREDIT_ZERO_POINT: 11932700  # €119.327
+
+    # Arbeidskorting voor AOW-gerechtigden
+    LABOR_TAX_CREDIT_MAX_AOW: 238500  # €2.385 (lager vanwege geen AOW-premie)
+    LABOR_TAX_CREDIT_REDUCTION_RATE_AOW: 0.03400  # 3,40% (lager vanwege geen AOW-premie)
+
+    INCOME_DEPENDENT_COMBINATION_CREDIT_BASE: 88800  # €888
+    INCOME_DEPENDENT_COMBINATION_CREDIT_RATE: 0.11213  # 11,213%
+    INCOME_DEPENDENT_COMBINATION_CREDIT_MIN_INCOME: 550300  # €5.503
+    INCOME_DEPENDENT_COMBINATION_CREDIT_MAX: 265000  # €2.650
+
+    # Minimum persoonlijk inkomen
+    MIN_PERSONAL_INCOME: 0
+
 actions:
+  # Box 1 inkomen berekening
   - output: "box1_income"
     operation: ADD
     values:
       - "$BOX1_EMPLOYMENT"
-      - "$BOX1_BENEFITS"
       - "$BOX1_BUSINESS"
+      - "$BOX1_BENEFITS"
       - "$BOX1_OTHER_WORK"
       - "$BOX1_HOME"
 
+  # Box 2 inkomen berekening
   - output: "box2_income"
     operation: ADD
     values:
       - "$BOX2_DIVIDEND"
       - "$BOX2_SHARES"
 
+  # Box 3 assets berekening (zonder belasting)
+  - output: "box3_assets"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - operation: ADD
+            values:
+              - "$BOX3_SAVINGS"
+              - "$BOX3_INVESTMENTS"
+              - "$BOX3_PROPERTIES"
+          - "$BOX3_DEBTS"
+          - operation: IF
+            conditions:
+              - test:
+                  subject: "$HAS_PARTNER"
+                  operation: EQUALS
+                  value: true
+                then: "$BOX3_TAX_FREE_ALLOWANCE_PARTNERS"
+              - else: "$BOX3_TAX_FREE_ALLOWANCE_SINGLE"
+      - 0
+
+  # Box 3 inkomen berekening (belastbare vermogen x fictief rendement)
   - output: "box3_income"
     operation: MULTIPLY
     values:
-      - operation: MAX
-        values:
-          - operation: SUBTRACT
-            values:
-              - operation: ADD
-                values:
-                  - "$BOX3_SAVINGS"
-                  - "$BOX3_INVESTMENTS"
-                  - "$BOX3_PROPERTIES"
-              - "$BOX3_DEBTS"
-              - "$HEFFINGSVRIJ_VERMOGEN"
-          - 0
-      - "$BOX3_RENDEMENT"
+      - "$box3_assets"
+      - "$BOX3_DEEMED_RETURN_RATE"
 
+  # Totaal belastbaar inkomen berekening
+  - output: "taxable_income"
+    operation: ADD
+    values:
+      - "$box1_income"
+      - "$box2_income"
+      - "$box3_income"
+      - operation: SUBTRACT
+        values:
+          - 0
+          - "$PERSONAL_DEDUCTIONS"
+
+  # Verrekening van persoonsgebonden aftrek in vaste volgorde (eerst box 1, dan 3, dan 2)
+  - output: "box1_income_after_deduction"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$box1_income"
+          - "$PERSONAL_DEDUCTIONS"
+      - 0
+
+  - output: "remaining_deduction_after_box1"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$PERSONAL_DEDUCTIONS"
+          - "$box1_income"
+      - 0
+
+  - output: "box3_income_after_deduction"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$box3_income"
+          - "$remaining_deduction_after_box1"
+      - 0
+
+  - output: "remaining_deduction_after_box3"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$remaining_deduction_after_box1"
+          - "$box3_income"
+      - 0
+
+  - output: "box2_income_after_deduction"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$box2_income"
+          - "$remaining_deduction_after_box3"
+      - 0
+
+  # Bepaal is_aow_age
+  - output: "is_aow_age"
+    operation: GREATER_OR_EQUAL
+    values:
+      - "$AGE"
+      - "$RETIREMENT_AGE"
+
+  # Box 1 belasting herberekening na aftrek
+  - output: "box1_tax"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_aow_age"
+          operation: EQUALS
+          value: true
+        then:
+          operation: IF
+          conditions:
+            - test:
+                operation: LESS_OR_EQUAL
+                values:
+                  - "$box1_income_after_deduction"
+                  - "$BOX1_BRACKET1_LIMIT"
+              then:
+                operation: MULTIPLY
+                values:
+                  - "$box1_income_after_deduction"
+                  - "$BOX1_RATE1_AOW"
+            - else:
+                operation: ADD
+                values:
+                  - operation: MULTIPLY
+                    values:
+                      - "$BOX1_BRACKET1_LIMIT"
+                      - "$BOX1_RATE1_AOW"
+                  - operation: MULTIPLY
+                    values:
+                      - operation: SUBTRACT
+                        values:
+                          - "$box1_income_after_deduction"
+                          - "$BOX1_BRACKET1_LIMIT"
+                      - "$BOX1_RATE2_AOW"
+      - else:
+          operation: IF
+          conditions:
+            - test:
+                operation: LESS_OR_EQUAL
+                values:
+                  - "$box1_income_after_deduction"
+                  - "$BOX1_BRACKET1_LIMIT"
+              then:
+                operation: MULTIPLY
+                values:
+                  - "$box1_income_after_deduction"
+                  - "$BOX1_RATE1"
+            - else:
+                operation: ADD
+                values:
+                  - operation: MULTIPLY
+                    values:
+                      - "$BOX1_BRACKET1_LIMIT"
+                      - "$BOX1_RATE1"
+                  - operation: MULTIPLY
+                    values:
+                      - operation: SUBTRACT
+                        values:
+                          - "$box1_income_after_deduction"
+                          - "$BOX1_BRACKET1_LIMIT"
+                      - "$BOX1_RATE2"
+
+  # Box 2 belasting herberekening na aftrek
+  - output: "box2_tax"
+    operation: IF
+    conditions:
+      - test:
+          operation: LESS_OR_EQUAL
+          values:
+            - "$box2_income_after_deduction"
+            - "$BOX2_BRACKET1_LIMIT"
+        then:
+          operation: MULTIPLY
+          values:
+            - "$box2_income_after_deduction"
+            - "$BOX2_RATE1"
+      - else:
+          operation: ADD
+          values:
+            - operation: MULTIPLY
+              values:
+                - "$BOX2_BRACKET1_LIMIT"
+                - "$BOX2_RATE1"
+            - operation: MULTIPLY
+              values:
+                - operation: SUBTRACT
+                  values:
+                    - "$box2_income_after_deduction"
+                    - "$BOX2_BRACKET1_LIMIT"
+                - "$BOX2_RATE2"
+
+  # Box 3 belasting herberekening na aftrek
+  - output: "box3_tax"
+    operation: MULTIPLY
+    values:
+      - "$box3_income_after_deduction"
+      - "$BOX3_TAX_RATE"
+
+  # Algemene heffingskorting berekening met verschillende regels voor AOW-gerechtigden
+  - output: "general_tax_credit"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_aow_age"
+          operation: EQUALS
+          value: true
+        then:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$GENERAL_TAX_CREDIT_MAX_AOW"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$box1_income"
+                          - "$GENERAL_TAX_CREDIT_REDUCTION_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$box1_income"
+                                  - "$GENERAL_TAX_CREDIT_REDUCTION_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$GENERAL_TAX_CREDIT_ZERO_POINT"
+                                  - "$GENERAL_TAX_CREDIT_REDUCTION_START"
+                          - "$GENERAL_TAX_CREDIT_REDUCTION_RATE_AOW"
+                    - else: 0
+            - 0
+      - else:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$GENERAL_TAX_CREDIT_MAX"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$box1_income"
+                          - "$GENERAL_TAX_CREDIT_REDUCTION_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$box1_income"
+                                  - "$GENERAL_TAX_CREDIT_REDUCTION_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$GENERAL_TAX_CREDIT_ZERO_POINT"
+                                  - "$GENERAL_TAX_CREDIT_REDUCTION_START"
+                          - "$GENERAL_TAX_CREDIT_REDUCTION_RATE"
+                    - else: 0
+            - 0
+
+  # Arbeidskorting berekening met verschillende regels voor AOW-gerechtigden
+  - output: "labor_tax_credit"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_aow_age"
+          operation: EQUALS
+          value: true
+        then:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$LABOR_TAX_CREDIT_MAX_AOW"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$BOX1_EMPLOYMENT"
+                          - "$LABOR_TAX_CREDIT_REDUCTION_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$BOX1_EMPLOYMENT"
+                                  - "$LABOR_TAX_CREDIT_REDUCTION_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$LABOR_TAX_CREDIT_ZERO_POINT"
+                                  - "$LABOR_TAX_CREDIT_REDUCTION_START"
+                          - "$LABOR_TAX_CREDIT_REDUCTION_RATE_AOW"
+                    - else: 0
+            - 0
+      - else:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$LABOR_TAX_CREDIT_MAX"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$BOX1_EMPLOYMENT"
+                          - "$LABOR_TAX_CREDIT_REDUCTION_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$BOX1_EMPLOYMENT"
+                                  - "$LABOR_TAX_CREDIT_REDUCTION_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$LABOR_TAX_CREDIT_ZERO_POINT"
+                                  - "$LABOR_TAX_CREDIT_REDUCTION_START"
+                          - "$LABOR_TAX_CREDIT_REDUCTION_RATE"
+                    - else: 0
+            - 0
+
+  # Inkomensafhankelijke combinatiekorting berekening
+  - output: "income_dependent_combination_credit"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - subject: "$HAS_CHILDREN_UNDER_12"
+              operation: EQUALS
+              value: true
+            - operation: GREATER_THAN
+              values:
+                - "$BOX1_EMPLOYMENT"
+                - "$INCOME_DEPENDENT_COMBINATION_CREDIT_MIN_INCOME"
+        then:
+          operation: MIN
+          values:
+            - operation: ADD
+              values:
+                - "$INCOME_DEPENDENT_COMBINATION_CREDIT_BASE"
+                - operation: MULTIPLY
+                  values:
+                    - operation: SUBTRACT
+                      values:
+                        - "$BOX1_EMPLOYMENT"
+                        - "$INCOME_DEPENDENT_COMBINATION_CREDIT_MIN_INCOME"
+                    - "$INCOME_DEPENDENT_COMBINATION_CREDIT_RATE"
+            - "$INCOME_DEPENDENT_COMBINATION_CREDIT_MAX"
+      - else: 0
+
+  # Totaal aan heffingskortingen
+  - output: "total_tax_credits"
+    operation: ADD
+    values:
+      - "$general_tax_credit"
+      - "$labor_tax_credit"
+      - "$income_dependent_combination_credit"
+
+  # Totaal verschuldigde belasting
+  - output: "total_tax_due"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - operation: ADD
+            values:
+              - "$box1_tax"
+              - "$box2_tax"
+              - "$box3_tax"
+          - "$total_tax_credits"
+      - 0
+
+  # Berekeningen voor de missende outputs die nodig zijn voor andere wetten
+  # Foreign income
+  - output: "foreign_income"
+    value: "$FOREIGN_INCOME"
+
+  # Income (= verzamelinkomen, equivalent aan taxable_income)
   - output: "income"
     operation: ADD
     values:
@@ -668,6 +1286,7 @@ actions:
       - "$box3_income"
       - "$foreign_income"
 
+  # Net worth berekening
   - output: "net_worth"
     operation: SUBTRACT
     values:
@@ -678,6 +1297,7 @@ actions:
           - "$BOX3_PROPERTIES"
       - "$BOX3_DEBTS"
 
+  # Partner box 1 inkomen berekening
   - output: "partner_box1_income"
     operation: ADD
     values:
@@ -696,6 +1316,7 @@ actions:
                 - "$PARTNER_BOX1_HOME"
           - else: 0
 
+  # Partner box 2 inkomen berekening
   - output: "partner_box2_income"
     operation: ADD
     values:
@@ -711,6 +1332,7 @@ actions:
                 - "$PARTNER_BOX2_SHARES"
           - else: 0
 
+  # Partner box 3 inkomen berekening
   - output: "partner_box3_income"
     operation: IF
     conditions:
@@ -735,6 +1357,11 @@ actions:
             - "$BOX3_RENDEMENT"
       - else: 0
 
+  # Partner foreign income
+  - output: "partner_foreign_income"
+    value: "$PARTNER_FOREIGN_INCOME"
+
+  # Partner totaal inkomen berekening
   - output: "partner_income"
     operation: ADD
     values:
@@ -743,9 +1370,7 @@ actions:
       - "$partner_box3_income"
       - "$partner_foreign_income"
 
-  - output: "partner_foreign_income"
-    value: "$PARTNER_FOREIGN_INCOME"
-
+  # Gezamenlijk vermogen berekening
   - output: "combined_net_worth"
     operation: IF
     conditions:
@@ -766,6 +1391,7 @@ actions:
                 - "$PARTNER_BOX3_DEBTS"
       - else: "$net_worth"
 
+  # Bezittingen voor participatiewet berekening
   - output: "assets"
     operation: ADD
     values:
@@ -773,12 +1399,14 @@ actions:
       - "$BOX3_INVESTMENTS"
       - "$BOX3_PROPERTIES"
 
+  # Maandelijks bedrijfsinkomen voor participatiewet berekening
   - output: "business_income"
     operation: DIVIDE
     values:
       - "$BOX1_BUSINESS"
       - 12  # Jaar naar maand
 
+  # Maandelijks inkomen voor participatiewet berekening
   - output: "monthly_income"
     operation: DIVIDE
     values:

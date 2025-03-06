@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json",
+  "$id": "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json",
   "title": "Dutch Government Service Definition",
   "type": "object",
   "required": [
@@ -43,7 +43,8 @@
         "ALGEMEEN_VERBINDEND_VOORSCHRIFT",
         "BELEIDSREGEL",
         "VOORBEREIDINGSBESLUIT",
-        "ANDERE_HANDELING"
+        "ANDERE_HANDELING",
+        "AANSLAG"
       ]
     },
     "discoverable": {

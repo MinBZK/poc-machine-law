@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
 uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
 name: Bepalen persoonsgegevens BRP
 law: wet_brp
@@ -185,6 +185,21 @@ properties:
             description: "Huisnummer van het adres van de persoon"
             type: "string"
 
+    - name: "CHILDREN_DATA"
+      description: "Gegevens over kinderen van de persoon"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "relaties"
+        field: "kinderen"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
   output:
     - name: "age"
       description: "Leeftijd van de persoon in jaren"
@@ -297,6 +312,14 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
+    # Nieuwe output voor de inkomstenbelastingwet
+    - name: "has_children_under_12"
+      description: "Heeft de persoon kinderen jonger dan 12 jaar"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
   definitions:
     DUTCH_NATIONALITIES:
       - "NEDERLANDS"
@@ -308,6 +331,7 @@ properties:
       - "WOONADRES"
     POSTAL_ADDRESS_TYPES:
       - "BRIEFADRES"
+    CHILD_MAX_AGE_COMBINATIEKORTING: 12
 
 requirements:
   - all:
@@ -451,4 +475,26 @@ actions:
               - else: null     # Anders niets toevoegen
       - else:
           value: null  # Leeg resultaat
+    reference: "Wet BRP Art. 1.6"
+
+  # Nieuwe actie voor het bepalen of de persoon kinderen jonger dan 12 jaar heeft
+  - output: "has_children_under_12"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$CHILDREN_DATA"
+          operation: NOT_NULL
+        then:
+          operation: EXISTS
+          subject: "$CHILDREN_DATA"
+          value:
+            operation: LESS_THAN
+            values:
+              - operation: SUBTRACT_DATE
+                unit: "years"
+                values:
+                  - "$calculation_date"
+                  - "$item.geboortedatum"
+              - "$CHILD_MAX_AGE_COMBINATIEKORTING"
+      - else: false
     reference: "Wet BRP Art. 1.6"
