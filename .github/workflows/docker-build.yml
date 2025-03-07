@@ -1,5 +1,9 @@
 name: Build image and push to GitHub Container Registry
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches:
@@ -23,13 +27,10 @@ jobs:
     - name: Lowercase the GitHub repository
       id: lowercase-repository
       run: |
-        echo "github_repository=${{ github.repository }}" >> $GITHUB_OUTPUT
+        echo "github_repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
 
     - name: Build and Push Image with Kaniko
       uses: int128/kaniko-action@v1
       with:
         push: true
-        tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/poc:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
-        cache: true
-        cache-ttl: 168h
-        cache-repository: ghcr.io/${{ github.repository }}/cache
+        tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
