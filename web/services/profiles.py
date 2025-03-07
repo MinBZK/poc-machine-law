@@ -625,7 +625,7 @@ PROFILES = {
                         "bsn": "999993660",
                         "partnerschap_type": "GEEN",
                         "partner_bsn": None,
-                        "children": [{"bsn": "999993660"}, {"bsn": "222222222"}],
+                        "children": [{"bsn": "222222222"}],
                     }
                 ],
                 "verblijfplaats": [
@@ -639,7 +639,7 @@ PROFILES = {
                     }
                 ],
                 "children": [
-                    {"kind_bsn": "999993660", "geboortedatum": "2020-01-01", "naam": "Jonathan de Boer"},
+                    {"kind_bsn": "222222222", "geboortedatum": "2020-01-01", "naam": "Jonathan de Boer"},
                 ],
             },
             "BELASTINGDIENST": {

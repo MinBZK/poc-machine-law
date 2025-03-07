@@ -384,6 +384,8 @@ class RulesEngine:
         combine = operation.get("combine")
 
         array_data = await self._evaluate_value(operation["subject"], context)
+        if "DECLARED_HOURS" in operation["subject"]:
+            pass
         if not array_data:
             logger.warning("No data found to run FOREACH on")
             return self._evaluate_aggregate_ops(combine, [])

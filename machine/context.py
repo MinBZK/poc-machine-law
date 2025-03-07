@@ -245,8 +245,6 @@ class RuleContext:
                         if df is not None:
                             result = await self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
-                            if table == "relaties":
-                                pass
                             node.result = result
                             node.resolve_type = "SOURCE"
                             node.required = bool(spec.get("required", False))
@@ -255,7 +253,9 @@ class RuleContext:
                             if "type" in spec:
                                 node.details["type"] = spec["type"]
                             if "type_spec" in spec:
-                                node.details["type_spec"] = spec["type_spec"]
+                                # Gebruik helper-methode om enum-referenties op te lossen
+                                resolved_type_spec = await self._resolve_type_spec_enums(spec, spec["type_spec"])
+                                node.details["type_spec"] = resolved_type_spec
 
                             return result
 
@@ -276,7 +276,9 @@ class RuleContext:
                         if "type" in spec:
                             node.details["type"] = spec["type"]
                         if "type_spec" in spec:
-                            node.details["type_spec"] = spec["type_spec"]
+                            # Gebruik helper-methode om enum-referenties op te lossen
+                            resolved_type_spec = await self._resolve_type_spec_enums(spec, spec["type_spec"])
+                            node.details["type_spec"] = resolved_type_spec
 
                         return value
 
@@ -294,7 +296,9 @@ class RuleContext:
                     if "type" in spec:
                         node.details["type"] = spec["type"]
                     if "type_spec" in spec:
-                        node.details["type_spec"] = spec["type_spec"]
+                        # Gebruik helper-methode om enum-referenties op te lossen
+                        resolved_type_spec = await self._resolve_type_spec_enums(spec, spec["type_spec"])
+                        node.details["type_spec"] = resolved_type_spec
 
                 return None
         finally:
@@ -377,6 +381,32 @@ class RuleContext:
             return value
         finally:
             self.pop_path()
+
+    async def _resolve_type_spec_enums(self, spec: dict[str, Any], type_spec: dict[str, Any]) -> dict[str, Any]:
+        """
+        Resolve enum references in type_spec voor arrays
+
+        Args:
+            spec: De volledige property specificatie
+            type_spec: De type specificatie object
+
+        Returns:
+            Een kopie van de type_spec met opgeloste enum-referenties
+        """
+        # Maak een kopie van de type_spec om te voorkomen dat we het origineel wijzigen
+        type_spec_copy = copy(type_spec)
+
+        # Resolve enum references in type_spec voor arrays
+        if "type" in spec and spec["type"] == "array" and "fields" in type_spec_copy:
+            for field in type_spec_copy["fields"]:
+                if "enum" in field and isinstance(field["enum"], str) and field["enum"].startswith("$"):
+                    # Gebruik resolve_value om de enum-referentie op te lossen
+                    enum_value = await self.resolve_value(field["enum"])
+                    if enum_value is not None:
+                        field["enum_values"] = enum_value
+                        logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
+
+        return type_spec_copy
 
     async def _resolve_from_source(self, source_ref, table, df):
         if "select_on" in source_ref:

@@ -39,7 +39,7 @@ properties:
       type_spec:
         fields:
           - name: "kind_bsn"
-            type: "string"
+            type: "enum"
             enum: "$CHILDREN_BSNS"
           - name: "uren_per_jaar"
             type: "number"
@@ -47,7 +47,9 @@ properties:
             type: "amount"
           - name: "soort_opvang"
             type: "enum"
-            allowed_values: [ "DAGOPVANG", "BSO" ]
+            enum: [ "DAGOPVANG", "BSO" ]
+          - name: "LRK_registratienummer"
+            type: "string"
       source_reference:
         source_type: "claim"
 
