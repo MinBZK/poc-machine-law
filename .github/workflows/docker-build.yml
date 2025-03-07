@@ -20,11 +20,16 @@ jobs:
         username: ${{github.actor}}
         password: ${{secrets.GITHUB_TOKEN}}
 
+    - name: Lowercase the GitHub repository
+      id: lowercase-repository
+      run: |
+        echo "github_repository=${{ github.repository }}" >> $GITHUB_OUTPUT
+
     - name: Build and Push Image with Kaniko
       uses: int128/kaniko-action@v1
       with:
         push: true
-        tags: ghcr.io/${{ github.repository }}/poc:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+        tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/poc:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
         cache: true
         cache-ttl: 168h
         cache-repository: ghcr.io/${{ github.repository }}/cache
