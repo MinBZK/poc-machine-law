@@ -1,0 +1,30 @@
+{{- if eq .Operation "test" }}- Indien {{ end }}
+{{- if eq .Operation "then" }}  dan {{ end }}
+{{- if eq .Operation "else" }}- Anders {{ end }}
+{{- with toActionConditionRequirement .Value }}
+{{- if eq .Operation "IF"}}
+	{{- range .Conditions }}
+		{{- if avail . "Test" }}
+			{{- include "action.tmpl" (map "Value" .Test "Operation" "test") | nindent 2 }}
+		{{- end }}
+		{{- if avail . "Then" }}
+			{{- include "action.tmpl" (map "Value" .Then "Operation" "then") | nindent 2 }}
+		{{- end }}
+		{{- if avail . "Else" }}
+			{{- include "action.tmpl" (map "Value" .Else "Operation" "else") | nindent 2 }}
+		{{- end }}
+	{{ end }}
+{{- else if eq .Operation "IN" -}}
+	<span style="color:{{ FormatColor .Subject }}">{{- .Subject }}</span> in {{ if isIndexer .Values }}
+		{{- range .Values }}<span style="color:{{ FormatColor . }}">{{ . }}</span>{{ end }}
+	{{- else }}
+		<span style="color:{{ FormatColor .Values }}">{{ .Values }}</span>
+	{{- end }}
+{{- else if avail . "Value" }}
+	{{- template "value.tmpl" . }}
+{{- else if avail . "Values" }}
+	{{- template "values.tmpl" . }}
+{{- end }}
+{{- else -}}
+	<span style="color:{{ FormatColor .Value }}"> {{- .Value }}</span>
+{{- end }}

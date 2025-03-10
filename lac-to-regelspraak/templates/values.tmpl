@@ -1,0 +1,17 @@
+{{- $operation := .Operation }}
+{{- if isIndexer .Values }}
+    {{- range $i, $e := .Values }}
+        {{- if . }}
+            {{- if ne $i 0 }} {{ $operation | FormatOperation }} {{end -}}
+            {{- if isStruct . }}
+                {{- template "action.tmpl" (map "Value" .) }}
+            {{- else if isIndexer . }}
+                {{- template "action.tmpl" (map "Value" .)  }}
+            {{- else }}
+            {{- "" }}<span style="color:{{ FormatColor . }}">{{. }}</span>
+            {{- end }}
+        {{- end }}
+    {{- end }}
+{{- else }}
+{{- template "value.tmpl" (map "Subject" .Subject "Operation" .Operation "Value" .Values) }}
+{{- end }}

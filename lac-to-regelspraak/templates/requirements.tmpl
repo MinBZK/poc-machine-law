@@ -1,0 +1,14 @@
+Een <span style="color:purple">{{ .Subject }}</span> <span style="color:green">{{ .Output }}</span>
+Indien hij aan de volgende voorwaarden voldoet:
+{{- with .Requirements }}
+  {{- range .All }}
+    {{- if .Or }}
+- Hij voldoet aan ten minste een van de volgende voorwaarden:
+      {{- range .Or }}
+  - {{ FormatRequirement . }}
+      {{- end }}
+    {{- else }}
+- {{ FormatRequirement . }}
+    {{- end }}
+  {{- end }}
+{{- end }}

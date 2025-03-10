@@ -1,0 +1,30 @@
+{{ .Name }} \
+Gegenereerd op basis van {{ .Law }} \
+**Geldig vanaf**: {{ .ValidFrom }} \
+**Omschrijving**: {{ .Description }}
+
+Objecttype: {{ .Subject }}
+{{- range .Properties.Input }}
+- {{ if .Description }}{{ .Description }} {{ end }}<span style="color:green">{{ FormatID .Name }}</span> uit het <span style="color:yellow"> {{ .ServiceReference.Service }} </span> op basis van <span style="color:pink"> {{ .ServiceReference.Law }} </span>
+{{- end }}
+{{- range .Properties.Output }}
+- <span style="color:green">{{ FormatID .Name }}</span> {{ .Type }}{{ if .TypeSpec }} ({{ .TypeSpec.Unit }} precisie: {{.TypeSpec.Precision}} minimum: {{.TypeSpec.Min}}){{ end }}
+{{- end }}
+
+## Parameters ##
+{{- range $k, $v := .Properties.Definitions }}
+- Parameter <span style="color:blue">{{ $k }}</span> : {{ $v }}
+{{- end }}
+
+{{ range .Actions }}
+Regel bepaal/bereken {{ FormatActionOutput .Output }} \
+Geldig vanaf: {{ $.ValidFrom }}
+{{- "\n" }}
+{{ if .Reference }}
+{{- $requirement := solveReference .Reference}}
+{{- template "requirements.tmpl" (map "Subject" $.Subject "Requirements" $requirement "Output" .Output )}}
+{{- else -}}
+De <span style="color: green">{{ .Output }}</span> is
+{{- include "action.tmpl" (map "Value" .) | nindent 0 }}
+{{- end}}
+{{- end}}
