@@ -1,95 +1,91 @@
 {# templates/admin/partials/event_detail.html #}
 {% macro render_event(event) %}
-{% set event_colors = {
-    'Submitted': 'bg-sky-50 border-sky-200',
-    'AutomaticallyDecided': 'bg-emerald-50 border-emerald-200',
-    'AddedToManualReview': 'bg-amber-50 border-amber-200',
-    'Objected': 'bg-rose-50 border-rose-200',
-    'ObjectionStatusSet': 'bg-violet-50 border-violet-200'
-} %}
-
-{# Bepaal kleur voor Decided op basis van approved #}
-{% if event.event_type == 'Decided' or event.event_type == 'AutomaticallyDecided' %}
-    {% if event.data.approved %}
-        {% set color_class = 'bg-emerald-50 border-emerald-200' %}
+    {% set event_colors = {
+        "Submitted": "bg-sky-50 border-sky-200",
+        "AutomaticallyDecided": "bg-emerald-50 border-emerald-200",
+        "AddedToManualReview": "bg-amber-50 border-amber-200",
+        "Objected": "bg-rose-50 border-rose-200",
+        "ObjectionStatusSet": "bg-violet-50 border-violet-200"
+    } %}
+    {# Bepaal kleur voor Decided op basis van approved #}
+    {% if event.event_type == 'Decided' or event.event_type == 'AutomaticallyDecided' %}
+        {% if event.data.approved %}
+            {% set color_class = "bg-emerald-50 border-emerald-200" %}
+        {% else %}
+            {% set color_class = "bg-red-50 border-red-200" %}
+        {% endif %}
     {% else %}
-        {% set color_class = 'bg-red-50 border-red-200' %}
+        {% set color_class = event_colors[event.event_type] %}
     {% endif %}
-{% else %}
-    {% set color_class = event_colors[event.event_type] %}
-{% endif %}
-
-
-<div class="rounded-lg border shadow-sm p-4 {{ color_class }}">
-    <div class="flex justify-between items-start mb-4">
-        <div>
-            <h3 class="font-medium text-gray-900">{{ event.event_type|replace('_', ' ')|title }}</h3>
-            <p class="text-sm text-gray-600">{{ event.timestamp|format_date }}</p>
-        </div>
-    </div>
-
-    {% if event.data.reason %}
-    <div class="mt-3">
-        <h4 class="text-sm font-medium text-gray-900 mb-1">Reden:</h4>
-        <p class="text-sm bg-white bg-opacity-75 rounded p-3">{{ event.data.reason }}</p>
-    </div>
-    {% endif %}
-
-    {% if event.event_type == 'Submitted' %}
-    <div class="mt-3">
-        <h4 class="text-sm font-medium text-gray-900 mb-1">Geclaimde Resultaten:</h4>
-        <div class="bg-white bg-opacity-75 rounded p-3">
-            {% for key, value in event.data.claimed_result.items() %}
-            <div class="grid grid-cols-2 gap-2 text-sm">
-                <span class="text-gray-600">{{ key|title|replace('_', ' ') }}</span>
-                <span class="text-gray-900">{{ value }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    {% elif event.event_type in ['AutomaticallyDecided', 'Decided'] %}
-    <div class="mt-3">
-        <div class="bg-white bg-opacity-75 rounded p-3 mb-3">
-            <div class="grid grid-cols-2 gap-2 text-sm">
-                <span class="text-gray-600">Beslissing</span>
-                <span class="text-gray-900 font-medium">
-                        {% if event.data.approved %}Goedgekeurd{% else %}Afgewezen{% endif %}
-                    </span>
+    <div class="rounded-lg border shadow-sm p-4 {{ color_class }}">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h3 class="font-medium text-gray-900">{{ event.event_type|replace('_', ' ') |title }}</h3>
+                <p class="text-sm text-gray-600">{{ event.timestamp|format_date }}</p>
             </div>
         </div>
-
-        {% if event.data.verified_result %}
-        <h4 class="text-sm font-medium text-gray-900 mb-1">Geverifieerde Resultaten:</h4>
-        <div class="bg-white bg-opacity-75 rounded p-3">
-            {% for key, value in event.data.verified_result.items() %}
-            <div class="grid grid-cols-2 gap-2 text-sm">
-                <span class="text-gray-600">{{ key|title|replace('_', ' ') }}</span>
-                <span class="text-gray-900">{{ value }}</span>
+        {% if event.data.reason %}
+            <div class="mt-3">
+                <h4 class="text-sm font-medium text-gray-900 mb-1">Reden:</h4>
+                <p class="text-sm bg-white bg-opacity-75 rounded p-3">{{ event.data.reason }}</p>
             </div>
-            {% endfor %}
-        </div>
+        {% endif %}
+        {% if event.event_type == 'Submitted' %}
+            <div class="mt-3">
+                <h4 class="text-sm font-medium text-gray-900 mb-1">Geclaimde Resultaten:</h4>
+                <div class="bg-white bg-opacity-75 rounded p-3">
+                    {% for key, value in event.data.claimed_result.items() %}
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}</span>
+                            <span class="text-gray-900">{{ value }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% elif event.event_type in ['AutomaticallyDecided', 'Decided'] %}
+            <div class="mt-3">
+                <div class="bg-white bg-opacity-75 rounded p-3 mb-3">
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <span class="text-gray-600">Beslissing</span>
+                        <span class="text-gray-900 font-medium">
+                            {% if event.data.approved %}
+                                Goedgekeurd
+                            {% else %}
+                                Afgewezen
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% if event.data.verified_result %}
+                    <h4 class="text-sm font-medium text-gray-900 mb-1">Geverifieerde Resultaten:</h4>
+                    <div class="bg-white bg-opacity-75 rounded p-3">
+                        {% for key, value in event.data.verified_result.items() %}
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <span class="text-gray-600">{{ key|title|replace('_', ' ') }}</span>
+                                <span class="text-gray-900">{{ value }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% elif event.event_type == 'AddedToManualReview' %}
+            <div class="mt-3">
+                <h4 class="text-sm font-medium text-gray-900 mb-1">Vergelijking Resultaten:</h4>
+                <div class="bg-white bg-opacity-75 rounded p-3">
+                    <div class="grid grid-cols-3 gap-2 text-sm border-b border-gray-200 pb-2 mb-2">
+                        <span class="font-medium text-gray-900">Veld</span>
+                        <span class="font-medium text-gray-900">Geclaimd</span>
+                        <span class="font-medium text-gray-900">Geverifieerd</span>
+                    </div>
+                    {% for key, value in event.data.verified_result.items() %}
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <span class="text-gray-600">{{ key|replace('_', ' ') |title }}</span>
+                            <span class="text-gray-900">{{ event.data.claimed_result[key] }}</span>
+                            <span class="text-gray-900">{{ value }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% endif %}
     </div>
-
-    {% elif event.event_type == 'AddedToManualReview' %}
-    <div class="mt-3">
-        <h4 class="text-sm font-medium text-gray-900 mb-1">Vergelijking Resultaten:</h4>
-        <div class="bg-white bg-opacity-75 rounded p-3">
-            <div class="grid grid-cols-3 gap-2 text-sm border-b border-gray-200 pb-2 mb-2">
-                <span class="font-medium text-gray-900">Veld</span>
-                <span class="font-medium text-gray-900">Geclaimd</span>
-                <span class="font-medium text-gray-900">Geverifieerd</span>
-            </div>
-            {% for key, value in event.data.verified_result.items() %}
-            <div class="grid grid-cols-3 gap-2 text-sm">
-                <span class="text-gray-600">{{ key|replace('_', ' ')|title }}</span>
-                <span class="text-gray-900">{{ event.data.claimed_result[key] }}</span>
-                <span class="text-gray-900">{{ value }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-</div>
 {% endmacro %}

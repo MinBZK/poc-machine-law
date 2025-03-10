@@ -13,7 +13,7 @@ repos:
       - id: check-toml
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.9.9
     hooks:
       - id: ruff
       - id: ruff-format
@@ -21,6 +21,8 @@ repos:
     rev: v1.36.4
     hooks:
       - id: djlint-reformat-jinja
+        types_or: [ "html" ]
+
   - repo: local
     hooks:
       - id: validate-schema

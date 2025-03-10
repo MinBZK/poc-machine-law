@@ -219,6 +219,14 @@ class RulesEngine:
                 output_def, output_name = await self._evaluate_action(action, context)
                 context.outputs[output_name] = output_def["value"]
                 output_values[output_name] = output_def
+                if context.missing_required:
+                    logger.warning("Missing required values, breaking")
+                    break
+
+        if context.missing_required:
+            logger.warning("Missing required values, requirements not met, setting outputs to empty.")
+            output_values = {}
+            requirements_met = False
 
         if not output_values:
             logger.warning(f"No output values computed for {calculation_date} {requested_output}")
@@ -228,6 +236,7 @@ class RulesEngine:
             "output": output_values,
             "requirements_met": requirements_met,
             "path": root,
+            "missing_required": context.missing_required,
         }
 
     async def _evaluate_action(self, action, context):
@@ -296,12 +305,24 @@ class RulesEngine:
                     for r in req["all"]:
                         result = await self._evaluate_requirements([r], context)
                         results.append(result)
+                        if not bool(result):
+                            logger.debug("False value found in an ALL, no need to compute the rest, breaking.")
+                            break
+                        if context.missing_required:
+                            logger.warning("Missing required values, breaking")
+                            break
                     result = all(results)
                 elif "or" in req:
                     results = []
                     for r in req["or"]:
                         result = await self._evaluate_requirements([r], context)
                         results.append(result)
+                        if bool(result):
+                            logger.debug("True value found in an OR, no need to compute the rest, breaking.")
+                            break
+                        if context.missing_required:
+                            logger.warning("Missing required values, breaking")
+                            break
                     result = any(results)
                 else:
                     result = await self._evaluate_operation(req, context)
@@ -373,7 +394,10 @@ class RulesEngine:
                 with logger.indent_block(f"Item {item}"):
                     item_context = copy(context)
                     item_context.local = item
-                    result = await self._evaluate_value(operation["value"][0], item_context)
+                    value_to_evaluate = (
+                        operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
+                    )
+                    result = await self._evaluate_value(value_to_evaluate, item_context)
                     values.extend(result if isinstance(result, list) else [result])
             logger.debug(f"Foreach values: {values}")
             result = self._evaluate_aggregate_ops(combine, values)
@@ -530,7 +554,10 @@ class RulesEngine:
             with logger.indent_block(op_type):
                 subject = await self._evaluate_value(operation["subject"], context)
                 allowed_values = await self._evaluate_value(operation.get("values", []), context)
-                result = subject in (allowed_values if isinstance(allowed_values, list) else [allowed_values])
+
+                result = subject in (
+                    allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
+                )
                 if op_type == "NOT_IN":
                     result = not result
 
@@ -610,6 +637,13 @@ class RulesEngine:
                     "arithmetic_type": op_type,
                 }
             )
+
+        elif op_type == "GET":
+            subject = await self._evaluate_value(operation["subject"], context)
+            values = await self._evaluate_value(operation.get("values", []), context)
+            result = values.get(subject)
+            node.details.update({"subject_value": subject, "allowed_values": values})
+            logger.debug(f"GET {subject} from {values}: {result}")
 
         else:
             result = None

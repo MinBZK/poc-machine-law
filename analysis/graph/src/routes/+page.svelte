@@ -18,8 +18,11 @@
   // Define the paths to the YAML files
   const filePaths = [
     '/law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml',
-    '/law/wet_inkomstenbelasting/UWV-2020-01-01.yaml',
+    '/law/wet_brp/RvIG-2020-01-01.yaml',
     '/law/zvw/RVZ-2024-01-01.yaml',
+    '/law/wet_inkomstenbelasting/UWV-2020-01-01.yaml',
+    '/law/penitentiaire_beginselenwet/DJI-2022-01-01.yaml',
+    '/law/wet_forensische_zorg/DJI-2022-01-01.yaml',
     '/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml',
   ];
 

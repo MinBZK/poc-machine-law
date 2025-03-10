@@ -1,9 +1,10 @@
+import os
+import sys
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
-from machine.context import flatten_path_nodes
 from machine.events.case.aggregate import CaseStatus
 from machine.service import Services
 from web.dependencies import get_services, templates
@@ -29,6 +30,26 @@ async def admin_redirect(request: Request, services: Services = Depends(get_serv
     discoverable_laws = services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
     return RedirectResponse(f"/admin/{available_services[0]}")
+
+
+@router.get("/reset")
+async def reset(request: Request, services: Services = Depends(get_services)):
+    """Show a button to reset the state of the application"""
+
+    return templates.TemplateResponse(
+        "admin/reset.html",
+        {
+            "request": request,
+        },
+    )
+
+
+@router.post("/reset")
+async def post_reset(request: Request, services: Services = Depends(get_services)):
+    """Reset the state of the application"""
+
+    # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 @router.get("/{service}")
@@ -172,7 +193,7 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
 
     case.events = services.case_manager.get_events(case.id)
     law, result, rule_spec, parameters = await evaluate_law(case.bsn, case.law, case.service, services)
-    flat_path = flatten_path_nodes(result.path)
+    value_tree = services.extract_value_tree(result.path)
     claims = services.claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
     claim_ids = {claim.id: claim for claim in claims}
     claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
@@ -181,7 +202,7 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
         {
             "request": request,
             "case": case,
-            "path": flat_path,
+            "path": value_tree,
             "claim_map": claim_map,
             "claim_ids": claim_ids,
         },

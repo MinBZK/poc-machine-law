@@ -23,6 +23,9 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ruff>=0.9.6",
+    "pytest>=8.0.0",
+    "pytest-playwright>=0.4.0",
+    "playwright>=1.40.0",
 ]
 
 [tool.ruff]
@@ -38,3 +41,7 @@ select = ["I", "SIM", "UP", "F", "LOG", "PIE", "PT", "W"]
 fixable = ["ALL"]
 task-tags = ["TODO"]
 ignore = ["TRY003"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"

@@ -1,204 +1,303 @@
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
-     id="edit-modal"
-     x-data='{
-        value: {{ value|tojson }},
-        {% if claim_data %}
-        newValue: {{ claim_data.new_value|tojson }},
-        reason: {{ claim_data.reason|tojson }},
-        autoApprove: {{ claim_data.auto_approve|tojson }},
-        status: {{ claim_data.status|tojson }},
-        selectedHardheidsclausule: "",
-        showHardheidsclausuleInfo: false,
-        {% else %}
-        newValue: {{ value|tojson }},
-        reason: "",
-        autoApprove: false,
-        status: null,
-        selectedHardheidsclausule: "",
-        showHardheidsclausuleInfo: false,
-        {% endif %}
-        formatDate(dateStr) {
-            if (!dateStr) return "";
-            const date = new Date(dateStr);
-            return date.toISOString().split("T")[0];
-        }
-     }'>
-    <div class="relative top-20 mx-auto p-6 border w-[800px] shadow-lg rounded-lg bg-white">
-        <!-- Header -->
-        <div class="mb-6">
-            <h3 class="text-xl font-semibold text-gray-900">
-                Waarde wijzigen voor {{ key|title|replace('_', ' ') }}
-            </h3>
-
-            {% if claim_data %}
-            <div class="mt-3 p-3 rounded-lg border flex items-center gap-2"
-                 :class="{
-                    'bg-yellow-50 border-yellow-200': status === 'PENDING',
-                    'bg-green-50 border-green-200': status === 'APPROVED',
-                    'bg-red-50 border-red-200': status === 'REJECTED'
-                 }">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"
-                     :class="{
-                        'text-yellow-700': status === 'PENDING',
-                        'text-green-700': status === 'APPROVED',
-                        'text-red-700': status === 'REJECTED'
-                     }">
-                    <path fill-rule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clip-rule="evenodd"/>
-                </svg>
-                <p class="text-sm"
-                   :class="{
-                    'text-yellow-700': status === 'PENDING',
-                    'text-green-700': status === 'APPROVED',
-                    'text-red-700': status === 'REJECTED'
-                   }">
-                    <span class="font-medium">Let op:</span> Er bestaat al een claim voor deze waarde
-                    <span x-text="{
-                        'PENDING': '(in behandeling)',
-                        'APPROVED': '(goedgekeurd)',
-                        'REJECTED': '(ingetrokken)'
-                    }[status]"></span>.<br/>
-                    <span>Met dit formulier wijzigt u de bestaande claim en wordt deze opnieuw in behandeling genomen.</span>
-                </p>
-            </div>
-            {% endif %}
-        </div>
-
-        <form hx-post="/edit/update-value"
-              hx-target="#edit-form-container"
-              enctype="multipart/form-data">
-            <input type="hidden" name="case_id" value="{{ case_id }}">
-            <input type="hidden" name="service" value="{{ service }}">
-            <input type="hidden" name="key" value="{{ key }}">
-            <input type="hidden" name="law" value="{{ law }}">
-            <input type="hidden" name="bsn" value="{{ bsn }}">
-            <input type="hidden" name="claimant" value="{{ claimant }}">
-
-            <div class="space-y-6">
-                <!-- Current and New Value Section -->
-                <div class="grid grid-cols-2 gap-6">
-                    <!-- Current Value -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <label class="block text-sm font-medium text-gray-700">Huidige waarde</label>
-                        <div class="mt-2">
-                            <template x-if="typeof value === 'boolean'">
-                                <div class="text-gray-900 font-medium">
-                                    <span x-text="value ? 'Ja' : 'Nee'"></span>
-                                </div>
-                            </template>
-                            <template x-if="typeof value === 'string' && !isNaN(Date.parse(value))">
-                                <div class="text-gray-900 font-medium">
-                                    <span x-text="new Date(value).toLocaleDateString('nl-NL')"></span>
-                                </div>
-                            </template>
-                            <template
-                                    x-if="typeof value === 'string' && isNaN(Date.parse(value)) || typeof value === 'number'">
-                                <div class="text-gray-900 font-medium">
-                                    <span x-text="value"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- New Value -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <label for="new-value" class="block text-sm font-medium text-gray-700">Nieuwe waarde</label>
-                        <div class="mt-2">
-                            <template x-if="typeof value === 'boolean'">
-                                <select id="new-value" name="new_value"
-                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                        x-model="newValue">
-                                    <option value="true">Ja</option>
-                                    <option value="false">Nee</option>
-                                </select>
-                            </template>
-                            <template x-if="typeof value === 'string' && !isNaN(Date.parse(value))">
-                                <input type="date" id="new-value" name="new_value"
-                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                       x-model="newValue"
-                                       required>
-                            </template>
-                            <template x-if="typeof value === 'number'">
-                                <input type="number" id="new-value" name="new_value"
-                                       x-model="newValue"
-                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                       required>
-                            </template>
-                            <template x-if="typeof value === 'string' && isNaN(Date.parse(value))">
-                                <input type="text" id="new-value" name="new_value"
-                                       x-model="newValue"
-                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                       required>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Motivation -->
-                <div>
-                    <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">Motivatie voor wijziging</label>
-                    <textarea id="reason" name="reason" rows="3"
-                              class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                              x-model="reason"
-                              required></textarea>
-                </div>
-
-                <!-- Hardheidsclausule Section -->
-                <div class="bg-blue-50 p-4 rounded-lg space-y-3">
-                    <div>
-                        <p class="text-sm text-blue-800 mb-3">
-                            Een hardheidsclausule maakt het mogelijk om af te wijken van standaardregels wanneer deze tot onredelijke situaties leiden.
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[100]" id="edit-modal" x-data='{ value: {{ value|tojson }}, newValueType: null,
+    {% if claim_data %}
+        newValue: {{ claim_data.new_value|tojson }}, reason: {{ claim_data.reason|tojson }}, autoApprove: {{ claim_data.auto_approve|tojson }}, status: {{ claim_data.status|tojson }},
+    {% else %}
+        newValue: {{ value|tojson }}, reason: "", autoApprove: false, status: null, {% endif %} selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, hasDetails: {{ (details is defined and details)|tojson }}, details: {% if details %}{{ details|tojson }}{% else %}null{% endif %}, isEurocent: function() { return this.hasDetails && this.details && this.details.type === "amount" && this.details.type_spec && this.details.type_spec.unit === "eurocent"; }, displayValue: function(val) { if (this.isEurocent() && typeof val === "number") { return (val / 100).toFixed(2); } return val; }, parseValue: function(val) { if (this.isEurocent() && !isNaN(parseFloat(val))) { return Math.round(parseFloat(val) * 100); } return val; }, formatDate: function(dateStr) { if (!dateStr) return ""; const date = new Date(dateStr); return date.toISOString().split("T")[0]; } }' x-init=" // Convert claim data and value to proper display format if needed $nextTick(() => { if (isEurocent()) { setTimeout(() => { const displayInput = document.getElementById('display-new-value'); if (displayInput) { displayInput.value = displayValue(newValue); } }, 50); } }) ">
+        <div class="relative top-20 mx-auto p-6 border w-[800px] shadow-lg rounded-lg bg-white z-[100]">
+            <!-- Header -->
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-900">Waarde wijzigen voor {{ key|title|replace('_', ' ') }}</h3>
+                {% if claim_data %}
+                    <div class="mt-3 p-3 rounded-lg border flex items-center gap-2"
+                         :class="{ 'bg-yellow-50 border-yellow-200': status === 'PENDING', 'bg-green-50 border-green-200': status === 'APPROVED', 'bg-red-50 border-red-200': status === 'REJECTED' }">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5"
+                             viewBox="0 0 20 20"
+                             fill="currentColor"
+                             :class="{ 'text-yellow-700': status === 'PENDING', 'text-green-700': status === 'APPROVED', 'text-red-700': status === 'REJECTED' }">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm"
+                           :class="{ 'text-yellow-700': status === 'PENDING', 'text-green-700': status === 'APPROVED', 'text-red-700': status === 'REJECTED' }">
+                            <span class="font-medium">Let op:</span> Er bestaat al een claim voor deze waarde
+                            <span x-text="{ 'PENDING': '(in behandeling)', 'APPROVED': '(goedgekeurd)', 'REJECTED': '(ingetrokken)' }[status]"></span>.
+                            <br />
+                            <span>Met dit formulier wijzigt u de bestaande claim en wordt deze opnieuw in behandeling genomen.</span>
                         </p>
                     </div>
+                {% endif %}
+            </div>
+            <form hx-post="/edit/update-value"
+                  hx-target="#edit-form-container"
+                  enctype="multipart/form-data">
+                <input type="hidden" name="case_id" value="{{ case_id }}">
+                <input type="hidden" name="service" value="{{ service }}">
+                <input type="hidden" name="key" value="{{ key }}">
+                <input type="hidden" name="law" value="{{ law }}">
+                <input type="hidden" name="bsn" value="{{ bsn }}">
+                <input type="hidden" name="claimant" value="{{ claimant }}">
+                <div class="space-y-6">
+                    <!-- Current and New Value Section -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Current Value -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <label class="block text-sm font-medium text-gray-700">Huidige waarde</label>
+                            <div class="mt-2">
+                                <template x-if="typeof value === 'boolean'">
+                                    <div class="text-gray-900 font-medium">
+                                        <span x-text="value ? 'Ja' : 'Nee'"></span>
+                                    </div>
+                                </template>
+                                <template x-if="typeof value === 'string' && !isNaN(Date.parse(value))">
+                                    <div class="text-gray-900 font-medium">
+                                        <span x-text="new Date(value).toLocaleDateString('nl-NL')"></span>
+                                    </div>
+                                </template>
+                                <template x-if="isEurocent() && typeof value === 'number'">
+                                    <div class="text-gray-900 font-medium">
+                                        <span class="text-gray-500 mr-1">€</span>
+                                        <span x-text="displayValue(value)"></span>
+                                    </div>
+                                </template>
+                                <template x-if="(typeof value === 'string' && isNaN(Date.parse(value))) || (typeof value === 'number' && !isEurocent())">
+                                    <div class="text-gray-900 font-medium">
+                                        <span x-text="value"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <!-- New Value -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <label for="new-value" class="block text-sm font-medium text-gray-700">Nieuwe waarde</label>
+                            <div class="mt-2">
+                                <template x-if="typeof value === 'boolean'">
+                                    <select id="new-value"
+                                            name="new_value"
+                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            x-model="newValue">
+                                        <option value="true">Ja</option>
+                                        <option value="false">Nee</option>
+                                    </select>
+                                </template>
+                                <template x-if="typeof value === 'string' && !isNaN(Date.parse(value))">
+                                    <input type="date"
+                                           id="new-value"
+                                           name="new_value"
+                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           x-model="newValue"
+                                           required>
+                                </template>
+                                <template x-if="isEurocent() && typeof value === 'number'">
+                                    <div class="flex items-center">
+                                        <span class="mr-2 text-gray-700">€</span>
+                                        <div class="w-full">
+                                            <input type="number"
+                                                   id="display-new-value"
+                                                   class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                   step="0.01"
+                                                   placeholder="0.00"
+                                                   :value="displayValue(newValue)"
+                                                   @input="newValue = parseValue($event.target.value)"
+                                                   @change="$event.target.value = parseFloat($event.target.value).toFixed(2)"
+                                                   required>
+                                            <input type="hidden" id="new-value" name="new_value" :value="newValue">
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="typeof value === 'number' && !isEurocent()">
+                                    <input type="number"
+                                           id="new-value"
+                                           name="new_value"
+                                           x-model="newValue"
+                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           required>
+                                </template>
+                                <template x-if="typeof value === 'string' && isNaN(Date.parse(value))">
+                                    <input type="text"
+                                           id="new-value"
+                                           name="new_value"
+                                           x-model="newValue"
+                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           required>
+                                </template>
+                                <template x-if="value === null || value === undefined">
+                                    <div>
+                                        <template x-if="hasDetails && details && details.type">
+                                            <input type="hidden" name="new_value_type" :value="details.type">
+                                        </template>
+                                        <template x-if="!(hasDetails && details && details.type)">
+                                            <select id="new-value-type"
+                                                    name="new_value_type"
+                                                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                    x-model="newValueType">
+                                                <option value="">Kies een type</option>
+                                                <option value="string">Tekst</option>
+                                                <option value="number">Getal</option>
+                                                <option value="boolean">Ja/Nee</option>
+                                                <option value="date">Datum</option>
+                                                <option value="amount">Bedrag</option>
+                                            </select>
+                                        </template>
+                                        <div class="mt-2">
+                                            <!-- When we have detail info about amount in eurocent -->
+                                            <template x-if="hasDetails && details && details.type === 'amount' && details.type_spec && details.type_spec.unit === 'eurocent'">
+                                                <div class="flex items-center">
+                                                    <span class="mr-2 text-gray-700">€</span>
+                                                    <div class="w-full">
+                                                        <input type="number"
+                                                               id="display-new-value-missing"
+                                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               step="0.01"
+                                                               placeholder="0.00"
+                                                               @input="newValue = parseValue($event.target.value)"
+                                                               @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
+                                                               required>
+                                                        <input type="hidden" id="new-value" name="new_value" :value="newValue">
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <!-- When we have other type detail info -->
+                                            <template x-if="hasDetails && details && details.type === 'boolean'">
+                                                <select name="new_value"
+                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                    <option value="true">Ja</option>
+                                                    <option value="false">Nee</option>
+                                                </select>
+                                            </template>
+                                            <template x-if="hasDetails && details && details.type === 'date'">
+                                                <input type="date"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="hasDetails && details && details.type === 'number' && !(details.type === 'amount' && details.type_spec && details.type_spec.unit === 'eurocent')">
+                                                <input type="number"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="hasDetails && details && details.type === 'string'">
+                                                <input type="text"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <!-- Fall back to user selected type when no details available -->
+                                            <template x-if="!hasDetails && newValueType === 'string'">
+                                                <input type="text"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'number'">
+                                                <input type="number"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'boolean'">
+                                                <select name="new_value"
+                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                    <option value="true">Ja</option>
+                                                    <option value="false">Nee</option>
+                                                </select>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'date'">
+                                                <input type="date"
+                                                       name="new_value"
+                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       required>
+                                            </template>
+                                            <template x-if="!hasDetails && newValueType === 'amount'">
+                                                <div class="flex items-center">
+                                                    <span class="mr-2 text-gray-700">€</span>
+                                                    <div class="w-full">
+                                                        <input type="number"
+                                                               id="display-new-value-amount"
+                                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               step="0.01"
+                                                               placeholder="0.00"
+                                                               @input="newValue = Math.round(parseFloat($event.target.value || 0) * 100)"
+                                                               @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
+                                                               required>
+                                                        <input type="hidden" id="new-value" name="new_value" :value="newValue">
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Motivation -->
                     <div>
-                        <label for="hardheidsclausule" class="block text-sm font-medium text-gray-700 mb-2">Selecteer een hardheidsclausule</label>
-                        <select id="hardheidsclausule" name="hardheidsclausule"
-                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                x-model="selectedHardheidsclausule">
-                            <option value="">Selecteer een hardheidsclausule</option>
-                            <option value="Awb Art. 4:84">Awb Art. 4:84 - Inherente afwijkingsbevoegdheid bestuursorgaan</option>
-                            <option value="Participatiewet Art. 18">Participatiewet Art. 18 - Bijzondere bijstand</option>
-                            <option value="Wmo 2015 Art. 2.3.5">Wmo 2015 Art. 2.3.5 - Maatwerkvoorziening</option>
-                            <option value="Belastingwet Art. 63">Belastingwet Art. 63 - Hardheidsclausule Belastingen</option>
-                            <option value="Jeugdwet Art. 2.3">Jeugdwet Art. 2.3 - Maatwerkvoorziening jeugdhulp</option>
-                            <option value="Anders">Anders - Andere specifieke hardheidsclausule</option>
-                        </select>
+                        <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">Motivatie voor wijziging</label>
+                        <textarea id="reason"
+                                  name="reason"
+                                  rows="3"
+                                  class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                  x-model="reason"
+                                  required></textarea>
+                    </div>
+                    <!-- Hardheidsclausule Section -->
+                    <div class="bg-blue-50 p-4 rounded-lg space-y-3">
+                        <div>
+                            <p class="text-sm text-blue-800 mb-3">
+                                Een hardheidsclausule maakt het mogelijk om af te wijken van standaardregels wanneer deze tot onredelijke situaties leiden.
+                            </p>
+                        </div>
+                        <div>
+                            <label for="hardheidsclausule"
+                                   class="block text-sm font-medium text-gray-700 mb-2">
+                                Selecteer een hardheidsclausule
+                            </label>
+                            <select id="hardheidsclausule"
+                                    name="hardheidsclausule"
+                                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                    x-model="selectedHardheidsclausule">
+                                <option value="">Selecteer een hardheidsclausule</option>
+                                <option value="Awb Art. 4:84">Awb Art. 4:84 - Inherente afwijkingsbevoegdheid bestuursorgaan</option>
+                                <option value="Participatiewet Art. 18">Participatiewet Art. 18 - Bijzondere bijstand</option>
+                                <option value="Wmo 2015 Art. 2.3.5">Wmo 2015 Art. 2.3.5 - Maatwerkvoorziening</option>
+                                <option value="Belastingwet Art. 63">Belastingwet Art. 63 - Hardheidsclausule Belastingen</option>
+                                <option value="Jeugdwet Art. 2.3">Jeugdwet Art. 2.3 - Maatwerkvoorziening jeugdhulp</option>
+                                <option value="Anders">Anders - Andere specifieke hardheidsclausule</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Evidence Upload -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label for="evidence" class="block text-sm font-medium text-gray-700 mb-2">Bewijs</label>
+                        <input type="file"
+                               id="evidence"
+                               name="evidence"
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="mt-2 text-sm text-gray-500">Upload hier eventueel bewijsmateriaal voor de wijziging</p>
+                    </div>
+                    {% if show_approve %}
+                        <div class="border-t pt-4">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox"
+                                       id="auto_approve"
+                                       name="auto_approve"
+                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                       x-model="autoApprove">
+                                <span class="ml-2 text-sm text-gray-700">Direct goedkeuren</span>
+                            </label>
+                        </div>
+                    {% endif %}
+                    <!-- Buttons -->
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button"
+                                class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                @click="document.getElementById('edit-modal').remove()">Annuleren</button>
+                        <button type="submit"
+                                class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Opslaan
+                        </button>
                     </div>
                 </div>
-
-                <!-- Evidence Upload -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <label for="evidence" class="block text-sm font-medium text-gray-700 mb-2">Bewijs</label>
-                    <input type="file" id="evidence" name="evidence"
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    <p class="mt-2 text-sm text-gray-500">Upload hier eventueel bewijsmateriaal voor de wijziging</p>
-                </div>
-
-                {% if show_approve %}
-                <div class="border-t pt-4">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" id="auto_approve" name="auto_approve"
-                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                               x-model="autoApprove">
-                        <span class="ml-2 text-sm text-gray-700">Direct goedkeuren</span>
-                    </label>
-                </div>
-                {% endif %}
-
-                <!-- Buttons -->
-                <div class="flex justify-end gap-3 pt-2">
-                    <button type="button"
-                            class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                            @click="document.getElementById('edit-modal').remove()">
-                        Annuleren
-                    </button>
-                    <button type="submit"
-                            class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Opslaan
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>

@@ -31,7 +31,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar"} else parse_value(v)
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn"} else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)
@@ -353,22 +353,65 @@ def step_impl(context, competent_court):
     )
 
 
-@when("de burger een wijziging indient")
-def step_impl(context):
+@when("de burger {chance} indient")
+def step_impl(context, chance):
     """Submit a claim for data change"""
     if not context.table:
-        raise ValueError("No table provided for claim")
+        raise ValueError("No table provided for claims")
 
-    row = context.table[0]  # We expect one row with the claim details
-    claim_id = context.services.claim_manager.submit_claim(
-        service=row["service"],
-        key=row["key"],
-        new_value=row["nieuwe_waarde"],
-        reason=row["reden"],
-        claimant="BURGER",
-        case_id=None,
-        evidence_path=row.get("bewijs"),
-        law=row["law"],
-        bsn=context.parameters["BSN"]
+    if not hasattr(context, "claims"):
+        context.claims = []
+
+    for row in context.table:
+        claim_id = context.services.claim_manager.submit_claim(
+            service=row["service"],
+            key=row["key"],
+            new_value=parse_value(row["nieuwe_waarde"]),
+            reason=row["reden"],
+            claimant="BURGER",
+            case_id=None,
+            evidence_path=row.get("bewijs"),
+            law=row["law"],
+            bsn=context.parameters["BSN"]
+        )
+        context.claims.append(claim_id)
+
+
+@then("heeft de persoon recht op huurtoeslag")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    assertions.assertTrue(
+        context.result.requirements_met,
+        "Persoon heeft toch geen recht op huurtoeslag",
     )
-    context.claim_id = claim_id
+
+
+@then('is de huurtoeslag "{amount}" euro')
+def step_impl(context, amount):
+    actual_amount = context.result.output["subsidy_amount"]
+    compare_euro_amount(actual_amount, amount)
+
+
+@then("ontbreken er verplichte gegevens")
+def step_impl(context):
+    assertions.assertTrue(context.result.missing_required,
+                          "Er zouden gegevens moeten ontbreken.")
+
+
+@then("ontbreken er geen verplichte gegevens")
+def step_impl(context):
+    assertions.assertFalse(context.result.missing_required,
+                           "Er zouden geen gegevens moeten ontbreken.")
+
+
+@then('is het {field} "{amount}" eurocent')
+def step_impl(context, field, amount):
+    actual_amount = context.result.output[field]
+    expected_amount = int(amount)
+    assertions.assertEqual(
+        actual_amount,
+        expected_amount,
+        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent",
+    )

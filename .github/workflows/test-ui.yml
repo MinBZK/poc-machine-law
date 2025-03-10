@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run UI Tests
 
 on:
   push:
@@ -27,5 +27,17 @@ jobs:
       run: |
         uv sync
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y locales
+        sudo locale-gen nl_NL.UTF-8
+        sudo update-locale LANG=nl_NL.UTF-8
+
+    - name: Install Playwright browsers
+      run: |
+        uv pip install pytest-playwright
+        uv run playwright install --with-deps chromium firefox webkit
+
     - name: Run tests
-      run: ./script/test
+      run: ./script/test-ui

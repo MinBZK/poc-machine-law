@@ -20,6 +20,86 @@ GLOBAL_SERVICES = {
     },
 }
 PROFILES = {
+    "777777777": {
+        "name": "Fatima Al-Zahra",
+        "description": "Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor huurtoeslag",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "777777777",
+                        "geboortedatum": "1991-04-15",
+                        "verblijfsadres": "Utrecht",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "MAROKKAANS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "777777777",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "777777777",
+                        "straat": "Rooseveltlaan",
+                        "huisnummer": "42",
+                        "postcode": "3527AK",
+                        "woonplaats": "Utrecht",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {
+                        "bsn": "777777777",
+                        "polis_status": "ACTIEF",
+                        "verdrag_status": "GEEN",
+                        "zorg_type": "BASIS",
+                    }
+                ]
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "777777777",
+                        "loon_uit_dienstbetrekking": 1750000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 25000,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "777777777", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "777777777",
+                        "spaargeld": 1200000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "777777777", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "777777777", "persoonsgebonden_aftrek": 85000}],
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "777777777",
+                        "type": "ONBEPAALDE_TIJD_REGULIER",
+                        "status": "VERLEEND",
+                        "ingangsdatum": "2010-05-12",
+                        "einddatum": None,
+                    }
+                ]
+            },
+        },
+    },
     "999993653": {
         "name": "Jan Jansen",
         "description": "Jongere met part-time baan naast MBO opleiding, komt in aanmerking voor zorgtoeslag",
@@ -67,14 +147,14 @@ PROFILES = {
                 "box1": [
                     {
                         "bsn": "999993653",
-                        "loon_uit_dienstbetrekking": 79547,
+                        "loon_uit_dienstbetrekking": 1850000,
                         "uitkeringen_en_pensioenen": 0,
                         "winst_uit_onderneming": 0,
                         "resultaat_overige_werkzaamheden": 0,
-                        "eigen_woning": 0,
+                        "eigen_woning": -60000,
                     }
                 ],
-                "box2": [{"bsn": "999993653", "dividend": 0, "vervreemding_aandelen": 0}],
+                "box2": [{"bsn": "999993653", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
                 "box3": [
                     {
                         "bsn": "999993653",
@@ -85,6 +165,7 @@ PROFILES = {
                     }
                 ],
                 "buitenlands_inkomen": [{"bsn": "999993653", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993653", "persoonsgebonden_aftrek": 120000}],
             },
             "DUO": {
                 "inschrijvingen": [{"bsn": "999993653", "onderwijssoort": "MBO", "niveau": 4}],
@@ -153,23 +234,24 @@ PROFILES = {
                     {
                         "bsn": "999993654",
                         "loon_uit_dienstbetrekking": 0,
-                        "uitkeringen_en_pensioenen": 0,
+                        "uitkeringen_en_pensioenen": 1380000,
                         "winst_uit_onderneming": 0,
                         "resultaat_overige_werkzaamheden": 0,
-                        "eigen_woning": 0,
+                        "eigen_woning": -75000,
                     }
                 ],
-                "box2": [{"bsn": "999993654", "dividend": 0, "vervreemding_aandelen": 0}],
+                "box2": [{"bsn": "999993654", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
                 "box3": [
                     {
                         "bsn": "999993654",
-                        "spaargeld": 0,
-                        "beleggingen": 0,
+                        "spaargeld": 8500000,
+                        "beleggingen": 3700000,
                         "onroerend_goed": 0,
                         "schulden": 0,
                     }
                 ],
                 "buitenlands_inkomen": [{"bsn": "999993654", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993654", "persoonsgebonden_aftrek": 230000}],
             },
             "RVZ": {
                 "verzekeringen": [
@@ -226,7 +308,19 @@ PROFILES = {
                         "resultaat_overige_werkzaamheden": 0,
                         "eigen_woning": 0,
                     }
-                ]
+                ],
+                "box2": [{"bsn": "999993655", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993655",
+                        "spaargeld": 250000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993655", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993655", "persoonsgebonden_aftrek": 0}],
             },
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [
@@ -278,11 +372,23 @@ PROFILES = {
                         "bsn": "999993656",
                         "loon_uit_dienstbetrekking": 0,
                         "uitkeringen_en_pensioenen": 0,
-                        "winst_uit_onderneming": 50000,
+                        "winst_uit_onderneming": 3850000,  # Verhoogd naar €38.500
                         "resultaat_overige_werkzaamheden": 0,
-                        "eigen_woning": 0,
+                        "eigen_woning": -110000,
                     }
-                ]
+                ],
+                "box2": [{"bsn": "999993656", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993656",
+                        "spaargeld": 1550000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993656", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993656", "persoonsgebonden_aftrek": 850000}],
             },
             "KVK": {
                 "inschrijvingen": [
@@ -329,6 +435,30 @@ PROFILES = {
                     }
                 ],
             },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993657",
+                        "loon_uit_dienstbetrekking": 0,
+                        "uitkeringen_en_pensioenen": 1089000,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -45000,
+                    }
+                ],
+                "box2": [{"bsn": "999993657", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993657",
+                        "spaargeld": 3250000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993657", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993657", "persoonsgebonden_aftrek": 180000}],
+            },
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [
                     {
@@ -363,19 +493,41 @@ PROFILES = {
                         "partner_bsn": None,
                     }
                 ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993658",
+                        "straat": "Science Park",
+                        "huisnummer": "123",
+                        "postcode": "1098XG",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
             },
             "RVZ": {"verzekeringen": [{"bsn": "999993658", "polis_status": "ACTIEF"}]},
             "BELASTINGDIENST": {
                 "box1": [
                     {
                         "bsn": "999993658",
-                        "loon_uit_dienstbetrekking": 15000,
-                        "uitkeringen_en_pensioenen": 0,
+                        "loon_uit_dienstbetrekking": 825000,
+                        "uitkeringen_en_pensioenen": 1025000,  # Studiefinanciering
                         "winst_uit_onderneming": 0,
-                        "resultaat_overige_werkzaamheden": 0,
+                        "resultaat_overige_werkzaamheden": 230000,  # Bijbaantjes
                         "eigen_woning": 0,
                     }
-                ]
+                ],
+                "box2": [{"bsn": "999993658", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993658",
+                        "spaargeld": 1200000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 1800000,  # Studieschuld
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993658", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993658", "persoonsgebonden_aftrek": 75000}],
             },
             "DUO": {
                 "inschrijvingen": [{"bsn": "999993658", "onderwijstype": "WO"}],
@@ -416,7 +568,117 @@ PROFILES = {
                     }
                 ],
             },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993659",
+                        "loon_uit_dienstbetrekking": 1750000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 350000,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "999993659", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993659",
+                        "spaargeld": 950000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993659", "bedrag": 450000, "land": "DUITSLAND"}],
+                "aftrekposten": [{"bsn": "999993659", "persoonsgebonden_aftrek": 65000}],
+            },
             "DUO": {"inschrijvingen": [{"bsn": "999993659", "onderwijstype": "WO"}]},
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "999993659",
+                        "type": "STUDIE",
+                        "status": "VERLEEND",
+                        "ingangsdatum": "2022-09-01",
+                        "einddatum": "2025-08-31",
+                    }
+                ]
+            },
+        },
+    },
+    "999993660": {
+        "name": "Lisa de Jong",
+        "description": "Werkende ouder met jong kind, komt in aanmerking voor inkomensafhankelijke combinatiekorting",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993660",
+                        "geboortedatum": "1998-05-15",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "999993660",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993660",
+                        "straat": "Prinsengracht",
+                        "huisnummer": "42",
+                        "postcode": "1015DX",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [{"bsn": "999993660", "kinderen": [{"geboortedatum": "2020-01-01"}]}],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993660",
+                        "loon_uit_dienstbetrekking": 3000000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -90000,
+                    }
+                ],
+                "box2": [{"bsn": "999993660", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993660",
+                        "spaargeld": 2000000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "aftrekposten": [
+                    {
+                        "bsn": "999993660",
+                        "persoonsgebonden_aftrek": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993660", "bedrag": 0, "land": "GEEN"}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {
+                        "bsn": "999993660",
+                        "polis_status": "ACTIEF",
+                        "verdrag_status": "GEEN",
+                        "zorg_type": "BASIS",
+                    }
+                ]
+            },
         },
     },
 }

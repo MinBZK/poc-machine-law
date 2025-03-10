@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.1/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
 uuid: 5be9dbe7-f565-40e2-8931-da82825dcf21
 name: Zorgtoeslag
 law: zorgtoeslagwet
@@ -183,6 +183,7 @@ properties:
         immutable_after: "P2Y"
 
   definitions:
+    MINIMUM_AGE: 18
     STANDAARDPREMIE_2024: 182100
     PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.0486
     PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.0486
@@ -204,7 +205,7 @@ requirements:
             value: true
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
-        value: 18
+        value: "$MINIMUM_AGE"
       - subject: "$IS_INCARCERATED"
         operation: EQUALS
         value: false
