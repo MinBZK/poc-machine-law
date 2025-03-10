@@ -136,9 +136,26 @@ async def update_value(
         auto_approve=auto_approve,
     )
 
+    # Get details from form data if they exist
+    from contextlib import suppress
+
+    # Get the form data
+    form = await request.form()
+    details_json = form.get("details")
+    details = None
+    if details_json:
+        with suppress(json.JSONDecodeError):
+            details = json.loads(details_json)
+
     response = templates.TemplateResponse(
         "partials/edit_success.html",
-        {"request": request, "key": key, "new_value": parsed_value, "claim_id": claim_id},
+        {
+            "request": request,
+            "key": key,
+            "new_value": parsed_value,
+            "claim_id": claim_id,
+            "details": details,
+        },
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed"
     return response
@@ -297,7 +314,13 @@ async def update_missing_values(
 
     response = templates.TemplateResponse(
         "partials/edit_success.html",
-        {"request": request, "key": "Benodigde gegevens", "new_value": "Bijgewerkt", "claim_id": None},
+        {
+            "request": request,
+            "key": "Benodigde gegevens",
+            "new_value": "Bijgewerkt",
+            "claim_id": None,
+            "details": None,
+        },
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed, reload-page"
     return response

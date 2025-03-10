@@ -60,7 +60,13 @@
     {% if (service, law, key) in claim_map %}
         {% set claim = claim_map[(service, law, key)] %}
         <span class="text-gray-500 text-xs">→</span>
-        <span class="text-gray-800 text-xs">{{ claim.new_value }}</span>
+        <span class="text-gray-800 text-xs">
+            {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' and claim.new_value is number %}
+                €{{ '%.2f'|format(claim.new_value / 100) }}
+            {% else %}
+                {{ claim.new_value }}
+            {% endif %}
+        </span>
         {% if claim.status == "PENDING" %}
             <div class="ml-2 inline-flex items-center gap-1">
                 <div class="inline-flex gap-1 ml-2">
