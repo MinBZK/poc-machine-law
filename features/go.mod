@@ -2,7 +2,7 @@ module github.com/minbzk/poc-machine-law/features
 
 go 1.23.3
 
-// replace github.com/minbzk/poc-machine-law/machine-v2/rules => ../machine-v2/rules 
+// replace github.com/minbzk/poc-machine-law/machine-v2/rules => ../machine-v2/rules
 
 require (
 	github.com/cucumber/godog v0.15.0
