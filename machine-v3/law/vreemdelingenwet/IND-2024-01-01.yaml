@@ -1,0 +1,113 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: af0fed0d-ee11-48f3-b629-07becda4b7e9
+name: Bepalen verblijfsstatus
+law: vreemdelingenwet
+valid_from: 2024-01-01
+service: "IND"
+description: >
+  Regels voor het bepalen van de verblijfsstatus volgens de Vreemdelingenwet 2000.
+  Dit omvat reguliere verblijfsvergunningen, verblijfsvergunningen voor EU-burgers
+  en hun familieleden, en permanente verblijfsvergunningen.
+
+references:
+  - law: "Vreemdelingenwet 2000"
+    article: "8"
+    url: "https://wetten.overheid.nl/BWBR0011823/2024-01-01#Hoofdstuk3_Afdeling1_Artikel8"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "PERMIT_DATA"
+      description: "Gegevens verblijfsvergunning"
+      type: "object"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "verblijfsvergunningen"
+        fields: ["type", "status", "ingangsdatum", "einddatum"]
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "EU_REGISTRATION"
+      description: "EU registratie"
+      type: "object"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "eu_registraties"
+        fields: ["type", "ingangsdatum"]
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "residence_permit_type"
+      description: "Type verblijfsvergunning"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    VALID_PERMIT_STATUSES:
+      - "VERLEEND"
+      - "VERLENGD"
+      - "VAN_RECHTSWEGE"
+
+    PERMANENT_TYPES:
+      - "ONBEPAALDE_TIJD_REGULIER"
+      - "ONBEPAALDE_TIJD_ASIEL"
+      - "ONBEPAALDE_TIJD_EU"
+      - "DUURZAAM_VERBLIJF_EU"
+
+    EU_TYPES:
+      - "EU_BURGER"
+      - "FAMILIE_EU_BURGER"
+
+actions:
+  - output: "residence_permit_type"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - operation: IN
+              subject: "$PERMIT_DATA.type"
+              values: "$PERMANENT_TYPES"
+            - operation: IN
+              subject: "$PERMIT_DATA.status"
+              values: "$VALID_PERMIT_STATUSES"
+        then: "PERMANENT"
+      - test:
+          operation: IN
+          subject: "$EU_REGISTRATION.type"
+          values: "$EU_TYPES"
+        then: "EU"
+      - test:
+          operation: AND
+          values:
+            - subject: "$PERMIT_DATA.status"
+              operation: IN
+              values: "$VALID_PERMIT_STATUSES"
+            - operation: LESS_OR_EQUAL
+              values:
+                - "$PERMIT_DATA.ingangsdatum"
+                - "$calculation_date"
+            - operation: GREATER_OR_EQUAL
+              values:
+                - "$PERMIT_DATA.einddatum"
+                - "$calculation_date"
+        then: "TIJDELIJK"
+      - else: null

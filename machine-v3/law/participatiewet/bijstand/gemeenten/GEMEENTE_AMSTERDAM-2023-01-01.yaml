@@ -1,0 +1,294 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: b1d3a15b-45a2-44a3-b26a-d636785032c0
+name: Bijstand Gemeente Amsterdam
+law: participatiewet/bijstand
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2024-01-01
+service: "GEMEENTE_AMSTERDAM"
+description: >
+  Regels voor het bepalen van bijstand in Amsterdam. Amsterdam heeft specifiek beleid voor
+  jongeren (jongerentoeslag), ZZP-ers (inkomensberekening), dak- en thuislozen
+  (briefadres) en re-integratie (maatwerktrajecten).
+
+references:
+  - law: "Beleidsregels Participatiewet Amsterdam"
+    article: "2.1"
+    url: "https://lokaleregelgeving.overheid.nl/CVDR645455/1"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "WORK_CAPABILITY"
+      description: "Arbeidsvermogen en re-integratie gegevens"
+      type: "object"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "werk_en_re_integratie"
+        fields: [ "arbeidsvermogen", "ontheffing_reden", "ontheffing_einddatum", "re_integratie_traject" ]
+        select_on:
+          - name: "bsn"
+            description: "BSN van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  input:
+    - name: "MEETS_NATIONAL_REQUIREMENTS"
+      description: "Voldoet aan landelijke voorwaarden"
+      type: "boolean"
+      service_reference:
+        service: "SZW"
+        field: "is_eligible"
+        law: "participatiewet/bijstand"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "NATIONAL_BASE_AMOUNT"
+      description: "Landelijke bijstandsnorm"
+      type: "amount"
+      service_reference:
+        service: "SZW"
+        field: "base_amount"
+        law: "participatiewet/bijstand"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "KOSTENDELERSNORM"
+      description: "Landelijke kostendelersnorm"
+      type: "number"
+      service_reference:
+        service: "SZW"
+        field: "kostendelersnorm"
+        law: "participatiewet/bijstand"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "AGE"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "HAS_FIXED_ADDRESS"
+      description: "Heeft vast woonadres"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "has_fixed_address"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "POSTAL_ADDRESS"
+      description: "Postdres"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "postal_address"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "IS_ENTREPRENEUR"
+      description: "Is ondernemer/ZZP-er"
+      type: "boolean"
+      service_reference:
+        service: "KVK"
+        field: "is_active_entrepreneur"
+        law: "handelsregisterwet"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "BUSINESS_INCOME"
+      description: "Inkomsten uit onderneming"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "business_income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+  output:
+    - name: "is_eligible"
+      description: "Voldoet aan Amsterdamse voorwaarden"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "benefit_amount"
+      description: "Uitkeringsbedrag inclusief toeslagen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "housing_assistance"
+      description: "Woonkostentoeslag bij briefadres"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "startup_assistance"
+      description: "Bedrag voor bedrijfskapitaal ZZP"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+  definitions:
+    YOUTH_SUPPLEMENT: 25000  # 250 euro voor jongeren
+    YOUTH_MAX_AGE: 27
+    ZZP_INCOME_DISREGARD_PERCENTAGE: 0.20  # 20% vrijlating ondernemersinkomen
+    HOUSING_ASSISTANCE_AMOUNT: 60000  # 600 euro woonkostentoeslag
+    STARTUP_ASSISTANCE_MAX: 200000  # 2000 euro max bedrijfskapitaal
+    RE_INTEGRATION_SUPPLEMENT: 15000  # 150 euro toeslag tijdens re-integratie
+    VALID_POSTAL_ADDRESSES: # TODO: dit hoort eigenlijk een BAG adres te zijn
+      - "De Regenboog Groep 1, 1012NX Amsterdam"
+      - "HVO-Querido"
+      - "Leger des Heils Amsterdam"
+    FULL_EXEMPTION_REASONS:
+      - "MEDISCH_VOLLEDIG"
+      - "MANTELZORG_VOLLEDIG"
+      - "SOCIALE_OMSTANDIGHEDEN_VOLLEDIG"
+
+requirements:
+  - all:
+      - subject: "$MEETS_NATIONAL_REQUIREMENTS"
+        operation: EQUALS
+        value: true
+      - or:
+          - subject: "$HAS_FIXED_ADDRESS"
+            operation: EQUALS
+            value: true
+          - operation: IN
+            subject: "$POSTAL_ADDRESS"
+            values: "$VALID_POSTAL_ADDRESSES"
+      # Arbeidsverplichting check
+      - or:
+          - operation: IN
+            subject: "$WORK_CAPABILITY.arbeidsvermogen"
+            values: "$FULL_EXEMPTION_REASONS"
+          - operation: NOT_NULL
+            subject: "$WORK_CAPABILITY.re_integratie_traject"
+
+actions:
+  - output: "is_eligible"
+    value: true
+
+  - output: "benefit_amount"
+    operation: ADD
+    values:
+      # Basis bedrag met kostendelersnorm
+      - operation: MULTIPLY
+        values:
+          - "$NATIONAL_BASE_AMOUNT"
+          - "$KOSTENDELERSNORM"
+      # Jongerentoeslag
+      - operation: IF
+        conditions:
+          - test:
+              operation: AND
+              values:
+                - operation: LESS_OR_EQUAL
+                  values:
+                    - "$AGE"
+                    - "$YOUTH_MAX_AGE"
+                - operation: EQUALS
+                  subject: "$HAS_FIXED_ADDRESS"
+                  value: true
+            then: "$YOUTH_SUPPLEMENT"
+          - else: 0
+      # ZZP vrijlating
+      - operation: IF
+        conditions:
+          - test:
+              operation: AND
+              values:
+                - subject: "$IS_ENTREPRENEUR"
+                  operation: EQUALS
+                  value: true
+                - operation: GREATER_THAN
+                  values:
+                    - "$BUSINESS_INCOME"
+                    - 0
+            then:
+              operation: MULTIPLY
+              values:
+                - "$BUSINESS_INCOME"
+                - "$ZZP_INCOME_DISREGARD_PERCENTAGE"
+          - else: 0
+      # Re-integratie toeslag
+      - operation: IF
+        conditions:
+          - test:
+            operation: NOT_NULL
+            subject: "$WORK_CAPABILITY.re_integratie_traject"
+            then: "$RE_INTEGRATION_SUPPLEMENT"
+          - else: 0
+
+  - output: "housing_assistance"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - subject: "$HAS_FIXED_ADDRESS"
+              operation: EQUALS
+              value: false
+            - operation: IN
+              subject: "$POSTAL_ADDRESS"
+              values: "$VALID_POSTAL_ADDRESSES"
+        then: "$HOUSING_ASSISTANCE_AMOUNT"
+      - else: 0
+
+  - output: "startup_assistance"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - subject: "$IS_ENTREPRENEUR"
+              operation: EQUALS
+              value: true
+            - operation: LESS_THAN
+              values:
+                - "$BUSINESS_INCOME"
+                - "$NATIONAL_BASE_AMOUNT"
+        then: "$STARTUP_ASSISTANCE_MAX"
+      - else: 0

@@ -1,0 +1,367 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
+name: AOW-uitkering
+law: algemene_ouderdomswet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2024-01-01
+service: "SVB"
+description: >
+  Regels voor het bepalen van het recht op en de hoogte van de AOW-uitkering volgens
+  de Algemene Ouderdomswet. De AOW is een basispensioen voor mensen die de AOW-leeftijd
+  hebben bereikt. De hoogte is afhankelijk van het opbouwpercentage (bepaald door
+  verzekerde jaren) en de leefsituatie.
+
+references:
+  - law: "Algemene Ouderdomswet"
+    article: "7"
+    url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+  - law: "Algemene Ouderdomswet"
+    article: "9"
+    url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+  - law: "Algemene Ouderdomswet"
+    article: "13"
+    url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "RESIDENCE_INSURED_YEARS"
+      description: "Aantal verzekerde jaren voor AOW-opbouw op basis van woonperiodes"
+      type: "number"
+      type_spec:
+        precision: 2
+        min: 0
+        max: 50
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "verzekerde_tijdvakken"
+        field: "woonperiodes"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  input:
+    - name: "EMPLOYMENT_INSURED_YEARS"
+      description: "Aantal verzekerde jaren voor AOW-opbouw op basis van werk en uitkeringen"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "insured_years"
+        law: "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        precision: 2
+        min: 0
+        max: 50
+      temporal:
+        type: "period"
+        period_type: "continuous"
+
+    - name: "BIRTH_DATE"
+      description: "Geboortedatum van de aanvrager"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "birth_date"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "PARTNER_BIRTH_DATE"
+      description: "Geboortedatum van de partner"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "partner_birth_date"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "AGE"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "HAS_PARTNER"
+      description: "Heeft de persoon een partner volgens RvIG"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "has_partner"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "PARTNER_BSN"
+      description: "BSN van de partner"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "PARTNER_AGE"
+      description: "Leeftijd van de partner"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "INCOME"
+      description: "Toetsingsinkomen"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "PARTNER_INCOME"
+      description: "Toetsingsinkomen partner"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "partner_income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "RETIREMENT_AGE"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "retirement_age"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "BIRTH_DATE"
+            reference: "$BIRTH_DATE"
+      type_spec:
+        unit: "years"
+        precision: 2
+        min: 65
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "PARTNER_RETIREMENT_AGE"
+      description: "AOW-leeftijd voor de partner"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "retirement_age"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "BIRTH_DATE"
+            reference: "$PARTNER_BIRTH_DATE"
+      type_spec:
+        unit: "years"
+        precision: 2
+        min: 65
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  output:
+    - name: "is_eligible"
+      description: "Heeft de persoon recht op AOW"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "base_amount"
+      description: "Basis AOW-bedrag voor opbouw"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "accrual_percentage"
+      description: "Opbouwpercentage AOW"
+      type: "number"
+      type_spec:
+        precision: 4
+        min: 0
+        max: 1
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "pension_amount"
+      description: "Uiteindelijke AOW-uitkering"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+  definitions:
+    YEARS_FOR_FULL_PENSION: 50
+    ACCRUAL_PER_YEAR: 0.02
+    BASE_AMOUNT_SINGLE: 138000
+    BASE_AMOUNT_SHARED: 95200
+    PARTNER_ALLOWANCE_MAX: 25800
+    INCOME_THRESHOLD_PARTNER: 280000
+    REDUCTION_RATE: 0.02
+
+requirements:
+  - all:
+      - subject: "$AGE"
+        operation: GREATER_OR_EQUAL
+        value: "$RETIREMENT_AGE"
+      - operation: GREATER_THAN
+        values:
+          - operation: ADD
+            values:
+              - "$RESIDENCE_INSURED_YEARS"
+              - "$EMPLOYMENT_INSURED_YEARS"
+          - 0
+
+actions:
+  - output: "is_eligible"
+    value: true
+
+  - output: "base_amount"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HAS_PARTNER"
+          operation: EQUALS
+          value: true
+        then: "$BASE_AMOUNT_SHARED"
+      - else: "$BASE_AMOUNT_SINGLE"
+
+  - output: "accrual_percentage"
+    operation: DIVIDE
+    values:
+      - operation: MIN
+        values:
+          - operation: ADD
+            values:
+              - "$RESIDENCE_INSURED_YEARS"
+              - "$EMPLOYMENT_INSURED_YEARS"
+          - "$YEARS_FOR_FULL_PENSION"
+      - "$YEARS_FOR_FULL_PENSION"
+
+  - output: "pension_amount"
+    operation: MULTIPLY
+    values:
+      - "$base_amount"
+      - "$accrual_percentage"
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$HAS_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: ADD
+              values:
+                - 1
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: AND
+                        values:
+                          - operation: LESS_THAN
+                            values:
+                              - "$PARTNER_AGE"
+                              - "$PARTNER_RETIREMENT_AGE"
+                          - operation: LESS_THAN
+                            values:
+                              - "$PARTNER_INCOME"
+                              - "$INCOME_THRESHOLD_PARTNER"
+                      then:
+                        operation: MIN
+                        values:
+                          - operation: DIVIDE
+                            values:
+                              - "$PARTNER_ALLOWANCE_MAX"
+                              - "$BASE_AMOUNT_SHARED"
+                          - operation: MULTIPLY
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$INCOME_THRESHOLD_PARTNER"
+                                  - "$PARTNER_INCOME"
+                              - "$REDUCTION_RATE"
+                    - else: 0
+          - else: 1

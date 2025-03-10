@@ -1,0 +1,57 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: bfc4ce3d-1c52-4fb8-ad96-4f1b9d836c4a
+name: Bepalen levensverwachting 2025
+law: wet_op_het_centraal_bureau_voor_de_statistiek
+valid_from: 2024-01-01
+service: "CBS"
+description: >
+  Regels voor het bepalen van de levensverwachting volgens de Wet op het Centraal Bureau
+  voor de Statistiek. Het CBS is verantwoordelijk voor het berekenen en publiceren van
+  statistieken over de Nederlandse samenleving, waaronder de levensverwachting.
+
+references:
+  - law: "Wet op het Centraal Bureau voor de Statistiek"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0016060/2024-01-01#Hoofdstuk3_Artikel3"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "LIFE_EXPECTANCY_DATA"
+      description: "Levensverwachting op 65-jarige leeftijd"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 2
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "levensverwachting"
+        field: "verwachting_65"
+        select_on:
+          - name: "jaar"
+            description: "Jaar van de statistiek"
+            type: "number"
+            value: "$year"
+
+  output:
+    - name: "life_expectancy_65"
+      description: "Resterende levensverwachting op 65-jarige leeftijd"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 2
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+actions:
+  - output: "life_expectancy_65"
+    value: "$LIFE_EXPECTANCY_DATA"

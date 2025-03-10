@@ -1,0 +1,455 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: e3bb489c-b7d1-49dd-985c-a3cde1ab0ad3
+name: Bepalen studiefinanciering 2024
+law: wet_studiefinanciering
+valid_from: 2024-01-01
+service: "DUO"
+description: >
+  Regels voor het bepalen van studiefinanciering volgens de Wet studiefinanciering 2000.
+  Vanaf 2024 is de basisbeurs weer ingevoerd en is studiefinanciering een gift geworden
+  die meetelt als inkomen voor toeslagen.
+
+references:
+  - law: "Wet studiefinanciering 2000"
+    article: "3.1"
+    url: "https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk3_Paragraaf3.1_Artikel3.1"
+  - law: "Wet studiefinanciering 2000"
+    article: "3.9"
+    url: "https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk3_Paragraaf3.2_Artikel3.9"
+  - law: "Wet studiefinanciering 2000"
+    article: "3.14"
+    url: "https://wetten.overheid.nl/BWBR0011453/2024-01-01#Hoofdstuk3_Paragraaf3.3_Artikel3.14"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "EDUCATION_TYPE"
+      description: "Type onderwijs (MBO/HBO/WO)"
+      type: "string"
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        table: "inschrijvingen"
+        field: "onderwijstype"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "SIBLINGS_STUDYING"
+      description: "Aantal studerende broers/zussen"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "studiefinanciering"
+        field: "aantal_studerend_gezin"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+    - name: "PARTNER_EDUCATION_TYPE"
+      description: "Type onderwijs (MBO/HBO/WO) van partner"
+      type: "string"
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        table: "inschrijvingen"
+        field: "onderwijstype"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_SIBLINGS_STUDYING"
+      description: "Aantal studerende broers/zussen van partner"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "studiefinanciering"
+        field: "aantal_studerend_gezin"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+  input:
+    - name: "LIVING_SITUATION"
+      description: "Woonsituatie (uit/thuis) op basis van RvIG adres"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "living_situation"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "PARENT1_INCOME"
+      description: "Inkomen eerste ouder"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "PARENT2_INCOME"
+      description: "Inkomen tweede ouder"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "PARTNER_BSN"
+      description: "Heeft de persoon een fiscaal partner"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "PARTNER_LIVING_SITUATION"
+      description: "Woonsituatie (uit/thuis) op basis van RvIG adres"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "living_situation"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "PARTNER_PARENT1_INCOME"
+      description: "Inkomen eerste ouder"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "PARTNER_PARENT2_INCOME"
+      description: "Inkomen tweede ouder"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+      temporal:
+        type: "period"
+        period_type: "year"
+
+  output:
+    - name: "study_grant"
+      description: "Totale studiefinanciering"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "partner_study_grant"
+      description: "Totale studiefinanciering partner"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "is_student"
+      description: "Is ingeschreven als student"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "receives_study_grant"
+      description: "Ontvangt studiefinanciering"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+
+  definitions:
+    BASISBEURS_WO_UIT: 28800
+    BASISBEURS_WO_THUIS: 10300
+    BASISBEURS_HBO_UIT: 28800
+    BASISBEURS_HBO_THUIS: 10300
+    BASISBEURS_MBO_UIT: 28800
+    BASISBEURS_MBO_THUIS: 10300
+    MAX_AANVULLENDE_BEURS_WO: 41900
+    MAX_AANVULLENDE_BEURS_HBO: 41900
+    MAX_AANVULLENDE_BEURS_MBO: 41900
+    INKOMEN_GRENS_GEEN_BEURS: 7000000
+    INKOMENSDREMPEL_BASIS: 3400000
+    VERHOGING_DREMPEL_PER_KIND: 350000
+
+actions:
+  - output: "study_grant"
+    operation: ADD
+    values:
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$EDUCATION_TYPE"
+              operation: EQUALS
+              value: "WO"
+            then:
+              operation: IF
+              conditions:
+                - test:
+                    subject: "$LIVING_SITUATION"
+                    operation: EQUALS
+                    value: "UIT"
+                  then: "$BASISBEURS_WO_UIT"
+                - else: "$BASISBEURS_WO_THUIS"
+          - test:
+              subject: "$EDUCATION_TYPE"
+              operation: EQUALS
+              value: "HBO"
+            then:
+              operation: IF
+              conditions:
+                - test:
+                    subject: "$LIVING_SITUATION"
+                    operation: EQUALS
+                    value: "UIT"
+                  then: "$BASISBEURS_HBO_UIT"
+                - else: "$BASISBEURS_HBO_THUIS"
+          - test:
+              subject: "$EDUCATION_TYPE"
+              operation: EQUALS
+              value: "MBO"
+            then:
+              operation: IF
+              conditions:
+                - test:
+                    subject: "$LIVING_SITUATION"
+                    operation: EQUALS
+                    value: "UIT"
+                  then: "$BASISBEURS_MBO_UIT"
+                - else: "$BASISBEURS_MBO_THUIS"
+      - operation: IF
+        conditions:
+          - test:
+              operation: LESS_THAN
+              values:
+                - operation: ADD
+                  values:
+                    - "$PARENT1_INCOME"
+                    - "$PARENT2_INCOME"
+                - "$INKOMEN_GRENS_GEEN_BEURS"
+            then:
+              operation: MULTIPLY
+              values:
+                - operation: IF
+                  conditions:
+                    - test:
+                        subject: "$EDUCATION_TYPE"
+                        operation: EQUALS
+                        value: "WO"
+                      then: "$MAX_AANVULLENDE_BEURS_WO"
+                    - test:
+                        subject: "$EDUCATION_TYPE"
+                        operation: EQUALS
+                        value: "HBO"
+                      then: "$MAX_AANVULLENDE_BEURS_HBO"
+                    - test:
+                        subject: "$EDUCATION_TYPE"
+                        operation: EQUALS
+                        value: "MBO"
+                      then: "$MAX_AANVULLENDE_BEURS_MBO"
+                - operation: SUBTRACT
+                  values:
+                    - 1
+                    - operation: DIVIDE
+                      values:
+                        - operation: SUBTRACT
+                          values:
+                            - operation: ADD
+                              values:
+                                - "$PARENT1_INCOME"
+                                - "$PARENT2_INCOME"
+                            - "$INKOMENSDREMPEL_BASIS"
+                            - operation: MULTIPLY
+                              values:
+                                - "$SIBLINGS_STUDYING"
+                                - "$VERHOGING_DREMPEL_PER_KIND"
+                        - operation: SUBTRACT
+                          values:
+                            - "$INKOMEN_GRENS_GEEN_BEURS"
+                            - "$INKOMENSDREMPEL_BASIS"
+            else: 0
+
+
+  - output: "partner_study_grant"
+    operation: ADD
+    values:
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$PARTNER_EDUCATION_TYPE"
+              operation: EQUALS
+              value: "WO"
+            then:
+              operation: IF
+              conditions:
+                - test:
+                    subject: "$PARTNER_LIVING_SITUATION"
+                    operation: EQUALS
+                    value: "UIT"
+                  then: "$BASISBEURS_WO_UIT"
+                - else: "$BASISBEURS_WO_THUIS"
+          - test:
+              subject: "$PARTNER_EDUCATION_TYPE"
+              operation: EQUALS
+              value: "HBO"
+            then:
+              operation: IF
+              conditions:
+                - test:
+                    subject: "$PARTNER_LIVING_SITUATION"
+                    operation: EQUALS
+                    value: "UIT"
+                  then: "$BASISBEURS_HBO_UIT"
+                - else: "$BASISBEURS_HBO_THUIS"
+          - test:
+              subject: "$PARTNER_EDUCATION_TYPE"
+              operation: EQUALS
+              value: "MBO"
+            then:
+              operation: IF
+              conditions:
+                - test:
+                    subject: "$PARTNER_LIVING_SITUATION"
+                    operation: EQUALS
+                    value: "UIT"
+                  then: "$BASISBEURS_MBO_UIT"
+                - else: "$BASISBEURS_MBO_THUIS"
+      - operation: IF
+        conditions:
+          - test:
+              operation: LESS_THAN
+              values:
+                - operation: ADD
+                  values:
+                    - "$PARTNER_PARENT1_INCOME"
+                    - "$PARTNER_PARENT2_INCOME"
+                - "$INKOMEN_GRENS_GEEN_BEURS"
+            then:
+              operation: MULTIPLY
+              values:
+                - operation: IF
+                  conditions:
+                    - test:
+                        subject: "$PARTNER_EDUCATION_TYPE"
+                        operation: EQUALS
+                        value: "WO"
+                      then: "$MAX_AANVULLENDE_BEURS_WO"
+                    - test:
+                        subject: "$PARTNER_EDUCATION_TYPE"
+                        operation: EQUALS
+                        value: "HBO"
+                      then: "$MAX_AANVULLENDE_BEURS_HBO"
+                    - test:
+                        subject: "$PARTNER_EDUCATION_TYPE"
+                        operation: EQUALS
+                        value: "MBO"
+                      then: "$MAX_AANVULLENDE_BEURS_MBO"
+                - operation: SUBTRACT
+                  values:
+                    - 1
+                    - operation: DIVIDE
+                      values:
+                        - operation: SUBTRACT
+                          values:
+                            - operation: ADD
+                              values:
+                                - "$PARTNER_PARENT1_INCOME"
+                                - "$PARTNER_PARENT2_INCOME"
+                            - "$INKOMENSDREMPEL_BASIS"
+                            - operation: MULTIPLY
+                              values:
+                                - "$PARTNER_SIBLINGS_STUDYING"
+                                - "$VERHOGING_DREMPEL_PER_KIND"
+                        - operation: SUBTRACT
+                          values:
+                            - "$INKOMEN_GRENS_GEEN_BEURS"
+                            - "$INKOMENSDREMPEL_BASIS"
+            else: 0
+
+  - output: "is_student"
+    operation: NOT_NULL
+    subject: "$EDUCATION_TYPE"
+
+  - output: "receives_study_grant"
+    operation: GREATER_THAN
+    values:
+      - "$study_grant"
+      - 0

@@ -1,0 +1,126 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: 96d926a0-b45f-4cf3-92af-01b167221a00
+name: Kiesrecht Tweede Kamer
+law: kieswet
+discoverable: "CITIZEN"
+valid_from: 2024-01-01
+service: "KIESRAAD"
+description: >
+  Regels voor het bepalen van kiesrecht voor de Tweede Kamerverkiezingen volgens
+  de Kieswet. Het kiesrecht is afhankelijk van leeftijd, nationaliteit en
+  eventuele uitsluiting door rechterlijke uitspraak.
+
+references:
+  - law: "Kieswet"
+    article: "B1"
+    url: "https://wetten.overheid.nl/BWBR0004627/2024-01-01#AfdelingII_HoofdstukB_Artikel_B1"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "ELECTION_DATE"
+      description: "Datum van de verkiezingen"
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "verkiezingen"
+        field: "verkiezingsdatum"
+        select_on:
+          - name: "type"
+            value: "TWEEDE_KAMER"
+            description: "Type verkiezing"
+            type: "string"
+
+  input:
+    - name: "AGE"
+      description: "Leeftijd op dag van stemming"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+          - name: "REFERENCE_DATE"
+            reference: "$ELECTION_DATE"
+
+    - name: "NATIONALITY"
+      description: "Heeft persoon de Nederlandse nationaliteit"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "has_dutch_nationality"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "IS_DETAINED"
+      description: "Is persoon gedetineerd"
+      type: "boolean"
+      service_reference:
+        service: "DJI"
+        field: "is_incarcerated"
+        law: "penitentiaire_beginselenwet"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "JUDICIAL_EXCLUSION"
+      description: "Is persoon uitgesloten van kiesrecht door rechterlijke uitspraak"
+      type: "boolean"
+      service_reference:
+        service: "JUSTID"
+        field: "has_voting_exclusion"
+        law: "wetboek_van_strafrecht"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$ELECTION_DATE"
+
+  output:
+    - name: "has_voting_rights"
+      description: "Heeft de persoon stemrecht"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$ELECTION_DATE"
+
+  definitions:
+    MINIMUM_AGE: 18
+
+requirements:
+  - all:
+      - subject: "$NATIONALITY"
+        operation: EQUALS
+        value: true
+      - subject: "$AGE"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_AGE"
+      - subject: "$JUDICIAL_EXCLUSION"
+        operation: EQUALS
+        value: false
+
+actions:
+  - output: "has_voting_rights"
+    operation: AND
+    values:
+      - subject: "$NATIONALITY"
+        operation: EQUALS
+        value: true
+      - subject: "$AGE"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_AGE"
+      - subject: "$JUDICIAL_EXCLUSION"
+        operation: EQUALS
+        value: false

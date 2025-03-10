@@ -1,0 +1,78 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: 41ffa9a4-89a6-4fed-acc7-6b4fdb2e56ce
+name: Bepalen uitsluiting kiesrecht
+law: wetboek_van_strafrecht
+valid_from: 2023-01-01
+service: "JUSTID"
+description: >
+  Regels voor het bepalen of iemand is uitgesloten van het kiesrecht op basis van
+  een rechterlijke uitspraak volgens art. 28 Wetboek van Strafrecht.
+
+references:
+  - law: "Wetboek van Strafrecht"
+    article: "28"
+    url: "https://wetten.overheid.nl/BWBR0001854/2024-01-01#BoekEerste_TiteldeelII_Artikel28"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "VOTING_EXCLUSIONS"
+      description: "Rechterlijke uitspraken met ontzetting uit kiesrecht"
+      type: "array"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "ontzettingen"
+        fields: [ "startdatum", "einddatum" ]
+        select_on:
+          - name: "bsn"
+            description: "BSN van de persoon"
+            type: "string"
+            value: "$BSN"
+          - name: "type"
+            description: "Type ontzetting"
+            type: "string"
+            value: "KIESRECHT"
+
+  output:
+    - name: "has_voting_exclusion"
+      description: "Is de persoon uitgesloten van kiesrecht"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+actions:
+  - output: "has_voting_exclusion"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$VOTING_EXCLUSIONS"
+          operation: NOT_NULL
+        then:
+          operation: FOREACH
+          subject: "$VOTING_EXCLUSIONS"
+          combine: "OR"
+          value:
+            - operation: AND
+              values:
+                - operation: LESS_OR_EQUAL
+                  values:
+                    - "$startdatum"
+                    - "$calculation_date"
+                - operation: OR
+                  values:
+                    - operation: EQUALS
+                      subject: "$einddatum"
+                      value: null
+                    - operation: GREATER_OR_EQUAL
+                      values:
+                        - "$einddatum"
+                        - "$calculation_date"
+      - else: false
