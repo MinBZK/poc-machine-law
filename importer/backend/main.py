@@ -6,7 +6,7 @@ from typing import Dict, Literal, Optional, TypedDict, Annotated, List
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 import pprint
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
@@ -16,6 +16,10 @@ import json
 from langgraph.types import Command, interrupt
 import asyncio
 import nest_asyncio
+from jsonschema import validate
+import yaml
+import jsonschema
+import re
 
 
 model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, max_retries=2)
@@ -46,6 +50,19 @@ workflow = StateGraph(state_schema=State)
 # Get the event loop and enable nesting, see https://pypi.org/project/nest-asyncio/
 nest_asyncio.apply()
 loop = asyncio.get_event_loop()
+
+
+def validate_schema(yaml_content: str) -> str | None:
+    """Validate a YAML file against the JSON schema."""
+    schema = json.loads(schema_content)
+
+    yaml_data = yaml.safe_load(yaml_content)
+
+    try:
+        validate(instance=yaml_data, schema=schema)
+        return None
+    except jsonschema.exceptions.ValidationError as err:
+        return f"Error: {err.message}"
 
 
 def ask_law(state: State, config: Dict) -> Dict:
@@ -130,8 +147,15 @@ def fetch_and_format_data(url: str) -> str:
     return "\n\n".join(doc.page_content for doc in docs)
 
 
+# Get the schema content
+with open("../../schema/v0.1.3/schema.json") as sf:
+    schema_content = sf.read()
+
 analyize_law_prompt = ChatPromptTemplate(
     [
+        SystemMessage(
+            "Je bent een AI-agent die wetteksten kan analyseren en omzetten naar YAML-formaat. Tutoyeer de gebruiker. Je JSON-output moet gebaseerd zijn op dit JSON-schema: ```json\n{schema_content}\n```\nReturn de output direct, zonder uitleg of aanvullende tekst."
+        ),
         (
             "user",
             [
@@ -141,14 +165,14 @@ analyize_law_prompt = ChatPromptTemplate(
                 },
                 {
                     "type": "document",
-                    "title": "voorbeeld 1",
+                    "title": "Voorbeeld 1",
                     "text": fetch_and_format_data(
                         "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/zvw/RVZ-2024-01-01.yaml"
                     ),
                 },
                 {
                     "type": "document",
-                    "title": "voorbeeld 2",
+                    "title": "Voorbeeld 2",
                     "text": fetch_and_format_data(
                         "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/handelsregisterwet/KVK-2024-01-01.yaml"
                     ),
@@ -160,12 +184,11 @@ analyize_law_prompt = ChatPromptTemplate(
             [
                 {
                     "type": "text",
-                    # "text": "Zet de volgende wettekst om naar YAML-formaat:",
                     "text": "Ik wil nu hetzelfde doen voor de volgende wettekst. Analyseer de wet grondig! Dan wil ik graag eerst stap voor stap zien wat de wet doet. Wie het uitvoert. Waar de wet van afhankelijk is. En dan graag per uitvoeringsorganisatie een YAML file precies zoals de voorbeelden (verzin geen nieuwe velden/operations/...).",
                 },
                 {
                     "type": "document",
-                    "title": "wettekst",
+                    "title": "Wettekst",
                     "text": "{content}",
                 },
             ],
@@ -193,12 +216,20 @@ def process_law(state: State, config: Dict) -> Dict:
     # Fetch the law content
     content = fetch_and_format_data(state["law_url"])
 
-    # Clip the law content to 100 characters for testing purposes. TODO: remove this
-    if len(content) > 100:
-        content = content[:100]
+    # Remove duplicate whitespace from the content
+    content = re.sub(r"\s+", " ", content)
+
+    # Cap the law content for testing purposes. TODO: remove this
+    if len(content) > 1000:
+        content = content[:1000]
 
     # Add a human message to process the law
-    result = model.invoke(analyize_law_prompt.format_messages(content=content))
+    result = model.invoke(
+        analyize_law_prompt.format_messages(
+            schema_content=schema_content,
+            content=content,
+        )
+    )
 
     return {"messages": [result]}
 
@@ -209,7 +240,26 @@ def process_law_feedback(state: State, config: Dict) -> Dict:
     user_input = interrupt("process_law_feedback")
     state["messages"].append(HumanMessage(user_input))
 
-    return {"messages": model.invoke(state["messages"])}
+    result = model.invoke(state["messages"])
+
+    # If the result contains yaml content, validate it against the schema
+    if "```yaml" in result.content:
+        print("---> analyzing YAML content")
+
+        # Find all substrings between ```yaml and ```
+        pattern = r"```yaml\n(.*?)```"
+
+        # re.DOTALL flag makes '.' match newlines as well
+        matches = re.finditer(pattern, result.content, re.DOTALL)
+
+        # Extract just the YAML content (without the delimiters)
+        yaml_blocks = [match.group(1) for match in matches]
+        for block in yaml_blocks:
+            validation_result = validate_schema(block)
+
+            print("---> validation result:", validation_result)
+
+    return {"messages": result}
 
 
 # Add nodes
@@ -327,6 +377,16 @@ async def websocket_endpoint(websocket: WebSocket):
 
     except Exception as e:
         print(f"Error: {pprint.pformat(e)}")
+
+        # Send an error message to the user
+        await manager.send_message(
+            WebSocketMessage(
+                id=str(uuid.uuid4()),
+                content=f"Er is een fout opgetreden: {e}",
+                quick_replies=[],
+            ),
+            thread_id,
+        )
 
     finally:
         manager.disconnect(thread_id)
