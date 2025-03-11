@@ -238,26 +238,51 @@ def process_law_feedback(state: State, config: Dict) -> Dict:
     print("----> process_law_feedback")
 
     user_input = interrupt("process_law_feedback")
-    state["messages"].append(HumanMessage(user_input))
 
-    result = model.invoke(state["messages"])
+    # If the user wants to analyze the law, validate it against the schema
+    if user_input.lower() in ("analyze", "analyseer"):
+        print("----> analyzing YAML content")
 
-    # If the result contains yaml content, validate it against the schema
-    if "```yaml" in result.content:
-        print("---> analyzing YAML content")
+        validation_errors = []
 
         # Find all substrings between ```yaml and ```
-        pattern = r"```yaml\n(.*?)```"
+        pattern = r"```yaml\n(.*?)(```|$)"
 
         # re.DOTALL flag makes '.' match newlines as well
-        matches = re.finditer(pattern, result.content, re.DOTALL)
+        matches = re.finditer(pattern, state["messages"][-1].content, re.DOTALL)
 
         # Extract just the YAML content (without the delimiters)
         yaml_blocks = [match.group(1) for match in matches]
         for block in yaml_blocks:
-            validation_result = validate_schema(block)
+            print("----> YAML block found")
+            err = validate_schema(block)
 
-            print("---> validation result:", validation_result)
+            if err:
+                validation_errors.append(err)
+
+        if validation_errors:
+            user_input = (
+                f"Er zijn fouten gevonden in de YAML-output:\n```\n{"\n".join(validation_errors)}\n```"
+            )
+        else:
+            user_input = "De YAML-output is correct!"
+
+    thread_id = config["configurable"]["thread_id"]
+    
+    loop.run_until_complete(
+        manager.send_message(
+            WebSocketMessage(
+                id=str(uuid.uuid4()),
+                content=user_input,
+                quick_replies=[],
+            ),
+            thread_id,
+        )
+    )  # IMPROVE: send/show this as user message instead of AI message in the frontend
+
+    state["messages"].append(HumanMessage(user_input))
+
+    result = model.invoke(state["messages"])
 
     return {"messages": result}
 
@@ -382,7 +407,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
-                content=f"Er is een fout opgetreden: {e}",
+                content=f"Er is een fout opgetreden:\n```\n{e}\n```",
                 quick_replies=[],
             ),
             thread_id,

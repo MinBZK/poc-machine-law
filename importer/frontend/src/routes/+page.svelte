@@ -183,6 +183,6 @@
   }
 
   :global(.message pre) {
-    @apply rounded-sm bg-gray-800 px-3 py-2 text-sm text-white;
+    @apply overflow-x-auto rounded-sm bg-gray-800 px-3 py-2 text-sm text-white;
   }
 </style>
