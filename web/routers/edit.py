@@ -90,6 +90,9 @@ async def update_value(
     services: Services = Depends(get_services),
 ):
     """Handle the value update by creating a claim"""
+    # Convert empty case_id to None
+    if case_id == "":
+        case_id = None
     parsed_value = new_value
     try:
         # Try parsing as JSON first (handles booleans)

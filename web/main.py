@@ -40,6 +40,10 @@ async def root(request: Request, bsn: str = "999993653", services: Services = De
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
+    # Haal claims op voor deze BSN, net zoals in application_panel
+    claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
+    claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -49,6 +53,10 @@ async def root(request: Request, bsn: str = "999993653", services: Services = De
             "formatted_date": FORMATTED_DATE,
             "all_profiles": get_all_profiles(),
             "discoverable_service_laws": services.get_discoverable_service_laws(),
+            "claim_map": claim_map,
+            # Geen default case_id, want dit veroorzaakt problemen bij het aanmaken van een claim
+            "show_approve": False,  # Toon approve knop niet standaard
+            "claimant": "CITIZEN",  # Standaard claimant
         },
     )
 
