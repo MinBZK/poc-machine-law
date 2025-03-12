@@ -56,6 +56,10 @@ properties:
     - name: "NATIONAL_BASE_AMOUNT"
       description: "Landelijke bijstandsnorm"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "SZW"
         field: "base_amount"
@@ -122,6 +126,10 @@ properties:
     - name: "BUSINESS_INCOME"
       description: "Inkomsten uit onderneming"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "BELASTINGDIENST"
         field: "business_income"

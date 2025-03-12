@@ -94,6 +94,10 @@ properties:
     - name: "INCOME"
       description: "Maandelijks inkomen"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "BELASTINGDIENST"
         field: "monthly_income"
@@ -105,6 +109,10 @@ properties:
     - name: "ASSETS"
       description: "Vermogen"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "BELASTINGDIENST"
         field: "assets"
@@ -138,6 +146,10 @@ properties:
     - name: "PARTNER_INCOME"
       description: "Maandelijks inkomen partner"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "BELASTINGDIENST"
         field: "monthly_income"
@@ -149,6 +161,10 @@ properties:
     - name: "PARTNER_ASSETS"
       description: "Vermogen partner"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "BELASTINGDIENST"
         field: "assets"

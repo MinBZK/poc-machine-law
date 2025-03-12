@@ -15,7 +15,8 @@ class CaseManager(Application):
     Handles case submission, verification, decisions, and objections.
     """
 
-    SAMPLE_RATE = 0.50  # 10% sample rate
+    # SAMPLE_RATE = 0.50
+    SAMPLE_RATE = 0.0
 
     def __init__(self, rules_engine, **kwargs) -> None:
         super().__init__(**kwargs)
