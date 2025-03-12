@@ -80,6 +80,7 @@ async def update_value(
     service: str = Form(...),
     key: str = Form(...),
     new_value: str = Form(...),
+    old_value: str = Form(...),
     reason: str = Form(...),
     case_id: str | None = Form(None),
     law: str = Form(...),
@@ -91,6 +92,9 @@ async def update_value(
 ):
     """Handle the value update by creating a claim"""
     parsed_value = new_value
+    parsed_old_value = old_value
+
+    # Parse new value
     try:
         # Try parsing as JSON first (handles booleans)
         if new_value.lower() in ("true", "false"):
@@ -114,6 +118,30 @@ async def update_value(
         # If parsing fails, keep original string value
         pass
 
+    # Parse old value using the same logic
+    try:
+        # Try parsing as JSON first (handles booleans)
+        if old_value.lower() in ("true", "false"):
+            parsed_old_value = old_value.lower() == "true"
+        # Try parsing as number
+        elif old_value.replace(".", "", 1).isdigit() or (
+            old_value.startswith("-") and old_value[1:].replace(".", "", 1).isdigit()
+        ):
+            parsed_old_value = float(old_value) if "." in old_value else int(old_value)
+        # Try parsing as date
+        elif old_value and len(old_value.split("-")) == 3:
+            try:
+                from datetime import date
+
+                year, month, day = map(int, old_value.split("-"))
+                parsed_old_value = date(year, month, day).isoformat()
+            except ValueError:
+                # If date parsing fails, keep original string
+                pass
+    except (json.JSONDecodeError, ValueError):
+        # If parsing fails, keep original string value
+        pass
+
     # Note: No special handling needed for eurocent here, as the frontend already converts
     # the display value (e.g., €10.50) to the actual value in cents (1050) before submission
 
@@ -130,6 +158,7 @@ async def update_value(
         reason=reason,
         claimant=claimant,
         case_id=case_id,
+        old_value=parsed_old_value,  # Now passing the old value properly
         evidence_path=evidence_path,
         law=law,
         bsn=bsn,

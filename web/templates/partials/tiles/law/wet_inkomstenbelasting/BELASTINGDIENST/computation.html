@@ -3,7 +3,7 @@
         <h4 class="text-sm font-medium text-gray-600 mb-2">Uw verschuldigde inkomstenbelasting is waarschijnlijk</h4>
         <div class="flex items-baseline">
             <span class="text-4xl font-bold text-blue-600">€ {{ "%.2f"|format(result.total_tax_due / 100) }}</span>
-            <span class="ml-2 text-gray-600">per jaar</span>
+            <span class="ml-2 text-gray-600">dit jaar</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
                     hx-swap="innerHTML"
@@ -29,6 +29,14 @@
             </div>
         </div>
     {% else %}
-        <h4 class="text-sm font-medium text-gray-500 mb-1">Er is geen inkomstenbelasting verschuldigd.</h4>
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            Er is geen inkomstenbelasting verschuldigd.
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600">
+                waarom?
+            </button>
+        </h4>
     {% endif %}
 </div>
