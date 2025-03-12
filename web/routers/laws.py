@@ -80,7 +80,7 @@ async def execute_law(
     try:
         law = unquote(law)
         law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=False)
-    except Exception:
+    except Exception as e:
         return templates.TemplateResponse(
             get_tile_template(service, law),
             {
@@ -90,6 +90,7 @@ async def execute_law(
                 "service": service,
                 "rule_spec": {"name": law.split("/")[-1].replace("_", " ").title()},
                 "error": True,
+                "message": str(e),
             },
         )
 

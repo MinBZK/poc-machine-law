@@ -34,7 +34,7 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "999993653", services: Services = Depends(get_services)):
+async def root(request: Request, bsn: str = "100000001", services: Services = Depends(get_services)):
     """Render the main dashboard page"""
     profile = get_profile_data(bsn)
     if not profile:

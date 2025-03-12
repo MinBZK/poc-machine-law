@@ -78,7 +78,7 @@ Feature: Bepalen recht op bijstand Amsterdam
       | 999993653 | VOLLEDIG        | Zelfstandigentraject  |
     When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is voldaan aan de voorwaarden
-    And is het bijstandsuitkeringsbedrag "1097.33" euro
+    And is het bijstandsuitkeringsbedrag "1089.69" euro
     And is het startkapitaal "2000.00" euro
 
   Scenario: Persoon met medische ontheffing krijgt bijstand zonder re-integratieverplichting

@@ -20,83 +20,499 @@ GLOBAL_SERVICES = {
     },
 }
 PROFILES = {
-    "777777777": {
-        "name": "Fatima Al-Zahra",
-        "description": "Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor huurtoeslag",
+    # 1. Merijn - ZZP'er in de thuiszorg met jonge kinderen
+    "100000001": {
+        "name": "Merijn van der Meer",
+        "description": "ZZP'er in de thuiszorg, alleenstaande ouder met twee jonge kinderen waarvan één met chronische aandoening",
         "sources": {
             **GLOBAL_SERVICES,
             "RvIG": {
                 "personen": [
                     {
-                        "bsn": "777777777",
-                        "geboortedatum": "1991-04-15",
-                        "verblijfsadres": "Utrecht",
+                        "bsn": "100000001",
+                        "geboortedatum": "1989-05-15",  # 36 jaar in 2025
+                        "verblijfsadres": "Amsterdam",
                         "land_verblijf": "NEDERLAND",
-                        "nationaliteit": "MAROKKAANS",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 36,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Meeuwenlaan 28, 1021HS Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 3,  # Merijn + 2 kinderen
                     }
                 ],
-                "relaties": [
-                    {
-                        "bsn": "777777777",
-                        "partnerschap_type": "GEEN",
-                        "partner_bsn": None,
-                    }
-                ],
+                "relaties": [{"bsn": "100000001", "partnerschap_type": "GEEN", "partner_bsn": None}],
                 "verblijfplaats": [
                     {
-                        "bsn": "777777777",
-                        "straat": "Rooseveltlaan",
-                        "huisnummer": "42",
-                        "postcode": "3527AK",
-                        "woonplaats": "Utrecht",
+                        "bsn": "100000001",
+                        "straat": "Meeuwenlaan",
+                        "huisnummer": "28",
+                        "postcode": "1021HS",
+                        "woonplaats": "Amsterdam",
                         "type": "WOONADRES",
                     }
                 ],
-            },
-            "RVZ": {
-                "verzekeringen": [
+                "CHILDREN_DATA": [
                     {
-                        "bsn": "777777777",
-                        "polis_status": "ACTIEF",
-                        "verdrag_status": "GEEN",
-                        "zorg_type": "BASIS",
+                        "bsn": "100000001",
+                        "kinderen": [
+                            {"geboortedatum": "2020-01-01"},  # 5 jaar in 2025
+                            {"geboortedatum": "2022-01-01", "zorgbehoefte": True},
+                            # 3 jaar in 2025, met chronische aandoening
+                        ],
                     }
-                ]
+                ],
             },
             "BELASTINGDIENST": {
                 "box1": [
                     {
-                        "bsn": "777777777",
-                        "loon_uit_dienstbetrekking": 1750000,
+                        "bsn": "100000001",
+                        "loon_uit_dienstbetrekking": 600000,  # Verlaagd naar €6.000 (onder bijstandsnorm)
                         "uitkeringen_en_pensioenen": 0,
-                        "winst_uit_onderneming": 0,
-                        "resultaat_overige_werkzaamheden": 25000,
-                        "eigen_woning": 0,
+                        "winst_uit_onderneming": 950000,  # Verlaagd naar €9.500 (onder bijstandsnorm)
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -85000,
                     }
                 ],
-                "box2": [{"bsn": "777777777", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box2": [{"bsn": "100000001", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
                 "box3": [
                     {
-                        "bsn": "777777777",
-                        "spaargeld": 1200000,
+                        "bsn": "100000001",
+                        "spaargeld": 580000,  # €5.800 spaargeld (onder de vermogensgrens van €7.500)
                         "beleggingen": 0,
                         "onroerend_goed": 0,
                         "schulden": 0,
                     }
                 ],
-                "buitenlands_inkomen": [{"bsn": "777777777", "bedrag": 0, "land": "GEEN"}],
-                "aftrekposten": [{"bsn": "777777777", "persoonsgebonden_aftrek": 85000}],
+                "monthly_income": [{"bsn": "100000001", "bedrag": 129167}],
+                # (€6.000 + €9.500) / 12 = €1.291,67 per maand
+                "assets": [{"bsn": "100000001", "bedrag": 580000}],  # €5.800 spaargeld, onder vermogensgrens
+                "business_income": [{"bsn": "100000001", "bedrag": 950000}],  # €9.500 inkomsten uit onderneming
+                "buitenlands_inkomen": [{"bsn": "100000001", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "100000001", "persoonsgebonden_aftrek": 320000}],
+            },
+            "KVK": {
+                "inschrijvingen": [
+                    {
+                        "bsn": "100000001",
+                        "rechtsvorm": "EENMANSZAAK",
+                        "status": "ACTIEF",
+                        "activiteit": "Thuiszorg",
+                        "is_active_entrepreneur": True,
+                    }
+                ],
+                "is_entrepreneur": [{"bsn": "100000001", "waarde": True}],
+            },
+            "UWV": {
+                "arbeidsverhoudingen": [
+                    {"bsn": "100000001", "dienstverband_type": "GEEN", "verzekerd_ww": False, "verzekerd_wia": False}
+                ]
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "100000001", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+            "DUO": {
+                "inschrijvingen": [{"bsn": "100000001", "onderwijssoort": "GEEN"}],
+                "studiefinanciering": [{"bsn": "100000001", "ontvangt_studiefinanciering": False}],
+                "is_student": [{"bsn": "100000001", "waarde": False}],
+                "receives_study_grant": [{"bsn": "100000001", "waarde": False}],
+            },
+            "DJI": {
+                "detenties": [{"bsn": "100000001", "is_gedetineerd": False}],
+                "is_detainee": [{"bsn": "100000001", "waarde": False}],
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [
+                    {"bsn": "100000001", "arbeidsvermogen": "VOLLEDIG", "re_integratie_traject": "Ondernemerscoaching"}
+                ]
+            },
+            "SVB": {
+                "retirement_age": [{"bsn": "100000001", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
             },
             "IND": {
                 "verblijfsvergunningen": [
                     {
-                        "bsn": "777777777",
-                        "type": "ONBEPAALDE_TIJD_REGULIER",
+                        "bsn": "100000001",
+                        "type": "PERMANENT",  # Valide type voor bijstand
                         "status": "VERLEEND",
-                        "ingangsdatum": "2010-05-12",
-                        "einddatum": None,
+                    }
+                ],
+                "residence_permit_type": [{"bsn": "100000001", "type": "PERMANENT"}],
+            },
+        },
+    },
+    # 2. Maria - Parttime werknemer met onregelmatige uren
+    "100000002": {
+        "name": "Maria Rodriguez",
+        "description": "Alleenstaande moeder, parttime werkend in de horeca met onregelmatige uren, vraagt alleen huurtoeslag aan",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "100000002",
+                        "geboortedatum": "1987-08-10",  # 38 jaar in 2025
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 38,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Javastraat 54, 1094HK Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 3,  # Maria + 2 kinderen
+                    }
+                ],
+                "relaties": [{"bsn": "100000002", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "100000002",
+                        "straat": "Javastraat",
+                        "huisnummer": "54",
+                        "postcode": "1094HK",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [
+                    {
+                        "bsn": "100000002",
+                        "kinderen": [
+                            {"geboortedatum": "2014-05-15"},  # 11 jaar in 2025
+                            {"geboortedatum": "2017-03-22"},  # 8 jaar in 2025
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "100000002",
+                        "loon_uit_dienstbetrekking": 950000,  # Verlaagd naar €9.500 (onder bijstandsnorm)
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 180000,  # Kleine bijverdiensten
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "100000002", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "100000002",
+                        "spaargeld": 230000,  # €2.300 spaargeld (onder vermogensgrens)
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "100000002", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "100000002", "persoonsgebonden_aftrek": 120000}],
+                "monthly_income": [{"bsn": "100000002", "bedrag": 79167}],  # €9.500 / 12 = €791,67 per maand
+                "assets": [{"bsn": "100000002", "bedrag": 230000}],  # €2.300 spaargeld, onder vermogensgrens
+                "business_income": [{"bsn": "100000002", "bedrag": 0}],  # Geen ZZP inkomsten
+            },
+            "UWV": {
+                "arbeidsverhoudingen": [
+                    {
+                        "bsn": "100000002",
+                        "dienstverband_type": "BEPAALDE_TIJD",
+                        "dienstverband_uren": 16,  # Verlaagd naar 16 uur
+                        "verzekerd_ww": True,
+                        "verzekerd_wia": True,
                     }
                 ]
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "100000002", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+            "DUO": {
+                "inschrijvingen": [{"bsn": "100000002", "onderwijssoort": "GEEN"}],
+                "studiefinanciering": [{"bsn": "100000002", "ontvangt_studiefinanciering": False}],
+                "is_student": [{"bsn": "100000002", "waarde": False}],
+                "receives_study_grant": [{"bsn": "100000002", "waarde": False}],
+            },
+            "DJI": {
+                "detenties": [{"bsn": "100000002", "is_gedetineerd": False}],
+                "is_detainee": [{"bsn": "100000002", "waarde": False}],
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [
+                    {"bsn": "100000002", "arbeidsvermogen": "VOLLEDIG", "re_integratie_traject": "Werkstage"}
+                ]
+            },
+            "SVB": {
+                "retirement_age": [{"bsn": "100000002", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "100000002",
+                        "type": "PERMANENT",  # Valide type voor bijstand
+                        "status": "VERLEEND",
+                    }
+                ],
+                "residence_permit_type": [{"bsn": "100000002", "type": "PERMANENT"}],
+            },
+            "KVK": {
+                "is_entrepreneur": [{"bsn": "100000002", "waarde": False}],
+                "is_active_entrepreneur": [{"bsn": "100000002", "waarde": False}],
+            },
+        },
+    },
+    # 3. Omar - Zelfstandige met fluctuerend inkomen in de bouw
+    # 3. Omar - Zelfstandige met fluctuerend inkomen in de bouw
+    "100000003": {
+        "name": "Omar Yilmaz",
+        "description": "ZZP'er in de bouwsector met sterk fluctuerend inkomen, moeite met administratie en lage tarieven",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "100000003",
+                        "geboortedatum": "1983-11-22",  # 42 jaar in 2025
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 42,
+                        "has_dutch_nationality": True,
+                        "residence_address": "Kinkerstraat 112, 1053ED Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 3,  # Partner + kind + Omar
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "100000003",
+                        "partnerschap_type": "HUWELIJK",
+                        "partner_bsn": "100000013",  # Fictieve partner BSN
+                        "has_partner": True,
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "100000003",
+                        "straat": "Kinkerstraat",
+                        "huisnummer": "112",
+                        "postcode": "1053ED",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [
+                    {
+                        "bsn": "100000003",
+                        "kinderen": [
+                            {"geboortedatum": "2011-08-30"}  # 14 jaar in 2025
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "100000003",
+                        "loon_uit_dienstbetrekking": 0,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 1250000,  # Verlaagd naar €12.500 (onder bijstandsnorm voor gezin)
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -95000,
+                    }
+                ],
+                "box2": [{"bsn": "100000003", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "100000003",
+                        "spaargeld": 120000,  # €1.200 beperkte buffer
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 850000,  # €8.500 schulden (belastingschulden)
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "100000003", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "100000003", "persoonsgebonden_aftrek": 450000}],
+                "monthly_income": [{"bsn": "100000003", "bedrag": 104167}],  # €12.500 / 12 = €1.041,67 per maand
+                "assets": [{"bsn": "100000003", "bedrag": 120000}],  # €1.200 spaargeld, onder de vermogensgrens
+                "business_income": [{"bsn": "100000003", "bedrag": 1250000}],  # €12.500 inkomsten uit onderneming
+                "partner_income": [{"bsn": "100000003", "bedrag": 350000}],  # €3.500 partner inkomen
+                "partner_assets": [{"bsn": "100000003", "bedrag": 95000}],  # €950 partner vermogen
+                "belastingschulden": [
+                    {
+                        "bsn": "100000003",
+                        "totaalbedrag": 850000,  # €8.500 openstaande belastingschulden
+                        "betalingsregeling": "LOPEND",
+                    }
+                ],
+            },
+            "KVK": {
+                "inschrijvingen": [
+                    {
+                        "bsn": "100000003",
+                        "rechtsvorm": "EENMANSZAAK",
+                        "status": "ACTIEF",
+                        "activiteit": "Bouwwerkzaamheden",
+                        "is_active_entrepreneur": True,
+                    }
+                ],
+                "is_entrepreneur": [{"bsn": "100000003", "waarde": True}],
+                "is_active_entrepreneur": [{"bsn": "100000003", "waarde": True}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "100000003", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+            "DUO": {
+                "inschrijvingen": [{"bsn": "100000003", "onderwijssoort": "GEEN"}],
+                "studiefinanciering": [{"bsn": "100000003", "ontvangt_studiefinanciering": False}],
+                "is_student": [{"bsn": "100000003", "waarde": False}],
+                "receives_study_grant": [{"bsn": "100000003", "waarde": False}],
+            },
+            "DJI": {
+                "detenties": [{"bsn": "100000003", "is_gedetineerd": False}],
+                "is_detainee": [{"bsn": "100000003", "waarde": False}],
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [
+                    {"bsn": "100000003", "arbeidsvermogen": "VOLLEDIG", "re_integratie_traject": "Ondernemerscoaching"}
+                ]
+            },
+            "SVB": {
+                "retirement_age": [{"bsn": "100000003", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "100000003",
+                        "type": "PERMANENT",  # Valide type voor bijstand
+                        "status": "VERLEEND",
+                    }
+                ],
+                "residence_permit_type": [{"bsn": "100000003", "type": "PERMANENT"}],
+            },
+        },
+    },
+    # 4. Fatima - Bijstandsgerechtigde met gedeeltelijke arbeidsongeschiktheid
+    "100000004": {
+        "name": "Fatima el Hassan",
+        "description": "Bijstandsgerechtigde met gedeeltelijke arbeidsongeschiktheid, ontvangt alle toeslagen maar komt moeilijk rond",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "100000004",
+                        "geboortedatum": "1971-09-08",  # 54 jaar in 2025
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 54,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Van der Pekstraat 87, 1031CN Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 1,  # Alleenstaand
+                    }
+                ],
+                "relaties": [{"bsn": "100000004", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "100000004",
+                        "straat": "Van der Pekstraat",
+                        "huisnummer": "87",
+                        "postcode": "1031CN",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "100000004",
+                        "loon_uit_dienstbetrekking": 0,
+                        "uitkeringen_en_pensioenen": 1089000,  # Bijstandsuitkering
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "100000004", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "100000004",
+                        "spaargeld": 380000,  # €3.800 spaargeld (onder de vermogensgrens van €7.500)
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "100000004", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "100000004", "persoonsgebonden_aftrek": 0}],
+                "monthly_income": [{"bsn": "100000004", "bedrag": 0}],  # Voor bijstandsberekening
+                "assets": [{"bsn": "100000004", "bedrag": 380000}],  # Voor vermogenstoets bijstand (onder limiet)
+                "business_income": [{"bsn": "100000004", "bedrag": 0}],  # Geen inkomsten uit onderneming
+            },
+            "UWV": {
+                "arbeidsongeschiktheid": [
+                    {
+                        "bsn": "100000004",
+                        "percentage": 40,  # 40% arbeidsongeschikt
+                        "diagnose_categorie": "BEWEGINGSAPPARAAT",
+                        "uitkering_type": "GEEN",  # Geen WIA/WAO door onvoldoende arbeidsverleden
+                    }
+                ],
+                "arbeidsverhoudingen": [
+                    {"bsn": "100000004", "dienstverband_type": "GEEN", "verzekerd_ww": False, "verzekerd_wia": False}
+                ],
+            },
+            "GEMEENTE_AMSTERDAM": {
+                "werk_en_re_integratie": [
+                    {
+                        "bsn": "100000004",
+                        "arbeidsvermogen": "MEDISCH_VOLLEDIG",  # Gewijzigd naar volledige ontheffing voor bijstand
+                        "ontheffing_reden": "Chronische ziekte",
+                        "ontheffing_einddatum": "2026-09-01",
+                        "re_integratie_traject": "Aangepast traject",  # Toegevoegd voor bijstand
+                    }
+                ]
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "100000004", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+            "DUO": {
+                "inschrijvingen": [{"bsn": "100000004", "onderwijssoort": "GEEN"}],
+                "studiefinanciering": [{"bsn": "100000004", "ontvangt_studiefinanciering": False}],
+                "is_student": [{"bsn": "100000004", "waarde": False}],
+                "receives_study_grant": [{"bsn": "100000004", "waarde": False}],
+            },
+            "DJI": {
+                "detenties": [{"bsn": "100000004", "is_gedetineerd": False}],
+                "is_detainee": [{"bsn": "100000004", "waarde": False}],
+            },
+            "SVB": {
+                "retirement_age": [{"bsn": "100000004", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "100000004",
+                        "type": "PERMANENT",  # Valide type voor bijstand
+                        "status": "VERLEEND",
+                    }
+                ],
+                "residence_permit_type": [{"bsn": "100000004", "type": "PERMANENT"}],
+            },
+            "KVK": {
+                "is_entrepreneur": [{"bsn": "100000004", "waarde": False}],
+                "is_active_entrepreneur": [{"bsn": "100000004", "waarde": False}],
             },
         },
     },
@@ -676,6 +1092,86 @@ PROFILES = {
                         "polis_status": "ACTIEF",
                         "verdrag_status": "GEEN",
                         "zorg_type": "BASIS",
+                    }
+                ]
+            },
+        },
+    },
+    "777777777": {
+        "name": "Fatima Al-Zahra",
+        "description": "Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor huurtoeslag",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "777777777",
+                        "geboortedatum": "1991-04-15",
+                        "verblijfsadres": "Utrecht",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "MAROKKAANS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "777777777",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "777777777",
+                        "straat": "Rooseveltlaan",
+                        "huisnummer": "42",
+                        "postcode": "3527AK",
+                        "woonplaats": "Utrecht",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {
+                        "bsn": "777777777",
+                        "polis_status": "ACTIEF",
+                        "verdrag_status": "GEEN",
+                        "zorg_type": "BASIS",
+                    }
+                ]
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "777777777",
+                        "loon_uit_dienstbetrekking": 1750000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 25000,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "777777777", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "777777777",
+                        "spaargeld": 1200000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "777777777", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "777777777", "persoonsgebonden_aftrek": 85000}],
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "777777777",
+                        "type": "ONBEPAALDE_TIJD_REGULIER",
+                        "status": "VERLEEND",
+                        "ingangsdatum": "2010-05-12",
+                        "einddatum": None,
                     }
                 ]
             },
