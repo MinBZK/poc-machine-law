@@ -198,7 +198,7 @@ async def objection_case(
     )
 
 
-def node_to_dict(node):
+def node_to_dict(node, skip_services=False):
     """Convert PathNode to serializable dict"""
     if node is None:
         return None
@@ -207,7 +207,9 @@ def node_to_dict(node):
         "name": node.name,
         "result": str(node.result),
         "details": {k: str(v) for k, v in node.details.items()},
-        "children": [node_to_dict(child) for child in node.children],
+        "children": []
+        if skip_services and node.type == "service_evaluation"
+        else [node_to_dict(child, skip_services=skip_services) for child in node.children],
     }
 
 
@@ -226,7 +228,7 @@ async def explanation(
         law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
 
         # Convert path and rule_spec to JSON strings
-        path_dict = node_to_dict(result.path)
+        path_dict = node_to_dict(result.path, skip_services=True)
         path_json = json.dumps(path_dict, ensure_ascii=False, indent=2)
 
         # Filter relevant parts of rule_spec

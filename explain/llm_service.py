@@ -12,29 +12,36 @@ class LLMService:
     def generate_explanation(self, path_json: str, rule_spec_json: str) -> str:
         try:
             prompt = f"""
-Je bent een behulpzame overheidsmedewerker die burgers uitlegt hoe hun aanvraag is beoordeeld.
+Je bent een zeer behulpzame overheidsmedewerker die een specifieke burger uitlegt hoe een wet uitgevoerd is.
 
-Dit is het evaluatiepad van de aanvraag: {path_json}
+Dit is het evaluatie pad van de wetsuitvoering:
+```json
+{path_json}
+```
 
-En dit is de regelset die is gebruikt: {rule_spec_json}
+En dit is de wet (de regelset) die is gebruikt:
+```json
+{rule_spec_json}
+```
 
-Dit is het pad door de boom heen en de regelset. Geef een simpele Nederlandse uitleg.
-Maak de uitleg persoonlijk (gebaseerd op het pad) en niet algemeen.
-Bedragen zijn altijd in centen (dus deel door 100).
+Geef een simpele Nederlandse uitleg in B1.
+Maak de uitleg persoonlijk (gebaseerd op het pad), specifiek, en niet algemeen.
+Bedragen zijn altijd in centen (dus deel door 100). Noem de bedragen (en bewerkingen waar logisch).
 
 Dit is GEEN besluit.
 
-In eenvoudig Nederlands voor een burger die duidelijk beschrijft wat er gebeurd.
+In eenvoudig Nederlands (B1) voor een burger die duidelijk beschrijft wat er gebeurd.
 In 1 KORTE paragraaf, benoem vooral de specifieke zaken voor deze burger.
 Het moet een PARAGRAAF zijn die ik in een brief aan de burger kan sturen (dus niet de hele brief, geen aanhef en dergelijke).
 Graag vriendelijk en behulpzaam.
+Platte tekst, geen markdown/kopjes/andere gekkigheden.
 """
 
             message = self.client.messages.create(
-                model="claude-3-sonnet-20240229",
+                model="claude-3-7-sonnet-20250219",
                 max_tokens=1000,
                 temperature=0,
-                system="Je bent een behulpzame overheidsmedewerker die burgers uitlegt hoe hun aanvraag is beoordeeld. Je geeft altijd korte, duidelijke uitleg in begrijpelijk Nederlands.",
+                system="Je bent een zeer behulpzame overheidsmedewerker die burgers uitlegt hoe een wet op hen werkt. Je geeft altijd duidelijke uitleg in begrijpelijk Nederlands (B1).",
                 messages=[{"role": "user", "content": prompt}],
             )
 
@@ -43,7 +50,7 @@ Graag vriendelijk en behulpzaam.
         except Exception as e:
             # Log the error and return a fallback message
             print(f"Error generating explanation: {e}")
-            return "We hebben uw aanvraag beoordeeld volgens de regels van de wet. Op basis van uw persoonlijke situatie hebben we bepaald waar u recht op heeft."
+            return "We konden geen uitleg genereren. Probeer het later opnieuw."
 
 
 # Initialize the service as a singleton
