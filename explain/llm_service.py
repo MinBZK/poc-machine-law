@@ -33,7 +33,8 @@ Dit is GEEN besluit.
 In eenvoudig Nederlands (B1) voor een burger die duidelijk beschrijft wat er gebeurd.
 In 1 KORTE paragraaf, benoem vooral de specifieke zaken voor deze burger.
 Het moet een PARAGRAAF zijn die ik in een brief aan de burger kan sturen (dus niet de hele brief, geen aanhef en dergelijke).
-Graag vriendelijk en behulpzaam.
+Graag vriendelijk en behulpzaam. Maar GEEN informatie over contact opnemen en vervolgstappen en dergelijke.
+Wees nooit stellig. Dus niet "U heeft recht op" maar "U heeft waarschijnlijk recht op".
 Platte tekst, geen markdown/kopjes/andere gekkigheden.
 """
 
