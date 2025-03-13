@@ -1,21 +1,40 @@
 {% from "macros/logos.html" import org_logo %}
-<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
-     x-data="{ showExplanation: false }"
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow group"
+     x-data="{ showExplanation: false, hideCard: false }"
      @close-explanation.window="showExplanation = false"
-     id="tile-{{ law|replace('/', '-') }}">
+     id="tile-{{ law|replace('/', '-') }}"
+     x-show="!hideCard"
+     x-transition:leave="transition ease-in duration-300"
+     x-transition:leave-start="opacity-100 transform scale-100"
+     x-transition:leave-end="opacity-0 transform scale-95">
     <div class="p-6 flex flex-col h-full">
         {% if error %}
             <div class="flex-grow space-y-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
-                    {% if current_case %}
-                        <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
-                    {% endif %}
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
+                        {% if current_case %}
+                            <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-start">
+                        <button @click="hideCard = true"
+                                class="text-gray-400 hover:text-gray-700 transition-colors mr-3 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                title="Verberg deze tegel">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5"
+                                 viewBox="0 0 20 20"
+                                 fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="-mt-2">{{ org_logo(service) }}</div>
                     </div>
                 </div>
-                <div class="p-2">{{ org_logo(service) }}</div>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
+                </div>
             </div>
         {% elif requirements_met %}
             <div class="flex-grow space-y-6">
@@ -27,7 +46,20 @@
                             <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
                         {% endif %}
                     </div>
-                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                    <div class="flex items-start">
+                        <button @click="hideCard = true"
+                                class="text-gray-400 hover:text-gray-700 transition-colors mr-3 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                title="Verberg deze tegel">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5"
+                                 viewBox="0 0 20 20"
+                                 fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="-mt-2">{{ org_logo(service) }}</div>
+                    </div>
                 </div>
                 <!-- Main Content -->
                 <div class="space-y-6">
@@ -137,7 +169,20 @@
                             <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
                         {% endif %}
                     </div>
-                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                    <div class="flex items-start">
+                        <button @click="hideCard = true"
+                                class="text-gray-400 hover:text-gray-700 transition-colors mr-3 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                title="Verberg deze tegel">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5"
+                                 viewBox="0 0 20 20"
+                                 fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="-mt-2">{{ org_logo(service) }}</div>
+                    </div>
                 </div>
                 <div class="space-y-6">
                     <div class="flex items-center">
@@ -166,7 +211,20 @@
                             <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
                         {% endif %}
                     </div>
-                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                    <div class="flex items-start">
+                        <button @click="hideCard = true"
+                                class="text-gray-400 hover:text-gray-700 transition-colors mr-3 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                title="Verberg deze tegel">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5"
+                                 viewBox="0 0 20 20"
+                                 fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="-mt-2">{{ org_logo(service) }}</div>
+                    </div>
                 </div>
                 <div class="space-y-6">
                     <div class="flex items-center">
