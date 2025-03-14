@@ -476,7 +476,7 @@ class RulesEngine:
         return result
 
     @staticmethod
-    def _evaluate_date_operation(op: str, values: list[Any], unit: str) -> int:
+    def _evaluate_date_operation(op: str, values: list[Any], unit: str, context: RuleContext) -> int:
         """Handle date-specific operations"""
         result = None
         if op == "SUBTRACT_DATE":
@@ -485,6 +485,9 @@ class RulesEngine:
                 return 0
 
             end_date, start_date = values
+
+            if not end_date:
+                end_date = context.calculation_date
 
             if not isinstance(end_date, datetime):
                 end_date = datetime.fromisoformat(str(end_date))
@@ -618,7 +621,7 @@ class RulesEngine:
         elif "_DATE" in op_type:
             values = [await self._evaluate_value(v, context) for v in operation["values"]]
             unit = operation.get("unit", "days")
-            result = self._evaluate_date_operation(op_type, values, unit)
+            result = self._evaluate_date_operation(op_type, values, unit, context)
             node.details.update({"evaluated_values": values, "unit": unit})
 
         elif op_type in self.COMPARISON_OPS:
