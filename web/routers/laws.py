@@ -36,22 +36,25 @@ async def evaluate_law(bsn: str, law: str, service: str, services: Services, app
     if not rule_spec:
         raise HTTPException(status_code=400, detail="Invalid law specified")
 
-    # Get profile data for the BSN
-    profile_data = get_profile_data(bsn)
-    if not profile_data:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    # Load source data into services
-    for service_name, tables in profile_data["sources"].items():
-        for table_name, data in tables.items():
-            df = pd.DataFrame(data)
-            services.set_source_dataframe(service_name, table_name, df)
+    await set_profile_data(bsn, services)
 
     parameters = {"BSN": bsn}
 
     # Execute the law
     result = await services.evaluate(service, law=law, parameters=parameters, reference_date=TODAY, approved=approved)
     return law, result, rule_spec, parameters
+
+
+async def set_profile_data(bsn, services):
+    # Get profile data for the BSN
+    profile_data = get_profile_data(bsn)
+    if not profile_data:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    # Load source data into services
+    for service_name, tables in profile_data["sources"].items():
+        for table_name, data in tables.items():
+            df = pd.DataFrame(data)
+            services.set_source_dataframe(service_name, table_name, df)
 
 
 @router.get("/list")

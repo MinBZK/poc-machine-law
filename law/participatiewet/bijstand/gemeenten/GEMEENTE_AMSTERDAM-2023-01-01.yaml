@@ -145,6 +145,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      citizen_relevance: secondary
 
     - name: "benefit_amount"
       description: "Uitkeringsbedrag inclusief toeslagen"
@@ -156,6 +157,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
     - name: "housing_assistance"
       description: "Woonkostentoeslag bij briefadres"
@@ -167,6 +169,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
     - name: "startup_assistance"
       description: "Bedrag voor bedrijfskapitaal ZZP"
@@ -178,6 +181,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
   definitions:
     YOUTH_SUPPLEMENT: 25000  # 250 euro voor jongeren

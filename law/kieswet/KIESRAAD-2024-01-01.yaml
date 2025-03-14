@@ -95,6 +95,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$ELECTION_DATE"
+      citizen_relevance: primary
 
   definitions:
     MINIMUM_AGE: 18

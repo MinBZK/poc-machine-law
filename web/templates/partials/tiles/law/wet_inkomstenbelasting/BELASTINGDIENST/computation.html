@@ -30,7 +30,7 @@
         </div>
     {% else %}
         <h4 class="text-sm font-medium text-gray-500 mb-1">
-            Er is geen inkomstenbelasting verschuldigd.
+            Waarschijnlijk geen inkomstenbelasting verschuldigd
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
                     hx-swap="innerHTML"

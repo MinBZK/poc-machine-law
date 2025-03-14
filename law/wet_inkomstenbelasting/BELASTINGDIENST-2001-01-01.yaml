@@ -584,6 +584,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: primary
 
     - name: "box1_income"
       description: "Belastbaar inkomen uit werk en woning (box 1)"

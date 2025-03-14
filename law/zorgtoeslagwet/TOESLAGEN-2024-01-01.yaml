@@ -37,6 +37,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: secondary
 
     - name: "hoogte_toeslag"
       description: "De hoogte van de zorgtoeslag"
@@ -48,6 +49,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: primary
 
   input:
     - name: "AGE"

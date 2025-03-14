@@ -140,6 +140,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: secondary
 
     - name: "yearly_amount"
       description: "Hoogte toeslag per jaar"
@@ -151,6 +152,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: primary
 
   definitions:
     MAX_HOURLY_RATE_DAYCARE: 902  # €9,02
