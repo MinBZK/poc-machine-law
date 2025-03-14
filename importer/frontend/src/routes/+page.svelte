@@ -4,10 +4,10 @@
   import Markdown from 'svelte-exmarkdown';
   import { highlightPlugin } from './highlight-plugin';
   import 'highlight.js/styles/github-dark.css';
-  // import PreWithCopyButton from './PreWithCopyButton.svelte';
-  // const copyButtonPlugin = {
-  //   renderer: { pre: PreWithCopyButton }
-  // };
+  import PreWithCopyButton from './PreWithCopyButton.svelte';
+  const copyButtonPlugin = {
+    renderer: { pre: PreWithCopyButton },
+  };
 
   type Message = {
     id: string;
@@ -101,7 +101,9 @@
       {#if message.isOwn}
         <div class="message own">{message.content}</div>
       {:else}
-        <div class="message"><Markdown md={message.content} plugins={[highlightPlugin]} /></div>
+        <div class="message">
+          <Markdown md={message.content} plugins={[highlightPlugin, copyButtonPlugin]} />
+        </div>
       {/if}
     {/each}
 
@@ -193,6 +195,6 @@
   }
 
   :global(pre code.hljs) {
-    @apply !p-0 !bg-transparent;
+    @apply !bg-transparent !p-0;
   }
 </style>
