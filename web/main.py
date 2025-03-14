@@ -1,4 +1,3 @@
-# At the top of web/main.py
 import sys
 from pathlib import Path
 
@@ -22,14 +21,25 @@ if STATIC_DIR.exists():
 app.include_router(laws.router)
 app.include_router(admin.router)
 app.include_router(edit.router)
+app.mount("/analysis/graph/law", StaticFiles(directory="law"))
+app.mount(
+    "/analysis/graph",
+    StaticFiles(
+        # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/graph/build",  # Note: absolute path is required when follow_symlink=True
+        directory="analysis/graph/build",
+        html=True,
+    ),
+)
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "999993653", services: Services = Depends(get_services)):
+async def root(request: Request, bsn: str = "100000001", services: Services = Depends(get_services)):
     """Render the main dashboard page"""
     profile = get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
+
+    await laws.set_profile_data(bsn, services)
 
     return templates.TemplateResponse(
         "index.html",
@@ -39,7 +49,7 @@ async def root(request: Request, bsn: str = "999993653", services: Services = De
             "bsn": bsn,
             "formatted_date": FORMATTED_DATE,
             "all_profiles": get_all_profiles(),
-            "discoverable_service_laws": services.get_discoverable_service_laws(),
+            "discoverable_service_laws": await services.get_sorted_discoverable_service_laws(bsn),
         },
     )
 

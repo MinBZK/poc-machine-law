@@ -36,6 +36,8 @@
                 <input type="hidden" name="law" value="{{ law }}">
                 <input type="hidden" name="bsn" value="{{ bsn }}">
                 <input type="hidden" name="claimant" value="{{ claimant }}">
+                <input type="hidden" name="old_value" :value="{{ value|tojson }}">
+                {% if details %}<input type="hidden" name="details" value="{{ details|tojson }}">{% endif %}
                 <div class="space-y-6">
                     <!-- Current and New Value Section -->
                     <div class="grid grid-cols-2 gap-6">

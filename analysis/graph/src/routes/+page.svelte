@@ -1,6 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
   import yaml from 'yaml';
+  import { base } from '$app/paths';
   import {
     MarkerType,
     SvelteFlow,
@@ -11,66 +12,105 @@
     type Node,
     type Edge,
   } from '@xyflow/svelte';
+  import LawNode from './LawNode.svelte';
 
   // Import the styles for Svelte Flow to work
   import '@xyflow/svelte/dist/style.css';
 
+  type Law = {
+    uuid: string;
+    name: string;
+    service: string;
+    properties: {
+      sources?: { name: string }[];
+      input?: { name: string; service_reference?: { service: string; field: string } }[];
+      output?: { name: string }[];
+    };
+  };
+
   // Define the paths to the YAML files
-  const filePaths = [
-    '/law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml',
-    '/law/wet_brp/RvIG-2020-01-01.yaml',
-    '/law/zvw/RVZ-2024-01-01.yaml',
-    '/law/wet_inkomstenbelasting/UWV-2020-01-01.yaml',
-    '/law/penitentiaire_beginselenwet/DJI-2022-01-01.yaml',
-    '/law/wet_forensische_zorg/DJI-2022-01-01.yaml',
-    '/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml',
-  ];
+  let filePaths: string[] = [];
 
   const nodes = writable<Node[]>([]);
   const edges = writable<Edge[]>([]);
 
+  const nodeTypes: any = {
+    law: LawNode,
+  };
+
   (async () => {
     try {
+      // Fetch the available laws from the backend
+      const response = await fetch('/laws/list');
+      filePaths = await response.json();
+
       let i = 0;
 
       const ns: Node[] = [];
       const es: Edge[] = [];
 
-      // Initialize a Set to store unique service names
-      const uniqueServices = new Set<string>();
+      // Initialize a map of service names to their UUIDs
+      const serviceToUUIDsMap = new Map<string, string[]>();
 
-      for (const filePath of filePaths) {
-        // Read the file content
-        const fileContent = await fetch(filePath).then((response) => response.text());
+      const laws: Law[] = await Promise.all(
+        filePaths.map(async (filePath) => {
+          // Read the file content
+          const fileContent = await fetch(`${base}/law/${filePath}`).then((response) =>
+            response.text(),
+          );
 
-        // Parse the YAML content
-        const data = yaml.parse(fileContent);
+          // Parse the YAML content
+          const law = yaml.parse(fileContent) as Law;
 
-        // console.log('data', data);
+          // Populate the map with the service names and their corresponding UUIDs
+          const current = serviceToUUIDsMap.get(law.service);
+          if (current) {
+            serviceToUUIDsMap.set(law.service, [...current, law.uuid]);
+          } else {
+            serviceToUUIDsMap.set(law.service, [law.uuid]);
+          }
 
-        // Add the service name to the Set of unique services
-        uniqueServices.add(data.service);
+          return law;
+        }),
+      );
 
+      // Sort the laws (topological sort)
+      laws.sort((a, b) => {
+        return (
+          (
+            a.properties.input?.filter((input) =>
+              serviceToUUIDsMap.has(input.service_reference?.service as string),
+            ) || []
+          ).length -
+          (
+            b.properties.input?.filter((input) =>
+              serviceToUUIDsMap.has(input.service_reference?.service as string),
+            ) || []
+          ).length
+        );
+      });
+
+      for (const data of laws) {
         const lawID = data.uuid;
 
         // Add parent nodes
         ns.push({
           id: lawID,
-          type: 'default',
+          type: 'law',
           data: { label: data.name }, // Algorithm name
           position: { x: i++ * 400, y: 0 },
           width: 340,
           height:
             Math.max(
-              ((data.properties.sources?.length || 0) + (data.properties.input?.length || 0)) * 50 + 70,
+              ((data.properties.sources?.length || 0) + (data.properties.input?.length || 0)) * 50 +
+                70,
               (data.properties.output?.length || 0) * 50,
-            ) +
-            120,
+            ) + 120,
           class: 'root',
         });
 
         // Sources
-        const sourcesID = `${data.service}-sources`;
+        const sourcesID = `${data.uuid}-sources`;
 
         ns.push({
           id: sourcesID,
@@ -89,7 +129,7 @@
 
         for (const source of data.properties.sources || []) {
           ns.push({
-            id: `${data.service}-source-${source.name}`,
+            id: `${data.uuid}-source-${source.name}`,
             type: 'input',
             data: { label: source.name },
             position: { x: 10, y: (j++ + 1) * 50 },
@@ -101,7 +141,7 @@
         }
 
         // Input
-        const inputsID = `${data.service}-input`;
+        const inputsID = `${data.uuid}-input`;
 
         ns.push({
           id: inputsID,
@@ -119,7 +159,7 @@
         j = 0;
 
         for (const input of data.properties.input || []) {
-          const inputID = `${data.service}-input-${input.name};`;
+          const inputID = `${data.uuid}-input-${input.name};`;
 
           ns.push({
             id: inputID,
@@ -135,23 +175,25 @@
           // If the input has a service reference, show it with an edge
           const ref = input.service_reference;
           if (ref) {
-            const target = `${ref.service}-output-${ref.field}`;
-            es.push({
-              id: `${inputID}-${target}`,
-              source: inputID,
-              target: target,
-              data: { refersToService: ref.service },
-              type: 'bezier',
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-              },
-              zIndex: 1,
-            });
+            for (const uuid of serviceToUUIDsMap.get(ref.service) || []) {
+              const target = `${uuid}-output-${ref.field}`;
+              es.push({
+                id: `${inputID}-${target}`,
+                source: inputID,
+                target: target,
+                data: { refersToService: ref.service },
+                type: 'bezier',
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                },
+                zIndex: 1,
+              });
+            }
           }
         }
 
         // Output
-        const outputsID = `${data.service}-output`;
+        const outputsID = `${data.uuid}-output`;
 
         ns.push({
           id: outputsID,
@@ -170,7 +212,7 @@
 
         for (const output of data.properties.output || []) {
           ns.push({
-            id: `${data.service}-output-${output.name}`,
+            id: `${data.uuid}-output-${output.name}`,
             type: 'output',
             data: { label: output.name },
             position: { x: 10, y: (j++ + 1) * 50 },
@@ -185,12 +227,25 @@
       // Add the nodes to the graph
       $nodes = ns;
 
-      // Add the edges to the graph, but only those that refer to services that are in the Set of unique services
-      $edges = es.filter((edge) => uniqueServices.has(edge.data!.refersToService as string));
+      // Add the edges to the graph
+      $edges = es;
     } catch (error) {
       console.error('Error reading file', error);
     }
   })();
+
+  function handleNodeClick(event: CustomEvent<{ event: MouseEvent | TouchEvent; node: Node }>) {
+    // If the click is on a button.close, remove the node. IMPROVE: remove the child nodes first
+    if ((event.detail.event.target as HTMLElement).closest('.close')) {
+      const node = event.detail.node;
+
+      // Remove the node and all its children (using ID prefix matching)
+      $nodes = $nodes.filter((n) => !n.id.startsWith(node.id));
+
+      // Remove all edges connected to the removed nodes
+      $edges = $edges.filter((e) => !e.source.startsWith(node.id) && !e.target.startsWith(node.id));
+    }
+  }
 </script>
 
 <svelte:head>
@@ -205,12 +260,14 @@ This means that the parent container needs a height to render the flow.
   <SvelteFlow
     {nodes}
     {edges}
+    {nodeTypes}
+    on:nodeclick={handleNodeClick}
     fitView
     nodesConnectable={false}
     proOptions={{
       hideAttribution: true,
     }}
-    minZoom={0.2}
+    minZoom={0.1}
   >
     <Controls showLock={false} />
     <Background variant={BackgroundVariant.Dots} />
@@ -219,9 +276,7 @@ This means that the parent container needs a height to render the flow.
 </div>
 
 <style lang="postcss">
-  :global(.root) {
-    @apply bg-blue-50;
-  }
+  @reference "tailwindcss/theme";
 
   :global(.property-group) {
     @apply bg-blue-100;

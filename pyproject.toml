@@ -40,7 +40,7 @@ line-ending = "lf"
 select = ["I", "SIM", "UP", "F", "LOG", "PIE", "PT", "W"]
 fixable = ["ALL"]
 task-tags = ["TODO"]
-ignore = ["TRY003"]
+ignore = ["TRY003", "SIM105"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

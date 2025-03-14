@@ -1,0 +1,245 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: f8e7d6c5-4321-4f0f-bbbb-123456789abc
+name: Bepalen kinderopvangtoeslag
+law: wet_kinderopvang
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2024-01-01
+service: "TOESLAGEN"
+description: >
+  Regels voor het bepalen van recht op en hoogte van kinderopvangtoeslag volgens
+  de Wet kinderopvang voor het jaar 2025.
+
+references:
+  - law: "Wet kinderopvang"
+    article: "1.5"
+    url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de aanvrager"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "CHILDCARE_KVK"
+      required: true
+      description: "KVK nummer van de kinderopvangorganisatie"
+      type: "string"
+      source_reference:
+        source_type: "claim"
+
+    - name: "DECLARED_HOURS"
+      required: true
+      description: "Opgegeven opvanguren per kind per jaar"
+      type: "array"
+      type_spec:
+        fields:
+          - name: "kind_bsn"
+            type: "enum"
+            enum: "$CHILDREN_BSNS"
+          - name: "uren_per_jaar"
+            type: "number"
+          - name: "uurtarief"
+            type: "amount"
+          - name: "soort_opvang"
+            type: "enum"
+            enum: [ "DAGOPVANG", "BSO" ]
+          - name: "LRK_registratienummer"
+            type: "string"
+      source_reference:
+        source_type: "claim"
+
+    - name: "EXPECTED_PARTNER_HOURS"
+      required: true
+      description: "Verwachte werkuren partner per week volgens contract/werkgeversverklaring"
+      type: "number"
+      type_spec:
+        min: 0
+      source_reference:
+        source_type: "claim"
+
+  input:
+    - name: "INCOME"
+      description: "Toetsingsinkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "PARTNER_BSN"
+      description: "BSN van de partner"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "PARTNER_INCOME"
+      description: "Toetsingsinkomen partner"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "income"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+
+    - name: "CHILDREN_BSNS"
+      description: "BSNs van de kinderen van de aanvrager"
+      type: "array"
+      service_reference:
+        service: "RvIG"
+        field: "children_bsns"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "WORKED_HOURS"
+      description: "Totaal gewerkte uren per jaar"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "worked_hours"
+        law: "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "PARTNER_WORKED_HOURS"
+      description: "Totaal gewerkte uren partner per jaar"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "worked_hours"
+        law: "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+
+  output:
+    - name: "is_eligible"
+      description: "Recht op toeslag"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: secondary
+
+    - name: "yearly_amount"
+      description: "Hoogte toeslag per jaar"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: primary
+
+  definitions:
+    MAX_HOURLY_RATE_DAYCARE: 902  # €9,02
+    MAX_HOURLY_RATE_BSO: 766      # €7,66
+    MAX_HOURS_PER_YEAR: 2760      # 230 uur per maand * 12
+    INCOME_THRESHOLD_1: 3500000   # €35.000
+    INCOME_THRESHOLD_2: 7000000   # €70.000
+    PERCENTAGE_1: 0.96            # 96% vergoeding
+    PERCENTAGE_2: 0.80            # 80% vergoeding
+    PERCENTAGE_3: 0.33            # 33% vergoeding
+    MIN_HOURS_PARTNER: 1040       # Minimaal 20 uur per week * 52 weken
+    MIN_HOURS_PER_WEEK: 20        # Minimum werkuren per week
+
+requirements:
+  - all:
+      - operation: OR
+        values:
+          - subject: "$PARTNER_BSN"
+            operation: "IS_NULL"
+          - operation: OR
+            values:
+              - subject: "$PARTNER_WORKED_HOURS"
+                operation: GREATER_OR_EQUAL
+                value: "$MIN_HOURS_PARTNER"
+              - subject: "$EXPECTED_PARTNER_HOURS"
+                operation: GREATER_OR_EQUAL
+                value: "$MIN_HOURS_PER_WEEK"
+      - subject: "$WORKED_HOURS"
+        operation: GREATER_THAN
+        value: 0
+
+actions:
+  - output: "is_eligible"
+    value: true
+
+  - output: "yearly_amount"
+    operation: FOREACH
+    combine: ADD
+    subject: "$DECLARED_HOURS"
+    value:
+      - operation: MULTIPLY
+        values:
+          - operation: MIN
+            values:
+              - operation: IF
+                conditions:
+                  - test:
+                      subject: "$soort_opvang"
+                      operation: EQUALS
+                      value: "DAGOPVANG"
+                    then: "$MAX_HOURLY_RATE_DAYCARE"
+                  - else: "$MAX_HOURLY_RATE_BSO"
+              - "$uurtarief"
+          - operation: MIN
+            values:
+              - "$uren_per_jaar"
+              - "$MAX_HOURS_PER_YEAR"
+          - operation: IF
+            conditions:
+              - test:
+                  operation: LESS_THAN
+                  values:
+                    - operation: ADD
+                      values:
+                        - "$INCOME"
+                        - operation: IF
+                          conditions:
+                            - test:
+                                subject: "$PARTNER_BSN"
+                                operation: NOT_NULL
+                              then: "$PARTNER_INCOME"
+                            - else: 0
+                    - "$INCOME_THRESHOLD_1"
+                then: "$PERCENTAGE_1"
+              - test:
+                  operation: LESS_THAN
+                  values:
+                    - operation: ADD
+                      values:
+                        - "$INCOME"
+                        - operation: IF
+                          conditions:
+                            - test:
+                                subject: "$PARTNER_BSN"
+                                operation: NOT_NULL
+                              then: "$PARTNER_INCOME"
+                            - else: 0
+                    - "$INCOME_THRESHOLD_2"
+                then: "$PERCENTAGE_2"
+              - else: "$PERCENTAGE_3"

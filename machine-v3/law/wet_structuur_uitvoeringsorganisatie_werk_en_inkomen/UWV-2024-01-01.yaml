@@ -1,0 +1,108 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: c19a458e-3f5e-4d99-a7c3-67a4288aaa07
+name: Bepalen verzekerde jaren 2025
+law: wet_structuur_uitvoeringsorganisatie_werk_en_inkomen
+valid_from: 2024-01-01
+service: "UWV"
+description: >
+  Regels voor het bepalen van verzekerde jaren voor de AOW op basis van werk- en
+  uitkeringsperiodes volgens de Wet SUWI. Dit omvat periodes van werk in Nederland,
+  grensarbeid, detachering en periodes van uitkeringen zoals WW, WIA, etc.
+
+references:
+  - law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+    article: "33"
+    url: "https://wetten.overheid.nl/BWBR0013060/2024-01-01#Hoofdstuk4_Paragraaf4.2_Artikel33"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "EMPLOYMENT_PERIODS"
+      description: "Periodes van werk in Nederland en verzekerde buitenlandse arbeid"
+      type: "array"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "dienstverbanden"
+        fields: ["start_date", "end_date"]
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BENEFIT_PERIODS"
+      description: "Periodes van uitkeringen die meetellen voor de AOW"
+      type: "array"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "uitkeringen"
+        fields: ["start_date", "end_date"]
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+          - name: "type"
+            description: "Uitkerkingen die meetellen"
+            type: "string"
+            value:
+              operation: IN
+              values: "$VALID_BENEFIT_TYPES"
+
+  output:
+    - name: "insured_years"
+      description: "Aantal verzekerde jaren voor AOW-opbouw op basis van werk en uitkeringen"
+      type: "number"
+      type_spec:
+        precision: 2
+        min: 0
+        max: 50
+      temporal:
+        type: "period"
+        period_type: "continuous"
+
+  definitions:
+    VALID_BENEFIT_TYPES:
+      - "WW"
+      - "WIA"
+      - "WAO"
+      - "ZW"
+      - "WAZO"
+    DAYS_PER_YEAR: 365.25
+
+actions:
+  - output: "insured_years"
+    operation: DIVIDE
+    values:
+      - operation: ADD
+        values:
+          # Add up employment periodss
+          - operation: FOREACH
+            combine: ADD
+            subject: "$EMPLOYMENT_PERIODS"
+            value:
+              - operation: SUBTRACT_DATE
+                unit: "days"
+                values:
+                  - "$end_date"
+                  - "$start_date"
+          # Add up benefit periods
+          - operation: FOREACH
+            combine: ADD
+            subject: "$BENEFIT_PERIODS"
+            value:
+              - operation: SUBTRACT_DATE
+                unit: "days"
+                values:
+                  - "$end_date"
+                  - "$start_date"
+      - "$DAYS_PER_YEAR"

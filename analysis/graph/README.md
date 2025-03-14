@@ -2,6 +2,7 @@
 
 ![Screenshot](static/img/screenshot.png)
 
+
 ## Developing
 
 Install the dependencies once with `pnpm install`. Then, start a development server:
@@ -10,13 +11,29 @@ Install the dependencies once with `pnpm install`. Then, start a development ser
 pnpm dev
 ```
 
+(However, this will be broken due to the Python backend not serving from the same domain.)
+
 
 ## Building
 
-To create a production version of your app:
+Should be built using Docker, e.g.:
 
 ```sh
-pnpm build
+docker build -t poc-machine-law .
+docker run --rm -p8000:8000 poc-machine-law
 ```
 
-You can preview the production build with `pnpm preview`.
+The graph is then available under http://localhost:8000/analysis/graph/
+
+
+## Building (alternatively)
+
+```sh
+cd analysis/graph
+pnpm install
+pnpm build
+cd ../..
+uv run web/main.py
+```
+
+The graph is then also available under http://localhost:8000/analysis/graph/

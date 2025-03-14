@@ -232,6 +232,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      citizen_relevance: secondary
 
     - name: "base_rent"
       description: "Basishuur (na aftrek minimale eigen bijdrage)"
@@ -243,6 +244,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: secondary
 
     - name: "subsidy_amount"
       description: "Hoogte van de wet_op_de_huurtoeslag"
@@ -254,6 +256,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
   definitions:
     MINIMUM_AGE: 18

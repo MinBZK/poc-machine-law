@@ -12,7 +12,7 @@
                         <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
                     {% endif %}
                     <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen</p>
+                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
                     </div>
                 </div>
                 <div class="p-2">{{ org_logo(service) }}</div>

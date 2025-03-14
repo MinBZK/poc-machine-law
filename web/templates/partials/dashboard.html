@@ -3,8 +3,11 @@
 <section class="mb-8">
     <div class="flex justify-between items-start">
         <div>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Waar heb ik recht op?</h2>
-            <p class="text-gray-600">Bekijk hier uw toeslagen, uitkeringen en andere regelingen van de overheid.</p>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Waar heb ik recht op? Wat zijn mijn plichten?</h2>
+            <p class="text-gray-600">
+                Bekijk hier uw toeslagen, uitkeringen, aangiften, en andere regelingen van de
+                overheid.
+            </p>
         </div>
         <div class="flex items-center space-x-2">
             <span class="text-sm text-gray-600">Datum: {{ formatted_date }}</span>
@@ -181,13 +184,11 @@
 <section>
     <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-        {% for service, laws in discoverable_service_laws.items() %}
-            {% for law in laws %}
-                <div hx-get="/laws/execute?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}"
-                     hx-trigger="load"
-                     hx-swap="outerHTML"
-                     class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
-            {% endfor %}
+        {% for law in discoverable_service_laws %}
+            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}"
+                 hx-trigger="load"
+                 hx-swap="outerHTML"
+                 class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
         {% endfor %}
     </div>
 </section>
@@ -214,6 +215,18 @@
             <li class="flex items-center">
                 <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
                 <span>Bijstand (Participatiewet)</span>
+            </li>
+            <li class="flex items-center">
+                <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+                <span>Inkomstenbelasting</span>
+            </li>
+            <li class="flex items-center">
+                <span class="w-4 h-4 bg-indigo-200 rounded-full mr-2"></span>
+                <span>Huurtoeslag</span>
+            </li>
+            <li class="flex items-center">
+                <span class="w-4 h-4 bg-pink-200 rounded-full mr-2"></span>
+                <span>Kieswet</span>
             </li>
         </ul>
     </div>

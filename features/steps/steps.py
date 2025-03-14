@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Any
 from unittest import TestCase
 
@@ -12,13 +13,18 @@ assertions = TestCase()
 
 def parse_value(value: str) -> Any:
     """Parse string value to appropriate type"""
+    # Try to parse as JSON
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        pass
+
     # Try to convert to int (for monetary values in cents)
     try:
         return int(value)
     except ValueError:
         pass
 
-    # Return as string for other cases
     return value
 
 
@@ -76,6 +82,27 @@ def evaluate_law(context, service, law, approved=True):
 @when("de {law} wordt uitgevoerd door {service} met wijzigingen")
 def step_impl(context, law, service):
     evaluate_law(context, service, law, approved=False)
+
+
+@when("de {law} wordt uitgevoerd door {service} met")
+def step_impl(context, law, service):
+    if not hasattr(context, "test_data"):
+        context.test_data = {}
+
+    # Process the table to get the input data
+    for row in context.table:
+        key = row.headings[0]
+        value = row[key]
+        # Special handling for JSON-like values
+        if value.startswith('[') or value.startswith('{'):
+            import json
+            try:
+                value = json.loads(value.replace("'", '"'))
+            except json.JSONDecodeError:
+                pass
+        context.test_data[key] = value
+
+    evaluate_law(context, service, law)
 
 
 @when("de {law} wordt uitgevoerd door {service}")
@@ -137,7 +164,12 @@ def compare_euro_amount(actual_amount, amount):
 
 @then('is het toeslagbedrag "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["hoogte_toeslag"]
+    if "hoogte_toeslag" in context.result.output:
+        actual_amount = context.result.output["hoogte_toeslag"]
+    elif "yearly_amount" in context.result.output:
+        actual_amount = context.result.output["yearly_amount"]
+    else:
+        raise ValueError("No toeslag amount found in output")
     compare_euro_amount(actual_amount, amount)
 
 
@@ -413,5 +445,19 @@ def step_impl(context, field, amount):
     assertions.assertEqual(
         actual_amount,
         expected_amount,
-        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent",
+        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent")
+
+
+@then("heeft de persoon recht op kinderopvangtoeslag")
+def step_impl(context):
+    assertions.assertTrue(
+        "is_eligible" in context.result.output and context.result.output["is_eligible"],
+        "Expected person to be eligible for childcare allowance, but they were not",
+    )
+
+@then("heeft de persoon geen recht op kinderopvangtoeslag")
+def step_impl(context):
+    assertions.assertFalse(
+        "is_eligible" not in context.result.output or not context.result.output["is_eligible"],
+        "Expected person to NOT be eligible for childcare allowance, but they were",
     )

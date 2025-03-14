@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # Don't use 'set -e' here as we want to handle errors manually
 
 # Set up variables

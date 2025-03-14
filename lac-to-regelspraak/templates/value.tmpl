@@ -1,0 +1,3 @@
+{{- if .Subject }}<span style="color:{{ FormatColor .Subject }}">{{ .Subject }}</span> {{end}}
+{{- if .Operation }}{{ .Operation | FormatOperation }} {{end -}}
+<span style="color:{{ FormatColor .Value }}">{{- .Value }}</span>

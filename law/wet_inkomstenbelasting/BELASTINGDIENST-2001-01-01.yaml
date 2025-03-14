@@ -1,6 +1,6 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
-name: Berekening Inkomstenbelasting
+name: Inkomstenbelasting
 law: wet_inkomstenbelasting
 valid_from: 2001-01-01
 law_type: "FORMELE_WET"
@@ -584,6 +584,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: primary
 
     - name: "box1_income"
       description: "Belastbaar inkomen uit werk en woning (box 1)"

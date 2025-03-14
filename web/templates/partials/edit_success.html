@@ -1,4 +1,5 @@
-<div class="bg-green-50 p-4 rounded-md">
+<div class="bg-green-50 p-4 rounded-md"
+     x-data="{ isEurocent: function() { return {{ (details is defined and details and details.type == 'amount' and details.type_spec and details.type_spec.unit == 'eurocent')|tojson }}; }, displayValue: function(val) { if (this.isEurocent() && typeof val === 'number') { return '€' + (val / 100).toFixed(2); } else if (typeof val === 'boolean') { return val ? 'Ja' : 'Nee'; } return val; } }">
     <div class="flex">
         <div class="flex-shrink-0">
             <svg class="h-5 w-5 text-green-400"
@@ -12,7 +13,8 @@
                 {% if key == "Benodigde gegevens" %}
                     Alle benodigde gegevens zijn bijgewerkt
                 {% else %}
-                    Waarde succesvol bijgewerkt
+                    Waarde succesvol bijgewerkt:
+                    <span x-text="displayValue({{ new_value|tojson }})"></span>
                 {% endif %}
             </p>
         </div>

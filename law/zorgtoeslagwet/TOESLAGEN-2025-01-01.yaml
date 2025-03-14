@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: b87fbf5e-98d7-45a5-b82c-04ef64bae452
 name: Zorgtoeslag
 law: zorgtoeslagwet
@@ -38,6 +38,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: secondary
 
     - name: "hoogte_toeslag"
       description: "De hoogte van de zorgtoeslag"
@@ -49,6 +50,7 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      citizen_relevance: primary
 
   input:
     - name: "AGE"

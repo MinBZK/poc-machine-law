@@ -2,9 +2,11 @@
 __pycache__/
 *.py[oc]
 build/
+!analysis/graph/build
 dist/
 wheels/
 *.egg-info
+.vscode
 
 # Virtual environments
 .venv

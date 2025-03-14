@@ -241,6 +241,8 @@ class RulesEngine:
 
     async def _evaluate_action(self, action, context):
         with logger.indent_block(f"Computing {action.get('output', '')}"):
+            if action["output"] == "partner_bsn":
+                pass
             action_node = PathNode(
                 type="action",
                 name=f"Evaluate action for {action.get('output', '')}",
@@ -260,10 +262,13 @@ class RulesEngine:
             ):
                 raw_result = context.overwrite_input[self.service_name][output_name]
                 logger.debug(f"Resolving value {self.service_name}/{output_name} from OVERWRITE {raw_result}")
+            elif "operation" in action:
+                raw_result = await self._evaluate_operation(action, context)
             elif "value" in action:
                 raw_result = await self._evaluate_value(action["value"], context)
             else:
-                raw_result = await self._evaluate_operation(action, context)
+                raw_result = None
+
             result = self._enforce_output_type(output_name, raw_result)
         action_node.result = result
         logger.debug(f"Result of {action.get('output', '')}: {result}")
@@ -308,9 +313,6 @@ class RulesEngine:
                         if not bool(result):
                             logger.debug("False value found in an ALL, no need to compute the rest, breaking.")
                             break
-                        if context.missing_required:
-                            logger.warning("Missing required values, breaking")
-                            break
                     result = all(results)
                 elif "or" in req:
                     results = []
@@ -319,9 +321,6 @@ class RulesEngine:
                         results.append(result)
                         if bool(result):
                             logger.debug("True value found in an OR, no need to compute the rest, breaking.")
-                            break
-                        if context.missing_required:
-                            logger.warning("Missing required values, breaking")
                             break
                     result = any(results)
                 else:
@@ -339,48 +338,54 @@ class RulesEngine:
 
     async def _evaluate_if_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
         """Evaluate an IF operation"""
-        if_node = PathNode(
-            type="operation",
-            name="IF conditions",
-            result=None,
-            details={"condition_results": []},
-        )
-        context.add_to_path(if_node)
+        with logger.indent_block("Evaluating IF"):
+            if_node = PathNode(
+                type="operation",
+                name="IF conditions",
+                result=None,
+                details={"condition_results": []},
+            )
+            context.add_to_path(if_node)
 
-        result = 0
-        conditions = operation.get("conditions", [])
+            result = 0
+            conditions = operation.get("conditions", [])
 
-        for i, condition in enumerate(conditions):
-            condition_result = {
-                "condition_index": i,
-                "type": "test" if "test" in condition else "else",
-            }
+            for i, condition in enumerate(conditions):
+                condition_result = {
+                    "condition_index": i,
+                    "type": "test" if "test" in condition else "else",
+                }
 
-            if "test" in condition:
-                test_result = await self._evaluate_operation(condition["test"], context)
-                condition_result["test_result"] = test_result
-                if test_result:
-                    result = await self._evaluate_value(condition["then"], context)
-                    condition_result["then_value"] = result
+                if "test" in condition:
+                    test_result = await self._evaluate_operation(condition["test"], context)
+                    condition_result["test_result"] = test_result
+                    if test_result:
+                        result = await self._evaluate_value(condition["then"], context)
+                        if_node.details["condition_results"].append(condition_result)
+                        logger.debug(f"THEN condition: {result}")
+                        break
+                elif "else" in condition:
+                    result = await self._evaluate_value(condition["else"], context)
+                    condition_result["else_value"] = result
                     if_node.details["condition_results"].append(condition_result)
+                    logger.debug(f"ELSE condition: {result}")
                     break
-            elif "else" in condition:
-                result = await self._evaluate_value(condition["else"], context)
-                condition_result["else_value"] = result
+
                 if_node.details["condition_results"].append(condition_result)
-                break
 
-            if_node.details["condition_results"].append(condition_result)
-
-        if_node.result = result
-        context.pop_path()
-        return result
+            if_node.result = result
+            context.pop_path()
+            return result
 
     async def _evaluate_foreach(self, operation, context):
         """Handle FOREACH operation"""
+        logger.debug("For each condition")
+
         combine = operation.get("combine")
 
         array_data = await self._evaluate_value(operation["subject"], context)
+        if "DECLARED_HOURS" in operation["subject"]:
+            pass
         if not array_data:
             logger.warning("No data found to run FOREACH on")
             return self._evaluate_aggregate_ops(combine, [])
@@ -393,14 +398,21 @@ class RulesEngine:
             for item in array_data:
                 with logger.indent_block(f"Item {item}"):
                     item_context = copy(context)
-                    item_context.local = item
+                    if isinstance(item, dict):
+                        item_context.local.update(item)
+                    for i in range(100):
+                        if f"current_{i}" not in item_context.local:
+                            item_context.local[f"current_{i}"] = item
+                            break
                     value_to_evaluate = (
                         operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
                     )
                     result = await self._evaluate_value(value_to_evaluate, item_context)
+                    context.missing_required = context.missing_required or item_context.missing_required
+                    context.path = item_context.path
                     values.extend(result if isinstance(result, list) else [result])
             logger.debug(f"Foreach values: {values}")
-            result = self._evaluate_aggregate_ops(combine, values)
+            result = self._evaluate_aggregate_ops(combine, values) if combine else values
             logger.debug(f"Foreach result: {result}")
         return result
 
@@ -464,7 +476,7 @@ class RulesEngine:
         return result
 
     @staticmethod
-    def _evaluate_date_operation(op: str, values: list[Any], unit: str) -> int:
+    def _evaluate_date_operation(op: str, values: list[Any], unit: str, context: RuleContext) -> int:
         """Handle date-specific operations"""
         result = None
         if op == "SUBTRACT_DATE":
@@ -473,6 +485,9 @@ class RulesEngine:
                 return 0
 
             end_date, start_date = values
+
+            if not end_date:
+                end_date = context.calculation_date
 
             if not isinstance(end_date, datetime):
                 end_date = datetime.fromisoformat(str(end_date))
@@ -568,6 +583,13 @@ class RulesEngine:
             subject = await self._evaluate_value(operation["subject"], context)
             result = subject is not None
             node.details["subject_value"] = subject
+            logger.debug(f"NOT_NULL result: {result}")
+
+        elif op_type == "IS_NULL":
+            subject = await self._evaluate_value(operation["subject"], context)
+            result = subject is None
+            node.details["subject_value"] = subject
+            logger.debug(f"IS_NULL result: {result}")
 
         elif op_type == "AND":
             with logger.indent_block("AND"):
@@ -599,7 +621,7 @@ class RulesEngine:
         elif "_DATE" in op_type:
             values = [await self._evaluate_value(v, context) for v in operation["values"]]
             unit = operation.get("unit", "days")
-            result = self._evaluate_date_operation(op_type, values, unit)
+            result = self._evaluate_date_operation(op_type, values, unit, context)
             node.details.update({"evaluated_values": values, "unit": unit})
 
         elif op_type in self.COMPARISON_OPS:
@@ -656,7 +678,7 @@ class RulesEngine:
 
     async def _evaluate_value(self, value: Any, context: RuleContext) -> Any:
         """Evaluate a value which might be a number, operation, or reference"""
-        if isinstance(value, int | float | bool | date | datetime):
+        if isinstance(value, int | float | bool | date | datetime) or value is None:
             return value
         elif isinstance(value, dict) and "operation" in value:
             return await self._evaluate_operation(value, context)

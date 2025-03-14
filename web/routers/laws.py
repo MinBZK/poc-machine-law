@@ -1,8 +1,10 @@
 import json
+import os
 from urllib.parse import unquote
 
 import pandas as pd
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_service import llm_service
@@ -34,22 +36,39 @@ async def evaluate_law(bsn: str, law: str, service: str, services: Services, app
     if not rule_spec:
         raise HTTPException(status_code=400, detail="Invalid law specified")
 
-    # Get profile data for the BSN
-    profile_data = get_profile_data(bsn)
-    if not profile_data:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    # Load source data into services
-    for service_name, tables in profile_data["sources"].items():
-        for table_name, data in tables.items():
-            df = pd.DataFrame(data)
-            services.set_source_dataframe(service_name, table_name, df)
+    await set_profile_data(bsn, services)
 
     parameters = {"BSN": bsn}
 
     # Execute the law
     result = await services.evaluate(service, law=law, parameters=parameters, reference_date=TODAY, approved=approved)
     return law, result, rule_spec, parameters
+
+
+async def set_profile_data(bsn, services):
+    # Get profile data for the BSN
+    profile_data = get_profile_data(bsn)
+    if not profile_data:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    # Load source data into services
+    for service_name, tables in profile_data["sources"].items():
+        for table_name, data in tables.items():
+            df = pd.DataFrame(data)
+            services.set_source_dataframe(service_name, table_name, df)
+
+
+@router.get("/list")
+async def list_laws():
+    """List all available law files"""
+
+    laws_dir = os.path.join(os.path.dirname(__file__), "../../law")
+    law_files = []
+    for root, _, files in os.walk(laws_dir):
+        for file in files:
+            if file.endswith(".yaml"):  # Return only YAML files
+                law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
+
+    return JSONResponse(content=law_files)
 
 
 @router.get("/execute")
@@ -64,7 +83,7 @@ async def execute_law(
     try:
         law = unquote(law)
         law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=False)
-    except Exception:
+    except Exception as e:
         return templates.TemplateResponse(
             get_tile_template(service, law),
             {
@@ -74,6 +93,7 @@ async def execute_law(
                 "service": service,
                 "rule_spec": {"name": law.split("/")[-1].replace("_", " ").title()},
                 "error": True,
+                "message": str(e),
             },
         )
 
@@ -181,7 +201,7 @@ async def objection_case(
     )
 
 
-def node_to_dict(node):
+def node_to_dict(node, skip_services=False):
     """Convert PathNode to serializable dict"""
     if node is None:
         return None
@@ -190,7 +210,9 @@ def node_to_dict(node):
         "name": node.name,
         "result": str(node.result),
         "details": {k: str(v) for k, v in node.details.items()},
-        "children": [node_to_dict(child) for child in node.children],
+        "children": []
+        if skip_services and node.type == "service_evaluation"
+        else [node_to_dict(child, skip_services=skip_services) for child in node.children],
     }
 
 
@@ -209,7 +231,7 @@ async def explanation(
         law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
 
         # Convert path and rule_spec to JSON strings
-        path_dict = node_to_dict(result.path)
+        path_dict = node_to_dict(result.path, skip_services=True)
         path_json = json.dumps(path_dict, ensure_ascii=False, indent=2)
 
         # Filter relevant parts of rule_spec

@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: b1d3a15b-45a2-44a3-b26a-d636785032c0
 name: Bijstand Gemeente Amsterdam
 law: participatiewet/bijstand
@@ -56,6 +56,10 @@ properties:
     - name: "NATIONAL_BASE_AMOUNT"
       description: "Landelijke bijstandsnorm"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "SZW"
         field: "base_amount"
@@ -122,6 +126,10 @@ properties:
     - name: "BUSINESS_INCOME"
       description: "Inkomsten uit onderneming"
       type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
       service_reference:
         service: "BELASTINGDIENST"
         field: "business_income"
@@ -137,6 +145,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      citizen_relevance: secondary
 
     - name: "benefit_amount"
       description: "Uitkeringsbedrag inclusief toeslagen"
@@ -148,6 +157,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
     - name: "housing_assistance"
       description: "Woonkostentoeslag bij briefadres"
@@ -159,6 +169,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
     - name: "startup_assistance"
       description: "Bedrag voor bedrijfskapitaal ZZP"
@@ -170,11 +181,13 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
   definitions:
     YOUTH_SUPPLEMENT: 25000  # 250 euro voor jongeren
     YOUTH_MAX_AGE: 27
     ZZP_INCOME_DISREGARD_PERCENTAGE: 0.20  # 20% vrijlating ondernemersinkomen
+    MONTHS_IN_YEAR: 12  # Aantal maanden in een jaar voor omrekening
     HOUSING_ASSISTANCE_AMOUNT: 60000  # 600 euro woonkostentoeslag
     STARTUP_ASSISTANCE_MAX: 200000  # 2000 euro max bedrijfskapitaal
     RE_INTEGRATION_SUPPLEMENT: 15000  # 150 euro toeslag tijdens re-integratie
@@ -247,10 +260,25 @@ actions:
                   values:
                     - "$BUSINESS_INCOME"
                     - 0
+                - operation: LESS_THAN
+                  values:
+                    # Maandinkomen berekenen en vergelijken met bijstandsnorm
+                    - operation: DIVIDE
+                      values:
+                        - "$BUSINESS_INCOME"
+                        - "$MONTHS_IN_YEAR"
+                    - operation: MULTIPLY
+                      values:
+                        - "$NATIONAL_BASE_AMOUNT"
+                        - "$KOSTENDELERSNORM"
             then:
+              # Alleen 20% van het maandinkomen vrijlaten
               operation: MULTIPLY
               values:
-                - "$BUSINESS_INCOME"
+                - operation: DIVIDE
+                  values:
+                    - "$BUSINESS_INCOME"
+                    - "$MONTHS_IN_YEAR"
                 - "$ZZP_INCOME_DISREGARD_PERCENTAGE"
           - else: 0
       # Re-integratie toeslag
@@ -288,7 +316,13 @@ actions:
               value: true
             - operation: LESS_THAN
               values:
-                - "$BUSINESS_INCOME"
-                - "$NATIONAL_BASE_AMOUNT"
+                - operation: DIVIDE
+                  values:
+                    - "$BUSINESS_INCOME"
+                    - "$MONTHS_IN_YEAR"
+                - operation: MULTIPLY
+                  values:
+                    - "$NATIONAL_BASE_AMOUNT"
+                    - "$KOSTENDELERSNORM"
         then: "$STARTUP_ASSISTANCE_MAX"
       - else: 0

@@ -27,7 +27,7 @@ def group_cases_by_status(cases):
 @router.get("/")
 async def admin_redirect(request: Request, services: Services = Depends(get_services)):
     """Redirect to first available service"""
-    discoverable_laws = services.get_discoverable_service_laws()
+    discoverable_laws = await services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
     return RedirectResponse(f"/admin/{available_services[0]}")
 
@@ -55,7 +55,7 @@ async def post_reset(request: Request, services: Services = Depends(get_services
 @router.get("/{service}")
 async def admin_dashboard(request: Request, service: str, services: Services = Depends(get_services)):
     """Main admin dashboard view"""
-    discoverable_laws = services.get_discoverable_service_laws()
+    discoverable_laws = await services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
 
     # Get cases for selected service

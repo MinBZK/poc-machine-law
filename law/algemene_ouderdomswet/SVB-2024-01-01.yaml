@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
 name: AOW-uitkering
 law: algemene_ouderdomswet
@@ -239,6 +239,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      citizen_relevance: secondary
 
     - name: "base_amount"
       description: "Basis AOW-bedrag voor opbouw"
@@ -250,6 +251,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: secondary
 
     - name: "accrual_percentage"
       description: "Opbouwpercentage AOW"
@@ -261,6 +263,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      citizen_relevance: secondary
 
     - name: "pension_amount"
       description: "Uiteindelijke AOW-uitkering"
@@ -272,6 +275,7 @@ properties:
       temporal:
         type: "period"
         period_type: "month"
+      citizen_relevance: primary
 
   definitions:
     YEARS_FOR_FULL_PENSION: 50

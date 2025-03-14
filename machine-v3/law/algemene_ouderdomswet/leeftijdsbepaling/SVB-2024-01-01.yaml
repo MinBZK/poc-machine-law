@@ -1,0 +1,255 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.2/schema.json
+uuid: 47fa262a-b8f7-43bf-a5dd-5f9b2d2c1228
+name: Bepalen AOW-leeftijd 2025
+law: algemene_ouderdomswet/leeftijdsbepaling
+valid_from: 2024-01-01
+service: "SVB"
+description: >
+  Regels voor het bepalen van de AOW-leeftijd volgens de Algemene Ouderdomswet.
+  De AOW-leeftijd is sinds 2013 stapsgewijs verhoogd van 65 jaar naar 67 jaar en wordt
+  vanaf 2025 gekoppeld aan de levensverwachting. Een verhoging wordt vijf jaar van
+  tevoren aangekondigd. De eerste volgende herberekening is in 2025 voor het jaar 2030.
+
+references:
+  - law: "Algemene Ouderdomswet"
+    article: "7a"
+    url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+  - law: "Wet temporisering verhoging AOW-leeftijd"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0042381/2024-01-01#Artikel1"
+  - law: "Wet verandering koppeling AOW-leeftijd"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0045566/2024-01-01#Artikel1"
+
+properties:
+  parameters:
+    - name: "BIRTH_DATE"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      required: true
+
+  input:
+    - name: "LIFE_EXPECTANCY_65"
+      description: "Resterende levensverwachting op 65-jarige leeftijd"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 2
+      service_reference:
+        service: "CBS"
+        law: "wet_op_het_centraal_bureau_voor_de_statistiek"
+        field: "life_expectancy_65"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  output:
+    - name: "retirement_age"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 2
+        min: 65
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    BASE_RETIREMENT_AGE: 65
+    # Verhogingen per jaar in maanden
+    INCREASE_2013: 1    # 65 jaar + 1 maand
+    INCREASE_2014: 2    # 65 jaar + 2 maanden
+    INCREASE_2015: 3    # 65 jaar + 3 maanden
+    INCREASE_2016: 6    # 65 jaar + 6 maanden
+    INCREASE_2017: 9    # 65 jaar + 9 maanden
+    INCREASE_2018: 12   # 66 jaar
+    INCREASE_2019: 16   # 66 jaar + 4 maanden
+    INCREASE_2020: 16   # 66 jaar + 4 maanden (temporisering)
+    INCREASE_2021: 18   # 66 jaar + 6 maanden
+    INCREASE_2022: 21   # 66 jaar + 9 maanden
+    INCREASE_2023: 24   # 67 jaar
+    INCREASE_2024: 24   # 67 jaar
+    INCREASE_2025: 24   # 67 jaar
+    # Referentiewaarden voor levensverwachting
+    REFERENCE_AGE: 65
+    REFERENCE_LIFE_EXPECTANCY: 20.00  # Referentiewaarde uit de wet
+    MONTHS_INCREASE_PER_YEAR: 3       # Maximaal 3 maanden verhoging per jaar
+    # Periode tussen aankondiging en implementatie
+    ANNOUNCEMENT_PERIOD_YEARS: 5
+
+requirements:
+  - all:
+      - subject: "$BIRTH_DATE"
+        operation: NOT_NULL
+
+actions:
+  - output: "retirement_age"
+    operation: ADD
+    values:
+      - "$BASE_RETIREMENT_AGE"
+      - operation: IF
+        conditions:
+          # Voor 1948 geboren: 65 jaar
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1948-01-01"
+            then: 0
+          # 1948: 65 + 1 maand
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1949-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2013"
+                - 12
+          # 1949: 65 + 2 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1950-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2014"
+                - 12
+          # 1950: 65 + 3 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1951-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2015"
+                - 12
+          # 1951: 65 + 6 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1952-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2016"
+                - 12
+          # 1952: 65 + 9 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1953-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2017"
+                - 12
+          # 1953: 66 jaar
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1954-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2018"
+                - 12
+          # 1954: 66 + 4 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1955-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2019"
+                - 12
+          # 1955: 66 + 4 maanden (temporisering)
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1956-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2020"
+                - 12
+          # 1956: 66 + 7 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1957-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2021"
+                - 12
+          # 1957: 66 + 10 maanden
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1958-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2022"
+                - 12
+          # 1958: 67 jaar
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1959-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2023"
+                - 12
+          # 1959: 67 jaar
+          - test:
+              operation: LESS_THAN
+              values:
+                - "$BIRTH_DATE"
+                - "1960-01-01"
+            then:
+              operation: DIVIDE
+              values:
+                - "$INCREASE_2024"
+                - 12
+          # Na 1960: koppeling aan levensverwachting
+          - else:
+              operation: IF
+              conditions:
+                - test:
+                    operation: GREATER_THAN
+                    values:
+                      - "$LIFE_EXPECTANCY_65"
+                      - "$REFERENCE_LIFE_EXPECTANCY"
+                  then:
+                    operation: MIN
+                    values:
+                      - operation: MULTIPLY
+                        values:
+                          - operation: SUBTRACT
+                            values:
+                              - "$LIFE_EXPECTANCY_65"
+                              - "$REFERENCE_LIFE_EXPECTANCY"
+                          - operation: DIVIDE
+                            values:
+                              - "$MONTHS_INCREASE_PER_YEAR"
+                              - 12
+                      - 2  # Maximaal 2 jaar extra verhoging
+                  else: 0

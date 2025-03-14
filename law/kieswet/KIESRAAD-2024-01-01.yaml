@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.3/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
 uuid: 96d926a0-b45f-4cf3-92af-01b167221a00
 name: Kiesrecht Tweede Kamer
 law: kieswet
@@ -95,6 +95,7 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$ELECTION_DATE"
+      citizen_relevance: primary
 
   definitions:
     MINIMUM_AGE: 18

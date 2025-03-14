@@ -1,7 +1,7 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
     {% include "partials/tiles/law/participatiewet/bijstand/GEMEENTE_AMSTERDAM/computation.html" %}
-    {% if result.hoogte_toeslag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+    {% if result.benefit_amount and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.benefit_amount != current_case.claimed_result.benefit_amount %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
