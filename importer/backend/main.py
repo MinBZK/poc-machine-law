@@ -171,7 +171,7 @@ analyize_law_prompt = ChatPromptTemplate(
                 {
                     "type": "document",
                     "title": "Voorbeeld 1",
-                    "text": fetch_and_format_data(
+                    "text": fetch_and_format_data(  # IMPROVE: get locally, dynamically
                         "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/zvw/RVZ-2024-01-01.yaml"
                     ),
                 },
@@ -245,7 +245,7 @@ def process_law_feedback(state: State, config: Dict) -> Dict:
     user_input = interrupt("process_law_feedback")
 
     # If the user wants to analyze the law, validate it against the schema
-    if user_input.lower() in ("analyze", "analyseer"):
+    if "analyseer" in user_input.lower():
         print("----> analyzing YAML content")
 
         validation_errors = []
@@ -390,15 +390,25 @@ async def websocket_endpoint(websocket: WebSocket):
             # Process the received data through the workflow
             print("message received:", user_input)
 
+            contains_yaml = False
+            chunk_content_so_far = ""
             for chunk, _ in graph.stream(
                 Command(resume=user_input),
                 {"configurable": {"thread_id": thread_id}},
                 stream_mode="messages",
             ):
+                if not contains_yaml:
+                    chunk_content_so_far += chunk.content
+                    if "```yaml" in chunk_content_so_far:
+                        contains_yaml = True
+
                 # If the chunk contains response_metadata.stop_reason "max_tokens", then add a quick reply to continue
                 quick_replies = []
-                if chunk.response_metadata.get("stop_reason") == "max_tokens":
+                stop_reason = chunk.response_metadata.get("stop_reason")
+                if stop_reason == "max_tokens":
                     quick_replies = ["Ga door"]
+                elif contains_yaml and stop_reason == "end_turn":
+                    quick_replies = ["Analyseer deze YAML-code"]
 
                 await manager.send_message(
                     WebSocketMessage(
