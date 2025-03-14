@@ -22,7 +22,12 @@ import jsonschema
 import re
 
 
-model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, max_retries=2)
+model = ChatAnthropic(
+    model="claude-3-5-sonnet-latest",
+    temperature=0,
+    max_retries=2,
+    max_tokens_to_sample=4000,  # Note: default is 1024 tokens
+)
 
 # Retriever to find the specified law online
 retriever = TavilySearchAPIRetriever(
@@ -154,7 +159,7 @@ with open("../../schema/v0.1.3/schema.json") as sf:
 analyize_law_prompt = ChatPromptTemplate(
     [
         SystemMessage(
-            "Je bent een AI-agent die wetteksten kan analyseren en omzetten naar YAML-formaat. Tutoyeer de gebruiker. Je JSON-output moet gebaseerd zijn op dit JSON-schema: ```json\n{schema_content}\n```\nReturn de output direct, zonder uitleg of aanvullende tekst."
+            "Je bent een AI-agent die wetteksten kan analyseren en omzetten naar YAML-formaat. Tutoyeer de gebruiker. Je YAML output moet gebaseerd zijn op dit JSON schema: ```json\n{schema_content}\n```\nReturn de output direct, *in YAML-formaat*, zonder uitleg of aanvullende tekst. Begin de YAML output met ```yaml.",
         ),
         (
             "user",
@@ -184,7 +189,7 @@ analyize_law_prompt = ChatPromptTemplate(
             [
                 {
                     "type": "text",
-                    "text": "Ik wil nu hetzelfde doen voor de volgende wettekst. Analyseer de wet grondig! Dan wil ik graag eerst stap voor stap zien wat de wet doet. Wie het uitvoert. Waar de wet van afhankelijk is. En dan graag per uitvoeringsorganisatie een YAML file precies zoals de voorbeelden (verzin geen nieuwe velden/operations/...).",
+                    "text": "Ik wil nu hetzelfde doen voor de volgende wettekst. Analyseer de wet grondig! Ik wil graag per uitvoeringsorganisatie een YAML file die de wet modelleert, precies zoals de voorbeelden (verzin geen nieuwe velden/operations/...).",
                 },
                 {
                     "type": "document",
@@ -261,14 +266,12 @@ def process_law_feedback(state: State, config: Dict) -> Dict:
                 validation_errors.append(err)
 
         if validation_errors:
-            user_input = (
-                f"Er zijn fouten gevonden in de YAML-output:\n```\n{"\n".join(validation_errors)}\n```"
-            )
+            user_input = f"Er zijn fouten gevonden in de YAML output:\n```\n{"\n".join(validation_errors)}\n```"
         else:
-            user_input = "De YAML-output is correct!"
+            user_input = "De YAML output lijkt correct."  # IMPROVE: validate agains the Girkin tables
 
     thread_id = config["configurable"]["thread_id"]
-    
+
     loop.run_until_complete(
         manager.send_message(
             WebSocketMessage(
@@ -392,8 +395,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 {"configurable": {"thread_id": thread_id}},
                 stream_mode="messages",
             ):
+                # If the chunk contains response_metadata.stop_reason "max_tokens", then add a quick reply to continue
+                quick_replies = []
+                if chunk.response_metadata.get("stop_reason") == "max_tokens":
+                    quick_replies = ["Ga door"]
+
                 await manager.send_message(
-                    WebSocketMessage(id=chunk.id, content=chunk.content),
+                    WebSocketMessage(
+                        id=chunk.id, content=chunk.content, quick_replies=quick_replies
+                    ),
                     thread_id,
                 )
 
