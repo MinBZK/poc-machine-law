@@ -2,6 +2,12 @@
   import { focusElement } from '$lib';
   import { tick } from 'svelte';
   import Markdown from 'svelte-exmarkdown';
+  import { highlightPlugin } from './highlight-plugin';
+  import 'highlight.js/styles/github-dark.css';
+  // import PreWithCopyButton from './PreWithCopyButton.svelte';
+  // const copyButtonPlugin = {
+  //   renderer: { pre: PreWithCopyButton }
+  // };
 
   type Message = {
     id: string;
@@ -95,7 +101,7 @@
       {#if message.isOwn}
         <div class="message own">{message.content}</div>
       {:else}
-        <div class="message"><Markdown md={message.content} /></div>
+        <div class="message"><Markdown md={message.content} plugins={[highlightPlugin]} /></div>
       {/if}
     {/each}
 
@@ -183,6 +189,10 @@
   }
 
   :global(.message pre) {
-    @apply overflow-x-auto rounded-sm bg-gray-800 px-3 py-2 text-sm text-white;
+    @apply overflow-x-auto rounded-sm bg-gray-900 px-3 py-2 text-sm text-white;
+  }
+
+  :global(pre code.hljs) {
+    @apply !p-0 !bg-transparent;
   }
 </style>
