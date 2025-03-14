@@ -18,6 +18,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "uvicorn>=0.34.0",
+    "websockets>=15.0.1",
 ]
 
 [dependency-groups]

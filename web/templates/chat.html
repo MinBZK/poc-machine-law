@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% block content %}
+    <!-- Add Tailwind Typography for markdown styling -->
+    <style>
+    /* Custom typography styles for chat messages - more compact */
+    .prose h1, .prose h2, .prose h3, .prose h4 {
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+    }
+    .prose h1 { font-size: 1.3em; }
+    .prose h2 { font-size: 1.2em; }
+    .prose h3 { font-size: 1.1em; }
+    .prose p { margin-top: 0.3em; margin-bottom: 0.3em; }
+    .prose ul, .prose ol {
+        margin-top: 0.15em;
+        margin-bottom: 0.15em;
+        padding-left: 1.2em;
+    }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose li { margin-bottom: 0.1em; }
+    .prose code {
+        background-color: rgba(0,0,0,0.05);
+        padding: 0.1em 0.2em;
+        border-radius: 0.2em;
+        font-size: 0.9em;
+    }
+    .prose pre {
+        background-color: rgba(0,0,0,0.05);
+        padding: 0.3em;
+        border-radius: 0.3em;
+        overflow-x: auto;
+        margin: 0.3em 0;
+    }
+    .prose table {
+        border-collapse: collapse;
+        margin: 0.3em 0;
+        font-size: 0.85em;
+    }
+    .prose table th, .prose table td {
+        border: 1px solid #ddd;
+        padding: 0.15em 0.3em;
+        text-align: left;
+    }
+    .prose table th {
+        background-color: rgba(0,0,0,0.05);
+    }
+    .prose blockquote {
+        border-left: 2px solid #ddd;
+        padding-left: 0.5em;
+        color: #666;
+        margin: 0.3em 0;
+    }
+    </style>
+    <div class="flex flex-col h-[calc(100vh-120px)]"
+         x-data="chatApp()"
+         x-init="init('{{ bsn }}')">
+        <!-- Header section -->
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Chat over wetten en regels</h2>
+            <p class="text-gray-600 mb-4">Stel uw vraag over wetten, toeslagen, uitkeringen of andere regelingen.</p>
+        </div>
+        <!-- Main chat container -->
+        <div class="flex flex-col bg-white rounded-lg shadow overflow-hidden flex-grow relative">
+            <!-- Scrollable message area that fills available space -->
+            <div class="overflow-y-auto p-4 space-y-3 absolute inset-0 bottom-16"
+                 id="chat-messages"
+                 x-ref="chatContainer">
+                <!-- Welcome Message -->
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 bg-blue-200 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5 text-blue-700"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 max-w-3xl">
+                        <p class="text-gray-800">
+                            Hallo {{ profile.name }}! Ik ben Buro, uw digitale assistent. Ik kan u helpen met vragen over wetten en regelingen. Wat wilt u weten?
+                        </p>
+                    </div>
+                </div>
+                <!-- Dynamic Messages -->
+                <template x-for="(message, index) in messages" :key="index">
+                    <div :class="message.isUser ? 'flex items-start justify-end' : 'flex items-start'">
+                        <!-- Bot Avatar -->
+                        <template x-if="!message.isUser">
+                            <div class="flex-shrink-0 bg-blue-200 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-5 w-5 text-blue-700"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                </svg>
+                            </div>
+                        </template>
+                        <!-- Message Content -->
+                        <div :class="message.isUser ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'"
+                             class="rounded-lg px-4 py-2 max-w-3xl prose prose-sm"
+                             x-html="formatMessage(message.text)"></div>
+                        <!-- User Avatar -->
+                        <template x-if="message.isUser">
+                            <div class="flex-shrink-0 bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center ml-3">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-5 w-5 text-gray-700"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <!-- Loading Indicator -->
+                <div x-show="isLoading" class="flex items-start">
+                    <div class="flex-shrink-0 bg-blue-200 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5 text-blue-700"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 space-x-1">
+                        <span class="animate-pulse">•</span>
+                        <span class="animate-pulse animation-delay-200">•</span>
+                        <span class="animate-pulse animation-delay-400">•</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fixed position Chat Input at bottom of message container -->
+        <div class="absolute bottom-0 left-0 right-0 border-t bg-white z-10">
+            <form @submit.prevent="sendMessage" class="flex px-4 py-3">
+                <input type="text"
+                       x-model="newMessage"
+                       class="flex-grow focus:outline-none"
+                       placeholder="Stel uw vraag..."
+                       @keydown.enter="sendMessage">
+                <button type="submit"
+                        class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-6 w-6"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- Add Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+    function chatApp() {
+        return {
+            websocket: null,
+            messages: [],
+            newMessage: '',
+            isLoading: false,
+            bsn: '',
+
+            init(bsn) {
+                this.bsn = bsn || '100000001'; // Default BSN if none provided
+                console.log("Initializing chat with BSN:", this.bsn);
+
+                // Set up marked.js options for Markdown parsing
+                marked.setOptions({
+                    breaks: true,  // Add 'br' on single line breaks
+                    gfm: true,     // Use GitHub Flavored Markdown
+                    headerIds: false, // Don't add IDs to headers
+                    mangle: false,  // Don't mangle email addresses
+                    sanitize: false, // Allow HTML in the source
+                    tables: true    // Enable tables
+                });
+
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/chat/ws/chat_${this.bsn}`;
+                console.log("Connecting to WebSocket URL:", wsUrl);
+
+                this.websocket = new WebSocket(wsUrl);
+
+                this.websocket.onmessage = (event) => {
+                    this.isLoading = false;
+                    const data = JSON.parse(event.data);
+
+                    if (data.error) {
+                        this.messages.push({
+                            text: `Er is een fout opgetreden: ${data.error}`,
+                            isUser: false
+                        });
+                    } else if (data.isProcessing) {
+                        // This is a processing message, show it as a temporary message that will be replaced
+                        this.messages.push({
+                            text: data.message,
+                            isUser: false,
+                            isTemporary: true
+                        });
+                    } else {
+                        // If there's a temporary message, remove it
+                        if (this.messages.length > 0 && this.messages[this.messages.length - 1].isTemporary) {
+                            this.messages.pop();
+                        }
+
+                        this.messages.push({
+                            text: data.message,
+                            isUser: false
+                        });
+                    }
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                };
+
+                this.websocket.onclose = () => {
+                    console.log('WebSocket connection closed');
+                };
+
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    this.messages.push({
+                        text: 'Er is een probleem met de verbinding. Probeer het later opnieuw.',
+                        isUser: false
+                    });
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                };
+            },
+
+            sendMessage() {
+                if (!this.newMessage.trim()) return;
+
+                const message = this.newMessage.trim();
+                this.messages.push({
+                    text: message,
+                    isUser: true
+                });
+
+                this.newMessage = '';
+                this.isLoading = true;
+
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                });
+
+                if (this.websocket.readyState === WebSocket.OPEN) {
+                    this.websocket.send(JSON.stringify({ message }));
+                } else {
+                    this.isLoading = false;
+                    this.messages.push({
+                        text: 'Kan geen verbinding maken met de server. Probeer het later opnieuw.',
+                        isUser: false
+                    });
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                }
+            },
+
+            scrollToBottom() {
+                const container = this.$refs.chatContainer;
+                container.scrollTop = container.scrollHeight;
+            },
+
+            formatMessage(text) {
+                if (!text) return '';
+
+                // For user messages, only convert URLs (no markdown)
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+                // Check if this is a user message
+                const isUserMessage = this.messages.find(m => m.text === text)?.isUser;
+
+                // For bot messages, apply markdown rendering
+                if (!isUserMessage) {
+                    try {
+                        // First convert URLs to markdown links
+                        const processedText = text.replace(urlRegex, url => `[${url}](${url})`);
+                        // Then parse the markdown
+                        return marked.parse(processedText);
+                    } catch (e) {
+                        console.error('Error parsing markdown:', e);
+                        return text; // Fallback to plain text if markdown parsing fails
+                    }
+                }
+
+                // For user messages just convert links
+                return text.replace(urlRegex, url => `<a href="${url}" target="_blank" class="underline">${url}</a>`);
+            }
+        };
+    }
+    </script>
+{% endblock %}
