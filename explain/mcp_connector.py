@@ -48,7 +48,7 @@ class MCPLawConnector:
 <parameters>
     {"service": "De regeling waarvoor deze waarde geldt (bijv. zorgtoeslag)",
      "key": "De naam van het gegeven (bijv. inkomen, leeftijd, aantal_kinderen)",
-     "value": "De waarde die de burger heeft opgegeven"}
+     "value": "De waarde die de burger heeft opgegeven. BELANGRIJK: voor geldbedragen, zet deze om naar EUROCENTEN (bijv. €42,50 wordt 4250)"}
 </parameters>
 </tool_description>"""
 
@@ -86,7 +86,7 @@ Wanneer de berekening aangeeft dat er essentiële gegevens ontbreken:
 <tool_use>
 <tool_name>claim_value</tool_name>
 <parameters>
-  {{"service": "zorgtoeslag", "key": "inkomen", "value": 35000}}
+  {{"service": "zorgtoeslag", "key": "inkomen", "value": 3500000}}
 </parameters>
 </tool_use>
 
@@ -115,6 +115,10 @@ BELANGRIJK:
 - Blijf ALTIJD binnen de tool syntax. Gebruik geen aangepaste JSON formats of andere variaties.
 - Als essentiële gegevens ontbreken, vraag hier expliciet naar en gebruik de claim_value tool om ze toe te voegen.
 - Gebruik gechainede wetten alleen als dit logisch is of als er om gevraagd wordt
+- Verwijs NOOIT naar externe websites of applicaties zoals toeslagen.nl, belastingdienst.nl, DUO, of overheids-apps
+- Hou je focus op de uitleg van de wet en rechten zoals berekend door de tool; geef geen advies over hoe aanvragen buiten dit systeem gedaan moeten worden
+- Geen verwijzingen naar "aanvragen" of "indienen" bij externe instanties - ga ervan uit dat alles via dit systeem gebeurt
+- BELANGRIJK: Zorg dat je bij geldbedragen ALTIJD EUROCENTEN gebruikt (bijv. €42,50 wordt 4250 cent)
 
 Reageer in het Nederlands tenzij iemand expliciet vraagt om een andere taal.
 """

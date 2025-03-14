@@ -227,6 +227,13 @@ Resultaten van tool aanroep:
 
 {service_context}
 
+BELANGRIJK:
+- Verwijs NIET naar externe websites of instanties zoals toeslagen.nl, belastingdienst.nl, etc.
+- Geef GEEN instructies over hoe de burger ergens een aanvraag kan indienen
+- Focus ALLEEN op de wettelijke berekening en resultaten
+- Ga ervan uit dat alle stappen via dit systeem kunnen worden afgehandeld
+- Zorg dat je bij geldbedragen EUROCENTEN gebruikt (bijv. €42,50 wordt 4250)
+
 """
 
                 # If we have missing required fields, add a form-like interaction option
@@ -393,6 +400,13 @@ Resultaten na verwerking van de ingediende gegevens voor {service_name}:
 Geef een korte samenvatting van deze resultaten aan de burger.
 Leg uit wat de impact is van de gegevens die zij hebben verstrekt.
 Wees vriendelijk en helder in je uitleg.
+
+BELANGRIJK:
+- Verwijs NIET naar externe websites of instanties zoals toeslagen.nl, belastingdienst.nl, etc.
+- Geef GEEN instructies over hoe de burger ergens een aanvraag kan indienen
+- Focus ALLEEN op de wettelijke berekening en resultaten
+- Ga ervan uit dat alle stappen via dit systeem kunnen worden afgehandeld
+- Zorg dat je bij geldbedragen EUROCENTEN gebruikt (bijv. €42,50 wordt 4250)
 """
                         else:
                             content = f"""
@@ -403,6 +417,13 @@ Resultaten van de regeling {service_name}:
 Geef een korte samenvatting van deze resultaten aan de burger.
 Als dit een gechainede regeling is, leg dan uit waarom deze regeling relevant was na de vorige.
 Wees vriendelijk en helder in je uitleg.
+
+BELANGRIJK:
+- Verwijs NIET naar externe websites of instanties zoals toeslagen.nl, belastingdienst.nl, etc.
+- Geef GEEN instructies over hoe de burger ergens een aanvraag kan indienen
+- Focus ALLEEN op de wettelijke berekening en resultaten
+- Ga ervan uit dat alle stappen via dit systeem kunnen worden afgehandeld
+- Zorg dat je bij geldbedragen EUROCENTEN gebruikt (bijv. €42,50 wordt 4250)
 """
 
                         # Create a new conversation with these results
