@@ -20,6 +20,7 @@ from jsonschema import validate
 import yaml
 import jsonschema
 import re
+import os
 
 
 model = ChatAnthropic(
@@ -156,6 +157,22 @@ def fetch_and_format_data(url: str) -> str:
 with open("../../schema/v0.1.3/schema.json") as sf:
     schema_content = sf.read()
 
+# Get all law YAML files
+laws_dir = os.path.join(os.path.dirname(__file__), "../../law")
+examples = []
+for root, _, files in os.walk(laws_dir):
+    for file in files:
+        if file.endswith(".yaml"):  # Return only YAML files
+            # law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
+            with open(os.path.join(root, file), "r") as f:
+                examples.append(
+                    {
+                        "type": "document",
+                        "title": "Voorbeeld",
+                        "text": f.read(),
+                    }
+                )
+
 analyize_law_prompt = ChatPromptTemplate(
     [
         SystemMessage(
@@ -168,20 +185,7 @@ analyize_law_prompt = ChatPromptTemplate(
                     "type": "text",
                     "text": "Ik heb deze wetten zo gemodelleerd in YAML.",
                 },
-                {
-                    "type": "document",
-                    "title": "Voorbeeld 1",
-                    "text": fetch_and_format_data(  # IMPROVE: get locally, dynamically
-                        "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/zvw/RVZ-2024-01-01.yaml"
-                    ),
-                },
-                {
-                    "type": "document",
-                    "title": "Voorbeeld 2",
-                    "text": fetch_and_format_data(
-                        "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/law/handelsregisterwet/KVK-2024-01-01.yaml"
-                    ),
-                },
+                *examples,  # Use the * operator to unpack the examples list
             ],
         ),
         (
