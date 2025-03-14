@@ -154,7 +154,15 @@ Resultaten van tool aanroep:
 
 {service_context}
 
-Verwerk deze resultaten in je antwoord aan de burger. Leg uit wat de uitkomst betekent in eenvoudige taal.
+Ik wil dat je een uitleg geeft aan de burger in eenvoudig Nederlands (B1-niveau) over wat deze resultaten betekenen en wat de gevolgen zijn.
+
+Let hierbij op het volgende:
+1. Als er essentiële gegevens ontbreken (missing_required), leg uit dat de burger eerst deze informatie moet aanleveren.
+2. Als de burger niet aan alle voorwaarden voldoet, leg duidelijk uit waarom niet en wat er ontbreekt.
+3. Als er specifieke bedragen worden berekend, leg uit hoe deze zijn opgebouwd.
+4. Bedragen zijn altijd in centen, dus deel door 100 om het juiste eurobedrag te krijgen.
+
+Wees vriendelijk maar nooit te stellig - gebruik termen als "waarschijnlijk recht op" in plaats van absolute garanties.
 Gebruik geen technische termen zoals "tool" of "resultaten" in je antwoord aan de burger.
 """,
                 }

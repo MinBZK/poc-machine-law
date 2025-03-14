@@ -107,10 +107,17 @@ Reageer in het Nederlands tenzij iemand expliciet vraagt om een andere taal.
         # Check for Claude tool syntax: <tool_use><tool_name>service</tool_name></tool_use>
         import re
 
+        # Check multiple patterns that Claude might use for tool calls
         tool_patterns = re.findall(r"<tool_use>[\s\S]*?<tool_name>(.*?)</tool_name>[\s\S]*?</tool_use>", message)
+        # Alternative patterns that Claude sometimes uses
+        tool_patterns_alt1 = re.findall(r"<tool>\s*<name>(.*?)</name>", message)
+        tool_patterns_alt2 = re.findall(r"<tool name=\"([^\"]+)\"", message)
 
-        if tool_patterns:
-            for service_name in tool_patterns:
+        # Combine all pattern matches
+        all_tool_patterns = tool_patterns + tool_patterns_alt1 + tool_patterns_alt2
+
+        if all_tool_patterns:
+            for service_name in all_tool_patterns:
                 service_name = service_name.strip().lower()
                 if service_name in available_services and service_name not in referenced_services:
                     print(f"Found tool syntax for service: {service_name}")
@@ -179,7 +186,30 @@ Reageer in het Nederlands tenzij iemand expliciet vraagt om een andere taal.
                 formatted += f"**Fout:** {result['error']}\n\n"
                 continue
 
-            formatted += f"**Komt in aanmerking:** {'Ja ✅' if result.get('eligibility') else 'Nee ❌'}\n\n"
+            # Check requirements_met and missing_required fields first
+            # These are important to understand if the person is eligible
+            if "requirements_met" in result:
+                if not result.get("requirements_met"):
+                    formatted += "**Voldoet niet aan alle voorwaarden ❌**\n\n"
+                else:
+                    formatted += "**Voldoet aan alle voorwaarden ✅**\n\n"
+            else:
+                # Fallback to eligibility field if requirements_met is not available
+                formatted += f"**Komt in aanmerking:** {'Ja ✅' if result.get('eligibility') else 'Nee ❌'}\n\n"
+
+            # Handle missing_required specifically
+            if result.get("missing_required"):
+                formatted += "**U kunt geen aanvraag indienen omdat er essentiële informatie ontbreekt.**\n\n"
+
+                # If there's a missing_fields list in the result, show those
+                if isinstance(result.get("missing_fields"), list) and result.get("missing_fields"):
+                    formatted += "**Ontbrekende velden:**\n\n"
+                    for req in result.get("missing_fields", []):
+                        formatted += f"- {req}\n"
+                    formatted += "\n"
+                # Otherwise just show the generic message
+                else:
+                    formatted += "Vul de benodigde informatie in om verder te gaan.\n\n"
 
             # Try to get rule spec for this law to determine types
             money_fields = []
@@ -232,9 +262,9 @@ Reageer in het Nederlands tenzij iemand expliciet vraagt om een andere taal.
                             formatted += f"- {key}: {value}\n"
                 formatted += "\n"
 
-            # Include missing requirements with better formatting
-            if result.get("missing_requirements"):
-                formatted += "**Ontbrekende voorwaarden:**\n\n"
+            # Include missing requirements with better formatting (only if not missing_required)
+            if result.get("missing_requirements") and not result.get("missing_required"):
+                formatted += "**Ontbrekende voorwaarden (niet-essentieel):**\n\n"
                 for req in result.get("missing_requirements", []):
                     formatted += f"- {req}\n"
                 formatted += "\n"

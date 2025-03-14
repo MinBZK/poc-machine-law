@@ -151,12 +151,27 @@ class BaseMCPService:
             self.service_type, law=self.law_path, parameters=parameters, reference_date=TODAY, approved=False
         )
 
+        # Extract missing fields if any required values are missing
+        missing_fields = []
+        if result.missing_required:
+            # Extract missing required fields from the value tree
+            value_tree = self.services.extract_value_tree(result.path)
+
+            for path, node_info in value_tree.items():
+                if node_info.get("required") and (node_info.get("result") is None or "result" not in node_info):
+                    # Get the field name (last part of the path)
+                    field_name = path.split(".")[-1]
+                    missing_fields.append(field_name)
+
         # Format the result
         return {
             "eligibility": result.requirements_met,
+            "requirements_met": result.requirements_met,
             "result": result.output,
             "input_data": result.input,
             "missing_requirements": result.missing_required,
+            "missing_required": result.missing_required,
+            "missing_fields": missing_fields,
             "explanation": self._format_explanation(result, rule_spec),
         }
 
@@ -165,10 +180,23 @@ class BaseMCPService:
         if result.requirements_met:
             return f"U voldoet aan alle voorwaarden voor {self.description}."
         elif result.missing_required:
-            return (
-                f"U voldoet niet aan alle voorwaarden voor {self.description}. "
-                + f"U mist de volgende voorwaarden: {', '.join(result.missing_required)}."
-            )
+            # Use the missing_fields that were extracted in the execute method
+            missing_fields = []
+            value_tree = self.services.extract_value_tree(result.path)
+
+            for path, node_info in value_tree.items():
+                if node_info.get("required") and (node_info.get("result") is None or "result" not in node_info):
+                    # Get the field name (last part of the path)
+                    field_name = path.split(".")[-1]
+                    missing_fields.append(field_name)
+
+            if missing_fields:
+                return (
+                    f"U voldoet niet aan alle voorwaarden voor {self.description}. "
+                    + f"U mist de volgende voorwaarden: {', '.join(missing_fields)}."
+                )
+            else:
+                return f"U voldoet niet aan alle voorwaarden voor {self.description}. Er ontbreken essentiële gegevens."
         else:
             return f"Er kan niet worden vastgesteld of u recht heeft op {self.description}."
 
