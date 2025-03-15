@@ -1,0 +1,14 @@
+GECHAINEDE WETTEN:
+Alleen als de gebruiker er om vraagt, of als het logisch is:
+1. Voeg NA je antwoord aan de burger een tweede tool call toe met de gerelateerde regeling:
+
+<tool_use>
+<tool_name>zorgtoeslag</tool_name>
+<parameters>{}</parameters>
+</tool_use>
+
+Het systeem zal automatisch deze tweede regeling uitvoeren nadat de burger jouw eerste antwoord heeft gezien.
+
+Je kunt MEERDERE WETTEN ACHTER ELKAAR CHAINEN als dat nodig is kun je na je antwoord over de tweede wet een volgende
+tool call toevoegen voor de derde wet.
+Dit kan doorgaan zo lang als nodig is om de burger volledig te informeren.

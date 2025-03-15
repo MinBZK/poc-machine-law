@@ -28,6 +28,27 @@
                             <path fill="white" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
                         </svg>
                         <h1 class="text-2xl font-semibold">Burger.nl</h1>
+                        <nav class="ml-8">
+                            <ul class="flex space-x-6">
+                                <li>
+                                    <a href="/?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="/chat?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="h-5 w-5 mr-1"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                        </svg>
+                                        Chat
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                     <!-- User Switcher -->
                     <div class="flex items-center space-x-4">

@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from machine.service import Services
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_services, templates
-from web.routers import admin, edit, laws
+from web.routers import admin, chat, edit, laws
 from web.services.profiles import get_all_profiles, get_profile_data
 
 app = FastAPI(title="Burger.nl")
@@ -21,6 +21,7 @@ if STATIC_DIR.exists():
 app.include_router(laws.router)
 app.include_router(admin.router)
 app.include_router(edit.router)
+app.include_router(chat.router)
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
 app.mount(
     "/analysis/graph",
