@@ -1,7 +1,19 @@
+import logging
 import os
 from functools import lru_cache
 
 import anthropic
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Configure logging format if not already configured
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 
 class LLMService:
@@ -50,7 +62,10 @@ Platte tekst, geen markdown/kopjes/andere gekkigheden.
 
         except Exception as e:
             # Log the error and return a fallback message
-            print(f"Error generating explanation: {e}")
+            logger.error(f"Error generating explanation: {e}")
+            import traceback
+
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return "We konden geen uitleg genereren. Probeer het later opnieuw."
 
 

@@ -4,6 +4,7 @@ This module wraps law execution engines as MCP-compatible services based on the
 Model Context Protocol specification: https://contextprovider.ai/
 """
 
+import logging
 from typing import Any
 
 import pandas as pd
@@ -11,6 +12,17 @@ import pandas as pd
 from machine.service import Services
 from web.dependencies import TODAY
 from web.services.profiles import get_profile_data
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Configure logging format if not already configured
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 
 class MCPServiceRegistry:
@@ -42,7 +54,7 @@ class MCPServiceRegistry:
         try:
             # Get discoverable service laws from the resolver for citizens
             discoverable_laws = self.services.resolver.get_discoverable_service_laws("CITIZEN")
-            print(f"Discovered services and laws: {discoverable_laws}")
+            logger.info(f"Discovered services and laws: {discoverable_laws}")
 
             # Generate service instances for each discoverable law
             for service_type, laws in discoverable_laws.items():
@@ -80,17 +92,17 @@ class MCPServiceRegistry:
                                 service_type=service_type,
                             )
                             self.law_services[service_name] = service
-                            print(f"Added service: {service_name} ({description}) for law {law_path}")
+                            logger.info(f"Added service: {service_name} ({description}) for law {law_path}")
                         except Exception as e:
-                            print(f"Error adding service for {law_path}: {e}")
+                            logger.error(f"Error adding service for {law_path}: {e}")
                             import traceback
 
-                            traceback.print_exc()
+                            logger.error(f"Traceback: {traceback.format_exc()}")
         except Exception as e:
-            print(f"Error discovering laws: {e}")
+            logger.error(f"Error discovering laws: {e}")
             import traceback
 
-            traceback.print_exc()
+            logger.error(f"Traceback: {traceback.format_exc()}")
 
     def get_service_names(self) -> list[str]:
         """Get all available service names"""
