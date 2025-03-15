@@ -161,7 +161,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                         try:
                             # Get services that might need this claim
                             # If we're responding to a specific service request, use that service
-                            service_refs = mcp_connector._extract_service_references(assistant_message)
+                            service_refs = mcp_connector.service_executor.extract_service_references(assistant_message)
                             if service_refs:
                                 for service_name in service_refs:
                                     service = mcp_connector.registry.get_service(service_name)
@@ -276,10 +276,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                 services_to_execute = []
 
                 # First check for claims - they take precedence
-                claim_refs = mcp_connector._extract_claim_references(current_message)
+                claim_refs = mcp_connector.claim_processor.extract_claims(current_message)
                 if claim_refs:
                     print(f"Found {len(claim_refs)} claim references in message")
-                    claims_result = await mcp_connector._process_claims(claim_refs, bsn)
+                    claims_result = await mcp_connector.claim_processor.process_claims(claim_refs, bsn)
 
                     if claims_result and claims_result.get("submitted"):
                         # Collect affected services for execution
@@ -290,7 +290,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                                 print(f"Adding service {service_name} to execution list due to claim")
 
                 # Then check for service references
-                service_refs = mcp_connector._extract_service_references(current_message)
+                service_refs = mcp_connector.service_executor.extract_service_references(current_message)
                 if service_refs:
                     for service_name in service_refs:
                         if service_name not in services_to_execute:
