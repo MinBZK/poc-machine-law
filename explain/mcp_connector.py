@@ -4,7 +4,10 @@ Implements the Model Context Protocol (MCP) specification from https://contextpr
 to create standardized services that can be used by any MCP-compatible LLM.
 """
 
+import os
 from typing import Any
+
+import jinja2
 
 from machine.service import Services
 
@@ -17,6 +20,15 @@ class MCPLawConnector:
     def __init__(self, services: Services):
         self.registry = MCPServiceRegistry(services)
 
+        # Set up Jinja2 environment for templates
+        template_dir = os.path.join(os.path.dirname(__file__), "prompts")
+        self.jinja_env = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(template_dir),
+            autoescape=False,
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
     def get_system_prompt(self) -> str:
         """Get the system prompt for the LLM that describes available services using a standardized tool-based approach"""
         available_services = self.registry.get_service_names()
@@ -25,103 +37,21 @@ class MCPLawConnector:
         service_tools = []
 
         # Get descriptions from the services
+        service_tool_template = self.jinja_env.get_template("service_tool_template.j2")
         for service_name in available_services:
             service = self.registry.get_service(service_name)
             if service:
                 description = service.description
-
                 # Format as a tool definition for Claude
-                service_tools.append(
-                    f"""<tool_description>
-<tool_name>{service_name}</tool_name>
-<description>{description}</description>
-<parameters>
-    {{}} (Geen parameters nodig - gebruikt automatisch burger profiel)
-</parameters>
-</tool_description>"""
-                )
+                service_tools.append(service_tool_template.render(service_name=service_name, description=description))
 
         # Add a claim tool for submitting values
-        claim_tool = """<tool_description>
-<tool_name>claim_value</tool_name>
-<description>Gebruiken wanneer een burger specifieke informatie verstrekt over zichzelf die nodig is voor een berekening</description>
-<parameters>
-    {"service": "De regeling waarvoor deze waarde geldt (bijv. zorgtoeslag)",
-     "key": "De naam van het gegeven (bijv. inkomen, leeftijd, aantal_kinderen)",
-     "value": "De waarde die de burger heeft opgegeven. BELANGRIJK: voor geldbedragen, zet deze om naar EUROCENTEN (bijv. €42,50 wordt 4250)"}
-</parameters>
-</tool_description>"""
-
-        service_tools.append(claim_tool)
+        claim_tool_template = self.jinja_env.get_template("claim_tool_template.j2")
+        service_tools.append(claim_tool_template.render())
 
         # Build the prompt with the actual available services in MCP compatible format
-        return f"""
-Je bent een behulpzame assistent die Nederlandse burgers helpt met vragen over overheidsregelingen.
-
-Je hebt toegang tot de volgende tools voor het berekenen van wettelijke regelingen:
-
-{chr(10).join(service_tools)}
-
-HOE JE TOOLS MOET GEBRUIKEN:
-1. ZEER BELANGRIJK: Wanneer een burger vraagt over een specifieke regeling zoals zorgtoeslag, huurtoeslag, of andere uitkeringen, MOET JE EERST de bijbehorende tool aanroepen VOORDAT je antwoord geeft.
-2. WACHT ALTIJD op de resultaten van de tool voordat je inhoudelijk antwoord geeft.
-3. Gebruik deze exacte syntax voor het aanroepen van tools:
-
-<tool_use>
-<tool_name>[naam_regeling]</tool_name>
-<parameters>{{}}</parameters>
-</tool_use>
-
-Bijvoorbeeld:
-<tool_use>
-<tool_name>zorgtoeslag</tool_name>
-<parameters>{{}}</parameters>
-</tool_use>
-
-CLAIMS VOOR ONTBREKENDE GEGEVENS:
-Wanneer de berekening aangeeft dat er essentiële gegevens ontbreken:
-1. Vraag de burger vriendelijk om de ontbrekende informatie
-2. Wanneer de burger antwoordt met de waarde, gebruik de claim_value tool:
-
-<tool_use>
-<tool_name>claim_value</tool_name>
-<parameters>
-  {{"service": "zorgtoeslag", "key": "inkomen", "value": 3500000}}
-</parameters>
-</tool_use>
-
-3. Roep daarna meteen opnieuw de oorspronkelijke regeling-tool aan om een nieuwe berekening te maken met de ingevulde waarde
-
-GECHAINEDE WETTEN:
-Alleen als de gebruiker er om vraagt, of als het logisch is:
-1. Voeg NA je antwoord aan de burger een tweede tool call toe met de gerelateerde regeling:
-
-<tool_use>
-<tool_name>zorgtoeslag</tool_name>
-<parameters>{{}}</parameters>
-</tool_use>
-
-Het systeem zal automatisch deze tweede regeling uitvoeren nadat de burger jouw eerste antwoord heeft gezien.
-
-Je kunt MEERDERE WETTEN ACHTER ELKAAR CHAINEN als dat nodig is kun je na je antwoord over de tweede wet een volgende
-tool call toevoegen voor de derde wet.
-Dit kan doorgaan zo lang als nodig is om de burger volledig te informeren.
-
-
-BELANGRIJK:
-- Het systeem zal je tool aanroepen detecteren, de berekening uitvoeren, en de resultaten terug aan jou geven.
-- Geef NOOIT informatie over of iemand recht heeft op een regeling zonder eerst de tool aan te roepen.
-- Als een burger vraagt over meerdere regelingen, roep dan één voor één de tools aan voor elke regeling.
-- Blijf ALTIJD binnen de tool syntax. Gebruik geen aangepaste JSON formats of andere variaties.
-- Als essentiële gegevens ontbreken, vraag hier expliciet naar en gebruik de claim_value tool om ze toe te voegen.
-- Gebruik gechainede wetten alleen als dit logisch is of als er om gevraagd wordt
-- Verwijs NOOIT naar externe websites of applicaties zoals toeslagen.nl, belastingdienst.nl, DUO, of overheids-apps
-- Hou je focus op de uitleg van de wet en rechten zoals berekend door de tool; geef geen advies over hoe aanvragen buiten dit systeem gedaan moeten worden
-- Geen verwijzingen naar "aanvragen" of "indienen" bij externe instanties - ga ervan uit dat alles via dit systeem gebeurt
-- BELANGRIJK: Zorg dat je bij geldbedragen ALTIJD EUROCENTEN gebruikt (bijv. €42,50 wordt 4250 cent)
-
-Reageer in het Nederlands tenzij iemand expliciet vraagt om een andere taal.
-"""
+        system_prompt_template = self.jinja_env.get_template("mcp_system_prompt.j2")
+        return system_prompt_template.render(service_tools=service_tools)
 
     async def process_message(self, message: str, bsn: str) -> dict[str, Any]:
         """Process a user message and execute any law services that might be referred to"""

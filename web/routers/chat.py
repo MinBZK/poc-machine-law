@@ -88,21 +88,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
         mcp_connector = MCPLawConnector(services)
 
         # Create initial system prompt with profile context and dynamic service information
-        system_prompt = f"""
-        Je bent een behulpzame assistent die Nederlandse burgers helpt met vragen over overheidsregelingen.
-
-        Huidige burger profiel:
-        Naam: {profile.get("name", "Onbekend")}
-        Beschrijving: {profile.get("description", "Geen beschrijving beschikbaar")}
-        BSN: {bsn}
-
-        {mcp_connector.get_system_prompt()}
-
-        Houd je antwoorden kort, informatief en relevant voor Nederlandse regelgeving. Als je het antwoord niet weet,
-        wees dan eerlijk en geef aan waar ze officiële informatie kunnen vinden.
-
-        Reageer in het Nederlands tenzij iemand expliciet vraagt om een andere taal.
-        """
+        system_prompt = mcp_connector.jinja_env.get_template("chat_system_prompt.j2").render(
+            profile=profile, bsn=bsn, mcp_system_prompt=mcp_connector.get_system_prompt()
+        )
 
         # Initialize the conversation with just a list for user/assistant messages
         messages = []
@@ -221,54 +209,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                     if isinstance(result.get("missing_fields"), list) and result.get("missing_fields"):
                         missing_fields.extend([(service_name, field) for field in result.get("missing_fields")])
 
-                # Prepare content for the tool response
-                content = f"""
-Resultaten van tool aanroep:
-
-{service_context}
-
-BELANGRIJK:
-- Verwijs NIET naar externe websites of instanties zoals toeslagen.nl, belastingdienst.nl, etc.
-- Geef GEEN instructies over hoe de burger ergens een aanvraag kan indienen
-- Focus ALLEEN op de wettelijke berekening en resultaten
-- Ga ervan uit dat alle stappen via dit systeem kunnen worden afgehandeld
-- Zorg dat je bij geldbedragen EUROCENTEN gebruikt (bijv. €42,50 wordt 4250)
-
-"""
-
-                # If we have missing required fields, add a form-like interaction option
-                if missing_fields:
-                    content += """
-Er ontbreken essentiële gegevens om een correcte berekening te maken.
-Vraag de burger naar de ontbrekende informatie en moedig ze aan om deze gegevens te verstrekken.
-
-Vraag één voor één naar de ontbrekende gegevens. Leg uit dat dit nodig is om de berekening te kunnen uitvoeren.
-De burger kan antwoorden in een natuurlijke vorm zoals "mijn inkomen is 35000 euro" of "inkomen: 35000".
-
-Stel vragen zoals:
-"""
-                    for service_name, field in missing_fields:
-                        # Convert field name to more natural format
-                        field_display = field.replace("_", " ")
-                        content += f"- Wat is uw {field_display}? (benodigd voor {service_name})\n"
-
-                    content += """
-Leg uit dat zodra ze de informatie verstrekken, je een nieuwe berekening kunt maken.
-Als ze een waarde invullen, bevestig dan dat je deze hebt ontvangen en vraag dan naar eventuele andere ontbrekende waarden.
-"""
-
-                content += """
-Ik wil dat je een uitleg geeft aan de burger in eenvoudig Nederlands (B1-niveau) over wat deze resultaten betekenen en wat de gevolgen zijn.
-
-Let hierbij op het volgende:
-1. Als er essentiële gegevens ontbreken (missing_required), leg uit dat de burger eerst deze informatie moet aanleveren.
-2. Als de burger niet aan alle voorwaarden voldoet, leg duidelijk uit waarom niet en wat er ontbreekt.
-3. Als er specifieke bedragen worden berekend, leg uit hoe deze zijn opgebouwd.
-4. Bedragen zijn altijd in centen, dus deel door 100 om het juiste eurobedrag te krijgen.
-
-Wees vriendelijk maar nooit te stellig - gebruik termen als "waarschijnlijk recht op" in plaats van absolute garanties.
-Gebruik geen technische termen zoals "tool" of "resultaten" in je antwoord aan de burger.
-"""
+                # Prepare content for the tool response using the template
+                content = mcp_connector.jinja_env.get_template("tool_response.j2").render(
+                    service_context=service_context, missing_fields=missing_fields if missing_fields else None
+                )
 
                 # Add service results as user message (representing tool output)
                 tool_response = {
@@ -392,39 +336,13 @@ Gebruik geen technische termen zoals "tool" of "resultaten" in je antwoord aan d
                         is_from_claim = service_name in services_to_execute[: len(claim_refs)] if claim_refs else False
 
                         if is_from_claim:
-                            content = f"""
-Resultaten na verwerking van de ingediende gegevens voor {service_name}:
-
-{service_context}
-
-Geef een korte samenvatting van deze resultaten aan de burger.
-Leg uit wat de impact is van de gegevens die zij hebben verstrekt.
-Wees vriendelijk en helder in je uitleg.
-
-BELANGRIJK:
-- Verwijs NIET naar externe websites of instanties zoals toeslagen.nl, belastingdienst.nl, etc.
-- Geef GEEN instructies over hoe de burger ergens een aanvraag kan indienen
-- Focus ALLEEN op de wettelijke berekening en resultaten
-- Ga ervan uit dat alle stappen via dit systeem kunnen worden afgehandeld
-- Zorg dat je bij geldbedragen EUROCENTEN gebruikt (bijv. €42,50 wordt 4250)
-"""
+                            content = mcp_connector.jinja_env.get_template("claim_processing.j2").render(
+                                service_name=service_name, service_context=service_context
+                            )
                         else:
-                            content = f"""
-Resultaten van de regeling {service_name}:
-
-{service_context}
-
-Geef een korte samenvatting van deze resultaten aan de burger.
-Als dit een gechainede regeling is, leg dan uit waarom deze regeling relevant was na de vorige.
-Wees vriendelijk en helder in je uitleg.
-
-BELANGRIJK:
-- Verwijs NIET naar externe websites of instanties zoals toeslagen.nl, belastingdienst.nl, etc.
-- Geef GEEN instructies over hoe de burger ergens een aanvraag kan indienen
-- Focus ALLEEN op de wettelijke berekening en resultaten
-- Ga ervan uit dat alle stappen via dit systeem kunnen worden afgehandeld
-- Zorg dat je bij geldbedragen EUROCENTEN gebruikt (bijv. €42,50 wordt 4250)
-"""
+                            content = mcp_connector.jinja_env.get_template("chained_service.j2").render(
+                                service_name=service_name, service_context=service_context
+                            )
 
                         # Create a new conversation with these results
                         next_conversation = current_messages.copy()
