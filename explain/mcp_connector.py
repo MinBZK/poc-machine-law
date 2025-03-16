@@ -4,6 +4,7 @@ Implements the Model Context Protocol (MCP) specification from https://contextpr
 to create standardized services that can be used by any MCP-compatible LLM.
 """
 
+import json
 import os
 
 import jinja2
@@ -72,9 +73,61 @@ class MCPLawConnector:
         claim_tool_template = self.jinja_env.get_template("claim_tool_template.j2")
         service_tools.append(claim_tool_template.render())
 
+        # Add application form tool
+        application_tool_template = self.jinja_env.get_template("application_form_tool_template.j2")
+        service_tools.append(application_tool_template.render())
+
         # Build the prompt with the actual available services in MCP compatible format
         system_prompt_template = self.jinja_env.get_template("mcp_system_prompt.j2")
         return system_prompt_template.render(service_tools=service_tools)
+
+    def extract_application_form_reference(self, message: str) -> str | None:
+        """Extract application form references from LLM responses.
+
+        Args:
+            message: The message to extract application form references from
+
+        Returns:
+            Service name to show application form for, or None if no reference found
+        """
+        # Import here to avoid circular imports
+        import re
+
+        # Check for show_application_form tool call
+        app_form_pattern = r"<tool_use>[\s\S]*?<tool_name>show_application_form</tool_name>[\s\S]*?<parameters>([\s\S]*?)</parameters>[\s\S]*?</tool_use>"
+
+        # Find matches
+        matches = re.findall(app_form_pattern, message)
+
+        if matches:
+            try:
+                for match in matches:
+                    # Clean up the JSON string
+                    clean_json = match.strip().replace("'", '"')
+                    if not clean_json.startswith("{"):
+                        logger.warning(f"Skipping invalid application form format: {match}")
+                        continue
+
+                    try:
+                        # Parse JSON
+                        data = json.loads(clean_json)
+                        service_name = data.get("service")
+
+                        if service_name and service_name in self.registry.get_service_names():
+                            logger.info(f"Found application form reference for service: {service_name}")
+                            return service_name
+                    except json.JSONDecodeError:
+                        # Try to extract with regex
+                        service_match = re.search(r'"service"\s*:\s*"([^"]+)"', clean_json)
+                        if service_match:
+                            service_name = service_match.group(1)
+                            if service_name in self.registry.get_service_names():
+                                logger.info(f"Found application form reference for service: {service_name}")
+                                return service_name
+            except Exception as e:
+                logger.error(f"Error extracting application form reference: {str(e)}")
+
+        return None
 
     async def process_message(self, message: str, bsn: str) -> MCPResult:
         """Process a user message and execute any law services that might be referred to
@@ -89,9 +142,11 @@ class MCPLawConnector:
         # Extract service references and claims from the message
         service_refs = self.service_executor.extract_service_references(message)
         claim_refs = self.claim_processor.extract_claims(message)
+        application_form_ref = self.extract_application_form_reference(message)
 
         logger.info(
-            f"Processing message with {len(service_refs)} service references and {len(claim_refs)} claim references"
+            f"Processing message with {len(service_refs)} service references, {len(claim_refs)} claim references, "
+            f"and application form reference: {application_form_ref}"
         )
 
         results: MCPResult = {}
@@ -110,6 +165,11 @@ class MCPLawConnector:
             # Add service results to the overall results
             for service_name, result in service_results.items():
                 results[service_name] = result
+
+        # Add application form reference if found
+        if application_form_ref:
+            logger.info(f"Application form reference found for service: {application_form_ref}")
+            results["application_form"] = {"service": application_form_ref}
 
         return results
 

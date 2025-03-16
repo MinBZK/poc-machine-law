@@ -98,10 +98,18 @@
                                 </svg>
                             </div>
                         </template>
-                        <!-- Message Content -->
-                        <div :class="message.isUser ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'"
-                             class="rounded-lg px-4 py-2 max-w-3xl prose prose-sm"
-                             x-html="message.html || '&lt;p&gt;' + message.text + '&lt;/p&gt;'"></div>
+                        <!-- Regular Message Content -->
+                        <template x-if="!message.applicationPanel">
+                            <div :class="message.isUser ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'"
+                                 class="rounded-lg px-4 py-2 max-w-3xl prose prose-sm"
+                                 x-html="message.html || '&lt;p&gt;' + message.text + '&lt;/p&gt;'"></div>
+                        </template>
+                        <!-- Application Panel -->
+                        <template x-if="message.applicationPanel">
+                            <div class="bg-gray-100 text-gray-800 rounded-lg px-4 py-2 max-w-3xl prose prose-sm w-full">
+                                <div x-html="message.html"></div>
+                            </div>
+                        </template>
                         <!-- User Avatar -->
                         <template x-if="message.isUser">
                             <div class="flex-shrink-0 bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center ml-3">
@@ -193,6 +201,34 @@
                             isUser: false,
                             isTemporary: true
                         });
+                    } else if (data.applicationPanel) {
+                        // If there's a temporary message, remove it
+                        if (this.messages.length > 0 && this.messages[this.messages.length - 1].isTemporary) {
+                            this.messages.pop();
+                        }
+
+                        // This is an application panel embedded in the chat
+                        this.messages.push({
+                            html: data.html,
+                            isUser: false,
+                            applicationPanel: true,
+                            service: data.service,
+                            law: data.law
+                        });
+                    } else if (data.isSystemMessage) {
+                        // System message (like application confirmation)
+                        // If there's a temporary message, remove it
+                        if (this.messages.length > 0 && this.messages[this.messages.length - 1].isTemporary) {
+                            this.messages.pop();
+                        }
+
+                        // Add the system message but don't include it in the conversation history for the LLM
+                        this.messages.push({
+                            text: data.message,
+                            html: data.html,
+                            isUser: false,
+                            isSystemMessage: true
+                        });
                     } else {
                         // If there's a temporary message, remove it
                         if (this.messages.length > 0 && this.messages[this.messages.length - 1].isTemporary) {
@@ -249,6 +285,35 @@
                     this.websocket.send(JSON.stringify({ message }));
                 } else {
                     this.isLoading = false;
+                    this.messages.push({
+                        text: 'Kan geen verbinding maken met de server. Probeer het later opnieuw.',
+                        html: '<p>Kan geen verbinding maken met de server. Probeer het later opnieuw.</p>',
+                        isUser: false
+                    });
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                }
+            },
+
+            submitApplication(service, law, bsn) {
+                if (this.websocket.readyState === WebSocket.OPEN) {
+                    // Send a special message to submit the application
+                    this.websocket.send(JSON.stringify({
+                        submitApplication: true,
+                        service: service,
+                        law: law,
+                        bsn: bsn
+                    }));
+
+                    // Show loading state
+                    this.isLoading = true;
+
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                } else {
                     this.messages.push({
                         text: 'Kan geen verbinding maken met de server. Probeer het later opnieuw.',
                         html: '<p>Kan geen verbinding maken met de server. Probeer het later opnieuw.</p>',

@@ -1,0 +1,82 @@
+{% from "macros/render_path.html" import render_path, render_missing_required_form %}
+<!-- Start of Shared Application Form Section -->
+<div class="border border-blue-200 rounded-lg p-5 mb-6 bg-blue-50/30">
+    <!-- Result Summary -->
+    <div class="mb-4">
+        {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
+        {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
+    </div>
+    <!-- Missing Required Data Form -->
+    <div class="mb-4">
+        {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                show_approve=False, claimant="CITIZEN") }}
+    </div>
+    <!-- Used Data -->
+    <div class="border-t border-blue-200 pt-4 mb-4"
+         x-data="{ showData: true }">
+        <button @click="showData = !showData"
+                class="flex items-center justify-between w-full text-left">
+            <span class="text-sm font-medium text-gray-900">Gebruikte gegevens</span>
+            <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
+                 :class="{ 'rotate-180': showData }"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        <div x-show="showData"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             class="mt-4">
+            {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                        show_approve=False, claimant="CITIZEN") }}
+        </div>
+    </div>
+    <!-- Submit Form -->
+    <div x-data="{ isChecked: false }"
+         class="space-y-4 border-t border-blue-200 pt-4">
+        <div class="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+            <label for="declaration-checkbox" class="cursor-pointer block">
+                <div class="flex items-center">
+                    <input type="checkbox"
+                           id="declaration-checkbox"
+                           x-model="isChecked"
+                           class="mr-3 rounded text-blue-600 focus:ring-blue-500"
+                           autofocus>
+                    <span class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
+            </label>
+        </div>
+        {% if in_chat_panel %}
+            <!-- Chat-specific submit button -->
+            <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
+                    :disabled="!isChecked"
+                    :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                    class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
+                Bevestig aanvraag
+            </button>
+        {% else %}
+            <!-- Standard panel submit button -->
+            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+                  hx-target="#tile-{{ law|replace('/', '-') }}"
+                  hx-swap="outerHTML"
+                  hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                  class="mb-2">
+                <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+                <button type="submit"
+                        :disabled="!isChecked"
+                        :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                        class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
+                    Bevestig aanvraag
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+<!-- End of Shared Application Form Section -->

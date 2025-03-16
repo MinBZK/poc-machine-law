@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -32,6 +33,203 @@ class ChatConnectionManager:
     async def send_message(self, message: str, client_id: str):
         if client_id in self.active_connections:
             await self.active_connections[client_id].send_text(message)
+
+
+async def handle_application_display(
+    websocket: WebSocket, bsn: str, services, mcp_connector, service_results, messages, user_msg_content, templates
+):
+    """Display an application panel in the chat interface."""
+    from web.routers.laws import evaluate_law
+
+    try:
+        # Parse the message to identify service and law
+        msg = user_msg_content.lower()
+        registry_service_name = None  # This is the service name in the registry (e.g. "zorgtoeslag")
+        service = None  # This is the service type (e.g. "TOESLAGEN")
+        law = None  # This is the law path (e.g. "zorgtoeslagwet")
+
+        # First try to use the service name directly from application_form reference
+        if "application_form" in service_results:
+            registry_service_name = service_results["application_form"]["service"]
+
+            # Get the service details from the registry
+            service_obj = mcp_connector.registry.get_service(registry_service_name)
+            if service_obj:
+                service = service_obj.service_type
+                law = service_obj.law_path
+
+        # If not found yet, try to identify from other service results
+        if not service or not law:
+            # Filter out the application_form entry if it exists
+            filtered_results = {k: v for k, v in service_results.items() if k != "application_form"}
+
+            if filtered_results and len(filtered_results) > 0:
+                result_service_name = list(filtered_results.keys())[0]
+                service_obj = mcp_connector.registry.get_service(result_service_name)
+                if service_obj:
+                    registry_service_name = result_service_name
+                    service = service_obj.service_type
+                    law = service_obj.law_path
+
+        # Last resort: search for all service names in the message
+        if not service or not law:
+            # Get all service names from the registry
+            all_service_names = mcp_connector.registry.get_service_names()
+
+            # Find service names that appear in the message
+            for name in all_service_names:
+                if name.lower() in msg:
+                    service_obj = mcp_connector.registry.get_service(name)
+                    if service_obj:
+                        registry_service_name = name
+                        service = service_obj.service_type
+                        law = service_obj.law_path
+                        break
+
+        if service and law:
+            # Get data for the application panel
+            law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=False)
+            value_tree = services.extract_value_tree(result.path)
+
+            # Get claims for this user
+            claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
+            claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+
+            # Get existing case if any
+            existing_case = services.case_manager.get_case(bsn, service, law)
+
+            # Render the application panel template with in_chat_panel=True
+            panel_html = templates.get_template("partials/tiles/components/application_form.html").render(
+                request=None,
+                service=service,
+                law=law,
+                rule_spec=rule_spec,
+                input=result.input,
+                result=result.output,
+                requirements_met=result.requirements_met,
+                path=value_tree,
+                bsn=bsn,
+                current_case=existing_case,
+                claim_map=claim_map,
+                missing_required=result.missing_required,
+                in_chat_panel=True,
+                registry_service_name=registry_service_name,  # Pass the registry service name for submission
+            )
+
+            # Send the application panel to the client
+            await websocket.send_text(
+                json.dumps(
+                    {
+                        "applicationPanel": True,
+                        "html": panel_html,
+                        "service": registry_service_name,  # Send the registry service name
+                        "law": law,
+                        "bsn": bsn,
+                    }
+                )
+            )
+
+            # Don't add anything to the conversation history when showing application panel
+            # Since the form is shown after the LLM response, we don't need to track it in the conversation
+
+            return True
+        else:
+            # No service/law identified, send message asking for more info
+            # Include the available service names in the message to help the user
+            available_services = mcp_connector.registry.get_service_names()
+            service_list = ", ".join([s for s in available_services])
+
+            error_msg = (
+                "Ik kan geen specifieke regeling vinden om een aanvraagformulier voor te tonen. "
+                "Kunt u aangeven voor welke van de volgende regelingen u een aanvraag wilt doen?\n\n"
+                f"Beschikbare regelingen: {service_list}"
+            )
+            html_message = format_message(error_msg)
+            await websocket.send_text(json.dumps({"message": error_msg, "html": str(html_message)}))
+
+            # Add messages to conversation
+            messages.append({"role": "user", "content": user_msg_content})
+            messages.append({"role": "assistant", "content": error_msg})
+
+            return True
+
+    except Exception as e:
+        print(f"Error showing application panel: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
+
+        # Send error message as a system message
+        error_msg = "Er is een fout opgetreden bij het tonen van het aanvraagformulier. Probeer het later opnieuw."
+        html_message = format_message(error_msg)
+        await websocket.send_text(
+            json.dumps({"message": error_msg, "html": str(html_message), "isSystemMessage": True})
+        )
+
+        # Add messages to conversation
+        messages.append({"role": "user", "content": user_msg_content})
+        messages.append({"role": "assistant", "content": error_msg})
+
+        return True
+
+
+async def handle_application_submission(
+    websocket: WebSocket, bsn: str, services, mcp_connector, service_name, law_path=None
+):
+    """Handle submission of an application from the chat interface."""
+    try:
+        # Import the laws router for application submission
+        from web.routers.laws import evaluate_law
+
+        # Get the service details from the registry using the service name
+        service_obj = mcp_connector.registry.get_service(service_name)
+
+        if not service_obj:
+            error_msg = f"Service '{service_name}' niet gevonden in het systeem."
+            html_message = format_message(error_msg)
+            await websocket.send_text(json.dumps({"message": error_msg, "html": str(html_message)}))
+            return True
+
+        # Extract service type and law path from the service object
+        service_type = service_obj.service_type
+        law = law_path or service_obj.law_path
+
+        # Get data needed for submission
+        law, result, rule_spec, parameters = await evaluate_law(bsn, law, service_type, services, approved=False)
+
+        # Submit the case
+        await services.case_manager.submit_case(
+            bsn=bsn,
+            service_type=service_type,
+            law=law,
+            parameters=parameters,
+            claimed_result=result.output,
+            approved_claims_only=False,
+        )
+
+        # Send confirmation message
+        # This will be the final message shown to the user, no additional LLM response needed
+        confirmation_msg = f"Uw aanvraag voor {rule_spec.get('name')} is succesvol verzonden."
+        html_message = format_message(confirmation_msg)
+        await websocket.send_text(
+            json.dumps({"message": confirmation_msg, "html": str(html_message), "isSystemMessage": True})
+        )
+
+        return True
+
+    except Exception as e:
+        error_msg = f"Er is een fout opgetreden bij het indienen van uw aanvraag: {str(e)}"
+        html_message = format_message(error_msg)
+        await websocket.send_text(
+            json.dumps({"message": error_msg, "html": str(html_message), "isSystemMessage": True})
+        )
+
+        print(f"Error submitting application: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
+
+        return True
 
 
 manager = ChatConnectionManager()
@@ -95,13 +293,27 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
         # Initialize the conversation with just a list for user/assistant messages
         messages = []
 
+        # Initialize variable to track service results
+        service_results = {}
+
         while True:
             # Receive message from WebSocket
             data = await websocket.receive_text()
             user_message = json.loads(data)
 
-            # Add user message to conversation
-            user_msg_content = user_message["message"]
+            # Handle application submission
+            if user_message.get("submitApplication"):
+                service_name = user_message.get("service")
+                law = user_message.get("law")
+
+                if await handle_application_submission(websocket, bsn, services, mcp_connector, service_name, law):
+                    continue
+
+            # Note: We previously had code here to check for "toon aanvraagformulier",
+            # but now we're using the LLM+tool approach instead, which is handled during service processing
+
+            # Regular message handling
+            user_msg_content = user_message.get("message", "")
             messages.append({"role": "user", "content": user_msg_content})
 
             # Send message to Claude API to get initial response
@@ -189,6 +401,20 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
 
             # If there are service results, add them to the context and generate a new response
             final_message = assistant_message
+
+            # Store the application form reference for later
+            app_form_request = None
+            if "application_form" in service_results:
+                app_form_service = service_results["application_form"]["service"]
+                # Store the request for later, after the LLM responds
+                app_form_request = {
+                    "service": app_form_service,
+                    "results": {k: v for k, v in service_results.items() if k != "application_form"},
+                }
+
+                # Remove the application_form from service_results to avoid confusion
+                service_results.pop("application_form")
+
             if service_results:
                 # Let the user know we're executing services
                 processing_msg = "Ik ben even bezig met het uitvoeren van berekeningen... ⏳"
@@ -260,6 +486,23 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
 
             # Send Claude's response back to the client with pre-rendered HTML
             await websocket.send_text(json.dumps({"message": cleaned_message, "html": str(html_message)}))
+
+            # Now, if we have a pending application form request, display it AFTER the LLM response
+            if app_form_request:
+                # Give a small delay for better user experience
+                await asyncio.sleep(0.5)
+
+                # Display the application panel
+                await handle_application_display(
+                    websocket,
+                    bsn,
+                    services,
+                    mcp_connector,
+                    app_form_request["results"],
+                    messages,
+                    f"Toon aanvraagformulier voor {app_form_request['service']}",
+                    templates,
+                )
 
             # Helper function for recursive law chaining and claim processing
             # We keep track of processed services to avoid duplicates in the same chain
