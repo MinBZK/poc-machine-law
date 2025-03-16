@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 from eventsourcing.domain import Aggregate, event
@@ -60,6 +61,9 @@ class Case(Aggregate):
         self.reason = None
         self.verifier_id = None
         self.objection_status = None
+
+        # Add created_at timestamp
+        self.created_at = datetime.now()
 
         self.approved = None
         self.status = CaseStatus.SUBMITTED

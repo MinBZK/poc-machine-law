@@ -31,6 +31,9 @@ class MCPLawConnector:
         # Set up logging
         setup_logging()
 
+        # Store services instance
+        self.services = services
+
         # Initialize components
         self.registry = MCPServiceRegistry(services)
         self.claim_processor = MCPClaimProcessor(self.registry)
@@ -80,6 +83,186 @@ class MCPLawConnector:
         # Build the prompt with the actual available services in MCP compatible format
         system_prompt_template = self.jinja_env.get_template("mcp_system_prompt.j2")
         return system_prompt_template.render(service_tools=service_tools)
+
+    async def get_cases_context(self, bsn: str) -> str:
+        """Get formatted context about a user's existing cases (applications).
+
+        Args:
+            bsn: The BSN of the user
+
+        Returns:
+            Formatted cases context for the system prompt
+        """
+        # Get all cases for this user from the case manager using our new method
+        cases = self.services.case_manager.get_cases_by_bsn(bsn)
+
+        if not cases:
+            return self.jinja_env.get_template("includes/cases_context.j2").render(cases=None)
+
+        # Prepare case data for template
+        case_data = []
+
+        # Check if we have a profile for this BSN
+        profile = None
+        try:
+            from web.services.profiles import get_profile_data
+
+            profile = get_profile_data(bsn)
+        except Exception as e:
+            logger.warning(f"Error fetching profile for BSN {bsn}: {e}")
+
+        for case in cases:
+            # Get service name from registry
+            service_obj = None
+            for service_name in self.registry.get_service_names():
+                service = self.registry.get_service(service_name)
+                if service and service.service_type == case.service and service.law_path == case.law:
+                    service_obj = service
+                    break
+
+            service_name = service_name if service_obj else case.service
+
+            # Check if objection or appeal is possible
+            can_object = False
+            can_appeal = False
+            try:
+                can_object = case.can_object()
+            except:
+                pass
+
+            try:
+                can_appeal = case.can_appeal()
+            except:
+                pass
+
+            # Get objection and appeal status info if available
+            objection_info = (
+                case.objection_status if hasattr(case, "objection_status") and case.objection_status else None
+            )
+            appeal_info = case.appeal_status if hasattr(case, "appeal_status") and case.appeal_status else None
+
+            # Check for differences between current calculation and case
+            current_result = None
+            has_differences = False
+            differences_details = None
+
+            try:
+                if profile and hasattr(case, "verified_result") and case.verified_result:
+                    # Run a current calculation with approved=False to see current situation
+                    parameters = {"BSN": bsn}
+                    result = await self.services.evaluate(
+                        case.service, law=case.law, parameters=parameters, approved=False
+                    )
+
+                    if result and result.output:
+                        current_result = result.output
+
+                        # Get the rule spec to check for citizen_relevance markings
+                        rule_spec = self.services.resolver.get_rule_spec(case.law, "2025-01-01", service=case.service)
+
+                        # Extract primary value marked with citizen_relevance: primary
+                        primary_field = None
+                        if rule_spec and "properties" in rule_spec and "output" in rule_spec["properties"]:
+                            for output_def in rule_spec["properties"]["output"]:
+                                if output_def.get("citizen_relevance") == "primary":
+                                    primary_field = output_def.get("name")
+                                    break
+
+                        if primary_field and primary_field in current_result and primary_field in case.verified_result:
+                            # Use the field marked as primary for comparison
+                            current_amount = current_result.get(primary_field)
+                            case_amount = case.verified_result.get(primary_field)
+
+                            # Handle numbers - assume monetary amounts if fairly large (> 100)
+                            if isinstance(current_amount, int | float) and isinstance(case_amount, int | float):
+                                # Check if we need to format as money
+                                is_money = abs(current_amount) > 100 or abs(case_amount) > 100
+
+                                # Calculate difference and percentage
+                                abs_diff = abs(current_amount - case_amount)
+                                if case_amount != 0:
+                                    pct_diff = abs_diff / abs(case_amount) * 100
+
+                                    # Only flag significant differences (>1% or >€1)
+                                    if pct_diff > 1 or (is_money and abs_diff > 100):
+                                        has_differences = True
+
+                                        if is_money:
+                                            # Format as money (assuming cents)
+                                            differences_details = (
+                                                f"Bedrag verschil: €{abs_diff / 100:.2f} ({pct_diff:.1f}%)"
+                                            )
+
+                                            if current_amount > case_amount:
+                                                differences_details += f" (nu €{current_amount / 100:.2f}, eerder €{case_amount / 100:.2f})"
+                                            else:
+                                                differences_details += f" (nu €{current_amount / 100:.2f}, eerder €{case_amount / 100:.2f})"
+                                        else:
+                                            # Format as regular number
+                                            differences_details = (
+                                                f"Verschil in {primary_field}: {abs_diff} ({pct_diff:.1f}%)"
+                                            )
+
+                                            if current_amount > case_amount:
+                                                differences_details += f" (nu {current_amount}, eerder {case_amount})"
+                                            else:
+                                                differences_details += f" (nu {current_amount}, eerder {case_amount})"
+                        else:
+                            # Fallback to common amount fields if no primary field found
+                            for field_name in ["bedrag", "toeslag", "uitkering", "amount"]:
+                                if field_name in current_result and field_name in case.verified_result:
+                                    current_amount = current_result.get(field_name)
+                                    case_amount = case.verified_result.get(field_name)
+
+                                    # If amounts differ by more than 1 euro
+                                    if abs(current_amount - case_amount) > 100:  # amounts in cents
+                                        has_differences = True
+                                        differences_details = (
+                                            f"Bedrag verschil: €{abs(current_amount - case_amount) / 100:.2f}"
+                                        )
+
+                                        if current_amount > case_amount:
+                                            differences_details += (
+                                                f" (nu €{current_amount / 100:.2f}, eerder €{case_amount / 100:.2f})"
+                                            )
+                                        else:
+                                            differences_details += (
+                                                f" (nu €{current_amount / 100:.2f}, eerder €{case_amount / 100:.2f})"
+                                            )
+                                    break
+            except Exception as e:
+                logger.warning(f"Error calculating current result for comparison: {e}")
+
+            case_info = {
+                "id": case.id,
+                "service": case.service,
+                "service_name": service_name,
+                "law": case.law,
+                "status": case.status,
+                "approved": case.approved,
+                "created_at": case.created_at.strftime("%d-%m-%Y")
+                if hasattr(case, "created_at") and case.created_at
+                else None,
+                "can_object": can_object,
+                "can_appeal": can_appeal,
+                "objection_info": objection_info,
+                "appeal_info": appeal_info,
+                "has_differences": has_differences,
+                "differences_details": differences_details,
+                "current_result": current_result,
+                "case_result": case.verified_result if hasattr(case, "verified_result") else None,
+            }
+            case_data.append(case_info)
+
+        # Sort by most recent created date
+        case_data.sort(key=lambda x: x["created_at"] or "", reverse=True)
+
+        # Log the number of cases found
+        logger.info(f"Found {len(case_data)} cases for BSN {bsn}")
+
+        # Render the cases context template
+        cases_template = self.jinja_env.get_template("includes/cases_context.j2")
+        return cases_template.render(cases=case_data)
 
     def extract_application_form_reference(self, message: str) -> str | None:
         """Extract application form references from LLM responses.

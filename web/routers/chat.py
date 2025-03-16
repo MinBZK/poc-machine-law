@@ -285,10 +285,21 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
         # Set up MCP connector
         mcp_connector = MCPLawConnector(services)
 
-        # Create initial system prompt with profile context and dynamic service information
-        system_prompt = mcp_connector.jinja_env.get_template("chat_system_prompt.j2").render(
-            profile=profile, bsn=bsn, mcp_system_prompt=mcp_connector.get_system_prompt()
-        )
+        # Initial empty system prompt placeholder - we'll update it with fresh claims data each time
+        system_prompt = ""
+
+        # Function to get fresh system prompt with up-to-date cases data
+        async def get_updated_system_prompt():
+            cases_context = await mcp_connector.get_cases_context(bsn)
+            return mcp_connector.jinja_env.get_template("chat_system_prompt.j2").render(
+                profile=profile,
+                bsn=bsn,
+                cases_context=cases_context,
+                mcp_system_prompt=mcp_connector.get_system_prompt(),
+            )
+
+        # Initialize system prompt with initial data
+        system_prompt = await get_updated_system_prompt()
 
         # Initialize the conversation with just a list for user/assistant messages
         messages = []
@@ -315,6 +326,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
             # Regular message handling
             user_msg_content = user_message.get("message", "")
             messages.append({"role": "user", "content": user_msg_content})
+
+            # Get fresh system prompt with up-to-date claims data before each message
+            system_prompt = await get_updated_system_prompt()
 
             # Send message to Claude API to get initial response
             response = client.messages.create(
@@ -389,6 +403,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                                             bsn=bsn,
                                             auto_approve=True,  # Auto-approve user-provided values in chat
                                         )
+
+                                        # Update system prompt with new claim data
+                                        system_prompt = await get_updated_system_prompt()
                                         print(f"Created claim for {key}={parsed_value} for service {service_name}")
                         except Exception as e:
                             print(f"Error creating claim for {key}: {str(e)}")
@@ -398,6 +415,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
 
             # Process Claude's message with MCP connector to extract and execute law services
             service_results = await mcp_connector.process_message(assistant_message, bsn)
+
+            # Get fresh system prompt with updated claims data
+            system_prompt = await get_updated_system_prompt()
 
             # If there are service results, add them to the context and generate a new response
             final_message = assistant_message
@@ -450,6 +470,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                 tool_conversation = messages.copy()
                 tool_conversation.append(tool_message)
                 tool_conversation.append(tool_response)
+
+                # Get latest claims data before generating the final response
+                system_prompt = await get_updated_system_prompt()
 
                 # Get a new response from Claude with the tool results
                 final_response = client.messages.create(

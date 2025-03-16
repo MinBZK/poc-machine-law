@@ -1,0 +1,17 @@
+{% if claims %}
+## Eerder ingediende en goedgekeurde claims
+
+De burger heeft eerder aanvragen gedaan en claims ingediend:
+
+{% for claim in claims %}
+- {{ claim.service }} ({{ claim.law }}): {{ claim.key|replace('_', ' ') }} = {{ claim.value }}{% if claim.approved %} [GOEDGEKEURD]{% elif claim.rejected %} [AFGEWEZEN]{% else %} [IN_BEHANDELING]{% endif %}{% if claim.submission_date %} (ingediend op {{ claim.submission_date }}){% endif %}
+{% endfor %}
+
+Gebruik deze informatie om de burger beter te helpen:
+- Als een aanvraag al is goedgekeurd, vertel dat het al is goedgekeurd en sinds wanneer
+- Als een aanvraag in behandeling is, vertel dat ze moeten wachten op de uitkomst
+- Als een aanvraag is afgewezen, leg uit dat ze in beroep kunnen gaan of een nieuwe aanvraag kunnen doen
+- Wanneer de huidige berekening anders is dan de goedgekeurde aanvraag, wijs de burger hierop
+{% else %}
+De burger heeft nog geen eerdere aanvragen of claims ingediend.
+{% endif %}
