@@ -54,13 +54,20 @@
             </label>
         </div>
         {% if in_chat_panel %}
-            <!-- Chat-specific submit button -->
-            <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
-                    :disabled="!isChecked"
-                    :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
-                    class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
-                Bevestig aanvraag
-            </button>
+            <!-- Chat-specific buttons -->
+            <div class="flex gap-2">
+                <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
+                        :disabled="!isChecked"
+                        :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                        class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
+                    Bevestig aanvraag
+                </button>
+                <button type="button"
+                        @click="document.dispatchEvent(new CustomEvent('cancel-application-form'))"
+                        class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors">
+                    Annuleren
+                </button>
+            </div>
         {% else %}
             <!-- Standard panel submit button -->
             <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
@@ -69,12 +76,19 @@
                   hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
                   class="mb-2">
                 <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
-                <button type="submit"
-                        :disabled="!isChecked"
-                        :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
-                        class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
-                    Bevestig aanvraag
-                </button>
+                <div class="flex gap-2">
+                    <button type="submit"
+                            :disabled="!isChecked"
+                            :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                            class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
+                        Bevestig aanvraag
+                    </button>
+                    <button type="button"
+                            @click="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                            class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors">
+                        Annuleren
+                    </button>
+                </div>
             </form>
         {% endif %}
     </div>

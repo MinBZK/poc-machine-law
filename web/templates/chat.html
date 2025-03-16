@@ -1,57 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-    <!-- Add Tailwind Typography for markdown styling -->
-    <style>
-    /* Custom typography styles for chat messages - more compact */
-    .prose h1, .prose h2, .prose h3, .prose h4 {
-        margin-top: 0.3em;
-        margin-bottom: 0.3em;
-    }
-    .prose h1 { font-size: 1.3em; }
-    .prose h2 { font-size: 1.2em; }
-    .prose h3 { font-size: 1.1em; }
-    .prose p { margin-top: 0.3em; margin-bottom: 0.3em; }
-    .prose ul, .prose ol {
-        margin-top: 0.15em;
-        margin-bottom: 0.15em;
-        padding-left: 1.2em;
-    }
-    .prose ul { list-style-type: disc; }
-    .prose ol { list-style-type: decimal; }
-    .prose li { margin-bottom: 0.1em; }
-    .prose code {
-        background-color: rgba(0,0,0,0.05);
-        padding: 0.1em 0.2em;
-        border-radius: 0.2em;
-        font-size: 0.9em;
-    }
-    .prose pre {
-        background-color: rgba(0,0,0,0.05);
-        padding: 0.3em;
-        border-radius: 0.3em;
-        overflow-x: auto;
-        margin: 0.3em 0;
-    }
-    .prose table {
-        border-collapse: collapse;
-        margin: 0.3em 0;
-        font-size: 0.85em;
-    }
-    .prose table th, .prose table td {
-        border: 1px solid #ddd;
-        padding: 0.15em 0.3em;
-        text-align: left;
-    }
-    .prose table th {
-        background-color: rgba(0,0,0,0.05);
-    }
-    .prose blockquote {
-        border-left: 2px solid #ddd;
-        padding-left: 0.5em;
-        color: #666;
-        margin: 0.3em 0;
-    }
-    </style>
     <div class="flex flex-col h-[calc(100vh-120px)]"
          x-data="chatApp()"
          x-init="init('{{ bsn }}')">
@@ -180,6 +128,15 @@
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                 const wsUrl = `${protocol}//${window.location.host}/chat/ws/chat_${this.bsn}`;
                 console.log("Connecting to WebSocket URL:", wsUrl);
+
+                // Add event listener for cancelling application form
+                document.addEventListener('cancel-application-form', () => {
+                    // Find and remove the last application panel message
+                    const appPanelIndex = this.messages.findLastIndex(m => m.applicationPanel === true);
+                    if (appPanelIndex !== -1) {
+                        this.messages.splice(appPanelIndex, 1);
+                    }
+                });
 
                 this.websocket = new WebSocket(wsUrl);
 
