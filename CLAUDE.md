@@ -8,6 +8,7 @@
 - Validate schemas: `./script/validate`
 - Run web interface: `uv run web/main.py` (available at http://0.0.0.0:8000)
 - Run simulations: `uv run simulate.py`
+- Package management: `uv add [package]` to install dependencies
 
 ## Code Style
 - Python 3.12+
