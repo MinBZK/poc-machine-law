@@ -4,9 +4,9 @@ Vraag de burger naar de ontbrekende informatie en moedig ze aan om deze gegevens
 Vraag één voor één naar de ontbrekende gegevens. Leg uit dat dit nodig is om de berekening te kunnen uitvoeren.
 De burger kan antwoorden in een natuurlijke vorm zoals "mijn inkomen is 35000 euro" of "inkomen: 35000".
 
-Stel vragen zoals:
+Stel de volgende vragen (maak elke vraag vetgedrukt door markdown ** te gebruiken):
 {% for service_name, field in missing_fields %}
-- Wat is uw {{ field|replace('_', ' ') }}? (benodigd voor {{ service_name }})
+- **Wat is uw {{ field|replace('_', ' ') }}?** (benodigd voor {{ service_name }})
 {% endfor %}
 
 Leg uit dat zodra ze de informatie verstrekken, je een nieuwe berekening kunt maken.

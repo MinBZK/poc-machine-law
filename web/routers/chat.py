@@ -10,10 +10,10 @@ from explain.mcp_connector import MCPLawConnector
 from machine.service import Services
 from web.dependencies import get_services, templates
 from web.services.profiles import get_profile_data
+from web.utils import format_message
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-# Store active connections
 connections: dict[str, list[WebSocket]] = {}
 
 
@@ -191,10 +191,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
             final_message = assistant_message
             if service_results:
                 # Let the user know we're executing services
+                processing_msg = "Ik ben even bezig met het uitvoeren van berekeningen... ⏳"
+                html_message = format_message(processing_msg)
                 await websocket.send_text(
-                    json.dumps(
-                        {"message": "Ik ben even bezig met het uitvoeren van berekeningen... ⏳", "isProcessing": True}
-                    )
+                    json.dumps({"message": processing_msg, "html": str(html_message), "isProcessing": True})
                 )
 
                 # Format the service results
@@ -255,8 +255,11 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
             # Clean the message
             cleaned_message = clean_message(final_message)
 
-            # Send Claude's response back to the client
-            await websocket.send_text(json.dumps({"message": cleaned_message}))
+            # Server-side markdown rendering
+            html_message = format_message(cleaned_message)
+
+            # Send Claude's response back to the client with pre-rendered HTML
+            await websocket.send_text(json.dumps({"message": cleaned_message, "html": str(html_message)}))
 
             # Helper function for recursive law chaining and claim processing
             # We keep track of processed services to avoid duplicates in the same chain
@@ -318,10 +321,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                         continue
 
                     # Let the user know we're executing this service
+                    processing_msg = f"Ik ga nu kijken naar uw recht op {service_name}... ⏳"
+                    html_message = format_message(processing_msg)
                     await websocket.send_text(
-                        json.dumps(
-                            {"message": f"Ik ga nu kijken naar uw recht op {service_name}... ⏳", "isProcessing": True}
-                        )
+                        json.dumps({"message": processing_msg, "html": str(html_message), "isProcessing": True})
                     )
 
                     try:
@@ -367,8 +370,13 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Ser
                         # Clean message before sending to client
                         cleaned_next_message = clean_message(next_message)
 
-                        # Send response to client
-                        await websocket.send_text(json.dumps({"message": cleaned_next_message}))
+                        # Server-side markdown rendering
+                        html_message = format_message(cleaned_next_message)
+
+                        # Send response to client with pre-rendered HTML
+                        await websocket.send_text(
+                            json.dumps({"message": cleaned_next_message, "html": str(html_message)})
+                        )
 
                         # Continue recursion with this new message
                         await process_next_step(next_message, current_messages)

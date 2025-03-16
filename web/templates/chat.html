@@ -77,7 +77,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 max-w-3xl">
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 max-w-3xl prose prose-sm">
                         <p class="text-gray-800">
                             Hallo {{ profile.name }}! Ik ben BurgerBot, uw digitale assistent. Ik kan u helpen met vragen over wetten en regelingen. Wat wilt u weten?
                         </p>
@@ -101,7 +101,7 @@
                         <!-- Message Content -->
                         <div :class="message.isUser ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'"
                              class="rounded-lg px-4 py-2 max-w-3xl prose prose-sm"
-                             x-html="formatMessage(message.text)"></div>
+                             x-html="message.html || '&lt;p&gt;' + message.text + '&lt;/p&gt;'"></div>
                         <!-- User Avatar -->
                         <template x-if="message.isUser">
                             <div class="flex-shrink-0 bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center ml-3">
@@ -156,8 +156,6 @@
             </form>
         </div>
     </div>
-    <!-- Add Marked.js for Markdown rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
     function chatApp() {
         return {
@@ -170,16 +168,6 @@
             init(bsn) {
                 this.bsn = bsn || '100000001'; // Default BSN if none provided
                 console.log("Initializing chat with BSN:", this.bsn);
-
-                // Set up marked.js options for Markdown parsing
-                marked.setOptions({
-                    breaks: true,  // Add 'br' on single line breaks
-                    gfm: true,     // Use GitHub Flavored Markdown
-                    headerIds: false, // Don't add IDs to headers
-                    mangle: false,  // Don't mangle email addresses
-                    sanitize: false, // Allow HTML in the source
-                    tables: true    // Enable tables
-                });
 
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                 const wsUrl = `${protocol}//${window.location.host}/chat/ws/chat_${this.bsn}`;
@@ -194,12 +182,14 @@
                     if (data.error) {
                         this.messages.push({
                             text: `Er is een fout opgetreden: ${data.error}`,
+                            html: `<p>Er is een fout opgetreden: ${data.error}</p>`,
                             isUser: false
                         });
                     } else if (data.isProcessing) {
                         // This is a processing message, show it as a temporary message that will be replaced
                         this.messages.push({
                             text: data.message,
+                            html: data.html,
                             isUser: false,
                             isTemporary: true
                         });
@@ -211,6 +201,7 @@
 
                         this.messages.push({
                             text: data.message,
+                            html: data.html,
                             isUser: false
                         });
                     }
@@ -243,6 +234,7 @@
                 const message = this.newMessage.trim();
                 this.messages.push({
                     text: message,
+                    html: `<p>${message}</p>`, // Simple HTML for user messages
                     isUser: true
                 });
 
@@ -259,6 +251,7 @@
                     this.isLoading = false;
                     this.messages.push({
                         text: 'Kan geen verbinding maken met de server. Probeer het later opnieuw.',
+                        html: '<p>Kan geen verbinding maken met de server. Probeer het later opnieuw.</p>',
                         isUser: false
                     });
 
@@ -271,32 +264,6 @@
             scrollToBottom() {
                 const container = this.$refs.chatContainer;
                 container.scrollTop = container.scrollHeight;
-            },
-
-            formatMessage(text) {
-                if (!text) return '';
-
-                // For user messages, only convert URLs (no markdown)
-                const urlRegex = /(https?:\/\/[^\s]+)/g;
-
-                // Check if this is a user message
-                const isUserMessage = this.messages.find(m => m.text === text)?.isUser;
-
-                // For bot messages, apply markdown rendering
-                if (!isUserMessage) {
-                    try {
-                        // First convert URLs to markdown links
-                        const processedText = text.replace(urlRegex, url => `[${url}](${url})`);
-                        // Then parse the markdown
-                        return marked.parse(processedText);
-                    } catch (e) {
-                        console.error('Error parsing markdown:', e);
-                        return text; // Fallback to plain text if markdown parsing fails
-                    }
-                }
-
-                // For user messages just convert links
-                return text.replace(urlRegex, url => `<a href="${url}" target="_blank" class="underline">${url}</a>`);
             }
         };
     }
