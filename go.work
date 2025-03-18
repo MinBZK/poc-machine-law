@@ -1,3 +1,7 @@
 go 1.23.3
 
-use ./lac-to-regelspraak
+use (
+	./features
+	./lac-to-regelspraak
+	./machine-v3
+)

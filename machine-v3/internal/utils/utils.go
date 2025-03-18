@@ -18,22 +18,22 @@ const (
 
 // RuleSpec defines a rule specification
 type RuleSpec struct {
-	Path           string                 `json:"path"`
-	DecisionType   string                 `json:"decision_type"`
-	LawType        string                 `json:"law_type"`
-	LegalCharacter string                 `json:"legal_character"`
-	UUID           string                 `json:"uuid"`
-	Name           string                 `json:"name"`
-	Law            string                 `json:"law"`
-	ValidFrom      time.Time              `json:"valid_from"`
-	Service        string                 `json:"service"`
-	Discoverable   string                 `json:"discoverable"`
-	Properties     map[string]interface{} `json:"properties"`
+	Path           string         `json:"path"`
+	DecisionType   string         `json:"decision_type"`
+	LawType        string         `json:"law_type"`
+	LegalCharacter string         `json:"legal_character"`
+	UUID           string         `json:"uuid"`
+	Name           string         `json:"name"`
+	Law            string         `json:"law"`
+	ValidFrom      time.Time      `json:"valid_from"`
+	Service        string         `json:"service"`
+	Discoverable   string         `json:"discoverable"`
+	Properties     map[string]any `json:"properties"`
 }
 
 // FromYAML creates a RuleSpec from YAML file contents
 func (r *RuleSpec) FromYAML(data []byte, path string) error {
-	var rawData map[string]interface{}
+	var rawData map[string]any
 	if err := yaml.Unmarshal(data, &rawData); err != nil {
 		return err
 	}
@@ -63,17 +63,17 @@ func (r *RuleSpec) FromYAML(data []byte, path string) error {
 	}
 
 	// Get properties
-	if props, ok := rawData["properties"].(map[string]interface{}); ok {
+	if props, ok := rawData["properties"].(map[string]any); ok {
 		r.Properties = props
 	} else {
-		r.Properties = make(map[string]interface{})
+		r.Properties = make(map[string]any)
 	}
 
 	return nil
 }
 
 // Helper function to safely get string value from map
-func getString(data map[string]interface{}, key string) string {
+func getString(data map[string]any, key string) string {
 	if val, ok := data[key]; ok {
 		if strVal, ok := val.(string); ok {
 			return strVal
@@ -121,20 +121,29 @@ func (r *RuleResolver) LoadRules() error {
 	// Find all .yaml and .yml files recursively
 	var yamlFiles []string
 
-	err := filepath.Walk(r.RulesDir, func(path string, info os.FileInfo, err error) error {
+	err := func() error {
+		// First, evaluate the symlink to get the actual path
+		realPath, err := filepath.EvalSymlinks(r.RulesDir)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to evaluate symlink %s: %w", r.RulesDir, err)
 		}
 
-		if !info.IsDir() {
-			ext := strings.ToLower(filepath.Ext(path))
-			if ext == ".yaml" || ext == ".yml" {
-				yamlFiles = append(yamlFiles, path)
+		// Now walk the real path
+		return filepath.Walk(realPath, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
 			}
-		}
 
-		return nil
-	})
+			if !info.IsDir() {
+				ext := strings.ToLower(filepath.Ext(path))
+				if ext == ".yaml" || ext == ".yml" {
+					yamlFiles = append(yamlFiles, path)
+				}
+			}
+
+			return nil
+		})
+	}()
 
 	if err != nil {
 		return err
@@ -268,7 +277,7 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (*Rul
 }
 
 // GetRuleSpec gets the rule specification as a map
-func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (map[string]interface{}, error) {
+func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (map[string]any, error) {
 	rule, err := r.FindRule(law, referenceDate, service)
 	if err != nil {
 		return nil, err
@@ -279,7 +288,7 @@ func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (m
 		return nil, fmt.Errorf("error reading rule file: %v", err)
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	err = yaml.Unmarshal(data, &result)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing rule YAML: %v", err)
@@ -289,14 +298,14 @@ func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (m
 }
 
 // RulesDataFrame returns a slice of maps representing all rules
-func (r *RuleResolver) RulesDataFrame() []map[string]interface{} {
+func (r *RuleResolver) RulesDataFrame() []map[string]any {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	result := make([]map[string]interface{}, 0, len(r.Rules))
+	result := make([]map[string]any, 0, len(r.Rules))
 
 	for _, rule := range r.Rules {
-		ruleData := map[string]interface{}{
+		ruleData := map[string]any{
 			"path":            rule.Path,
 			"decision_type":   rule.DecisionType,
 			"legal_character": rule.LegalCharacter,

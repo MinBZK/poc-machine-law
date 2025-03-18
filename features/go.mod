@@ -2,12 +2,13 @@ module github.com/minbzk/poc-machine-law/features
 
 go 1.23.3
 
-// replace github.com/minbzk/poc-machine-law/machine-v2/rules => ../machine-v2/rules
+replace github.com/minbzk/poc-machine-law/machine-v3 => ../machine-v3
 
 require (
 	github.com/cucumber/godog v0.15.0
+	github.com/minbzk/poc-machine-law/machine-v3 v0.0.0-20250311082128-0b97b4006c7b
+	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.2
-	// github.com/minbzk/poc-machine-law/machine-v2/rules v0.0.0-20250303104833-9ac4ae2233b4
 )
 
 require (
@@ -15,10 +16,12 @@ require (
 	github.com/cucumber/messages/go/v21 v21.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gofrs/uuid v4.3.1+incompatible // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-memdb v1.3.4 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

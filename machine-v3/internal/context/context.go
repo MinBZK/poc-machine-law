@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/minbzk/poc-machine-law/machine-v3/internal/logging"
-	"github.com/minbzk/poc-machine-law/machine-v3/internal/model"
+	"github.com/minbzk/poc-machine-law/machine-v3/model"
 )
 
 var logger = logging.GetLogger("context")
@@ -25,7 +25,7 @@ type TypeSpec struct {
 }
 
 // Enforce applies type specifications to a value
-func (ts *TypeSpec) Enforce(value interface{}) interface{} {
+func (ts *TypeSpec) Enforce(value any) any {
 	if ts.Type == "string" {
 		return fmt.Sprintf("%v", value)
 	}
@@ -87,26 +87,26 @@ func (ts *TypeSpec) Enforce(value interface{}) interface{} {
 
 // ServiceProvider interface defines what a service provider needs to implement
 type ServiceProvider interface {
-	Evaluate(ctx context.Context, service, law string, parameters map[string]interface{}, referenceDate string,
-		overwriteInput map[string]map[string]interface{}, requestedOutput string, approved bool) (*model.RuleResult, error)
+	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
+		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
 }
 
 // RuleContext holds context for rule evaluation
 type RuleContext struct {
-	Definitions     map[string]interface{}
+	Definitions     map[string]any
 	ServiceProvider ServiceProvider
-	Parameters      map[string]interface{}
-	PropertySpecs   map[string]map[string]interface{}
+	Parameters      map[string]any
+	PropertySpecs   map[string]map[string]any
 	OutputSpecs     map[string]TypeSpec
 	Sources         map[string]model.DataFrame
-	Local           map[string]interface{}
+	Local           map[string]any
 	AccessedPaths   map[string]struct{}
-	ValuesCache     map[string]interface{}
+	ValuesCache     map[string]any
 	Path            []*model.PathNode
-	OverwriteInput  map[string]map[string]interface{}
-	Outputs         map[string]interface{}
+	OverwriteInput  map[string]map[string]any
+	Outputs         map[string]any
 	CalculationDate string
-	ResolvedPaths   map[string]interface{}
+	ResolvedPaths   map[string]any
 	ServiceName     string
 	Claims          map[string]*model.Claim
 	Approved        bool
@@ -115,10 +115,10 @@ type RuleContext struct {
 }
 
 // NewRuleContext creates a new rule context
-func NewRuleContext(ctx context.Context, definitions map[string]interface{}, serviceProvider ServiceProvider,
-	parameters map[string]interface{}, propertySpecs map[string]map[string]interface{},
+func NewRuleContext(ctx context.Context, definitions map[string]any, serviceProvider ServiceProvider,
+	parameters map[string]any, propertySpecs map[string]map[string]any,
 	outputSpecs map[string]TypeSpec, sources map[string]model.DataFrame, path []*model.PathNode,
-	overwriteInput map[string]map[string]interface{}, calculationDate string,
+	overwriteInput map[string]map[string]any, calculationDate string,
 	serviceName string, claims map[string]*model.Claim, approved bool) *RuleContext {
 
 	if path == nil {
@@ -132,14 +132,14 @@ func NewRuleContext(ctx context.Context, definitions map[string]interface{}, ser
 		PropertySpecs:   propertySpecs,
 		OutputSpecs:     outputSpecs,
 		Sources:         sources,
-		Local:           make(map[string]interface{}),
+		Local:           make(map[string]any),
 		AccessedPaths:   make(map[string]struct{}),
-		ValuesCache:     make(map[string]interface{}),
+		ValuesCache:     make(map[string]any),
 		Path:            path,
 		OverwriteInput:  overwriteInput,
-		Outputs:         make(map[string]interface{}),
+		Outputs:         make(map[string]any),
 		CalculationDate: calculationDate,
-		ResolvedPaths:   make(map[string]interface{}),
+		ResolvedPaths:   make(map[string]any),
 		ServiceName:     serviceName,
 		Claims:          claims,
 		Approved:        approved,
@@ -169,7 +169,7 @@ func (rc *RuleContext) PopPath() {
 }
 
 // ResolveValue resolves a value from definitions, services, or sources
-func (rc *RuleContext) ResolveValue(path interface{}) (interface{}, error) {
+func (rc *RuleContext) ResolveValue(path any) (any, error) {
 	value, err := rc.resolveValueInternal(path)
 	if err != nil {
 		return nil, err
@@ -181,12 +181,12 @@ func (rc *RuleContext) ResolveValue(path interface{}) (interface{}, error) {
 	return value, nil
 }
 
-func (rc *RuleContext) resolveValueInternal(path interface{}) (interface{}, error) {
+func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 	node := &model.PathNode{
 		Type:    "resolve",
 		Name:    fmt.Sprintf("Resolving value: %v", path),
 		Result:  nil,
-		Details: map[string]interface{}{"path": path},
+		Details: map[string]any{"path": path},
 	}
 	rc.AddToPath(node)
 
@@ -330,7 +330,7 @@ func (rc *RuleContext) resolveValueInternal(path interface{}) (interface{}, erro
 	// Handle property specs
 	if spec, exists := rc.PropertySpecs[strPath]; exists {
 		// Check overwrite data
-		if serviceRef, ok := spec["service_reference"].(map[string]interface{}); ok {
+		if serviceRef, ok := spec["service_reference"].(map[string]any); ok {
 			serviceName, hasService := serviceRef["service"].(string)
 			fieldName, hasField := serviceRef["field"].(string)
 
@@ -347,7 +347,7 @@ func (rc *RuleContext) resolveValueInternal(path interface{}) (interface{}, erro
 		}
 
 		// Check sources
-		if sourceRef, ok := spec["source_reference"].(map[string]interface{}); ok {
+		if sourceRef, ok := spec["source_reference"].(map[string]any); ok {
 			value, err := rc.resolveFromSource(sourceRef, spec)
 			if err == nil && value != nil {
 				node.Result = value
@@ -367,7 +367,7 @@ func (rc *RuleContext) resolveValueInternal(path interface{}) (interface{}, erro
 		}
 
 		// Check services
-		if serviceRef, ok := spec["service_reference"].(map[string]interface{}); ok && rc.ServiceProvider != nil {
+		if serviceRef, ok := spec["service_reference"].(map[string]any); ok && rc.ServiceProvider != nil {
 			value, err := rc.resolveFromService(strPath, serviceRef, spec)
 			if err == nil {
 				logger.WithIndent().Debugf("Result for $%s from %s field %s: %v",
@@ -411,7 +411,7 @@ func (rc *RuleContext) resolveValueInternal(path interface{}) (interface{}, erro
 }
 
 // resolveDate handles special date-related paths
-func (rc *RuleContext) resolveDate(path string) (interface{}, error) {
+func (rc *RuleContext) resolveDate(path string) (any, error) {
 	if path == "calculation_date" {
 		return rc.CalculationDate, nil
 	}
@@ -446,19 +446,19 @@ func (rc *RuleContext) resolveDate(path string) (interface{}, error) {
 // resolveFromService resolves a value from a service
 func (rc *RuleContext) resolveFromService(
 	path string,
-	serviceRef map[string]interface{},
-	spec map[string]interface{}) (interface{}, error) {
+	serviceRef map[string]any,
+	spec map[string]any) (any, error) {
 
 	// Clone parameters
-	parameters := make(map[string]interface{})
+	parameters := make(map[string]any)
 	for k, v := range rc.Parameters {
 		parameters[k] = v
 	}
 
 	// Add service reference parameters
-	if serviceParams, ok := serviceRef["parameters"].([]interface{}); ok {
+	if serviceParams, ok := serviceRef["parameters"].([]any); ok {
 		for _, paramObj := range serviceParams {
-			if param, ok := paramObj.(map[string]interface{}); ok {
+			if param, ok := paramObj.(map[string]any); ok {
 				name, hasName := param["name"].(string)
 				reference, hasRef := param["reference"].(string)
 
@@ -475,7 +475,7 @@ func (rc *RuleContext) resolveFromService(
 
 	// Get reference date
 	referenceDate := rc.CalculationDate
-	if temporal, ok := spec["temporal"].(map[string]interface{}); ok {
+	if temporal, ok := spec["temporal"].(map[string]any); ok {
 		if reference, ok := temporal["reference"].(string); ok {
 			refDate, err := rc.ResolveValue(reference)
 			if err != nil {
@@ -516,7 +516,7 @@ func (rc *RuleContext) resolveFromService(
 	}
 
 	// Create service evaluation node
-	details := map[string]interface{}{
+	details := map[string]any{
 		"service":        serviceRef["service"],
 		"law":            serviceRef["law"],
 		"field":          serviceRef["field"],
@@ -580,8 +580,8 @@ func (rc *RuleContext) resolveFromService(
 
 // resolveFromSource resolves a value from a data source
 func (rc *RuleContext) resolveFromSource(
-	sourceRef map[string]interface{},
-	spec map[string]interface{}) (interface{}, error) {
+	sourceRef map[string]any,
+	spec map[string]any) (any, error) {
 
 	var df model.DataFrame
 	tableName := ""
@@ -619,9 +619,9 @@ func (rc *RuleContext) resolveFromSource(
 	}
 
 	// Apply filters
-	if selectOn, ok := sourceRef["select_on"].([]interface{}); ok {
+	if selectOn, ok := sourceRef["select_on"].([]any); ok {
 		for _, selectCond := range selectOn {
-			if cond, ok := selectCond.(map[string]interface{}); ok {
+			if cond, ok := selectCond.(map[string]any); ok {
 				nameVal, hasName := cond["name"].(string)
 				valueRef, hasValue := cond["value"]
 
@@ -632,7 +632,7 @@ func (rc *RuleContext) resolveFromSource(
 					}
 
 					// Handle special operations
-					if valueMap, isMap := value.(map[string]interface{}); isMap {
+					if valueMap, isMap := value.(map[string]any); isMap {
 						if op, hasOp := valueMap["operation"].(string); hasOp && op == "IN" {
 							if valuesRef, hasValues := valueMap["values"]; hasValues {
 								allowedValues, err := rc.ResolveValue(valuesRef)
@@ -658,14 +658,14 @@ func (rc *RuleContext) resolveFromSource(
 	}
 
 	// Get results according to requested fields
-	var result interface{}
+	var result any
 
-	if fields, ok := sourceRef["fields"].([]string); ok && len(fields) > 0 {
+	if fields, ok := sourceRef["fields"].([]any); ok && len(fields) > 0 {
 		// Check if all requested fields exist
 		missingFields := []string{}
 		for _, f := range fields {
-			if !df.HasColumn(f) {
-				missingFields = append(missingFields, f)
+			if !df.HasColumn(f.(string)) {
+				missingFields = append(missingFields, f.(string))
 			}
 		}
 
@@ -676,8 +676,8 @@ func (rc *RuleContext) resolveFromSource(
 		// Get existing fields
 		existingFields := []string{}
 		for _, f := range fields {
-			if df.HasColumn(f) {
-				existingFields = append(existingFields, f)
+			if df.HasColumn(f.(string)) {
+				existingFields = append(existingFields, f.(string))
 			}
 		}
 
@@ -698,14 +698,14 @@ func (rc *RuleContext) resolveFromSource(
 
 	// Handle array results
 	switch r := result.(type) {
-	case []interface{}:
+	case []any:
 		if len(r) == 0 {
 			return nil, nil
 		}
 		if len(r) == 1 {
 			return r[0], nil
 		}
-	case []map[string]interface{}:
+	case []map[string]any:
 		if len(r) == 0 {
 			return nil, nil
 		}
@@ -718,7 +718,7 @@ func (rc *RuleContext) resolveFromSource(
 }
 
 // Helper function to safely get a boolean from a map
-func getBoolFromMap(m map[string]interface{}, key string, defaultValue bool) bool {
+func getBoolFromMap(m map[string]any, key string, defaultValue bool) bool {
 	if val, exists := m[key]; exists {
 		if boolVal, ok := val.(bool); ok {
 			return boolVal

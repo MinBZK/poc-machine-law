@@ -114,22 +114,22 @@ func (l *Logger) SetLevel(level logrus.Level) {
 }
 
 // Debugf logs a debug message with indentation
-func (e *IndentEntry) Debugf(format string, args ...interface{}) {
+func (e *IndentEntry) Debugf(format string, args ...any) {
 	e.entry.Debugf("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
 }
 
 // Infof logs an info message with indentation
-func (e *IndentEntry) Infof(format string, args ...interface{}) {
+func (e *IndentEntry) Infof(format string, args ...any) {
 	e.entry.Infof("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
 }
 
 // Warningf logs a warning message with indentation
-func (e *IndentEntry) Warningf(format string, args ...interface{}) {
+func (e *IndentEntry) Warningf(format string, args ...any) {
 	e.entry.Warnf("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
 }
 
 // Errorf logs an error message with indentation
-func (e *IndentEntry) Errorf(format string, args ...interface{}) {
+func (e *IndentEntry) Errorf(format string, args ...any) {
 	e.entry.Errorf("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
 }
 

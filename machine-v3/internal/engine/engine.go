@@ -9,31 +9,31 @@ import (
 
 	contexter "github.com/minbzk/poc-machine-law/machine-v3/internal/context"
 	"github.com/minbzk/poc-machine-law/machine-v3/internal/logging"
-	"github.com/minbzk/poc-machine-law/machine-v3/internal/model"
+	"github.com/minbzk/poc-machine-law/machine-v3/model"
 )
 
 var logger = logging.GetLogger("rules_engine")
 
 // RulesEngine evaluates business rules
 type RulesEngine struct {
-	Spec            map[string]interface{}
+	Spec            map[string]any
 	ServiceName     string
 	Law             string
-	Requirements    []interface{}
-	Actions         []interface{}
-	ParameterSpecs  map[string]interface{}
-	PropertySpecs   map[string]map[string]interface{}
+	Requirements    []any
+	Actions         []any
+	ParameterSpecs  map[string]any
+	PropertySpecs   map[string]map[string]any
 	OutputSpecs     map[string]contexter.TypeSpec
-	Definitions     map[string]interface{}
+	Definitions     map[string]any
 	ServiceProvider contexter.ServiceProvider
 }
 
 // NewRulesEngine creates a new rules engine instance
-func NewRulesEngine(spec map[string]interface{}, serviceProvider contexter.ServiceProvider) *RulesEngine {
+func NewRulesEngine(spec map[string]any, serviceProvider contexter.ServiceProvider) *RulesEngine {
 	engine := &RulesEngine{
 		Spec:            spec,
 		ServiceProvider: serviceProvider,
-		PropertySpecs:   make(map[string]map[string]interface{}),
+		PropertySpecs:   make(map[string]map[string]any),
 		OutputSpecs:     make(map[string]contexter.TypeSpec),
 	}
 
@@ -46,19 +46,19 @@ func NewRulesEngine(spec map[string]interface{}, serviceProvider contexter.Servi
 		engine.Law = law
 	}
 
-	if requirements, ok := spec["requirements"].([]interface{}); ok {
+	if requirements, ok := spec["requirements"].([]any); ok {
 		engine.Requirements = requirements
 	}
 
-	if actions, ok := spec["actions"].([]interface{}); ok {
+	if actions, ok := spec["actions"].([]any); ok {
 		engine.Actions = actions
 	}
 
 	// Extract properties
-	propertiesMap, _ := spec["properties"].(map[string]interface{})
+	propertiesMap, _ := spec["properties"].(map[string]any)
 	if propertiesMap != nil {
 		// Get parameter specs
-		engine.ParameterSpecs, _ = propertiesMap["parameters"].(map[string]interface{})
+		engine.ParameterSpecs, _ = propertiesMap["parameters"].(map[string]any)
 
 		// Build property specs
 		engine.PropertySpecs = engine.buildPropertySpecs(propertiesMap)
@@ -67,9 +67,9 @@ func NewRulesEngine(spec map[string]interface{}, serviceProvider contexter.Servi
 		engine.OutputSpecs = engine.buildOutputSpecs(propertiesMap)
 
 		// Get definitions
-		engine.Definitions, _ = propertiesMap["definitions"].(map[string]interface{})
+		engine.Definitions, _ = propertiesMap["definitions"].(map[string]any)
 		if engine.Definitions == nil {
-			engine.Definitions = make(map[string]interface{})
+			engine.Definitions = make(map[string]any)
 		}
 	}
 
@@ -77,13 +77,13 @@ func NewRulesEngine(spec map[string]interface{}, serviceProvider contexter.Servi
 }
 
 // buildPropertySpecs builds a mapping of property paths to their specifications
-func (re *RulesEngine) buildPropertySpecs(properties map[string]interface{}) map[string]map[string]interface{} {
-	specs := make(map[string]map[string]interface{})
+func (re *RulesEngine) buildPropertySpecs(properties map[string]any) map[string]map[string]any {
+	specs := make(map[string]map[string]any)
 
 	// Add input properties
-	if inputProps, ok := properties["input"].([]interface{}); ok {
+	if inputProps, ok := properties["input"].([]any); ok {
 		for _, prop := range inputProps {
-			if propMap, ok := prop.(map[string]interface{}); ok {
+			if propMap, ok := prop.(map[string]any); ok {
 				if name, ok := propMap["name"].(string); ok {
 					specs[name] = propMap
 				}
@@ -92,9 +92,9 @@ func (re *RulesEngine) buildPropertySpecs(properties map[string]interface{}) map
 	}
 
 	// Add source properties
-	if sources, ok := properties["sources"].([]interface{}); ok {
+	if sources, ok := properties["sources"].([]any); ok {
 		for _, source := range sources {
-			if sourceMap, ok := source.(map[string]interface{}); ok {
+			if sourceMap, ok := source.(map[string]any); ok {
 				if name, ok := sourceMap["name"].(string); ok {
 					specs[name] = sourceMap
 				}
@@ -106,13 +106,13 @@ func (re *RulesEngine) buildPropertySpecs(properties map[string]interface{}) map
 }
 
 // buildOutputSpecs builds a mapping of output names to their type specifications
-func (re *RulesEngine) buildOutputSpecs(properties map[string]interface{}) map[string]contexter.TypeSpec {
+func (re *RulesEngine) buildOutputSpecs(properties map[string]any) map[string]contexter.TypeSpec {
 	specs := make(map[string]contexter.TypeSpec)
 
 	// Process output properties
-	if outputProps, ok := properties["output"].([]interface{}); ok {
+	if outputProps, ok := properties["output"].([]any); ok {
 		for _, output := range outputProps {
-			if outputMap, ok := output.(map[string]interface{}); ok {
+			if outputMap, ok := output.(map[string]any); ok {
 				if name, ok := outputMap["name"].(string); ok {
 					var typeSpec contexter.TypeSpec
 
@@ -122,7 +122,7 @@ func (re *RulesEngine) buildOutputSpecs(properties map[string]interface{}) map[s
 					}
 
 					// Extract type_spec details
-					if typeSpecMap, ok := outputMap["type_spec"].(map[string]interface{}); ok {
+					if typeSpecMap, ok := outputMap["type_spec"].(map[string]any); ok {
 						if unit, ok := typeSpecMap["unit"].(string); ok {
 							typeSpec.Unit = unit
 						}
@@ -157,7 +157,7 @@ func (re *RulesEngine) buildOutputSpecs(properties map[string]interface{}) map[s
 }
 
 // enforceOutputType enforces type specifications on an output value
-func (re *RulesEngine) enforceOutputType(name string, value interface{}) interface{} {
+func (re *RulesEngine) enforceOutputType(name string, value any) any {
 	if spec, exists := re.OutputSpecs[name]; exists {
 		return spec.Enforce(value)
 	}
@@ -242,11 +242,11 @@ func (re *RulesEngine) topologicalSort(dependencies map[string]map[string]struct
 }
 
 // analyzeDependencies finds all outputs an action depends on
-func (re *RulesEngine) analyzeDependencies(action interface{}) map[string]struct{} {
+func (re *RulesEngine) analyzeDependencies(action any) map[string]struct{} {
 	deps := make(map[string]struct{})
 
-	var traverse func(obj interface{})
-	traverse = func(obj interface{}) {
+	var traverse func(obj any)
+	traverse = func(obj any) {
 		switch v := obj.(type) {
 		case string:
 			if strings.HasPrefix(v, "$") {
@@ -256,11 +256,11 @@ func (re *RulesEngine) analyzeDependencies(action interface{}) map[string]struct
 					deps[value] = struct{}{}
 				}
 			}
-		case map[string]interface{}:
+		case map[string]any:
 			for _, value := range v {
 				traverse(value)
 			}
-		case []interface{}:
+		case []any:
 			for _, item := range v {
 				traverse(item)
 			}
@@ -272,17 +272,17 @@ func (re *RulesEngine) analyzeDependencies(action interface{}) map[string]struct
 }
 
 // getRequiredActions gets all actions needed to compute requested output in dependency order
-func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []interface{}) ([]interface{}, error) {
+func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []any) ([]any, error) {
 	if requestedOutput == "" {
 		return actions, nil
 	}
 
 	// Build dependency graph
 	dependencies := make(map[string]map[string]struct{})
-	actionByOutput := make(map[string]interface{})
+	actionByOutput := make(map[string]any)
 
 	for _, action := range actions {
-		if actionMap, ok := action.(map[string]interface{}); ok {
+		if actionMap, ok := action.(map[string]any); ok {
 			if output, ok := actionMap["output"].(string); ok {
 				actionByOutput[output] = action
 				dependencies[output] = re.analyzeDependencies(action)
@@ -329,7 +329,7 @@ func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []inte
 	}
 
 	// Return actions in dependency order
-	var requiredActions []interface{}
+	var requiredActions []any
 	for _, output := range orderedOutputs {
 		if action, ok := actionByOutput[output]; ok {
 			requiredActions = append(requiredActions, action)
@@ -342,17 +342,17 @@ func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []inte
 // Evaluate evaluates rules using service context and sources
 func (re *RulesEngine) Evaluate(
 	ctx context.Context,
-	parameters map[string]interface{},
-	overwriteInput map[string]map[string]interface{},
+	parameters map[string]any,
+	overwriteInput map[string]map[string]any,
 	sources map[string]model.DataFrame,
 	calculationDate string,
 	requestedOutput string,
 	approved bool,
-) (map[string]interface{}, error) {
+) (map[string]any, error) {
 	// Check required parameters
 	if re.ParameterSpecs != nil {
 		for _, p := range re.ParameterSpecs {
-			if paramMap, ok := p.(map[string]interface{}); ok {
+			if paramMap, ok := p.(map[string]any); ok {
 				if required, ok := paramMap["required"].(bool); ok && required {
 					if name, ok := paramMap["name"].(string); ok {
 						if _, exists := parameters[name]; !exists {
@@ -423,7 +423,7 @@ func (re *RulesEngine) Evaluate(
 
 	ruleCtx.PopPath()
 
-	outputValues := make(map[string]interface{})
+	outputValues := make(map[string]any)
 	if requirementsMet {
 		// Get required actions including dependencies in order
 		requiredActions, err := re.getRequiredActions(requestedOutput, re.Actions)
@@ -449,7 +449,7 @@ func (re *RulesEngine) Evaluate(
 
 	if ruleCtx.MissingRequired {
 		logger.WithIndent().Warningf("Missing required values, requirements not met, setting outputs to empty.")
-		outputValues = make(map[string]interface{})
+		outputValues = make(map[string]any)
 		requirementsMet = false
 	}
 
@@ -457,7 +457,7 @@ func (re *RulesEngine) Evaluate(
 		logger.WithIndent().Warningf("No output values computed for %s %s", calculationDate, requestedOutput)
 	}
 
-	result := map[string]interface{}{
+	result := map[string]any{
 		"input":            ruleCtx.ResolvedPaths,
 		"output":           outputValues,
 		"requirements_met": requirementsMet,
@@ -471,13 +471,13 @@ func (re *RulesEngine) Evaluate(
 // evaluateAction evaluates a single action and returns its output
 func (re *RulesEngine) evaluateAction(
 	ctx context.Context,
-	action interface{},
+	action any,
 	ruleCtx *contexter.RuleContext,
-) (map[string]interface{}, string, error) {
+) (map[string]any, string, error) {
 	var outputName string
 	var err error
 
-	actionMap, ok := action.(map[string]interface{})
+	actionMap, ok := action.(map[string]any)
 	if !ok {
 		return nil, "", fmt.Errorf("action is not a map")
 	}
@@ -487,9 +487,9 @@ func (re *RulesEngine) evaluateAction(
 		return nil, "", fmt.Errorf("action does not have an output field")
 	}
 
-	var result interface{}
+	var result any
 
-	var outputSpec map[string]interface{}
+	var outputSpec map[string]any
 	err = logging.IndentBlock(ctx, fmt.Sprintf("Computing %s", outputName), false, func(ctx context.Context) error {
 		actionNode := &model.PathNode{
 			Type:   "action",
@@ -500,10 +500,10 @@ func (re *RulesEngine) evaluateAction(
 		defer ruleCtx.PopPath()
 
 		// Find output specification
-		if props, ok := re.Spec["properties"].(map[string]interface{}); ok {
-			if outputs, ok := props["output"].([]interface{}); ok {
+		if props, ok := re.Spec["properties"].(map[string]any); ok {
+			if outputs, ok := props["output"].([]any); ok {
 				for _, spec := range outputs {
-					if specMap, ok := spec.(map[string]interface{}); ok {
+					if specMap, ok := spec.(map[string]any); ok {
 						if name, ok := specMap["name"].(string); ok && name == outputName {
 							outputSpec = specMap
 							break
@@ -553,7 +553,7 @@ func (re *RulesEngine) evaluateAction(
 	}
 
 	// Build output with metadata
-	outputDef := map[string]interface{}{
+	outputDef := map[string]any{
 		"value": result,
 		"type":  "unknown",
 	}
@@ -568,11 +568,11 @@ func (re *RulesEngine) evaluateAction(
 			outputDef["description"] = desc
 		}
 
-		if typeSpec, ok := outputSpec["type_spec"].(map[string]interface{}); ok {
+		if typeSpec, ok := outputSpec["type_spec"].(map[string]any); ok {
 			outputDef["type_spec"] = typeSpec
 		}
 
-		if temporal, ok := outputSpec["temporal"].(map[string]interface{}); ok {
+		if temporal, ok := outputSpec["temporal"].(map[string]any); ok {
 			outputDef["temporal"] = temporal
 		}
 	}
@@ -583,7 +583,7 @@ func (re *RulesEngine) evaluateAction(
 // evaluateRequirements evaluates all requirements
 func (re *RulesEngine) evaluateRequirements(
 	ctx context.Context,
-	requirements []interface{},
+	requirements []any,
 	ruleCtx *contexter.RuleContext,
 ) (bool, error) {
 	if len(requirements) == 0 {
@@ -592,7 +592,7 @@ func (re *RulesEngine) evaluateRequirements(
 	}
 
 	for _, req := range requirements {
-		reqMap, ok := req.(map[string]interface{})
+		reqMap, ok := req.(map[string]any)
 		if !ok {
 			continue
 		}
@@ -618,11 +618,11 @@ func (re *RulesEngine) evaluateRequirements(
 			ruleCtx.AddToPath(node)
 			defer ruleCtx.PopPath()
 
-			if allConds, hasAll := reqMap["all"].([]interface{}); hasAll {
+			if allConds, hasAll := reqMap["all"].([]any); hasAll {
 				results := []bool{}
 
 				for _, r := range allConds {
-					res, err := re.evaluateRequirements(ctx, []interface{}{r}, ruleCtx)
+					res, err := re.evaluateRequirements(ctx, []any{r}, ruleCtx)
 					if err != nil {
 						return err
 					}
@@ -647,11 +647,11 @@ func (re *RulesEngine) evaluateRequirements(
 						break
 					}
 				}
-			} else if orConds, hasOr := reqMap["or"].([]interface{}); hasOr {
+			} else if orConds, hasOr := reqMap["or"].([]any); hasOr {
 				results := []bool{}
 
 				for _, r := range orConds {
-					res, err := re.evaluateRequirements(ctx, []interface{}{r}, ruleCtx)
+					res, err := re.evaluateRequirements(ctx, []any{r}, ruleCtx)
 					if err != nil {
 						return err
 					}
@@ -718,40 +718,40 @@ func (re *RulesEngine) evaluateRequirements(
 // evaluateIfOperation evaluates an IF operation
 func (re *RulesEngine) evaluateIfOperation(
 	ctx context.Context,
-	operation map[string]interface{},
+	operation map[string]any,
 	ruleCtx *contexter.RuleContext,
-) (interface{}, error) {
+) (any, error) {
 	ifNode := &model.PathNode{
 		Type:    "operation",
 		Name:    "IF conditions",
 		Result:  nil,
-		Details: map[string]interface{}{"condition_results": []interface{}{}},
+		Details: map[string]any{"condition_results": []any{}},
 	}
 	ruleCtx.AddToPath(ifNode)
 	defer ruleCtx.PopPath()
 
-	var result interface{}
-	conditions, ok := operation["conditions"].([]interface{})
+	var result any
+	conditions, ok := operation["conditions"].([]any)
 	if !ok {
 		return nil, fmt.Errorf("conditions not found or not an array")
 	}
 
-	conditionResults := make([]interface{}, 0)
+	conditionResults := make([]any, 0)
 
 	for i, condition := range conditions {
-		condMap, ok := condition.(map[string]interface{})
+		condMap, ok := condition.(map[string]any)
 		if !ok {
 			continue
 		}
 
-		conditionResult := map[string]interface{}{
+		conditionResult := map[string]any{
 			"condition_index": i,
 		}
 
-		if test, hasTest := condMap["test"]; hasTest {
+		if test, hasTest := condMap["test"]; hasTest && test != nil {
 			conditionResult["type"] = "test"
 
-			testResult, err := re.evaluateOperation(ctx, test.(map[string]interface{}), ruleCtx)
+			testResult, err := re.evaluateOperation(ctx, test.(map[string]any), ruleCtx)
 			if err != nil {
 				return nil, err
 			}
@@ -810,9 +810,9 @@ func (re *RulesEngine) evaluateIfOperation(
 // evaluateForeach evaluates a FOREACH operation
 func (re *RulesEngine) evaluateForeach(
 	ctx context.Context,
-	operation map[string]interface{},
+	operation map[string]any,
 	ruleCtx *contexter.RuleContext,
-) (interface{}, error) {
+) (any, error) {
 	combine, ok := operation["combine"].(string)
 	if !ok {
 		return nil, fmt.Errorf("combine operation not specified for FOREACH")
@@ -825,24 +825,24 @@ func (re *RulesEngine) evaluateForeach(
 
 	if arrayData == nil {
 		logger.WithIndent().Warningf("No data found to run FOREACH on")
-		return re.evaluateAggregateOps(combine, []interface{}{}), nil
+		return re.evaluateAggregateOps(combine, []any{}), nil
 	}
 
 	// Convert to array if not already
-	var arrayItems []interface{}
+	var arrayItems []any
 	switch v := arrayData.(type) {
-	case []interface{}:
+	case []any:
 		arrayItems = v
-	case []map[string]interface{}:
-		arrayItems = make([]interface{}, len(v))
+	case []map[string]any:
+		arrayItems = make([]any, len(v))
 		for i, item := range v {
 			arrayItems[i] = item
 		}
 	default:
-		arrayItems = []interface{}{arrayData}
+		arrayItems = []any{arrayData}
 	}
 
-	var values []interface{}
+	var values []any
 
 	err = logging.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", combine), false, func(ctx context.Context) error {
 		for _, item := range arrayItems {
@@ -852,16 +852,16 @@ func (re *RulesEngine) evaluateForeach(
 
 				// Set local to the item
 				switch v := item.(type) {
-				case map[string]interface{}:
+				case map[string]any:
 					itemCtx.Local = v
 				default:
 					// If not a map, create a map with "value" key
-					itemCtx.Local = map[string]interface{}{"value": v}
+					itemCtx.Local = map[string]any{"value": v}
 				}
 
 				// Get the value to evaluate
-				var valueToEvaluate interface{}
-				if valueArray, ok := operation["value"].([]interface{}); ok && len(valueArray) > 0 {
+				var valueToEvaluate any
+				if valueArray, ok := operation["value"].([]any); ok && len(valueArray) > 0 {
 					valueToEvaluate = valueArray[0]
 				} else {
 					valueToEvaluate = operation["value"]
@@ -874,7 +874,7 @@ func (re *RulesEngine) evaluateForeach(
 				}
 
 				// Add to values
-				if resultArray, ok := result.([]interface{}); ok {
+				if resultArray, ok := result.([]any); ok {
 					values = append(values, resultArray...)
 				} else {
 					values = append(values, result)
@@ -902,29 +902,29 @@ func (re *RulesEngine) evaluateForeach(
 }
 
 // Comparison operators
-var comparisonOps = map[string]func(a, b interface{}) (bool, error){
-	"EQUALS": func(a, b interface{}) (bool, error) {
+var comparisonOps = map[string]func(a, b any) (bool, error){
+	"EQUALS": func(a, b any) (bool, error) {
 		return reflect.DeepEqual(a, b), nil
 	},
-	"NOT_EQUALS": func(a, b interface{}) (bool, error) {
+	"NOT_EQUALS": func(a, b any) (bool, error) {
 		return !reflect.DeepEqual(a, b), nil
 	},
-	"GREATER_THAN": func(a, b interface{}) (bool, error) {
+	"GREATER_THAN": func(a, b any) (bool, error) {
 		return compareValues(a, b, func(x, y float64) bool { return x > y })
 	},
-	"LESS_THAN": func(a, b interface{}) (bool, error) {
+	"LESS_THAN": func(a, b any) (bool, error) {
 		return compareValues(a, b, func(x, y float64) bool { return x < y })
 	},
-	"GREATER_OR_EQUAL": func(a, b interface{}) (bool, error) {
+	"GREATER_OR_EQUAL": func(a, b any) (bool, error) {
 		return compareValues(a, b, func(x, y float64) bool { return x >= y })
 	},
-	"LESS_OR_EQUAL": func(a, b interface{}) (bool, error) {
+	"LESS_OR_EQUAL": func(a, b any) (bool, error) {
 		return compareValues(a, b, func(x, y float64) bool { return x <= y })
 	},
 }
 
 // Helper function to compare values with a comparison function
-func compareValues(a, b interface{}, cmp func(x, y float64) bool) (bool, error) {
+func compareValues(a, b any, cmp func(x, y float64) bool) (bool, error) {
 	// Convert to comparable types
 	var aFloat, bFloat float64
 	var err error
@@ -943,7 +943,7 @@ func compareValues(a, b interface{}, cmp func(x, y float64) bool) (bool, error) 
 }
 
 // Helper to convert various types to float64
-func convertToFloat(v interface{}) (float64, error) {
+func convertToFloat(v any) (float64, error) {
 	switch val := v.(type) {
 	case int:
 		return float64(val), nil
@@ -975,9 +975,9 @@ func convertToFloat(v interface{}) (float64, error) {
 }
 
 // evaluateAggregateOps evaluates aggregate operations
-func (re *RulesEngine) evaluateAggregateOps(op string, values []interface{}) interface{} {
+func (re *RulesEngine) evaluateAggregateOps(op string, values []any) any {
 	// Filter out nil values
-	filteredValues := make([]interface{}, 0, len(values))
+	filteredValues := make([]any, 0, len(values))
 	for _, v := range values {
 		if v != nil {
 			filteredValues = append(filteredValues, v)
@@ -991,7 +991,7 @@ func (re *RulesEngine) evaluateAggregateOps(op string, values []interface{}) int
 		logger.WithIndent().Warningf("Dropped %d values because they were nil", len(values)-len(filteredValues))
 	}
 
-	var result interface{}
+	var result any
 
 	switch op {
 	case "OR":
@@ -1139,7 +1139,7 @@ func (re *RulesEngine) evaluateAggregateOps(op string, values []interface{}) int
 }
 
 // evaluateComparison evaluates comparison operations
-func (re *RulesEngine) evaluateComparison(op string, left, right interface{}) (bool, error) {
+func (re *RulesEngine) evaluateComparison(op string, left, right any) (bool, error) {
 	// Handle date comparisons
 	leftTime, leftIsTime := left.(time.Time)
 	rightTime, rightIsTime := right.(time.Time)
@@ -1205,7 +1205,7 @@ func (re *RulesEngine) evaluateComparison(op string, left, right interface{}) (b
 }
 
 // evaluateDateOperation evaluates date-specific operations
-func (re *RulesEngine) evaluateDateOperation(op string, values []interface{}, unit string) (int, error) {
+func (re *RulesEngine) evaluateDateOperation(op string, values []any, unit string) (int, error) {
 	if op != "SUBTRACT_DATE" {
 		return 0, fmt.Errorf("unknown date operation: %s", op)
 	}
@@ -1265,7 +1265,7 @@ func (re *RulesEngine) evaluateDateOperation(op string, values []interface{}, un
 }
 
 // Helper function to convert various types to time.Time
-func convertToTime(v interface{}) (time.Time, error) {
+func convertToTime(v any) (time.Time, error) {
 	switch val := v.(type) {
 	case time.Time:
 		return val, nil
@@ -1285,17 +1285,17 @@ func convertToTime(v interface{}) (time.Time, error) {
 // evaluateOperation evaluates an operation or condition
 func (re *RulesEngine) evaluateOperation(
 	ctx context.Context,
-	operation interface{},
+	operation any,
 	ruleCtx *contexter.RuleContext,
-) (interface{}, error) {
+) (any, error) {
 	// If operation is not a map, evaluate as value
-	opMap, ok := operation.(map[string]interface{})
+	opMap, ok := operation.(map[string]any)
 	if !ok {
 		node := &model.PathNode{
 			Type:    "value",
 			Name:    "Direct value evaluation",
 			Result:  nil,
-			Details: map[string]interface{}{"raw_value": operation},
+			Details: map[string]any{"raw_value": operation},
 		}
 		ruleCtx.AddToPath(node)
 		defer ruleCtx.PopPath()
@@ -1315,7 +1315,7 @@ func (re *RulesEngine) evaluateOperation(
 			Type:    "direct_value",
 			Name:    "Direct value assignment",
 			Result:  nil,
-			Details: map[string]interface{}{"raw_value": val},
+			Details: map[string]any{"raw_value": val},
 		}
 		ruleCtx.AddToPath(node)
 		defer ruleCtx.PopPath()
@@ -1335,12 +1335,12 @@ func (re *RulesEngine) evaluateOperation(
 		Type:    "operation",
 		Name:    fmt.Sprintf("Operation: %s", opType),
 		Result:  nil,
-		Details: map[string]interface{}{"operation_type": opType},
+		Details: map[string]any{"operation_type": opType},
 	}
 	ruleCtx.AddToPath(node)
 	defer ruleCtx.PopPath()
 
-	var result interface{}
+	var result any
 	var err error
 
 	if opType == "" {
@@ -1372,12 +1372,12 @@ func (re *RulesEngine) evaluateOperation(
 			}
 
 			// Convert allowedValues to a slice if it's not already
-			var valuesList []interface{}
+			var valuesList []any
 			switch v := allowedValues.(type) {
-			case []interface{}:
+			case []any:
 				valuesList = v
 			default:
-				valuesList = []interface{}{allowedValues}
+				valuesList = []any{allowedValues}
 			}
 
 			// Check if subject is in the list
@@ -1412,8 +1412,8 @@ func (re *RulesEngine) evaluateOperation(
 
 	case "AND":
 		err = logging.IndentBlock(ctx, "AND", false, func(ctx context.Context) error {
-			values := []interface{}{}
-			vals, ok := opMap["values"].([]interface{})
+			values := []any{}
+			vals, ok := opMap["values"].([]any)
 			if !ok {
 				return fmt.Errorf("AND operation requires values array")
 			}
@@ -1449,8 +1449,8 @@ func (re *RulesEngine) evaluateOperation(
 
 	case "OR":
 		err = logging.IndentBlock(ctx, "OR", false, func(ctx context.Context) error {
-			values := []interface{}{}
-			vals, ok := opMap["values"].([]interface{})
+			values := []any{}
+			vals, ok := opMap["values"].([]any)
 			if !ok {
 				return fmt.Errorf("OR operation requires values array")
 			}
@@ -1485,8 +1485,8 @@ func (re *RulesEngine) evaluateOperation(
 		})
 
 	case "SUBTRACT_DATE":
-		var values []interface{}
-		if vals, ok := opMap["values"].([]interface{}); ok {
+		var values []any
+		if vals, ok := opMap["values"].([]any); ok {
 			for _, v := range vals {
 				val, err := re.evaluateValue(ctx, v, ruleCtx)
 				if err != nil {
@@ -1512,7 +1512,7 @@ func (re *RulesEngine) evaluateOperation(
 
 	case "EQUALS", "NOT_EQUALS", "GREATER_THAN", "LESS_THAN", "GREATER_OR_EQUAL", "LESS_OR_EQUAL":
 		// Get values to compare
-		var subject, value interface{}
+		var subject, value any
 
 		if subj, hasSubject := opMap["subject"]; hasSubject {
 			subject, err = re.evaluateValue(ctx, subj, ruleCtx)
@@ -1524,8 +1524,8 @@ func (re *RulesEngine) evaluateOperation(
 			if err != nil {
 				return nil, err
 			}
-		} else if vals, hasValues := opMap["values"].([]interface{}); hasValues && len(vals) >= 2 {
-			values := make([]interface{}, len(vals))
+		} else if vals, hasValues := opMap["values"].([]any); hasValues && len(vals) >= 2 {
+			values := make([]any, len(vals))
 			for i, v := range vals {
 				values[i], err = re.evaluateValue(ctx, v, ruleCtx)
 				if err != nil {
@@ -1552,9 +1552,9 @@ func (re *RulesEngine) evaluateOperation(
 
 	default:
 		// Check if it's an aggregate operation
-		if vals, hasValues := opMap["values"].([]interface{}); hasValues {
+		if vals, hasValues := opMap["values"].([]any); hasValues {
 			// This is probably an arithmetic operation
-			values := make([]interface{}, len(vals))
+			values := make([]any, len(vals))
 			for i, v := range vals {
 				values[i], err = re.evaluateValue(ctx, v, ruleCtx)
 				if err != nil {
@@ -1578,7 +1578,7 @@ func (re *RulesEngine) evaluateOperation(
 }
 
 // Helper function to check if a value is truthy
-func isTruthy(v interface{}) bool {
+func isTruthy(v any) bool {
 	if v == nil {
 		return false
 	}
@@ -1602,16 +1602,16 @@ func isTruthy(v interface{}) bool {
 // evaluateValue evaluates a value which might be a number, operation, or reference
 func (re *RulesEngine) evaluateValue(
 	ctx context.Context,
-	value interface{},
+	value any,
 	ruleCtx *contexter.RuleContext,
-) (interface{}, error) {
+) (any, error) {
 	// For primitive types, return directly
 	switch v := value.(type) {
 	case int, int64, float64, bool:
 		return v, nil
 	case time.Time:
 		return v, nil
-	case map[string]interface{}:
+	case map[string]any:
 		// todo why do we need this
 		if _, hasOp := v["operation"]; hasOp {
 			return re.evaluateOperation(ctx, v, ruleCtx)
