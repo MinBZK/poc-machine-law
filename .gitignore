@@ -17,3 +17,6 @@ wheels/
 
 # simulation
 simulation_results.csv
+*.out
+.aider*
+.env

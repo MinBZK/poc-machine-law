@@ -457,7 +457,7 @@ def step_impl(context):
 
 @then("heeft de persoon geen recht op kinderopvangtoeslag")
 def step_impl(context):
-    assertions.assertFalse(
+    assertions.assertTrue(
         "is_eligible" not in context.result.output or not context.result.output["is_eligible"],
         "Expected person to NOT be eligible for childcare allowance, but they were",
     )

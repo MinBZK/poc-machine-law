@@ -19,7 +19,7 @@ Feature: Wijzigen gegevens
       | 999993653 | 50           |
     When de algemene_ouderdomswet wordt uitgevoerd door SVB met wijzigingen
     Then is niet voldaan aan de voorwaarden
-    When de burger een wijziging indient
+    When de burger een wijziging indient:
       | service | law     | key        | nieuwe_waarde | reden                                    | bewijs           |
       | RvIG    | wet_brp | BIRTH_DATE | 1948-02-15    | Geboortedatum onjuist in BRP registratie | geboorteakte.pdf |
     When de algemene_ouderdomswet wordt uitgevoerd door SVB met wijzigingen

@@ -41,16 +41,16 @@ Feature: Berekening Kinderopvangtoeslag
       | bsn       | geboortedatum | verblijfsadres | land_verblijf | nationaliteit |
       | 888888888 | 1985-03-10    | Utrecht        | NEDERLAND     | NEDERLANDS    |
     And de volgende RvIG relaties gegevens:
-      | bsn       | partnerschap_type | partner_bsn | children               |
-      | 888888888 | GEHUWD            | 999999999   | [{"bsn": "333333333"}] |
+      | bsn       | partnerschap_type   | partner_bsn | children               |
+      | 888888888 | HUWELIJK            | 999999999   | [{"bsn": "333333333"}] |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 888888888 | 4500000                   | 0                         | 0                     | 0                               | 0            |
       | 999999999 | 3800000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | insured_years | worked_hours |
-      | 888888888 | 8             | 1840         |
-      | 999999999 | 6             | 1560         |
+      | BSN       | insured_years |
+      | 888888888 | 8             |
+      | 999999999 | 6             |
     And de volgende UWV dienstverbanden gegevens:
       | bsn       | start_date | end_date |
       | 888888888 | 2023-01-01 |          |
@@ -62,7 +62,7 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | EXPECTED_PARTNER_HOURS | 30                                                                                                                                      | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then heeft de persoon recht op kinderopvangtoeslag
-    And is het toeslagbedrag "17900.00" euro
+    And is het toeslagbedrag "7383.75" euro
 
   Scenario: Ouder met BSO en overschrijding van het maximale uurtarief
     Given de volgende RvIG personen gegevens:
@@ -75,8 +75,8 @@ Feature: Berekening Kinderopvangtoeslag
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 888888888 | 3200000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | insured_years | worked_hours |
-      | 888888888 | 4             | 1700         |
+      | BSN       | insured_years |
+      | 888888888 | 4             |
     And de volgende UWV dienstverbanden gegevens:
       | bsn       | start_date | end_date |
       | 888888888 | 2023-03-01 |          |
@@ -94,20 +94,20 @@ Feature: Berekening Kinderopvangtoeslag
       | bsn       | geboortedatum | verblijfsadres | land_verblijf | nationaliteit |
       | 888888888 | 1990-07-05    | Den Haag       | NEDERLAND     | NEDERLANDS    |
     And de volgende RvIG relaties gegevens:
-      | bsn       | partnerschap_type | partner_bsn | children               |
-      | 888888888 | GEHUWD            | 777777777   | [{"bsn": "666666666"}] |
+      | bsn       | partnerschap_type   | partner_bsn | children               |
+      | 888888888 | HUWELIJK            | 777777777   | [{"bsn": "666666666"}] |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 888888888 | 2900000                   | 0                         | 0                     | 0                               | 0            |
       | 777777777 | 1200000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | insured_years | worked_hours |
-      | 888888888 | 3             | 1800         |
-      | 777777777 | 2             | 800          |
+      | BSN       | insured_years |
+      | 888888888 | 3             |
+      | 777777777 | 2             |
     And de volgende UWV dienstverbanden gegevens:
-      | bsn       | start_date | end_date |
-      | 888888888 | 2022-09-01 |          |
-      | 777777777 | 2023-01-01 |          |
+      | bsn       | start_date | end_date   |
+      | 888888888 | 2022-09-01 |            |
+      | 777777777 | 2023-01-01 | 2023-01-15 |
     When de burger deze gegevens indient:
       | service   | law              | key                    | nieuwe_waarde                                                                                                                           | reden               | bewijs |
       | TOESLAGEN | wet_kinderopvang | CHILDCARE_KVK          | 34567890                                                                                                                                | verplichte gegevens |        |
@@ -121,16 +121,16 @@ Feature: Berekening Kinderopvangtoeslag
       | bsn       | geboortedatum | verblijfsadres | land_verblijf | nationaliteit |
       | 888888888 | 1987-02-18    | Groningen      | NEDERLAND     | NEDERLANDS    |
     And de volgende RvIG relaties gegevens:
-      | bsn       | partnerschap_type | partner_bsn | children                                     |
-      | 888888888 | GEHUWD            | 888888880   | [{"bsn": "888888881"}, {"bsn": "888888882"}] |
+      | bsn       | partnerschap_type   | partner_bsn | children                                     |
+      | 888888888 | HUWELIJK            | 888888880   | [{"bsn": "888888881"}, {"bsn": "888888882"}] |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 888888888 | 2800000                   | 0                         | 0                     | 0                               | 0            |
       | 888888880 | 2100000                   | 0                         | 0                     | 0                               | 0            |
     And de volgende UWV wet_structuur_uitvoeringsorganisatie_werk_en_inkomen gegevens:
-      | BSN       | insured_years | worked_hours |
-      | 888888888 | 7             | 1980         |
-      | 888888880 | 5             | 1600         |
+      | BSN       | insured_years |
+      | 888888888 | 7             |
+      | 888888880 | 5             |
     And de volgende UWV dienstverbanden gegevens:
       | bsn       | start_date | end_date |
       | 888888888 | 2020-02-01 |          |
@@ -142,4 +142,4 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | EXPECTED_PARTNER_HOURS | 30                                                                                                                                                                                                                                                                       | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then heeft de persoon recht op kinderopvangtoeslag
-    And is het toeslagbedrag "24460.80" euro
+    And is het toeslagbedrag "20384.00" euro

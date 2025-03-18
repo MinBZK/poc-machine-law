@@ -29,3 +29,45 @@ jobs:
 
     - name: Run tests
       run: ./script/test-behaviour
+
+  go-test-features:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+    # Add this permissions block
+    permissions:
+      # Set only what you need
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24' # Replace with your desired Go version
+
+      - name: Run tests
+        working-directory: ./features
+        run: go test -v .
+
+  go-test-machinev2:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+    # Add this permissions block
+    permissions:
+      # Set only what you need
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24' # Replace with your desired Go version
+
+      - name: Run tests
+        working-directory: ./machinev2
+        run: go test ./...
