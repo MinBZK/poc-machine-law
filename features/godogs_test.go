@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,6 +10,8 @@ import (
 	"time"
 
 	"github.com/cucumber/godog"
+	"github.com/google/uuid"
+	"github.com/minbzk/poc-machine-law/machine-v3/casemanager"
 	"github.com/minbzk/poc-machine-law/machine-v3/dataframe"
 	"github.com/minbzk/poc-machine-law/machine-v3/model"
 	"github.com/minbzk/poc-machine-law/machine-v3/service"
@@ -17,11 +20,13 @@ import (
 )
 
 // godogsCtxKey is the key used to store the available godogs in the context.Context.
-type dateCtxKey struct{}
 type paramsCtxKey struct{}
 type resultCtxKey struct{}
 type inputCtxKey struct{}
+type servicesCtxKey struct{}
 type serviceCtxKey struct{}
+type lawCtxKey struct{}
+type caseIDCtxKey struct{}
 
 func TestFeatures(t *testing.T) {
 	suite := godog.TestSuite{
@@ -46,11 +51,9 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.When(`^de ([^"]*) wordt uitgevoerd door ([^"]*)$`, deWetWordtUitgevoerdDoorService)
 	ctx.When(`^de ([^"]*) wordt uitgevoerd door ([^"]*) met wijzigingen$`, deWetWordtUitgevoerdDoorServiceMetWijzigingen)
 	ctx.When(`^de beoordelaar de aanvraag afwijst met reden "([^"]*)"$`, deBeoordelaarDeAanvraagAfwijstMetReden)
-	ctx.When(`^de beoordelaar het bezwaar afwijst met reden "([^"]*)"$`, deBeoordelaarHetBezwaarAfwijstMetReden)
-	ctx.When(`^de beoordelaar het bezwaar toewijst met reden "([^"]*)"$`, deBeoordelaarHetBezwaarToewijstMetReden)
+	ctx.When(`^de beoordelaar het bezwaar "([^"]*)" met reden "([^"]*)"$`, deBeoordelaarHetBezwaarBeoordeeldMetReden)
 	ctx.When(`^de burger bezwaar maakt met reden "([^"]*)"$`, deBurgerBezwaarMaaktMetReden)
 	ctx.When(`^de burger deze gegevens indient:$`, deBurgerDezeGegevensIndient)
-	ctx.When(`^de burger een wijziging indient$`, deBurgerEenWijzigingIndient)
 	ctx.When(`^de persoon dit aanvraagt$`, dePersoonDitAanvraagt)
 
 	ctx.Then(`^heeft de persoon geen stemrecht$`, heeftDePersoonGeenStemrecht)
@@ -87,7 +90,7 @@ func evaluate_law(ctx context.Context, svc, law string, approved bool) (context.
 		FullTimestamp:    true,
 	})
 
-	services, ok := ctx.Value(serviceCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -101,6 +104,9 @@ func evaluate_law(ctx context.Context, svc, law string, approved bool) (context.
 
 	result, err := services.Evaluate(ctx, svc, law, params, "", nil, "", approved)
 	assert.NoError(godog.T(ctx), err)
+
+	ctx = context.WithValue(ctx, serviceCtxKey{}, svc)
+	ctx = context.WithValue(ctx, lawCtxKey{}, law)
 
 	return context.WithValue(ctx, resultCtxKey{}, *result), nil
 }
@@ -170,18 +176,18 @@ func deDatumIs(ctx context.Context, arg1 string) (context.Context, error) {
 		return nil, fmt.Errorf("could not parse time: %w", err)
 	}
 
-	return context.WithValue(ctx, serviceCtxKey{}, service.NewServices(t1)), nil
+	return context.WithValue(ctx, servicesCtxKey{}, service.NewServices(t1)), nil
 }
 
-func eenPersoonMetBSN(ctx context.Context, arg1 string) (context.Context, error) {
-	v, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+func eenPersoonMetBSN(ctx context.Context, bsn string) (context.Context, error) {
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
 	if !ok {
-		v = map[string]any{}
+		params = map[string]any{}
 	}
 
-	v["BSN"] = arg1
+	params["BSN"] = bsn
 
-	return context.WithValue(ctx, paramsCtxKey{}, v), nil
+	return context.WithValue(ctx, paramsCtxKey{}, params), nil
 }
 
 func deWetWordtUitgevoerdDoorService(ctx context.Context, law, service string) (context.Context, error) {
@@ -228,7 +234,7 @@ func isHetToeslagbedragEuro(ctx context.Context, expected float64) error {
 }
 
 func alleAanvragenWordenBeoordeeld(ctx context.Context) error {
-	services, ok := ctx.Value(serviceCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -239,45 +245,178 @@ func alleAanvragenWordenBeoordeeld(ctx context.Context) error {
 }
 
 func deBeoordelaarDeAanvraagAfwijstMetReden(ctx context.Context, reason string) (context.Context, error) {
-	services, ok := ctx.Value(serviceCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
 
-	c, err := services.CaseManager.GetCaseByID(arg1)
-	if err != nil {
-		return ctx, fmt.Errorf("get case by id: %w", err)
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	return ctx, services.CaseManager.CompleteManualReview(ctx, caseID, "BEOORDELAAR", false, reason, nil)
+}
+
+func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve string, reason string) (context.Context, error) {
+	approved := approve == "toewijst"
+
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return ctx, fmt.Errorf("services not set")
 	}
 
-	c.Decide(nil, reason, "BEOORDELAAR", false)
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
 
-	services.CaseManager.SubmitCase()
+	// Check if we have a result in the context to use as verifiedResult
+	var verifiedResult map[string]any
+	if result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult); ok {
+		verifiedResult = result.Output
+	}
 
-	return ctx, godog.ErrPending
+	return ctx, services.CaseManager.CompleteManualReview(ctx, caseID, "BEOORDELAAR", approved, reason, verifiedResult)
 }
 
-func deBeoordelaarHetBezwaarAfwijstMetReden(ctx context.Context, arg1 string) (context.Context, error) {
-	return ctx, godog.ErrPending
+func deBurgerBezwaarMaaktMetReden(ctx context.Context, reason string) (context.Context, error) {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return ctx, fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	err := services.CaseManager.ObjectCase(ctx, caseID, reason)
+	return ctx, err
 }
 
-func deBeoordelaarHetBezwaarToewijstMetReden(ctx context.Context, arg1 string) (context.Context, error) {
-	return ctx, godog.ErrPending
+func deBurgerDezeGegevensIndient(ctx context.Context, table *godog.Table) (context.Context, error) {
+	if len(table.Rows) <= 1 {
+		return ctx, fmt.Errorf("table must have at least one data row")
+	}
+
+	// Process the table to get the input data
+	testData := map[string]any{}
+	for i := 1; i < len(table.Rows); i++ {
+		row := table.Rows[i]
+		key := table.Rows[0].Cells[0].Value
+		value := row.Cells[0].Value
+
+		// Try to parse JSON-like values
+		if value[0] == '{' || value[0] == '[' {
+			var jsonValue any
+			if err := json.Unmarshal([]byte(value), &jsonValue); err == nil {
+				testData[key] = jsonValue
+				continue
+			}
+		}
+
+		// Otherwise just use the string value
+		testData[key] = value
+	}
+
+	return context.WithValue(ctx, inputCtxKey{}, testData), nil
 }
 
-func deBurgerBezwaarMaaktMetReden(ctx context.Context, arg1 string) (context.Context, error) {
-	return ctx, godog.ErrPending
-}
+// func deBurgerEenWijzigingIndient(ctx context.Context, table *godog.Table) (context.Context, error) {
+// 	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+// 	if !ok || services == nil {
+// 		return ctx, fmt.Errorf("services not set")
+// 	}
 
-func deBurgerDezeGegevensIndient(arg1 *godog.Table) error {
-	return godog.ErrPending
-}
+// 	params := ctx.Value(paramsCtxKey{}).(map[string]any)
+// 	bsn, ok := params["BSN"].(string)
+// 	if !ok {
+// 		return ctx, fmt.Errorf("BSN not set in parameters")
+// 	}
 
-func deBurgerEenWijzigingIndient(arg1 *godog.Table) error {
-	return godog.ErrPending
-}
+// 	// Process each row of the table as a claim
+// 	claims := []string{}
 
-func dePersoonDitAanvraagt() error {
-	return godog.ErrPending
+// 	for i := 1; i < len(table.Rows); i++ {
+// 		row := table.Rows[i]
+// 		if len(row.Cells) < 4 {
+// 			continue // Skip rows with insufficient columns
+// 		}
+
+// 		serviceKey := table.Rows[0].Cells[0].Value
+// 		keyKey := table.Rows[0].Cells[1].Value
+// 		valueKey := table.Rows[0].Cells[2].Value
+// 		reasonKey := table.Rows[0].Cells[3].Value
+// 		lawKey := ""
+
+// 		if len(table.Rows[0].Cells) > 4 {
+// 			lawKey = table.Rows[0].Cells[4].Value
+// 		}
+
+// 		service := row.Cells[0].Value
+// 		key := row.Cells[1].Value
+// 		newValue := row.Cells[2].Value
+// 		reason := row.Cells[3].Value
+// 		law := ""
+
+// 		if len(row.Cells) > 4 {
+// 			law = row.Cells[4].Value
+// 		}
+
+// 		// Try to parse new value as appropriate type
+// 		var parsedValue any = newValue
+// 		if newValue != "" {
+// 			// Try to parse as int
+// 			if intVal, err := strconv.Atoi(newValue); err == nil {
+// 				parsedValue = intVal
+// 			} else if newValue[0] == '{' || newValue[0] == '[' {
+// 				// Try to parse as JSON
+// 				var jsonValue any
+// 				if err := json.Unmarshal([]byte(newValue), &jsonValue); err == nil {
+// 					parsedValue = jsonValue
+// 				}
+// 			}
+// 		}
+
+// 		// Get the case ID from context if available
+// 		var caseID string
+// 		if id, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID); ok {
+// 			caseID = id.String()
+// 		}
+
+// 		// Submit claim
+// 		claimID, err := services.ClaimManager.SubmitClaim(service, key, parsedValue, reason, "BURGER", caseID, "", law, bsn)
+// 		if err != nil {
+// 			return ctx, fmt.Errorf("failed to submit claim: %w", err)
+// 		}
+
+// 		claims = append(claims, claimID)
+// 	}
+
+// 	return context.WithValue(ctx, "claims", claims), nil
+// }
+
+func dePersoonDitAanvraagt(ctx context.Context) (context.Context, error) {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return ctx, fmt.Errorf("services not set")
+	}
+
+	params := ctx.Value(paramsCtxKey{}).(map[string]any)
+	svc := ctx.Value(serviceCtxKey{}).(string)
+	law := ctx.Value(lawCtxKey{}).(string)
+	result := ctx.Value(resultCtxKey{}).(model.RuleResult)
+
+	caseID, err := services.CaseManager.SubmitCase(
+		ctx,
+		params["BSN"].(string),
+		svc,
+		law,
+		result.Input,
+		result.Output,
+		true,
+	)
+
+	if err != nil {
+		return ctx, err
+	}
+
+	return context.WithValue(ctx, caseIDCtxKey{}, caseID), nil
 }
 
 func heeftDePersoonRechtOpHuurtoeslag(ctx context.Context) error {
@@ -298,12 +437,46 @@ func heeftDePersoonGeenStemrecht(ctx context.Context) error {
 	return nil
 }
 
-func isDeAanvraagAfgewezen() error {
-	return godog.ErrPending
+func isDeAanvraagAfgewezen(ctx context.Context) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.Equal(godog.T(ctx), casemanager.CaseStatusDecided, c.Status, "Expected case to be decided")
+	assert.NotNil(godog.T(ctx), c.Approved, "Expected approved status to be set")
+	assert.False(godog.T(ctx), *c.Approved, "Expected case to be rejected")
+
+	return nil
 }
 
-func isDeAanvraagToegekend() error {
-	return godog.ErrPending
+func isDeAanvraagToegekend(ctx context.Context) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.Equal(godog.T(ctx), casemanager.CaseStatusDecided, c.Status, "Expected case to be decided")
+	assert.NotNil(godog.T(ctx), c.Approved, "Expected approved status to be set")
+	assert.True(godog.T(ctx), *c.Approved, "Expected case to be approved")
+
+	return nil
 }
 
 func isDeHuurtoeslagEuro(ctx context.Context, expected float64) error {
@@ -321,8 +494,24 @@ func isDeHuurtoeslagEuro(ctx context.Context, expected float64) error {
 	return nil
 }
 
-func isDeStatus(arg1 string) error {
-	return godog.ErrPending
+func isDeStatus(ctx context.Context, expected string) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.Equal(godog.T(ctx), casemanager.CaseStatus(expected), c.Status,
+		fmt.Sprintf("Expected status to be %s, but was %s", expected, c.Status))
+
+	return nil
 }
 
 func isDeWoonkostentoeslagEuro(ctx context.Context, expected float64) error {
@@ -391,28 +580,114 @@ func isVoldaanAanDeVoorwaarden(ctx context.Context) error {
 	return nil
 }
 
-func kanDeBurgerInBeroepGaanBij(arg1 string) error {
-	return godog.ErrPending
+func kanDeBurgerInBeroepGaanBij(ctx context.Context, competentCourt string) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.True(godog.T(ctx), c.CanAppeal(), "Expected to be able to appeal")
+
+	courtValue, ok := c.AppealStatus["competent_court"]
+	assert.True(godog.T(ctx), ok, "Expected competent court to be set")
+
+	court, ok := courtValue.(string)
+	assert.True(godog.T(ctx), ok, "Expected competent court to be a string")
+
+	assert.Equal(godog.T(ctx), competentCourt, court, "Expected another competent court")
+
+	return nil
 }
 
-func kanDeBurgerInBezwaarGaan() error {
-	return godog.ErrPending
+func kanDeBurgerInBezwaarGaan(ctx context.Context) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.True(godog.T(ctx), c.CanObject(), "Expected case to be objectable")
+
+	return nil
 }
 
-func kanDeBurgerNietInBezwaarGaanMetReden(arg1 string) error {
-	return godog.ErrPending
+func kanDeBurgerNietInBezwaarGaanMetReden(ctx context.Context, expectedReason string) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.False(godog.T(ctx), c.CanObject(), "Expected case not to be objectable")
+
+	reasonValue, ok := c.ObjectionStatus["not_possible_reason"]
+	assert.True(godog.T(ctx), ok, "Expected reason to be set")
+
+	reason, ok := reasonValue.(string)
+	assert.True(godog.T(ctx), ok, "Expected reason to be a string")
+
+	assert.Equal(godog.T(ctx), expectedReason, reason, "Expected reasons to match")
+
+	return nil
 }
 
-func ontbrekenErGeenVerplichteGegevens() error {
-	return godog.ErrPending
+func ontbrekenErGeenVerplichteGegevens(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	assert.True(godog.T(ctx), ok)
+
+	assert.False(godog.T(ctx), result.MissingRequired, "Expected no missing required fields")
+
+	return nil
 }
 
-func ontbrekenErVerplichteGegevens() error {
-	return godog.ErrPending
+func ontbrekenErVerplichteGegevens(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	assert.True(godog.T(ctx), ok)
+
+	assert.True(godog.T(ctx), result.MissingRequired, "Expected missing required fields")
+
+	return nil
 }
 
-func wordtDeAanvraagToegevoegdAanHandmatigeBeoordeling() error {
-	return godog.ErrPending
+func wordtDeAanvraagToegevoegdAanHandmatigeBeoordeling(ctx context.Context) error {
+	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	if !ok || services == nil {
+		return fmt.Errorf("services not set")
+	}
+
+	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
+	assert.True(godog.T(ctx), ok)
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		return fmt.Errorf("failed to get case: %w", err)
+	}
+
+	assert.Equal(godog.T(ctx), casemanager.CaseStatusInReview, c.Status, "Expected case to be in review")
+
+	return nil
 }
 
 // helper functions

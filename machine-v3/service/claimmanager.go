@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/looplab/eventhorizon/uuid"
+	"github.com/minbzk/poc-machine-law/machine-v3/casemanager"
 	"github.com/minbzk/poc-machine-law/machine-v3/model"
 )
 
@@ -12,7 +14,7 @@ type ClaimManager struct {
 	Services           *Services
 	CaseManager        *CaseManager
 	serviceIndex       map[string][]string            // service -> [claim_ids]
-	caseIndex          map[string][]string            // case_id -> [claim_ids]
+	caseIndex          map[uuid.UUID][]string         // case_id -> [claim_ids]
 	claimantIndex      map[string][]string            // claimant -> [claim_ids]
 	bsnIndex           map[string][]string            // bsn -> [claim_ids]
 	statusIndex        map[model.ClaimStatus][]string // status -> [claim_ids]
@@ -26,7 +28,7 @@ func NewClaimManager(services *Services) *ClaimManager {
 	return &ClaimManager{
 		Services:           services,
 		serviceIndex:       make(map[string][]string),
-		caseIndex:          make(map[string][]string),
+		caseIndex:          make(map[uuid.UUID][]string),
 		claimantIndex:      make(map[string][]string),
 		bsnIndex:           make(map[string][]string),
 		statusIndex:        make(map[model.ClaimStatus][]string),
@@ -43,7 +45,7 @@ func (cm *ClaimManager) indexClaim(claim *model.Claim) {
 	cm.serviceIndex[claim.Service] = append(cm.serviceIndex[claim.Service], claimID)
 
 	// Case index (if applicable)
-	if claim.CaseID != "" {
+	if claim.CaseID == uuid.Nil {
 		cm.caseIndex[claim.CaseID] = append(cm.caseIndex[claim.CaseID], claimID)
 	}
 
@@ -73,7 +75,7 @@ func (cm *ClaimManager) SubmitClaim(
 	claimant string,
 	law string,
 	bsn string,
-	caseID string,
+	caseID uuid.UUID,
 	oldValue any,
 	evidencePath string,
 	autoApprove bool,
@@ -126,8 +128,8 @@ func (cm *ClaimManager) SubmitClaim(
 	}
 
 	// Link to case if provided
-	var case_ *model.Case
-	if caseID != "" {
+	var case_ *casemanager.Case
+	if caseID != uuid.Nil {
 		var err error
 		case_, err = cm.CaseManager.GetCaseByID(caseID)
 		if err == nil && case_ != nil {
@@ -171,7 +173,7 @@ func (cm *ClaimManager) ApproveClaim(claimID, verifiedBy string, verifiedValue a
 		return err
 	}
 
-	if claim.CaseID != "" {
+	if claim.CaseID != uuid.Nil {
 		case_, err := cm.CaseManager.GetCaseByID(claim.CaseID)
 		if err == nil && case_ != nil {
 			err = case_.ApproveOrRejectClaim(claim.ID)
@@ -199,7 +201,7 @@ func (cm *ClaimManager) RejectClaim(claimID, rejectedBy, rejectionReason string)
 		return err
 	}
 
-	if claim.CaseID != "" {
+	if claim.CaseID != uuid.Nil {
 		case_, err := cm.CaseManager.GetCaseByID(claim.CaseID)
 		if err == nil && case_ != nil {
 			err = case_.ApproveOrRejectClaim(claim.ID)
@@ -213,7 +215,7 @@ func (cm *ClaimManager) RejectClaim(claimID, rejectedBy, rejectionReason string)
 }
 
 // LinkCase links an existing claim to a case
-func (cm *ClaimManager) LinkCase(claimID, caseID string) error {
+func (cm *ClaimManager) LinkCase(claimID string, caseID uuid.UUID) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 
@@ -309,7 +311,7 @@ func (cm *ClaimManager) GetClaimsByService(
 
 // GetClaimsByCase gets all claims for a case
 func (cm *ClaimManager) GetClaimsByCase(
-	caseID string,
+	caseID uuid.UUID,
 	approved bool,
 	includeRejected bool,
 ) ([]*model.Claim, error) {

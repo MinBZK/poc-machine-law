@@ -1,0 +1,600 @@
+[36mINFO[0m[2025-03-19T14:21:16+01:00]
+Direct rules engine evaluation example:     [36mcomponent[0m=main
+[37mDEBU[0m[2025-03-19T14:21:16+01:00]  GEMEENTE_AMSTERDAM: participatiewet/bijstand (2025-03-19 map[BSN:999993653] )  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║── Evaluating rules for GEMEENTE_AMSTERDAM participatiewet/bijstand (2025-03-19 )  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Requirements map[all:[map[operation:EQUALS subject:$MEETS_NATIONAL_REQUIREMENTS value:true] map[or:[map[operation:EQUALS subject:$HAS_FIXED_ADDRESS value:true] map[operation:IN subject:$POSTAL_ADDRESS values:$VALID_POSTAL_ADDRESSES]]] map[or:[map[operation:IN subject:$WORK_CAPABILITY.arbeidsvermogen values:$FULL_EXEMPTION_REASONS] map[operation:NOT_NULL subject:$WORK_CAPABILITY.re_integratie_traject]]]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirements map[operation:EQUALS subject:$MEETS_NATIONAL_REQUIREMENTS value:true]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── SZW: participatiewet/bijstand (2025-03-19 map[BSN:999993653] is_eligible)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║── Evaluating rules for SZW participatiewet/bijstand (2025-03-19 is_eligible)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   ├── Requirements map[all:[map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE] map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE] map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]] map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS] map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]] map[operation:EQUALS subject:$IS_DETAINEE value:false] map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing age  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute SUBTRACT_DATE([2025-03-19 1990-01-01], years) = 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of age: 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Compute GREATER_OR_EQUAL(35, 18) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] birth_date)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 birth_date)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing birth_date  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of birth_date: 1990-01-01  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── SVB: algemene_ouderdomswet/leeftijdsbepaling (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] retirement_age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for SVB algemene_ouderdomswet/leeftijdsbepaling (2025-03-19 retirement_age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing retirement_age  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1948-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1949-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1950-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1951-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1952-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1953-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1954-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1955-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1956-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1957-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1958-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1959-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1960-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── CBS: wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] life_expectancy_65)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║── Evaluating rules for CBS wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 life_expectancy_65)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║── Computing life_expectancy_65  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║   ├── Result of life_expectancy_65: 20.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute GREATER_THAN(20.5, 20) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── CBS: wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] life_expectancy_65)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║── Evaluating rules for CBS wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 life_expectancy_65)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║── Computing life_expectancy_65  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ║   ├── Result of life_expectancy_65: 20.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute SUBTRACT([20.5 20]) = 0.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute DIVIDE([3 12]) = 0.25  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute MULTIPLY([0.5 0.25]) = 0.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute MIN([0.125 2]) = 0.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute ADD([65 0.125]) = 65.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of retirement_age: 65.13  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Compute LESS_THAN(35, 65.13) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Requirements map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_dutch_nationality)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_dutch_nationality)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║── Computing has_dutch_nationality  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── IN  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   │   ├── Field nationaliteit not found in source for table personen  [33mcomponent[0m=context
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   │   ├── Could not resolve value for NATIONALITY  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   │   ├── Result <nil> IN [NEDERLANDS]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── Result of has_dutch_nationality: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Requirement met: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Requirements map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ├── IN        [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ├── IND: vreemdelingenwet (2025-03-19 map[BSN:999993653] residence_permit_type)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║── Evaluating rules for IND vreemdelingenwet (2025-03-19 residence_permit_type)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║── Computing residence_permit_type  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   ├── AND  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   │   │   ├── Result ONBEPAALDE_TIJD_REGULIER IN [ONBEPAALDE_TIJD_REGULIER ONBEPAALDE_TIJD_ASIEL ONBEPAALDE_TIJD_EU DUURZAAM_VERBLIJF_EU]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   │   │   ├── Result VERLEEND IN [VERLEEND VERLENGD VAN_RECHTSWEGE]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   │   ├── Result [true true] AND: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   │   ║   ├── Result of residence_permit_type: PERMANENT  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ├── Result PERMANENT IN [PERMANENT EU FAMILY_REUNIFICATION]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] residence_address)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 residence_address)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing residence_address  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute CONCAT([Kalverstraat   1 ,  1012NX   Amsterdam]) = Kalverstraat 1, 1012NX Amsterdam  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of residence_address: Kalverstraat 1, 1012NX Amsterdam  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Requirements map[operation:EQUALS subject:$IS_STUDENT value:false]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ├── DUO: wet_studiefinanciering (2025-03-19 map[BSN:999993653] is_student)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║── Evaluating rules for DUO wet_studiefinanciering (2025-03-19 is_student)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║── Computing is_student  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── Could not resolve value for EDUCATION_TYPE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   │   ║   ├── Result of is_student: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ├── Compute EQUALS(false, false) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[operation:EQUALS subject:$IS_DETAINEE value:false]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── DJI: penitentiaire_beginselenwet (2025-03-19 map[BSN:999993653] is_incarcerated)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for DJI penitentiaire_beginselenwet (2025-03-19 is_incarcerated)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing is_incarcerated  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── AND   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   │   ├── Could not resolve value for FACILITY_TYPE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   │   ├── Result <nil> IN [PENITENTIAIRE_INRICHTING HUIS_VAN_BEWARING]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Result [false] AND: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of is_incarcerated: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Compute EQUALS(false, false) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_partner)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_partner)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing has_partner  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── IN    [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Result GEEN IN [HUWELIJK GEREGISTREERD_PARTNERSCHAP]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of has_partner: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── BELASTINGDIENST: wet_inkomstenbelasting (2025-03-19 map[BSN:999993653] assets)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for BELASTINGDIENST wet_inkomstenbelasting (2025-03-19 assets)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Computing assets  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Compute ADD([5000 0 0]) = 0  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Result of assets: 0  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Compute LESS_THAN(0, 750000) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║── Computing is_eligible     [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   ├── Result of is_eligible: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Compute EQUALS(true, true) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirement met: true             [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$HAS_FIXED_ADDRESS value:true] map[operation:IN subject:$POSTAL_ADDRESS values:$VALID_POSTAL_ADDRESSES]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Requirements map[operation:EQUALS subject:$HAS_FIXED_ADDRESS value:true]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_fixed_address)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_fixed_address)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║── Computing has_fixed_address  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   ├── IN                [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   │   ├── Result WOONADRES IN [WOONADRES]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ║   ├── Result of has_fixed_address: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ├── Compute EQUALS(true, true) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Requirement met: true         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirement met: true             [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirements map[or:[map[operation:IN subject:$WORK_CAPABILITY.arbeidsvermogen values:$FULL_EXEMPTION_REASONS] map[operation:NOT_NULL subject:$WORK_CAPABILITY.re_integratie_traject]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Requirements map[operation:IN subject:$WORK_CAPABILITY.arbeidsvermogen values:$FULL_EXEMPTION_REASONS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ├── IN                        [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ├── Fields [ontheffing_reden ontheffing_einddatum] not found in source for table werk_en_re_integratie  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   │   ├── Result VOLLEDIG IN [MEDISCH_VOLLEDIG MANTELZORG_VOLLEDIG SOCIALE_OMSTANDIGHEDEN_VOLLEDIG]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Requirement met: false        [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Requirements map[operation:NOT_NULL subject:$WORK_CAPABILITY.re_integratie_traject]  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ├── Fields [ontheffing_reden ontheffing_einddatum] not found in source for table werk_en_re_integratie  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Requirement met: true         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirement met: true             [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Requirement met: true                 [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║── Computing is_eligible                     [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Result of is_eligible: true           [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║── Computing benefit_amount                  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── SZW: participatiewet/bijstand (2025-03-19 map[BSN:999993653] base_amount)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║── Evaluating rules for SZW participatiewet/bijstand (2025-03-19 base_amount)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Requirements map[all:[map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE] map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE] map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]] map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS] map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]] map[operation:EQUALS subject:$IS_DETAINEE value:false] map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing age     [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute SUBTRACT_DATE([2025-03-19 1990-01-01], years) = 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of age: 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute GREATER_OR_EQUAL(35, 18) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] birth_date)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 birth_date)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing birth_date  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of birth_date: 1990-01-01  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── SVB: algemene_ouderdomswet/leeftijdsbepaling (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] retirement_age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for SVB algemene_ouderdomswet/leeftijdsbepaling (2025-03-19 retirement_age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing retirement_age  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1948-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1949-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1950-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1951-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1952-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1953-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1954-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1955-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1956-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1957-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1958-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1959-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1960-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── CBS: wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] life_expectancy_65)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Evaluating rules for CBS wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 life_expectancy_65)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Computing life_expectancy_65  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── Result of life_expectancy_65: 20.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute GREATER_THAN(20.5, 20) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── CBS: wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] life_expectancy_65)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Evaluating rules for CBS wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 life_expectancy_65)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Computing life_expectancy_65  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── Result of life_expectancy_65: 20.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute SUBTRACT([20.5 20]) = 0.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute DIVIDE([3 12]) = 0.25  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute MULTIPLY([0.5 0.25]) = 0.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute MIN([0.125 2]) = 0.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute ADD([65 0.125]) = 65.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of retirement_age: 65.13  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute LESS_THAN(35, 65.13) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirements map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_dutch_nationality)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_dutch_nationality)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Computing has_dutch_nationality  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── IN        [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Field nationaliteit not found in source for table personen  [33mcomponent[0m=context
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Could not resolve value for NATIONALITY  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Result <nil> IN [NEDERLANDS]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Result of has_dutch_nationality: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirement met: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirements map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── IN                [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ├── IND: vreemdelingenwet (2025-03-19 map[BSN:999993653] residence_permit_type)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║── Evaluating rules for IND vreemdelingenwet (2025-03-19 residence_permit_type)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║── Computing residence_permit_type  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   ├── AND   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   │   ├── Result ONBEPAALDE_TIJD_REGULIER IN [ONBEPAALDE_TIJD_REGULIER ONBEPAALDE_TIJD_ASIEL ONBEPAALDE_TIJD_EU DUURZAAM_VERBLIJF_EU]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   │   ├── Result VERLEEND IN [VERLEEND VERLENGD VAN_RECHTSWEGE]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   ├── Result [true true] AND: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   ├── Result of residence_permit_type: PERMANENT  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ├── Result PERMANENT IN [PERMANENT EU FAMILY_REUNIFICATION]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] residence_address)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 residence_address)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing residence_address  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute CONCAT([Kalverstraat   1 ,  1012NX   Amsterdam]) = Kalverstraat 1, 1012NX Amsterdam  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of residence_address: Kalverstraat 1, 1012NX Amsterdam  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirements map[operation:EQUALS subject:$IS_STUDENT value:false]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── DUO: wet_studiefinanciering (2025-03-19 map[BSN:999993653] is_student)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Evaluating rules for DUO wet_studiefinanciering (2025-03-19 is_student)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Computing is_student  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Could not resolve value for EDUCATION_TYPE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Result of is_student: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── Compute EQUALS(false, false) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:EQUALS subject:$IS_DETAINEE value:false]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── DJI: penitentiaire_beginselenwet (2025-03-19 map[BSN:999993653] is_incarcerated)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for DJI penitentiaire_beginselenwet (2025-03-19 is_incarcerated)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing is_incarcerated  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── AND           [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── IN        [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   │   ├── Could not resolve value for FACILITY_TYPE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   │   ├── Result <nil> IN [PENITENTIAIRE_INRICHTING HUIS_VAN_BEWARING]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Result [false] AND: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of is_incarcerated: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute EQUALS(false, false) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_partner)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_partner)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing has_partner  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── IN            [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Result GEEN IN [HUWELIJK GEREGISTREERD_PARTNERSCHAP]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of has_partner: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── BELASTINGDIENST: wet_inkomstenbelasting (2025-03-19 map[BSN:999993653] assets)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for BELASTINGDIENST wet_inkomstenbelasting (2025-03-19 assets)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing assets  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute ADD([5000 0 0]) = 0  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of assets: 0  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute LESS_THAN(0, 750000) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Requirement met: true         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║── Computing base_amount             [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Result of base_amount: 108900  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── SZW: participatiewet/bijstand (2025-03-19 map[BSN:999993653] kostendelersnorm)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║── Evaluating rules for SZW participatiewet/bijstand (2025-03-19 kostendelersnorm)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Requirements map[all:[map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE] map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE] map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]] map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS] map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]] map[operation:EQUALS subject:$IS_DETAINEE value:false] map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing age     [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute SUBTRACT_DATE([2025-03-19 1990-01-01], years) = 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of age: 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute GREATER_OR_EQUAL(35, 18) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] birth_date)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 birth_date)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing birth_date  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of birth_date: 1990-01-01  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── SVB: algemene_ouderdomswet/leeftijdsbepaling (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] retirement_age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for SVB algemene_ouderdomswet/leeftijdsbepaling (2025-03-19 retirement_age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing retirement_age  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1948-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1949-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1950-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1951-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1952-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1953-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1954-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1955-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1956-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1957-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1958-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1959-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute LESS_THAN(1990-01-01, 1960-01-01) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── CBS: wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] life_expectancy_65)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Evaluating rules for CBS wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 life_expectancy_65)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Computing life_expectancy_65  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── Result of life_expectancy_65: 20.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute GREATER_THAN(20.5, 20) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── CBS: wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 map[BIRTH_DATE:1990-01-01 BSN:999993653] life_expectancy_65)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Evaluating rules for CBS wet_op_het_centraal_bureau_voor_de_statistiek (2025-03-19 life_expectancy_65)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║── Computing life_expectancy_65  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ║   ├── Result of life_expectancy_65: 20.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute SUBTRACT([20.5 20]) = 0.5  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute DIVIDE([3 12]) = 0.25  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute MULTIPLY([0.5 0.25]) = 0.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute MIN([0.125 2]) = 0.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute ADD([65 0.125]) = 65.125  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of retirement_age: 65.13  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute LESS_THAN(35, 65.13) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirements map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_dutch_nationality)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_dutch_nationality)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Computing has_dutch_nationality  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── IN        [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Field nationaliteit not found in source for table personen  [33mcomponent[0m=context
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Could not resolve value for NATIONALITY  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   │   ├── Result <nil> IN [NEDERLANDS]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Result of has_dutch_nationality: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirement met: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirements map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── IN                [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ├── IND: vreemdelingenwet (2025-03-19 map[BSN:999993653] residence_permit_type)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║── Evaluating rules for IND vreemdelingenwet (2025-03-19 residence_permit_type)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║── Computing residence_permit_type  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   ├── AND   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   │   ├── Result ONBEPAALDE_TIJD_REGULIER IN [ONBEPAALDE_TIJD_REGULIER ONBEPAALDE_TIJD_ASIEL ONBEPAALDE_TIJD_EU DUURZAAM_VERBLIJF_EU]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   ├── IN  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   │   ├── Result VERLEEND IN [VERLEEND VERLENGD VAN_RECHTSWEGE]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   │   ├── Result [true true] AND: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   │   ║   ├── Result of residence_permit_type: PERMANENT  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ├── Result PERMANENT IN [PERMANENT EU FAMILY_REUNIFICATION]: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] residence_address)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 residence_address)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing residence_address  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute CONCAT([Kalverstraat   1 ,  1012NX   Amsterdam]) = Kalverstraat 1, 1012NX Amsterdam  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of residence_address: Kalverstraat 1, 1012NX Amsterdam  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirements map[operation:EQUALS subject:$IS_STUDENT value:false]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── DUO: wet_studiefinanciering (2025-03-19 map[BSN:999993653] is_student)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Evaluating rules for DUO wet_studiefinanciering (2025-03-19 is_student)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║── Computing is_student  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Could not resolve value for EDUCATION_TYPE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   │   ║   ├── Result of is_student: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ├── Compute EQUALS(false, false) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── True value found in an OR, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[operation:EQUALS subject:$IS_DETAINEE value:false]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── DJI: penitentiaire_beginselenwet (2025-03-19 map[BSN:999993653] is_incarcerated)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for DJI penitentiaire_beginselenwet (2025-03-19 is_incarcerated)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing is_incarcerated  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── AND           [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── IN        [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   │   ├── Could not resolve value for FACILITY_TYPE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   │   ├── Result <nil> IN [PENITENTIAIRE_INRICHTING HUIS_VAN_BEWARING]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Result [false] AND: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of is_incarcerated: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute EQUALS(false, false) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirements map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] has_partner)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 has_partner)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing has_partner  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── IN            [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   │   ├── Result GEEN IN [HUWELIJK GEREGISTREERD_PARTNERSCHAP]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of has_partner: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── BELASTINGDIENST: wet_inkomstenbelasting (2025-03-19 map[BSN:999993653] assets)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Evaluating rules for BELASTINGDIENST wet_inkomstenbelasting (2025-03-19 assets)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── No requirements found  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║── Computing assets  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Compute ADD([5000 0 0]) = 0  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   │   ║   ├── Result of assets: 0  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ├── Compute LESS_THAN(0, 750000) = true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Requirement met: true         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║── Computing kostendelersnorm        [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── IN                            [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] household_size)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 household_size)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║── Computing household_size  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║   ├── Could not resolve value for HOUSEHOLD  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   │   ║   ├── Result of household_size: 1  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   │   ├── Result 1 IN map[1:1 2:0.5 3:0.43 4:0.4]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ║   ├── Result of kostendelersnorm: 0.38  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Compute MULTIPLY([108900 0.38]) = 41382  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── AND                                   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:999993653] age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   ├── Requirement met: true  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── Requirement met: true     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║── Computing age                 [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── Compute SUBTRACT_DATE([2025-03-19 1990-01-01], years) = 35  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── Result of age: 35         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Compute LESS_OR_EQUAL(35, 27) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Result [false] AND: false         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── AND                                   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── KVK: handelsregisterwet (2025-03-19 map[BSN:999993653] is_active_entrepreneur)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║── Evaluating rules for KVK handelsregisterwet (2025-03-19 is_active_entrepreneur)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── No requirements found     [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║── Computing is_active_entrepreneur  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── OR                        [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   ├── AND                   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   ├── IN                [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   │   ├── Could not resolve value for REGISTRATIONS  [33mcomponent[0m=context
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   │   ├── Value is nil, could not resolve value $REGISTRATIONS.rechtsvorm: nil  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   │   ├── Result <nil> IN [EENMANSZAAK VOF MAATSCHAP COMMANDITAIRE_VENNOOTSCHAP]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   ├── Result [false] AND: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   ├── AND                   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   ├── IN                [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   │   ├── Could not resolve value for POSITIONS  [33mcomponent[0m=context
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   │   ├── Value is nil, could not resolve value $POSITIONS.functie: nil  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   │   ├── Result <nil> IN [EIGENAAR VENNOOT MAAT BEHEREND_VENNOOT]: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   │   ├── Result [false] AND: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   │   ├── Result [false false] OR: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ║   ├── Result of is_active_entrepreneur: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Result [false] AND: false         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Compute ADD([41382 0 0 0]) = 41382    [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Result of benefit_amount: 41382       [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║── Computing housing_assistance              [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── AND                                   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Compute EQUALS(true, false) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Result [false] AND: false         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Result of housing_assistance: 0       [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║── Computing startup_assistance              [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── AND                                   [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Compute EQUALS(false, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── False value found in an AND, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Result [false] AND: false         [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Result of startup_assistance: 0       [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00]  GEMEENTE_AMSTERDAM: participatiewet/bijstand (2025-03-19 map[] )  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║── Evaluating rules for GEMEENTE_AMSTERDAM participatiewet/bijstand (2025-03-19 )  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Requirements map[all:[map[operation:EQUALS subject:$MEETS_NATIONAL_REQUIREMENTS value:true] map[or:[map[operation:EQUALS subject:$HAS_FIXED_ADDRESS value:true] map[operation:IN subject:$POSTAL_ADDRESS values:$VALID_POSTAL_ADDRESSES]]] map[or:[map[operation:IN subject:$WORK_CAPABILITY.arbeidsvermogen values:$FULL_EXEMPTION_REASONS] map[operation:NOT_NULL subject:$WORK_CAPABILITY.re_integratie_traject]]]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirements map[operation:EQUALS subject:$MEETS_NATIONAL_REQUIREMENTS value:true]  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Could not resolve value for BSN  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── SZW: participatiewet/bijstand (2025-03-19 map[BSN:<nil>] is_eligible)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║── Evaluating rules for SZW participatiewet/bijstand (2025-03-19 is_eligible)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   ├── Requirements map[all:[map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE] map[operation:LESS_THAN subject:$AGE value:$RETIREMENT_AGE] map[or:[map[operation:EQUALS subject:$HAS_DUTCH_NATIONALITY value:true] map[operation:IN subject:$RESIDENCE_PERMIT_TYPE values:$VALID_RESIDENCE_PERMITS]]] map[operation:NOT_NULL subject:$RESIDENCE_ADDRESS] map[or:[map[operation:EQUALS subject:$IS_STUDENT value:false] map[operation:EQUALS subject:$RECEIVES_STUDY_GRANT value:false]]] map[operation:EQUALS subject:$IS_DETAINEE value:false] map[conditions:[map[test:map[operation:EQUALS subject:$HAS_PARTNER value:true] then:map[operation:LESS_THAN values:[map[operation:ADD values:[$ASSETS $PARTNER_ASSETS]] $ASSET_LIMIT_PARTNER]]] map[else:map[operation:LESS_THAN values:[$ASSETS $ASSET_LIMIT_SINGLE]]]] operation:IF]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   ├── Requirements map[operation:GREATER_OR_EQUAL subject:$AGE value:$MINIMUM_AGE]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── RvIG: wet_brp (2025-03-19 map[BSN:<nil>] age)  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── Evaluating rules for RvIG wet_brp (2025-03-19 age)  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirements map[all:[map[operation:NOT_NULL subject:$BIRTH_DATE]]]  [37mcomponent[0m=system
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirements map[operation:NOT_NULL subject:$BIRTH_DATE]  [37mcomponent[0m=system
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   │   ├── Field geboortedatum not found in source for table personen  [33mcomponent[0m=context
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   │   ├── Could not resolve value for BIRTH_DATE  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── Requirement met: false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   │   ├── False value found in an ALL, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║   ├── Requirement met: false  [37mcomponent[0m=rules_engine
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   │   ║── No output values computed for 2025-03-19 age  [33mcomponent[0m=rules_engine
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   │   ║   │   │   ├── Error computing GREATER_OR_EQUAL(<nil>, 18): cannot convert <nil> of type <nil> to number  [33mcomponent[0m=rules_engine
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Could not resolve value for MEETS_NATIONAL_REQUIREMENTS  [33mcomponent[0m=context
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   │   ├── Compute EQUALS(<nil>, true) = false  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── Requirement met: false            [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   │   ├── False value found in an ALL, no need to compute the rest, breaking.  [37mcomponent[0m=rules_engine
+[37mDEBU[0m[2025-03-19T14:21:16+01:00] ║   ├── Requirement met: false                [37mcomponent[0m=rules_engine
+[33mWARN[0m[2025-03-19T14:21:16+01:00] ║── No output values computed for 2025-03-19   [33mcomponent[0m=rules_engine
+[36mINFO[0m[2025-03-19T14:21:16+01:00]
+Successfully completed demo!                [36mcomponent[0m=main

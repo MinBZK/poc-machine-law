@@ -31,7 +31,7 @@ type Claim struct {
 	Reason          string      `json:"reason"`
 	EvidencePath    string      `json:"evidence_path,omitempty"`
 	Claimant        string      `json:"claimant"`
-	CaseID          string      `json:"case_id,omitempty"`
+	CaseID          uuid.UUID   `json:"case_id,omitempty"`
 	Law             string      `json:"law"`
 	BSN             string      `json:"bsn"`
 	Status          ClaimStatus `json:"status"`
@@ -53,7 +53,7 @@ func NewClaim(
 	claimant string,
 	law string,
 	bsn string,
-	caseID string,
+	caseID uuid.UUID,
 	oldValue any,
 	evidencePath string,
 ) *Claim {
@@ -83,7 +83,7 @@ func (c *Claim) Reset(
 	claimant string,
 	law string,
 	bsn string,
-	caseID string,
+	caseID uuid.UUID,
 	oldValue any,
 	evidencePath string,
 ) {
@@ -140,11 +140,13 @@ func (c *Claim) Reject(rejectedBy string, rejectionReason string) error {
 }
 
 // LinkCase links a claim to a case
-func (c *Claim) LinkCase(caseID string) error {
-	if c.CaseID != "" {
+func (c *Claim) LinkCase(caseID uuid.UUID) error {
+	if c.CaseID != uuid.Nil {
 		return fmt.Errorf("claim is already linked to a case")
 	}
+
 	c.CaseID = caseID
+
 	return nil
 }
 

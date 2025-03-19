@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	eh "github.com/looplab/eventhorizon"
 )
 
 // CaseStatus represents the status of a case
@@ -24,14 +25,18 @@ const (
 	CaseStatusObjected CaseStatus = "OBJECTED"
 )
 
+var _ = eh.Entity(&Case{})
+var _ = eh.Versionable(&Case{})
+
 // Case represents a service case
 type Case struct {
-	ID                 uuid.UUID      `json:"id"`
+	ID                 uuid.UUID `json:"id"`
+	Version            int
 	ClaimIDs           []string       `json:"claim_ids,omitempty"`
 	BSN                string         `json:"bsn"`
 	Service            string         `json:"service"`
 	Law                string         `json:"law"`
-	RulespecUUID       string         `json:"rulespec_uuid"`
+	RulespecID         uuid.UUID      `json:"rulespec_uuid"`
 	ApprovedClaimsOnly bool           `json:"approved_claims_only"`
 	ClaimedResult      map[string]any `json:"claimed_result"`
 	VerifiedResult     map[string]any `json:"verified_result"`
@@ -56,16 +61,17 @@ func NewCase(
 	parameters map[string]any,
 	claimedResult map[string]any,
 	verifiedResult map[string]any,
-	rulespecUUID string,
+	rulespecUUID uuid.UUID,
 	approvedClaimsOnly bool,
 ) *Case {
 	now := time.Now()
 	return &Case{
 		ID:                 uuid.New(),
+		Version:            0,
 		BSN:                bsn,
 		Service:            service,
 		Law:                law,
-		RulespecUUID:       rulespecUUID,
+		RulespecID:         rulespecUUID,
 		ApprovedClaimsOnly: approvedClaimsOnly,
 		ClaimedResult:      claimedResult,
 		VerifiedResult:     verifiedResult,
@@ -74,6 +80,17 @@ func NewCase(
 		CreatedAt:          now,
 		UpdatedAt:          now,
 	}
+}
+
+// EntityID implements the EntityID method of the eventhorizon.Entity interface.
+func (i *Case) EntityID() uuid.UUID {
+	return i.ID
+}
+
+// AggregateVersion implements the AggregateVersion method of the
+// eventhorizon.Versionable interface.
+func (i *Case) AggregateVersion() int {
+	return i.Version
 }
 
 // Reset resets a case with new parameters and results
@@ -170,7 +187,7 @@ func (c *Case) Object(reason string) error {
 // DetermineObjectionStatus sets objection status and parameters
 func (c *Case) DetermineObjectionStatus(
 	possible *bool,
-	notPossibleReason string,
+	notPossibleReason *string,
 	objectionPeriod *int,
 	decisionPeriod *int,
 	extensionPeriod *int,
@@ -183,7 +200,7 @@ func (c *Case) DetermineObjectionStatus(
 		c.ObjectionStatus["possible"] = *possible
 	}
 
-	if notPossibleReason != "" {
+	if notPossibleReason != nil {
 		c.ObjectionStatus["not_possible_reason"] = notPossibleReason
 	}
 
@@ -230,12 +247,12 @@ func (c *Case) CanObject() bool {
 // DetermineAppealStatus sets appeal status and parameters
 func (c *Case) DetermineAppealStatus(
 	possible *bool,
-	notPossibleReason string,
+	notPossibleReason *string,
 	appealPeriod *int,
 	directAppeal *bool,
-	directAppealReason string,
-	competentCourt string,
-	courtType string,
+	directAppealReason *string,
+	competentCourt *string,
+	courtType *string,
 ) error {
 	if c.AppealStatus == nil {
 		c.AppealStatus = make(map[string]any)
@@ -245,7 +262,7 @@ func (c *Case) DetermineAppealStatus(
 		c.AppealStatus["possible"] = *possible
 	}
 
-	if notPossibleReason != "" {
+	if notPossibleReason != nil {
 		c.AppealStatus["not_possible_reason"] = notPossibleReason
 	}
 
@@ -257,15 +274,15 @@ func (c *Case) DetermineAppealStatus(
 		c.AppealStatus["direct_appeal"] = *directAppeal
 	}
 
-	if directAppealReason != "" {
+	if directAppealReason != nil {
 		c.AppealStatus["direct_appeal_reason"] = directAppealReason
 	}
 
-	if competentCourt != "" {
+	if competentCourt != nil {
 		c.AppealStatus["competent_court"] = competentCourt
 	}
 
-	if courtType != "" {
+	if courtType != nil {
 		c.AppealStatus["court_type"] = courtType
 	}
 

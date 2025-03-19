@@ -6,49 +6,84 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/minbzk/poc-machine-law/machine-v3/casemanager"
 	"github.com/minbzk/poc-machine-law/machine-v3/internal/logging"
 	"github.com/minbzk/poc-machine-law/machine-v3/model"
 
+	eh "github.com/looplab/eventhorizon"
 	"github.com/looplab/eventhorizon/commandhandler/bus"
 	localEventBus "github.com/looplab/eventhorizon/eventbus/local"
 	memoryEventStore "github.com/looplab/eventhorizon/eventstore/memory"
+	"github.com/looplab/eventhorizon/repo/memory"
 )
 
-// CaseManager manages service cases including submission, verification, decisions and objections
+// CaseManager manages service cases using the EventHorizon-based casemanager.
 type CaseManager struct {
-	Services   *Services
-	caseIndex  map[string]string // (bsn:service:law) -> case_id
-	cases      map[string]*model.Case
-	events     []*model.Event
-	SampleRate float64
-	mu         sync.RWMutex
+	Services    *Services
+	caseIndex   map[string]uuid.UUID // Maps (bsn:service:law) -> case_id
+	events      []*model.Event
+	SampleRate  float64
+	mu          sync.RWMutex
+	commandBus  eh.CommandHandler
+	caseRepo    eh.ReadWriteRepo
+	eventBus    eh.EventBus
+	observerBus eh.EventBus
+	wg          *sync.WaitGroup
 }
 
-// NewCaseManager creates a new case manager
+// NewCaseManager creates a new case manager with EventHorizon components.
 func NewCaseManager(services *Services) *CaseManager {
+	// Create the event buses
 	eventBus := localEventBus.NewEventBus()
+	observerBus := localEventBus.NewEventBus()
 
-	// Create the event store.
+	// Handle errors from the event buses
+	go func() {
+		for e := range eventBus.Errors() {
+			log.Printf("eventbus: %s", e.Error())
+		}
+	}()
+	go func() {
+		for e := range observerBus.Errors() {
+			log.Printf("observerbus: %s", e.Error())
+		}
+	}()
+
+	// Create the event store with the event bus as a handler
 	eventStore, err := memoryEventStore.NewEventStore(
-		memoryEventStore.WithEventHandler(eventBus), // Add the event bus as a handler after save.
+		memoryEventStore.WithEventHandler(eventBus),
 	)
 	if err != nil {
 		log.Fatalf("could not create event store: %s", err)
 	}
 
-	// Create the command bus.
+	// Create the command bus
 	commandBus := bus.NewCommandHandler()
 
+	// Create the read repository for cases
+	caseRepo := memory.NewRepo()
+	caseRepo.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
+
+	// Set up the case manager
+	ctx := context.Background()
+	if err := casemanager.Setup(ctx, eventStore, eventBus, eventBus, commandBus, caseRepo); err != nil {
+		log.Fatalf("could not set up case manager: %s", err)
+	}
+
 	return &CaseManager{
-		Services:   services,
-		caseIndex:  make(map[string]string),
-		cases:      make(map[string]*model.Case),
-		events:     make([]*model.Event, 0),
-		SampleRate: 0.10, // 10% sample rate
+		Services:    services,
+		caseIndex:   make(map[string]uuid.UUID),
+		events:      make([]*model.Event, 0),
+		SampleRate:  0.10, // 10% sample rate
+		commandBus:  commandBus,
+		caseRepo:    caseRepo,
+		eventBus:    eventBus,
+		observerBus: observerBus,
+		wg:          &sync.WaitGroup{},
 	}
 }
 
@@ -58,13 +93,13 @@ func (cm *CaseManager) indexKey(bsn, service, law string) string {
 }
 
 // indexCase adds a case to the index
-func (cm *CaseManager) indexCase(c *model.Case) {
-	key := cm.indexKey(c.BSN, c.Service, c.Law)
-	cm.caseIndex[key] = c.ID
+func (cm *CaseManager) indexCase(caseID uuid.UUID, bsn, service, law string) {
+	key := cm.indexKey(bsn, service, law)
+	cm.SetCase(caseID, key)
 }
 
 // recordEvent records a new event
-func (cm *CaseManager) recordEvent(caseID, eventType string, data map[string]any) {
+func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[string]any) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 
@@ -77,11 +112,14 @@ func (cm *CaseManager) recordEvent(caseID, eventType string, data map[string]any
 
 	cm.events = append(cm.events, event)
 
+	cm.wg.Add(1)
 	// Trigger rules in response to event
 	go func() {
 		if err := cm.Services.ApplyRules(event); err != nil {
 			logging.GetLogger("case_manager").WithIndent().Errorf("Error applying rules: %v", err)
 		}
+
+		cm.wg.Done()
 	}()
 }
 
@@ -154,7 +192,7 @@ func (cm *CaseManager) resultsMatch(claimed, verified map[string]any) bool {
 	return true
 }
 
-// todo: change Helper function for deep equality comparison
+// Helper function for deep equality comparison
 func deepEqual(a, b any) bool {
 	aJson, err := json.Marshal(a)
 	if err != nil {
@@ -169,7 +207,26 @@ func deepEqual(a, b any) bool {
 	return string(aJson) == string(bJson)
 }
 
-// SubmitCase submits a new case and automatically processes it if possible
+func (cm *CaseManager) SetCase(caseID uuid.UUID, key string) {
+	cm.mu.Lock()
+
+	cm.caseIndex[key] = caseID
+
+	cm.mu.Unlock()
+
+}
+
+func (cm *CaseManager) GetCaseByKey(key string) (uuid.UUID, bool) {
+	cm.mu.RLock()
+
+	caseID, exists := cm.caseIndex[key]
+
+	cm.mu.RUnlock()
+
+	return caseID, exists
+}
+
+// SubmitCase submits a new case and automatically processes it
 func (cm *CaseManager) SubmitCase(
 	ctx context.Context,
 	bsn string,
@@ -178,9 +235,7 @@ func (cm *CaseManager) SubmitCase(
 	parameters map[string]any,
 	claimedResult map[string]any,
 	approvedClaimsOnly bool,
-) (string, error) {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
+) (uuid.UUID, error) {
 
 	// Verify using rules engine
 	result, err := cm.Services.Evaluate(
@@ -194,30 +249,43 @@ func (cm *CaseManager) SubmitCase(
 		true,
 	)
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 
 	verifiedResult := result.Output
+	rulespecUUID, err := uuid.Parse(result.RulespecUUID)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("invalid rulespec UUID: %w", err)
+	}
 
 	// Check if a case already exists
-	existingCase := cm.GetCase(bsn, serviceType, law)
+	key := cm.indexKey(bsn, serviceType, law)
+	existingCaseID, exists := cm.GetCaseByKey(key)
 
-	var c *model.Case
+	var caseID uuid.UUID
 	var eventType string
 	var eventData map[string]any
 
-	if existingCase == nil {
-		// Create new case
-		c = model.NewCase(
+	if !exists {
+		// Submit a new case
+		caseID, err = casemanager.SubmitCase(
+			ctx,
+			cm.commandBus,
 			bsn,
 			serviceType,
 			law,
 			parameters,
 			claimedResult,
 			verifiedResult,
-			result.RulespecUUID,
+			rulespecUUID,
 			approvedClaimsOnly,
 		)
+		if err != nil {
+			return uuid.Nil, fmt.Errorf("failed to submit case: %w", err)
+		}
+
+		// Add to index
+		cm.indexCase(caseID, bsn, serviceType, law)
 
 		eventType = "Submitted"
 		eventData = map[string]any{
@@ -232,15 +300,17 @@ func (cm *CaseManager) SubmitCase(
 		}
 	} else {
 		// Reset existing case
-		c = existingCase
-		err := c.Reset(
-			parameters,
-			claimedResult,
-			verifiedResult,
-			approvedClaimsOnly,
-		)
-		if err != nil {
-			return "", err
+		caseID = existingCaseID
+		cmd := casemanager.ResetCaseCommand{
+			ID:                 caseID,
+			Parameters:         parameters,
+			ClaimedResult:      claimedResult,
+			VerifiedResult:     verifiedResult,
+			ApprovedClaimsOnly: approvedClaimsOnly,
+		}
+
+		if err := cm.commandBus.HandleCommand(ctx, cmd); err != nil {
+			return uuid.Nil, fmt.Errorf("failed to reset case: %w", err)
 		}
 
 		eventType = "Reset"
@@ -252,101 +322,71 @@ func (cm *CaseManager) SubmitCase(
 		}
 	}
 
-	// Check if results match and if manual review is needed
+	// Check if results match
 	resultsMatch := cm.resultsMatch(claimedResult, verifiedResult)
-	needsManualReview := rand.Float64() < cm.SampleRate
 
-	if resultsMatch && !needsManualReview {
-		// Automatic approval
-		err := c.DecideAutomatically(
-			verifiedResult,
-			parameters,
-			true,
-		)
-		if err != nil {
-			return "", err
-		}
-
-		cm.recordEvent(c.ID, "AutomaticallyDecided", map[string]any{
-			"verified_result": verifiedResult,
-			"parameters":      parameters,
-			"approved":        true,
-		})
-	} else {
-		// Route to manual review with reason
-		reason := "Selected for manual review - "
-		if !resultsMatch {
-			reason += "results differ"
-		} else {
-			reason += "random sample check"
-		}
-
-		err := c.SelectForManualReview(
-			"SYSTEM",
-			reason,
-			claimedResult,
-			verifiedResult,
-		)
-		if err != nil {
-			return "", err
-		}
-
-		cm.recordEvent(c.ID, "AddedToManualReview", map[string]any{
-			"verifier_id":     "SYSTEM",
-			"reason":          reason,
-			"claimed_result":  claimedResult,
-			"verified_result": verifiedResult,
-		})
+	// Process the case automatically
+	err = casemanager.ProcessCase(
+		ctx,
+		cm.commandBus,
+		caseID,
+		verifiedResult,
+		parameters,
+		resultsMatch,
+		cm.SampleRate,
+	)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("failed to process case: %w", err)
 	}
 
-	// Save case and record initial event
-	cm.cases[c.ID] = c
-	cm.indexCase(c)
-
-	// Record initial event if new case
+	// Record the initial event
 	if eventType == "Submitted" {
-		cm.recordEvent(c.ID, eventType, eventData)
+		cm.recordEvent(caseID, eventType, eventData)
 	}
 
-	return c.ID, nil
+	return caseID, nil
 }
 
 // CompleteManualReview completes manual review of a case
 func (cm *CaseManager) CompleteManualReview(
-	caseID string,
+	ctx context.Context,
+	caseID uuid.UUID,
 	verifierID string,
 	approved bool,
 	reason string,
 	overrideResult map[string]any,
-) (string, error) {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
-
-	case_, err := cm.GetCaseByID(caseID)
+) error {
+	// Get the case from the repository
+	c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
 	if err != nil {
-		return "", err
+		return fmt.Errorf("failed to find case: %w", err)
 	}
 
-	if case_.Status != model.CaseStatusInReview && case_.Status != model.CaseStatusObjected {
-		return "", fmt.Errorf("can only complete review for cases in review or objections")
+	// Check case status
+	if c.Status != casemanager.CaseStatusInReview && c.Status != casemanager.CaseStatusObjected {
+		return fmt.Errorf("can only complete review for cases in review or objections")
 	}
 
 	// Use current verified_result or override if provided
-	verifiedResult := case_.VerifiedResult
+	verifiedResult := c.VerifiedResult
 	if overrideResult != nil {
 		verifiedResult = overrideResult
 	}
 
-	err = case_.Decide(
-		verifiedResult,
-		reason,
+	// Complete the manual review
+	if err := casemanager.CompleteManualReview(
+		ctx,
+		cm.commandBus,
+		caseID,
 		verifierID,
 		approved,
-	)
-	if err != nil {
-		return "", err
+		reason,
+		verifiedResult,
+	); err != nil {
+		return fmt.Errorf("failed to complete manual review: %w", err)
 	}
 
+	// Record the event
 	cm.recordEvent(caseID, "Decided", map[string]any{
 		"verified_result": verifiedResult,
 		"reason":          reason,
@@ -354,59 +394,57 @@ func (cm *CaseManager) CompleteManualReview(
 		"approved":        approved,
 	})
 
-	return caseID, nil
+	return nil
 }
 
 // ObjectCase submits an objection for a case
-func (cm *CaseManager) ObjectCase(caseID string, reason string) (string, error) {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
-
-	case_, err := cm.GetCaseByID(caseID)
+func (cm *CaseManager) ObjectCase(ctx context.Context, caseID uuid.UUID, reason string) error {
+	// Object to the case
+	err := casemanager.ObjectToCase(ctx, cm.commandBus, caseID, reason)
 	if err != nil {
-		return "", err
+		return fmt.Errorf("failed to object to case: %w", err)
 	}
 
-	err = case_.Object(reason)
-	if err != nil {
-		return "", err
-	}
-
+	// Record the event
 	cm.recordEvent(caseID, "Objected", map[string]any{
 		"reason": reason,
 	})
 
-	return caseID, nil
+	return nil
 }
 
 // DetermineObjectionStatus determines objection status and periods
 func (cm *CaseManager) DetermineObjectionStatus(
-	caseID string,
+	caseID uuid.UUID,
 	possible *bool,
 	notPossibleReason string,
 	objectionPeriod *int,
 	decisionPeriod *int,
 	extensionPeriod *int,
 ) error {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
+	ctx := context.Background()
 
-	case_, err := cm.GetCaseByID(caseID)
-	if err != nil {
-		return err
+	// Convert string to pointer if not empty
+	var notPossibleReasonPtr *string
+	if notPossibleReason != "" {
+		notPossibleReasonPtr = &notPossibleReason
 	}
 
-	err = case_.DetermineObjectionStatus(
+	// Determine objection status
+	if err := casemanager.DetermineObjectionStatus(
+		ctx,
+		cm.commandBus,
+		caseID,
 		possible,
-		notPossibleReason,
+		notPossibleReasonPtr,
 		objectionPeriod,
 		decisionPeriod,
 		extensionPeriod,
-	)
-	if err != nil {
-		return err
+	); err != nil {
+		return fmt.Errorf("failed to determine objection status: %w", err)
 	}
 
+	// Record the event
 	eventData := make(map[string]any)
 	if possible != nil {
 		eventData["possible"] = *possible
@@ -430,20 +468,15 @@ func (cm *CaseManager) DetermineObjectionStatus(
 }
 
 // DetermineObjectionAdmissibility determines whether an objection is admissible
-func (cm *CaseManager) DetermineObjectionAdmissibility(caseID string, admissible *bool) error {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
+func (cm *CaseManager) DetermineObjectionAdmissibility(caseID uuid.UUID, admissible *bool) error {
+	ctx := context.Background()
 
-	case_, err := cm.GetCaseByID(caseID)
-	if err != nil {
-		return err
+	// Determine objection admissibility
+	if err := casemanager.DetermineObjectionAdmissibility(ctx, cm.commandBus, caseID, admissible); err != nil {
+		return fmt.Errorf("failed to determine objection admissibility: %w", err)
 	}
 
-	err = case_.DetermineObjectionAdmissibility(admissible)
-	if err != nil {
-		return err
-	}
-
+	// Record the event
 	eventData := make(map[string]any)
 	if admissible != nil {
 		eventData["admissible"] = *admissible
@@ -456,7 +489,7 @@ func (cm *CaseManager) DetermineObjectionAdmissibility(caseID string, admissible
 
 // DetermineAppealStatus determines appeal status and parameters
 func (cm *CaseManager) DetermineAppealStatus(
-	caseID string,
+	caseID uuid.UUID,
 	possible *bool,
 	notPossibleReason string,
 	appealPeriod *int,
@@ -465,27 +498,44 @@ func (cm *CaseManager) DetermineAppealStatus(
 	competentCourt string,
 	courtType string,
 ) error {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
+	ctx := context.Background()
 
-	case_, err := cm.GetCaseByID(caseID)
-	if err != nil {
-		return err
+	// Convert strings to pointers if not empty
+	var notPossibleReasonPtr, directAppealReasonPtr, competentCourtPtr, courtTypePtr *string
+
+	if notPossibleReason != "" {
+		notPossibleReasonPtr = &notPossibleReason
 	}
 
-	err = case_.DetermineAppealStatus(
+	if directAppealReason != "" {
+		directAppealReasonPtr = &directAppealReason
+	}
+
+	if competentCourt != "" {
+		competentCourtPtr = &competentCourt
+	}
+
+	if courtType != "" {
+		courtTypePtr = &courtType
+	}
+
+	// Determine appeal status
+	if err := casemanager.DetermineAppealStatus(
+		ctx,
+		cm.commandBus,
+		caseID,
 		possible,
-		notPossibleReason,
+		notPossibleReasonPtr,
 		appealPeriod,
 		directAppeal,
-		directAppealReason,
-		competentCourt,
-		courtType,
-	)
-	if err != nil {
-		return err
+		directAppealReasonPtr,
+		competentCourtPtr,
+		courtTypePtr,
+	); err != nil {
+		return fmt.Errorf("failed to determine appeal status: %w", err)
 	}
 
+	// Record the event
 	eventData := make(map[string]any)
 	if possible != nil {
 		eventData["possible"] = *possible
@@ -515,72 +565,88 @@ func (cm *CaseManager) DetermineAppealStatus(
 }
 
 // CanAppeal checks if appeal is possible for a case
-func (cm *CaseManager) CanAppeal(caseID string) (bool, error) {
-	cm.mu.RLock()
-	defer cm.mu.RUnlock()
+func (cm *CaseManager) CanAppeal(caseID uuid.UUID) (bool, error) {
+	ctx := context.Background()
 
-	case_, err := cm.GetCaseByID(caseID)
+	// Find the case
+	c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to find case: %w", err)
 	}
 
-	return case_.CanAppeal(), nil
+	return c.CanAppeal(), nil
 }
 
 // CanObject checks if objection is possible for a case
-func (cm *CaseManager) CanObject(caseID string) (bool, error) {
-	cm.mu.RLock()
-	defer cm.mu.RUnlock()
+func (cm *CaseManager) CanObject(caseID uuid.UUID) (bool, error) {
+	ctx := context.Background()
 
-	case_, err := cm.GetCaseByID(caseID)
+	// Find the case
+	c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to find case: %w", err)
 	}
 
-	return case_.CanObject(), nil
+	return c.CanObject(), nil
 }
 
 // GetCase gets a case for a specific bsn, service and law combination
-func (cm *CaseManager) GetCase(bsn, serviceType, law string) *model.Case {
+func (cm *CaseManager) GetCase(bsn, serviceType, law string) *casemanager.Case {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
 	key := cm.indexKey(bsn, serviceType, law)
-	caseID, exists := cm.caseIndex[key]
+
+	caseID, exists := cm.GetCaseByKey(key)
 	if !exists {
 		return nil
 	}
 
-	return cm.cases[caseID]
+	// Find the case in the repository
+	ctx := context.Background()
+	c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
+	if err != nil {
+		return nil
+	}
+
+	// Convert from casemanager.Case to model.Case
+	return c
 }
 
 // GetCaseByID gets a case by ID
-func (cm *CaseManager) GetCaseByID(caseID string) (*model.Case, error) {
-	cm.mu.RLock()
-	defer cm.mu.RUnlock()
-
-	if caseID == "" {
+func (cm *CaseManager) GetCaseByID(id uuid.UUID) (*casemanager.Case, error) {
+	if id == uuid.Nil {
 		return nil, fmt.Errorf("case ID cannot be empty")
 	}
 
-	case_, exists := cm.cases[caseID]
-	if !exists {
-		return nil, fmt.Errorf("case not found: %s", caseID)
+	// Find the case in the repository
+	ctx := context.Background()
+	c, err := casemanager.FindCase(ctx, cm.caseRepo, id)
+	if err != nil {
+		return nil, fmt.Errorf("case not found: %s", id)
 	}
 
-	return case_, nil
+	return c, nil
 }
 
 // GetCasesByStatus gets all cases for a service in a particular status
-func (cm *CaseManager) GetCasesByStatus(serviceType string, status model.CaseStatus) []*model.Case {
+func (cm *CaseManager) GetCasesByStatus(serviceType string, status casemanager.CaseStatus) []*casemanager.Case {
+	// This would normally involve a more efficient query to the repository
+	// For now, we'll scan through all cases in the index
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	var result []*model.Case
+	var result []*casemanager.Case
+	ctx := context.Background()
 
-	for _, case_ := range cm.cases {
-		if case_.Service == serviceType && case_.Status == status {
-			result = append(result, case_)
+	for _, caseID := range cm.caseIndex {
+		c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
+		if err != nil {
+			continue
+		}
+
+		if c.Service == serviceType && string(c.Status) == string(status) {
+			result = append(result, c)
 		}
 	}
 
@@ -588,15 +654,23 @@ func (cm *CaseManager) GetCasesByStatus(serviceType string, status model.CaseSta
 }
 
 // GetCasesByLaw gets all cases for a specific law and service combination
-func (cm *CaseManager) GetCasesByLaw(law, serviceType string) []*model.Case {
+func (cm *CaseManager) GetCasesByLaw(law, serviceType string) []*casemanager.Case {
+	// This would normally involve a more efficient query to the repository
+	// For now, we'll scan through all cases in the index
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	var result []*model.Case
+	var result []*casemanager.Case
+	ctx := context.Background()
 
-	for _, case_ := range cm.cases {
-		if case_.Law == law && case_.Service == serviceType {
-			result = append(result, case_)
+	for _, caseID := range cm.caseIndex {
+		c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
+		if err != nil {
+			continue
+		}
+
+		if c.Law == law && c.Service == serviceType {
+			result = append(result, c)
 		}
 	}
 
@@ -604,18 +678,17 @@ func (cm *CaseManager) GetCasesByLaw(law, serviceType string) []*model.Case {
 }
 
 // GetEvents gets events, optionally filtered by case ID
-func (cm *CaseManager) GetEvents(caseID string) []*model.Event {
+func (cm *CaseManager) GetEvents(caseID uuid.UUID) []*model.Event {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	if caseID == "" {
+	if caseID == uuid.Nil {
 		// Return all events
 		return cm.events
 	}
 
 	// Filter events by case ID
 	var filteredEvents []*model.Event
-
 	for _, event := range cm.events {
 		if event.CaseID == caseID {
 			filteredEvents = append(filteredEvents, event)
@@ -623,4 +696,14 @@ func (cm *CaseManager) GetEvents(caseID string) []*model.Event {
 	}
 
 	return filteredEvents
+}
+
+func (cm *CaseManager) Save(ctx context.Context, c *casemanager.Case) error {
+	return nil
+}
+
+func (cm *CaseManager) Wait() {
+	cm.wg.Wait()
+	cm.eventBus.Close()
+	cm.observerBus.Close()
 }

@@ -1376,6 +1376,13 @@ func (re *RulesEngine) evaluateOperation(
 			switch v := allowedValues.(type) {
 			case []any:
 				valuesList = v
+			case map[any]any:
+				valuesList = make([]any, 0, len(v))
+
+				for key := range v {
+					valuesList = append(valuesList, key)
+				}
+
 			default:
 				valuesList = []any{allowedValues}
 			}

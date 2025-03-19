@@ -73,6 +73,10 @@ func (ts *TypeSpec) Enforce(value any) any {
 
 	// Apply precision
 	if ts.Precision != nil {
+		if *ts.Precision == 0 {
+			return int(floatVal)
+		}
+
 		factor := math.Pow(10, float64(*ts.Precision))
 		floatVal = math.Round(floatVal*factor) / factor
 	}

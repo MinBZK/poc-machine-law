@@ -29,6 +29,10 @@ func main() {
 		"BSN": "999993653",
 	}
 
+	a := map[any]any{
+		1: 1.0,
+	}
+
 	services.SetSourceDataFrame("CBS", "levensverwachting", dataframe.New([]map[string]any{
 		{
 			"jaar":           "2025",
@@ -119,6 +123,29 @@ func main() {
 		resultJSON, _ := json.MarshalIndent(evalResult.Output, "", "  ")
 		fmt.Printf("\nDirect Evaluation Result:\n%s\n", string(resultJSON))
 	}
+
+	caseID, err := services.CaseManager.SubmitCase(
+		ctx,
+		"999993653",
+		"GEMEENTE_AMSTERDAM",
+		"participatiewet/bijstand",
+		nil,
+		nil,
+		true,
+	)
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
+
+	services.CaseManager.Wait()
+
+	c, err := services.CaseManager.GetCaseByID(caseID)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
+
+	fmt.Printf("c: %v\n", c)
 
 	logger.WithIndent().Infof("\nSuccessfully completed demo!")
 }

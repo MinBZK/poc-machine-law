@@ -3,6 +3,7 @@ package logging
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -87,6 +88,16 @@ type IndentEntry struct {
 	entry *logrus.Entry
 }
 
+var messagesFile *os.File
+
+func messages() *os.File {
+	if messagesFile == nil {
+		messagesFile, _ = os.Create("tests.out")
+		ConfigureLogging("debug")
+	}
+	return messagesFile
+}
+
 // NewLogger creates a new IndentLogger
 func NewLogger(name string) *Logger {
 	logger := logrus.New()
@@ -95,6 +106,8 @@ func NewLogger(name string) *Logger {
 		FullTimestamp:    true,
 		ForceColors:      true,
 	})
+
+	// logger.SetOutput(messages())
 
 	return &Logger{
 		logger: logger,
@@ -183,6 +196,7 @@ func ConfigureLogging(level string) {
 		"rule_context",
 		"logger",
 		"system",
+		"context",
 	}
 
 	for _, component := range logComponents {

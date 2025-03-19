@@ -1,6 +1,7 @@
 package casemanager
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -8,8 +9,13 @@ import (
 	"github.com/google/uuid"
 	eh "github.com/looplab/eventhorizon"
 	"github.com/looplab/eventhorizon/aggregatestore/events"
-	"github.com/minbzk/poc-machine-law/machine-v3/model"
 )
+
+// CaseAggregateType is the aggregate type for cases.
+const CaseAggregateType = eh.AggregateType("Case")
+
+var _ eh.Aggregate = &CaseAggregate{}
+var _ events.VersionedAggregate = &CaseAggregate{}
 
 // CaseAggregate represents an aggregate for managing cases.
 type CaseAggregate struct {
@@ -19,24 +25,25 @@ type CaseAggregate struct {
 	resultsMatchFn func(map[string]any, map[string]any) bool
 }
 
-// CaseAggregateType is the aggregate type for cases.
-const CaseAggregateType = eh.AggregateType("Case")
+func RegisterAggregate() {
+	eh.RegisterAggregate(func(id uuid.UUID) eh.Aggregate {
+		return NewCaseAggregate(id)
+	})
+}
 
 // NewCaseAggregate creates a new CaseAggregate.
-func NewCaseAggregate(id uuid.UUID) (*CaseAggregate, error) {
+func NewCaseAggregate(id uuid.UUID) *CaseAggregate {
 	// Create a new aggregate with default values
 	aggregate := &CaseAggregate{
-		sampleRate: 0.10, // 10% sample rate
+		AggregateBase: events.NewAggregateBase(CaseAggregateType, id), // Set the aggregate ID
+		sampleRate:    0.10,                                           // 10% sample rate
 	}
 
-	// Set the aggregate ID
-	aggregate.AggregateBase = events.NewAggregateBase(CaseAggregateType, id)
-
-	return aggregate, nil
+	return aggregate
 }
 
 // HandleCommand implements the HandleCommand method of the Aggregate interface.
-func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
+func (aggregate *CaseAggregate) HandleCommand(ctx context.Context, cmd eh.Command) error {
 	switch cmd := cmd.(type) {
 	case SubmitCaseCommand:
 		if aggregate.c != nil {
@@ -55,8 +62,8 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 				Law:                cmd.Law,
 				Parameters:         cmd.Parameters,
 				ClaimedResult:      cmd.ClaimedResult,
-				VerifiedResult:     nil, // This will be filled in during processing
-				RulespecUUID:       "",  // This will be filled in during processing
+				VerifiedResult:     cmd.VerifiedResult,
+				RulespecUUID:       cmd.RulespecID,
 				ApprovedClaimsOnly: cmd.ApprovedClaimsOnly,
 			},
 			time.Now(),
@@ -70,7 +77,7 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 		}
 
 		// Emit a CaseReset event
-		event := eh.NewEvent(
+		aggregate.AppendEvent(
 			CaseResetEvent,
 			&CaseReset{
 				Parameters:         cmd.Parameters,
@@ -79,16 +86,20 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 				ApprovedClaimsOnly: cmd.ApprovedClaimsOnly,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+
+		return nil
 
 	case DecideAutomaticallyCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		event := eh.NewEvent(
+		if aggregate.c.Status != CaseStatusSubmitted && aggregate.c.Status != CaseStatusObjected {
+			return fmt.Errorf("case incorrect state, can only decide on submitted or objections")
+		}
+
+		aggregate.AppendEvent(
 			CaseAutomaticallyDecidedEvent,
 			&CaseAutomaticallyDecided{
 				VerifiedResult: cmd.VerifiedResult,
@@ -96,16 +107,20 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 				Approved:       cmd.Approved,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+
+		return nil
 
 	case AddToManualReviewCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		event := eh.NewEvent(
+		if aggregate.c.Status != CaseStatusSubmitted && aggregate.c.Status != CaseStatusObjected {
+			return fmt.Errorf("case incorrect state, can only add to review on submitted or objections")
+		}
+
+		aggregate.AppendEvent(
 			CaseAddedToManualReviewEvent,
 			&CaseAddedToManualReview{
 				VerifierID:     cmd.VerifierID,
@@ -114,53 +129,58 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 				VerifiedResult: cmd.VerifiedResult,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+		return nil
 
 	case CompleteManualReviewCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		if aggregate.c.Status != model.CaseStatusInReview && aggregate.c.Status != model.CaseStatusObjected {
+		if aggregate.c.Status != CaseStatusInReview && aggregate.c.Status != CaseStatusObjected {
 			return fmt.Errorf("can only complete review for cases in review or objections")
 		}
 
-		event := eh.NewEvent(
+		aggregate.AppendEvent(
 			CaseDecidedEvent,
 			&CaseDecided{
-				VerifiedResult: cmd.OverrideResult,
+				VerifiedResult: cmd.VerifiedResult,
 				Reason:         cmd.Reason,
 				VerifierID:     cmd.VerifierID,
 				Approved:       cmd.Approved,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+		return nil
 
 	case ObjectToCaseCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		event := eh.NewEvent(
+		if aggregate.c.Status != CaseStatusDecided {
+			return fmt.Errorf("can only object on decided cases")
+		}
+
+		aggregate.AppendEvent(
 			CaseObjectedEvent,
 			&CaseObjected{
 				Reason: cmd.Reason,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+		return nil
 
 	case SetObjectionStatusCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		event := eh.NewEvent(
+		if aggregate.c.ObjectionStatus == nil {
+			aggregate.c.ObjectionStatus = make(map[string]any)
+		}
+
+		aggregate.AppendEvent(
 			ObjectionStatusDeterminedEvent,
 			&ObjectionStatusDetermined{
 				Possible:          cmd.Possible,
@@ -170,31 +190,37 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 				ExtensionPeriod:   cmd.ExtensionPeriod,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+		return nil
 
 	case SetObjectionAdmissibilityCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		event := eh.NewEvent(
+		if aggregate.c.ObjectionStatus == nil {
+			aggregate.c.ObjectionStatus = make(map[string]any)
+		}
+
+		aggregate.AppendEvent(
 			ObjectionAdmissibilityDeterminedEvent,
 			&ObjectionAdmissibilityDetermined{
 				Admissible: cmd.Admissible,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+		return nil
 
 	case SetAppealStatusCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
 		}
 
-		event := eh.NewEvent(
+		if aggregate.c.ObjectionStatus == nil {
+			aggregate.c.ObjectionStatus = make(map[string]any)
+		}
+
+		aggregate.AppendEvent(
 			AppealStatusDeterminedEvent,
 			&AppealStatusDetermined{
 				Possible:           cmd.Possible,
@@ -206,16 +232,15 @@ func (aggregate *CaseAggregate) HandleCommand(cmd eh.Command) error {
 				CourtType:          cmd.CourtType,
 			},
 			time.Now(),
-			eh.ForAggregate(aggregate.AggregateType(), aggregate.AggregateID(), aggregate.Version()),
 		)
-		return eh.DispatchEvent(event)
+		return nil
 	}
 
 	return fmt.Errorf("couldn't handle command: %s", cmd.CommandType())
 }
 
 // ApplyEvent implements the ApplyEvent method of the Aggregate interface.
-func (aggregate *CaseAggregate) ApplyEvent(event eh.Event) error {
+func (aggregate *CaseAggregate) ApplyEvent(ctx context.Context, event eh.Event) error {
 	switch event.EventType() {
 	case CaseSubmittedEvent:
 		if data, ok := event.Data().(*CaseSubmitted); ok {

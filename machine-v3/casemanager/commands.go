@@ -5,6 +5,18 @@ import (
 	eh "github.com/looplab/eventhorizon"
 )
 
+func RegisterCommands() {
+	eh.RegisterCommand(func() eh.Command { return &SubmitCaseCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &ResetCaseCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &DecideAutomaticallyCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &AddToManualReviewCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &CompleteManualReviewCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &ObjectToCaseCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &SetObjectionStatusCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &SetObjectionAdmissibilityCommand{} })
+	eh.RegisterCommand(func() eh.Command { return &SetAppealStatusCommand{} })
+}
+
 // Command types for the case manager.
 const (
 	CommandSubmitCase                eh.CommandType = "SubmitCase"
@@ -37,8 +49,10 @@ type SubmitCaseCommand struct {
 	BSN                string         `json:"bsn"`
 	ServiceType        string         `json:"service_type"`
 	Law                string         `json:"law"`
-	Parameters         map[string]any `json:"parameters"`
-	ClaimedResult      map[string]any `json:"claimed_result"`
+	Parameters         map[string]any `json:"parameters" eh:"optional"`
+	ClaimedResult      map[string]any `json:"claimed_result" eh:"optional"`
+	VerifiedResult     map[string]any `json:"verified_result" eh:"optional"`
+	RulespecID         uuid.UUID      `json:"rulespec_uuid"`
 	ApprovedClaimsOnly bool           `json:"approved_claims_only"`
 }
 
@@ -60,9 +74,9 @@ func (c SubmitCaseCommand) AggregateType() eh.AggregateType {
 // ResetCaseCommand is a command for resetting an existing case.
 type ResetCaseCommand struct {
 	ID                 uuid.UUID      `json:"id"`
-	Parameters         map[string]any `json:"parameters"`
-	ClaimedResult      map[string]any `json:"claimed_result"`
-	VerifiedResult     map[string]any `json:"verified_result"`
+	Parameters         map[string]any `json:"parameters" eh:"optional"`
+	ClaimedResult      map[string]any `json:"claimed_result" eh:"optional"`
+	VerifiedResult     map[string]any `json:"verified_result" eh:"optional"`
 	ApprovedClaimsOnly bool           `json:"approved_claims_only"`
 }
 
@@ -85,7 +99,7 @@ func (c ResetCaseCommand) AggregateType() eh.AggregateType {
 type DecideAutomaticallyCommand struct {
 	ID             uuid.UUID      `json:"id"`
 	VerifiedResult map[string]any `json:"verified_result"`
-	Parameters     map[string]any `json:"parameters"`
+	Parameters     map[string]any `json:"parameters" eh:"optional"`
 	Approved       bool           `json:"approved"`
 }
 
@@ -109,8 +123,8 @@ type AddToManualReviewCommand struct {
 	ID             uuid.UUID      `json:"id"`
 	VerifierID     string         `json:"verifier_id"`
 	Reason         string         `json:"reason"`
-	ClaimedResult  map[string]any `json:"claimed_result"`
-	VerifiedResult map[string]any `json:"verified_result"`
+	ClaimedResult  map[string]any `json:"claimed_result" eh:"optional"`
+	VerifiedResult map[string]any `json:"verified_result" eh:"optional"`
 }
 
 // CommandType returns the type of the command.
@@ -134,7 +148,7 @@ type CompleteManualReviewCommand struct {
 	VerifierID     string         `json:"verifier_id"`
 	Approved       bool           `json:"approved"`
 	Reason         string         `json:"reason"`
-	OverrideResult map[string]any `json:"override_result,omitempty"`
+	VerifiedResult map[string]any `json:"verified_result"`
 }
 
 // CommandType returns the type of the command.
@@ -176,11 +190,11 @@ func (c ObjectToCaseCommand) AggregateType() eh.AggregateType {
 // SetObjectionStatusCommand is a command for setting objection status.
 type SetObjectionStatusCommand struct {
 	ID                uuid.UUID `json:"id"`
-	Possible          *bool     `json:"possible,omitempty"`
-	NotPossibleReason string    `json:"not_possible_reason,omitempty"`
-	ObjectionPeriod   *int      `json:"objection_period,omitempty"`
-	DecisionPeriod    *int      `json:"decision_period,omitempty"`
-	ExtensionPeriod   *int      `json:"extension_period,omitempty"`
+	Possible          *bool     `json:"possible,omitempty" eh:"optional"`
+	NotPossibleReason *string   `json:"not_possible_reason,omitempty" eh:"optional"`
+	ObjectionPeriod   *int      `json:"objection_period,omitempty" eh:"optional"`
+	DecisionPeriod    *int      `json:"decision_period,omitempty" eh:"optional"`
+	ExtensionPeriod   *int      `json:"extension_period,omitempty" eh:"optional"`
 }
 
 // CommandType returns the type of the command.
@@ -223,12 +237,12 @@ func (c SetObjectionAdmissibilityCommand) AggregateType() eh.AggregateType {
 type SetAppealStatusCommand struct {
 	ID                 uuid.UUID `json:"id"`
 	Possible           *bool     `json:"possible,omitempty"`
-	NotPossibleReason  string    `json:"not_possible_reason,omitempty"`
+	NotPossibleReason  *string   `json:"not_possible_reason,omitempty"`
 	AppealPeriod       *int      `json:"appeal_period,omitempty"`
 	DirectAppeal       *bool     `json:"direct_appeal,omitempty"`
-	DirectAppealReason string    `json:"direct_appeal_reason,omitempty"`
-	CompetentCourt     string    `json:"competent_court,omitempty"`
-	CourtType          string    `json:"court_type,omitempty"`
+	DirectAppealReason *string   `json:"direct_appeal_reason,omitempty"`
+	CompetentCourt     *string   `json:"competent_court,omitempty"`
+	CourtType          *string   `json:"court_type,omitempty"`
 }
 
 // CommandType returns the type of the command.
