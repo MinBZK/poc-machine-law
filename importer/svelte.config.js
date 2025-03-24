@@ -14,6 +14,11 @@ const config = {
     adapter: adapter({
       fallback: 'index.html',
     }),
+
+    // Serve the app at a subpath
+    paths: {
+      base: '/importer',
+    },
   },
 };
 

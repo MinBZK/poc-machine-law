@@ -24,7 +24,7 @@
   let quickReplies: string[] = [];
 
   // Initialize WebSocket connection
-  const socket = new WebSocket('ws://localhost:8000/ws');
+  const socket = new WebSocket('/importer/ws');
 
   // Connection opened
   socket.addEventListener('open', function (event) {

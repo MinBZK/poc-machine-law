@@ -1,26 +1,27 @@
-from langchain_anthropic import ChatAnthropic
-from langchain_community.retrievers import TavilySearchAPIRetriever
-from langchain_community.document_loaders import WebBaseLoader
-from langgraph.graph import StateGraph
-from typing import Dict, Literal, Optional, TypedDict, Annotated, List
-from langgraph.graph.message import add_messages
-from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, SystemMessage
-import pprint
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
-import uvicorn
-import uuid
-import json
-from langgraph.types import Command, interrupt
 import asyncio
-import nest_asyncio
-from jsonschema import validate
-import yaml
-import jsonschema
-import re
+import json
 import os
+import pprint
+import re
+import uuid
+from typing import Annotated, Literal, TypedDict
+
+import jsonschema
+import nest_asyncio
+import yaml
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from jsonschema import validate
+from langchain_anthropic import ChatAnthropic
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.retrievers import TavilySearchAPIRetriever
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import StateGraph
+from langgraph.graph.message import add_messages
+from langgraph.types import Command, interrupt
+
+router = APIRouter(prefix="/importer", tags=["importer"])
 
 
 model = ChatAnthropic(
@@ -31,9 +32,7 @@ model = ChatAnthropic(
 )
 
 # Retriever to find the specified law online
-retriever = TavilySearchAPIRetriever(
-    k=1, include_domains=["wetten.overheid.nl"]
-)  # Limit to 1 result
+retriever = TavilySearchAPIRetriever(k=1, include_domains=["wetten.overheid.nl"])  # Limit to 1 result
 
 
 class State(TypedDict):
@@ -41,13 +40,13 @@ class State(TypedDict):
     law: str
     should_retry: bool
     law_url: str
-    law_url_approved: Optional[bool]  # Can be True, False, or None
+    law_url_approved: bool | None  # Can be True, False, or None
 
 
 class WebSocketMessage(TypedDict):
     id: str
     content: str
-    quick_replies: List[str]
+    quick_replies: list[str]
 
 
 # Initialize the graph
@@ -71,23 +70,19 @@ def validate_schema(yaml_content: str) -> str | None:
         return f"Error: {err.message}"
 
 
-def ask_law(state: State, config: Dict) -> Dict:
+def ask_law(state: State, config: dict) -> dict:
     print("----> ask_law")
 
     thread_id = config["configurable"]["thread_id"]
 
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
-    loop.run_until_complete(
-        manager.send_message(
-            WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id
-        )
-    )
+    loop.run_until_complete(manager.send_message(WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id))
 
     return {"messages": []}  # Note: we reset the messages
 
 
-def check_law_input(state: State, config: Dict) -> Dict:
+def check_law_input(state: State, config: dict) -> dict:
     print("----> check_law_input")
 
     resp = interrupt("check_law_input")
@@ -108,7 +103,7 @@ def check_law_input(state: State, config: Dict) -> Dict:
     return {"should_retry": False, "law": resp}
 
 
-def ask_law_confirmation(state: State, config: Dict) -> Dict:
+def ask_law_confirmation(state: State, config: dict) -> dict:
     print("----> ask_law_confirmation")
 
     # Find the law URL
@@ -123,7 +118,7 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
-                content=f"Is dit de wet die je bedoelt?\n\n{metadata["title"]}\n[{url}]({url})",
+                content=f"Is dit de wet die je bedoelt?\n\n{metadata['title']}\n[{url}]({url})",
                 quick_replies=["Ja", "Nee"],
             ),
             thread_id,
@@ -133,7 +128,7 @@ def ask_law_confirmation(state: State, config: Dict) -> Dict:
     return {"law_url": url}
 
 
-def handle_law_confirmation(state: State) -> Dict:
+def handle_law_confirmation(state: State) -> dict:
     print("----> handle_law_confirmation")
 
     resp = interrupt("handle_law_confirmation")
@@ -147,14 +142,12 @@ def handle_law_confirmation(state: State) -> Dict:
 
 
 def fetch_and_format_data(url: str) -> str:
-    docs = WebBaseLoader(
-        url
-    ).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
+    docs = WebBaseLoader(url).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
     return "\n\n".join(doc.page_content for doc in docs)
 
 
 # Get the schema content
-with open("../../schema/v0.1.3/schema.json") as sf:
+with open("schema/v0.1.3/schema.json") as sf:
     schema_content = sf.read()
 
 # Get all law YAML files
@@ -164,7 +157,7 @@ for root, _, files in os.walk(laws_dir):
     for file in files:
         if file.endswith(".yaml"):  # Return only YAML files
             # law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
-            with open(os.path.join(root, file), "r") as f:
+            with open(os.path.join(root, file)) as f:
                 examples.append(
                     {
                         "type": "document",
@@ -210,7 +203,7 @@ analyize_law_prompt = ChatPromptTemplate(
 )
 
 
-def process_law(state: State, config: Dict) -> Dict:
+def process_law(state: State, config: dict) -> dict:
     print("----> process_law")
 
     thread_id = config["configurable"]["thread_id"]
@@ -247,7 +240,7 @@ def process_law(state: State, config: Dict) -> Dict:
     return {"messages": [result]}
 
 
-def process_law_feedback(state: State, config: Dict) -> Dict:
+def process_law_feedback(state: State, config: dict) -> dict:
     print("----> process_law_feedback")
 
     user_input = interrupt("process_law_feedback")
@@ -274,7 +267,7 @@ def process_law_feedback(state: State, config: Dict) -> Dict:
                 validation_errors.append(err)
 
         if validation_errors:
-            user_input = f"Er zijn fouten gevonden in de YAML output:\n```\n{"\n".join(validation_errors)}\n```"
+            user_input = f"Er zijn fouten gevonden in de YAML output:\n```\n{'\n'.join(validation_errors)}\n```"
         else:
             user_input = "De YAML output lijkt correct."  # IMPROVE: validate agains the Girkin tables
 
@@ -331,9 +324,7 @@ def handle_law_confirmation_result(state: State) -> Literal["process_law", "ask_
     return "process_law" if state["law_url_approved"] else "ask_law"
 
 
-workflow.add_conditional_edges(
-    "handle_law_confirmation", handle_law_confirmation_result
-)
+workflow.add_conditional_edges("handle_law_confirmation", handle_law_confirmation_result)
 
 workflow.add_edge("process_law", "process_law_feedback")
 workflow.add_edge("process_law_feedback", "process_law_feedback")
@@ -348,18 +339,10 @@ graph = workflow.compile(
     # interrupt_after=["ask_law", "handle_law_confirmation"]
 )
 
-# Initialize a FastAPI web server
-app = FastAPI()
-
-
-@app.get("/")
-async def get():
-    return FileResponse("workflow_graph.png")  # TODO: other response
-
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: Dict[uuid.UUID, WebSocket] = {}
+        self.active_connections: dict[uuid.UUID, WebSocket] = {}
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -387,7 +370,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.websocket("/ws")
+@router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     thread_id = await manager.connect(websocket)
 
@@ -419,9 +402,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     quick_replies = ["Analyseer deze YAML-code"]
 
                 await manager.send_message(
-                    WebSocketMessage(
-                        id=chunk.id, content=chunk.content, quick_replies=quick_replies
-                    ),
+                    WebSocketMessage(id=chunk.id, content=chunk.content, quick_replies=quick_replies),
                     thread_id,
                 )
 
@@ -443,15 +424,3 @@ async def websocket_endpoint(websocket: WebSocket):
 
     finally:
         manager.disconnect(thread_id)
-
-
-def main():
-    # Generate a Mermaid graph of the workflow
-    # with open("workflow_graph.png", "wb") as f:
-    #     f.write(graph.get_graph().draw_mermaid_png())
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-if __name__ == "__main__":
-    main()
