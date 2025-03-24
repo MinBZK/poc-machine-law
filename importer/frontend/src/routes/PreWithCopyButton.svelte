@@ -2,10 +2,9 @@
   let pre: HTMLPreElement;
 </script>
 
-<div class="relative">
-  <pre bind:this={pre}><slot /></pre>
+<div>
   <button
-    class="absolute right-1 top-1 inline-flex cursor-pointer items-center rounded-sm border border-gray-200 bg-gray-900/80 px-1 py-0.5 text-sm text-gray-200 hover:bg-gray-900 hover:text-white hover:border-white"
+    class="float-right inline-flex cursor-pointer items-center rounded-sm rounded-b-none bg-gray-800/90 px-1 py-0.5 text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
     type="button"
     on:click={() => navigator.clipboard.writeText(pre.textContent || '')}
   >
@@ -22,4 +21,7 @@
       ></svg
     > Kopiëren
   </button>
+  <pre
+    class="clear-right overflow-x-auto rounded-sm rounded-tr-none bg-gray-900 px-3 py-2 text-sm text-white"
+    bind:this={pre}><slot /></pre>
 </div>

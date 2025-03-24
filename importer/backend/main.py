@@ -173,6 +173,10 @@ for root, _, files in os.walk(laws_dir):
                     }
                 )
 
+# Limit to 2 YAML files for testing purposes to reduce costs. TODO: remove this
+if len(examples) > 2:
+    examples = examples[:2]
+
 analyize_law_prompt = ChatPromptTemplate(
     [
         SystemMessage(
@@ -228,7 +232,7 @@ def process_law(state: State, config: Dict) -> Dict:
     # Remove duplicate whitespace from the content
     content = re.sub(r"\s+", " ", content)
 
-    # Cap the law content for testing purposes. TODO: remove this
+    # Cap the law content for testing purposes to reduce costs. TODO: remove this
     if len(content) > 1000:
         content = content[:1000]
 
@@ -443,9 +447,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 def main():
     # Generate a Mermaid graph of the workflow
-    # display(Image(graph.get_graph().draw_mermaid_png()))
-    with open("workflow_graph.png", "wb") as f:
-        f.write(graph.get_graph().draw_mermaid_png())
+    # with open("workflow_graph.png", "wb") as f:
+    #     f.write(graph.get_graph().draw_mermaid_png())
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
 

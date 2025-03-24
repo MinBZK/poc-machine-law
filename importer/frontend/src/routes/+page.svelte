@@ -190,10 +190,6 @@
     @apply text-blue-600 underline hover:text-blue-800 hover:no-underline;
   }
 
-  :global(.message pre) {
-    @apply overflow-x-auto rounded-sm bg-gray-900 px-3 py-2 text-sm text-white;
-  }
-
   :global(pre code.hljs) {
     @apply !bg-transparent !p-0;
   }
