@@ -32,7 +32,9 @@ model = ChatAnthropic(
 )
 
 # Retriever to find the specified law online
-retriever = TavilySearchAPIRetriever(k=1, include_domains=["wetten.overheid.nl"])  # Limit to 1 result
+retriever = TavilySearchAPIRetriever(
+    k=1, include_domains=["wetten.overheid.nl"]
+)  # Limit to 1 result
 
 
 class State(TypedDict):
@@ -77,7 +79,11 @@ def ask_law(state: State, config: dict) -> dict:
 
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
-    loop.run_until_complete(manager.send_message(WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id))
+    loop.run_until_complete(
+        manager.send_message(
+            WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id
+        )
+    )
 
     return {"messages": []}  # Note: we reset the messages
 
@@ -109,6 +115,9 @@ def ask_law_confirmation(state: State, config: dict) -> dict:
     # Find the law URL
     docs = retriever.invoke(state["law"])
 
+    if len(docs) == 0:
+        return {"law_url": None}
+
     metadata = docs[0].metadata
     url = metadata["source"]  # IMPROVE: handle the case where no docs are found
 
@@ -128,8 +137,21 @@ def ask_law_confirmation(state: State, config: dict) -> dict:
     return {"law_url": url}
 
 
-def handle_law_confirmation(state: State) -> dict:
+def handle_law_confirmation(state: State, config: dict) -> dict:
     print("----> handle_law_confirmation")
+
+    if state["law_url"] is None:
+        thread_id = config["configurable"]["thread_id"]
+        loop.run_until_complete(
+            manager.send_message(
+                WebSocketMessage(
+                    id=str(uuid.uuid4()),
+                    content="Geen resultaten gevondem voor deze wetnaam.",
+                ),
+                thread_id,
+            )
+        )
+        return {"law_url_approved": False}
 
     resp = interrupt("handle_law_confirmation")
 
@@ -142,7 +164,9 @@ def handle_law_confirmation(state: State) -> dict:
 
 
 def fetch_and_format_data(url: str) -> str:
-    docs = WebBaseLoader(url).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
+    docs = WebBaseLoader(
+        url
+    ).load()  # IMPROVE: compare to UnstructuredLoader and DoclingLoader
     return "\n\n".join(doc.page_content for doc in docs)
 
 
@@ -324,7 +348,9 @@ def handle_law_confirmation_result(state: State) -> Literal["process_law", "ask_
     return "process_law" if state["law_url_approved"] else "ask_law"
 
 
-workflow.add_conditional_edges("handle_law_confirmation", handle_law_confirmation_result)
+workflow.add_conditional_edges(
+    "handle_law_confirmation", handle_law_confirmation_result
+)
 
 workflow.add_edge("process_law", "process_law_feedback")
 workflow.add_edge("process_law_feedback", "process_law_feedback")
@@ -402,7 +428,9 @@ async def websocket_endpoint(websocket: WebSocket):
                     quick_replies = ["Analyseer deze YAML-code"]
 
                 await manager.send_message(
-                    WebSocketMessage(id=chunk.id, content=chunk.content, quick_replies=quick_replies),
+                    WebSocketMessage(
+                        id=chunk.id, content=chunk.content, quick_replies=quick_replies
+                    ),
                     thread_id,
                 )
 
