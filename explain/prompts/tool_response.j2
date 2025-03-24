@@ -1,0 +1,11 @@
+Resultaten van tool aanroep:
+
+{{ service_context }}
+
+{% include 'includes/belangrijk.j2' %}
+
+{% if missing_fields %}
+{% include 'includes/missing_fields_instructions.j2' %}
+{% endif %}
+
+{% include 'includes/explanation_instructions.j2' %}

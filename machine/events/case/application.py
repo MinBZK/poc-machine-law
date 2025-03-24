@@ -294,6 +294,17 @@ class CaseManager(Application):
             if self.repository.get(case_id).service == service_type and self.repository.get(case_id).status == status
         ]
 
+    def get_cases_by_bsn(self, bsn: str) -> list[Case]:
+        """Get all cases for a specific citizen by BSN"""
+        cases = []
+        for key_tuple, case_id in self._case_index.items():
+            key_bsn, _, _ = key_tuple  # Unpack the (bsn, service, law) tuple
+            if key_bsn == bsn:
+                case = self.get_case_by_id(case_id)
+                if case:
+                    cases.append(case)
+        return cases
+
     def get_case_by_id(self, case_id: str | None) -> Case | None:
         """Get case by ID"""
         if not case_id:

@@ -1,0 +1,50 @@
+{% if cases %}
+## Eerder ingediende aanvragen
+
+De burger heeft de volgende aanvragen ingediend:
+
+{% for case in cases %}
+- {{ case.service_name }} ({{ case.law }}):
+  {% if case.status == 'DECIDED' and case.approved == True %}
+    GOEDGEKEURD
+  {% elif case.status == 'DECIDED' and case.approved == False %}
+    AFGEWEZEN
+    {% if case.can_object %}(bezwaar mogelijk){% endif %}
+    {% if case.can_appeal %}(beroep mogelijk){% endif %}
+  {% elif case.status == 'IN_REVIEW' %}
+    IN BEHANDELING
+  {% elif case.status == 'OBJECTED' %}
+    IN BEZWAAR
+  {% else %}
+    INGEDIEND
+  {% endif %}
+  {% if case.created_at %} (ingediend op {{ case.created_at }}){% endif %}
+
+  {% if case.has_differences %}
+    - ⚠️ VERSCHIL MET HUIDIGE BEREKENING ⚠️
+    - {{ case.differences_details }}
+  {% endif %}
+
+  {% if case.objection_info and case.objection_info.objection_period %}
+    - Bezwaartermijn: {{ case.objection_info.objection_period }} weken
+  {% endif %}
+  {% if case.appeal_info and case.appeal_info.appeal_period %}
+    - Beroepstermijn: {{ case.appeal_info.appeal_period }} weken
+  {% endif %}
+{% endfor %}
+
+Gebruik deze informatie om de burger beter te helpen:
+- Als een aanvraag al is goedgekeurd, vertel dat het al is goedgekeurd en sinds wanneer
+- Als een aanvraag in behandeling is, vertel dat ze moeten wachten op de uitkomst
+- Als een aanvraag is afgewezen:
+  - Informeer de burger over bezwaarmogelijkheden als deze beschikbaar zijn
+  - Informeer de burger over beroepsmogelijkheden als deze beschikbaar zijn
+  - Vermeld de termijnen (aantal weken) waarbinnen bezwaar of beroep mogelijk is
+  - Leg uit dat ze ook een nieuwe aanvraag kunnen doen als hun situatie is veranderd
+- Als er een VERSCHIL is tussen de huidige berekening en een eerdere aanvraag:
+  - Signaleer dit DUIDELIJK aan het begin van je antwoord!
+  - Leg uit wat het verschil is en hoeveel het scheelt
+  - Adviseer de burger om een nieuwe aanvraag te doen (ook als oude bedrag hoger is dan het nieuwe!) en biedt aan het formulier te tonen.
+{% else %}
+De burger heeft nog geen eerdere aanvragen ingediend.
+{% endif %}

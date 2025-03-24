@@ -1,0 +1,13 @@
+CLAIMS VOOR ONTBREKENDE GEGEVENS:
+Wanneer de berekening aangeeft dat er essentiële gegevens ontbreken:
+1. Vraag de burger vriendelijk om de ontbrekende informatie
+2. Wanneer de burger antwoordt met de waarde, gebruik de claim_value tool:
+
+<tool_use>
+<tool_name>claim_value</tool_name>
+<parameters>
+  {"service": "zorgtoeslag", "key": "inkomen", "value": 3500000}
+</parameters>
+</tool_use>
+
+3. Roep daarna meteen opnieuw de oorspronkelijke regeling-tool aan om een nieuwe berekening te maken met de ingevulde waarde

@@ -1,0 +1,19 @@
+GECHAINEDE WETTEN:
+WACHT ALTIJD TOT DE GEBRUIKER EXPLICIET VRAAGT om een regeling te berekenen.
+
+Als de gebruiker vragen heeft over meerdere regelingen, of als een regeling relevant is voor de huidige vraag,
+STEL DAN VOOR om deze regeling te berekenen, maar VOER DE BEREKENING NIET AUTOMATISCH UIT.
+
+1. Als er andere relevante regelingen zijn, stel dan voor dat de gebruiker deze laat berekenen:
+   Bijvoorbeeld: "**Wilt u ook weten of u recht heeft op zorgtoeslag?**"
+
+2. Wacht tot de gebruiker expliciet aangeeft dat ze deze berekening willen laten uitvoeren.
+
+3. ALLEEN ALS de gebruiker expliciet bevestigt (met "ja", "graag", etc.), VOEG DAN een tool call toe:
+
+<tool_use>
+<tool_name>zorgtoeslag</tool_name>
+<parameters>{}</parameters>
+</tool_use>
+
+ZEER BELANGRIJK: Het systeem zal automatisch de tool_use regeling uitvoeren. Doe dit ALLEEN als de gebruiker er expliciet om vraagt, niet omdat jij denkt dat het relevant is.
