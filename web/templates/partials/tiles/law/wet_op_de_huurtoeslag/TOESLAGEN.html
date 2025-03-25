@@ -1,25 +1,27 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
-    {% if result.is_eligible %}
-        {% include "partials/tiles/law/wet_op_de_huurtoeslag/TOESLAGEN/computation.html" %}
-    {% else %}
-        <div class="text-sm leading-6 text-gray-700 mt-4">
-            <p class="mb-3">
-                U voldoet niet aan alle voorwaarden voor huurtoeslag.
-                Dit kan verschillende redenen hebben, zoals:
-            </p>
-            <ul class="list-disc pl-5 space-y-2">
-                <li>Uw inkomen is te hoog (meer dan €44.000 voor alleenstaanden)</li>
-                <li>Uw vermogen is te hoog (meer dan €36.952 voor alleenstaanden)</li>
-                <li>Uw huur is te hoog (meer dan €885,71)</li>
-                <li>U bent jonger dan 18 jaar</li>
-            </ul>
-            <p class="mt-3">
-                Bekijk voor meer informatie de uitleg hiernaast.
-                U kunt ook kijken op <a href="https://www.belastingdienst.nl/huurtoeslag"
-    class="text-blue-600 hover:underline">belastingdienst.nl/huurtoeslag</a>.
-            </p>
-        </div>
+    {% if not missing_required %}
+        {% if result.is_eligible %}
+            {% include "partials/tiles/law/wet_op_de_huurtoeslag/TOESLAGEN/computation.html" %}
+        {% else %}
+            <div class="text-sm leading-6 text-gray-700 mt-4">
+                <p class="mb-3">
+                    U voldoet niet aan alle voorwaarden voor huurtoeslag.
+                    Dit kan verschillende redenen hebben, zoals:
+                </p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>Uw inkomen is te hoog (meer dan €44.000 voor alleenstaanden)</li>
+                    <li>Uw vermogen is te hoog (meer dan €36.952 voor alleenstaanden)</li>
+                    <li>Uw huur is te hoog (meer dan €885,71)</li>
+                    <li>U bent jonger dan 18 jaar</li>
+                </ul>
+                <p class="mt-3">
+                    Bekijk voor meer informatie de uitleg hiernaast.
+                    U kunt ook kijken op <a href="https://www.belastingdienst.nl/huurtoeslag"
+                    class="text-blue-600 hover:underline">belastingdienst.nl/huurtoeslag</a>.
+                </p>
+            </div>
+        {% endif %}
     {% endif %}
     {% if result.is_eligible and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.subsidy_amount != current_case.claimed_result.subsidy_amount %}
