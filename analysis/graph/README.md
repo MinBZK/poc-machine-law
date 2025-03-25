@@ -33,6 +33,7 @@ cd analysis/graph
 pnpm install
 pnpm build
 cd ../..
+source .venv/bin/activate
 uv run web/main.py
 ```
 
