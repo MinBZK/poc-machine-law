@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from machine.service import Services
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_services, templates
-from web.routers import admin, chat, edit, laws
+from web.routers import admin, chat, edit, importer, laws
 from web.services.profiles import get_all_profiles, get_profile_data
 
 app = FastAPI(title="Burger.nl")
@@ -22,12 +22,20 @@ app.include_router(laws.router)
 app.include_router(admin.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
+app.include_router(importer.router)
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
 app.mount(
     "/analysis/graph",
     StaticFiles(
         # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/graph/build",  # Note: absolute path is required when follow_symlink=True
         directory="analysis/graph/build",
+        html=True,
+    ),
+)
+app.mount(
+    "/importer",
+    StaticFiles(
+        directory="importer/build",
         html=True,
     ),
 )

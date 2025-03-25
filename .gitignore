@@ -8,6 +8,9 @@ wheels/
 *.egg-info
 .vscode
 
+# Environment variables
+.env
+
 # Virtual environments
 .venv
 
