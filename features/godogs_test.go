@@ -112,7 +112,7 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 
 	inputs := ctx.Value(inputCtxKey{}).([]input)
 	for _, input := range inputs {
-		services.SetSourceDataFrame(input.Service, input.Table, input.DF)
+		services.SetSourceDataFrame(input.svc, input.Table, input.DF)
 	}
 
 	params := ctx.Value(paramsCtxKey{}).(map[string]any)
@@ -127,9 +127,9 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 }
 
 type input struct {
-	Service string
-	Table   string
-	DF      model.DataFrame
+	svc   string
+	Table string
+	DF    model.DataFrame
 }
 
 func doParseValue(key string) bool {
@@ -185,9 +185,9 @@ func DeVolgendeGegevens(ctx context.Context, service, table string, data *godog.
 	}
 
 	v = append(v, input{
-		Service: service,
-		Table:   table,
-		DF:      dataframe.New(t),
+		svc:   service,
+		Table: table,
+		DF:    dataframe.New(t),
 	})
 
 	return context.WithValue(ctx, inputCtxKey{}, v), nil
@@ -213,12 +213,12 @@ func eenPersoonMetBSN(ctx context.Context, bsn string) (context.Context, error) 
 	return context.WithValue(ctx, paramsCtxKey{}, params), nil
 }
 
-func deWetWordtUitgevoerdDoorService(ctx context.Context, law, service string) (context.Context, error) {
-	return evaluateLaw(ctx, service, law, true)
+func deWetWordtUitgevoerdDoorService(ctx context.Context, law, svc string) (context.Context, error) {
+	return evaluateLaw(ctx, svc, law, true)
 }
 
-func deWetWordtUitgevoerdDoorServiceMetWijzigingen(ctx context.Context, law, service string) (context.Context, error) {
-	return evaluateLaw(ctx, service, law, false)
+func deWetWordtUitgevoerdDoorServiceMetWijzigingen(ctx context.Context, law, svc string) (context.Context, error) {
+	return evaluateLaw(ctx, svc, law, false)
 }
 
 func isNietVoldaanAanDeVoorwaarden(ctx context.Context) error {

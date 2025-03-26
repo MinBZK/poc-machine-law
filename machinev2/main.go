@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/service"
 )
 

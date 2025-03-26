@@ -6,8 +6,7 @@ from datetime import date, datetime
 
 import numpy as np
 import pandas as pd
-
-from machine.service import Services
+from gopy_machine import service as Services
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -143,8 +142,8 @@ class LawSimulator:
             ("CBS", "levensverwachting"): [{"jaar": "2025", "verwachting_65": 20.5}],
         }
 
-        for (service, table), data in sources.items():
-            self.services.set_source_dataframe(service, table, pd.DataFrame(data))
+        for (svc, table), data in sources.items():
+            self.services.set_source_dataframe(svc, table, pd.DataFrame(data))
 
         return people
 

@@ -70,7 +70,7 @@ func (cm *ClaimManager) indexClaim(claim *model.Claim) {
 // SubmitClaim submits a new claim
 func (cm *ClaimManager) SubmitClaim(
 	ctx context.Context,
-	service string,
+	svc string,
 	key string,
 	newValue any,
 	reason string,
@@ -87,7 +87,7 @@ func (cm *ClaimManager) SubmitClaim(
 
 	// Check for existing claim
 	var claim *model.Claim
-	bslKey := fmt.Sprintf("%s:%s:%s", bsn, service, law)
+	bslKey := fmt.Sprintf("%s:%s:%s", bsn, svc, law)
 
 	if keyMap, exists := cm.bsnServiceLawIndex[bslKey]; exists {
 		if claimID, exists := keyMap[key]; exists {
@@ -95,7 +95,7 @@ func (cm *ClaimManager) SubmitClaim(
 
 			// Reset existing claim
 			claim.Reset(
-				service,
+				svc,
 				key,
 				newValue,
 				reason,
@@ -112,7 +112,7 @@ func (cm *ClaimManager) SubmitClaim(
 	// Create new claim if none exists
 	if claim == nil {
 		claim = model.NewClaim(
-			service,
+			svc,
 			key,
 			newValue,
 			reason,
@@ -293,7 +293,7 @@ func (cm *ClaimManager) filterClaimsByStatus(
 
 // GetClaimsByService gets all claims for a service
 func (cm *ClaimManager) GetClaimsByService(
-	service string,
+	svc string,
 	approved bool,
 	includeRejected bool,
 ) ([]*model.Claim, error) {
@@ -302,7 +302,7 @@ func (cm *ClaimManager) GetClaimsByService(
 
 	var claims []*model.Claim
 
-	for _, claimID := range cm.serviceIndex[service] {
+	for _, claimID := range cm.serviceIndex[svc] {
 		if claim, exists := cm.claims[claimID]; exists {
 			claims = append(claims, claim)
 		}
@@ -374,7 +374,7 @@ func (cm *ClaimManager) GetClaimsByBSN(
 // GetClaimByBSNServiceLaw gets claims for a BSN, service, and law combination
 func (cm *ClaimManager) GetClaimByBSNServiceLaw(
 	bsn string,
-	service string,
+	svc string,
 	law string,
 	approved bool,
 	includeRejected bool,
@@ -382,7 +382,7 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	bslKey := fmt.Sprintf("%s:%s:%s", bsn, service, law)
+	bslKey := fmt.Sprintf("%s:%s:%s", bsn, svc, law)
 	keyMap, exists := cm.bsnServiceLawIndex[bslKey]
 	if !exists {
 		return nil, nil

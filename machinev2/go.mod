@@ -3,6 +3,7 @@ module github.com/minbzk/poc-machine-law/machinev2
 go 1.24.1
 
 require (
+	github.com/go-python/gopy v0.4.10
 	github.com/google/uuid v1.6.0
 	github.com/looplab/eventhorizon v0.16.0
 	github.com/shopspring/decimal v1.4.0

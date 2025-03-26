@@ -5,18 +5,28 @@ repos:
     rev: v5.0.0
     hooks:
       - id: end-of-file-fixer
+        exclude: machinev2/gopy_machine
       - id: trailing-whitespace
+        exclude: machinev2/gopy_machine
       - id: check-yaml
+        exclude: machinev2/gopy_machine
       - id: check-json
+        exclude: machinev2/gopy_machine
       - id: check-added-large-files
+        exclude: machinev2/gopy_machine
       - id: check-merge-conflict
+        exclude: machinev2/gopy_machine
       - id: check-toml
+        exclude: machinev2/gopy_machine
       - id: detect-private-key
+        exclude: machinev2/gopy_machine
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.2
     hooks:
       - id: ruff
+        exclude: machinev2/gopy_machine
       - id: ruff-format
+        exclude: machinev2/gopy_machine
   - repo: https://github.com/djlint/djLint
     rev: v1.36.4
     hooks:
