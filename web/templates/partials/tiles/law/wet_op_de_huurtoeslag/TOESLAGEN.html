@@ -1,5 +1,6 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
+    {% if not missing_required %}
     {% if result.is_eligible %}
         {% include "partials/tiles/law/wet_op_de_huurtoeslag/TOESLAGEN/computation.html" %}
     {% else %}
@@ -20,6 +21,7 @@
     class="text-blue-600 hover:underline">belastingdienst.nl/huurtoeslag</a>.
             </p>
         </div>
+    {% endif %}
     {% endif %}
     {% if result.is_eligible and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
         {% if result.subsidy_amount != current_case.claimed_result.subsidy_amount %}
