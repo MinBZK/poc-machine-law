@@ -5,61 +5,65 @@
      id="tile-{{ law|replace('/', '-') }}">
     <div class="p-6 flex flex-col h-full">
         {% if error %}
-            <div class="flex-grow space-y-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
-                    {% if current_case %}
-                        <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
-                    {% endif %}
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
-                    </div>
-                </div>
-                <div class="p-2">{{ org_logo(service) }}</div>
-            </div>
-        {% else %}
-            <div class="flex-grow space-y-6">
-                <!-- Header -->
-                <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+            <div class="flex flex-col h-full">
+                <div class="flex-grow space-y-6">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
                         {% if current_case %}
                             <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
                         {% endif %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
+                        </div>
                     </div>
-                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                    <div class="p-2">{{ org_logo(service) }}</div>
                 </div>
-                <!-- Main Content -->
-                <div class="space-y-6">
-                    {% block tile_content %}
-                        {% if missing_required and current_case %}
-                            <div class="flex items-center">
-                                <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens.</h4>
-                            </div>
+            </div>
+        {% else %}
+            <div class="flex flex-col h-full">
+                <div class="flex-grow space-y-6">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
+                            {% if current_case %}
+                                <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                    </div>
+                    <!-- Main Content -->
+                    <div class="space-y-6">
+                        {% block tile_content %}
+                            {% if missing_required and current_case %}
+                                <div class="flex items-center">
+                                    <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens.</h4>
+                                </div>
+                            {% endif %}
+                        {% endblock %}
+                        {% if not current_case %}
+                            {% if missing_required %}
+                                <div class="flex items-center">
+                                    <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens.</h4>
+                                </div>
+                            {% elif not requirements_met %}
+                                <div class="flex items-center">
+                                    <h4 class="text-sm font-medium text-gray-500 mb-1">
+                                        U komt waarschijnlijk niet in aanmerking
+                                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                                                hx-target="#shared-application-panel"
+                                                hx-swap="innerHTML"
+                                                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600">
+                                            waarom?
+                                        </button>
+                                    </h4>
+                                </div>
+                            {% endif %}
                         {% endif %}
-                    {% endblock %}
-                    {% if not current_case %}
-                        {% if missing_required %}
-                            <div class="flex items-center">
-                                <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens.</h4>
-                            </div>
-                        {% elif not requirements_met %}
-                            <div class="flex items-center">
-                                <h4 class="text-sm font-medium text-gray-500 mb-1">
-                                    U komt waarschijnlijk niet in aanmerking
-                                    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
-                                            hx-target="#shared-application-panel"
-                                            hx-swap="innerHTML"
-                                            class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600">
-                                        waarom?
-                                    </button>
-                                </h4>
-                            </div>
-                        {% endif %}
-                    {% endif %}
+                    </div>
                 </div>
                 <!-- Actions Section -->
-                <div class="mt-6 pt-4 border-t border-gray-100">
+                <div class="mt-auto pt-4 border-t border-gray-100">
                     {% if current_case %}
                         {% if current_case.status == 'SUBMITTED' %}
                             <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
