@@ -7,7 +7,7 @@ cd gopy_machine
 
 python3 setup.py bdist_wheel
 
-cd ../ 
+cd ../
 
-uv pip install ./gopy_machine/dist/gopy_machine-0.0.0-py3-none-any.whl 
+uv pip install ./gopy_machine/dist/gopy_machine-0.0.0-py3-none-any.whl
 ```

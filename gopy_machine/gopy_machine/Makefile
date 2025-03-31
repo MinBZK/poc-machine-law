@@ -31,8 +31,6 @@ build:
 	$(PYTHON) build.py
 	# build the _gopy_machine$(LIBEXT) library that contains the cgo and CPython wrappers
 	# generated gopy_machine.py python wrapper imports this c-code package
-	
-	$(GCC) gopy_machine.c  gopy_machine_go$(LIBEXT) -o _gopy_machine$(LIBEXT) $(CFLAGS) $(LDFLAGS) -fPIC --shared -w
-	
 
+	$(GCC) gopy_machine.c  gopy_machine_go$(LIBEXT) -o _gopy_machine$(LIBEXT) $(CFLAGS) $(LDFLAGS) -fPIC --shared -w
 

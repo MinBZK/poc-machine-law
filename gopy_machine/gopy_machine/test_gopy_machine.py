@@ -13,19 +13,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
     import gopy_machine
+
     print(f"Successfully imported {MODULE_NAME} module")
-    
+
     # TODO: Add your test code here
     # Example:
     # result = gopy_machine.SomeFunction()
     # print(f"Result: {result}")
-    
+
     # Print available functions and classes
     print("\nAvailable attributes in the module:")
     for attr in dir(gopy_machine):
-        if not attr.startswith('_'):
+        if not attr.startswith("_"):
             print(f"  - {attr}")
-    
+
 except ImportError as e:
     print(f"Error importing module: {e}")
     sys.exit(1)

@@ -94,7 +94,7 @@ if ! command -v gopy &> /dev/null; then
   log "gopy not found, installing..."
   go install golang.org/x/tools/cmd/goimports@latest
   go install github.com/go-python/gopy@latest
-  
+
   if ! command -v gopy &> /dev/null; then
     error "Failed to install gopy. Please install manually: go install github.com/go-python/gopy@latest"
   fi
@@ -135,10 +135,10 @@ mkdir -p "$BUILD_TMP" || error "Failed to create temporary build directory"
 # Check if we're in a Go module and initialize one if needed
 if [ ! -f "go.mod" ]; then
   log "No go.mod file found. Initializing a temporary Go module..."
-  
+
   # Create a temporary module for building
   MODULE_TEMP_NAME="tempmodule$(date +%s)"
-  
+
   if [ $VERBOSE -eq 1 ]; then
     go mod init "$MODULE_TEMP_NAME" || error "Failed to initialize Go module"
     # Try to tidy the module to resolve dependencies
@@ -148,7 +148,7 @@ if [ ! -f "go.mod" ]; then
     # Try to tidy the module to resolve dependencies
     go mod tidy >/dev/null 2>&1 || warn "go mod tidy had issues, but continuing..."
   fi
-  
+
   # Remember that we created a temporary module so we can clean it up later
   CREATED_TEMP_MODULE=1
 else
@@ -278,18 +278,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     import ${MODULE_NAME}
     print(f"Successfully imported {MODULE_NAME} module")
-    
+
     # TODO: Add your test code here
     # Example:
     # result = ${MODULE_NAME}.SomeFunction()
     # print(f"Result: {result}")
-    
+
     # Print available functions and classes
     print("\nAvailable attributes in the module:")
     for attr in dir(${MODULE_NAME}):
         if not attr.startswith('_'):
             print(f"  - {attr}")
-    
+
 except ImportError as e:
     print(f"Error importing module: {e}")
     sys.exit(1)

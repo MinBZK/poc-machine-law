@@ -5,11 +5,12 @@
 from pybindgen import retval, param, Function, Module
 import sys
 
+
 class CheckedFunction(Function):
     def __init__(self, *a, **kw):
         super(CheckedFunction, self).__init__(*a, **kw)
-        self._failure_expression = kw.get('failure_expression', '')
-        self._failure_cleanup = kw.get('failure_cleanup', '')
+        self._failure_expression = kw.get("failure_expression", "")
+        self._failure_cleanup = kw.get("failure_cleanup", "")
 
     def set_failure_expression(self, expr):
         self._failure_expression = expr
@@ -25,276 +26,627 @@ class CheckedFunction(Function):
         failure_cleanup = self._failure_cleanup or None
         self.before_call.write_error_check(check, failure_cleanup)
 
-def add_checked_function(mod, name, retval, params, failure_expression='', *a, **kw):
+
+def add_checked_function(mod, name, retval, params, failure_expression="", *a, **kw):
     fn = CheckedFunction(name, retval, params, *a, **kw)
     fn.set_failure_expression(failure_expression)
     mod._add_function_obj(fn)
     return fn
 
-def add_checked_string_function(mod, name, retval, params, failure_expression='', *a, **kw):
+
+def add_checked_string_function(mod, name, retval, params, failure_expression="", *a, **kw):
     fn = CheckedFunction(name, retval, params, *a, **kw)
-    fn.set_failure_cleanup('if (retval != NULL) free(retval);')
-    fn.after_call.add_cleanup_code('free(retval);')
+    fn.set_failure_cleanup("if (retval != NULL) free(retval);")
+    fn.after_call.add_cleanup_code("free(retval);")
     fn.set_failure_expression(failure_expression)
     mod._add_function_obj(fn)
     return fn
 
-mod = Module('_gopy_machine')
+
+mod = Module("_gopy_machine")
 mod.add_include('"gopy_machine_go.h"')
-mod.add_function('GoPyInit', None, [])
-mod.add_function('DecRef', None, [param('int64_t', 'handle')])
-mod.add_function('IncRef', None, [param('int64_t', 'handle')])
-mod.add_function('NumHandles', retval('int'), [])
-mod.add_function('uuid_UUID_CTor', retval('int64_t'), [])
-mod.add_function('uuid_UUID_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('uuid_UUID_elem', retval('uint8_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('uuid_UUID_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint8_t', 'value')])
-mod.add_function('Slice_bool_CTor', retval('int64_t'), [])
-mod.add_function('Slice_bool_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_bool_elem', retval('bool'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_bool_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_bool_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('bool', 'value')])
-mod.add_function('Slice_bool_append', None, [param('int64_t', 'handle'), param('bool', 'value')])
-mod.add_function('Slice_byte_CTor', retval('int64_t'), [])
-mod.add_function('Slice_byte_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_byte_elem', retval('uint8_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_byte_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_byte_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint8_t', 'value')])
-mod.add_function('Slice_byte_append', None, [param('int64_t', 'handle'), param('uint8_t', 'value')])
-mod.add_function('Slice_byte_from_bytes', retval('int64_t'), [param('PyObject*', 'o', transfer_ownership=False)])
-mod.add_function('Slice_byte_to_bytes', retval('PyObject*', caller_owns_return=True), [param('int64_t', 'handle')])
-mod.add_function('Slice_error_CTor', retval('int64_t'), [])
-mod.add_function('Slice_error_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_error_elem', retval('char*'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_error_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_error_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('char*', 'value')])
-mod.add_function('Slice_error_append', None, [param('int64_t', 'handle'), param('char*', 'value')])
-mod.add_function('Slice_float32_CTor', retval('int64_t'), [])
-mod.add_function('Slice_float32_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_float32_elem', retval('float'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_float32_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_float32_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('float', 'value')])
-mod.add_function('Slice_float32_append', None, [param('int64_t', 'handle'), param('float', 'value')])
-mod.add_function('Slice_float64_CTor', retval('int64_t'), [])
-mod.add_function('Slice_float64_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_float64_elem', retval('double'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_float64_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_float64_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('double', 'value')])
-mod.add_function('Slice_float64_append', None, [param('int64_t', 'handle'), param('double', 'value')])
-mod.add_function('Slice_int_CTor', retval('int64_t'), [])
-mod.add_function('Slice_int_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_int_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_int_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_int_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_int_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_int16_CTor', retval('int64_t'), [])
-mod.add_function('Slice_int16_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_int16_elem', retval('int16_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_int16_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_int16_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int16_t', 'value')])
-mod.add_function('Slice_int16_append', None, [param('int64_t', 'handle'), param('int16_t', 'value')])
-mod.add_function('Slice_int32_CTor', retval('int64_t'), [])
-mod.add_function('Slice_int32_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_int32_elem', retval('int32_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_int32_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_int32_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int32_t', 'value')])
-mod.add_function('Slice_int32_append', None, [param('int64_t', 'handle'), param('int32_t', 'value')])
-mod.add_function('Slice_int64_CTor', retval('int64_t'), [])
-mod.add_function('Slice_int64_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_int64_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_int64_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_int64_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_int64_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_int8_CTor', retval('int64_t'), [])
-mod.add_function('Slice_int8_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_int8_elem', retval('int8_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_int8_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_int8_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int8_t', 'value')])
-mod.add_function('Slice_int8_append', None, [param('int64_t', 'handle'), param('int8_t', 'value')])
-mod.add_function('Slice_rune_CTor', retval('int64_t'), [])
-mod.add_function('Slice_rune_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_rune_elem', retval('int32_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_rune_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_rune_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int32_t', 'value')])
-mod.add_function('Slice_rune_append', None, [param('int64_t', 'handle'), param('int32_t', 'value')])
-mod.add_function('Slice_string_CTor', retval('int64_t'), [])
-mod.add_function('Slice_string_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_string_elem', retval('char*'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_string_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_string_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('char*', 'value')])
-mod.add_function('Slice_string_append', None, [param('int64_t', 'handle'), param('char*', 'value')])
-mod.add_function('Slice_uint_CTor', retval('int64_t'), [])
-mod.add_function('Slice_uint_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_uint_elem', retval('uint64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_uint_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_uint_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint64_t', 'value')])
-mod.add_function('Slice_uint_append', None, [param('int64_t', 'handle'), param('uint64_t', 'value')])
-mod.add_function('Slice_uint16_CTor', retval('int64_t'), [])
-mod.add_function('Slice_uint16_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_uint16_elem', retval('uint16_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_uint16_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_uint16_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint16_t', 'value')])
-mod.add_function('Slice_uint16_append', None, [param('int64_t', 'handle'), param('uint16_t', 'value')])
-mod.add_function('Slice_uint32_CTor', retval('int64_t'), [])
-mod.add_function('Slice_uint32_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_uint32_elem', retval('uint32_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_uint32_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_uint32_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint32_t', 'value')])
-mod.add_function('Slice_uint32_append', None, [param('int64_t', 'handle'), param('uint32_t', 'value')])
-mod.add_function('Slice_uint64_CTor', retval('int64_t'), [])
-mod.add_function('Slice_uint64_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_uint64_elem', retval('uint64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_uint64_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_uint64_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint64_t', 'value')])
-mod.add_function('Slice_uint64_append', None, [param('int64_t', 'handle'), param('uint64_t', 'value')])
-mod.add_function('Slice_uint8_CTor', retval('int64_t'), [])
-mod.add_function('Slice_uint8_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_uint8_elem', retval('uint8_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_uint8_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_uint8_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('uint8_t', 'value')])
-mod.add_function('Slice_uint8_append', None, [param('int64_t', 'handle'), param('uint8_t', 'value')])
-mod.add_function('Slice_Ptr_casemanager_Case_CTor', retval('int64_t'), [])
-mod.add_function('Slice_Ptr_casemanager_Case_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_Ptr_casemanager_Case_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_Ptr_casemanager_Case_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_Ptr_casemanager_Case_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_casemanager_Case_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_model_Claim_CTor', retval('int64_t'), [])
-mod.add_function('Slice_Ptr_model_Claim_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_Ptr_model_Claim_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_Ptr_model_Claim_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_Ptr_model_Claim_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_model_Claim_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_model_Event_CTor', retval('int64_t'), [])
-mod.add_function('Slice_Ptr_model_Event_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_Ptr_model_Event_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_Ptr_model_Event_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_Ptr_model_Event_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_model_Event_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_model_PathNode_CTor', retval('int64_t'), [])
-mod.add_function('Slice_Ptr_model_PathNode_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_Ptr_model_PathNode_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_Ptr_model_PathNode_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_Ptr_model_PathNode_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_model_PathNode_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_utils_RuleSpec_CTor', retval('int64_t'), [])
-mod.add_function('Slice_Ptr_utils_RuleSpec_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_Ptr_utils_RuleSpec_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_Ptr_utils_RuleSpec_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_Ptr_utils_RuleSpec_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_Ptr_utils_RuleSpec_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Slice_Map_string_any_CTor', retval('int64_t'), [])
-mod.add_function('Slice_Map_string_any_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Slice_Map_string_any_elem', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'idx')])
-mod.add_function('Slice_Map_string_any_subslice', retval('int64_t'), [param('int64_t', 'handle'), param('int', 'st'), param('int', 'ed')])
-mod.add_function('Slice_Map_string_any_set', None, [param('int64_t', 'handle'), param('int', 'idx'), param('int64_t', 'value')])
-mod.add_function('Slice_Map_string_any_append', None, [param('int64_t', 'handle'), param('int64_t', 'value')])
-mod.add_function('Map_string_Ptr_model_Claim_CTor', retval('int64_t'), [])
-mod.add_function('Map_string_Ptr_model_Claim_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_Ptr_model_Claim_elem', retval('int64_t'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Ptr_model_Claim_contains', retval('bool'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Ptr_model_Claim_set', None, [param('int64_t', 'handle'), param('char*', 'key'), param('int64_t', 'value')])
-mod.add_function('Map_string_Ptr_model_Claim_delete', None, [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Ptr_model_Claim_keys', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_Slice_string_CTor', retval('int64_t'), [])
-mod.add_function('Map_string_Slice_string_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_Slice_string_elem', retval('int64_t'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Slice_string_contains', retval('bool'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Slice_string_set', None, [param('int64_t', 'handle'), param('char*', 'key'), param('int64_t', 'value')])
-mod.add_function('Map_string_Slice_string_delete', None, [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Slice_string_keys', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_any_CTor', retval('int64_t'), [])
-mod.add_function('Map_string_any_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_any_elem', retval('int64_t'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_any_contains', retval('bool'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_any_set', None, [param('int64_t', 'handle'), param('char*', 'key'), param('int64_t', 'value')])
-mod.add_function('Map_string_any_delete', None, [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_any_keys', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_model_DataFrame_CTor', retval('int64_t'), [])
-mod.add_function('Map_string_model_DataFrame_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_model_DataFrame_elem', retval('int64_t'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_model_DataFrame_contains', retval('bool'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_model_DataFrame_set', None, [param('int64_t', 'handle'), param('char*', 'key'), param('int64_t', 'value')])
-mod.add_function('Map_string_model_DataFrame_delete', None, [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_model_DataFrame_keys', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_Map_string_any_CTor', retval('int64_t'), [])
-mod.add_function('Map_string_Map_string_any_len', retval('int'), [param('int64_t', 'handle')])
-mod.add_function('Map_string_Map_string_any_elem', retval('int64_t'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Map_string_any_contains', retval('bool'), [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Map_string_any_set', None, [param('int64_t', 'handle'), param('char*', 'key'), param('int64_t', 'value')])
-mod.add_function('Map_string_Map_string_any_delete', None, [param('int64_t', 'handle'), param('char*', '_ky')])
-mod.add_function('Map_string_Map_string_any_keys', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_CaseManager_CTor', retval('int64_t'), [])
-mod.add_function('service_CaseManager_Services_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_CaseManager_Services_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-mod.add_function('service_CaseManager_SampleRate_Get', retval('double'), [param('int64_t', 'handle')])
-mod.add_function('service_CaseManager_SampleRate_Set', None, [param('int64_t', 'handle'), param('double', 'val')])
-add_checked_function(mod, 'service_CaseManager_SetCase', None, [param('int64_t', '_handle'), param('int64_t', 'caseID'), param('char*', 'key'), param('bool', 'goRun')])
-add_checked_function(mod, 'service_CaseManager_SubmitCase', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('char*', 'bsn'), param('char*', 'serviceType'), param('char*', 'law'), param('int64_t', 'parameters'), param('int64_t', 'claimedResult'), param('bool', 'approvedClaimsOnly')])
-add_checked_function(mod, 'service_CaseManager_CompleteManualReview', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('int64_t', 'caseID'), param('char*', 'verifierID'), param('bool', 'approved'), param('char*', 'reason'), param('int64_t', 'overrideResult')])
-add_checked_function(mod, 'service_CaseManager_ObjectCase', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('int64_t', 'caseID'), param('char*', 'reason')])
-add_checked_function(mod, 'service_CaseManager_CanAppeal', retval('bool'), [param('int64_t', '_handle'), param('int64_t', 'caseID')])
-add_checked_function(mod, 'service_CaseManager_CanObject', retval('bool'), [param('int64_t', '_handle'), param('int64_t', 'caseID')])
-add_checked_function(mod, 'service_CaseManager_GetCase', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'bsn'), param('char*', 'serviceType'), param('char*', 'law')])
-add_checked_function(mod, 'service_CaseManager_GetCaseByID', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('int64_t', 'id')])
-add_checked_function(mod, 'service_CaseManager_GetCasesByStatus', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'serviceType'), param('char*', 'status')])
-add_checked_function(mod, 'service_CaseManager_GetCasesByLaw', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'law'), param('char*', 'serviceType')])
-add_checked_function(mod, 'service_CaseManager_GetEventsByUUID', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'caseID')])
-add_checked_function(mod, 'service_CaseManager_GetEvents', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'caseID')])
-add_checked_function(mod, 'service_CaseManager_Save', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('int64_t', 'c')])
-add_checked_function(mod, 'service_CaseManager_Wait', None, [param('int64_t', '_handle'), param('bool', 'goRun')])
-add_checked_function(mod, 'service_CaseManager_Close', None, [param('int64_t', '_handle'), param('bool', 'goRun')])
-mod.add_function('service_ClaimManager_CTor', retval('int64_t'), [])
-mod.add_function('service_ClaimManager_Services_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_ClaimManager_Services_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-mod.add_function('service_ClaimManager_CaseManager_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_ClaimManager_CaseManager_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-add_checked_string_function(mod, 'service_ClaimManager_SubmitClaim', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('char*', 'svc'), param('char*', 'key'), param('int64_t', 'newValue'), param('char*', 'reason'), param('char*', 'claimant'), param('char*', 'law'), param('char*', 'bsn'), param('int64_t', 'caseID'), param('int64_t', 'oldValue'), param('char*', 'evidencePath'), param('bool', 'autoApprove')])
-add_checked_function(mod, 'service_ClaimManager_ApproveClaim', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('char*', 'claimID'), param('char*', 'verifiedBy'), param('int64_t', 'verifiedValue')])
-add_checked_function(mod, 'service_ClaimManager_RejectClaim', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('char*', 'claimID'), param('char*', 'rejectedBy'), param('char*', 'rejectionReason')])
-add_checked_function(mod, 'service_ClaimManager_LinkCase', retval('char*'), [param('int64_t', '_handle'), param('char*', 'claimID'), param('int64_t', 'caseID')])
-add_checked_function(mod, 'service_ClaimManager_AddEvidence', retval('char*'), [param('int64_t', '_handle'), param('char*', 'claimID'), param('char*', 'evidencePath')])
-add_checked_function(mod, 'service_ClaimManager_GetClaim', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'claimID')])
-add_checked_function(mod, 'service_ClaimManager_GetClaimsByService', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'svc'), param('bool', 'approved'), param('bool', 'includeRejected')])
-add_checked_function(mod, 'service_ClaimManager_GetClaimsByCase', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'caseID'), param('bool', 'approved'), param('bool', 'includeRejected')])
-add_checked_function(mod, 'service_ClaimManager_GetClaimsByClaimant', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'claimant'), param('bool', 'approved'), param('bool', 'includeRejected')])
-add_checked_function(mod, 'service_ClaimManager_GetClaimsByBSN', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'bsn'), param('bool', 'approved'), param('bool', 'includeRejected')])
-add_checked_function(mod, 'service_ClaimManager_GetClaimByBSNServiceLaw', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'bsn'), param('char*', 'svc'), param('char*', 'law'), param('bool', 'approved'), param('bool', 'includeRejected')])
-mod.add_function('service_RuleService_CTor', retval('int64_t'), [])
-mod.add_function('service_RuleService_ServiceName_Get', retval('char*'), [param('int64_t', 'handle')])
-mod.add_function('service_RuleService_ServiceName_Set', None, [param('int64_t', 'handle'), param('char*', 'val')])
-mod.add_function('service_RuleService_Services_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_RuleService_Services_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-mod.add_function('service_RuleService_Resolver_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_RuleService_Resolver_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-mod.add_function('service_RuleService_SourceDataFrames_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_RuleService_SourceDataFrames_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-add_checked_function(mod, 'service_RuleService_GetResolver', retval('int64_t'), [param('int64_t', '_handle')])
-add_checked_function(mod, 'service_RuleService_Evaluate', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('char*', 'law'), param('char*', 'referenceDate'), param('int64_t', 'parameters'), param('int64_t', 'overwriteInput'), param('char*', 'requestedOutput'), param('bool', 'approved')])
-add_checked_function(mod, 'service_RuleService_GetRuleInfo', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'law'), param('char*', 'referenceDate')])
-add_checked_function(mod, 'service_RuleService_SetSourceDataFrame', None, [param('int64_t', '_handle'), param('char*', 'table'), param('int64_t', 'df'), param('bool', 'goRun')])
-mod.add_function('service_Services_CTor', retval('int64_t'), [])
-mod.add_function('service_Services_Resolver_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_Services_Resolver_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-mod.add_function('service_Services_RootReferenceDate_Get', retval('char*'), [param('int64_t', 'handle')])
-mod.add_function('service_Services_RootReferenceDate_Set', None, [param('int64_t', 'handle'), param('char*', 'val')])
-mod.add_function('service_Services_CaseManager_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_Services_CaseManager_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-mod.add_function('service_Services_ClaimManager_Get', retval('int64_t'), [param('int64_t', 'handle')])
-mod.add_function('service_Services_ClaimManager_Set', None, [param('int64_t', 'handle'), param('int64_t', 'val')])
-add_checked_function(mod, 'service_Services_GetDiscoverableServiceLaws', retval('int64_t'), [param('int64_t', '_handle')])
-add_checked_function(mod, 'service_Services_SetSourceDataFrame', None, [param('int64_t', '_handle'), param('char*', 'svc'), param('char*', 'table'), param('int64_t', 'df'), param('bool', 'goRun')])
-add_checked_function(mod, 'service_Services_GetResolver', retval('int64_t'), [param('int64_t', '_handle')])
-add_checked_function(mod, 'service_Services_GetCaseManager', retval('int64_t'), [param('int64_t', '_handle')])
-add_checked_function(mod, 'service_Services_GetClaimManager', retval('int64_t'), [param('int64_t', '_handle')])
-add_checked_function(mod, 'service_Services_EvaluateWithCtx', retval('int64_t'), [param('int64_t', '_handle'), param('char*', 'svc'), param('char*', 'law'), param('int64_t', 'parameters')])
-add_checked_function(mod, 'service_Services_Evaluate', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('char*', 'svc'), param('char*', 'law'), param('int64_t', 'parameters'), param('char*', 'referenceDate'), param('int64_t', 'overwriteInput'), param('char*', 'requestedOutput'), param('bool', 'approved')])
-add_checked_function(mod, 'service_Services_ExtractValueTree', retval('int64_t'), [param('int64_t', '_handle'), param('int64_t', 'root')])
-add_checked_function(mod, 'service_Services_ApplyRules', retval('char*'), [param('int64_t', '_handle'), param('int64_t', 'ctx'), param('int64_t', 'event')])
-add_checked_function(mod, 'service_NewCaseManager', retval('int64_t'), [param('int64_t', 'logger'), param('int64_t', 'services')])
-add_checked_function(mod, 'service_NewClaimManager', retval('int64_t'), [param('int64_t', 'services')])
-add_checked_function(mod, 'service_NewRuleService', retval('int64_t'), [param('int64_t', 'logger'), param('char*', 'serviceName'), param('int64_t', 'services')])
-add_checked_function(mod, 'service_NewServices', retval('int64_t'), [param('char*', 'referenceDate')])
+mod.add_function("GoPyInit", None, [])
+mod.add_function("DecRef", None, [param("int64_t", "handle")])
+mod.add_function("IncRef", None, [param("int64_t", "handle")])
+mod.add_function("NumHandles", retval("int"), [])
+mod.add_function("uuid_UUID_CTor", retval("int64_t"), [])
+mod.add_function("uuid_UUID_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("uuid_UUID_elem", retval("uint8_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function("uuid_UUID_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint8_t", "value")])
+mod.add_function("Slice_bool_CTor", retval("int64_t"), [])
+mod.add_function("Slice_bool_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_bool_elem", retval("bool"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_bool_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_bool_set", None, [param("int64_t", "handle"), param("int", "idx"), param("bool", "value")])
+mod.add_function("Slice_bool_append", None, [param("int64_t", "handle"), param("bool", "value")])
+mod.add_function("Slice_byte_CTor", retval("int64_t"), [])
+mod.add_function("Slice_byte_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_byte_elem", retval("uint8_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_byte_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_byte_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint8_t", "value")])
+mod.add_function("Slice_byte_append", None, [param("int64_t", "handle"), param("uint8_t", "value")])
+mod.add_function("Slice_byte_from_bytes", retval("int64_t"), [param("PyObject*", "o", transfer_ownership=False)])
+mod.add_function("Slice_byte_to_bytes", retval("PyObject*", caller_owns_return=True), [param("int64_t", "handle")])
+mod.add_function("Slice_error_CTor", retval("int64_t"), [])
+mod.add_function("Slice_error_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_error_elem", retval("char*"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_error_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_error_set", None, [param("int64_t", "handle"), param("int", "idx"), param("char*", "value")])
+mod.add_function("Slice_error_append", None, [param("int64_t", "handle"), param("char*", "value")])
+mod.add_function("Slice_float32_CTor", retval("int64_t"), [])
+mod.add_function("Slice_float32_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_float32_elem", retval("float"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_float32_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_float32_set", None, [param("int64_t", "handle"), param("int", "idx"), param("float", "value")])
+mod.add_function("Slice_float32_append", None, [param("int64_t", "handle"), param("float", "value")])
+mod.add_function("Slice_float64_CTor", retval("int64_t"), [])
+mod.add_function("Slice_float64_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_float64_elem", retval("double"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_float64_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_float64_set", None, [param("int64_t", "handle"), param("int", "idx"), param("double", "value")])
+mod.add_function("Slice_float64_append", None, [param("int64_t", "handle"), param("double", "value")])
+mod.add_function("Slice_int_CTor", retval("int64_t"), [])
+mod.add_function("Slice_int_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_int_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_int_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_int_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")])
+mod.add_function("Slice_int_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_int16_CTor", retval("int64_t"), [])
+mod.add_function("Slice_int16_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_int16_elem", retval("int16_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_int16_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_int16_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int16_t", "value")])
+mod.add_function("Slice_int16_append", None, [param("int64_t", "handle"), param("int16_t", "value")])
+mod.add_function("Slice_int32_CTor", retval("int64_t"), [])
+mod.add_function("Slice_int32_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_int32_elem", retval("int32_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_int32_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_int32_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int32_t", "value")])
+mod.add_function("Slice_int32_append", None, [param("int64_t", "handle"), param("int32_t", "value")])
+mod.add_function("Slice_int64_CTor", retval("int64_t"), [])
+mod.add_function("Slice_int64_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_int64_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_int64_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_int64_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")])
+mod.add_function("Slice_int64_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_int8_CTor", retval("int64_t"), [])
+mod.add_function("Slice_int8_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_int8_elem", retval("int8_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_int8_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_int8_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int8_t", "value")])
+mod.add_function("Slice_int8_append", None, [param("int64_t", "handle"), param("int8_t", "value")])
+mod.add_function("Slice_rune_CTor", retval("int64_t"), [])
+mod.add_function("Slice_rune_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_rune_elem", retval("int32_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_rune_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_rune_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int32_t", "value")])
+mod.add_function("Slice_rune_append", None, [param("int64_t", "handle"), param("int32_t", "value")])
+mod.add_function("Slice_string_CTor", retval("int64_t"), [])
+mod.add_function("Slice_string_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_string_elem", retval("char*"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_string_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_string_set", None, [param("int64_t", "handle"), param("int", "idx"), param("char*", "value")])
+mod.add_function("Slice_string_append", None, [param("int64_t", "handle"), param("char*", "value")])
+mod.add_function("Slice_uint_CTor", retval("int64_t"), [])
+mod.add_function("Slice_uint_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_uint_elem", retval("uint64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_uint_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_uint_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint64_t", "value")])
+mod.add_function("Slice_uint_append", None, [param("int64_t", "handle"), param("uint64_t", "value")])
+mod.add_function("Slice_uint16_CTor", retval("int64_t"), [])
+mod.add_function("Slice_uint16_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_uint16_elem", retval("uint16_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_uint16_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function(
+    "Slice_uint16_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint16_t", "value")]
+)
+mod.add_function("Slice_uint16_append", None, [param("int64_t", "handle"), param("uint16_t", "value")])
+mod.add_function("Slice_uint32_CTor", retval("int64_t"), [])
+mod.add_function("Slice_uint32_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_uint32_elem", retval("uint32_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_uint32_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function(
+    "Slice_uint32_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint32_t", "value")]
+)
+mod.add_function("Slice_uint32_append", None, [param("int64_t", "handle"), param("uint32_t", "value")])
+mod.add_function("Slice_uint64_CTor", retval("int64_t"), [])
+mod.add_function("Slice_uint64_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_uint64_elem", retval("uint64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_uint64_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function(
+    "Slice_uint64_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint64_t", "value")]
+)
+mod.add_function("Slice_uint64_append", None, [param("int64_t", "handle"), param("uint64_t", "value")])
+mod.add_function("Slice_uint8_CTor", retval("int64_t"), [])
+mod.add_function("Slice_uint8_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_uint8_elem", retval("uint8_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_uint8_subslice", retval("int64_t"), [param("int64_t", "handle"), param("int", "st"), param("int", "ed")]
+)
+mod.add_function("Slice_uint8_set", None, [param("int64_t", "handle"), param("int", "idx"), param("uint8_t", "value")])
+mod.add_function("Slice_uint8_append", None, [param("int64_t", "handle"), param("uint8_t", "value")])
+mod.add_function("Slice_Ptr_casemanager_Case_CTor", retval("int64_t"), [])
+mod.add_function("Slice_Ptr_casemanager_Case_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function(
+    "Slice_Ptr_casemanager_Case_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")]
+)
+mod.add_function(
+    "Slice_Ptr_casemanager_Case_subslice",
+    retval("int64_t"),
+    [param("int64_t", "handle"), param("int", "st"), param("int", "ed")],
+)
+mod.add_function(
+    "Slice_Ptr_casemanager_Case_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")]
+)
+mod.add_function("Slice_Ptr_casemanager_Case_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_Ptr_model_Claim_CTor", retval("int64_t"), [])
+mod.add_function("Slice_Ptr_model_Claim_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_Ptr_model_Claim_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_Ptr_model_Claim_subslice",
+    retval("int64_t"),
+    [param("int64_t", "handle"), param("int", "st"), param("int", "ed")],
+)
+mod.add_function(
+    "Slice_Ptr_model_Claim_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")]
+)
+mod.add_function("Slice_Ptr_model_Claim_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_Ptr_model_Event_CTor", retval("int64_t"), [])
+mod.add_function("Slice_Ptr_model_Event_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_Ptr_model_Event_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_Ptr_model_Event_subslice",
+    retval("int64_t"),
+    [param("int64_t", "handle"), param("int", "st"), param("int", "ed")],
+)
+mod.add_function(
+    "Slice_Ptr_model_Event_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")]
+)
+mod.add_function("Slice_Ptr_model_Event_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_Ptr_model_PathNode_CTor", retval("int64_t"), [])
+mod.add_function("Slice_Ptr_model_PathNode_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_Ptr_model_PathNode_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_Ptr_model_PathNode_subslice",
+    retval("int64_t"),
+    [param("int64_t", "handle"), param("int", "st"), param("int", "ed")],
+)
+mod.add_function(
+    "Slice_Ptr_model_PathNode_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")]
+)
+mod.add_function("Slice_Ptr_model_PathNode_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_Ptr_utils_RuleSpec_CTor", retval("int64_t"), [])
+mod.add_function("Slice_Ptr_utils_RuleSpec_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_Ptr_utils_RuleSpec_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_Ptr_utils_RuleSpec_subslice",
+    retval("int64_t"),
+    [param("int64_t", "handle"), param("int", "st"), param("int", "ed")],
+)
+mod.add_function(
+    "Slice_Ptr_utils_RuleSpec_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")]
+)
+mod.add_function("Slice_Ptr_utils_RuleSpec_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Slice_Map_string_any_CTor", retval("int64_t"), [])
+mod.add_function("Slice_Map_string_any_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Slice_Map_string_any_elem", retval("int64_t"), [param("int64_t", "handle"), param("int", "idx")])
+mod.add_function(
+    "Slice_Map_string_any_subslice",
+    retval("int64_t"),
+    [param("int64_t", "handle"), param("int", "st"), param("int", "ed")],
+)
+mod.add_function(
+    "Slice_Map_string_any_set", None, [param("int64_t", "handle"), param("int", "idx"), param("int64_t", "value")]
+)
+mod.add_function("Slice_Map_string_any_append", None, [param("int64_t", "handle"), param("int64_t", "value")])
+mod.add_function("Map_string_Ptr_model_Claim_CTor", retval("int64_t"), [])
+mod.add_function("Map_string_Ptr_model_Claim_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function(
+    "Map_string_Ptr_model_Claim_elem", retval("int64_t"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_Ptr_model_Claim_contains", retval("bool"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_Ptr_model_Claim_set",
+    None,
+    [param("int64_t", "handle"), param("char*", "key"), param("int64_t", "value")],
+)
+mod.add_function("Map_string_Ptr_model_Claim_delete", None, [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function("Map_string_Ptr_model_Claim_keys", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("Map_string_Slice_string_CTor", retval("int64_t"), [])
+mod.add_function("Map_string_Slice_string_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Map_string_Slice_string_elem", retval("int64_t"), [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function(
+    "Map_string_Slice_string_contains", retval("bool"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_Slice_string_set", None, [param("int64_t", "handle"), param("char*", "key"), param("int64_t", "value")]
+)
+mod.add_function("Map_string_Slice_string_delete", None, [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function("Map_string_Slice_string_keys", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("Map_string_any_CTor", retval("int64_t"), [])
+mod.add_function("Map_string_any_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function("Map_string_any_elem", retval("int64_t"), [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function("Map_string_any_contains", retval("bool"), [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function(
+    "Map_string_any_set", None, [param("int64_t", "handle"), param("char*", "key"), param("int64_t", "value")]
+)
+mod.add_function("Map_string_any_delete", None, [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function("Map_string_any_keys", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("Map_string_model_DataFrame_CTor", retval("int64_t"), [])
+mod.add_function("Map_string_model_DataFrame_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function(
+    "Map_string_model_DataFrame_elem", retval("int64_t"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_model_DataFrame_contains", retval("bool"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_model_DataFrame_set",
+    None,
+    [param("int64_t", "handle"), param("char*", "key"), param("int64_t", "value")],
+)
+mod.add_function("Map_string_model_DataFrame_delete", None, [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function("Map_string_model_DataFrame_keys", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("Map_string_Map_string_any_CTor", retval("int64_t"), [])
+mod.add_function("Map_string_Map_string_any_len", retval("int"), [param("int64_t", "handle")])
+mod.add_function(
+    "Map_string_Map_string_any_elem", retval("int64_t"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_Map_string_any_contains", retval("bool"), [param("int64_t", "handle"), param("char*", "_ky")]
+)
+mod.add_function(
+    "Map_string_Map_string_any_set",
+    None,
+    [param("int64_t", "handle"), param("char*", "key"), param("int64_t", "value")],
+)
+mod.add_function("Map_string_Map_string_any_delete", None, [param("int64_t", "handle"), param("char*", "_ky")])
+mod.add_function("Map_string_Map_string_any_keys", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_CaseManager_CTor", retval("int64_t"), [])
+mod.add_function("service_CaseManager_Services_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_CaseManager_Services_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+mod.add_function("service_CaseManager_SampleRate_Get", retval("double"), [param("int64_t", "handle")])
+mod.add_function("service_CaseManager_SampleRate_Set", None, [param("int64_t", "handle"), param("double", "val")])
+add_checked_function(
+    mod,
+    "service_CaseManager_SetCase",
+    None,
+    [param("int64_t", "_handle"), param("int64_t", "caseID"), param("char*", "key"), param("bool", "goRun")],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_SubmitCase",
+    retval("int64_t"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("char*", "bsn"),
+        param("char*", "serviceType"),
+        param("char*", "law"),
+        param("int64_t", "parameters"),
+        param("int64_t", "claimedResult"),
+        param("bool", "approvedClaimsOnly"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_CompleteManualReview",
+    retval("char*"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("int64_t", "caseID"),
+        param("char*", "verifierID"),
+        param("bool", "approved"),
+        param("char*", "reason"),
+        param("int64_t", "overrideResult"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_ObjectCase",
+    retval("char*"),
+    [param("int64_t", "_handle"), param("int64_t", "ctx"), param("int64_t", "caseID"), param("char*", "reason")],
+)
+add_checked_function(
+    mod, "service_CaseManager_CanAppeal", retval("bool"), [param("int64_t", "_handle"), param("int64_t", "caseID")]
+)
+add_checked_function(
+    mod, "service_CaseManager_CanObject", retval("bool"), [param("int64_t", "_handle"), param("int64_t", "caseID")]
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_GetCase",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "bsn"), param("char*", "serviceType"), param("char*", "law")],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_GetCaseByID",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("int64_t", "ctx"), param("int64_t", "id")],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_GetCasesByStatus",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "serviceType"), param("char*", "status")],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_GetCasesByLaw",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "law"), param("char*", "serviceType")],
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_GetEventsByUUID",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("int64_t", "caseID")],
+)
+add_checked_function(
+    mod, "service_CaseManager_GetEvents", retval("int64_t"), [param("int64_t", "_handle"), param("int64_t", "caseID")]
+)
+add_checked_function(
+    mod,
+    "service_CaseManager_Save",
+    retval("char*"),
+    [param("int64_t", "_handle"), param("int64_t", "ctx"), param("int64_t", "c")],
+)
+add_checked_function(mod, "service_CaseManager_Wait", None, [param("int64_t", "_handle"), param("bool", "goRun")])
+add_checked_function(mod, "service_CaseManager_Close", None, [param("int64_t", "_handle"), param("bool", "goRun")])
+mod.add_function("service_ClaimManager_CTor", retval("int64_t"), [])
+mod.add_function("service_ClaimManager_Services_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_ClaimManager_Services_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+mod.add_function("service_ClaimManager_CaseManager_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_ClaimManager_CaseManager_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+add_checked_string_function(
+    mod,
+    "service_ClaimManager_SubmitClaim",
+    retval("char*"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("char*", "svc"),
+        param("char*", "key"),
+        param("int64_t", "newValue"),
+        param("char*", "reason"),
+        param("char*", "claimant"),
+        param("char*", "law"),
+        param("char*", "bsn"),
+        param("int64_t", "caseID"),
+        param("int64_t", "oldValue"),
+        param("char*", "evidencePath"),
+        param("bool", "autoApprove"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_ApproveClaim",
+    retval("char*"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("char*", "claimID"),
+        param("char*", "verifiedBy"),
+        param("int64_t", "verifiedValue"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_RejectClaim",
+    retval("char*"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("char*", "claimID"),
+        param("char*", "rejectedBy"),
+        param("char*", "rejectionReason"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_LinkCase",
+    retval("char*"),
+    [param("int64_t", "_handle"), param("char*", "claimID"), param("int64_t", "caseID")],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_AddEvidence",
+    retval("char*"),
+    [param("int64_t", "_handle"), param("char*", "claimID"), param("char*", "evidencePath")],
+)
+add_checked_function(
+    mod, "service_ClaimManager_GetClaim", retval("int64_t"), [param("int64_t", "_handle"), param("char*", "claimID")]
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_GetClaimsByService",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "svc"), param("bool", "approved"), param("bool", "includeRejected")],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_GetClaimsByCase",
+    retval("int64_t"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "caseID"),
+        param("bool", "approved"),
+        param("bool", "includeRejected"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_GetClaimsByClaimant",
+    retval("int64_t"),
+    [
+        param("int64_t", "_handle"),
+        param("char*", "claimant"),
+        param("bool", "approved"),
+        param("bool", "includeRejected"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_GetClaimsByBSN",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "bsn"), param("bool", "approved"), param("bool", "includeRejected")],
+)
+add_checked_function(
+    mod,
+    "service_ClaimManager_GetClaimByBSNServiceLaw",
+    retval("int64_t"),
+    [
+        param("int64_t", "_handle"),
+        param("char*", "bsn"),
+        param("char*", "svc"),
+        param("char*", "law"),
+        param("bool", "approved"),
+        param("bool", "includeRejected"),
+    ],
+)
+mod.add_function("service_RuleService_CTor", retval("int64_t"), [])
+mod.add_function("service_RuleService_ServiceName_Get", retval("char*"), [param("int64_t", "handle")])
+mod.add_function("service_RuleService_ServiceName_Set", None, [param("int64_t", "handle"), param("char*", "val")])
+mod.add_function("service_RuleService_Services_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_RuleService_Services_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+mod.add_function("service_RuleService_Resolver_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_RuleService_Resolver_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+mod.add_function("service_RuleService_SourceDataFrames_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function(
+    "service_RuleService_SourceDataFrames_Set", None, [param("int64_t", "handle"), param("int64_t", "val")]
+)
+add_checked_function(mod, "service_RuleService_GetResolver", retval("int64_t"), [param("int64_t", "_handle")])
+add_checked_function(
+    mod,
+    "service_RuleService_Evaluate",
+    retval("int64_t"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("char*", "law"),
+        param("char*", "referenceDate"),
+        param("int64_t", "parameters"),
+        param("int64_t", "overwriteInput"),
+        param("char*", "requestedOutput"),
+        param("bool", "approved"),
+    ],
+)
+add_checked_function(
+    mod,
+    "service_RuleService_GetRuleInfo",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "law"), param("char*", "referenceDate")],
+)
+add_checked_function(
+    mod,
+    "service_RuleService_SetSourceDataFrame",
+    None,
+    [param("int64_t", "_handle"), param("char*", "table"), param("int64_t", "df"), param("bool", "goRun")],
+)
+mod.add_function("service_Services_CTor", retval("int64_t"), [])
+mod.add_function("service_Services_Resolver_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_Services_Resolver_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+mod.add_function("service_Services_RootReferenceDate_Get", retval("char*"), [param("int64_t", "handle")])
+mod.add_function("service_Services_RootReferenceDate_Set", None, [param("int64_t", "handle"), param("char*", "val")])
+mod.add_function("service_Services_CaseManager_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_Services_CaseManager_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+mod.add_function("service_Services_ClaimManager_Get", retval("int64_t"), [param("int64_t", "handle")])
+mod.add_function("service_Services_ClaimManager_Set", None, [param("int64_t", "handle"), param("int64_t", "val")])
+add_checked_function(
+    mod, "service_Services_GetDiscoverableServiceLaws", retval("int64_t"), [param("int64_t", "_handle")]
+)
+add_checked_function(
+    mod,
+    "service_Services_SetSourceDataFrame",
+    None,
+    [
+        param("int64_t", "_handle"),
+        param("char*", "svc"),
+        param("char*", "table"),
+        param("int64_t", "df"),
+        param("bool", "goRun"),
+    ],
+)
+add_checked_function(mod, "service_Services_GetResolver", retval("int64_t"), [param("int64_t", "_handle")])
+add_checked_function(mod, "service_Services_GetCaseManager", retval("int64_t"), [param("int64_t", "_handle")])
+add_checked_function(mod, "service_Services_GetClaimManager", retval("int64_t"), [param("int64_t", "_handle")])
+add_checked_function(
+    mod,
+    "service_Services_EvaluateWithCtx",
+    retval("int64_t"),
+    [param("int64_t", "_handle"), param("char*", "svc"), param("char*", "law"), param("int64_t", "parameters")],
+)
+add_checked_function(
+    mod,
+    "service_Services_Evaluate",
+    retval("int64_t"),
+    [
+        param("int64_t", "_handle"),
+        param("int64_t", "ctx"),
+        param("char*", "svc"),
+        param("char*", "law"),
+        param("int64_t", "parameters"),
+        param("char*", "referenceDate"),
+        param("int64_t", "overwriteInput"),
+        param("char*", "requestedOutput"),
+        param("bool", "approved"),
+    ],
+)
+add_checked_function(
+    mod, "service_Services_ExtractValueTree", retval("int64_t"), [param("int64_t", "_handle"), param("int64_t", "root")]
+)
+add_checked_function(
+    mod,
+    "service_Services_ApplyRules",
+    retval("char*"),
+    [param("int64_t", "_handle"), param("int64_t", "ctx"), param("int64_t", "event")],
+)
+add_checked_function(
+    mod, "service_NewCaseManager", retval("int64_t"), [param("int64_t", "logger"), param("int64_t", "services")]
+)
+add_checked_function(mod, "service_NewClaimManager", retval("int64_t"), [param("int64_t", "services")])
+add_checked_function(
+    mod,
+    "service_NewRuleService",
+    retval("int64_t"),
+    [param("int64_t", "logger"), param("char*", "serviceName"), param("int64_t", "services")],
+)
+add_checked_function(mod, "service_NewServices", retval("int64_t"), [param("char*", "referenceDate")])
 
-mod.generate(open('gopy_machine.c', 'w'))
-
+mod.generate(open("gopy_machine.c", "w"))
