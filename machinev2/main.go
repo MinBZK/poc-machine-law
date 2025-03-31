@@ -4,20 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/service"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
 
 	start := time.Now()
 
-	// Configure logging
-	logging.ConfigureLogging("debug")
-	logger := logging.GetLogger("main")
+	logger := logging.New("main", os.Stdout, logrus.DebugLevel)
 
 	// Set up context
 	ctx := context.Background()
@@ -26,7 +26,7 @@ func main() {
 	currentDate := time.Now()
 	services := service.NewServices(currentDate)
 
-	logger.WithIndent().Infof("\nDirect rules engine evaluation example:")
+	logger.Infof(ctx, "Direct rules engine evaluation example:")
 
 	evalParams := map[string]any{
 		"BSN": "999993653",
@@ -117,10 +117,10 @@ func main() {
 	)
 
 	if err != nil {
-		logger.WithIndent().Errorf("Error evaluating rules: %v", err)
+		logger.WithIndent().Errorf(ctx, "Error evaluating rules: %v", err)
 	} else {
 		resultJSON, _ := json.MarshalIndent(evalResult.Output, "", "  ")
-		fmt.Printf("\nDirect Evaluation Result:\n%s\n", string(resultJSON))
+		fmt.Printf("Direct Evaluation Result:\n%s\n", string(resultJSON))
 	}
 
 	// caseID, err := services.CaseManager.SubmitCase(
@@ -148,5 +148,5 @@ func main() {
 
 	fmt.Printf("time.Since(start): %v\n", time.Since(start))
 
-	logger.WithIndent().Infof("\nSuccessfully completed demo!")
+	logger.Infof(ctx, "Successfully completed demo!")
 }

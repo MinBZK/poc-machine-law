@@ -16,8 +16,6 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/model"
 )
 
-var logger = logging.GetLogger("context")
-
 // TypeSpec defines specifications for value types
 type TypeSpec struct {
 	Type      string  `json:"type,omitempty" yaml:"type,omitempty"`
@@ -141,11 +139,12 @@ type RuleContext struct {
 	Claims          map[string]*model.Claim
 	Approved        bool
 	MissingRequired bool
-	ctx             context.Context
+	// ctx             context.Context
+	logger logging.Logger
 }
 
 // NewRuleContext creates a new rule context
-func NewRuleContext(ctx context.Context, definitions map[string]any, serviceProvider ServiceProvider,
+func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProvider ServiceProvider,
 	parameters map[string]any, propertySpecs map[string]map[string]any,
 	outputSpecs map[string]TypeSpec, sources map[string]model.DataFrame, path []*model.PathNode,
 	overwriteInput map[string]map[string]any, calculationDate string,
@@ -174,7 +173,7 @@ func NewRuleContext(ctx context.Context, definitions map[string]any, serviceProv
 		Claims:          claims,
 		Approved:        approved,
 		MissingRequired: false,
-		ctx:             ctx,
+		logger:          logr.WithName("context"),
 	}
 }
 
@@ -199,11 +198,10 @@ func (rc *RuleContext) PopPath() {
 }
 
 // ResolveValue resolves a value from definitions, services, or sources
-func (rc *RuleContext) ResolveValue(path any) (any, error) {
+func (rc *RuleContext) ResolveValue(ctx context.Context, path any) (any, error) {
 	var value any
-	if err := logging.IndentBlock(context.TODO(), fmt.Sprintf("Resolving path: %v", path), false, func(ctx context.Context) error {
-
-		v, err := rc.resolveValueInternal(path)
+	if err := rc.logger.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
+		v, err := rc.resolveValueInternal(ctx, path)
 		if err != nil {
 			return err
 		}
@@ -222,7 +220,7 @@ func (rc *RuleContext) ResolveValue(path any) (any, error) {
 	return value, nil
 }
 
-func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
+func (rc *RuleContext) resolveValueInternal(ctx context.Context, path any) (any, error) {
 
 	node := &model.PathNode{
 		Type:    "resolve",
@@ -245,10 +243,12 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 	strPath = strPath[1:]
 	rc.TrackAccess(strPath)
 
+	logger := rc.logger
+
 	// Resolve dates first
 	dateValue, err := rc.resolveDate(strPath)
 	if err == nil && dateValue != nil {
-		logger.WithIndent().Debugf("Resolved date $%s: %v", strPath, dateValue)
+		logger.Debugf(ctx, "Resolved date $%s: %v", strPath, dateValue)
 		node.Result = dateValue
 		return dateValue, nil
 	}
@@ -258,13 +258,13 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 		parts := strings.SplitN(strPath, ".", 2)
 		root, rest := parts[0], parts[1]
 
-		rootValue, err := rc.ResolveValue("$" + root)
+		rootValue, err := rc.ResolveValue(ctx, "$"+root)
 		if err != nil {
 			return nil, err
 		}
 
 		if rootValue == nil {
-			logger.WithIndent().Warningf("Value is nil, could not resolve value $%s: nil", strPath)
+			logger.Warningf(ctx, "Value is nil, could not resolve value $%s: nil", strPath)
 			node.Result = nil
 			return nil, nil
 		}
@@ -280,7 +280,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 			}
 
 			if currentValue == nil {
-				logger.WithIndent().Warningf("Value is nil, could not resolve nested path $%s.%s", root, rest)
+				logger.Warningf(ctx, "Value is nil, could not resolve nested path $%s.%s", root, rest)
 				node.Result = nil
 				return nil, nil
 			}
@@ -289,7 +289,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 			if rValue.Kind() == reflect.Map {
 				mapValue := rValue.MapIndex(reflect.ValueOf(part))
 				if !mapValue.IsValid() {
-					logger.WithIndent().Warningf("Key %s not found in map, could not resolve value $%s", part, strPath)
+					logger.Warningf(ctx, "Key %s not found in map, could not resolve value $%s", part, strPath)
 					node.Result = nil
 					return nil, nil
 				}
@@ -302,7 +302,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 					// Handle struct
 					field = rValue.FieldByName(part)
 					if !field.IsValid() {
-						logger.WithIndent().Warningf("Field %s not found in struct, could not resolve value $%s", part, strPath)
+						logger.Warningf(ctx, "Field %s not found in struct, could not resolve value $%s", part, strPath)
 						node.Result = nil
 						return nil, nil
 					}
@@ -334,13 +334,13 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 				currentValue = field.Interface()
 			} else {
-				logger.WithIndent().Warningf("Value is not map or struct, could not resolve value $%s", strPath)
+				logger.Warningf(ctx, "Value is not map or struct, could not resolve value $%s", strPath)
 				node.Result = nil
 				return nil, nil
 			}
 		}
 
-		logger.WithIndent().Debugf("Resolved value $%s: %v", strPath, currentValue)
+		logger.Debugf(ctx, "Resolved value $%s: %v", strPath, currentValue)
 		node.Result = currentValue
 		return currentValue, nil
 	}
@@ -349,7 +349,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 	if rc.Claims != nil {
 		if claim, exists := rc.Claims[strPath]; exists {
 			value := claim.NewValue
-			logger.WithIndent().Debugf("Resolving from CLAIM: %v", value)
+			logger.Debugf(ctx, "Resolving from CLAIM: %v", value)
 			node.Result = value
 			node.ResolveType = "CLAIM"
 
@@ -370,7 +370,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 	// Check local scope
 	if value, exists := rc.Local[strPath]; exists {
-		logger.WithIndent().Debugf("Resolving from LOCAL: %v", value)
+		logger.Debugf(ctx, "Resolving from LOCAL: %v", value)
 		node.Result = value
 		node.ResolveType = "LOCAL"
 		return value, nil
@@ -378,7 +378,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 	// Check definitions
 	if value, exists := rc.Definitions[strPath]; exists {
-		logger.WithIndent().Debugf("Resolving from DEFINITION: %v", value)
+		logger.Debugf(ctx, "Resolving from DEFINITION: %v", value)
 		node.Result = value
 		node.ResolveType = "DEFINITION"
 		return value, nil
@@ -386,7 +386,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 	// Check parameters
 	if value, exists := rc.Parameters[strPath]; exists {
-		logger.WithIndent().Debugf("Resolving from PARAMETERS: %v", value)
+		logger.Debugf(ctx, "Resolving from PARAMETERS: %v", value)
 		node.Result = value
 		node.ResolveType = "PARAMETER"
 		return value, nil
@@ -394,7 +394,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 	// Check outputs
 	if value, exists := rc.Outputs[strPath]; exists {
-		logger.WithIndent().Debugf("Resolving from previous OUTPUT: %v", value)
+		logger.Debugf(ctx, "Resolving from previous OUTPUT: %v", value)
 		node.Result = value
 		node.ResolveType = "OUTPUT"
 		return value, nil
@@ -410,7 +410,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 			if hasService && hasField && rc.OverwriteInput != nil {
 				if serviceOverwrites, ok := rc.OverwriteInput[serviceName]; ok {
 					if value, ok := serviceOverwrites[fieldName]; ok {
-						logger.WithIndent().Debugf("Resolving from OVERWRITE: %v", value)
+						logger.Debugf(ctx, "Resolving from OVERWRITE: %v", value)
 						node.Result = value
 						node.ResolveType = "OVERWRITE"
 						return value, nil
@@ -421,9 +421,9 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 		// Check sources
 		if sourceRef, ok := spec["source_reference"].(map[string]any); ok {
-			value, err := rc.resolveFromSource(sourceRef, spec)
+			value, err := rc.resolveFromSource(ctx, sourceRef, spec)
 			if err != nil {
-				logger.WithIndent().Debugf("Resolving from source: %s", err)
+				logger.Debugf(ctx, "Resolving from source: %s", err)
 			}
 
 			if err == nil && value != nil {
@@ -439,7 +439,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 					node.Details["type_spec"] = typeSpec
 				}
 
-				logger.WithIndent().Debugf("Resolving from SOURCE %v: %v", sourceRef["table"], value)
+				logger.Debugf(ctx, "Resolving from SOURCE %v: %v", sourceRef["table"], value)
 
 				return value, nil
 			}
@@ -447,9 +447,9 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 
 		// Check services
 		if serviceRef, ok := spec["service_reference"].(map[string]any); ok && rc.ServiceProvider != nil {
-			value, err := rc.resolveFromService(strPath, serviceRef, spec)
+			value, err := rc.resolveFromService(ctx, strPath, serviceRef, spec)
 			if err == nil {
-				logger.WithIndent().Debugf("Result for $%s from %s field %s: %v",
+				rc.logger.Debugf(ctx, "Result for $%s from %s field %s: %v",
 					strPath, serviceRef["service"], serviceRef["field"], value)
 				node.Result = value
 				node.ResolveType = "SERVICE"
@@ -482,7 +482,7 @@ func (rc *RuleContext) resolveValueInternal(path any) (any, error) {
 		}
 	}
 
-	logger.WithIndent().Warningf("Could not resolve value for %s", strPath)
+	logger.Warningf(ctx, "Could not resolve value for %s", strPath)
 	node.Result = nil
 	node.ResolveType = "NONE"
 
@@ -524,6 +524,7 @@ func (rc *RuleContext) resolveDate(path string) (any, error) {
 
 // resolveFromService resolves a value from a service
 func (rc *RuleContext) resolveFromService(
+	ctx context.Context,
 	path string,
 	serviceRef map[string]any,
 	spec map[string]any) (any, error) {
@@ -542,7 +543,7 @@ func (rc *RuleContext) resolveFromService(
 				reference, hasRef := param["reference"].(string)
 
 				if hasName && hasRef {
-					value, err := rc.ResolveValue(reference)
+					value, err := rc.ResolveValue(ctx, reference)
 					if err != nil {
 						return nil, err
 					}
@@ -556,7 +557,7 @@ func (rc *RuleContext) resolveFromService(
 	referenceDate := rc.CalculationDate
 	if temporal, ok := spec["temporal"].(map[string]any); ok {
 		if reference, ok := temporal["reference"].(string); ok {
-			refDate, err := rc.ResolveValue(reference)
+			refDate, err := rc.ResolveValue(ctx, reference)
 			if err != nil {
 				return nil, err
 			}
@@ -590,7 +591,7 @@ func (rc *RuleContext) resolveFromService(
 
 	cacheKeyStr := cacheKey.String()
 	if cachedVal, exists := rc.ValuesCache[cacheKeyStr]; exists {
-		logger.WithIndent().Debugf("Resolving from CACHE with key '%s': %v", cacheKeyStr, cachedVal)
+		rc.logger.WithIndent().Debugf(ctx, "Resolving from CACHE with key '%s': %v", cacheKeyStr, cachedVal)
 		return cachedVal, nil
 	}
 
@@ -630,7 +631,7 @@ func (rc *RuleContext) resolveFromService(
 	}
 
 	result, err := rc.ServiceProvider.Evaluate(
-		context.TODO(),
+		ctx,
 		service,
 		law,
 		parameters,
@@ -659,6 +660,7 @@ func (rc *RuleContext) resolveFromService(
 
 // resolveFromSource resolves a value from a data source
 func (rc *RuleContext) resolveFromSource(
+	ctx context.Context,
 	sourceRef map[string]any,
 	spec map[string]any) (any, error) {
 
@@ -689,7 +691,7 @@ func (rc *RuleContext) resolveFromSource(
 				var caseID any
 				if caseIDRef, ok := sourceRef["case_id"].(string); ok {
 					var err error
-					caseID, err = rc.ResolveValue(caseIDRef)
+					caseID, err = rc.ResolveValue(ctx, caseIDRef)
 					if err != nil {
 						return nil, fmt.Errorf("failed to resolve case_id: %w", err)
 					}
@@ -730,7 +732,7 @@ func (rc *RuleContext) resolveFromSource(
 				valueRef, hasValue := cond["value"]
 
 				if hasName && hasValue {
-					value, err := rc.ResolveValue(valueRef)
+					value, err := rc.ResolveValue(ctx, valueRef)
 					if err != nil {
 						return nil, err
 					}
@@ -739,7 +741,7 @@ func (rc *RuleContext) resolveFromSource(
 					if valueMap, isMap := value.(map[string]any); isMap {
 						if op, hasOp := valueMap["operation"].(string); hasOp && op == "IN" {
 							if valuesRef, hasValues := valueMap["values"]; hasValues {
-								allowedValues, err := rc.ResolveValue(valuesRef)
+								allowedValues, err := rc.ResolveValue(ctx, valuesRef)
 								if err != nil {
 									return nil, err
 								}
@@ -774,7 +776,7 @@ func (rc *RuleContext) resolveFromSource(
 		}
 
 		if len(missingFields) > 0 {
-			logger.WithIndent().Warningf("Fields %v not found in source for table %s", missingFields, tableName)
+			rc.logger.WithIndent().Warningf(ctx, "Fields %v not found in source for table %s", missingFields, tableName)
 		}
 
 		// Get existing fields
@@ -788,7 +790,7 @@ func (rc *RuleContext) resolveFromSource(
 		result = df.Select(existingFields).ToRecords()
 	} else if field, ok := sourceRef["field"].(string); ok {
 		if !df.HasColumn(field) {
-			logger.WithIndent().Warningf("Field %s not found in source for table %s", field, tableName)
+			rc.logger.WithIndent().Warningf(ctx, "Field %s not found in source for table %s", field, tableName)
 			return nil, nil
 		}
 		result = df.GetColumnValues(field)

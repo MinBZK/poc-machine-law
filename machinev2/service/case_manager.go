@@ -25,6 +25,7 @@ import (
 
 // CaseManager manages service cases using the EventHorizon-based casemanager.
 type CaseManager struct {
+	logger      logging.Logger
 	Services    *Services
 	caseIndex   map[string]uuid.UUID // Maps (bsn:service:law) -> case_id
 	events      []*model.Event
@@ -38,7 +39,7 @@ type CaseManager struct {
 }
 
 // NewCaseManager creates a new case manager with EventHorizon components.
-func NewCaseManager(services *Services) *CaseManager {
+func NewCaseManager(logger logging.Logger, services *Services) *CaseManager {
 	// Create the event buses
 	eventBus := localEventBus.NewEventBus()
 	observerBus := localEventBus.NewEventBus()
@@ -77,6 +78,7 @@ func NewCaseManager(services *Services) *CaseManager {
 	}
 
 	return &CaseManager{
+		logger:      logger.WithName("case_manager"),
 		Services:    services,
 		caseIndex:   make(map[string]uuid.UUID),
 		events:      make([]*model.Event, 0),
@@ -117,8 +119,9 @@ func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[
 	cm.wg.Add(1)
 	// Trigger rules in response to event
 	go func() {
-		if err := cm.Services.ApplyRules(context.Background(), event); err != nil {
-			logging.GetLogger("case_manager").WithIndent().Errorf("Error applying rules: %v", err)
+		ctx := context.Background()
+		if err := cm.Services.ApplyRules(ctx, event); err != nil {
+			cm.logger.WithIndent().Errorf(ctx, "Error applying rules: %v", err)
 		}
 
 		cm.wg.Done()

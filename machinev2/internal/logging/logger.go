@@ -3,249 +3,303 @@ package logging
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
-	"sync"
+
+	"maps"
 
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
-	loggers = make(map[string]*Logger)
+var _ Logger = &LoggerImpl{}
+
+// Logger interface defines the logging methods
+type Logger interface {
+	Debug(ctx context.Context, msg string, fields ...Field)
+	Info(ctx context.Context, msg string, fields ...Field)
+	Warning(ctx context.Context, msg string, fields ...Field)
+	Error(ctx context.Context, msg string, fields ...Field)
+	Debugf(ctx context.Context, format string, args ...any)
+	Infof(ctx context.Context, format string, args ...any)
+	Warningf(ctx context.Context, format string, args ...any)
+	Errorf(ctx context.Context, format string, args ...any)
+	WithName(name string) Logger
+	WithService(service string) Logger
+	WithLaw(law string) Logger
+	WithField(key string, value any) Logger
+	WithFields(fields ...Field) Logger
+	WithIndent() Logger
+	IndentBlock(ctx context.Context, msg string, fn func(context.Context) error, op ...Options) error
 }
 
-// Increase increments the indentation level
-func (g *GlobalIndent) Increase(doubleLine bool) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
+type Options func(l *LoggerImpl) error
 
-	g.Level++
-	g.ActiveBranches[g.Level-1] = true
-	if doubleLine {
-		g.DoubleLines[g.Level-1] = true
+func OptionWithDoubleLine(l *LoggerImpl) error {
+	l.doubleLine = true
+	return nil
+}
+
+// Field represents a key-value pair for structured logging
+type Field struct {
+	Key   string
+	Value interface{}
+}
+
+// LoggerImpl is the concrete implementation of Logger
+type LoggerImpl struct {
+	logger     *logrus.Logger
+	name       string
+	service    string
+	law        string
+	fields     logrus.Fields
+	indentLvl  int
+	doubleLine bool
+}
+
+// New creates a new logger instance
+func New(name string, output io.Writer, level logrus.Level) *LoggerImpl {
+	l := logrus.New()
+	l.SetOutput(output)
+	l.SetLevel(level)
+	l.SetFormatter(&logrus.TextFormatter{
+		ForceColors:      true,
+		DisableColors:    false,
+		DisableTimestamp: false,
+		FullTimestamp:    false,
+		ForceQuote:       true,
+	})
+
+	return &LoggerImpl{
+		logger: l,
+		name:   name,
+		fields: make(logrus.Fields),
 	}
 }
 
-// Decrease decrements the indentation level
-func (g *GlobalIndent) Decrease() {
-	g.mu.Lock()
-	defer g.mu.Unlock()
+// getIndent generates the indentation string with proper tree structure
+func (l *LoggerImpl) getIndent(ctx context.Context) string {
+	other := FromContext(ctx).(*LoggerImpl)
 
-	if g.Level > 0 {
-		delete(g.ActiveBranches, g.Level-1)
-		delete(g.DoubleLines, g.Level-1)
-		g.Level--
-	}
-}
+	total := l.indentLvl + other.indentLvl
 
-// GetIndent returns the current indentation string
-func (g *GlobalIndent) GetIndent() string {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
-	if g.Level == 0 {
+	if total == 0 {
 		return ""
 	}
 
-	var result string
+	var indent string
 
-	// For all levels except current, show pipe only if level is still active
-	for i := 0; i < g.Level-1; i++ {
-		if _, active := g.ActiveBranches[i]; active {
-			chars := SingleTreeChars
-			if _, isDouble := g.DoubleLines[i]; isDouble {
-				chars = DoubleTreeChars
+	for i := range total {
+		if l.doubleLine {
+
+			if i == total-1 {
+				indent += string(BranchDouble)
+			} else {
+				indent += string(PipeDouble)
 			}
-			result += chars.Pipe + chars.Space
-		} else {
-			result += "    "
 		}
+
+		if i == total-1 {
+			indent += string(BranchSingle)
+		} else {
+			indent += string(PipeSingle)
+		}
+
+		indent += " "
 	}
 
-	// For current level, use leaf if not active (end of block)
-	chars := SingleTreeChars
-	if _, isDouble := g.DoubleLines[g.Level-1]; isDouble {
-		chars = DoubleTreeChars
-	}
-
-	_, isEnd := g.ActiveBranches[g.Level-1]
-	if !isEnd {
-		result += chars.Leaf
-	} else {
-		result += chars.Branch
-	}
-
-	return result
+	return indent
 }
 
-// IndentLogger provides indented logging functionality
-type Logger struct {
-	logger *logrus.Logger
-	name   string
-}
-
-// IndentEntry is a wrapper around a log entry with indentation
-type IndentEntry struct {
-	entry *logrus.Entry
-}
-
-var messagesFile *os.File
-
-func messages() *os.File {
-	if messagesFile == nil {
-		messagesFile, _ = os.Create("tests.out")
-	}
-	return messagesFile
-}
-
-func init() {
-	ConfigureLogging("debug")
-}
-
-// NewLogger creates a new IndentLogger
-func NewLogger(name string) *Logger {
-	logger := logrus.New()
-	logger.SetFormatter(&logrus.TextFormatter{
-		DisableTimestamp: false,
-		FullTimestamp:    true,
-		ForceColors:      false,
-	})
-
-	logger.SetOutput(messages())
-
-	return &Logger{
-		logger: logger,
-		name:   name,
-	}
-}
-
-// WithIndent returns an IndentEntry with indentation
-func (l *Logger) WithIndent() *IndentEntry {
-	entry := l.logger.WithField("component", l.name)
-	return &IndentEntry{entry: entry}
-}
-
-// SetLevel sets the logging level
-func (l *Logger) SetLevel(level logrus.Level) {
-	l.logger.SetLevel(level)
+// Debug logs a debug message with indentation
+func (l *LoggerImpl) Debug(ctx context.Context, msg string, fields ...Field) {
+	entry := l.createEntry(fields...)
+	entry.Debug(l.getIndent(ctx) + msg)
 }
 
 // Debugf logs a debug message with indentation
-func (e *IndentEntry) Debugf(format string, args ...any) {
-	e.entry.Debugf("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
+func (l *LoggerImpl) Debugf(ctx context.Context, format string, args ...any) {
+
+	entry := l.createEntry()
+	entry.Debug(l.getIndent(ctx) + fmt.Sprintf(format, args...))
 }
 
-// Infof logs an info message with indentation
-func (e *IndentEntry) Infof(format string, args ...any) {
-	e.entry.Infof("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
+// Info logs an info message with indentation
+func (l *LoggerImpl) Info(ctx context.Context, msg string, fields ...Field) {
+	entry := l.createEntry(fields...)
+	entry.Info(l.getIndent(ctx) + msg)
 }
 
-// Warningf logs a warning message with indentation
-func (e *IndentEntry) Warningf(format string, args ...any) {
-	e.entry.Warnf("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
+// Infof logs a debug message with indentation
+func (l *LoggerImpl) Infof(ctx context.Context, format string, args ...any) {
+	entry := l.createEntry()
+	entry.Info(l.getIndent(ctx) + fmt.Sprintf(format, args...))
 }
 
-// Errorf logs an error message with indentation
-func (e *IndentEntry) Errorf(format string, args ...any) {
-	e.entry.Errorf("%s %s", global.GetIndent(), fmt.Sprintf(format, args...))
+// Warning logs a warning message with indentation
+func (l *LoggerImpl) Warning(ctx context.Context, msg string, fields ...Field) {
+	entry := l.createEntry(fields...)
+	entry.Warn(l.getIndent(ctx) + msg)
 }
 
-// GetLogger returns a logger for the given name
-func GetLogger(name string) *Logger {
-	loggersMutex.Lock()
-	defer loggersMutex.Unlock()
+// Warningf logs a debug message with indentation
+func (l *LoggerImpl) Warningf(ctx context.Context, format string, args ...any) {
+	entry := l.createEntry()
+	entry.Warn(l.getIndent(ctx) + fmt.Sprintf(format, args...))
+}
 
-	if logger, exists := loggers[name]; exists {
+// Error logs an error message with indentation
+func (l *LoggerImpl) Error(ctx context.Context, msg string, fields ...Field) {
+	entry := l.createEntry(fields...)
+	entry.Error(l.getIndent(ctx) + msg)
+}
+
+// Errorf logs a debug message with indentation
+func (l *LoggerImpl) Errorf(ctx context.Context, format string, args ...any) {
+	entry := l.createEntry()
+	entry.Error(l.getIndent(ctx) + fmt.Sprintf(format, args...))
+}
+
+func (l *LoggerImpl) WithName(name string) Logger {
+	other := copyLogger(l)
+	other.name = name
+
+	return other
+}
+
+func (l *LoggerImpl) WithService(service string) Logger {
+	other := copyLogger(l)
+	other.service = service
+
+	return other
+}
+
+func (l *LoggerImpl) WithLaw(law string) Logger {
+	other := copyLogger(l)
+	other.law = law
+
+	return other
+}
+
+// WithField returns a new logger with an additional field
+func (l *LoggerImpl) WithField(key string, value interface{}) Logger {
+	newFields := make(logrus.Fields, len(l.fields)+1)
+	maps.Copy(newFields, l.fields)
+
+	newFields[key] = value
+
+	other := copyLogger(l)
+	other.fields = newFields
+
+	return other
+}
+
+// WithFields returns a new logger with additional fields
+func (l *LoggerImpl) WithFields(fields ...Field) Logger {
+	newFields := make(logrus.Fields, len(l.fields)+len(fields))
+	maps.Copy(newFields, l.fields)
+
+	for _, f := range fields {
+		newFields[f.Key] = f.Value
+	}
+
+	other := copyLogger(l)
+	other.fields = newFields
+
+	return other
+}
+
+// WithIndent returns a new logger with increased indentation level
+func (l *LoggerImpl) WithIndent() Logger {
+	return l.WithIndentValue(1)
+}
+
+// WithIndent returns a new logger with increased indentation level
+func (l *LoggerImpl) WithIndentValue(v int) Logger {
+	other := copyLogger(l)
+	other.indentLvl += v
+
+	return other
+}
+
+// IndentBlock executes a function within an indented logging block
+func (l *LoggerImpl) IndentBlock(ctx context.Context, msg string, fn func(context.Context) error, options ...Options) error {
+	for _, option := range options {
+		option(l)
+	}
+
+	if msg != "" {
+		l.Info(ctx, msg)
+	}
+
+	other := FromContext(ctx).(*LoggerImpl)
+
+	return fn(WithLogger(ctx, l.WithIndentValue(1+other.indentLvl)))
+}
+
+// createEntry creates a logrus entry with all fields and context values
+func (l *LoggerImpl) createEntry(fields ...Field) *logrus.Entry {
+	allFields := make(logrus.Fields, len(l.fields)+len(fields)+1)
+	maps.Copy(allFields, l.fields)
+
+	// Add component name
+	allFields["component"] = l.name
+
+	if l.service != "" {
+		allFields["service"] = l.service
+	}
+
+	if l.law != "" {
+		allFields["law"] = l.law
+	}
+
+	// Add immediate fields
+	for _, f := range fields {
+		allFields[f.Key] = f.Value
+	}
+
+	return l.logger.WithFields(allFields)
+}
+
+func copyLogger(l *LoggerImpl) *LoggerImpl {
+	return &LoggerImpl{
+		logger:    l.logger,
+		name:      l.name,
+		service:   l.service,
+		law:       l.law,
+		indentLvl: l.indentLvl,
+	}
+}
+
+// contextKey is a private type for context keys
+type contextKey struct{}
+
+var loggerKey = &contextKey{}
+
+// WithLogger adds a logger to the context
+func WithLogger(ctx context.Context, logger Logger) context.Context {
+	return context.WithValue(ctx, loggerKey, logger)
+}
+
+// FromContext retrieves the logger from context
+func FromContext(ctx context.Context) Logger {
+	if logger, ok := ctx.Value(loggerKey).(Logger); ok {
 		return logger
 	}
 
-	logger := NewLogger(name)
-	loggers[name] = logger
-	return logger
+	// Return a default logger if none is found in context
+	return New("default", os.Stdout, logrus.InfoLevel)
 }
 
-// IndentBlock executes a function within an indented block
-func IndentBlock(ctx context.Context, initialMessage string, doubleLine bool, fn func(context.Context) error) error {
-	logger := GetLogger("system")
+type TreeChar string
 
-	if initialMessage != "" {
-		logger.WithIndent().Debugf("%s", initialMessage)
-	}
+const (
+	PipeSingle   TreeChar = "│  "
+	BranchSingle TreeChar = "├──"
+	LeafSingle   TreeChar = "└──"
 
-	global.Increase(doubleLine)
-	defer global.Decrease()
+	PipeDouble   TreeChar = "║  "
+	BranchDouble TreeChar = "║──"
+	LeadDouble   TreeChar = "╚══"
 
-	return fn(ctx)
-}
-
-// ConfigureLogging sets up logging with the specified level
-func ConfigureLogging(level string) {
-	// Parse level string
-	logLevel := logrus.InfoLevel
-	switch level {
-	case "debug":
-		logLevel = logrus.DebugLevel
-	case "info":
-		logLevel = logrus.InfoLevel
-	case "warn", "warning":
-		logLevel = logrus.WarnLevel
-	case "error":
-		logLevel = logrus.ErrorLevel
-	}
-
-	// Configure loggers
-	logComponents := []string{
-		"rules_engine",
-		"service",
-		"rule_context",
-		"logger",
-		"system",
-		"context",
-	}
-
-	for _, component := range logComponents {
-		logger := GetLogger(component)
-		logger.SetLevel(logLevel)
-	}
-}
-
-// GlobalIndent manages indentation globally across threads
-type GlobalIndent struct {
-	Level          int
-	ActiveBranches map[int]bool
-	DoubleLines    map[int]bool
-	mu             sync.Mutex
-}
-
-// TreeChars defines characters used for tree-like output
-type TreeChars struct {
-	Pipe   string
-	Branch string
-	Leaf   string
-	Space  string
-}
-
-var (
-	global = &GlobalIndent{
-		Level:          0,
-		ActiveBranches: make(map[int]bool),
-		DoubleLines:    make(map[int]bool),
-		mu:             sync.Mutex{},
-	}
-
-	SingleTreeChars = TreeChars{
-		Pipe:   "│",
-		Branch: "├──",
-		Leaf:   "└──",
-		Space:  "   ",
-	}
-
-	DoubleTreeChars = TreeChars{
-		Pipe:   "║",
-		Branch: "║──",
-		Leaf:   "╚══",
-		Space:  "   ",
-	}
-
-	loggers      map[string]*Logger
-	loggersMutex sync.Mutex
+	Space TreeChar = "   "
 )

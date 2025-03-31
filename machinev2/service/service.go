@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -12,12 +13,12 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/model"
+	"github.com/sirupsen/logrus"
 )
-
-var logger = logging.GetLogger("service")
 
 // RuleService interface for executing business rules for a specific service
 type RuleService struct {
+	logger           logging.Logger
 	ServiceName      string
 	Services         *Services
 	Resolver         *utils.RuleResolver
@@ -27,8 +28,9 @@ type RuleService struct {
 }
 
 // NewRuleService creates a new rule service instance
-func NewRuleService(serviceName string, services *Services) *RuleService {
+func NewRuleService(logger logging.Logger, serviceName string, services *Services) *RuleService {
 	return &RuleService{
+		logger:           logger.WithName("service"),
 		ServiceName:      serviceName,
 		Services:         services,
 		Resolver:         utils.NewRuleResolver(),
@@ -64,7 +66,7 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 		)
 	}
 
-	ruleEngine := engine.NewRulesEngine(spec, rs.Services, referenceDate)
+	ruleEngine := engine.NewRulesEngine(rs.logger, spec, rs.Services, referenceDate)
 	rs.engines[law][referenceDate] = ruleEngine
 
 	return ruleEngine, nil
@@ -129,6 +131,7 @@ func (rs *RuleService) SetSourceDataFrame(table string, df model.DataFrame) {
 
 // Services is the main service provider for rule evaluation
 type Services struct {
+	logger            logging.Logger
 	Resolver          *utils.RuleResolver
 	services          map[string]*RuleService
 	RootReferenceDate string
@@ -140,6 +143,7 @@ type Services struct {
 // NewServices creates a new services instance
 func NewServices(referenceDate time.Time) *Services {
 	s := &Services{
+		logger:            logging.New("service", os.Stdout, logrus.DebugLevel),
 		Resolver:          utils.NewRuleResolver(),
 		services:          make(map[string]*RuleService),
 		RootReferenceDate: referenceDate.Format("2006-01-02"),
@@ -147,11 +151,11 @@ func NewServices(referenceDate time.Time) *Services {
 
 	// Initialize services
 	for service := range s.Resolver.GetServiceLaws() {
-		s.services[service] = NewRuleService(service, s)
+		s.services[service] = NewRuleService(s.logger, service, s)
 	}
 
 	// Create managers
-	s.CaseManager = NewCaseManager(s)
+	s.CaseManager = NewCaseManager(s.logger, s)
 	s.ClaimManager = NewClaimManager(s)
 	s.ClaimManager.CaseManager = s.CaseManager
 
@@ -211,10 +215,10 @@ func (s *Services) Evaluate(
 	var result *model.RuleResult
 	var err error
 
-	err = logging.IndentBlock(
+	// TODO add double line into logger
+	err = s.logger.IndentBlock(
 		ctx,
 		fmt.Sprintf("%s: %s (%s %v %s)", service, law, referenceDate, parameters, requestedOutput),
-		true,
 		func(ctx context.Context) error {
 			result, err = svc.Evaluate(
 				ctx,
