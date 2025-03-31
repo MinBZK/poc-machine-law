@@ -4,4 +4,5 @@ use (
 	./features
 	./lac-to-regelspraak
 	./machinev2
+	./simulator
 )
