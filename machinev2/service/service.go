@@ -6,13 +6,12 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
-	internalContext "github.com/minbzk/poc-machine-law/machinev2/internal/context"
-	"github.com/minbzk/poc-machine-law/machinev2/internal/engine"
-	"github.com/minbzk/poc-machine-law/machinev2/internal/logging"
-	"github.com/minbzk/poc-machine-law/machinev2/internal/utils"
+	internalContext "github.com/minbzk/poc-machine-law/machinev2/context"
+	"github.com/minbzk/poc-machine-law/machinev2/engine"
+	"github.com/minbzk/poc-machine-law/machinev2/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/model"
+	"github.com/minbzk/poc-machine-law/machinev2/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -141,12 +140,12 @@ type Services struct {
 }
 
 // NewServices creates a new services instance
-func NewServices(referenceDate time.Time) *Services {
+func NewServices(referenceDate string) *Services {
 	s := &Services{
-		logger:            logging.New("service", os.Stdout, logrus.DebugLevel),
+		logger:            logging.New("service", os.Stdout, logrus.ErrorLevel),
 		Resolver:          utils.NewRuleResolver(),
 		services:          make(map[string]*RuleService),
-		RootReferenceDate: referenceDate.Format("2006-01-02"),
+		RootReferenceDate: referenceDate,
 	}
 
 	// Initialize services
@@ -168,8 +167,8 @@ func (s *Services) GetDiscoverableServiceLaws() map[string][]string {
 }
 
 // SetSourceDataFrame sets a source DataFrame for a service
-func (s *Services) SetSourceDataFrame(service, table string, df model.DataFrame) {
-	if srv, ok := s.services[service]; ok {
+func (s *Services) SetSourceDataFrame(svc, table string, df model.DataFrame) {
+	if srv, ok := s.services[svc]; ok {
 		srv.SetSourceDataFrame(table, df)
 	}
 }
@@ -189,10 +188,27 @@ func (s *Services) GetClaimManager() internalContext.ClaimManagerAccessor {
 	return s.ClaimManager
 }
 
+func (s *Services) EvaluateWithCtx(
+	svc string,
+	law string,
+	parameters map[string]any,
+) (*model.RuleResult, error) {
+	return s.Evaluate(
+		context.Background(),
+		svc,
+		law,
+		parameters,
+		"",
+		nil,
+		"",
+		false,
+	)
+}
+
 // Evaluate evaluates rules for a specific service, law, and context
 func (s *Services) Evaluate(
 	ctx context.Context,
-	service string,
+	svc string,
 	law string,
 	parameters map[string]any,
 	referenceDate string,
@@ -201,11 +217,11 @@ func (s *Services) Evaluate(
 	approved bool,
 ) (*model.RuleResult, error) {
 	s.mu.RLock()
-	svc, ok := s.services[service]
+	service, ok := s.services[svc]
 	s.mu.RUnlock()
 
 	if !ok {
-		return nil, fmt.Errorf("service not found: %s", service)
+		return nil, fmt.Errorf("service not found: %s", svc)
 	}
 
 	if referenceDate == "" {
@@ -218,9 +234,9 @@ func (s *Services) Evaluate(
 	// TODO add double line into logger
 	err = s.logger.IndentBlock(
 		ctx,
-		fmt.Sprintf("%s: %s (%s %v %s)", service, law, referenceDate, parameters, requestedOutput),
+		fmt.Sprintf("%s: %s (%s %v %s)", svc, law, referenceDate, parameters, requestedOutput),
 		func(ctx context.Context) error {
-			result, err = svc.Evaluate(
+			result, err = service.Evaluate(
 				ctx,
 				law,
 				referenceDate,

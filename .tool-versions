@@ -1,3 +1,4 @@
 uv         0.5.6
 pre-commit 4.0.1
 golang     1.24.1
+python 3.13

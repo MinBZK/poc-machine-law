@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/service"
 	"github.com/sirupsen/logrus"
 )
@@ -23,8 +23,7 @@ func main() {
 	ctx := context.Background()
 
 	// Initialize services with current date
-	currentDate := time.Now()
-	services := service.NewServices(currentDate)
+	services := service.NewServices(time.Now().Format("2006-01-02"))
 
 	logger.Infof(ctx, "Direct rules engine evaluation example:")
 

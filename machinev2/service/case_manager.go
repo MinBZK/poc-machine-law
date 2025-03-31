@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/casemanager"
-	"github.com/minbzk/poc-machine-law/machinev2/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/model"
 
 	"maps"

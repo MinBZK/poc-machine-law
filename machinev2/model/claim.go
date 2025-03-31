@@ -46,7 +46,7 @@ type Claim struct {
 
 // NewClaim creates a new Claim
 func NewClaim(
-	service string,
+	svc string,
 	key string,
 	newValue any,
 	reason string,
@@ -59,7 +59,7 @@ func NewClaim(
 ) *Claim {
 	return &Claim{
 		ID:           uuid.New().String(),
-		Service:      service,
+		Service:      svc,
 		Key:          key,
 		OldValue:     oldValue,
 		NewValue:     newValue,
@@ -76,7 +76,7 @@ func NewClaim(
 
 // Reset resets a claim with new values
 func (c *Claim) Reset(
-	service string,
+	svc string,
 	key string,
 	newValue any,
 	reason string,
@@ -87,7 +87,7 @@ func (c *Claim) Reset(
 	oldValue any,
 	evidencePath string,
 ) {
-	c.Service = service
+	c.Service = svc
 	c.Key = key
 	c.OldValue = oldValue
 	c.NewValue = newValue

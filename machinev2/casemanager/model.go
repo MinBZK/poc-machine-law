@@ -56,7 +56,7 @@ type Case struct {
 // NewCase creates a new Case
 func NewCase(
 	bsn string,
-	service string,
+	svc string,
 	law string,
 	parameters map[string]any,
 	claimedResult map[string]any,
@@ -69,7 +69,7 @@ func NewCase(
 		ID:                 uuid.New(),
 		Version:            0,
 		BSN:                bsn,
-		Service:            service,
+		Service:            svc,
 		Law:                law,
 		RulespecID:         rulespecUUID,
 		ApprovedClaimsOnly: approvedClaimsOnly,
