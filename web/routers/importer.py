@@ -20,12 +20,20 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Command, interrupt
+from langchain_ollama import ChatOllama
 
 router = APIRouter(prefix="/importer", tags=["importer"])
 
 
-model = ChatAnthropic(
-    model="claude-3-5-sonnet-latest",
+# model = ChatAnthropic(
+#     model="deepseek-r1",
+#     temperature=0,
+#     max_retries=2,
+#     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
+# )
+
+model = ChatOllama(
+    model="deepseek-r1",
     temperature=0,
     max_retries=2,
     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
