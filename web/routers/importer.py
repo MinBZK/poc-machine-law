@@ -417,12 +417,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     if "```yaml" in chunk_content_so_far:
                         contains_yaml = True
 
-                # If the chunk contains response_metadata.stop_reason "max_tokens", then add a quick reply to continue
+                # Give quick responses based on the stop reason. Note: Anthropic responses only contain "stop_reason": "end_turn", but Ollama metadata contains "stop": True/False and "stop_reason": "stop"
                 quick_replies = []
-                stop_reason = chunk.response_metadata.get("stop_reason")
+                stop_reason = chunk.response_metadata.get("stop_reason") or chunk.response_metadata.get("done_reason")
                 if stop_reason == "max_tokens":
                     quick_replies = ["Ga door"]
-                elif contains_yaml and stop_reason == "end_turn":
+                elif contains_yaml and (stop_reason == "end_turn" or stop_reason == "stop"):
                     quick_replies = ["Analyseer deze YAML-code"]
 
                 await manager.send_message(
