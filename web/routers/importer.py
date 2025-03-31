@@ -26,14 +26,14 @@ router = APIRouter(prefix="/importer", tags=["importer"])
 
 
 # model = ChatAnthropic(
-#     model="deepseek-r1",
+#     model="claude-3-7-sonnet-latest",
 #     temperature=0,
 #     max_retries=2,
 #     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
 # )
 
 model = ChatOllama(
-    model="deepseek-r1",
+    model="qwen2.5",
     temperature=0,
     max_retries=2,
     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
