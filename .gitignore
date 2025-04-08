@@ -17,6 +17,8 @@ wheels/
 
 # simulation
 simulation_results.csv
+simulation_summary.txt
+
 *.out
 .aider*
 .env
