@@ -1,0 +1,297 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: 9efb5a21-3fe8-4b7c-a2e1-7890da6341fb
+name: Vertegenwoordiging en machtigingen
+law: wet_vertegenwoordiging
+valid_from: 2024-01-01
+service: "JenV"
+discoverable: "CITIZEN"
+description: >
+  Regels voor het bepalen van vertegenwoordigingsrelaties volgens de Wet Vertegenwoordiging.
+  Dit omvat wettelijke vertegenwoordiging voor wilsonbekwame personen, curatele, bewind,
+  mentorschap en andere vormen van machtiging voor het handelen namens anderen bij overheidsdiensten.
+
+references:
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "Titel 16 - Curatele"
+    url: "https://wetten.overheid.nl/BWBR0002656/2020-01-01#Boek1_Titeldeel16"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "Titel 19 - Onderbewindstelling ter bescherming van meerderjarigen"
+    url: "https://wetten.overheid.nl/BWBR0002656/2020-01-01#Boek1_Titeldeel19"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "Titel 20 - Mentorschap ten behoeve van meerderjarigen"
+    url: "https://wetten.overheid.nl/BWBR0002656/2020-01-01#Boek1_Titeldeel20"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "PERSON_STATUS"
+      description: "Status van de persoon m.b.t. wilsbekwaamheid"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "wilsbekwaamheid"
+        field: "status"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "LEGAL_REPRESENTATIVES"
+      description: "Wettelijke vertegenwoordigers van de persoon"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "vertegenwoordiging"
+        field: "vertegenwoordigers"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "REPRESENTATION_TYPE"
+      description: "Type vertegenwoordiging"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "vertegenwoordiging"
+        field: "type"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "REPRESENTING_FOR"
+      description: "Personen voor wie de huidige persoon als vertegenwoordiger optreedt"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "vertegenwoordiging"
+        field: "vertegenwoordigt_voor"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "CHILDREN_DATA"
+      description: "Gegevens van de kinderen van de persoon"
+      type: "array"
+      source_reference:
+        table: "relaties"
+        field: "children"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BIRTH_DATE"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "personen"
+        field: "geboortedatum"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "is_wilsonbekwaam"
+      description: "Is de persoon wilsonbekwaam volgens het register"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "has_legal_representative"
+      description: "Heeft de persoon een wettelijke vertegenwoordiger"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "legal_representatives"
+      description: "BSNs van vertegenwoordigers van deze persoon"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "representation_type"
+      description: "Type vertegenwoordiging (curatele, bewind, mentorschap, ouderlijk gezag, etc.)"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "is_representative_for"
+      description: "Is deze persoon vertegenwoordiger voor anderen"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "representing_bsns"
+      description: "BSNs van personen voor wie deze persoon vertegenwoordiger is"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "representing_details"
+      description: "Details over vertegenwoordigingsrelaties"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "parent_of_minor"
+      description: "Is deze persoon ouder van een minderjarig kind (automatische vertegenwoordiging)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "minor_children"
+      description: "Minderjarige kinderen van deze persoon"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    WILSONBEKWAAM_STATUSSEN:
+      - "WILSONBEKWAAM"
+      - "GEDEELTELIJK_WILSONBEKWAAM"
+    REPRESENTATION_TYPES:
+      - "CURATELE"
+      - "BEWIND"
+      - "MENTORSCHAP"
+      - "OUDERLIJK_GEZAG"
+      - "ALGEMENE_MACHTIGING"
+      - "SPECIFIEKE_MACHTIGING"
+    LEGAL_ADULT_AGE: 18
+
+requirements:
+  - all:
+      - subject: "$BSN"
+        operation: NOT_NULL
+
+actions:
+  - output: "is_wilsonbekwaam"
+    subject: "$PERSON_STATUS"
+    operation: IN
+    values: "$WILSONBEKWAAM_STATUSSEN"
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16"
+
+  - output: "has_legal_representative"
+    operation: NOT_EQUALS
+    subject: "$LEGAL_REPRESENTATIVES"
+    value: null
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16, 19, 20"
+
+  - output: "legal_representatives"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$LEGAL_REPRESENTATIVES"
+          operation: NOT_NULL
+        then: "$LEGAL_REPRESENTATIVES"
+      - else: []
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16, 19, 20"
+
+  - output: "representation_type"
+    value: "$REPRESENTATION_TYPE"
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16, 19, 20"
+
+  - output: "is_representative_for"
+    operation: NOT_EQUALS
+    subject: "$REPRESENTING_FOR"
+    value: null
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16, 19, 20"
+
+  - output: "representing_bsns"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$REPRESENTING_FOR"
+          operation: NOT_NULL
+        then:
+          operation: FOREACH
+          subject: "$REPRESENTING_FOR"
+          value: "$item.bsn"
+      - else: []
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16, 19, 20"
+
+  - output: "representing_details"
+    value: "$REPRESENTING_FOR"
+    reference: "Burgerlijk Wetboek Boek 1, Titel 16, 19, 20"
+
+  - output: "parent_of_minor"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$CHILDREN_DATA"
+          operation: NOT_NULL
+        then:
+          operation: EXISTS
+          subject: "$CHILDREN_DATA"
+          value:
+            operation: LESS_THAN
+            values:
+              - operation: SUBTRACT_DATE
+                unit: "years"
+                values:
+                  - "$calculation_date"
+                  - "$item.geboortedatum"
+              - "$LEGAL_ADULT_AGE"
+      - else: false
+    reference: "Burgerlijk Wetboek Boek 1, Titel 14"
+
+  - output: "minor_children"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$CHILDREN_DATA"
+          operation: NOT_NULL
+        then:
+          operation: FOREACH
+          subject: "$CHILDREN_DATA"
+          combine: "ADD"
+          value:
+            operation: IF
+            conditions:
+              - test:
+                  operation: LESS_THAN
+                  values:
+                    - operation: SUBTRACT_DATE
+                      unit: "years"
+                      values:
+                        - "$calculation_date"
+                        - "$item.geboortedatum"
+                    - "$LEGAL_ADULT_AGE"
+                then: "$item"
+              - else: null
+      - else: []
+    reference: "Burgerlijk Wetboek Boek 1, Titel 14"
