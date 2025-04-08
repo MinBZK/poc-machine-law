@@ -38,6 +38,31 @@
     law: LawNode,
   };
 
+  // Batch size for rendering nodes and edges
+  const BATCH_SIZE = 50; // Adjust this based on testing in Safari
+  let allNodes: Node[] = [];
+  let allEdges: Edge[] = [];
+  let currentIndex = 0;
+
+  // Function to add nodes and edges in batches
+  function addBatch() {
+    const nextNodes = allNodes.slice(currentIndex, currentIndex + BATCH_SIZE);
+    const nextEdges = allEdges.filter(edge =>
+      nextNodes.some(node => node.id === edge.source || node.id === edge.target)
+    );
+
+    // Add the batch to the existing nodes and edges
+    nodes.update(currentNodes => [...currentNodes, ...nextNodes]);
+    edges.update(currentEdges => [...currentEdges, ...nextEdges]);
+
+    currentIndex += BATCH_SIZE;
+
+    // Continue adding batches if there are more nodes to process
+    if (currentIndex < allNodes.length) {
+      requestAnimationFrame(addBatch);
+    }
+  }
+
   (async () => {
     try {
       // Fetch the available laws from the backend
@@ -224,11 +249,12 @@
         }
       }
 
-      // Add the nodes to the graph
-      $nodes = ns;
+      // Store all nodes and edges
+      allNodes = ns;
+      allEdges = es;
 
-      // Add the edges to the graph
-      $edges = es;
+      // Start rendering in batches
+      addBatch();
     } catch (error) {
       console.error('Error reading file', error);
     }
@@ -240,10 +266,10 @@
       const node = event.detail.node;
 
       // Remove the node and all its children (using ID prefix matching)
-      $nodes = $nodes.filter((n) => !n.id.startsWith(node.id));
+      nodes.update(currentNodes => currentNodes.filter((n) => !n.id.startsWith(node.id)));
 
       // Remove all edges connected to the removed nodes
-      $edges = $edges.filter((e) => !e.source.startsWith(node.id) && !e.target.startsWith(node.id));
+      edges.update(currentEdges => currentEdges.filter((e) => !e.source.startsWith(node.id) && !e.target.startsWith(node.id)));
     }
   }
 </script>
@@ -252,10 +278,6 @@
   <title>Dependency graph — Digilab</title>
 </svelte:head>
 
-<!--
-👇 By default, the Svelte Flow container has a height of 100%.
-This means that the parent container needs a height to render the flow.
--->
 <div class="h-screen">
   <SvelteFlow
     {nodes}
