@@ -236,13 +236,31 @@ manager = ChatConnectionManager()
 
 
 @router.get("/", response_class=HTMLResponse)
-async def get_chat_page(request: Request, bsn: str = "100000001", services: Services = Depends(get_services)):
+async def get_chat_page(
+    request: Request,
+    bsn: str = "100000001",
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
+    services: Services = Depends(get_services),
+):
     """Render the chat interface page"""
     profile = get_profile_data(bsn)
     if not profile:
         return HTMLResponse("Profile not found", status_code=404)
 
     from web.services.profiles import get_all_profiles
+
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
 
     return templates.TemplateResponse(
         "chat.html",
@@ -251,6 +269,7 @@ async def get_chat_page(request: Request, bsn: str = "100000001", services: Serv
             "profile": profile,
             "bsn": bsn,
             "all_profiles": get_all_profiles(),  # Add this for the profile selector
+            "representative_info": representative_info,
         },
     )
 

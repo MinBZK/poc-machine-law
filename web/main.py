@@ -42,11 +42,29 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "100000001", services: Services = Depends(get_services)):
+async def root(
+    request: Request,
+    bsn: str = "100000001",
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
+    services: Services = Depends(get_services),
+):
     """Render the main dashboard page"""
     profile = get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
 
     await laws.set_profile_data(bsn, services)
 
@@ -59,6 +77,7 @@ async def root(request: Request, bsn: str = "100000001", services: Services = De
             "formatted_date": FORMATTED_DATE,
             "all_profiles": get_all_profiles(),
             "discoverable_service_laws": await services.get_sorted_discoverable_service_laws(bsn),
+            "representative_info": representative_info,
         },
     )
 
