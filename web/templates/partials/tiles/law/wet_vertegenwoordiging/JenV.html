@@ -1,15 +1,12 @@
 {% extends "partials/tiles/base_tile.html" %}
+{% block title %}Vertegenwoordiging{% endblock %}
 {% block tile_content %}
     {% include "partials/tiles/law/wet_vertegenwoordiging/JenV/computation.html" %}
 {% endblock %}
 {% block actions %}
     {% if result.is_wilsonbekwaam %}
         <div class="flex flex-col justify-center items-center py-3">
-            <p class="text-center text-yellow-800 font-medium">U bent geregistreerd als wilsonbekwaam</p>
-            {% if result.has_legal_representative %}
-                <p class="text-sm text-center text-yellow-700 mt-2">Uw vertegenwoordiger(s) handelt/handelen namens u.</p>
-                <p class="text-sm text-center text-yellow-700 mt-2">U kunt niet zelf handelen.</p>
-            {% else %}
+            {% if not result.has_legal_representative %}
                 <p class="text-sm text-center text-yellow-700 mt-2">
                     Er is momenteel geen wettelijke vertegenwoordiger geregistreerd voor u.
                 </p>
@@ -22,8 +19,8 @@
             </div>
             <div class="space-y-2">
                 {% for person in result.representing_details %}
-                    <button onclick="window.location.href='/?bsn={{ person.bsn }}'"
-                            class="w-full px-4 py-2 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-between">
+                    <a href="/?bsn={{ person.bsn }}&acting_as={{ profile.name|urlencode }}&acting_as_bsn={{ bsn }}&relationship_type={{ person.type|urlencode }}"
+                       class="w-full px-4 py-2 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-between">
                         <span>{{ person.naam }}</span>
                         <div class="flex items-center">
                             <span class="text-xs bg-indigo-500 px-2 py-0.5 rounded mr-2">{{ person.type }}</span>
@@ -36,7 +33,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
                         </div>
-                    </button>
+                    </a>
                 {% endfor %}
             </div>
         </div>
@@ -47,8 +44,8 @@
             </div>
             <div class="space-y-2">
                 {% for child in result.minor_children %}
-                    <button onclick="window.location.href='/?bsn={{ child.bsn }}'"
-                            class="w-full px-4 py-2 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-between">
+                    <a href="/?bsn={{ child.bsn }}&acting_as={{ profile.name|urlencode }}&acting_as_bsn={{ bsn }}&relationship_type={{ 'OUDERLIJK_GEZAG'|urlencode }}"
+                       class="w-full px-4 py-2 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-between">
                         <span>{{ child.naam }}</span>
                         <div class="flex items-center">
                             <span class="text-xs bg-indigo-500 px-2 py-0.5 rounded mr-2">{{ child.leeftijd|default(result.minor_children[0].age|default('Minderjarig') ) }} jaar</span>
@@ -61,18 +58,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
                         </div>
-                    </button>
+                    </a>
                 {% endfor %}
             </div>
         </div>
     {% elif profile and profile.sources.RvIG and profile.sources.RvIG.personen and profile.sources.RvIG.personen[0].age < 18 %}
-        <div class="flex flex-col justify-center items-center py-3">
-            <p class="text-center text-yellow-800 font-medium">
-                U bent minderjarig ({{ profile.sources.RvIG.personen[0].age }} jaar)
-            </p>
-            <p class="text-sm text-center text-yellow-700 mt-2">Uw ouder(s)/voogd(en) handelt/handelen namens u.</p>
-            <p class="text-sm text-center text-yellow-700 mt-2">U kunt niet zelf handelen.</p>
-        </div>
+        <!-- Leeg gelaten om redundantie te verwijderen -->
+        <div></div>
     {% else %}
         <div class="text-center py-4">
             <p class="text-gray-600">U heeft momenteel geen vertegenwoordigingsrelaties.</p>

@@ -14,7 +14,8 @@
             document.addEventListener('alpine:init', function() {
                 Alpine.store('user', {
                     canAct: true, // Default assumption: user can act
-                    isRepresentative: false
+                    isRepresentative: false,
+                    isActingAsRepresentative: false
                 });
             });
 
@@ -27,6 +28,9 @@
                 // Check if user is a representative
                 const representativeBanner = document.querySelector('.w-full.mb-6.bg-indigo-50.border-l-4.border-indigo-600.p-4');
 
+                // Check if user is acting as a representative for someone
+                const actingAsRepresentativeBanner = document.querySelector('.w-full.mb-6.bg-green-50.border-l-4.border-green-600.p-4');
+
                 let cannotAct = false;
                 warningBanners.forEach(banner => {
                     const text = banner.textContent.trim();
@@ -35,11 +39,17 @@
                     }
                 });
 
+                // If acting as a representative, user should be able to act regardless
+                if (actingAsRepresentativeBanner) {
+                    cannotAct = false;
+                }
+
                 // Update Alpine store if available
                 if (window.Alpine) {
                     Alpine.store('user', {
                         canAct: !cannotAct,
-                        isRepresentative: !!representativeBanner
+                        isRepresentative: !!representativeBanner,
+                        isActingAsRepresentative: !!actingAsRepresentativeBanner
                     });
                 }
 
@@ -139,11 +149,11 @@
                         <nav class="ml-8">
                             <ul class="flex space-x-6">
                                 <li>
-                                    <a href="/?bsn={{ bsn }}"
+                                    <a href="/?bsn={{ bsn }}{% if representative_info %}&acting_as={{ representative_info.name|urlencode }}&acting_as_bsn={{ representative_info.bsn }}&relationship_type={{ representative_info.relationship_type|urlencode }}{% endif %}"
                                        class="text-white hover:text-blue-200 font-medium">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="/chat?bsn={{ bsn }}"
+                                    <a href="/chat?bsn={{ bsn }}{% if representative_info %}&acting_as={{ representative_info.name|urlencode }}&acting_as_bsn={{ representative_info.bsn }}&relationship_type={{ representative_info.relationship_type|urlencode }}{% endif %}"
                                        class="text-white hover:text-blue-200 font-medium flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              class="h-5 w-5 mr-1"
@@ -160,14 +170,22 @@
                     </div>
                     <!-- User Switcher -->
                     <div class="flex items-center space-x-4">
-                        <select class="bg-white text-gray-900 px-4 py-2 rounded w-96"
-                                onchange="window.location.href='/?bsn=' + this.value">
-                            {% for bsn_key, profile_data in all_profiles.items() %}
-                                <option value="{{ bsn_key }}" {% if bsn== bsn_key %}selected{% endif %}>
-                                    {{ profile_data.name }} - {{ profile_data.description }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        {% if representative_info %}
+                            <!-- In vertegenwoordigingsmodus tonen we alleen een label, geen dropdown -->
+                            <div class="bg-green-100 text-gray-900 px-4 py-2 rounded w-96 border border-green-300">
+                                <span class="font-medium">{{ profile.name }}</span> - Bekijken als {{ representative_info.relationship_type|lower|replace('_', ' ') }}
+                            </div>
+                        {% else %}
+                            <!-- Normale dropdown met alle profielen -->
+                            <select class="bg-white text-gray-900 px-4 py-2 rounded w-96"
+                                    onchange="window.location.href='/?bsn=' + this.value">
+                                {% for bsn_key, profile_data in all_profiles.items() %}
+                                    <option value="{{ bsn_key }}" {% if bsn== bsn_key %}selected{% endif %}>
+                                        {{ profile_data.name }} - {{ profile_data.description }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
                     </div>
                 </div>
             </div>
