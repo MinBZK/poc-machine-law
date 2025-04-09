@@ -1,4 +1,4 @@
-Feature: Berekening Zorgtoeslag
+Feature: Berekening Zorgtoeslag 2024
   Als burger
   Wil ik weten of ik recht heb op zorgtoeslag
   Zodat ik de juiste toeslag kan ontvangen

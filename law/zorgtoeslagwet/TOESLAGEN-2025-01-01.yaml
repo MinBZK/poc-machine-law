@@ -1,5 +1,5 @@
 $id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
-uuid: b87fbf5e-98d7-45a5-b82c-04ef64bae452
+uuid: 60e71675-38bc-4297-87ac-0c145613e481
 name: Zorgtoeslag
 law: zorgtoeslagwet
 law_type: "FORMELE_WET"
@@ -10,19 +10,22 @@ valid_from: 2025-01-01
 service: "TOESLAGEN"
 description: >
   Berekeningsregels voor het bepalen van het recht op en de hoogte van de zorgtoeslag volgens artikel 2
-  van de Wet op de zorgtoeslag, geldend voor het jaar 2025. Dit jaar wordt de studiefinanciering meegenomen als
-  inkomen (studiefinanciering is een gift geworden).
+  van de Wet op de zorgtoeslag, geldend voor het jaar 2025.
 
 references:
   - law: "Wet op de zorgtoeslag"
     article: "2"
-    url: "https://wetten.overheid.nl/BWBR0018451/2024-01-01#Paragraaf2_Artikel2"
+    url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
   - law: "Wet op de zorgtoeslag"
     article: "2a"
-    url: "https://wetten.overheid.nl/BWBR0018451/2024-01-01#Paragraaf2_Artikel2a"
+    url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2a"
   - law: "Wet op de zorgtoeslag"
     article: "3"
-    url: "https://wetten.overheid.nl/BWBR0018451/2024-01-01#Paragraaf2_Artikel3"
+    url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel3"
+  - law: "zvw"
+    article: "1"
+    description: "Definitie verzekerde"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk1_Artikel1"
 
 properties:
   parameters:
@@ -68,60 +71,16 @@ properties:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "HAS_PARTNER"
-      description: "Partnerschap status"
-      type: "boolean"
-      service_reference:
-        service: "RvIG"
-        field: "has_partner"
-        law: "wet_brp"
-      temporal:
-        type: "point_in_time"
-        reference: "$prev_january_first"
-
-    - name: "HAS_INSURANCE"
-      description: "Verzekeringsstatus"
+    - name: "IS_VERZEKERDE"
+      description: "Aanvrager is verzekerde in de zin van de zvw"
       type: "boolean"
       service_reference:
         service: "RVZ"
-        field: "has_insurance"
+        field: "is_verzekerde"
         law: "zvw"
       temporal:
         type: "period"
         period_type: "month"
-
-    - name: "HAS_ACT_INSURANCE"
-      description: "Verdragsverzekering status"
-      type: "boolean"
-      service_reference:
-        service: "RVZ"
-        field: "has_act_insurance"
-        law: "zvw"
-      temporal:
-        type: "period"
-        period_type: "month"
-
-    - name: "IS_INCARCERATED"
-      description: "Detentiestatus"
-      type: "boolean"
-      service_reference:
-        service: "DJI"
-        field: "is_incarcerated"
-        law: "penitentiaire_beginselenwet"
-      temporal:
-        type: "point_in_time"
-        reference: "$prev_january_first"
-
-    - name: "IS_FORENSIC"
-      description: "Forensische status"
-      type: "boolean"
-      service_reference:
-        service: "DJI"
-        field: "is_forensic"
-        law: "wet_forensische_zorg"
-      temporal:
-        type: "point_in_time"
-        reference: "$prev_january_first"
 
     - name: "INCOME"
       description: "Toetsingsinkomen"
@@ -138,21 +97,6 @@ properties:
         type: "period"
         period_type: "year"
         immutable_after: "P2Y"
-
-    - name: "STUDY_GRANT"
-      description: "Studiefinanciering"
-      type: "amount"
-      service_reference:
-        service: "DUO"
-        field: "study_grant"
-        law: "wet_studiefinanciering"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
 
     - name: "NET_WORTH"
       description: "Vermogen"
@@ -200,50 +144,37 @@ properties:
         period_type: "year"
         immutable_after: "P2Y"
 
-    - name: "PARTNER_STUDY_GRANT"
-      description: "Partner studiefinanciering"
-      type: "amount"
+    - name: "HAS_PARTNER"
+      description: "Partnerschap status"
+      type: "boolean"
       service_reference:
-        service: "DUO"
-        field: "partner_study_grant"
-        law: "wet_studiefinanciering"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
+        service: "RvIG"
+        field: "has_partner"
+        law: "wet_brp"
       temporal:
-        type: "period"
-        period_type: "year"
+        type: "point_in_time"
+        reference: "$prev_january_first"
 
   definitions:
     MINIMUM_AGE: 18
-    STANDAARDPREMIE_2025: 182100
-    PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.04256
-    PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.01879
-    AFBOUWPERCENTAGE_BOVEN_DREMPEL: 0.13670
-    DREMPELINKOMEN_ALLEENSTAANDE: 3749600
-    DREMPELINKOMEN_TOESLAGPARTNER: 4821800
-    VERMOGENSGRENS_ALLEENSTAANDE: 14193900
+    STANDAARDPREMIE_2025: 210000
+    PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.04273
+    PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.01896
+    AFBOUWPERCENTAGE_MINIMUM: 0.13700
+    AFBOUWPERCENTAGE_BOVEN_DREMPEL: 0.13700
+    DREMPELINKOMEN_ALLEENSTAANDE: 3971900
+    DREMPELINKOMEN_TOESLAGPARTNER: 5020600
+    VERMOGENSGRENS_ALLEENSTAANDE: 14189600
     VERMOGENSGRENS_TOESLAGPARTNER: 17942900
 
 requirements:
   - all:
-      - or:
-          - subject: "$HAS_INSURANCE"
-            operation: EQUALS
-            value: true
-          - subject: "$HAS_ACT_INSURANCE"
-            operation: EQUALS
-            value: true
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
         value: "$MINIMUM_AGE"
-      - subject: "$IS_INCARCERATED"
+      - subject: "$IS_VERZEKERDE"
         operation: EQUALS
-        value: false
-      - subject: "$IS_FORENSIC"
-        operation: EQUALS
-        value: false
+        value: true
 
 actions:
   - output: "is_verzekerde_zorgtoeslag"
@@ -260,13 +191,9 @@ actions:
           operation: IF
           conditions:
             - test:
+                subject: "$INCOME"
                 operation: GREATER_THAN
-                values:
-                  - operation: ADD
-                    values:
-                      - "$INCOME"
-                      - "$STUDY_GRANT"
-                  - "$DREMPELINKOMEN_ALLEENSTAANDE"
+                value: "$DREMPELINKOMEN_ALLEENSTAANDE"
               then: 0
             - test:
                 subject: "$NET_WORTH"
@@ -284,32 +211,23 @@ actions:
                           - "$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
                           - operation: MIN
                             values:
-                              - operation: ADD
-                                values:
-                                  - "$INCOME"
-                                  - "$STUDY_GRANT"
+                              - "$INCOME"
                               - "$DREMPELINKOMEN_ALLEENSTAANDE"
                       - operation: IF
                         conditions:
                           - test:
                               operation: GREATER_THAN
                               values:
-                                - operation: ADD
-                                  values:
-                                    - "$INCOME"
-                                    - "$STUDY_GRANT"
+                                - "$INCOME"
                                 - "$DREMPELINKOMEN_ALLEENSTAANDE"
                             then:
                               operation: MULTIPLY
                               values:
                                 - operation: SUBTRACT
                                   values:
-                                    - operation: ADD
-                                      values:
-                                        - "$INCOME"
-                                        - "$STUDY_GRANT"
+                                    - "$INCOME"
                                     - "$DREMPELINKOMEN_ALLEENSTAANDE"
-                                - "$AFBOUWPERCENTAGE_BOVEN_DREMPEL"
+                                - "$AFBOUWPERCENTAGE_MINIMUM"
                           - else: 0
       - test:
           subject: "$HAS_PARTNER"
@@ -324,9 +242,7 @@ actions:
                   - operation: ADD
                     values:
                       - "$INCOME"
-                      - "$STUDY_GRANT"
                       - "$PARTNER_INCOME"
-                      - "$PARTNER_STUDY_GRANT"
                   - "$DREMPELINKOMEN_TOESLAGPARTNER"
               then: 0
             - test:
@@ -351,9 +267,7 @@ actions:
                               - operation: ADD
                                 values:
                                   - "$INCOME"
-                                  - "$STUDY_GRANT"
                                   - "$PARTNER_INCOME"
-                                  - "$PARTNER_STUDY_GRANT"
                               - "$DREMPELINKOMEN_TOESLAGPARTNER"
                       - operation: IF
                         conditions:
@@ -363,9 +277,7 @@ actions:
                                 - operation: ADD
                                   values:
                                     - "$INCOME"
-                                    - "$STUDY_GRANT"
                                     - "$PARTNER_INCOME"
-                                    - "$PARTNER_STUDY_GRANT"
                                 - "$DREMPELINKOMEN_TOESLAGPARTNER"
                             then:
                               operation: MULTIPLY
@@ -375,9 +287,7 @@ actions:
                                     - operation: ADD
                                       values:
                                         - "$INCOME"
-                                        - "$STUDY_GRANT"
                                         - "$PARTNER_INCOME"
-                                        - "$PARTNER_STUDY_GRANT"
                                     - "$DREMPELINKOMEN_TOESLAGPARTNER"
                                 - "$AFBOUWPERCENTAGE_BOVEN_DREMPEL"
                           - else: 0

@@ -6,15 +6,23 @@ valid_from: 2024-01-01
 service: "RVZ"
 description: >
   Regels voor het bepalen van de verzekeringsstatus volgens de Zorgverzekeringswet (Zvw),
-  artikel 2 (verzekeringsplicht) en artikel 9 (verdragsverzekering).
+  artikel 2 (verzekeringsplicht), artikel 9 (verdragsverzekering) en artikel 24 (opschorting).
 
 references:
   - law: "Zorgverzekeringswet"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk1_Artikel1"
+    description: "Definitie verzekerde"
+  - law: "Zorgverzekeringswet"
     article: "2"
-    url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2"
   - law: "Zorgverzekeringswet"
     article: "9"
-    url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel9"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel9"
+  - law: "Zorgverzekeringswet"
+    article: "24"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk3_Paragraaf3.6_Artikel24"
+    description: "Opschorting zorgverzekering tijdens detentie"
 
 properties:
   parameters:
@@ -66,6 +74,17 @@ properties:
         type: "period"
         period_type: "continuous"
 
+    - name: "IS_INCARCERATED"
+      description: "Detentiestatus"
+      type: "boolean"
+      service_reference:
+        service: "DJI"
+        field: "is_incarcerated"
+        law: "penitentiaire_beginselenwet"
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
   output:
     - name: "has_insurance"
       description: "Heeft de persoon een Nederlandse zorgverzekering"
@@ -76,6 +95,13 @@ properties:
 
     - name: "has_act_insurance"
       description: "Heeft de persoon een verdragsverzekering"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "is_verzekerde"
+      description: "Is de persoon een verzekerde in de zin van artikel 1 Zvw"
       type: "boolean"
       temporal:
         type: "period"
@@ -113,3 +139,18 @@ actions:
       - operation: EQUALS
         subject: "$TREATY_REGISTRATION"
         value: "ACTIEF"
+
+  - output: "is_verzekerde"
+    operation: AND
+    values:
+      - operation: OR
+        values:
+          - subject: "$has_insurance"
+            operation: EQUALS
+            value: true
+          - subject: "$has_act_insurance"
+            operation: EQUALS
+            value: true
+      - subject: "$IS_INCARCERATED"
+        operation: NOT_EQUALS
+        value: true
