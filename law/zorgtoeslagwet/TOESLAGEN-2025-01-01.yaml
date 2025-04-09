@@ -169,12 +169,12 @@ properties:
 
 requirements:
   - all:
-      - subject: "$IS_VERZEKERDE"
-        operation: EQUALS
-        value: true
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
         value: "$MINIMUM_AGE"
+      - subject: "$IS_VERZEKERDE"
+        operation: EQUALS
+        value: true
 
 actions:
   - output: "is_verzekerde_zorgtoeslag"
