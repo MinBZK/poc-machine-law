@@ -3,5 +3,6 @@ go 1.24.1
 use (
 	./features
 	./lac-to-regelspraak
-	./machinev2
+	./machinev2/backend
+	./machinev2/machine
 )

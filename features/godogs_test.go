@@ -11,10 +11,10 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/google/uuid"
-	"github.com/minbzk/poc-machine-law/machinev2/casemanager"
-	"github.com/minbzk/poc-machine-law/machinev2/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/model"
-	"github.com/minbzk/poc-machine-law/machinev2/service"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
