@@ -78,7 +78,7 @@ func (ts *TypeSpec) Enforce(value any) any {
 
 	// Convert to int for cent units
 	if ts.Unit == "eurocent" {
-		return int(floatVal)
+		return int(math.Round(floatVal))
 	}
 
 	return floatVal
