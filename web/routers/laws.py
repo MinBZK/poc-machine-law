@@ -77,6 +77,9 @@ async def execute_law(
     service: str,
     law: str,
     bsn: str,
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     services: Services = Depends(get_services),
 ):
     """Execute a law and render its result"""
@@ -100,8 +103,22 @@ async def execute_law(
     # Check if there's an existing case
     existing_case = services.case_manager.get_case(bsn, service, law)
 
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
+
     # Get the appropriate template
     template_path = get_tile_template(service, law)
+
+    # Get profile data for context
+    profile = get_profile_data(bsn)
 
     return templates.TemplateResponse(
         template_path,
@@ -116,6 +133,8 @@ async def execute_law(
             "requirements_met": result.requirements_met,
             "missing_required": result.missing_required,
             "current_case": existing_case,
+            "representative_info": representative_info,
+            "profile": profile,  # Add profile data to the context
         },
     )
 
@@ -127,12 +146,23 @@ async def submit_case(
     law: str,
     bsn: str,
     approved: bool = False,
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     services: Services = Depends(get_services),
 ):
     """Submit a new case"""
     law = unquote(law)
 
     law, result, rule_spec, parameters = await evaluate_law(bsn, law, service, services, approved=approved)
+
+    # Add a note that this was submitted by a representative if applicable
+    representative_note = ""
+    if acting_as and acting_as_bsn:
+        representative_note = f"Ingediend door {acting_as} (BSN: {acting_as_bsn}) als {relationship_type}."
+        parameters["REPRESENTATIVE_BSN"] = acting_as_bsn
+        parameters["REPRESENTATIVE_NAME"] = acting_as
+        parameters["REPRESENTATIVE_TYPE"] = relationship_type
 
     case_id = await services.case_manager.submit_case(
         bsn=bsn,
@@ -141,10 +171,25 @@ async def submit_case(
         parameters=parameters,
         claimed_result=result.output,
         approved_claims_only=approved,
+        note=representative_note,
     )
     case = services.case_manager.get_case_by_id(case_id)
 
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
+
     # Return the updated law result with the new case
+    # Get profile data for context
+    profile = get_profile_data(bsn)
+
     return templates.TemplateResponse(
         get_tile_template(service, law),
         {
@@ -157,6 +202,8 @@ async def submit_case(
             "input": result.input,
             "requirements_met": result.requirements_met,
             "current_case": case,
+            "representative_info": representative_info,
+            "profile": profile,  # Add profile data to the context
         },
     )
 
@@ -185,6 +232,9 @@ async def objection_case(
 
     template_path = get_tile_template(service, law)
 
+    # Get profile data for context
+    profile = get_profile_data(bsn)
+
     return templates.TemplateResponse(
         template_path,
         {
@@ -197,6 +247,7 @@ async def objection_case(
             "input": result.input,
             "requirements_met": result.requirements_met,
             "current_case": services.case_manager.get_case_by_id(case_id),
+            "profile": profile,  # Add profile data to the context
         },
     )
 
@@ -277,6 +328,9 @@ async def application_panel(
     law: str,
     bsn: str,
     approved: bool = False,
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     services: Services = Depends(get_services),
 ):
     """Get the application panel with tabs"""
@@ -288,6 +342,20 @@ async def application_panel(
 
         claims = services.claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
         claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+
+        # Get profile data for context
+        profile = get_profile_data(bsn)
+
+        # Load representative information if needed
+        representative_info = None
+        if acting_as and acting_as_bsn:
+            representative_profile = get_profile_data(acting_as_bsn)
+            if representative_profile:
+                representative_info = {
+                    "name": acting_as,
+                    "bsn": acting_as_bsn,
+                    "relationship_type": relationship_type,
+                }
 
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
@@ -304,10 +372,33 @@ async def application_panel(
                 "current_case": existing_case,
                 "claim_map": claim_map,
                 "missing_required": result.missing_required,
+                "profile": profile,  # Add profile data to the context
+                "representative_info": representative_info,  # Add representative info
             },
         )
     except Exception as e:
         print(f"Error in application panel: {e}")
+        # Get profile data for context
+        profile = None
+        try:
+            profile = get_profile_data(bsn)
+        except:
+            pass  # Ignore errors when getting profile in the error handler
+
+        # Create representative info if possible
+        representative_info = None
+        if acting_as and acting_as_bsn:
+            try:
+                representative_profile = get_profile_data(acting_as_bsn)
+                if representative_profile:
+                    representative_info = {
+                        "name": acting_as,
+                        "bsn": acting_as_bsn,
+                        "relationship_type": relationship_type,
+                    }
+            except:
+                pass  # Ignore errors when getting representative in the error handler
+
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
             {
@@ -315,5 +406,8 @@ async def application_panel(
                 "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
                 "service": service,
                 "law": law,
+                "bsn": bsn,
+                "profile": profile,
+                "representative_info": representative_info,
             },
         )
