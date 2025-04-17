@@ -1,0 +1,167 @@
+# Jurisprudentie: ECLI:NL:CRVB:2017:243
+# Betreft: Uitzondering kostendelersnorm bij commerciële relatie
+# Bron: Centrale Raad van Beroep
+# Datum: 2017-01-17
+# Onderwerp: Uitzonderingsbepaling op de toepassing van de kostendelersnorm bij commerciële relatie
+
+# Dit is een volledige, atomaire patch die de jurisprudentie implementeert
+# en direct het effect heeft op de kostendelersnorm
+
+# Referentie toevoegen aan de jurisprudentie
+- op: add
+  path: /references/-
+  value:
+    law: "Jurisprudentie"
+    article: "ECLI:NL:CRVB:2017:243"
+    url: "https://uitspraken.rechtspraak.nl/inziendocument?id=ECLI:NL:CRVB:2017:243"
+    description: "Uitzondering op de kostendelersnorm bij commerciële relatie"
+
+# Definitie toevoegen of updaten voor uitzonderingen op de kostendelersnorm
+- op: add
+  path: /properties/definitions/KOSTENDELERSNORM_UITZONDERINGEN
+  value:
+    - "COMMERCIELE_RELATIE"
+    - "JONGEREN_TOT_21_JAAR"
+    - "STUDERENDEN_MET_STUDIEFINANCIERING"
+    - "APARTE_ZELFSTANDIGE_WOONRUIMTE_OP_EIGEN_ERF"  # Behoud bestaande uitzondering van eerdere patch
+
+# Vragen toevoegen die aan de gebruiker gesteld moeten worden
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "HAS_COMMERCIAL_RELATION"
+    required: true
+    description: "Is er sprake van een commerciële relatie (bijv. onderhuur tegen marktconforme prijs)"
+    type: "boolean"
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan of er sprake is van een schriftelijke huurovereenkomst tegen een commerciële (marktconforme) prijs"
+
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "RENTAL_AMOUNT"
+    required: true
+    description: "Maandelijks huurbedrag bij commerciële relatie"
+    type: "amount"
+    type_spec:
+      unit: "eurocent"
+      precision: 0
+      min: 0
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef het maandelijkse huurbedrag aan in euro's"
+
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "HAS_RENTAL_CONTRACT"
+    required: true
+    description: "Is er sprake van een schriftelijke huurovereenkomst?"
+    type: "boolean"
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan of er een schriftelijke huurovereenkomst is"
+
+# Acties toevoegen om te bepalen of er sprake is van een commerciële relatie
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt of er sprake is van een commerciële relatie (ECLI:NL:CRVB:2017:243)"
+    operation: "AND"
+    values:
+      - {operation: "EQUALS", subject: "$HAS_COMMERCIAL_RELATION", value: true}
+      - {operation: "EQUALS", subject: "$HAS_RENTAL_CONTRACT", value: true}
+      - {operation: "GREATER_THAN", subject: "$RENTAL_AMOUNT", value: 20000} # 200 euro minimum voor marktconforme huur
+    output: "commerciele_relatie_aanwezig"
+
+# Actie toevoegen voor kostendelersnorm_reason bepaling
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt de aangepaste reden voor wel/niet toepassen kostendelersnorm inclusief commerciële relatie"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$commerciele_relatie_aanwezig"
+          value: true
+        then:
+          value: "COMMERCIELE_RELATIE"
+      - test:
+          operation: "EQUALS"
+          subject: "$zelfstandige_woonruimte_aanwezig"
+          value: true
+        then:
+          value: "APARTE_ZELFSTANDIGE_WOONRUIMTE_OP_EIGEN_ERF"
+      - else:
+          value: "GEEN_UITZONDERING_VAN_TOEPASSING"
+    output: "kostendelersnorm_reason"
+
+# Actie toevoegen voor commerciële relatie check
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt of er sprake is van een commerciële relatie (ECLI:NL:CRVB:2017:243)"
+    operation: "AND"
+    values:
+      - {operation: "EQUALS", subject: "$HAS_COMMERCIAL_RELATION", value: true}
+      - {operation: "EQUALS", subject: "$HAS_RENTAL_CONTRACT", value: true}
+      - {operation: "GREATER_THAN", subject: "$RENTAL_AMOUNT", value: 20000} # 200 euro minimum voor marktconforme huur
+    output: "commerciele_relatie_aanwezig"
+
+# Actie toevoegen voor bepalen van kostendelersnorm_reason
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt de aangepaste reden voor wel/niet toepassen kostendelersnorm inclusief commerciële relatie"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$commerciele_relatie_aanwezig"
+          value: true
+        then:
+          value: "COMMERCIELE_RELATIE"
+      - test:
+          operation: "EQUALS"
+          subject: "$zelfstandige_woonruimte_aanwezig"
+          value: true
+        then:
+          value: "APARTE_ZELFSTANDIGE_WOONRUIMTE_OP_EIGEN_ERF"
+      - else:
+          value: "GEEN_UITZONDERING_VAN_TOEPASSING"
+    output: "kostendelersnorm_reason"
+
+# Vervang de kostendelersnorm berekening met de definitieve versie die alle jurisprudentie combineert
+- op: replace
+  path: /actions/2
+  value:
+    description: "VERVANGENDE IMPLEMENTATIE: Bepaalt de kostendelersnorm op basis van commerciële relatie, zelfstandige woonruimte of erkend woningtype (ECLI:NL:CRVB:2017:243)"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "OR"
+          values:
+            - {operation: "EQUALS", subject: "$commerciele_relatie_aanwezig", value: true}
+            - {operation: "EQUALS", subject: "$zelfstandige_woonruimte_aanwezig", value: true}
+            - {operation: "EQUALS", subject: "$is_valid_housing_type", value: true}
+        then:
+          # Pas het aantal kostendelers aan indien er een geldige uitzondering is
+          operation: "GET"
+          subject: "$HOUSEHOLD_MEMBERS - 1" # Trek één persoon af van het huishouden
+          values: "$KOSTENDELERSNORM_FACTORS"
+      - else:
+          # Geen aanpassing voor aantal kostendelers - behoud origineel
+          operation: "IF"
+          conditions:
+            - test:
+                operation: "IN"
+                subject: "$HOUSEHOLD_MEMBERS"
+                values: "$KOSTENDELERSNORM_FACTORS"
+              then:
+                operation: "GET"
+                subject: "$HOUSEHOLD_MEMBERS"
+                values: "$KOSTENDELERSNORM_FACTORS"
+            - else: 0.38
+    output: "kostendelersnorm"

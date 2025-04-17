@@ -138,7 +138,11 @@ class RulesEngine:
         dependencies = {}
         action_by_output = {}
         for action in actions:
-            output = action["output"]
+            try:
+                output = action["output"]
+            except KeyError:
+                logger.error(f"No output defined for action {action}")
+                raise
             action_by_output[output] = action
             dependencies[output] = RulesEngine.analyze_dependencies(action)
 

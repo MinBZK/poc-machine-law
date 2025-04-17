@@ -1,0 +1,172 @@
+# Jurisprudentie: ECLI:NL:CRVB:2001:AD9524
+# Betreft: Criteria voor zelfstandige woning i.r.t. kostendelersnorm
+# Bron: Centrale Raad van Beroep
+# Datum: 2001-11-27
+# Onderwerp: Er is geen sprake van een zelfstandige woning als een wezenlijke woonfunctie, zoals de douche, wordt gedeeld
+#
+# Dit is een patch die de jurisprudentie implementeert
+# en direct het effect heeft op de kostendelersnorm
+# Aangepast aan de correcte structuur van beide rule files (Amsterdam en SZW)
+
+# Referentie aan jurisprudentie toevoegen
+- op: add
+  path: /references/-
+  value:
+    law: "Jurisprudentie"
+    article: "ECLI:NL:CRVB:2001:AD9524"
+    url: "https://uitspraken.rechtspraak.nl/inziendocument?id=ECLI:NL:CRVB:2001:AD9524"
+    description: "Er is geen sprake van een zelfstandige woning als een wezenlijke woonfunctie, zoals de douche, wordt gedeeld"
+
+# Definitie toevoegen voor criteria zelfstandige woonruimte
+- op: add
+  path: /properties/definitions/ZELFSTANDIGE_WOONRUIMTE_CRITERIA
+  value:
+    - "EIGEN_TOEGANG"
+    - "EIGEN_KEUKEN"
+    - "EIGEN_TOILET"
+    - "EIGEN_DOUCHE_OF_BAD"
+
+# Definitie voor eigen erf locaties
+- op: add
+  path: /properties/definitions/EIGEN_ERF_LOCATIES
+  value:
+    - "EIGEN_ERF"
+    - "TUIN"
+    - "ACHTERTUIN"
+    - "VOORTUIN"
+    - "ZIJTUIN"
+
+# Vragen toevoegen die aan de gebruiker gesteld moeten worden
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "HAS_SECONDARY_RESIDENCE"
+    required: true
+    description: "Is er sprake van een aparte woonruimte op het erf?"
+    type: "boolean"
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan of er een aparte woonruimte (zoals caravan/stacaravan) op het erf aanwezig is"
+
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "SECONDARY_RESIDENCE_TYPE"
+    required: true
+    description: "Type secundaire woonruimte op het erf"
+    type: "enum"
+    enum: [ "CARAVAN", "STACARAVAN", "WOONWAGEN", "TUINHUIS" ]
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan welk type woonruimte op het erf aanwezig is"
+
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "SECONDARY_RESIDENCE_LOCATION"
+    required: true
+    description: "Locatie van secundaire woonruimte"
+    type: "enum"
+    enum: "$EIGEN_ERF_LOCATIES"
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan waar de secundaire woonruimte zich bevindt"
+
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "SECONDARY_RESIDENCE_FACILITIES"
+    required: true
+    description: "Faciliteiten van de secundaire woonruimte"
+    type: "array"
+    items:
+      type: "enum"
+      enum: "$ZELFSTANDIGE_WOONRUIMTE_CRITERIA"
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan welke voorzieningen de secundaire woonruimte heeft"
+
+# Acties toevoegen voor controle van zelfstandige woonruimte
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt of er een woonruimte op eigen erf aanwezig is"
+    operation: "AND"
+    values:
+      - {operation: "EQUALS", subject: "$HAS_SECONDARY_RESIDENCE", value: true}
+      - {operation: "IN", subject: "$SECONDARY_RESIDENCE_LOCATION", values: "$EIGEN_ERF_LOCATIES"}
+    output: "has_residence_on_own_property"
+
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt of de woonruimte als zelfstandig wordt aangemerkt o.b.v. faciliteiten (ECLI:NL:CRVB:2001:AD9524)"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$has_residence_on_own_property"
+          value: true
+        then:
+          operation: "SUBSET"
+          subject: "$ZELFSTANDIGE_WOONRUIMTE_CRITERIA"
+          values: "$SECONDARY_RESIDENCE_FACILITIES"
+      - else:
+          value: false
+    output: "zelfstandige_woonruimte_aanwezig"
+
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt de reden voor wel/niet toepassen kostendelersnorm"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$zelfstandige_woonruimte_aanwezig"
+          value: true
+        then:
+          value: "APARTE_ZELFSTANDIGE_WOONRUIMTE_OP_EIGEN_ERF"
+      - else:
+          value: "GEEN_UITZONDERING_VAN_TOEPASSING"
+    output: "kostendelersnorm_reason"
+
+# Vervang de (mogelijk al eerder vervangen) kostendelersnorm berekening
+- op: replace
+  path: /actions/2
+  value:
+    description: "VERVANGENDE IMPLEMENTATIE: Past de kostendelersnorm aan op basis van zelfstandige woonruimte (ECLI:NL:CRVB:2001:AD9524)"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$zelfstandige_woonruimte_aanwezig"
+          value: true
+        then:
+          # Pas het aantal kostendelers aan indien er een zelfstandige woonruimte is
+          operation: "GET"
+          subject: "$HOUSEHOLD_MEMBERS - 1" # Trek één persoon af van het huishouden
+          values: "$KOSTENDELERSNORM_FACTORS"
+      - test:
+          operation: "EQUALS"
+          subject: "$is_valid_housing_type"
+          value: true
+        then:
+          # Behoud de afhandeling van erkende woningtypen uit eerste jurisprudentie
+          operation: "GET"
+          subject: "$HOUSEHOLD_MEMBERS - 1" # Trek één persoon af van het huishouden
+          values: "$KOSTENDELERSNORM_FACTORS"
+      - else:
+          # Geen aanpassing voor aantal kostendelers - behoud origineel
+          operation: "IF"
+          conditions:
+            - test:
+                operation: "IN"
+                subject: "$HOUSEHOLD_MEMBERS"
+                values: "$KOSTENDELERSNORM_FACTORS"
+              then:
+                operation: "GET"
+                subject: "$HOUSEHOLD_MEMBERS"
+                values: "$KOSTENDELERSNORM_FACTORS"
+            - else: 0.38
+    output: "kostendelersnorm"

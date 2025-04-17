@@ -334,6 +334,17 @@
                                         <option value="false">Nee</option>
                                     </select>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="boolean">
+                                {% elif item.node.details and item.node.details.type == 'enum' %}
+                                    <select id="value-{{ item.key }}"
+                                            name="values[{{ loop.index0 }}]"
+                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            {% if loop.first %}autofocus{% endif %}
+                                            required>
+                                        {% if item.node.details.enum_values is defined and item.node.details.enum_values %}
+                                            {% for value in item.node.details.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
+                                        {% endif %}
+                                    </select>
+                                    <input type="hidden" name="types[{{ loop.index0 }}]" value="enum">
                                 {% elif item.node.details and (item.node.details.type == 'number' or item.node.details.type == 'amount') %}
                                     {% if item.node.details.type == 'amount' and item.node.details.type_spec and item.node.details.type_spec.unit == 'eurocent' %}
                                         <div class="flex items-center">
