@@ -405,6 +405,19 @@ class RuleContext:
                     if enum_value is not None:
                         field["enum_values"] = enum_value
                         logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
+        elif (
+            "type" in spec
+            and spec["type"] == "enum"
+            and (
+                "enum" in type_spec_copy
+                and isinstance(type_spec_copy["enum"], str)
+                and type_spec_copy["enum"].startswith("$")
+            )
+        ):
+            enum_value = await self.resolve_value(type_spec_copy["enum"])
+            if enum_value is not None:
+                type_spec_copy["enum_values"] = enum_value
+                logger.error(f"Resolved enum reference {type_spec_copy['enum']} to {type_spec_copy['enum_values']}")
 
         return type_spec_copy
 

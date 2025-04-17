@@ -1,0 +1,124 @@
+# Jurisprudentie: ECLI:NL:CRVB:2001:AD7128
+# Betreft: Definitie van een woning voor kostendelersnorm
+# Bron: Centrale Raad van Beroep
+# Datum: 2001-11-06
+# Onderwerp: Definitie van wat als een woning wordt beschouwd in relatie tot de kostendelersnorm
+#
+# Dit is een gecorrigeerde patch die jurisprudentie implementeert
+# en direct het effect heeft op de kostendelersnorm
+# Aangepast aan de correcte structuur van beide rule files (Amsterdam en SZW)
+
+# Referentie aan jurisprudentie toevoegen
+- op: add
+  path: /references/-
+  value:
+    law: "Jurisprudentie"
+    article: "ECLI:NL:CRVB:2001:AD7128"
+    url: "https://uitspraken.rechtspraak.nl/inziendocument?id=ECLI:NL:CRVB:2001:AD7128"
+    description: "Definitie van een woning in relatie tot de kostendelersnorm"
+
+# Definitie toevoegen voor woningtypen die als woning worden beschouwd
+- op: add
+  path: /properties/definitions/WONINGTYPEN
+  value:
+    - "REGULIERE_WONING"
+    - "WOONWAGEN"
+    - "WOONSCHIP"
+    - "CARAVAN"
+    - "STACARAVAN"
+
+# Eerst een leeg array aanmaken voor KOSTENDELERSNORM_UITZONDERINGEN als deze nog niet bestaat
+- op: add
+  path: /properties/definitions/KOSTENDELERSNORM_UITZONDERINGEN
+  value: []
+
+# Uitbreiden van KOSTENDELERSNORM_UITZONDERINGEN met erkend woningtype
+- op: add
+  path: /properties/definitions/KOSTENDELERSNORM_UITZONDERINGEN/-
+  value: "ERKEND_WONINGTYPE"
+
+
+# Velden toevoegen voor het type secundaire woonruimte
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "HAS_SECONDARY_RESIDENCE"
+    required: true
+    description: "Is er een tweede woonruimte aanwezig op hetzelfde erf?"
+    type: "boolean"
+    source_reference:
+      source_type: "claim"
+      explanation: "Geef aan of er een tweede woonruimte aanwezig is op hetzelfde erf"
+
+- op: add
+  path: /properties/sources/-
+  value:
+    name: "SECONDARY_RESIDENCE_TYPE"
+    required: true
+    description: "Type woonruimte op hetzelfde erf"
+    type: "enum"
+    type_spec:
+      enum: "$WONINGTYPEN"
+    source_reference:
+      source_type: "claim"
+      explanation: "Selecteer het type woonruimte dat aanwezig is op hetzelfde erf"
+
+# Definitie voor kostendelersnorm factoren toevoegen
+- op: add
+  path: /properties/definitions/KOSTENDELERSNORM_FACTORS
+  value:
+    "1": 0.7
+    "2": 0.5
+    "3": 0.43
+    "4": 0.4
+    "5+": 0.38
+
+# Actie toevoegen voor woning type validatie
+- op: add
+  path: /actions/-
+  value:
+    description: "Bepaalt of secundaire woonruimte als woning wordt aangemerkt volgens definitie (ECLI:NL:CRVB:2001:AD7128)"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$HAS_SECONDARY_RESIDENCE"
+          value: true
+        then:
+          operation: "IN"
+          subject: "$SECONDARY_RESIDENCE_TYPE"
+          values: "$WONINGTYPEN"
+      - else:
+          value: false
+    output: "is_valid_housing_type"
+
+# Vervang de kostendelersnorm berekening (3de actie in de acties array)
+- op: replace
+  path: /actions/2
+  value:
+    description: "VERVANGENDE IMPLEMENTATIE: Berekent de kostendelersnorm op basis van erkende woningtypes (ECLI:NL:CRVB:2001:AD7128)"
+    operation: "IF"
+    conditions:
+      - test:
+          operation: "EQUALS"
+          subject: "$is_valid_housing_type"
+          value: true
+        then:
+          # Pas het aantal kostendelers aan indien er een erkend woningtype is
+          operation: "GET"
+          subject: "$HOUSEHOLD_MEMBERS - 1" # Trek één persoon af van het huishouden
+          values: "$KOSTENDELERSNORM_FACTORS"
+      - else:
+          # Geen aanpassing voor aantal kostendelers - behoud origineel
+          operation: "IF"
+          conditions:
+            - test:
+                operation: "IN"
+                subject: "$HOUSEHOLD_MEMBERS"
+                values: "$KOSTENDELERSNORM_FACTORS"
+              then:
+                operation: "GET"
+                subject: "$HOUSEHOLD_MEMBERS"
+                values: "$KOSTENDELERSNORM_FACTORS"
+            - else: 0.38
+    output: "kostendelersnorm"
