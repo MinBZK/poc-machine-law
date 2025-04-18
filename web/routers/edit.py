@@ -4,8 +4,8 @@ import re
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse
 
-from web.case_manager.claim_manager import ClaimManagerInterface
 from web.dependencies import get_claim_manager, templates
+from web.engines import ClaimManagerInterface
 
 router = APIRouter(prefix="/edit", tags=["edit"])
 

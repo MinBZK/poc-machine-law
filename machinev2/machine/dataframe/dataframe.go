@@ -16,6 +16,7 @@ type SimpleDataFrame struct {
 
 // Append implements model.DataFrame.
 func (df *SimpleDataFrame) Append(other model.DataFrame) (model.DataFrame, error) {
+	// return other, nil
 	// Get the data from the other dataframe
 	otherData := other.ToRecords()
 	if len(otherData) == 0 {
@@ -28,12 +29,12 @@ func (df *SimpleDataFrame) Append(other model.DataFrame) (model.DataFrame, error
 	currentColumns := df.GetColumns()
 
 	// Create a map of all unique columns
-	allColumns := make([]string, 0)
+	allColumns := make(map[string]struct{}, 0)
 	for _, col := range currentColumns {
-		allColumns = append(allColumns, col)
+		allColumns[col] = struct{}{}
 	}
 	for _, col := range otherColumns {
-		allColumns = append(allColumns, col)
+		allColumns[col] = struct{}{}
 	}
 
 	// Create new data with all columns
@@ -42,7 +43,7 @@ func (df *SimpleDataFrame) Append(other model.DataFrame) (model.DataFrame, error
 	// Copy current dataframe data
 	for i, row := range df.data {
 		newRow := make(map[string]any)
-		for _, col := range allColumns {
+		for col := range allColumns {
 			if val, exists := row[col]; exists {
 				newRow[col] = val
 			} else {
@@ -56,7 +57,7 @@ func (df *SimpleDataFrame) Append(other model.DataFrame) (model.DataFrame, error
 	// Copy other dataframe data
 	for i, row := range otherData {
 		newRow := make(map[string]any)
-		for _, col := range allColumns {
+		for col := range allColumns {
 			if val, exists := row[col]; exists {
 				newRow[col] = val
 			} else {

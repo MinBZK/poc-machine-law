@@ -7,6 +7,8 @@ servers:
 tags:
   - name: Law
   - name: Profile
+  - name: Claim
+  - name: Case
 paths:
   /evaluate:
     post:
@@ -81,6 +83,77 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/RuleSpecResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /claims/{bsn}:
+    get:
+      tags:
+        - Claim
+      description: Get all claims
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/queryOnlyApproved"
+        - $ref: "#/components/parameters/queryIncludeRejected"
+      operation: claimListBasedOnBSN
+      responses:
+        "200":
+          $ref: "#/components/responses/ClaimListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /claims/{bsn}/{service}/{law}:
+    get:
+      tags:
+        - Claim
+      description: Get all claims
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/pathService"
+        - $ref: "#/components/parameters/pathLaw"
+        - $ref: "#/components/parameters/queryOnlyApproved"
+        - $ref: "#/components/parameters/queryIncludeRejected"
+      operation: claimListBasedOnBSN
+      responses:
+        "200":
+          $ref: "#/components/responses/ClaimListWithKeyResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /cases/{bsn}/{service}/{law}:
+    get:
+      tags:
+        - Case
+      description: Get a case based on bsn, service and law
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/pathService"
+        - $ref: "#/components/parameters/pathLaw"
+      operation: caseasedOnBSNServiceAndLaw
+      responses:
+        "200":
+          $ref: "#/components/responses/CaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "404":
+          $ref: "#/components/responses/ResourceNotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /cases/{service}/{law}:
+    get:
+      tags:
+        - Case
+      description: Get all cases based on service and law
+      parameters:
+        - $ref: "#/components/parameters/pathService"
+        - $ref: "#/components/parameters/pathLaw"
+      operation: caseasedOnBSNServiceAndLaw
+      responses:
+        "200":
+          $ref: "#/components/responses/CaseListResponse"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -165,12 +238,38 @@ components:
         missingRequired:
           type: boolean
           description: Will be true when a required value is missing
+        path:
+          $ref: "#/components/schemas/PathNode"
       required:
         - output
         - input
         - requirementsMet
         - rulespecId
         - missingRequired
+        - path
+    PathNode:
+      description: path node
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        result: {}
+        resolveType:
+          type: string
+        required:
+          type: boolean
+        details:
+          type: object
+          additionalProperties: true
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/PathNode"
+      required:
+        - type
+        - name
     Profile:
       description: Profile
       type: object
@@ -254,6 +353,62 @@ components:
       description: Rule spec
       type: object
       additionalProperties: true
+    Claim:
+      description: Claim
+      type: object
+      properties:
+        bsn:
+          $ref: "#/components/schemas/bsn"
+        service:
+          type: string
+          description: Specify the service that needs to be executed
+        law:
+          type: string
+          description: Specify the law that needs to be executed
+        key:
+          type: string
+      required:
+        - bsn
+        - service
+        - law
+        - key
+    ClaimList:
+      description: List of all claims
+      type: array
+      items:
+        $ref: "#/components/schemas/Claim"
+    Case:
+      description: Claim
+      type: object
+      properties:
+        bsn:
+          $ref: "#/components/schemas/bsn"
+        service:
+          type: string
+          description: Specify the service that needs to be executed
+        law:
+          type: string
+          description: Specify the law that needs to be executed
+        status:
+          type: string
+          enum:
+            - SUBMITTED
+            - DECIDED
+            - IN_REVIEW
+            - OBJECTED
+        approved:
+          type: boolean
+      required:
+        - bsn
+        - service
+        - law
+        - status
+    CaseList:
+      description: List of all cases
+      type: array
+      items:
+        $ref: "#/components/schemas/Case"
+
   parameters:
     pathBSN:
       name: bsn
@@ -262,6 +417,38 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/bsn"
+    pathService:
+      name: service
+      in: path
+      description: filter for service
+      required: true
+      schema:
+        type: string
+        example: TOESLAGEN
+    pathLaw:
+      name: law
+      in: path
+      description: filter for law
+      required: true
+      schema:
+        type: string
+        example: zorgtoeslagwet
+    queryOnlyApproved:
+      name: approved
+      in: query
+      description: If added to URI only approved claims will be returned.
+      required: false
+      schema:
+        type: boolean
+        example: true
+    queryIncludeRejected:
+      name: include_rejected
+      in: query
+      description: If added to URI rejected claims will be added to the return
+      required: false
+      schema:
+        type: boolean
+        example: false
     queryDiscoverableBy:
       name: discoverableBy
       in: query
@@ -276,7 +463,7 @@ components:
       required: true
       schema:
         type: string
-        example: TOESLAGNE
+        example: TOESLAGEN
     queryLaw:
       name: law
       in: query
@@ -413,5 +600,51 @@ components:
             properties:
               data:
                 $ref: "#/components/schemas/RuleSpec"
+            required:
+              - data
+    ClaimListResponse:
+      description: Claim list response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/ClaimList"
+            required:
+              - data
+    ClaimListWithKeyResponse:
+      description: Successfully filtered claims
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/Claim"
+            required:
+              - data
+    CaseResponse:
+      description: Case response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/Case"
+            required:
+              - data
+    CaseListResponse:
+      description: Case list response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/CaseList"
             required:
               - data

@@ -266,11 +266,11 @@ func (cm *ClaimManager) GetClaim(claimID string) (*model.Claim, error) {
 
 // filterClaimsByStatus filters claims based on status parameters
 func (cm *ClaimManager) filterClaimsByStatus(
-	claims []*model.Claim,
+	claims []model.Claim,
 	approved bool,
 	includeRejected bool,
-) []*model.Claim {
-	var result []*model.Claim
+) []model.Claim {
+	var result []model.Claim
 
 	for _, claim := range claims {
 		if approved {
@@ -296,15 +296,15 @@ func (cm *ClaimManager) GetClaimsByService(
 	service string,
 	approved bool,
 	includeRejected bool,
-) ([]*model.Claim, error) {
+) ([]model.Claim, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	var claims []*model.Claim
+	var claims []model.Claim
 
 	for _, claimID := range cm.serviceIndex[service] {
 		if claim, exists := cm.claims[claimID]; exists {
-			claims = append(claims, claim)
+			claims = append(claims, *claim)
 		}
 	}
 
@@ -316,15 +316,15 @@ func (cm *ClaimManager) GetClaimsByCase(
 	caseID uuid.UUID,
 	approved bool,
 	includeRejected bool,
-) ([]*model.Claim, error) {
+) ([]model.Claim, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	var claims []*model.Claim
+	var claims []model.Claim
 
 	for _, claimID := range cm.caseIndex[caseID] {
 		if claim, exists := cm.claims[claimID]; exists {
-			claims = append(claims, claim)
+			claims = append(claims, *claim)
 		}
 	}
 
@@ -336,15 +336,15 @@ func (cm *ClaimManager) GetClaimsByClaimant(
 	claimant string,
 	approved bool,
 	includeRejected bool,
-) ([]*model.Claim, error) {
+) ([]model.Claim, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	var claims []*model.Claim
+	var claims []model.Claim
 
 	for _, claimID := range cm.claimantIndex[claimant] {
 		if claim, exists := cm.claims[claimID]; exists {
-			claims = append(claims, claim)
+			claims = append(claims, *claim)
 		}
 	}
 
@@ -356,15 +356,15 @@ func (cm *ClaimManager) GetClaimsByBSN(
 	bsn string,
 	approved bool,
 	includeRejected bool,
-) ([]*model.Claim, error) {
+) ([]model.Claim, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
-	var claims []*model.Claim
+	var claims []model.Claim
 
 	for _, claimID := range cm.bsnIndex[bsn] {
 		if claim, exists := cm.claims[claimID]; exists {
-			claims = append(claims, claim)
+			claims = append(claims, *claim)
 		}
 	}
 
@@ -378,7 +378,7 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(
 	law string,
 	approved bool,
 	includeRejected bool,
-) (map[string]*model.Claim, error) {
+) (map[string]model.Claim, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
@@ -388,7 +388,7 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(
 		return nil, nil
 	}
 
-	result := make(map[string]*model.Claim)
+	result := make(map[string]model.Claim)
 
 	for key, claimID := range keyMap {
 		if claim, exists := cm.claims[claimID]; exists {
@@ -401,7 +401,7 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(
 				continue
 			}
 
-			result[key] = claim
+			result[key] = *claim
 		}
 	}
 

@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"slices"
+
 	"github.com/cucumber/godog"
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
@@ -110,6 +112,8 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 		return ctx, fmt.Errorf("services not set")
 	}
 
+	services.Reset()
+
 	inputs := ctx.Value(inputCtxKey{}).([]input)
 	for _, input := range inputs {
 		services.SetSourceDataFrame(input.Service, input.Table, input.DF)
@@ -133,13 +137,7 @@ type input struct {
 }
 
 func doParseValue(key string) bool {
-	for _, v := range []string{"bsn", "partner_bsn", "jaar", "kind_bsn"} {
-		if v == key {
-			return false
-		}
-	}
-
-	return true
+	return !slices.Contains([]string{"bsn", "partner_bsn", "jaar", "kind_bsn"}, key)
 }
 
 func parseValue(value string) any {

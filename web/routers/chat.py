@@ -8,8 +8,8 @@ from fastapi import APIRouter, Depends, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 from explain.mcp_connector import MCPLawConnector
-from web.case_manager import MachineInterface
 from web.dependencies import get_machine_service, templates
+from web.engines import EngineInterface
 from web.utils import format_message
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -236,7 +236,7 @@ manager = ChatConnectionManager()
 
 @router.get("/", response_class=HTMLResponse)
 async def get_chat_page(
-    request: Request, bsn: str = "100000001", services: MachineInterface = Depends(get_machine_service)
+    request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)
 ):
     """Render the chat interface page"""
     profile = services.get_profile_data(bsn)
@@ -256,7 +256,7 @@ async def get_chat_page(
 
 @router.websocket("/ws/{client_id}")
 async def websocket_endpoint(
-    websocket: WebSocket, client_id: str, services: MachineInterface = Depends(get_machine_service)
+    websocket: WebSocket, client_id: str, services: EngineInterface = Depends(get_machine_service)
 ):
     await manager.connect(websocket, client_id)
 

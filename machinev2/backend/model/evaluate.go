@@ -26,15 +26,27 @@ type Evaluate struct {
 }
 
 type EvaluateResponse struct {
-	Input map[string]interface{}
+	Input map[string]any
 
 	// MissingRequired Will be true when a required value is missing
 	MissingRequired bool
-	Output          map[string]interface{}
+	Output          map[string]any
+	Path            *PathNode
 
 	// RequirementsMet Will be true when all requirements where met
 	RequirementsMet bool
 
 	// RulespecId Identifier of the rulespec
 	RulespecId uuid.UUID
+}
+
+// PathNode represents a node in the evaluation path
+type PathNode struct {
+	Type        string
+	Name        string
+	Result      any
+	ResolveType string
+	Required    bool
+	Details     map[string]any
+	Children    []*PathNode
 }

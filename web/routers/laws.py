@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Any
 from urllib.parse import unquote
 
 from fastapi import APIRouter, Depends, Form, Request
@@ -7,8 +8,8 @@ from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_service import llm_service
-from web.case_manager import CaseManagerInterface, MachineInterface
-from web.dependencies import TODAY, get_case_manager, get_machine_service, templates
+from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service, templates
+from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 
@@ -27,12 +28,14 @@ def get_tile_template(service: str, law: str) -> str:
         return "partials/tiles/fallback_tile.html"
 
 
-async def evaluate_law(bsn: str, law: str, service: str, machine_service: MachineInterface, approved: bool = True):
+async def evaluate_law(
+    bsn: str, law: str, service: str, machine_service: EngineInterface, approved: bool = True
+) -> tuple[str, RuleResult, dict[str, Any]]:
     """Evaluate a law for a given BSN"""
 
     parameters = {"BSN": bsn}
 
-    # Execute the law using MachineInterface
+    # Execute the law using EngineInterface
     result = await machine_service.evaluate(
         service=service, law=law, parameters=parameters, reference_date=TODAY, approved=approved
     )
@@ -61,7 +64,7 @@ async def execute_law(
     law: str,
     bsn: str,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
-    machine_service: MachineInterface = Depends(get_machine_service),
+    machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Execute a law and render its result"""
     try:
@@ -99,10 +102,10 @@ async def execute_law(
             "law": law,
             "service": service,
             "rule_spec": rule_spec,
-            "result": result["output"],  # TODO: fix -> was result.output
-            "input": result["input"],
-            "requirements_met": result["requirements_met"],
-            "missing_required": result["missing_required"],
+            "result": result.output,
+            "input": result.input,
+            "requirements_met": result.requirements_met,
+            "missing_required": result.missing_required,
             "current_case": existing_case,
         },
     )
@@ -116,7 +119,7 @@ async def submit_case(
     bsn: str,
     approved: bool = False,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
-    machine_service: MachineInterface = Depends(get_machine_service),
+    machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit a new case"""
     law = unquote(law)
@@ -162,7 +165,7 @@ async def objection_case(
     bsn: str,
     reason: str = Form(...),  # Changed this line to use Form
     case_manager: CaseManagerInterface = Depends(get_case_manager),
-    machine_service: MachineInterface = Depends(get_machine_service),
+    machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit an objection for an existing case"""
     # First calculate the new result with disputed parameters
@@ -216,7 +219,7 @@ async def explanation(
     law: str,
     bsn: str,
     approved: bool = False,  # Add this parameter
-    machine_service: MachineInterface = Depends(get_machine_service),
+    machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Get a citizen-friendly explanation of the rule evaluation path"""
     try:
@@ -242,6 +245,7 @@ async def explanation(
             "requirements": rule_spec.get("requirements"),
             "actions": rule_spec.get("actions"),
         }
+
         rule_spec_json = json.dumps(relevant_spec, ensure_ascii=False, indent=2)
 
         # Get explanation from LLM
@@ -273,16 +277,18 @@ async def application_panel(
     bsn: str,
     approved: bool = False,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
-    machine_service: MachineInterface = Depends(get_machine_service),
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+    machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Get the application panel with tabs"""
     try:
         law = unquote(law)
         law, result, parameters = await evaluate_law(bsn, law, service, machine_service, approved=approved)
+
         value_tree = machine_service.extract_value_tree(result.path)
         existing_case = await case_manager.get_case(bsn, service, law)
 
-        claims = await case_manager.get_claims_by_bsn(bsn, include_rejected=True)
+        claims = await claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
         claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
 
         return templates.TemplateResponse(

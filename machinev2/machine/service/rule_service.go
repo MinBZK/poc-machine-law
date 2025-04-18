@@ -138,3 +138,10 @@ func (rs *RuleService) SetSourceDataFrame(table string, df model.DataFrame) {
 
 	rs.SourceDataFrames[table] = df
 }
+
+// SetSourceDataFrame sets a source DataFrame
+func (rs *RuleService) Reset() {
+	rs.mu.Lock()
+	defer rs.mu.Unlock()
+	rs.SourceDataFrames = make(map[string]model.DataFrame)
+}

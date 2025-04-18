@@ -3,8 +3,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from case_manager import CaseManagerInterface, ClaimManagerInterface, MachineInterface
-from case_manager.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory, MachineType
+from engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
+from engines.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory, MachineType
 from fastapi.templating import Jinja2Templates
 
 from machine.service import Services
@@ -73,9 +73,36 @@ async def get_claim_manager() -> ClaimManagerInterface:
     return claim_manager
 
 
-async def get_machine_service() -> MachineInterface:
-    """Dependency to get MachineInterface instance"""
+async def get_machine_service() -> EngineInterface:
+    """Dependency to get EngineInterface instance"""
     return machine_service
+
+
+def set_engine_type(m: MachineType):
+    global machine_type
+    global case_manager
+    global machine_service
+    global claim_manager
+    machine_type = m
+
+    # Create case manager based on configuration
+    case_manager = CaseManagerFactory.create_case_manager(
+        machine_type=machine_type, services=services, go_api_url=GO_API_URL
+    )
+
+    # Create machine service based on configuration
+    machine_service = MachineFactory.create_machine_service(
+        machine_type=machine_type, services=services, go_api_url=GO_API_URL
+    )
+
+    # Create machine service based on configuration
+    claim_manager = ClaimManagerFactory.create_claim_manager(
+        machine_type=machine_type, services=services, go_api_url=GO_API_URL
+    )
+
+
+def get_engine_type() -> str:
+    return machine_type
 
 
 def setup_jinja_env(directory: str) -> Jinja2Templates:

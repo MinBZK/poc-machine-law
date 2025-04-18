@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"maps"
+
 	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
@@ -387,7 +389,7 @@ func (re *RulesEngine) Evaluate(
 	}
 
 	// Handle claims
-	var claims map[string]*model.Claim
+	var claims map[string]model.Claim
 	if bsn, ok := parameters["BSN"].(string); ok {
 		// Get claims from the claim manager if ServiceProvider implements it
 		if provider, ok := re.ServiceProvider.(contexter.ClaimManagerProvider); ok {
@@ -397,7 +399,7 @@ func (re *RulesEngine) Evaluate(
 				re.logger.WithIndent().Warningf(ctx, "Failed to get claims for BSN %s: %v", bsn, err)
 			} else {
 				// Convert claims list to map indexed by key
-				claims = make(map[string]*model.Claim)
+				claims = make(map[string]model.Claim, len(claimsList))
 				for _, claim := range claimsList {
 					claims[claim.Key] = claim
 				}
@@ -406,17 +408,13 @@ func (re *RulesEngine) Evaluate(
 				if serviceClaims, err := claimManager.GetClaimByBSNServiceLaw(
 					bsn, re.ServiceName, re.Law, approved, true); err == nil && serviceClaims != nil {
 					// Add service-specific claims to the map
-					for key, claim := range serviceClaims {
-						claims[key] = claim
-					}
+					maps.Copy(claims, serviceClaims)
 				}
 			}
 		} else {
 			// Fallback to an empty map if claim manager is not available
-			claims = make(map[string]*model.Claim)
-			claims["bsn"] = &model.Claim{
-				BSN: bsn,
-			}
+			claims = make(map[string]model.Claim, 1)
+			claims["bsn"] = model.Claim{BSN: bsn}
 		}
 	}
 

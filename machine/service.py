@@ -228,8 +228,8 @@ class Services:
 
         return flattened
 
-    async def get_discoverable_service_laws(self):
-        return self.resolver.get_discoverable_service_laws()
+    async def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
+        return self.resolver.get_discoverable_service_laws(discoverable_by)
 
     async def get_sorted_discoverable_service_laws(self, bsn):
         """

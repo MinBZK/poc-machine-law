@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/minbzk/poc-machine-law/machinev2/backend/handler/adapter"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/interface/api"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/model"
 )
@@ -40,6 +41,7 @@ func (handler *Handler) Evaluate(ctx context.Context, request api.EvaluateReques
 				Output:          result.Output,
 				RequirementsMet: result.RequirementsMet,
 				RulespecId:      result.RulespecId,
+				Path:            *adapter.FromPathNode(result.Path),
 			},
 		},
 	}, nil

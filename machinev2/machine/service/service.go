@@ -60,6 +60,12 @@ func (s *Services) SetSourceDataFrame(service, table string, df model.DataFrame)
 	}
 }
 
+func (s *Services) Reset() {
+	for key := range s.services {
+		s.services[key].Reset()
+	}
+}
+
 // GetResolver returns the rule resolver
 func (s *Services) GetResolver() *utils.RuleResolver {
 	return s.Resolver

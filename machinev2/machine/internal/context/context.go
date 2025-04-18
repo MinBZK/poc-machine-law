@@ -115,8 +115,8 @@ type ClaimManagerProvider interface {
 
 // ClaimManagerAccessor interface for accessing claim manager functionality
 type ClaimManagerAccessor interface {
-	GetClaimsByBSN(bsn string, approved bool, includeRejected bool) ([]*model.Claim, error)
-	GetClaimByBSNServiceLaw(bsn string, service string, law string, approved bool, includeRejected bool) (map[string]*model.Claim, error)
+	GetClaimsByBSN(bsn string, approved bool, includeRejected bool) ([]model.Claim, error)
+	GetClaimByBSNServiceLaw(bsn string, service string, law string, approved bool, includeRejected bool) (map[string]model.Claim, error)
 }
 
 // RuleContext holds context for rule evaluation
@@ -136,7 +136,7 @@ type RuleContext struct {
 	CalculationDate string
 	ResolvedPaths   map[string]any
 	ServiceName     string
-	Claims          map[string]*model.Claim
+	Claims          map[string]model.Claim
 	Approved        bool
 	MissingRequired bool
 	// ctx             context.Context
@@ -148,7 +148,7 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 	parameters map[string]any, propertySpecs map[string]map[string]any,
 	outputSpecs map[string]TypeSpec, sources map[string]model.DataFrame, path []*model.PathNode,
 	overwriteInput map[string]map[string]any, calculationDate string,
-	serviceName string, claims map[string]*model.Claim, approved bool) *RuleContext {
+	serviceName string, claims map[string]model.Claim, approved bool) *RuleContext {
 
 	if path == nil {
 		path = make([]*model.PathNode, 0)

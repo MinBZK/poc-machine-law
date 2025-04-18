@@ -22,6 +22,51 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for CaseStatus.
+const (
+	DECIDED   CaseStatus = "DECIDED"
+	INREVIEW  CaseStatus = "IN_REVIEW"
+	OBJECTED  CaseStatus = "OBJECTED"
+	SUBMITTED CaseStatus = "SUBMITTED"
+)
+
+// Case Claim
+type Case struct {
+	Approved *bool `json:"approved,omitempty"`
+
+	// Bsn Burgerservicenummer of a Dutch citizen
+	Bsn Bsn `json:"bsn"`
+
+	// Law Specify the law that needs to be executed
+	Law string `json:"law"`
+
+	// Service Specify the service that needs to be executed
+	Service string     `json:"service"`
+	Status  CaseStatus `json:"status"`
+}
+
+// CaseStatus defines model for Case.Status.
+type CaseStatus string
+
+// CaseList List of all cases
+type CaseList = []Case
+
+// Claim Claim
+type Claim struct {
+	// Bsn Burgerservicenummer of a Dutch citizen
+	Bsn Bsn    `json:"bsn"`
+	Key string `json:"key"`
+
+	// Law Specify the law that needs to be executed
+	Law string `json:"law"`
+
+	// Service Specify the service that needs to be executed
+	Service string `json:"service"`
+}
+
+// ClaimList List of all claims
+type ClaimList = []Claim
+
 // Error The error that occured while processing this request.
 type Error struct {
 	Message string `json:"message"`
@@ -55,6 +100,9 @@ type EvaluateResponseSchema struct {
 	MissingRequired bool                   `json:"missingRequired"`
 	Output          map[string]interface{} `json:"output"`
 
+	// Path path node
+	Path PathNode `json:"path"`
+
 	// RequirementsMet Will be true when all requirements where met
 	RequirementsMet bool `json:"requirementsMet"`
 
@@ -69,6 +117,17 @@ type Law struct {
 
 	// Name Name of the law
 	Name string `json:"name"`
+}
+
+// PathNode path node
+type PathNode struct {
+	Children    *[]PathNode             `json:"children,omitempty"`
+	Details     *map[string]interface{} `json:"details,omitempty"`
+	Name        string                  `json:"name"`
+	Required    *bool                   `json:"required,omitempty"`
+	ResolveType *string                 `json:"resolveType,omitempty"`
+	Result      *interface{}            `json:"result,omitempty"`
+	Type        string                  `json:"type"`
 }
 
 // Profile Profile
@@ -118,11 +177,23 @@ type ReferenceDate = openapi_types.Date
 // PathBSN Burgerservicenummer of a Dutch citizen
 type PathBSN = Bsn
 
+// PathLaw defines model for pathLaw.
+type PathLaw = string
+
+// PathService defines model for pathService.
+type PathService = string
+
 // QueryDiscoverableBy DiscoverableBy is a string that can be used to filter lists
 type QueryDiscoverableBy = DiscoverableBy
 
+// QueryIncludeRejected defines model for queryIncludeRejected.
+type QueryIncludeRejected = bool
+
 // QueryLaw defines model for queryLaw.
 type QueryLaw = string
+
+// QueryOnlyApproved defines model for queryOnlyApproved.
+type QueryOnlyApproved = bool
 
 // QueryReferenceDate reference date
 type QueryReferenceDate = ReferenceDate
@@ -133,6 +204,29 @@ type QueryService = string
 // BadRequestErrorResponse defines model for BadRequestErrorResponse.
 type BadRequestErrorResponse struct {
 	Errors []Error `json:"errors"`
+}
+
+// CaseListResponse defines model for CaseListResponse.
+type CaseListResponse struct {
+	// Data List of all cases
+	Data CaseList `json:"data"`
+}
+
+// CaseResponse defines model for CaseResponse.
+type CaseResponse struct {
+	// Data Claim
+	Data Case `json:"data"`
+}
+
+// ClaimListResponse defines model for ClaimListResponse.
+type ClaimListResponse struct {
+	// Data List of all claims
+	Data ClaimList `json:"data"`
+}
+
+// ClaimListWithKeyResponse defines model for ClaimListWithKeyResponse.
+type ClaimListWithKeyResponse struct {
+	Data map[string]Claim `json:"data"`
 }
 
 // EvaluateResponse defines model for EvaluateResponse.
@@ -181,6 +275,24 @@ type EvaluateRequest struct {
 	Data Evaluate `json:"data"`
 }
 
+// GetClaimsBsnParams defines parameters for GetClaimsBsn.
+type GetClaimsBsnParams struct {
+	// Approved If added to URI only approved claims will be returned.
+	Approved *QueryOnlyApproved `form:"approved,omitempty" json:"approved,omitempty"`
+
+	// IncludeRejected If added to URI rejected claims will be added to the return
+	IncludeRejected *QueryIncludeRejected `form:"include_rejected,omitempty" json:"include_rejected,omitempty"`
+}
+
+// GetClaimsBsnServiceLawParams defines parameters for GetClaimsBsnServiceLaw.
+type GetClaimsBsnServiceLawParams struct {
+	// Approved If added to URI only approved claims will be returned.
+	Approved *QueryOnlyApproved `form:"approved,omitempty" json:"approved,omitempty"`
+
+	// IncludeRejected If added to URI rejected claims will be added to the return
+	IncludeRejected *QueryIncludeRejected `form:"include_rejected,omitempty" json:"include_rejected,omitempty"`
+}
+
 // ServiceLawsDiscoverableListParams defines parameters for ServiceLawsDiscoverableList.
 type ServiceLawsDiscoverableListParams struct {
 	// DiscoverableBy Filter for discoverable by, defaults to 'CITIZEN'
@@ -211,6 +323,18 @@ type EvaluateJSONRequestBody EvaluateJSONBody
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (GET /cases/{bsn}/{service}/{law})
+	GetCasesBsnServiceLaw(w http.ResponseWriter, r *http.Request, bsn PathBSN, service PathService, law PathLaw)
+
+	// (GET /cases/{service}/{law})
+	GetCasesServiceLaw(w http.ResponseWriter, r *http.Request, service PathService, law PathLaw)
+
+	// (GET /claims/{bsn})
+	GetClaimsBsn(w http.ResponseWriter, r *http.Request, bsn PathBSN, params GetClaimsBsnParams)
+
+	// (GET /claims/{bsn}/{service}/{law})
+	GetClaimsBsnServiceLaw(w http.ResponseWriter, r *http.Request, bsn PathBSN, service PathService, law PathLaw, params GetClaimsBsnServiceLawParams)
+
 	// (GET /discoverable-service-laws)
 	ServiceLawsDiscoverableList(w http.ResponseWriter, r *http.Request, params ServiceLawsDiscoverableListParams)
 
@@ -230,6 +354,26 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// (GET /cases/{bsn}/{service}/{law})
+func (_ Unimplemented) GetCasesBsnServiceLaw(w http.ResponseWriter, r *http.Request, bsn PathBSN, service PathService, law PathLaw) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /cases/{service}/{law})
+func (_ Unimplemented) GetCasesServiceLaw(w http.ResponseWriter, r *http.Request, service PathService, law PathLaw) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /claims/{bsn})
+func (_ Unimplemented) GetClaimsBsn(w http.ResponseWriter, r *http.Request, bsn PathBSN, params GetClaimsBsnParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /claims/{bsn}/{service}/{law})
+func (_ Unimplemented) GetClaimsBsnServiceLaw(w http.ResponseWriter, r *http.Request, bsn PathBSN, service PathService, law PathLaw, params GetClaimsBsnServiceLawParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // (GET /discoverable-service-laws)
 func (_ Unimplemented) ServiceLawsDiscoverableList(w http.ResponseWriter, r *http.Request, params ServiceLawsDiscoverableListParams) {
@@ -264,6 +408,189 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// GetCasesBsnServiceLaw operation middleware
+func (siw *ServerInterfaceWrapper) GetCasesBsnServiceLaw(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "bsn" -------------
+	var bsn PathBSN
+
+	err = runtime.BindStyledParameterWithOptions("simple", "bsn", chi.URLParam(r, "bsn"), &bsn, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bsn", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "service" -------------
+	var service PathService
+
+	err = runtime.BindStyledParameterWithOptions("simple", "service", chi.URLParam(r, "service"), &service, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "service", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "law" -------------
+	var law PathLaw
+
+	err = runtime.BindStyledParameterWithOptions("simple", "law", chi.URLParam(r, "law"), &law, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "law", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCasesBsnServiceLaw(w, r, bsn, service, law)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCasesServiceLaw operation middleware
+func (siw *ServerInterfaceWrapper) GetCasesServiceLaw(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "service" -------------
+	var service PathService
+
+	err = runtime.BindStyledParameterWithOptions("simple", "service", chi.URLParam(r, "service"), &service, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "service", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "law" -------------
+	var law PathLaw
+
+	err = runtime.BindStyledParameterWithOptions("simple", "law", chi.URLParam(r, "law"), &law, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "law", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCasesServiceLaw(w, r, service, law)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetClaimsBsn operation middleware
+func (siw *ServerInterfaceWrapper) GetClaimsBsn(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "bsn" -------------
+	var bsn PathBSN
+
+	err = runtime.BindStyledParameterWithOptions("simple", "bsn", chi.URLParam(r, "bsn"), &bsn, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bsn", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClaimsBsnParams
+
+	// ------------- Optional query parameter "approved" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "approved", r.URL.Query(), &params.Approved)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "approved", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "include_rejected" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "include_rejected", r.URL.Query(), &params.IncludeRejected)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "include_rejected", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetClaimsBsn(w, r, bsn, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetClaimsBsnServiceLaw operation middleware
+func (siw *ServerInterfaceWrapper) GetClaimsBsnServiceLaw(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "bsn" -------------
+	var bsn PathBSN
+
+	err = runtime.BindStyledParameterWithOptions("simple", "bsn", chi.URLParam(r, "bsn"), &bsn, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "bsn", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "service" -------------
+	var service PathService
+
+	err = runtime.BindStyledParameterWithOptions("simple", "service", chi.URLParam(r, "service"), &service, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "service", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "law" -------------
+	var law PathLaw
+
+	err = runtime.BindStyledParameterWithOptions("simple", "law", chi.URLParam(r, "law"), &law, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "law", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetClaimsBsnServiceLawParams
+
+	// ------------- Optional query parameter "approved" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "approved", r.URL.Query(), &params.Approved)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "approved", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "include_rejected" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "include_rejected", r.URL.Query(), &params.IncludeRejected)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "include_rejected", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetClaimsBsnServiceLaw(w, r, bsn, service, law, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ServiceLawsDiscoverableList operation middleware
 func (siw *ServerInterfaceWrapper) ServiceLawsDiscoverableList(w http.ResponseWriter, r *http.Request) {
@@ -523,6 +850,18 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cases/{bsn}/{service}/{law}", wrapper.GetCasesBsnServiceLaw)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cases/{service}/{law}", wrapper.GetCasesServiceLaw)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/claims/{bsn}", wrapper.GetClaimsBsn)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/claims/{bsn}/{service}/{law}", wrapper.GetClaimsBsnServiceLaw)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/discoverable-service-laws", wrapper.ServiceLawsDiscoverableList)
 	})
 	r.Group(func(r chi.Router) {
@@ -543,6 +882,25 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 
 type BadRequestErrorResponseJSONResponse struct {
 	Errors []Error `json:"errors"`
+}
+
+type CaseListResponseJSONResponse struct {
+	// Data List of all cases
+	Data CaseList `json:"data"`
+}
+
+type CaseResponseJSONResponse struct {
+	// Data Claim
+	Data Case `json:"data"`
+}
+
+type ClaimListResponseJSONResponse struct {
+	// Data List of all claims
+	Data ClaimList `json:"data"`
+}
+
+type ClaimListWithKeyResponseJSONResponse struct {
+	Data map[string]Claim `json:"data"`
 }
 
 type EvaluateResponseJSONResponse struct {
@@ -576,6 +934,182 @@ type RuleSpecResponseJSONResponse struct {
 type ServiceListResponseJSONResponse struct {
 	// Data List of all services
 	Data ServiceList `json:"data"`
+}
+
+type GetCasesBsnServiceLawRequestObject struct {
+	Bsn     PathBSN     `json:"bsn"`
+	Service PathService `json:"service"`
+	Law     PathLaw     `json:"law"`
+}
+
+type GetCasesBsnServiceLawResponseObject interface {
+	VisitGetCasesBsnServiceLawResponse(w http.ResponseWriter) error
+}
+
+type GetCasesBsnServiceLaw200JSONResponse struct{ CaseResponseJSONResponse }
+
+func (response GetCasesBsnServiceLaw200JSONResponse) VisitGetCasesBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCasesBsnServiceLaw400JSONResponse struct {
+	BadRequestErrorResponseJSONResponse
+}
+
+func (response GetCasesBsnServiceLaw400JSONResponse) VisitGetCasesBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCasesBsnServiceLaw404JSONResponse struct {
+	ResourceNotFoundErrorResponseJSONResponse
+}
+
+func (response GetCasesBsnServiceLaw404JSONResponse) VisitGetCasesBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCasesBsnServiceLaw500JSONResponse struct {
+	InternalServerErrorResponseJSONResponse
+}
+
+func (response GetCasesBsnServiceLaw500JSONResponse) VisitGetCasesBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCasesServiceLawRequestObject struct {
+	Service PathService `json:"service"`
+	Law     PathLaw     `json:"law"`
+}
+
+type GetCasesServiceLawResponseObject interface {
+	VisitGetCasesServiceLawResponse(w http.ResponseWriter) error
+}
+
+type GetCasesServiceLaw200JSONResponse struct{ CaseListResponseJSONResponse }
+
+func (response GetCasesServiceLaw200JSONResponse) VisitGetCasesServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCasesServiceLaw400JSONResponse struct {
+	BadRequestErrorResponseJSONResponse
+}
+
+func (response GetCasesServiceLaw400JSONResponse) VisitGetCasesServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCasesServiceLaw500JSONResponse struct {
+	InternalServerErrorResponseJSONResponse
+}
+
+func (response GetCasesServiceLaw500JSONResponse) VisitGetCasesServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetClaimsBsnRequestObject struct {
+	Bsn    PathBSN `json:"bsn"`
+	Params GetClaimsBsnParams
+}
+
+type GetClaimsBsnResponseObject interface {
+	VisitGetClaimsBsnResponse(w http.ResponseWriter) error
+}
+
+type GetClaimsBsn200JSONResponse struct{ ClaimListResponseJSONResponse }
+
+func (response GetClaimsBsn200JSONResponse) VisitGetClaimsBsnResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetClaimsBsn400JSONResponse struct {
+	BadRequestErrorResponseJSONResponse
+}
+
+func (response GetClaimsBsn400JSONResponse) VisitGetClaimsBsnResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetClaimsBsn500JSONResponse struct {
+	InternalServerErrorResponseJSONResponse
+}
+
+func (response GetClaimsBsn500JSONResponse) VisitGetClaimsBsnResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetClaimsBsnServiceLawRequestObject struct {
+	Bsn     PathBSN     `json:"bsn"`
+	Service PathService `json:"service"`
+	Law     PathLaw     `json:"law"`
+	Params  GetClaimsBsnServiceLawParams
+}
+
+type GetClaimsBsnServiceLawResponseObject interface {
+	VisitGetClaimsBsnServiceLawResponse(w http.ResponseWriter) error
+}
+
+type GetClaimsBsnServiceLaw200JSONResponse struct {
+	ClaimListWithKeyResponseJSONResponse
+}
+
+func (response GetClaimsBsnServiceLaw200JSONResponse) VisitGetClaimsBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetClaimsBsnServiceLaw400JSONResponse struct {
+	BadRequestErrorResponseJSONResponse
+}
+
+func (response GetClaimsBsnServiceLaw400JSONResponse) VisitGetClaimsBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetClaimsBsnServiceLaw500JSONResponse struct {
+	InternalServerErrorResponseJSONResponse
+}
+
+func (response GetClaimsBsnServiceLaw500JSONResponse) VisitGetClaimsBsnServiceLawResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type ServiceLawsDiscoverableListRequestObject struct {
@@ -790,6 +1324,18 @@ func (response RuleSpecGet500JSONResponse) VisitRuleSpecGetResponse(w http.Respo
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
+	// (GET /cases/{bsn}/{service}/{law})
+	GetCasesBsnServiceLaw(ctx context.Context, request GetCasesBsnServiceLawRequestObject) (GetCasesBsnServiceLawResponseObject, error)
+
+	// (GET /cases/{service}/{law})
+	GetCasesServiceLaw(ctx context.Context, request GetCasesServiceLawRequestObject) (GetCasesServiceLawResponseObject, error)
+
+	// (GET /claims/{bsn})
+	GetClaimsBsn(ctx context.Context, request GetClaimsBsnRequestObject) (GetClaimsBsnResponseObject, error)
+
+	// (GET /claims/{bsn}/{service}/{law})
+	GetClaimsBsnServiceLaw(ctx context.Context, request GetClaimsBsnServiceLawRequestObject) (GetClaimsBsnServiceLawResponseObject, error)
+
 	// (GET /discoverable-service-laws)
 	ServiceLawsDiscoverableList(ctx context.Context, request ServiceLawsDiscoverableListRequestObject) (ServiceLawsDiscoverableListResponseObject, error)
 
@@ -833,6 +1379,117 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// GetCasesBsnServiceLaw operation middleware
+func (sh *strictHandler) GetCasesBsnServiceLaw(w http.ResponseWriter, r *http.Request, bsn PathBSN, service PathService, law PathLaw) {
+	var request GetCasesBsnServiceLawRequestObject
+
+	request.Bsn = bsn
+	request.Service = service
+	request.Law = law
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCasesBsnServiceLaw(ctx, request.(GetCasesBsnServiceLawRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCasesBsnServiceLaw")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCasesBsnServiceLawResponseObject); ok {
+		if err := validResponse.VisitGetCasesBsnServiceLawResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCasesServiceLaw operation middleware
+func (sh *strictHandler) GetCasesServiceLaw(w http.ResponseWriter, r *http.Request, service PathService, law PathLaw) {
+	var request GetCasesServiceLawRequestObject
+
+	request.Service = service
+	request.Law = law
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCasesServiceLaw(ctx, request.(GetCasesServiceLawRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCasesServiceLaw")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCasesServiceLawResponseObject); ok {
+		if err := validResponse.VisitGetCasesServiceLawResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetClaimsBsn operation middleware
+func (sh *strictHandler) GetClaimsBsn(w http.ResponseWriter, r *http.Request, bsn PathBSN, params GetClaimsBsnParams) {
+	var request GetClaimsBsnRequestObject
+
+	request.Bsn = bsn
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetClaimsBsn(ctx, request.(GetClaimsBsnRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetClaimsBsn")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetClaimsBsnResponseObject); ok {
+		if err := validResponse.VisitGetClaimsBsnResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetClaimsBsnServiceLaw operation middleware
+func (sh *strictHandler) GetClaimsBsnServiceLaw(w http.ResponseWriter, r *http.Request, bsn PathBSN, service PathService, law PathLaw, params GetClaimsBsnServiceLawParams) {
+	var request GetClaimsBsnServiceLawRequestObject
+
+	request.Bsn = bsn
+	request.Service = service
+	request.Law = law
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetClaimsBsnServiceLaw(ctx, request.(GetClaimsBsnServiceLawRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetClaimsBsnServiceLaw")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetClaimsBsnServiceLawResponseObject); ok {
+		if err := validResponse.VisitGetClaimsBsnServiceLawResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ServiceLawsDiscoverableList operation middleware
@@ -971,36 +1628,46 @@ func (sh *strictHandler) RuleSpecGet(w http.ResponseWriter, r *http.Request, par
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"AAD//xOSH9n+IQAA",
+	"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",
+	"AAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

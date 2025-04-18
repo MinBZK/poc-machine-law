@@ -10,7 +10,7 @@ import pandas as pd
 
 from machine.service import Services
 from web.dependencies import TODAY
-from web.services.profiles import get_profile_data
+from web.engines.py_engine.services.profiles import get_profile_data
 
 
 class MCPServiceRegistry:

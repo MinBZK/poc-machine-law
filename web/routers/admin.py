@@ -2,15 +2,48 @@ import os
 import sys
 from datetime import datetime
 
+from engines.factory import MachineType
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from pydantic import BaseModel
 from starlette.responses import RedirectResponse
 
 from machine.events.case.aggregate import CaseStatus
-from web.case_manager import CaseManagerInterface, ClaimManagerInterface, MachineInterface
-from web.dependencies import get_case_manager, get_claim_manager, get_machine_service, templates
+from web.dependencies import (
+    get_case_manager,
+    get_claim_manager,
+    get_engine_type,
+    get_machine_service,
+    set_engine_type,
+    templates,
+)
+from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.routers.laws import evaluate_law
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+
+# Define Engine model
+class Engine(BaseModel):
+    id: MachineType
+    name: str
+    description: str
+    active: bool = False
+
+
+def get_engines() -> list[Engine]:
+    engines = [
+        Engine(id=MachineType.PYTHON, name="Python Engine", description="Default processing engine"),
+        Engine(id=MachineType.GO, name="Go Engine", description="Typed engine"),
+    ]
+
+    current = get_engine_type()
+
+    # Set active to True if engine id matches current
+    for engine in engines:
+        if engine.id == current:
+            engine.active = True
+
+    return engines
 
 
 def group_cases_by_status(cases):
@@ -25,7 +58,7 @@ def group_cases_by_status(cases):
 
 
 @router.get("/")
-async def admin_redirect(request: Request, services: MachineInterface = Depends(get_machine_service)):
+async def admin_redirect(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Redirect to first available service"""
     discoverable_laws = await services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
@@ -33,19 +66,46 @@ async def admin_redirect(request: Request, services: MachineInterface = Depends(
 
 
 @router.get("/reset")
-async def reset(request: Request, services: MachineInterface = Depends(get_machine_service)):
+async def reset(request: Request):
+    return RedirectResponse("/admin/control")
+
+
+@router.get("/control")
+async def control(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Show a button to reset the state of the application"""
 
     return templates.TemplateResponse(
-        "admin/reset.html",
+        "admin/control.html",
         {
             "request": request,
+            "engines": get_engines(),
+        },
+    )
+
+
+@router.post("/set-engine")
+async def post_set_engine(
+    request: Request, selected_engine: MachineType = Form(...), services: EngineInterface = Depends(get_machine_service)
+):
+    # Validate engine exists
+    engine_exists = any(engine.id == selected_engine for engine in get_engines())
+    if not engine_exists:
+        raise HTTPException(status_code=400, detail="Invalid engine selection")
+
+    set_engine_type(selected_engine)
+
+    # Redirect back to admin dashboard
+    return templates.TemplateResponse(
+        "/admin/partials/engines.html",
+        {
+            "request": request,
+            "engines": get_engines(),
         },
     )
 
 
 @router.post("/reset")
-async def post_reset(request: Request, services: MachineInterface = Depends(get_machine_service)):
+async def post_reset(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Reset the state of the application"""
 
     # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
@@ -56,7 +116,7 @@ async def post_reset(request: Request, services: MachineInterface = Depends(get_
 async def admin_dashboard(
     request: Request,
     service: str,
-    services: MachineInterface = Depends(get_machine_service),
+    services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
@@ -193,7 +253,7 @@ async def complete_review(
 async def view_case(
     request: Request,
     case_id: str,
-    machine_service: MachineInterface = Depends(get_machine_service),
+    machine_service: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):

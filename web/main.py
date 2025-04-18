@@ -6,8 +6,8 @@ from fastapi.staticfiles import StaticFiles
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from web.case_manager import MachineInterface
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
+from web.engines import EngineInterface
 from web.routers import admin, chat, edit, importer, laws
 
 app = FastAPI(title="Burger.nl")
@@ -41,7 +41,7 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "100000001", services: MachineInterface = Depends(get_machine_service)):
+async def root(request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)):
     """Render the main dashboard page"""
     profile = services.get_profile_data(bsn)
     if not profile:

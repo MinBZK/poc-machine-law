@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -37,6 +38,8 @@ type CaseManager struct {
 	observerBus eh.EventBus
 	wg          *sync.WaitGroup
 }
+
+var ErrCaseNotFound = errors.New("case_not_found")
 
 // NewCaseManager creates a new case manager with EventHorizon components.
 func NewCaseManager(logger logging.Logger, services *Services) *CaseManager {
@@ -587,7 +590,7 @@ func (cm *CaseManager) CanObject(caseID uuid.UUID) (bool, error) {
 }
 
 // GetCase gets a case for a specific bsn, service and law combination
-func (cm *CaseManager) GetCase(bsn, serviceType, law string) *casemanager.Case {
+func (cm *CaseManager) GetCase(ctx context.Context, bsn, serviceType, law string) (*casemanager.Case, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
@@ -595,18 +598,17 @@ func (cm *CaseManager) GetCase(bsn, serviceType, law string) *casemanager.Case {
 
 	caseID, exists := cm.GetCaseByKey(key)
 	if !exists {
-		return nil
+		return nil, nil // TODO: handle proper on the end that uses this function fmt.Errorf("get case by key: %w", ErrCaseNotFound)
 	}
 
 	// Find the case in the repository
-	ctx := context.Background()
 	c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
 	if err != nil {
-		return nil
+		return nil, nil // TODO: handle proper on the end that uses this function fmt.Errorf("find case %w", ErrCaseNotFound)
 	}
 
 	// Convert from casemanager.Case to model.Case
-	return c
+	return c, nil
 }
 
 // GetCaseByID gets a case by ID
@@ -649,15 +651,13 @@ func (cm *CaseManager) GetCasesByStatus(serviceType string, status casemanager.C
 }
 
 // GetCasesByLaw gets all cases for a specific law and service combination
-func (cm *CaseManager) GetCasesByLaw(law, serviceType string) []*casemanager.Case {
+func (cm *CaseManager) GetCasesByLaw(ctx context.Context, law, serviceType string) ([]*casemanager.Case, error) {
 	// This would normally involve a more efficient query to the repository
 	// For now, we'll scan through all cases in the index
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
 	var result []*casemanager.Case
-	ctx := context.Background()
-
 	for _, caseID := range cm.caseIndex {
 		c, err := casemanager.FindCase(ctx, cm.caseRepo, caseID)
 		if err != nil {
@@ -669,7 +669,7 @@ func (cm *CaseManager) GetCasesByLaw(law, serviceType string) []*casemanager.Cas
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 // GetEventsByUUID gets events, optionally filtered by case ID
