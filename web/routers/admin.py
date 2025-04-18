@@ -2,15 +2,48 @@ import os
 import sys
 from datetime import datetime
 
+from engines.factory import MachineType
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from pydantic import BaseModel
 from starlette.responses import RedirectResponse
 
 from machine.events.case.aggregate import CaseStatus
-from machine.service import Services
-from web.dependencies import get_services, templates
+from web.dependencies import (
+    get_case_manager,
+    get_claim_manager,
+    get_engine_type,
+    get_machine_service,
+    set_engine_type,
+    templates,
+)
+from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.routers.laws import evaluate_law
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+
+# Define Engine model
+class Engine(BaseModel):
+    id: MachineType
+    name: str
+    description: str
+    active: bool = False
+
+
+def get_engines() -> list[Engine]:
+    engines = [
+        Engine(id=MachineType.PYTHON, name="Python Engine", description="Default processing engine"),
+        Engine(id=MachineType.GO, name="Go Engine", description="Typed engine"),
+    ]
+
+    current = get_engine_type()
+
+    # Set active to True if engine id matches current
+    for engine in engines:
+        if engine.id == current:
+            engine.active = True
+
+    return engines
 
 
 def group_cases_by_status(cases):
@@ -25,7 +58,7 @@ def group_cases_by_status(cases):
 
 
 @router.get("/")
-async def admin_redirect(request: Request, services: Services = Depends(get_services)):
+async def admin_redirect(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Redirect to first available service"""
     discoverable_laws = await services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
@@ -33,19 +66,46 @@ async def admin_redirect(request: Request, services: Services = Depends(get_serv
 
 
 @router.get("/reset")
-async def reset(request: Request, services: Services = Depends(get_services)):
+async def reset(request: Request):
+    return RedirectResponse("/admin/control")
+
+
+@router.get("/control")
+async def control(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Show a button to reset the state of the application"""
 
     return templates.TemplateResponse(
-        "admin/reset.html",
+        "admin/control.html",
         {
             "request": request,
+            "engines": get_engines(),
+        },
+    )
+
+
+@router.post("/set-engine")
+async def post_set_engine(
+    request: Request, selected_engine: MachineType = Form(...), services: EngineInterface = Depends(get_machine_service)
+):
+    # Validate engine exists
+    engine_exists = any(engine.id == selected_engine for engine in get_engines())
+    if not engine_exists:
+        raise HTTPException(status_code=400, detail="Invalid engine selection")
+
+    set_engine_type(selected_engine)
+
+    # Redirect back to admin dashboard
+    return templates.TemplateResponse(
+        "/admin/partials/engines.html",
+        {
+            "request": request,
+            "engines": get_engines(),
         },
     )
 
 
 @router.post("/reset")
-async def post_reset(request: Request, services: Services = Depends(get_services)):
+async def post_reset(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Reset the state of the application"""
 
     # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
@@ -53,7 +113,12 @@ async def post_reset(request: Request, services: Services = Depends(get_services
 
 
 @router.get("/{service}")
-async def admin_dashboard(request: Request, service: str, services: Services = Depends(get_services)):
+async def admin_dashboard(
+    request: Request,
+    service: str,
+    services: EngineInterface = Depends(get_machine_service),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+):
     """Main admin dashboard view"""
     discoverable_laws = await services.get_discoverable_service_laws()
     available_services = list(discoverable_laws.keys())
@@ -62,7 +127,7 @@ async def admin_dashboard(request: Request, service: str, services: Services = D
     service_laws = discoverable_laws.get(service, [])
     service_cases = {}
     for law in service_laws:
-        cases = services.case_manager.get_cases_by_law(law, service)
+        cases = await case_manager.get_cases_by_law(law, service)
         service_cases[law] = group_cases_by_status(cases)
 
     return templates.TemplateResponse(
@@ -82,7 +147,7 @@ async def move_case(
     request: Request,
     case_id: str,
     new_status: str = Form(...),
-    services: Services = Depends(get_services),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Handle case movement between status lanes"""
     print(f"Moving case {case_id} to status {new_status}")  # Debug print
@@ -92,14 +157,14 @@ async def move_case(
         except KeyError:
             raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
 
-        case = services.case_manager.get_case_by_id(case_id)
+        case = await case_manager.get_case_by_id(case_id)
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
 
         # Based on the target status, call the appropriate method
         if new_status_enum == CaseStatus.IN_REVIEW:
             # Get latest results from events
-            events = services.case_manager.repository.events.get_domain_events(case.id)
+            events = case_manager.repository.events.get_domain_events(case.id)
             latest_results = {}
             for event in reversed(events):
                 if hasattr(event, "claimed_result") and hasattr(event, "verified_result"):
@@ -124,7 +189,7 @@ async def move_case(
         else:
             raise HTTPException(status_code=400, detail=f"Cannot move to status {new_status}")
 
-        services.case_manager.save(case)
+        await case_manager.save(case)
 
         # Return just the updated card
         return templates.TemplateResponse(
@@ -142,16 +207,16 @@ async def complete_review(
     case_id: str,
     decision: bool = Form(...),
     reason: str = Form(...),  # Note: changed from reasoning to match form
-    services: Services = Depends(get_services),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Complete manual review of a case"""
     try:
-        case_id = services.case_manager.complete_manual_review(
+        case_id = case_manager.complete_manual_review(
             case_id=case_id, verifier_id="ADMIN", approved=decision, reason=reason
         )
 
         # Get the updated case
-        updated_case = services.case_manager.get_case_by_id(case_id)
+        updated_case = await case_manager.get_case_by_id(case_id)
 
         # Check if request is from case detail page
         is_detail_page = request.headers.get("HX-Current-URL", "").endswith(f"/cases/{case_id}")
@@ -185,16 +250,22 @@ async def complete_review(
 
 
 @router.get("/cases/{case_id}")
-async def view_case(request: Request, case_id: str, services: Services = Depends(get_services)):
+async def view_case(
+    request: Request,
+    case_id: str,
+    machine_service: EngineInterface = Depends(get_machine_service),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+):
     """View details of a specific case"""
-    case = services.case_manager.get_case_by_id(case_id)
+    case = await case_manager.get_case_by_id(case_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
-    case.events = services.case_manager.get_events(case.id)
-    law, result, rule_spec, parameters = await evaluate_law(case.bsn, case.law, case.service, services)
-    value_tree = services.extract_value_tree(result.path)
-    claims = services.claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
+    case.events = await case_manager.get_events(case.id)
+    law, result, rule_spec, parameters = await evaluate_law(case.bsn, case.law, case.service, machine_service)
+    value_tree = machine_service.extract_value_tree(result.path)
+    claims = await claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
     claim_ids = {claim.id: claim for claim in claims}
     claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
     return templates.TemplateResponse(
@@ -210,16 +281,21 @@ async def view_case(request: Request, case_id: str, services: Services = Depends
 
 
 @router.get("/claims/{claim_id}")
-async def view_claim(request: Request, claim_id: str, services: Services = Depends(get_services)):
+async def view_claim(
+    request: Request,
+    claim_id: str,
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+):
     """View details of a specific claim"""
-    claim = services.claim_manager.get_claim(claim_id)
+    claim = await claim_manager.get_claim(claim_id)
     if not claim:
         raise HTTPException(status_code=404, detail="Claim not found")
 
     # Get related case if it exists
     related_case = None
     if claim.case_id:
-        related_case = services.case_manager.get_case_by_id(claim.case_id)
+        related_case = await case_manager.get_case_by_id(claim.case_id)
 
     return templates.TemplateResponse(
         "admin/claim_detail.html", {"request": request, "claim": claim, "related_case": related_case}

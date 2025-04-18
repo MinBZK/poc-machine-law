@@ -105,7 +105,7 @@ class MCPLawConnector:
         # Check if we have a profile for this BSN
         profile = None
         try:
-            from web.services.profiles import get_profile_data
+            from web.engines.py_engine.services.profiles import get_profile_data
 
             profile = get_profile_data(bsn)
         except Exception as e:

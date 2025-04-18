@@ -8,9 +8,8 @@ from fastapi import APIRouter, Depends, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 from explain.mcp_connector import MCPLawConnector
-from machine.service import Services
-from web.dependencies import get_services, templates
-from web.services.profiles import get_profile_data
+from web.dependencies import get_machine_service, templates
+from web.engines import EngineInterface
 from web.utils import format_message
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -236,13 +235,13 @@ manager = ChatConnectionManager()
 
 
 @router.get("/", response_class=HTMLResponse)
-async def get_chat_page(request: Request, bsn: str = "100000001", services: Services = Depends(get_services)):
+async def get_chat_page(
+    request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)
+):
     """Render the chat interface page"""
-    profile = get_profile_data(bsn)
+    profile = services.get_profile_data(bsn)
     if not profile:
         return HTMLResponse("Profile not found", status_code=404)
-
-    from web.services.profiles import get_all_profiles
 
     return templates.TemplateResponse(
         "chat.html",
@@ -250,19 +249,21 @@ async def get_chat_page(request: Request, bsn: str = "100000001", services: Serv
             "request": request,
             "profile": profile,
             "bsn": bsn,
-            "all_profiles": get_all_profiles(),  # Add this for the profile selector
+            "all_profiles": services.get_all_profiles(),  # Add this for the profile selector
         },
     )
 
 
 @router.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Services = Depends(get_services)):
+async def websocket_endpoint(
+    websocket: WebSocket, client_id: str, services: EngineInterface = Depends(get_machine_service)
+):
     await manager.connect(websocket, client_id)
 
     try:
         # Get the BSN from the client_id (client_id format is "chat_{bsn}")
         bsn = client_id.split("_")[1] if "_" in client_id else "100000001"
-        profile = get_profile_data(bsn)
+        profile = services.get_profile_data(bsn)
 
         if not profile:
             error_msg = f"Profile not found for BSN: {bsn}"

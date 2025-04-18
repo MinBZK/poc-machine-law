@@ -35,6 +35,7 @@ dev = [
     "pytest-playwright>=0.4.0",
     "playwright>=1.40.0",
     "ruff>=0.11.0",
+    "openapi-python-client>=0.24.3",
 ]
 
 [tool.ruff]

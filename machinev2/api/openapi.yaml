@@ -1,0 +1,650 @@
+openapi: "3.0.3"
+info:
+  title: Law as Code
+  version: 0.0.1
+servers:
+  - url: https://api.server.test/v1
+tags:
+  - name: Law
+  - name: Profile
+  - name: Claim
+  - name: Case
+paths:
+  /evaluate:
+    post:
+      tags:
+        - Law
+      description: Evaluate the law
+      operationId: evaluate
+      requestBody:
+        $ref: "#/components/requestBodies/EvaluateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/EvaluateResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /profiles:
+    get:
+      tags:
+        - Profile
+      description: Get all profiles
+      operationId: profileList
+      responses:
+        "200":
+          $ref: "#/components/responses/ProfileListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /profiles/{bsn}:
+    get:
+      tags:
+        - Profile
+      description: Get all profiles
+      operationId: profileGet
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProfileResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "404":
+          $ref: "#/components/responses/ResourceNotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /discoverable-service-laws:
+    get:
+      tags:
+        - Law
+      description: Get all discoverable service & laws
+      operationId: serviceLawsDiscoverableList
+      parameters:
+        - $ref: "#/components/parameters/queryDiscoverableBy"
+      responses:
+        "200":
+          $ref: "#/components/responses/ServiceListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /rule-spec:
+    get:
+      tags:
+        - Law
+      description: Get rule spec
+      operationId: ruleSpecGet
+      parameters:
+        - $ref: "#/components/parameters/queryService"
+        - $ref: "#/components/parameters/queryLaw"
+        - $ref: "#/components/parameters/queryReferenceDate"
+      responses:
+        "200":
+          $ref: "#/components/responses/RuleSpecResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /claims/{bsn}:
+    get:
+      tags:
+        - Claim
+      description: Get all claims
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/queryOnlyApproved"
+        - $ref: "#/components/parameters/queryIncludeRejected"
+      operation: claimListBasedOnBSN
+      responses:
+        "200":
+          $ref: "#/components/responses/ClaimListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /claims/{bsn}/{service}/{law}:
+    get:
+      tags:
+        - Claim
+      description: Get all claims
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/pathService"
+        - $ref: "#/components/parameters/pathLaw"
+        - $ref: "#/components/parameters/queryOnlyApproved"
+        - $ref: "#/components/parameters/queryIncludeRejected"
+      operation: claimListBasedOnBSN
+      responses:
+        "200":
+          $ref: "#/components/responses/ClaimListWithKeyResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /cases/{bsn}/{service}/{law}:
+    get:
+      tags:
+        - Case
+      description: Get a case based on bsn, service and law
+      parameters:
+        - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/pathService"
+        - $ref: "#/components/parameters/pathLaw"
+      operation: caseasedOnBSNServiceAndLaw
+      responses:
+        "200":
+          $ref: "#/components/responses/CaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "404":
+          $ref: "#/components/responses/ResourceNotFoundErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+  /cases/{service}/{law}:
+    get:
+      tags:
+        - Case
+      description: Get all cases based on service and law
+      parameters:
+        - $ref: "#/components/parameters/pathService"
+        - $ref: "#/components/parameters/pathLaw"
+      operation: caseasedOnBSNServiceAndLaw
+      responses:
+        "200":
+          $ref: "#/components/responses/CaseListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+components:
+  schemas:
+    bsn:
+      description: Burgerservicenummer of a Dutch citizen
+      type: string
+      pattern: "^[0-9]{9}$"
+      example: "111222333"
+    discoverableBy:
+      description: DiscoverableBy is a string that can be used to filter lists
+      type: string
+      example: CITIZEN
+    referenceDate:
+      description: reference date
+      type: string
+      format: date
+      example: 2025-01-31
+    Error:
+      description: The error that occured while processing this request.
+      type: object
+      properties:
+        message:
+          type: string
+          example: foo went wrong
+      required:
+        - message
+    Evaluate:
+      description: Evaluate.
+      type: object
+      properties:
+        service:
+          type: string
+          description: Specify the service that needs to be executed
+        law:
+          type: string
+          description: Specify the law that needs to be executed
+        parameters:
+          type: object
+          additionalProperties: true
+        date:
+          type: string
+          format: date
+          description: Can be used to overwrite the date used by the service
+          example: "2025-01-31"
+        input:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+        output:
+          type: string
+          description: specify a requested output value
+        approved:
+          type: boolean
+          description: only use approved claims, default to true
+      required:
+        - service
+        - law
+      example:
+        service: "TOESLAGEN"
+        law: "zorgtoeslagwet"
+    EvaluateResponseSchema:
+      description: Evaluate response
+      type: object
+      properties:
+        output:
+          type: object
+          additionalProperties: true
+        input:
+          type: object
+          additionalProperties: true
+        requirementsMet:
+          type: boolean
+          description: Will be true when all requirements where met
+        rulespecId:
+          type: string
+          format: uuid
+          description: Identifier of the rulespec
+        missingRequired:
+          type: boolean
+          description: Will be true when a required value is missing
+        path:
+          $ref: "#/components/schemas/PathNode"
+      required:
+        - output
+        - input
+        - requirementsMet
+        - rulespecId
+        - missingRequired
+        - path
+    PathNode:
+      description: path node
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        result: {}
+        resolveType:
+          type: string
+        required:
+          type: boolean
+        details:
+          type: object
+          additionalProperties: true
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/PathNode"
+      required:
+        - type
+        - name
+    Profile:
+      description: Profile
+      type: object
+      properties:
+        bsn:
+          $ref: "#/components/schemas/bsn"
+        name:
+          type: string
+          description: Name of the burger
+        description:
+          type: string
+          description: Description of the burger
+        sources:
+          type: object
+          description: All sources for a certain profile
+          additionalProperties:
+            $ref: "#/components/schemas/Source"
+      required:
+        - bsn
+        - name
+        - description
+        - sources
+    ProfileList:
+      description: List of all burgers
+      type: array
+      items:
+        $ref: "#/components/schemas/Profile"
+    Source:
+      type: object
+      description: A source
+      additionalProperties:
+        type: array
+        items:
+          type: object
+          additionalProperties: true # 'any' type is not directly supported, using 'object' as a close representation
+    Service:
+      description: Service
+      type: object
+      properties:
+        name:
+          type: string
+          description: Service name
+        laws:
+          type: array
+          items:
+            $ref: "#/components/schemas/Law"
+      required:
+        - name
+        - laws
+      example:
+        name: BELASTINGDIENST
+        laws:
+          - name: wet_inkomstenbelasting
+            discoverable_by:
+              - CITIZEN
+    Law:
+      description: Law
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the law
+        discoverable_by:
+          type: array
+          description: Who can discover this law
+          items:
+            type: string
+      required:
+        - name
+        - discoverable_by
+      example:
+        name: wet_inkomstenbelasting
+        discoverable_by:
+          - CITIZEN
+    ServiceList:
+      description: List of all services
+      type: array
+      items:
+        $ref: "#/components/schemas/Service"
+    RuleSpec:
+      description: Rule spec
+      type: object
+      additionalProperties: true
+    Claim:
+      description: Claim
+      type: object
+      properties:
+        bsn:
+          $ref: "#/components/schemas/bsn"
+        service:
+          type: string
+          description: Specify the service that needs to be executed
+        law:
+          type: string
+          description: Specify the law that needs to be executed
+        key:
+          type: string
+      required:
+        - bsn
+        - service
+        - law
+        - key
+    ClaimList:
+      description: List of all claims
+      type: array
+      items:
+        $ref: "#/components/schemas/Claim"
+    Case:
+      description: Claim
+      type: object
+      properties:
+        bsn:
+          $ref: "#/components/schemas/bsn"
+        service:
+          type: string
+          description: Specify the service that needs to be executed
+        law:
+          type: string
+          description: Specify the law that needs to be executed
+        status:
+          type: string
+          enum:
+            - SUBMITTED
+            - DECIDED
+            - IN_REVIEW
+            - OBJECTED
+        approved:
+          type: boolean
+      required:
+        - bsn
+        - service
+        - law
+        - status
+    CaseList:
+      description: List of all cases
+      type: array
+      items:
+        $ref: "#/components/schemas/Case"
+
+  parameters:
+    pathBSN:
+      name: bsn
+      in: path
+      description: Burgerservicenummer of a Dutch citizen
+      required: true
+      schema:
+        $ref: "#/components/schemas/bsn"
+    pathService:
+      name: service
+      in: path
+      description: filter for service
+      required: true
+      schema:
+        type: string
+        example: TOESLAGEN
+    pathLaw:
+      name: law
+      in: path
+      description: filter for law
+      required: true
+      schema:
+        type: string
+        example: zorgtoeslagwet
+    queryOnlyApproved:
+      name: approved
+      in: query
+      description: If added to URI only approved claims will be returned.
+      required: false
+      schema:
+        type: boolean
+        example: true
+    queryIncludeRejected:
+      name: include_rejected
+      in: query
+      description: If added to URI rejected claims will be added to the return
+      required: false
+      schema:
+        type: boolean
+        example: false
+    queryDiscoverableBy:
+      name: discoverableBy
+      in: query
+      description: Filter for discoverable by, defaults to 'CITIZEN'
+      required: false
+      schema:
+        $ref: "#/components/schemas/discoverableBy"
+    queryService:
+      name: service
+      in: query
+      description: filter for service
+      required: true
+      schema:
+        type: string
+        example: TOESLAGEN
+    queryLaw:
+      name: law
+      in: query
+      description: filter for law
+      required: true
+      schema:
+        type: string
+        example: zorgtoeslagwet
+    queryReferenceDate:
+      name: reference_date
+      in: query
+      description: reference date
+      required: true
+      schema:
+        $ref: "#/components/schemas/referenceDate"
+  requestBodies:
+    EvaluateRequest:
+      description: A student grant object update request.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/Evaluate"
+            required:
+              - data
+  responses:
+    EmptyResponse:
+      description: Nothing needs to be returned.
+    BadRequestErrorResponse:
+      description: Invalid input supplied.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Error"
+                example:
+                  - message: foo went wrong
+            required:
+              - errors
+            example:
+              errors:
+                - message: foo went wrong
+    ResourceNotFoundErrorResponse:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Error"
+                example:
+                  - message: foo went wrong
+            example:
+              errors:
+                - message: foo went wrong
+    InternalServerErrorResponse:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Error"
+                example:
+                  - message: foo went wrong
+            required:
+              - errors
+            example:
+              errors:
+                - message: foo went wrong
+    EvaluateResponse:
+      description: Evaluate response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/EvaluateResponseSchema"
+            required:
+              - data
+    ProfileResponse:
+      description: Profile response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/Profile"
+            required:
+              - data
+    ProfileListResponse:
+      description: Profile list response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/ProfileList"
+            required:
+              - data
+    ServiceListResponse:
+      description: Law list response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/ServiceList"
+            required:
+              - data
+    RuleSpecResponse:
+      description: Rule spec response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/RuleSpec"
+            required:
+              - data
+    ClaimListResponse:
+      description: Claim list response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/ClaimList"
+            required:
+              - data
+    ClaimListWithKeyResponse:
+      description: Successfully filtered claims
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/Claim"
+            required:
+              - data
+    CaseResponse:
+      description: Case response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/Case"
+            required:
+              - data
+    CaseListResponse:
+      description: Case list response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/CaseList"
+            required:
+              - data

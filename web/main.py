@@ -6,10 +6,9 @@ from fastapi.staticfiles import StaticFiles
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from machine.service import Services
-from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_services, templates
+from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
+from web.engines import EngineInterface
 from web.routers import admin, chat, edit, importer, laws
-from web.services.profiles import get_all_profiles, get_profile_data
 
 app = FastAPI(title="Burger.nl")
 
@@ -42,13 +41,11 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "100000001", services: Services = Depends(get_services)):
+async def root(request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)):
     """Render the main dashboard page"""
-    profile = get_profile_data(bsn)
+    profile = services.get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
-
-    await laws.set_profile_data(bsn, services)
 
     return templates.TemplateResponse(
         "index.html",
@@ -57,7 +54,7 @@ async def root(request: Request, bsn: str = "100000001", services: Services = De
             "profile": profile,
             "bsn": bsn,
             "formatted_date": FORMATTED_DATE,
-            "all_profiles": get_all_profiles(),
+            "all_profiles": services.get_all_profiles(),
             "discoverable_service_laws": await services.get_sorted_discoverable_service_laws(bsn),
         },
     )
