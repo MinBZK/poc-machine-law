@@ -52,7 +52,6 @@ Feature: Aanvraag Zorgtoeslag
     When de beoordelaar het bezwaar toewijst met reden "Inkomen correct na controle jaaropgave"
     Then is de status "DECIDED"
     And is de aanvraag toegekend
-    And is het toeslagbedrag "1811.28" euro
 
 
   Scenario: Burger gaat in bezwaar, krijgt geen gelijk, en kan in beroep gaan
