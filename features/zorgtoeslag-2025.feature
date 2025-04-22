@@ -43,7 +43,7 @@ Feature: Berekening Zorgtoeslag 2025
       | bsn       | spaargeld | beleggingen | onroerend_goed | schulden |
       | 999993653 | 0         | 0           | 0              | 0        |
     When de zorgtoeslagwet wordt uitgevoerd door TOESLAGEN
-    Then is het toeslagbedrag "2084.92" euro
+    Then is het toeslagbedrag "2096.92" euro
 
   Scenario: Alleenstaande met laag inkomen heeft recht op zorgtoeslag
     Given de volgende RvIG personen gegevens:
@@ -63,7 +63,7 @@ Feature: Berekening Zorgtoeslag 2025
       | 999993653 | 10000     | 0           | 0              | 0        |
     When de zorgtoeslagwet wordt uitgevoerd door TOESLAGEN
     Then heeft de persoon recht op zorgtoeslag
-    And is het toeslagbedrag "2096.21" euro
+    And is het toeslagbedrag "2108.21" euro
 
   Scenario: Persoon met studiefinanciering heeft recht op zorgtoeslag
     Given de volgende RvIG personen gegevens:
@@ -86,4 +86,4 @@ Feature: Berekening Zorgtoeslag 2025
       | 999993653 | 0                      |
     When de zorgtoeslagwet wordt uitgevoerd door TOESLAGEN
     Then heeft de persoon recht op zorgtoeslag
-    And is het toeslagbedrag "2097.16" euro
+    And is het toeslagbedrag "2109.16" euro

@@ -1,0 +1,38 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: ac962262-6628-49bf-a465-5d831271936a
+name: Vaststellen standaardpremie
+law: zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies
+law_type: "FORMELE_WET"
+legal_character: "BESLUIT_VAN_ALGEMENE_STREKKING"
+decision_type: "ALGEMEEN_VERBINDEND_VOORSCHRIFT"
+valid_from: 2025-01-01
+service: "VWS"
+description: >
+  Regeling van de Minister van Volksgezondheid, Welzijn en Sport van 19 november 2024, kenmerk 3973534-1072564-Z,
+  houdende vaststelling van de standaardpremie en de bestuursrechtelijke premies voor 2025 (Regeling vaststelling
+  standaardpremie en bestuursrechtelijke premies 2025)
+
+references:
+  - law: "Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025"
+    article: "1"
+    url: "https://wetten.overheid.nl/jci1.3:c:BWBR0050536&artikel=1&z=2025-01-01&g=2025-01-01"
+  - law: "Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025"
+    article: "3"
+    url: "https://wetten.overheid.nl/jci1.3:c:BWBR0050536&artikel=3&z=2025-01-01&g=2025-01-01"
+
+properties:
+  output:
+  - name: "standard_premium"
+    description: "De standaardpremie, bedoeld in de Wet op de zorgtoeslag voor het berekeningsjaar 2025"
+    type: "amount"
+    type_spec:
+      unit: "eurocent"
+      precision: 0
+      min: 0
+
+  definitions:
+    STANDAARDPREMIE_2025: 211200
+
+actions:
+  - output: "standard_premium"
+    value: $STANDAARDPREMIE_2025

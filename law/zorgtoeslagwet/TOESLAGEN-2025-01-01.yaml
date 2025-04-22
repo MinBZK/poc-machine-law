@@ -155,9 +155,20 @@ properties:
         type: "point_in_time"
         reference: "$prev_january_first"
 
+    - name: "STANDAARDPREMIE"
+      description: "Standaardpremie"
+      type: "amount"
+      service_reference:
+        service: "VWS"
+        field: "standard_premium"
+        law: "zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+
   definitions:
     MINIMUM_AGE: 18
-    STANDAARDPREMIE_2025: 210000
     PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.04273
     PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.01896
     AFBOUWPERCENTAGE_MINIMUM: 0.13700
@@ -203,7 +214,7 @@ actions:
             - else:
                 operation: SUBTRACT
                 values:
-                  - "$STANDAARDPREMIE_2025"
+                  - "$STANDAARDPREMIE"
                   - operation: ADD
                     values:
                       - operation: MULTIPLY
@@ -255,7 +266,7 @@ actions:
                 values:
                   - operation: MULTIPLY
                     values:
-                      - "$STANDAARDPREMIE_2025"
+                      - "$STANDAARDPREMIE"
                       - 2
                   - operation: ADD
                     values:
