@@ -61,6 +61,18 @@ class RuleService:
 
     def _get_engine(self, law: str, reference_date: str) -> RulesEngine:
         """Get or create RulesEngine instance for given law and date"""
+        # Use a single dictionary with tuple keys for more efficient lookup
+        cache_key = (law, reference_date)
+
+        # Flatten the nested dictionaries into a single lookup
+        engines_cache = getattr(self, "_engines_cache", {})
+        if not hasattr(self, "_engines_cache"):
+            self._engines_cache = engines_cache
+
+        if cache_key in engines_cache:
+            return engines_cache[cache_key]
+
+        # If we need to create a new engine, keep the law dictionary for backward compatibility
         if law not in self._engines:
             self._engines[law] = {}
 
@@ -72,9 +84,11 @@ class RuleService:
                 raise ValueError(
                     f"Rule spec service '{spec.get('service')}' does not match service '{self.service_name}'"
                 )
-            self._engines[law][reference_date] = RulesEngine(spec=spec, service_provider=self.services)
+            engine = RulesEngine(spec=spec, service_provider=self.services)
+            self._engines[law][reference_date] = engine
+            engines_cache[cache_key] = engine
 
-        return self._engines[law][reference_date]
+        return engines_cache[cache_key]
 
     async def evaluate(
         self,
