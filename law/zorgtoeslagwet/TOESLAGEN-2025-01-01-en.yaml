@@ -1,0 +1,304 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: 60e71675-38bc-4297-87ac-0c145613e481
+name: Healthcare Allowance
+law: healthcare_allowance_act
+law_type: "FORMAL_LAW"
+legal_character: "DECISION"
+decision_type: "GRANT"
+discoverable: "CITIZEN"
+valid_from: 2025-01-01
+service: "ALLOWANCES"
+description: >
+  Calculation rules for determining eligibility for and the amount of healthcare allowance according to article 2
+  of the Healthcare Allowance Act, applicable for the year 2025.
+
+references:
+  - law: "Healthcare Allowance Act"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+  - law: "Healthcare Allowance Act"
+    article: "2a"
+    url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2a"
+  - law: "Healthcare Allowance Act"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel3"
+  - law: "Healthcare Insurance Act"
+    article: "1"
+    description: "Definition of insured person"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk1_Artikel1"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN of the person"
+      type: "string"
+      required: true
+
+  output:
+    - name: "is_insured_healthcare_allowance"
+      description: "Indicates whether someone is entitled to healthcare allowance"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: secondary
+
+    - name: "allowance_amount"
+      description: "The amount of healthcare allowance"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: primary
+
+  input:
+    - name: "AGE"
+      description: "Age of the applicant"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "age"
+        law: "personal_records_database_act"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "IS_INSURED"
+      description: "Applicant is insured within the meaning of the Healthcare Insurance Act"
+      type: "boolean"
+      service_reference:
+        service: "RVZ"
+        field: "is_insured"
+        law: "healthcare_insurance_act"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "INCOME"
+      description: "Assessment income"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "income"
+        law: "income_tax_act"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        immutable_after: "P2Y"
+
+    - name: "NET_WORTH"
+      description: "Assets"
+      type: "amount"
+      service_reference:
+        service: "TAX_AUTHORITY"
+        field: "net_worth"
+        law: "income_tax_act"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "COMBINED_NET_WORTH"
+      description: "Combined assets"
+      type: "amount"
+      service_reference:
+        service: "TAX_AUTHORITY"
+        field: "combined_net_worth"
+        law: "income_tax_act"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "PARTNER_INCOME"
+      description: "Partner income"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "partner_income"
+        law: "income_tax_act"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        immutable_after: "P2Y"
+
+    - name: "HAS_PARTNER"
+      description: "Partnership status"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "has_partner"
+        law: "personal_records_database_act"
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "STANDARD_PREMIUM"
+      description: "Standard premium"
+      type: "amount"
+      service_reference:
+        service: "VWS"
+        field: "standard_premium"
+        law: "healthcare_allowance_act/regulations/regulation_determination_standard_premium_and_administrative_premiums"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+
+  definitions:
+    MINIMUM_AGE: 18
+    PERCENTAGE_THRESHOLD_INCOME_WITH_PARTNER: 0.04273
+    PERCENTAGE_THRESHOLD_INCOME_SINGLE: 0.01896
+    REDUCTION_PERCENTAGE_MINIMUM: 0.13700
+    REDUCTION_PERCENTAGE_ABOVE_THRESHOLD: 0.13700
+    THRESHOLD_INCOME_SINGLE: 3971900
+    THRESHOLD_INCOME_ALLOWANCE_PARTNER: 5020600
+    ASSET_LIMIT_SINGLE: 14189600
+    ASSET_LIMIT_ALLOWANCE_PARTNER: 17942900
+
+requirements:
+  - all:
+      - subject: "$AGE"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_AGE"
+      - subject: "$IS_INSURED"
+        operation: EQUALS
+        value: true
+
+actions:
+  - output: "is_insured_healthcare_allowance"
+    value: true
+
+  - output: "allowance_amount"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HAS_PARTNER"
+          operation: EQUALS
+          value: false
+        then:
+          operation: IF
+          conditions:
+            - test:
+                subject: "$INCOME"
+                operation: GREATER_THAN
+                value: "$THRESHOLD_INCOME_SINGLE"
+              then: 0
+            - test:
+                subject: "$NET_WORTH"
+                operation: GREATER_THAN
+                value: "$ASSET_LIMIT_SINGLE"
+              then: 0
+            - else:
+                operation: SUBTRACT
+                values:
+                  - "$STANDARD_PREMIUM"
+                  - operation: ADD
+                    values:
+                      - operation: MULTIPLY
+                        values:
+                          - "$PERCENTAGE_THRESHOLD_INCOME_SINGLE"
+                          - operation: MIN
+                            values:
+                              - "$INCOME"
+                              - "$THRESHOLD_INCOME_SINGLE"
+                      - operation: IF
+                        conditions:
+                          - test:
+                              operation: GREATER_THAN
+                              values:
+                                - "$INCOME"
+                                - "$THRESHOLD_INCOME_SINGLE"
+                            then:
+                              operation: MULTIPLY
+                              values:
+                                - operation: SUBTRACT
+                                  values:
+                                    - "$INCOME"
+                                    - "$THRESHOLD_INCOME_SINGLE"
+                                - "$REDUCTION_PERCENTAGE_MINIMUM"
+                          - else: 0
+      - test:
+          subject: "$HAS_PARTNER"
+          operation: EQUALS
+          value: true
+        then:
+          operation: IF
+          conditions:
+            - test:
+                operation: GREATER_THAN
+                values:
+                  - operation: ADD
+                    values:
+                      - "$INCOME"
+                      - "$PARTNER_INCOME"
+                  - "$THRESHOLD_INCOME_ALLOWANCE_PARTNER"
+              then: 0
+            - test:
+                subject: "$COMBINED_NET_WORTH"
+                operation: GREATER_THAN
+                value: "$ASSET_LIMIT_ALLOWANCE_PARTNER"
+              then: 0
+            - else:
+                operation: SUBTRACT
+                values:
+                  - operation: MULTIPLY
+                    values:
+                      - "$STANDARD_PREMIUM"
+                      - 2
+                  - operation: ADD
+                    values:
+                      - operation: MULTIPLY
+                        values:
+                          - "$PERCENTAGE_THRESHOLD_INCOME_WITH_PARTNER"
+                          - operation: MIN
+                            values:
+                              - operation: ADD
+                                values:
+                                  - "$INCOME"
+                                  - "$PARTNER_INCOME"
+                              - "$THRESHOLD_INCOME_ALLOWANCE_PARTNER"
+                      - operation: IF
+                        conditions:
+                          - test:
+                              operation: GREATER_THAN
+                              values:
+                                - operation: ADD
+                                  values:
+                                    - "$INCOME"
+                                    - "$PARTNER_INCOME"
+                                - "$THRESHOLD_INCOME_ALLOWANCE_PARTNER"
+                            then:
+                              operation: MULTIPLY
+                              values:
+                                - operation: SUBTRACT
+                                  values:
+                                    - operation: ADD
+                                      values:
+                                        - "$INCOME"
+                                        - "$PARTNER_INCOME"
+                                    - "$THRESHOLD_INCOME_ALLOWANCE_PARTNER"
+                                - "$REDUCTION_PERCENTAGE_ABOVE_THRESHOLD"
+                          - else: 0

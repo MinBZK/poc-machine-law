@@ -1,0 +1,80 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: 292c11ff-8318-4b7a-bb11-3ea545b04c8e
+name: Determining detention status
+law: penitentiary_principles_act
+valid_from: 2022-01-01
+service: "DJI"
+description: >
+  Rules for determining detention status according to the Penitentiary Principles Act,
+  articles 2 and 3. A detainee is someone who has been legally deprived of their freedom
+  and is admitted to a penitentiary institution.
+
+references:
+  - law: "Penitentiary Principles Act"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0009709/2024-01-01#HoofdstukI_Artikel2"
+  - law: "Penitentiary Principles Act"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0009709/2024-01-01#HoofdstukI_Artikel3"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN of the person"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "DETENTION_STATUS"
+      description: "Status of detention"
+      type: "string"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "detentions"
+        field: "status"
+        select_on:
+          - name: "bsn"
+            description: "Citizen service number of the person"
+            type: "string"
+            value: "$BSN"
+
+    - name: "FACILITY_TYPE"
+      description: "Type of facility"
+      type: "string"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "detentions"
+        field: "facility_type"
+        select_on:
+          - name: "bsn"
+            description: "Citizen service number of the person"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "is_incarcerated"
+      description: "Is the person detained"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+actions:
+  - output: "is_incarcerated"
+    operation: AND
+    values:
+      - operation: IN
+        subject: "$FACILITY_TYPE"
+        values:
+          - "PENITENTIARY_INSTITUTION"
+          - "HOUSE_OF_DETENTION"
+      - operation: IN
+        subject: "$DETENTION_STATUS"
+        values:
+          - "DETAINED"
+          - "TEMPORARILY_ABSENT"
+    reference: "Penitentiary Principles Act Art. 2 and 3"

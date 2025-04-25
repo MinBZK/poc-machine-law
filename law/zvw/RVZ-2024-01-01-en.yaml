@@ -1,0 +1,156 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: aba2b8fa-4b34-420f-883a-e78da326a8f4
+name: Determining insurance status 2024
+law: healthcare_insurance_act
+valid_from: 2024-01-01
+service: "RVZ"
+description: >
+  Rules for determining insurance status according to the Healthcare Insurance Act (Zvw),
+  article 2 (insurance obligation), article 9 (treaty insurance) and article 24 (suspension).
+
+references:
+  - law: "Healthcare Insurance Act"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk1_Artikel1"
+    description: "Definition of insured person"
+  - law: "Healthcare Insurance Act"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2"
+  - law: "Healthcare Insurance Act"
+    article: "9"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel9"
+  - law: "Healthcare Insurance Act"
+    article: "24"
+    url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk3_Paragraaf3.6_Artikel24"
+    description: "Suspension of healthcare insurance during detention"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN of the person"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "INSURANCE_POLICY"
+      description: "Active healthcare insurance policy"
+      type: "object"
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        table: "insurances"
+        field: "policy_status"
+        select_on:
+          - name: "bsn"
+            description: "Citizen service number of the person"
+            type: "string"
+            value: "$BSN"
+
+    - name: "TREATY_REGISTRATION"
+      description: "Treaty insurance registration"
+      type: "object"
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        table: "treaty_insurances"
+        field: "registration"
+        select_on:
+          - name: "bsn"
+            description: "Citizen service number of the person"
+            type: "string"
+            value: "$BSN"
+
+  input:
+    - name: "RESIDENCE_COUNTRY"
+      description: "Country of residence"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "country_of_residence"
+        law: "personal_records_database_act"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+
+    - name: "IS_INCARCERATED"
+      description: "Detention status"
+      type: "boolean"
+      service_reference:
+        service: "DJI"
+        field: "is_incarcerated"
+        law: "penitentiary_principles_act"
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+  output:
+    - name: "has_insurance"
+      description: "Does the person have Dutch healthcare insurance"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "has_act_insurance"
+      description: "Does the person have treaty insurance"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "is_insured"
+      description: "Is the person insured within the meaning of article 1 of the Healthcare Insurance Act"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+  definitions:
+    ACTIVE_POLICY_STATUSES:
+      - "ACTIVE"
+      - "SUSPENDED_WITH_RETROACTIVE_EFFECT"
+    VALID_TREATY_COUNTRIES:
+      - "BELGIUM"
+      - "GERMANY"
+      - "FRANCE"
+      - "UNITED_KINGDOM"
+      - "SWITZERLAND"
+
+actions:
+  - output: "has_insurance"
+    operation: AND
+    values:
+      - operation: NOT_NULL
+        subject: "$INSURANCE_POLICY"
+      - operation: IN
+        subject: "$INSURANCE_POLICY"
+        values: "$ACTIVE_POLICY_STATUSES"
+
+  - output: "has_act_insurance"
+    operation: AND
+    values:
+      - operation: NOT_NULL
+        subject: "$TREATY_REGISTRATION"
+      - operation: IN
+        subject: "$RESIDENCE_COUNTRY"
+        values: "$VALID_TREATY_COUNTRIES"
+      - operation: EQUALS
+        subject: "$TREATY_REGISTRATION"
+        value: "ACTIVE"
+
+  - output: "is_insured"
+    operation: AND
+    values:
+      - operation: OR
+        values:
+          - subject: "$has_insurance"
+            operation: EQUALS
+            value: true
+          - subject: "$has_act_insurance"
+            operation: EQUALS
+            value: true
+      - subject: "$IS_INCARCERATED"
+        operation: NOT_EQUALS
+        value: true
