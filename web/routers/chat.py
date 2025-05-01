@@ -263,19 +263,21 @@ async def get_chat_page(
 
 
 @router.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: str, services: EngineInterface = Depends(get_machine_service)):
+async def websocket_endpoint(
+    websocket: WebSocket, client_id: str, services: EngineInterface = Depends(get_machine_service)
+):
     await manager.connect(websocket, client_id)
 
     try:
         # First receive connection data to get provider and BSN
         data = await websocket.receive_text()
         connection_data = json.loads(data)
-        
+
         # Get the BSN from the client_id or connection data
         bsn = connection_data.get("bsn") or (client_id.split("_")[1] if "_" in client_id else "100000001")
         # Get LLM provider from request or use default
         selected_provider = connection_data.get("provider") or LLMFactory.get_provider()
-        
+
         profile = services.get_profile_data(bsn)
 
         if not profile:
@@ -292,10 +294,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, services: Eng
             await websocket.send_text(json.dumps({"error": error_msg}))
             manager.disconnect(client_id)
             return
-            
+
         # Get appropriate LLM service using the factory
         llm_service = LLMFactory.get_service(selected_provider)
-        
+
         # Send confirmation with provider info
         await websocket.send_text(
             json.dumps({"connected": True, "provider": selected_provider, "model": llm_service.model_id, "bsn": bsn})
