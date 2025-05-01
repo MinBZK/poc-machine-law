@@ -175,6 +175,28 @@ uv run web/main.py
 
 Dit zou een interface hier http://0.0.0.0:8000 en hier http://0.0.0.0:8000/admin op moeten leveren.
 
+### LLM Providers
+
+De applicatie ondersteunt meerdere LLM providers voor het genereren van uitleg en het beantwoorden van vragen:
+
+1. **Claude (Anthropic)** - Standaard provider
+   ```bash
+   # Stel Claude in als provider
+   export ANTHROPIC_API_KEY=jouw_anthropic_api_key
+   export LLM_PROVIDER=claude
+   ```
+
+2. **VLAM.ai** - Nederlandse overheids-LLM
+   ```bash
+   # Stel VLAM.ai in als provider
+   export VLAM_API_KEY=jouw_vlam_api_key
+   export VLAM_BASE_URL=https://api.demo.vlam.ai/v2.1/projects/poc/openai-compatible/v1
+   export VLAM_MODEL_ID=ubiops-deployment/bzk-dig-chat//chat-model
+   export LLM_PROVIDER=vlam
+   ```
+
+Je kunt ook de provider selecteren in de web-interface, op voorwaarde dat de benodigde API-sleutels zijn ingesteld.
+
 
 
 ## 📂 Repository structuur

@@ -1,12 +1,11 @@
 import asyncio
 import json
-import os
 import re
 
-import anthropic
-from fastapi import APIRouter, Depends, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
+from explain.llm_factory import LLMFactory
 from explain.mcp_connector import MCPLawConnector
 from web.dependencies import get_machine_service, templates
 from web.engines import EngineInterface
@@ -236,12 +235,19 @@ manager = ChatConnectionManager()
 
 @router.get("/", response_class=HTMLResponse)
 async def get_chat_page(
-    request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)
+    request: Request,
+    bsn: str = "100000001",
+    llm: str = Query(None, description="LLM provider to use (claude or vlam)"),
+    services: EngineInterface = Depends(get_machine_service),
 ):
     """Render the chat interface page"""
     profile = services.get_profile_data(bsn)
     if not profile:
         return HTMLResponse("Profile not found", status_code=404)
+
+    # Get available LLM providers
+    providers = LLMFactory.get_available_providers()
+    current_provider = llm or LLMFactory.get_provider()
 
     return templates.TemplateResponse(
         "chat.html",
@@ -250,19 +256,26 @@ async def get_chat_page(
             "profile": profile,
             "bsn": bsn,
             "all_profiles": services.get_all_profiles(),  # Add this for the profile selector
+            "llm_providers": providers,
+            "current_provider": current_provider,
         },
     )
 
 
 @router.websocket("/ws/{client_id}")
-async def websocket_endpoint(
-    websocket: WebSocket, client_id: str, services: EngineInterface = Depends(get_machine_service)
-):
+async def websocket_endpoint(websocket: WebSocket, client_id: str, services: EngineInterface = Depends(get_machine_service)):
     await manager.connect(websocket, client_id)
 
     try:
-        # Get the BSN from the client_id (client_id format is "chat_{bsn}")
-        bsn = client_id.split("_")[1] if "_" in client_id else "100000001"
+        # First receive connection data to get provider and BSN
+        data = await websocket.receive_text()
+        connection_data = json.loads(data)
+        
+        # Get the BSN from the client_id or connection data
+        bsn = connection_data.get("bsn") or (client_id.split("_")[1] if "_" in client_id else "100000001")
+        # Get LLM provider from request or use default
+        selected_provider = connection_data.get("provider") or LLMFactory.get_provider()
+        
         profile = services.get_profile_data(bsn)
 
         if not profile:
@@ -272,16 +285,21 @@ async def websocket_endpoint(
             manager.disconnect(client_id)
             return
 
-        # Set up Anthropic client
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
-            error_msg = "ANTHROPIC_API_KEY environment variable not set"
+        # Check if selected provider is properly configured
+        if not LLMFactory.is_provider_configured(selected_provider):
+            error_msg = f"LLM provider {selected_provider} is not properly configured"
             print(error_msg)
             await websocket.send_text(json.dumps({"error": error_msg}))
             manager.disconnect(client_id)
             return
-
-        client = anthropic.Anthropic(api_key=api_key)
+            
+        # Get appropriate LLM service using the factory
+        llm_service = LLMFactory.get_service(selected_provider)
+        
+        # Send confirmation with provider info
+        await websocket.send_text(
+            json.dumps({"connected": True, "provider": selected_provider, "model": llm_service.model_id, "bsn": bsn})
+        )
 
         # Set up MCP connector
         mcp_connector = MCPLawConnector(services)
@@ -331,17 +349,16 @@ async def websocket_endpoint(
             # Get fresh system prompt with up-to-date claims data before each message
             system_prompt = await get_updated_system_prompt()
 
-            # Send message to Claude API to get initial response
-            response = client.messages.create(
-                model="claude-3-7-sonnet-20250219",
+            # Send message to get initial response using the LLM service
+            response = llm_service.chat_completion(
+                messages=messages,
                 max_tokens=2000,
                 system=system_prompt,
-                messages=messages,
                 temperature=0.7,
             )
 
-            # Get Claude's response and extract any tool calls
-            assistant_message = response.content[0].text
+            # Extract the message text using the service's standard method
+            assistant_message = llm_service.get_completion_text(response)
 
             # Check for value responses to previous questions about missing fields
             # Format would be like "mijn inkomen is 35000 euro" or "mijn leeftijd is 42"
@@ -394,7 +411,7 @@ async def websocket_endpoint(
                                     service = mcp_connector.registry.get_service(service_name)
                                     if service:
                                         # Submit claim for this value
-                                        await services.claim_manager.submit_claim(
+                                        services.claim_manager.submit_claim(
                                             service=service.service_type,
                                             key=key,
                                             new_value=parsed_value,
@@ -475,17 +492,16 @@ async def websocket_endpoint(
                 # Get latest claims data before generating the final response
                 system_prompt = await get_updated_system_prompt()
 
-                # Get a new response from Claude with the tool results
-                final_response = client.messages.create(
-                    model="claude-3-7-sonnet-20250219",
+                # Get a new response with the tool results
+                final_response = llm_service.chat_completion(
+                    messages=tool_conversation,
                     max_tokens=2000,
                     system=system_prompt,
-                    messages=tool_conversation,
                     temperature=0.7,
                 )
 
                 # Get the final message with tool results incorporated
-                final_message = final_response.content[0].text
+                final_message = llm_service.get_completion_text(final_response)
 
                 # Update our conversation history
                 messages.append(tool_message)
@@ -618,17 +634,16 @@ async def websocket_endpoint(
                         next_conversation = current_messages.copy()
                         next_conversation.append({"role": "user", "content": content})
 
-                        # Get a new response from Claude
-                        next_response = client.messages.create(
-                            model="claude-3-7-sonnet-20250219",
+                        # Get a new response using the LLM service
+                        next_response = llm_service.chat_completion(
+                            messages=next_conversation,
                             max_tokens=2000,
                             system=system_prompt,
-                            messages=next_conversation,
                             temperature=0.7,
                         )
 
                         # Get the response message
-                        next_message = next_response.content[0].text
+                        next_message = llm_service.get_completion_text(next_response)
 
                         # Update conversation history
                         current_messages.append({"role": "user", "content": content})

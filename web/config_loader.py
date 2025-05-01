@@ -31,7 +31,9 @@ class AppConfig:
 
 class ConfigLoader:
     def __init__(self, config_path=None):
-        self.config_path = config_path or os.environ.get("APP_CONFIG_PATH", "config.yaml")
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        default_config_path = os.path.join(base_dir, "config", "config.yaml")
+        self.config_path = config_path or os.environ.get("APP_CONFIG_PATH", default_config_path)
         self._raw_config = self._load_config()
         self.config = self._parse_config()
 

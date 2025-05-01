@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
-from explain.llm_service import llm_service
+from explain.llm_factory import llm_factory
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 
@@ -248,7 +248,8 @@ async def explanation(
 
         rule_spec_json = json.dumps(relevant_spec, ensure_ascii=False, indent=2)
 
-        # Get explanation from LLM
+        # Get explanation from LLM using factory to select the configured provider
+        llm_service = llm_factory.get_service()
         explanation = llm_service.generate_explanation(path_json, rule_spec_json)
 
         return templates.TemplateResponse(

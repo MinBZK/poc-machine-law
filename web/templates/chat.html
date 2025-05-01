@@ -2,11 +2,25 @@
 {% block content %}
     <div class="flex flex-col h-[calc(100vh-120px)]"
          x-data="chatApp()"
-         x-init="init('{{ bsn }}')">
+         x-init="init('{{ bsn }}', '{{ current_provider }}')">
         <!-- Header section -->
-        <div>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Chat over wetten en regels</h2>
-            <p class="text-gray-600 mb-4">Stel uw vraag over wetten, toeslagen, uitkeringen of andere regelingen.</p>
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">Chat over wetten en regels</h2>
+                <p class="text-gray-600 mb-4">Stel uw vraag over wetten, toeslagen, uitkeringen of andere regelingen.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <select id="llm-provider"
+                        x-model="selectedProvider"
+                        @change="changeProvider()"
+                        class="border rounded-md px-2 py-1 text-sm">
+                    {% for provider in llm_providers %}
+                        <option value="{{ provider }}"
+                                {% if provider == current_provider %}selected{% endif %}>{{ provider|title }}</option>
+                    {% endfor %}
+                </select>
+                <span x-show="modelInfo" x-text="modelInfo" class="hidden"></span>
+            </div>
         </div>
         <!-- Main chat container -->
         <div class="flex flex-col bg-white rounded-lg shadow overflow-hidden flex-grow relative">
@@ -120,14 +134,14 @@
             newMessage: '',
             isLoading: false,
             bsn: '',
+            selectedProvider: '',
+            modelInfo: '',
+            isConnected: false,
 
-            init(bsn) {
+            init(bsn, provider) {
                 this.bsn = bsn || '100000001'; // Default BSN if none provided
-                console.log("Initializing chat with BSN:", this.bsn);
-
-                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${protocol}//${window.location.host}/chat/ws/chat_${this.bsn}`;
-                console.log("Connecting to WebSocket URL:", wsUrl);
+                this.selectedProvider = provider || 'claude'; // Default provider if none provided
+                console.log("Initializing chat with BSN:", this.bsn, "and provider:", this.selectedProvider);
 
                 // Add event listener for cancelling application form
                 document.addEventListener('cancel-application-form', () => {
@@ -138,11 +152,38 @@
                     }
                 });
 
+                // Connect to WebSocket
+                this.connectWebSocket();
+            },
+
+            connectWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/chat/ws/chat_${this.bsn}`;
+                console.log("Connecting to WebSocket URL:", wsUrl, "with provider:", this.selectedProvider);
+
                 this.websocket = new WebSocket(wsUrl);
 
+                this.websocket.onopen = () => {
+                    // Send initial connection data with provider preference
+                    this.websocket.send(JSON.stringify({
+                        provider: this.selectedProvider,
+                        bsn: this.bsn,
+                        isConnectionInit: true
+                    }));
+                };
+
                 this.websocket.onmessage = (event) => {
-                    this.isLoading = false;
                     const data = JSON.parse(event.data);
+
+                    // Handle connection confirmation
+                    if (data.connected) {
+                        this.isConnected = true;
+                        this.modelInfo = data.model || '';
+                        console.log("Connected to LLM provider:", data.provider, "with model:", data.model);
+                        return;
+                    }
+
+                    this.isLoading = false;
 
                     if (data.error) {
                         this.messages.push({
@@ -286,6 +327,34 @@
             scrollToBottom() {
                 const container = this.$refs.chatContainer;
                 container.scrollTop = container.scrollHeight;
+            },
+
+            changeProvider() {
+                // Close existing connection
+                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                    this.websocket.close();
+                }
+
+                // Clear messages
+                this.messages = [];
+                this.isConnected = false;
+                this.modelInfo = '';
+
+                // Add system message about provider change
+                this.messages.push({
+                    text: `Wisselen naar ${this.selectedProvider.charAt(0).toUpperCase() + this.selectedProvider.slice(1)} LLM...`,
+                    html: `<p>Wisselen naar ${this.selectedProvider.charAt(0).toUpperCase() + this.selectedProvider.slice(1)} LLM...</p>`,
+                    isUser: false,
+                    isSystemMessage: true
+                });
+
+                // Reconnect with new provider
+                this.connectWebSocket();
+
+                // Update URL with new provider
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('llm', this.selectedProvider);
+                window.history.pushState({}, '', newUrl.toString());
             }
         };
     }
