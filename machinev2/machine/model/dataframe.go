@@ -21,3 +21,9 @@ type DataFrame interface {
 
 	Append(df DataFrame) (DataFrame, error)
 }
+
+type SourceDataFrame interface {
+	Get(table string) (DataFrame, bool)
+	Set(table string, df DataFrame)
+	Reset()
+}

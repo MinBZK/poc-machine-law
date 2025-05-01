@@ -19,7 +19,7 @@ type RuleService struct {
 	Services         *Services
 	Resolver         *utils.RuleResolver
 	engines          map[string]map[string]*engine.RulesEngine
-	SourceDataFrames map[string]model.DataFrame
+	SourceDataFrames model.SourceDataFrame
 	mu               sync.RWMutex
 }
 
@@ -31,7 +31,7 @@ func NewRuleService(logger logging.Logger, serviceName string, services *Service
 		Services:         services,
 		Resolver:         utils.NewRuleResolver(),
 		engines:          make(map[string]map[string]*engine.RulesEngine),
-		SourceDataFrames: make(map[string]model.DataFrame),
+		SourceDataFrames: NewSourceDataFrame(),
 	}
 }
 
@@ -125,23 +125,10 @@ func (rs *RuleService) GetRuleInfo(law, referenceDate string) map[string]any {
 
 // SetSourceDataFrame sets a source DataFrame
 func (rs *RuleService) SetSourceDataFrame(table string, df model.DataFrame) {
-	rs.mu.Lock()
-	defer rs.mu.Unlock()
-	df1, ok := rs.SourceDataFrames[table]
-	if ok {
-		var err error
-		df, err = df1.Append(df)
-		if err != nil {
-			fmt.Printf("err: %v\n", err)
-		}
-	}
-
-	rs.SourceDataFrames[table] = df
+	rs.SourceDataFrames.Set(table, df)
 }
 
 // Reset removes all data in the rule service
 func (rs *RuleService) Reset() {
-	rs.mu.Lock()
-	defer rs.mu.Unlock()
-	rs.SourceDataFrames = make(map[string]model.DataFrame)
+	rs.SourceDataFrames.Reset()
 }

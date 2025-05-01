@@ -126,7 +126,7 @@ type RuleContext struct {
 	Parameters      map[string]any
 	PropertySpecs   map[string]map[string]any
 	OutputSpecs     map[string]TypeSpec
-	Sources         map[string]model.DataFrame
+	Sources         model.SourceDataFrame
 	Local           map[string]any
 	AccessedPaths   map[string]struct{}
 	ValuesCache     map[string]any
@@ -146,7 +146,7 @@ type RuleContext struct {
 // NewRuleContext creates a new rule context
 func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProvider ServiceProvider,
 	parameters map[string]any, propertySpecs map[string]map[string]any,
-	outputSpecs map[string]TypeSpec, sources map[string]model.DataFrame, path []*model.PathNode,
+	outputSpecs map[string]TypeSpec, sources model.SourceDataFrame, path []*model.PathNode,
 	overwriteInput map[string]map[string]any, calculationDate string,
 	serviceName string, claims map[string]model.Claim, approved bool) *RuleContext {
 
@@ -718,7 +718,7 @@ func (rc *RuleContext) resolveFromSource(
 		if table, ok := sourceRef["table"].(string); ok {
 			tableName = table
 			var exists bool
-			df, exists = rc.Sources[table]
+			df, exists = rc.Sources.Get(table)
 			if !exists {
 				return nil, fmt.Errorf("table %s not found in sources", table)
 			}

@@ -357,7 +357,7 @@ func (re *RulesEngine) Evaluate(
 	ctx context.Context,
 	parameters map[string]any,
 	overwriteInput map[string]map[string]any,
-	sources map[string]model.DataFrame,
+	sources model.SourceDataFrame,
 	calculationDate string,
 	requestedOutput string,
 	approved bool,
