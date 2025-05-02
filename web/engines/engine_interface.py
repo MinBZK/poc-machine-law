@@ -73,7 +73,7 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
-    async def evaluate(
+    def evaluate(
         self,
         service: str,
         law: str,
@@ -114,7 +114,7 @@ class EngineInterface(ABC):
         Set a dataframe in a table for a service
         """
 
-    async def get_sorted_discoverable_service_laws(self, bsn: str) -> list[dict[str, Any]]:
+    def get_sorted_discoverable_service_laws(self, bsn: str) -> list[dict[str, Any]]:
         """
         Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.
         Uses simple caching to improve performance and stability.
@@ -153,9 +153,7 @@ class EngineInterface(ABC):
                 rule_spec = self.get_rule_spec(law, current_date, service=service)
 
                 # Run the law for this person and get results
-                result = await self.evaluate(
-                    service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date
-                )
+                result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)
 
                 # Extract financial impact from result based on citizen_relevance
                 impact_value = 0

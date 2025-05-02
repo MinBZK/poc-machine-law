@@ -108,13 +108,13 @@ class RuleContext:
         if self.path:
             self.path.pop()
 
-    async def resolve_value(self, path: str) -> Any:
-        value = await self._resolve_value(path)
+    def resolve_value(self, path: str) -> Any:
+        value = self._resolve_value(path)
         if isinstance(path, str):
             self.resolved_paths[path] = value
         return value
 
-    async def _resolve_value(self, path: str) -> Any:
+    def _resolve_value(self, path: str) -> Any:
         """Resolve a value from definitions, services, or sources"""
         node = PathNode(
             type="resolve",
@@ -134,7 +134,7 @@ class RuleContext:
                 self.track_access(path)
 
                 # Resolve dates
-                value = await self._resolve_date(path)
+                value = self._resolve_date(path)
                 if value is not None:
                     logger.debug(f"Resolved date ${path}: {value}")
                     node.result = value
@@ -142,7 +142,7 @@ class RuleContext:
 
                 if "." in path:
                     root, rest = path.split(".", 1)
-                    value = await self.resolve_value(f"${root}")
+                    value = self.resolve_value(f"${root}")
                     for p in rest.split("."):
                         if value is None:
                             logger.warning(f"Value is None, could not resolve value ${path}: None")
@@ -243,7 +243,7 @@ class RuleContext:
                                 df = self.sources[table]
 
                         if df is not None:
-                            result = await self._resolve_from_source(source_ref, table, df)
+                            result = self._resolve_from_source(source_ref, table, df)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
                             node.resolve_type = "SOURCE"
@@ -254,7 +254,7 @@ class RuleContext:
                                 node.details["type"] = spec["type"]
                             if "type_spec" in spec:
                                 # Gebruik helper-methode om enum-referenties op te lossen
-                                resolved_type_spec = await self._resolve_type_spec_enums(spec, spec["type_spec"])
+                                resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
                                 node.details["type_spec"] = resolved_type_spec
 
                             return result
@@ -264,7 +264,7 @@ class RuleContext:
                     spec = self.property_specs[path]
                     service_ref = spec.get("service_reference", {})
                     if service_ref and self.service_provider:
-                        value = await self._resolve_from_service(path, service_ref, spec)
+                        value = self._resolve_from_service(path, service_ref, spec)
                         logger.debug(
                             f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}"
                         )
@@ -277,7 +277,7 @@ class RuleContext:
                             node.details["type"] = spec["type"]
                         if "type_spec" in spec:
                             # Gebruik helper-methode om enum-referenties op te lossen
-                            resolved_type_spec = await self._resolve_type_spec_enums(spec, spec["type_spec"])
+                            resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
                             node.details["type_spec"] = resolved_type_spec
 
                         return value
@@ -297,14 +297,14 @@ class RuleContext:
                         node.details["type"] = spec["type"]
                     if "type_spec" in spec:
                         # Gebruik helper-methode om enum-referenties op te lossen
-                        resolved_type_spec = await self._resolve_type_spec_enums(spec, spec["type_spec"])
+                        resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
                         node.details["type_spec"] = resolved_type_spec
 
                 return None
         finally:
             self.pop_path()
 
-    async def _resolve_date(self, path):
+    def _resolve_date(self, path):
         if path == "calculation_date":
             return self.calculation_date
         if path == "january_first":
@@ -317,14 +317,14 @@ class RuleContext:
             return self.calculation_date[:4]
         return None
 
-    async def _resolve_from_service(self, path, service_ref, spec):
+    def _resolve_from_service(self, path, service_ref, spec):
         parameters = copy(self.parameters)
         if "parameters" in service_ref:
-            parameters.update({p["name"]: await self.resolve_value(p["reference"]) for p in service_ref["parameters"]})
+            parameters.update({p["name"]: self.resolve_value(p["reference"]) for p in service_ref["parameters"]})
 
         reference_date = self.calculation_date
         if "temporal" in spec and "reference" in spec["temporal"]:
-            reference_date = await self.resolve_value(spec["temporal"]["reference"])
+            reference_date = self.resolve_value(spec["temporal"]["reference"])
 
         # Check cache
         cache_key = f"{path}({','.join([f'{k}:{v}' for k, v in sorted(parameters.items())])},{reference_date})"
@@ -359,7 +359,7 @@ class RuleContext:
         self.add_to_path(service_node)
 
         try:
-            result = await self.service_provider.evaluate(
+            result = self.service_provider.evaluate(
                 service_ref["service"],
                 service_ref["law"],
                 parameters,
@@ -382,7 +382,7 @@ class RuleContext:
         finally:
             self.pop_path()
 
-    async def _resolve_type_spec_enums(self, spec: dict[str, Any], type_spec: dict[str, Any]) -> dict[str, Any]:
+    def _resolve_type_spec_enums(self, spec: dict[str, Any], type_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Resolve enum references in type_spec voor arrays
 
@@ -401,20 +401,20 @@ class RuleContext:
             for field in type_spec_copy["fields"]:
                 if "enum" in field and isinstance(field["enum"], str) and field["enum"].startswith("$"):
                     # Gebruik resolve_value om de enum-referentie op te lossen
-                    enum_value = await self.resolve_value(field["enum"])
+                    enum_value = self.resolve_value(field["enum"])
                     if enum_value is not None:
                         field["enum_values"] = enum_value
                         logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
 
         return type_spec_copy
 
-    async def _resolve_from_source(self, source_ref, table, df):
+    def _resolve_from_source(self, source_ref, table, df):
         if "select_on" in source_ref:
             for select_on in source_ref["select_on"]:
-                value = await self.resolve_value(select_on["value"])
+                value = self.resolve_value(select_on["value"])
 
                 if isinstance(value, dict) and "operation" in value and value["operation"] == "IN":
-                    allowed_values = await self.resolve_value(value["values"])
+                    allowed_values = self.resolve_value(value["values"])
                     df = df[df[select_on["name"]].isin(allowed_values)]
                 else:
                     df = df[df[select_on["name"]] == value]

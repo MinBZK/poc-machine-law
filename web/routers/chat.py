@@ -101,7 +101,7 @@ async def handle_application_display(
 
         if service and law:
             # Get data for the application panel - explicitly use approved=False to include unapproved claims
-            law, result, parameters = await evaluate_law(bsn, law, service, services, approved=False)
+            law, result, parameters = evaluate_law(bsn, law, service, services, approved=False)
 
             # Get the rule spec separately
             rule_spec = services.get_rule_spec(law, TODAY, service)
@@ -213,11 +213,11 @@ async def handle_application_submission(
         law = law_path or service_obj.law_path
 
         # Get data needed for submission
-        law, result, parameters = await evaluate_law(bsn, law, service_type, services, approved=False)
+        law, result, parameters = evaluate_law(bsn, law, service_type, services, approved=False)
         rule_spec = services.get_rule_spec(law, TODAY, service_type)
 
         # Submit the case
-        await case_manager.submit_case(
+        case_manager.submit_case(
             bsn=bsn,
             service=service_type,
             law=law,
@@ -373,8 +373,8 @@ async def websocket_endpoint(
         system_prompt = ""
 
         # Function to get fresh system prompt with up-to-date cases data
-        async def get_updated_system_prompt():
-            cases_context = await mcp_connector.get_cases_context(bsn)
+        def get_updated_system_prompt():
+            cases_context = mcp_connector.get_cases_context(bsn)
             return mcp_connector.jinja_env.get_template("chat_system_prompt.j2").render(
                 profile=profile,
                 bsn=bsn,
@@ -383,7 +383,7 @@ async def websocket_endpoint(
             )
 
         # Initialize system prompt with initial data
-        system_prompt = await get_updated_system_prompt()
+        system_prompt = get_updated_system_prompt()
 
         # Initialize the conversation with just a list for user/assistant messages
         messages = []
@@ -414,7 +414,7 @@ async def websocket_endpoint(
             messages.append({"role": "user", "content": user_msg_content})
 
             # Get fresh system prompt with up-to-date claims data before each message
-            system_prompt = await get_updated_system_prompt()
+            system_prompt = get_updated_system_prompt()
 
             # Send message to get initial response using the LLM service
             response = llm_service.chat_completion(
@@ -490,7 +490,7 @@ async def websocket_endpoint(
                                         )
 
                                         # Update system prompt with new claim data
-                                        system_prompt = await get_updated_system_prompt()
+                                        system_prompt = get_updated_system_prompt()
                                         print(f"Created claim for {key}={parsed_value} for service {service_name}")
                         except Exception as e:
                             print(f"Error creating claim for {key}: {str(e)}")
@@ -499,10 +499,10 @@ async def websocket_endpoint(
                             traceback.print_exc()
 
             # Process Claude's message with MCP connector to extract and execute law services
-            service_results = await mcp_connector.process_message(assistant_message, bsn)
+            service_results = mcp_connector.process_message(assistant_message, bsn)
 
             # Get fresh system prompt with updated claims data
-            system_prompt = await get_updated_system_prompt()
+            system_prompt = get_updated_system_prompt()
 
             # If there are service results, add them to the context and generate a new response
             final_message = assistant_message
@@ -529,7 +529,7 @@ async def websocket_endpoint(
                 )
 
                 # Format the service results
-                service_context = await mcp_connector.format_results_for_llm(service_results)
+                service_context = mcp_connector.format_results_for_llm(service_results)
 
                 # Create a temporary message from Claude that includes the tool call
                 tool_message = {"role": "assistant", "content": assistant_message}
@@ -557,7 +557,7 @@ async def websocket_endpoint(
                 tool_conversation.append(tool_response)
 
                 # Get latest claims data before generating the final response
-                system_prompt = await get_updated_system_prompt()
+                system_prompt = get_updated_system_prompt()
 
                 # Get a new response with the tool results
                 final_response = llm_service.chat_completion(
@@ -634,7 +634,7 @@ async def websocket_endpoint(
                 claim_refs = mcp_connector.claim_processor.extract_claims(current_message)
                 if claim_refs:
                     print(f"Found {len(claim_refs)} claim references in message")
-                    claims_result = await mcp_connector.claim_processor.process_claims(claim_refs, bsn)
+                    claims_result = mcp_connector.claim_processor.process_claims(claim_refs, bsn)
 
                     if claims_result and claims_result.get("submitted"):
                         # Collect affected services for execution
@@ -681,11 +681,11 @@ async def websocket_endpoint(
 
                     try:
                         # Execute the service
-                        result = await service.execute(bsn, {})
+                        result = service.execute(bsn, {})
                         service_results = {service_name: result}
 
                         # Format the results
-                        service_context = await mcp_connector.format_results_for_llm(service_results)
+                        service_context = mcp_connector.format_results_for_llm(service_results)
 
                         # Create message prompt based on context
                         is_from_claim = service_name in services_to_execute[: len(claim_refs)] if claim_refs else False

@@ -103,7 +103,7 @@ class MCPServiceExecutor:
                 logger.debug(f"Found @service syntax for service: {service_name}")
                 referenced_services.append(service_name)
 
-    async def execute_service(self, service_name: str, bsn: str, params: dict[str, Any] | None = None) -> ServiceResult:
+    def execute_service(self, service_name: str, bsn: str, params: dict[str, Any] | None = None) -> ServiceResult:
         """Execute a law service.
 
         Args:
@@ -130,7 +130,7 @@ class MCPServiceExecutor:
 
         # Execute the service
         try:
-            result = await service.execute(bsn, params or {})
+            result = service.execute(bsn, params or {})
             logger.info(f"Service {service_name} executed successfully")
             logger.debug(f"Service {service_name} result: {result}")
             return result
@@ -138,7 +138,7 @@ class MCPServiceExecutor:
             log_error(e, {"service_name": service_name})
             raise MCPServiceExecutionError(service_name, e)
 
-    async def execute_services(
+    def execute_services(
         self, service_names: list[str], bsn: str, params: dict[str, Any] | None = None
     ) -> dict[str, ServiceResult]:
         """Execute multiple law services.
@@ -156,7 +156,7 @@ class MCPServiceExecutor:
         # Execute each service
         for service_name in service_names:
             try:
-                result = await self.execute_service(service_name, bsn, params)
+                result = self.execute_service(service_name, bsn, params)
                 results[service_name] = result
             except MCPServiceExecutionError as e:
                 logger.error(f"Error executing service {service_name}: {str(e)}")

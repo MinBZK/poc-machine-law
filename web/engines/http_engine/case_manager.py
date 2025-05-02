@@ -118,7 +118,7 @@ class CaseManager(CaseManagerInterface):
             print(cases)
             return cases
 
-    async def submit_case(
+    def submit_case(
         self,
         bsn: str,
         service: str,

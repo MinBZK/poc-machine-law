@@ -167,7 +167,7 @@ class RulesEngine:
         # Return actions in dependency order
         return [action_by_output[output] for output in ordered_outputs if output in action_by_output]
 
-    async def evaluate(
+    def evaluate(
         self,
         parameters: dict[str, Any] | None = None,
         overwrite_input: dict[str, Any] | None = None,
@@ -211,7 +211,7 @@ class RulesEngine:
         requirements_node = PathNode(type="requirements", name="Check all requirements", result=None)
         context.add_to_path(requirements_node)
         try:
-            requirements_met = await self._evaluate_requirements(self.requirements, context)
+            requirements_met = self._evaluate_requirements(self.requirements, context)
             requirements_node.result = requirements_met
         finally:
             context.pop_path()
@@ -222,7 +222,7 @@ class RulesEngine:
             required_actions = self.get_required_actions(requested_output, self.actions)
 
             for action in required_actions:
-                output_def, output_name = await self._evaluate_action(action, context)
+                output_def, output_name = self._evaluate_action(action, context)
                 context.outputs[output_name] = output_def["value"]
                 output_values[output_name] = output_def
                 if context.missing_required:
@@ -245,7 +245,7 @@ class RulesEngine:
             "missing_required": context.missing_required,
         }
 
-    async def _evaluate_action(self, action, context):
+    def _evaluate_action(self, action, context):
         with logger.indent_block(f"Computing {action.get('output', '')}"):
             if action["output"] == "partner_bsn":
                 pass
@@ -269,9 +269,9 @@ class RulesEngine:
                 raw_result = context.overwrite_input[self.service_name][output_name]
                 logger.debug(f"Resolving value {self.service_name}/{output_name} from OVERWRITE {raw_result}")
             elif "operation" in action:
-                raw_result = await self._evaluate_operation(action, context)
+                raw_result = self._evaluate_operation(action, context)
             elif "value" in action:
-                raw_result = await self._evaluate_value(action["value"], context)
+                raw_result = self._evaluate_value(action["value"], context)
             else:
                 raw_result = None
 
@@ -292,7 +292,7 @@ class RulesEngine:
             output_def["temporal"] = output_spec["temporal"]
         return output_def, output_name
 
-    async def _evaluate_requirements(self, requirements: list, context: RuleContext) -> bool:
+    def _evaluate_requirements(self, requirements: list, context: RuleContext) -> bool:
         """Evaluate all requirements"""
         if not requirements:
             logger.debug("No requirements found")
@@ -314,7 +314,7 @@ class RulesEngine:
                 if "all" in req:
                     results = []
                     for r in req["all"]:
-                        result = await self._evaluate_requirements([r], context)
+                        result = self._evaluate_requirements([r], context)
                         results.append(result)
                         if not bool(result):
                             logger.debug("False value found in an ALL, no need to compute the rest, breaking.")
@@ -323,14 +323,14 @@ class RulesEngine:
                 elif "or" in req:
                     results = []
                     for r in req["or"]:
-                        result = await self._evaluate_requirements([r], context)
+                        result = self._evaluate_requirements([r], context)
                         results.append(result)
                         if bool(result):
                             logger.debug("True value found in an OR, no need to compute the rest, breaking.")
                             break
                     result = any(results)
                 else:
-                    result = await self._evaluate_operation(req, context)
+                    result = self._evaluate_operation(req, context)
 
             logger.debug("Requirement met" if result else "Requirement NOT met")
 
@@ -342,7 +342,7 @@ class RulesEngine:
 
         return True
 
-    async def _evaluate_if_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
+    def _evaluate_if_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
         """Evaluate an IF operation"""
         with logger.indent_block("Evaluating IF"):
             if_node = PathNode(
@@ -363,15 +363,15 @@ class RulesEngine:
                 }
 
                 if "test" in condition:
-                    test_result = await self._evaluate_operation(condition["test"], context)
+                    test_result = self._evaluate_operation(condition["test"], context)
                     condition_result["test_result"] = test_result
                     if test_result:
-                        result = await self._evaluate_value(condition["then"], context)
+                        result = self._evaluate_value(condition["then"], context)
                         if_node.details["condition_results"].append(condition_result)
                         logger.debug(f"THEN condition: {result}")
                         break
                 elif "else" in condition:
-                    result = await self._evaluate_value(condition["else"], context)
+                    result = self._evaluate_value(condition["else"], context)
                     condition_result["else_value"] = result
                     if_node.details["condition_results"].append(condition_result)
                     logger.debug(f"ELSE condition: {result}")
@@ -383,13 +383,13 @@ class RulesEngine:
             context.pop_path()
             return result
 
-    async def _evaluate_foreach(self, operation, context):
+    def _evaluate_foreach(self, operation, context):
         """Handle FOREACH operation"""
         logger.debug("For each condition")
 
         combine = operation.get("combine")
 
-        array_data = await self._evaluate_value(operation["subject"], context)
+        array_data = self._evaluate_value(operation["subject"], context)
         if "DECLARED_HOURS" in operation["subject"]:
             pass
         if not array_data:
@@ -413,7 +413,7 @@ class RulesEngine:
                     value_to_evaluate = (
                         operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
                     )
-                    result = await self._evaluate_value(value_to_evaluate, item_context)
+                    result = self._evaluate_value(value_to_evaluate, item_context)
                     context.missing_required = context.missing_required or item_context.missing_required
                     context.path = item_context.path
                     values.extend(result if isinstance(result, list) else [result])
@@ -521,7 +521,7 @@ class RulesEngine:
 
         return result
 
-    async def _evaluate_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
+    def _evaluate_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
         """Evaluate an operation or condition"""
 
         if not isinstance(operation, dict):
@@ -532,7 +532,7 @@ class RulesEngine:
                 details={"raw_value": operation},
             )
             context.add_to_path(node)
-            result = await self._evaluate_value(operation, context)
+            result = self._evaluate_value(operation, context)
             node.result = result
             context.pop_path()
             return result
@@ -546,7 +546,7 @@ class RulesEngine:
                 details={"raw_value": operation["value"]},
             )
             context.add_to_path(node)
-            result = await self._evaluate_value(operation["value"], context)
+            result = self._evaluate_value(operation["value"], context)
             node.result = result
             context.pop_path()
             return result
@@ -565,16 +565,16 @@ class RulesEngine:
             result = None
 
         elif op_type == "IF":
-            result = await self._evaluate_if_operation(operation, context)
+            result = self._evaluate_if_operation(operation, context)
 
         elif op_type == "FOREACH":
-            result = await self._evaluate_foreach(operation, context)
+            result = self._evaluate_foreach(operation, context)
             node.details.update({"raw_values": operation["value"], "arithmetic_type": op_type})
 
         elif op_type in ["IN", "NOT_IN"]:
             with logger.indent_block(op_type):
-                subject = await self._evaluate_value(operation["subject"], context)
-                allowed_values = await self._evaluate_value(operation.get("values", []), context)
+                subject = self._evaluate_value(operation["subject"], context)
+                allowed_values = self._evaluate_value(operation.get("values", []), context)
 
                 result = subject in (
                     allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
@@ -586,13 +586,13 @@ class RulesEngine:
             logger.debug(f"Result {subject} {op_type} {allowed_values}: {result}")
 
         elif op_type == "NOT_NULL":
-            subject = await self._evaluate_value(operation["subject"], context)
+            subject = self._evaluate_value(operation["subject"], context)
             result = subject is not None
             node.details["subject_value"] = subject
             logger.debug(f"NOT_NULL result: {result}")
 
         elif op_type == "IS_NULL":
-            subject = await self._evaluate_value(operation["subject"], context)
+            subject = self._evaluate_value(operation["subject"], context)
             result = subject is None
             node.details["subject_value"] = subject
             logger.debug(f"IS_NULL result: {result}")
@@ -601,7 +601,7 @@ class RulesEngine:
             with logger.indent_block("AND"):
                 values = []
                 for v in operation["values"]:
-                    r = await self._evaluate_value(v, context)
+                    r = self._evaluate_value(v, context)
                     values.append(r)
                     if not bool(r):
                         logger.debug("False value found in an AND, no need to compute the rest, breaking.")
@@ -615,7 +615,7 @@ class RulesEngine:
             with logger.indent_block("OR"):
                 values = []
                 for v in operation["values"]:
-                    r = await self._evaluate_value(v, context)
+                    r = self._evaluate_value(v, context)
                     values.append(r)
                     if bool(r):
                         logger.debug("True value found in an OR, no need to compute the other, breaking.")
@@ -625,7 +625,7 @@ class RulesEngine:
             logger.debug(f"Result {list(values)} OR: {result}")
 
         elif "_DATE" in op_type:
-            values = [await self._evaluate_value(v, context) for v in operation["values"]]
+            values = [self._evaluate_value(v, context) for v in operation["values"]]
             unit = operation.get("unit", "days")
             result = self._evaluate_date_operation(op_type, values, unit, context)
             node.details.update({"evaluated_values": values, "unit": unit})
@@ -635,11 +635,11 @@ class RulesEngine:
             value = None
 
             if "subject" in operation:
-                subject = await self._evaluate_value(operation["subject"], context)
-                value = await self._evaluate_value(operation["value"], context)
+                subject = self._evaluate_value(operation["subject"], context)
+                value = self._evaluate_value(operation["value"], context)
 
             elif "values" in operation:
-                values = [await self._evaluate_value(v, context) for v in operation["values"]]
+                values = [self._evaluate_value(v, context) for v in operation["values"]]
                 subject = values[0]
                 value = values[1]
             else:
@@ -656,7 +656,7 @@ class RulesEngine:
             )
 
         elif op_type in self.AGGREGATE_OPS and "values" in operation:
-            values = [await self._evaluate_value(v, context) for v in operation["values"]]
+            values = [self._evaluate_value(v, context) for v in operation["values"]]
             result = self._evaluate_aggregate_ops(op_type, values)
             node.details.update(
                 {
@@ -667,8 +667,8 @@ class RulesEngine:
             )
 
         elif op_type == "GET":
-            subject = await self._evaluate_value(operation["subject"], context)
-            values = await self._evaluate_value(operation.get("values", []), context)
+            subject = self._evaluate_value(operation["subject"], context)
+            values = self._evaluate_value(operation.get("values", []), context)
             result = values.get(subject)
             node.details.update({"subject_value": subject, "allowed_values": values})
             logger.debug(f"GET {subject} from {values}: {result}")
@@ -682,11 +682,11 @@ class RulesEngine:
         context.pop_path()
         return result
 
-    async def _evaluate_value(self, value: Any, context: RuleContext) -> Any:
+    def _evaluate_value(self, value: Any, context: RuleContext) -> Any:
         """Evaluate a value which might be a number, operation, or reference"""
         if isinstance(value, int | float | bool | date | datetime) or value is None:
             return value
         elif isinstance(value, dict) and "operation" in value:
-            return await self._evaluate_operation(value, context)
+            return self._evaluate_operation(value, context)
         else:
-            return await context.resolve_value(value)
+            return context.resolve_value(value)
