@@ -20,7 +20,7 @@ class MCPResultFormatter:
         """
         self.registry = registry
 
-    async def format_for_llm(self, results: MCPResult) -> str:
+    def format_for_llm(self, results: MCPResult) -> str:
         """Format service results for inclusion in the LLM context.
 
         Args:
@@ -44,7 +44,7 @@ class MCPResultFormatter:
             if service_name == "claims":
                 continue
 
-            formatted += await self._format_service_section(service_name, result)
+            formatted += self._format_service_section(service_name, result)
 
         return formatted
 
@@ -82,7 +82,7 @@ class MCPResultFormatter:
         formatted += "---\n\n"
         return formatted
 
-    async def _format_service_section(self, service_name: str, result: dict[str, Any]) -> str:
+    def _format_service_section(self, service_name: str, result: dict[str, Any]) -> str:
         """Format a service section.
 
         Args:
@@ -121,7 +121,7 @@ class MCPResultFormatter:
             formatted += self._format_missing_required(result)
 
         # Get field types
-        money_fields, primary_outputs = await self._get_field_types(service_type, law_path)
+        money_fields, primary_outputs = self._get_field_types(service_type, law_path)
 
         # Format result data
         formatted += self._format_result_data(result, money_fields, primary_outputs)
@@ -178,7 +178,7 @@ class MCPResultFormatter:
 
         return formatted
 
-    async def _get_field_types(self, service_type: str | None, law_path: str | None) -> tuple[list[str], list[str]]:
+    def _get_field_types(self, service_type: str | None, law_path: str | None) -> tuple[list[str], list[str]]:
         """Get field types from the rule spec.
 
         Args:

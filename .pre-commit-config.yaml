@@ -13,7 +13,7 @@ repos:
       - id: check-toml
       - id: detect-private-key
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.8
+    rev: v0.11.9
     hooks:
       - id: ruff
       - id: ruff-format
@@ -21,7 +21,7 @@ repos:
     rev: v1.36.4
     hooks:
       - id: djlint-reformat-jinja
-        types_or: [ "html" ]
+        types_or: ["html"]
 
   - repo: local
     hooks:
@@ -29,6 +29,6 @@ repos:
         name: validate schema
         entry: sh -c './script/validate'
         language: python
-        additional_dependencies: [ jsonschema, pyyaml ]
+        additional_dependencies: [jsonschema, pyyaml]
         pass_filenames: false
         always_run: true

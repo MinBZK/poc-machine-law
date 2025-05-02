@@ -48,7 +48,7 @@ class CaseManager(CaseManagerInterface):
         cases = self.case_manager.get_cases_by_bsn(bsn)
         return to_cases(cases)
 
-    async def submit_case(
+    def submit_case(
         self,
         bsn: str,
         service: str,
@@ -57,7 +57,7 @@ class CaseManager(CaseManagerInterface):
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
     ) -> UUID:
-        return await self.case_manager.submit_case(
+        return self.case_manager.submit_case(
             bsn=bsn,
             service_type=service,
             law=law,

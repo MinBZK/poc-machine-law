@@ -129,7 +129,7 @@ class MCPClaimProcessor:
             except Exception as e:
                 raise MCPClaimParsingError(e, json_str)
 
-    async def process_claims(self, claims: list[ClaimData], bsn: str) -> ClaimsResponse:
+    def process_claims(self, claims: list[ClaimData], bsn: str) -> ClaimsResponse:
         """Process claim references and create claims.
 
         Args:

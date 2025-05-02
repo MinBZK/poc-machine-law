@@ -1,4 +1,3 @@
-import asyncio
 import itertools
 import logging
 import random
@@ -1011,7 +1010,7 @@ class LawSimulator:
 
         return people
 
-    async def simulate_person(self, person) -> None:
+    def simulate_person(self, person) -> None:
         """Simulate all applicable laws for a person and calculate besteedbaar inkomen"""
         has_partner = bool(person["partner_bsn"])
 
@@ -1040,19 +1039,17 @@ class LawSimulator:
         # Evaluate all relevant laws
         try:
             # 1. Zorgtoeslag (healthcare subsidy)
-            zorgtoeslag = await self.services.evaluate(
+            zorgtoeslag = self.services.evaluate(
                 "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, self.simulation_date
             )
 
             # 2. AOW (state pension)
-            aow = await self.services.evaluate(
-                "SVB", "algemene_ouderdomswet", {"BSN": person["bsn"]}, self.simulation_date
-            )
+            aow = self.services.evaluate("SVB", "algemene_ouderdomswet", {"BSN": person["bsn"]}, self.simulation_date)
 
             # 3. Huurtoeslag (rent subsidy)
             # Altijd een poging doen, inclusief niet-huurders (wet zegt wanneer iemand niet in aanmerking komt)
             # try:
-            #     huurtoeslag = await self.services.evaluate(
+            #     huurtoeslag = self.services.evaluate(
             #         "TOESLAGEN", "wet_op_de_huurtoeslag", {"BSN": person["bsn"]}, self.simulation_date
             #     )
             #
@@ -1062,7 +1059,7 @@ class LawSimulator:
 
             # 4. Bijstand (social assistance)
             try:
-                bijstand = await self.services.evaluate(
+                bijstand = self.services.evaluate(
                     "GEMEENTE_AMSTERDAM", "participatiewet/bijstand", {"BSN": person["bsn"]}, self.simulation_date
                 )
             except Exception:
@@ -1073,19 +1070,17 @@ class LawSimulator:
             # kinderopvangtoeslag = None
             # if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
             #     try:
-            #         kinderopvangtoeslag = await self.services.evaluate(
+            #         kinderopvangtoeslag = self.services.evaluate(
             #             "TOESLAGEN", "wet_kinderopvang", {"BSN": person["bsn"]}, self.simulation_date
             #         )
             #     except Exception as e:
             #         kinderopvangtoeslag = None
 
             # 6. Kiesrecht (voting rights)
-            kiesrecht = await self.services.evaluate(
-                "KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date
-            )
+            kiesrecht = self.services.evaluate("KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date)
 
             # 7. Inkomstenbelasting (income tax)
-            inkomstenbelasting = await self.services.evaluate(
+            inkomstenbelasting = self.services.evaluate(
                 "BELASTINGDIENST", "wet_inkomstenbelasting", {"BSN": person["bsn"]}, self.simulation_date
             )
         except Exception:
@@ -1160,7 +1155,7 @@ class LawSimulator:
 
         self.results.append(result)
 
-    async def run_simulation(self, num_people=1000):
+    def run_simulation(self, num_people=1000):
         print(f"Generating {num_people} people with realistic demographics...")
         pairs = self.generate_paired_people(num_people)
 
@@ -1171,7 +1166,7 @@ class LawSimulator:
         print(f"Simulating laws for {total_people} people...")
         progress_bar = tqdm(total=total_people, desc="Simulating", unit="person")
         for person in people:
-            await self.simulate_person(person)
+            self.simulate_person(person)
             progress_bar.update(1)
         progress_bar.close()
 
@@ -1300,12 +1295,12 @@ def print_law_statistics(df, law_name, law_eligible_col, law_amount_col):
                 print(f"  {housing_type}: {format_money(amount)}")
 
 
-async def main() -> None:
+def main() -> None:
     print("\n🇳🇱 Starting Dutch law simulation...")
     simulator = LawSimulator()
 
     # Run the simulation with progress bar
-    results = await simulator.run_simulation(num_people=1000)
+    results = simulator.run_simulation(num_people=1000)
 
     # Print summary statistics
     print("\n📊 === POPULATION DEMOGRAPHICS ===")
@@ -1392,4 +1387,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

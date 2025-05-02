@@ -28,7 +28,7 @@ from web.dependencies import get_case_manager, get_machine_service
 from engine import CaseManagerInterface, EngineInterface
 
 @router.get("/cases/{bsn}")
-async def get_case(
+def get_case(
     bsn: str,
     service: str,
     law: str,
@@ -38,7 +38,7 @@ async def get_case(
     return case
 
 @router.post("/evaluate")
-async def evaluate_law(
+def evaluate_law(
     service: str,
     law: str,
     parameters: dict,

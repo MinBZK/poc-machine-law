@@ -90,7 +90,7 @@ class RuleService:
 
         return engines_cache[cache_key]
 
-    async def evaluate(
+    def evaluate(
         self,
         law: str,
         reference_date: str,
@@ -113,7 +113,7 @@ class RuleService:
             RuleResult containing outputs and metadata
         """
         engine = self._get_engine(law, reference_date)
-        result = await engine.evaluate(
+        result = engine.evaluate(
             parameters=parameters,
             overwrite_input=overwrite_input,
             sources=self.source_dataframes,
@@ -245,7 +245,7 @@ class Services:
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
         return self.resolver.get_discoverable_service_laws(discoverable_by)
 
-    async def get_sorted_discoverable_service_laws(self, bsn):
+    def get_sorted_discoverable_service_laws(self, bsn):
         """
         Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.
         Uses simple caching to improve performance and stability.
@@ -283,9 +283,7 @@ class Services:
                 rule_spec = self.resolver.get_rule_spec(law, current_date, service=service)
 
                 # Run the law for this person and get results
-                result = await self.evaluate(
-                    service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date
-                )
+                result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)
 
                 # Extract financial impact from result based on citizen_relevance
                 impact_value = 0
@@ -359,7 +357,7 @@ class Services:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
 
-    async def evaluate(
+    def evaluate(
         self,
         service: str,
         law: str,
@@ -374,7 +372,7 @@ class Services:
             f"{service}: {law} ({reference_date} {parameters} {requested_output})",
             double_line=True,
         ):
-            return await self.services[service].evaluate(
+            return self.services[service].evaluate(
                 law=law,
                 reference_date=reference_date,
                 parameters=parameters,
@@ -383,7 +381,7 @@ class Services:
                 approved=approved,
             )
 
-    async def apply_rules(self, event) -> None:
+    def apply_rules(self, event) -> None:
         for rule in self.resolver.rules:
             applies = rule.properties.get("applies", [])
 
@@ -392,7 +390,7 @@ class Services:
                     aggregate_id = str(event.originator_id)
                     aggregate = self.case_manager.get_case_by_id(aggregate_id)
                     parameters = {apply["name"]: aggregate}
-                    result = await self.evaluate(rule.service, rule.law, parameters)
+                    result = self.evaluate(rule.service, rule.law, parameters)
 
                     # Apply updates back to aggregate
                     for update in apply.get("update", []):

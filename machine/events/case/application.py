@@ -68,7 +68,7 @@ class CaseManager(Application):
 
         return True
 
-    async def submit_case(
+    def submit_case(
         self,
         bsn: str,
         service_type: str,
@@ -82,7 +82,7 @@ class CaseManager(Application):
         A case starts with the citizen's claimed result which is then verified.
         """
 
-        result = await self.rules_engine.evaluate(service_type, law, parameters, approved=True)
+        result = self.rules_engine.evaluate(service_type, law, parameters, approved=True)
 
         # Verify using rules engine
         verified_result = result.output
