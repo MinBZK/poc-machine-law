@@ -7,14 +7,19 @@ class BaseLLMService(abc.ABC):
     """Base class for LLM services to define common interface"""
 
     @property
+    def is_configured(self) -> bool:
+        """Check if the service is properly configured"""
+        return hasattr(self, "client") and self.client is not None
+
+    @property
     def provider_name(self) -> str:
         """Get the provider name"""
-        return "base"
+        raise NotImplementedError()
 
     @property
     def model_id(self) -> str:
         """Get the model ID"""
-        return "unknown"
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def chat_completion(
@@ -23,7 +28,7 @@ class BaseLLMService(abc.ABC):
         max_tokens: int = 2000,
         temperature: float = 0.7,
         system: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> Any | None:
         """Make a chat completion request to the LLM provider
 
         Args:
@@ -33,7 +38,7 @@ class BaseLLMService(abc.ABC):
             system: System prompt
 
         Returns:
-            LLM response
+            LLM response or None if service not configured
         """
 
     @abc.abstractmethod
@@ -41,10 +46,11 @@ class BaseLLMService(abc.ABC):
         """Extract the completion text from the provider's response
 
         Args:
-            response: Provider-specific response object
+            response: Provider-specific response object or None
+                     if service not configured
 
         Returns:
-            Extracted text content
+            Extracted text content or error message if not configured
         """
 
     @lru_cache(maxsize=1000)  # Cache responses to avoid repeated calls

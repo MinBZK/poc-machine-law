@@ -25,13 +25,35 @@ class LLMFactory:
         return list(LLMFactory._provider_map.keys())
 
     @staticmethod
+    def get_configured_providers() -> list[str]:
+        """Get the list of available AND configured LLM providers
+
+        Returns:
+            List of configured provider names
+        """
+        return [provider for provider in LLMFactory._provider_map if LLMFactory.is_provider_configured(provider)]
+
+    @staticmethod
     def get_provider() -> str:
         """Get the currently configured LLM provider from environment
 
         Returns:
             Provider name (defaults to 'claude' if not specified)
         """
-        return os.getenv("LLM_PROVIDER", LLMFactory.PROVIDER_CLAUDE).lower()
+        requested_provider = os.getenv("LLM_PROVIDER", LLMFactory.PROVIDER_CLAUDE).lower()
+
+        # Check if the requested provider is configured
+        if LLMFactory.is_provider_configured(requested_provider):
+            return requested_provider
+
+        # If not, try to find any configured provider
+        configured_providers = LLMFactory.get_configured_providers()
+        if configured_providers:
+            return configured_providers[0]
+
+        # If no providers are configured, return the requested one anyway
+        # (the service will handle the unconfigured state gracefully)
+        return requested_provider
 
     @staticmethod
     def get_service(provider: str | None = None) -> BaseLLMService:
@@ -63,9 +85,11 @@ class LLMFactory:
         """
         try:
             if provider in LLMFactory._provider_map:
-                # Try to access the provider to check if it's configured
                 service = LLMFactory._provider_map[provider]
-                # If the service has a client, it's configured
+                # Use the is_configured property if available
+                if hasattr(service, "is_configured"):
+                    return service.is_configured
+                # Fall back to checking for client
                 return hasattr(service, "client") and service.client is not None
             return False
         except Exception:

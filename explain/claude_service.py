@@ -10,12 +10,16 @@ class ClaudeService(BaseLLMService):
     """Service for connecting to Claude API"""
 
     def __init__(self) -> None:
-        self.api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not self.api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable not set")
-
-        self.client = anthropic.Anthropic(api_key=self.api_key)
         self._model_id = "claude-3-7-sonnet-20250219"
+        self.api_key = os.getenv("ANTHROPIC_API_KEY")
+        self.client = None
+
+        if self.api_key:
+            try:
+                self.client = anthropic.Anthropic(api_key=self.api_key)
+            except Exception:
+                # Fail silently but keep client as None
+                pass
 
     @property
     def provider_name(self) -> str:
@@ -25,21 +29,13 @@ class ClaudeService(BaseLLMService):
     def model_id(self) -> str:
         return self._model_id
 
-    def create_chat_client(self) -> anthropic.Anthropic:
-        """Create a new Anthropic client instance
-
-        Returns:
-            Anthropic client
-        """
-        return anthropic.Anthropic(api_key=self.api_key)
-
     def chat_completion(
         self,
         messages: list[dict[str, str]],
         max_tokens: int = 2000,
         temperature: float = 0.7,
         system: str | None = None,
-    ) -> Any:
+    ) -> Any | None:
         """Make a chat completion request to Claude
 
         Args:
@@ -49,8 +45,11 @@ class ClaudeService(BaseLLMService):
             system: System prompt
 
         Returns:
-            Anthropic API response
+            Anthropic API response or None if service not configured
         """
+        if not self.is_configured:
+            return None
+
         return self.client.messages.create(
             model=self.model_id,
             max_tokens=max_tokens,
@@ -68,6 +67,9 @@ class ClaudeService(BaseLLMService):
         Returns:
             Extracted text content
         """
+        if response is None:
+            return "Service not configured. Please set ANTHROPIC_API_KEY environment variable."
+
         return response.content[0].text
 
 

@@ -13,12 +13,15 @@ class VLAMService(BaseLLMService):
         self.api_key = os.getenv("VLAM_API_KEY")
         self.base_url = os.getenv("VLAM_BASE_URL", "https://api.demo.vlam.ai/v2.1/projects/poc/openai-compatible/v1")
         self._model_id = os.getenv("VLAM_MODEL_ID", "ubiops-deployment/bzk-dig-chat//chat-model")
+        self.client = None
 
-        if not self.api_key:
-            raise ValueError("VLAM_API_KEY environment variable not set")
-
-        # Create OpenAI client with custom base URL
-        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+        if self.api_key:
+            try:
+                # Create OpenAI client with custom base URL
+                self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+            except Exception:
+                # Fail silently but keep client as None
+                pass
 
     @property
     def provider_name(self) -> str:
@@ -28,21 +31,13 @@ class VLAMService(BaseLLMService):
     def model_id(self) -> str:
         return self._model_id
 
-    def create_chat_client(self) -> OpenAI:
-        """Create a new OpenAI client instance for VLAM.ai
-
-        Returns:
-            OpenAI client configured for VLAM.ai
-        """
-        return OpenAI(api_key=self.api_key, base_url=self.base_url)
-
     def chat_completion(
         self,
         messages: list[dict[str, str]],
         max_tokens: int = 2000,
         temperature: float = 0.7,
         system: str | None = None,
-    ) -> Any:
+    ) -> Any | None:
         """Make a chat completion request to VLAM.ai using OpenAI-compatible API
 
         Args:
@@ -52,8 +47,11 @@ class VLAMService(BaseLLMService):
             system: System prompt
 
         Returns:
-            OpenAI API response
+            OpenAI API response or None if service not configured
         """
+        if not self.is_configured:
+            return None
+
         # If system is provided, add it as the first message
         all_messages = messages.copy()
         if system:
@@ -75,6 +73,9 @@ class VLAMService(BaseLLMService):
         Returns:
             Extracted text content
         """
+        if response is None:
+            return "Service not configured. Please set VLAM_API_KEY environment variable."
+
         return response.choices[0].message.content
 
 
