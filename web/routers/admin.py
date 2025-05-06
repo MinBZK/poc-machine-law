@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from pydantic import BaseModel
 from starlette.responses import RedirectResponse
 
+from explain.llm_factory import LLMFactory
 from machine.events.case.aggregate import CaseStatus
 from web.config_loader import ConfigLoader
 from web.dependencies import (
@@ -21,6 +22,7 @@ from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInter
 from web.routers.laws import evaluate_law
 
 config_loader = ConfigLoader()
+llm_factory = LLMFactory()
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -36,6 +38,29 @@ class Engine(BaseModel):
 
 def get_engines() -> list[Engine]:
     return config_loader.config.get_engines()
+
+
+def get_llm_providers() -> tuple[list[dict], str]:
+    """Get all available LLM providers with their status and the current provider
+
+    Returns:
+        Tuple containing:
+        - List of provider dictionaries with name, model_id, and configuration status
+        - Current provider name
+    """
+    providers = []
+    # Get the current provider name
+    current_provider = llm_factory.get_provider()
+
+    # Get available providers
+    available_providers = llm_factory.get_available_providers()
+
+    for provider_name in available_providers:
+        # Get the service for this provider
+        service = llm_factory.get_service(provider_name)
+        providers.append({"name": provider_name, "model_id": service.model_id, "is_configured": service.is_configured})
+
+    return providers, current_provider
 
 
 def group_cases_by_status(cases):
@@ -66,9 +91,17 @@ async def reset(request: Request):
 async def control(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Show a button to reset the state of the application"""
 
+    providers, current_provider = get_llm_providers()
+
     return templates.TemplateResponse(
         "admin/control.html",
-        {"request": request, "engines": get_engines(), "current_engine_id": get_engine_id()},
+        {
+            "request": request,
+            "engines": get_engines(),
+            "current_engine_id": get_engine_id(),
+            "providers": providers,
+            "current_provider": current_provider,
+        },
     )
 
 
@@ -87,6 +120,28 @@ async def post_set_engine(
     return templates.TemplateResponse(
         "/admin/partials/engines.html",
         {"request": request, "engines": get_engines(), "current_engine_id": get_engine_id()},
+    )
+
+
+@router.post("/set-llm-provider")
+async def post_set_llm_provider(request: Request, provider_name: str = Form(...)):
+    """Set the LLM provider to use for explanations"""
+
+    # Validate provider exists
+    available_providers = llm_factory.get_available_providers()
+    if provider_name not in available_providers:
+        raise HTTPException(status_code=404, detail="Selected LLM provider not found")
+
+    # Set environment variable to change the provider
+    os.environ["LLM_PROVIDER"] = provider_name
+
+    # Get updated providers info for the template
+    providers, current_provider = get_llm_providers()
+
+    # Return the updated LLM providers partial template
+    return templates.TemplateResponse(
+        "/admin/partials/llm_providers.html",
+        {"request": request, "providers": providers, "current_provider": current_provider},
     )
 
 
