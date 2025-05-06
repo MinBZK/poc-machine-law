@@ -2,14 +2,35 @@ import abc
 from functools import lru_cache
 from typing import Any
 
+from fastapi import Request
+
 
 class BaseLLMService(abc.ABC):
     """Base class for LLM services to define common interface"""
+
+    SESSION_KEY = "api_key"  # Should be overridden by subclasses
+    ENV_KEY = "API_KEY"  # Should be overridden by subclasses
 
     @property
     def is_configured(self) -> bool:
         """Check if the service is properly configured"""
         return hasattr(self, "client") and self.client is not None
+
+    @abc.abstractmethod
+    def set_session_key(self, request: Request, api_key: str) -> bool:
+        """Set the API key for the current session"""
+
+    @abc.abstractmethod
+    def get_api_key(self, request: Request | None = None) -> str | None:
+        """Get the API key from session or environment"""
+
+    @abc.abstractmethod
+    def configure_for_request(self, request: Request) -> None:
+        """Configure the service with the API key from the request session"""
+
+    @abc.abstractmethod
+    def clear_session_key(self, request: Request) -> None:
+        """Clear the API key from the session"""
 
     @property
     def provider_name(self) -> str:

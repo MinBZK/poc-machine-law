@@ -40,8 +40,11 @@ def get_engines() -> list[Engine]:
     return config_loader.config.get_engines()
 
 
-def get_llm_providers() -> tuple[list[dict], str]:
+def get_llm_providers(request: Request) -> tuple[list[dict], str]:
     """Get all available LLM providers with their status and the current provider
+
+    Args:
+        request: Request object for checking session keys
 
     Returns:
         Tuple containing:
@@ -50,7 +53,7 @@ def get_llm_providers() -> tuple[list[dict], str]:
     """
     providers = []
     # Get the current provider name
-    current_provider = llm_factory.get_provider()
+    current_provider = llm_factory.get_provider(request)
 
     # Get available providers
     available_providers = llm_factory.get_available_providers()
@@ -58,7 +61,29 @@ def get_llm_providers() -> tuple[list[dict], str]:
     for provider_name in available_providers:
         # Get the service for this provider
         service = llm_factory.get_service(provider_name)
-        providers.append({"name": provider_name, "model_id": service.model_id, "is_configured": service.is_configured})
+
+        # Check explicitly if we have a session key first
+        has_session_key = request and service.SESSION_KEY in request.session
+
+        # Then get the API key (which might be from session or env var)
+        api_key = service.get_api_key(request)
+
+        # Only mark as using session key if we actually have one in the session
+        uses_session_key = has_session_key
+
+        # Format key for display (only last 8 chars)
+        masked_key = None
+        if api_key and len(api_key) > 8:
+            masked_key = "•••••••" + api_key[-8:]
+
+        provider_info = {
+            "name": provider_name,
+            "model_id": service.model_id,
+            "is_configured": llm_factory.is_provider_configured(provider_name, request),
+            "masked_key": masked_key,
+            "uses_session_key": uses_session_key,
+        }
+        providers.append(provider_info)
 
     return providers, current_provider
 
@@ -91,7 +116,10 @@ async def reset(request: Request):
 async def control(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Show a button to reset the state of the application"""
 
-    providers, current_provider = get_llm_providers()
+    # DEBUG: Print session contents to see what's there
+    print(f"DEBUG SESSION: {dict(request.session)}")
+
+    providers, current_provider = get_llm_providers(request)
 
     return templates.TemplateResponse(
         "admin/control.html",
@@ -136,7 +164,52 @@ async def post_set_llm_provider(request: Request, provider_name: str = Form(...)
     os.environ["LLM_PROVIDER"] = provider_name
 
     # Get updated providers info for the template
-    providers, current_provider = get_llm_providers()
+    providers, current_provider = get_llm_providers(request)
+
+    # Return the updated LLM providers partial template
+    return templates.TemplateResponse(
+        "/admin/partials/llm_providers.html",
+        {"request": request, "providers": providers, "current_provider": current_provider},
+    )
+
+
+@router.post("/set-api-key")
+async def post_set_api_key(request: Request, provider_name: str = Form(...), api_key: str = Form(...)):
+    """Set the API key for a provider in the browser session"""
+    # Validate provider exists
+    available_providers = llm_factory.get_available_providers()
+    if provider_name not in available_providers:
+        raise HTTPException(status_code=404, detail="Selected LLM provider not found")
+
+    # Try to set the API key in the session via factory
+    success = llm_factory.set_session_key(request, provider_name, api_key)
+
+    if not success:
+        raise HTTPException(status_code=400, detail="Invalid API key")
+
+    # Get updated providers info for the template
+    providers, current_provider = get_llm_providers(request)
+
+    # Return the updated LLM providers partial template
+    return templates.TemplateResponse(
+        "/admin/partials/llm_providers.html",
+        {"request": request, "providers": providers, "current_provider": current_provider},
+    )
+
+
+@router.post("/clear-api-key")
+async def post_clear_api_key(request: Request, provider_name: str = Form(...)):
+    """Clear the API key for a provider from the browser session"""
+    # Validate provider exists
+    available_providers = llm_factory.get_available_providers()
+    if provider_name not in available_providers:
+        raise HTTPException(status_code=404, detail="Selected LLM provider not found")
+
+    # Clear the session key via the factory
+    llm_factory.clear_session_key(request, provider_name)
+
+    # Get updated providers info for the template
+    providers, current_provider = get_llm_providers(request)
 
     # Return the updated LLM providers partial template
     return templates.TemplateResponse(

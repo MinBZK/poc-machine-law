@@ -9,16 +9,44 @@
                 <h2 class="text-2xl font-semibold text-gray-900 mb-2">Chat over wetten en regels</h2>
                 <p class="text-gray-600 mb-4">Stel uw vraag over wetten, toeslagen, uitkeringen of andere regelingen.</p>
             </div>
-            <div class="flex items-center space-x-2">
-                <select id="llm-provider"
-                        x-model="selectedProvider"
-                        @change="changeProvider()"
-                        class="border rounded-md px-2 py-1 text-sm">
+            <div class="relative" x-data="{ settingsOpen: false }">
+                <button @click="settingsOpen = !settingsOpen"
+                        @click.away="settingsOpen = false"
+                        class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                </button>
+                <div x-show="settingsOpen"
+                     x-cloak
+                     @click.away="settingsOpen = false"
+                     class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1 text-sm">
+                    <div class="px-3 py-2 text-xs font-medium text-gray-500">LLM Provider</div>
                     {% for provider in llm_providers %}
-                        <option value="{{ provider }}"
-                                {% if provider == current_provider %}selected{% endif %}>{{ provider|title }}</option>
+                        <div class="border-t border-gray-100"></div>
+                        <form hx-post="/chat/set-provider"
+                              hx-target="body"
+                              hx-swap="beforeend"
+                              class="m-0 p-0">
+                            <input type="hidden" name="provider" value="{{ provider }}">
+                            <button type="submit"
+                                    @click="settingsOpen = false"
+                                    class="w-full text-left flex items-center px-4 py-2 hover:bg-gray-100 {% if provider == current_provider %}font-semibold text-indigo-600{% else %}text-gray-700{% endif %}">
+                                {{ provider|capitalize }}
+                                {% if provider == current_provider %}
+                                    <svg class="ml-1.5 h-2 w-2 text-indigo-600"
+                                         fill="currentColor"
+                                         viewBox="0 0 8 8">
+                                        <circle cx="4" cy="4" r="3" />
+                                    </svg>
+                                {% endif %}
+                            </button>
+                        </form>
                     {% endfor %}
-                </select>
+                </div>
                 <span x-show="modelInfo" x-text="modelInfo" class="hidden"></span>
             </div>
         </div>
@@ -329,32 +357,10 @@
                 container.scrollTop = container.scrollHeight;
             },
 
+            // Note: We're not using this method anymore, but keeping it for compatibility
             changeProvider() {
-                // Close existing connection
-                if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-                    this.websocket.close();
-                }
-
-                // Clear messages
-                this.messages = [];
-                this.isConnected = false;
-                this.modelInfo = '';
-
-                // Add system message about provider change
-                this.messages.push({
-                    text: `Wisselen naar ${this.selectedProvider.charAt(0).toUpperCase() + this.selectedProvider.slice(1)} LLM...`,
-                    html: `<p>Wisselen naar ${this.selectedProvider.charAt(0).toUpperCase() + this.selectedProvider.slice(1)} LLM...</p>`,
-                    isUser: false,
-                    isSystemMessage: true
-                });
-
-                // Reconnect with new provider
-                this.connectWebSocket();
-
-                // Update URL with new provider
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.set('llm', this.selectedProvider);
-                window.history.pushState({}, '', newUrl.toString());
+                // This is now handled by the form post to /chat/set-provider
+                // which will reload the page
             }
         };
     }

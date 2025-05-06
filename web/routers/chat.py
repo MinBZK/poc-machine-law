@@ -2,7 +2,7 @@ import asyncio
 import json
 import re
 
-from fastapi import APIRouter, Depends, Query, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Form, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 from explain.llm_factory import LLMFactory
@@ -245,9 +245,28 @@ async def get_chat_page(
     if not profile:
         return HTMLResponse("Profile not found", status_code=404)
 
-    # Get available LLM providers
-    providers = LLMFactory.get_available_providers()
-    current_provider = llm or LLMFactory.get_provider()
+    # Get available and configured LLM providers
+    available_providers = LLMFactory.get_available_providers()
+    configured_providers = LLMFactory.get_configured_providers(request)
+
+    # Determine which provider to use
+    current_provider = None
+
+    # First, check URL parameter
+    if llm and llm in configured_providers:
+        current_provider = llm
+        request.session["preferred_llm_provider"] = llm
+
+    # Then check session
+    elif (
+        "preferred_llm_provider" in request.session
+        and request.session["preferred_llm_provider"] in configured_providers
+    ):
+        current_provider = request.session["preferred_llm_provider"]
+
+    # Fall back to default
+    else:
+        current_provider = LLMFactory.get_provider(request)
 
     return templates.TemplateResponse(
         "chat.html",
@@ -255,9 +274,27 @@ async def get_chat_page(
             "request": request,
             "profile": profile,
             "bsn": bsn,
-            "all_profiles": services.get_all_profiles(),  # Add this for the profile selector
-            "llm_providers": providers,
+            "all_profiles": services.get_all_profiles(),
+            "llm_providers": available_providers,
             "current_provider": current_provider,
+        },
+    )
+
+
+@router.post("/set-provider")
+async def set_chat_provider(request: Request, provider: str = Form(...)):
+    """Set the preferred LLM provider in the session"""
+    configured_providers = LLMFactory.get_configured_providers(request)
+
+    if provider in configured_providers:
+        request.session["preferred_llm_provider"] = provider
+
+    # Redirect back to the chat page
+    return templates.TemplateResponse(
+        "partials/provider_updated.html",
+        {
+            "request": request,
+            "provider": provider,
         },
     )
 

@@ -218,11 +218,13 @@ async def explanation(
     service: str,
     law: str,
     bsn: str,
-    approved: bool = False,  # Add this parameter
+    provider: str = None,  # Add provider parameter
+    approved: bool = False,
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Get a citizen-friendly explanation of the rule evaluation path"""
     try:
+        print(f"Explanation requested for {service}, {law}, with provider: {provider}")
         law = unquote(law)
         law, result, parameters = await evaluate_law(bsn, law, service, machine_service, approved=approved)
 
@@ -248,17 +250,53 @@ async def explanation(
 
         rule_spec_json = json.dumps(relevant_spec, ensure_ascii=False, indent=2)
 
-        # Get explanation from LLM using factory to select the configured provider
-        llm_service = llm_factory.get_service()
-        explanation = llm_service.generate_explanation(path_json, rule_spec_json)
+        # Get available and configured LLM providers
+        available_providers = llm_factory.get_available_providers()
+        configured_providers = llm_factory.get_configured_providers(request)
 
-        return templates.TemplateResponse(
+        # Get the provider to use (first from parameter, then from session, then default)
+        current_provider = None
+        if provider and provider in configured_providers:
+            # If provider is specified and configured, use and store it
+            current_provider = provider
+            request.session["preferred_llm_provider"] = provider
+            print(f"Using and storing provider from parameter: {provider}")
+        elif (
+            "preferred_llm_provider" in request.session
+            and request.session["preferred_llm_provider"] in configured_providers
+        ):
+            # If provider is in session and configured, use it
+            current_provider = request.session["preferred_llm_provider"]
+            print(f"Using provider from session: {current_provider}")
+        else:
+            # Otherwise use default provider
+            current_provider = llm_factory.get_provider(request)
+            print(f"Using default provider: {current_provider}")
+
+        # Get explanation from the selected LLM provider
+        llm_service = llm_factory.get_service(current_provider)
+        explanation_text = llm_service.generate_explanation(path_json, rule_spec_json)
+        print(f"Generated explanation using provider: {current_provider}")
+
+        # Format provider info for the template
+        providers = [{"name": p, "is_configured": p in configured_providers} for p in available_providers]
+
+        # Create a response
+        response = templates.TemplateResponse(
             "partials/tiles/components/explanation.html",
             {
                 "request": request,
-                "explanation": explanation,
+                "explanation": explanation_text,
+                "service": service,
+                "law": law,
+                "bsn": bsn,
+                "providers": providers,
+                "current_provider": current_provider,
+                "id": "explanation-panel",  # needed for HTMX targeting
             },
         )
+
+        return response
     except Exception as e:
         print(f"Error in explain_path: {e}")
         return templates.TemplateResponse(
@@ -266,6 +304,11 @@ async def explanation(
             {
                 "request": request,
                 "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                "service": service,
+                "law": law,
+                "bsn": bsn,
+                "providers": [],  # Empty list to avoid further errors
+                "id": "explanation-panel",  # needed for HTMX targeting
             },
         )
 

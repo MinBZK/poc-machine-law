@@ -3,6 +3,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -11,6 +12,16 @@ from web.engines import EngineInterface
 from web.routers import admin, chat, edit, importer, laws
 
 app = FastAPI(title="Burger.nl")
+
+# Add session middleware with a secure secret key and max age of 7 days
+# In production, this should be stored securely and not in the code
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="machine-law-session-secret-key",
+    max_age=7 * 24 * 60 * 60,  # 7 days in seconds
+    same_site="lax",  # Allow cookies to be sent in first-party context
+    https_only=False,  # Allow HTTP for development
+)
 
 # Mount static directory if it exists
 if STATIC_DIR.exists():

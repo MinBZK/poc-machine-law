@@ -3,76 +3,93 @@
      id="llm-provider-selection">
     <h1 class="text-gray-900 text-3xl font-semibold mb-5">LLM Provider Selection</h1>
     <p class="mb-5">Select the LLM provider to use for generating explanations:</p>
-    <form hx-post="/admin/set-llm-provider"
-          hx-trigger="submit"
-          hx-target="#llm-provider-selection"
-          hx-swap="outerHTML"
-          class="w-full">
-        <table class="min-w-full bg-white rounded-lg overflow-hidden mb-5">
-            <thead class="bg-gray-100 text-gray-600">
-                <tr>
-                    <th class="py-3 px-4 text-left">Provider</th>
-                    <th class="py-3 px-4 text-left">Model ID</th>
-                    <th class="py-3 px-4 text-left">Status</th>
-                    <th class="py-3 px-4 text-left">Configuration</th>
-                    <th class="py-3 px-4 text-left">Select</th>
+    <table class="min-w-full bg-white rounded-lg overflow-hidden mb-5">
+        <thead class="bg-gray-100 text-gray-600">
+            <tr>
+                <th class="py-3 px-4 text-left">Provider</th>
+                <th class="py-3 px-4 text-left">Model ID</th>
+                <th class="py-3 px-4 text-left">Configuration</th>
+                <th class="py-3 px-4 text-left">API Key</th>
+                <th class="py-3 px-4 text-left">Select</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for provider in providers %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4">{{ provider.name|capitalize }}</td>
+                    <td class="py-3 px-4">{{ provider.model_id }}</td>
+                    <td class="py-3 px-4">
+                        {% if provider.is_configured %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Configured
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Not Configured
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                        {% if provider.masked_key %}
+                            <div class="flex items-center">
+                                <span class="mr-2">{{ provider.masked_key }}</span>
+                                {% if provider.uses_session_key %}
+                                    <span class="text-xs text-gray-500">(Session)</span>
+                                    <form hx-post="/admin/clear-api-key"
+                                          hx-target="#llm-provider-selection"
+                                          hx-swap="outerHTML"
+                                          class="ml-2 inline">
+                                        <input type="hidden" name="provider_name" value="{{ provider.name }}">
+                                        <button type="submit"
+                                                class="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded">
+                                            Clear
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-xs text-gray-500">(Env)</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <form hx-post="/admin/set-api-key"
+                                  hx-target="#llm-provider-selection"
+                                  hx-swap="outerHTML"
+                                  class="flex items-center">
+                                <input type="hidden" name="provider_name" value="{{ provider.name }}">
+                                <input type="text"
+                                       name="api_key"
+                                       placeholder="Enter API key"
+                                       class="border rounded px-2 py-1 text-sm w-36">
+                                <button type="submit"
+                                        class="ml-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                                    Set
+                                </button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td class="py-3 px-4">
+                        <div id="provider_radio_{{ provider.name }}">
+                            <form hx-post="/admin/set-llm-provider"
+                                  hx-target="#llm-provider-selection"
+                                  hx-swap="outerHTML"
+                                  class="m-0 p-0 inline">
+                                <input type="hidden" name="provider_name" value="{{ provider.name }}">
+                                <button type="submit"
+                                        class="{% if provider.name == current_provider %}bg-green-500 hover:bg-green-700{% else %}bg-gray-300 hover:bg-gray-400{% endif %} text-white font-bold py-1 px-3 rounded">
+                                    {% if provider.name == current_provider %}
+                                        Active
+                                    {% else %}
+                                        Activate
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for provider in providers %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-3 px-4">{{ provider.name|capitalize }}</td>
-                        <td class="py-3 px-4">{{ provider.model_id }}</td>
-                        <td class="py-3 px-4">
-                            {% if provider.name == current_provider %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                            {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Inactive
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td class="py-3 px-4">
-                            {% if provider.is_configured %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Configured
-                                </span>
-                            {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    Not Configured
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td class="py-3 px-4">
-                            <input type="radio"
-                                   name="provider_name"
-                                   value="{{ provider.name }}"
-                                   {% if provider.name == current_provider %}checked{% endif %}
-                                   class="form-radio h-4 w-4 text-blue-600">
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="5" class="py-4 px-4 text-center text-gray-500">No LLM providers available</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button type="submit"
-                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors align-middle mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="w-5 h-5 mr-2 -ml-1"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
-                <path d="M19 9l-7 7-7-7" />
-            </svg>
-            Set LLM Provider
-        </button>
-    </form>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="py-4 px-4 text-center text-gray-500">No LLM providers available</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>

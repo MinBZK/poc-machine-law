@@ -1,7 +1,74 @@
-<div class="space-y-2">
-    {% if error %}
-        <p class="text-red-600">{{ error }}</p>
-    {% else %}
-        <p class="text-sm text-gray-600">{{ explanation }}</p>
-    {% endif %}
+<div class="space-y-2" id="explanation-panel">
+    <div class="flex items-center justify-end">
+        {% if providers %}
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open"
+                        @click.away="open = false"
+                        class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                </button>
+                <div x-show="open"
+                     x-cloak
+                     @click.away="open = false"
+                     class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1 text-sm">
+                    <div class="px-3 py-2 text-xs font-medium text-gray-500">LLM Provider</div>
+                    {% for provider in providers %}
+                        <div class="border-t border-gray-100"></div>
+                        <a href="#"
+                           hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&provider={{ provider.name }}"
+                           hx-target="#explanation-panel"
+                           hx-swap="outerHTML"
+                           hx-indicator="#explanation-loading"
+                           class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer {% if provider.name == current_provider %}font-semibold text-indigo-600{% else %}text-gray-700{% endif %}">
+                            {{ provider.name|capitalize }}
+                            {% if provider.name == current_provider %}
+                                <svg class="ml-1.5 h-2 w-2 text-indigo-600"
+                                     fill="currentColor"
+                                     viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <div id="explanation-content">
+        {% if error %}
+            <p class="text-red-600">{{ error }}</p>
+        {% else %}
+            <div class="text-sm text-gray-600 relative">
+                <!-- De loading indicator die exact dezelfde positie inneemt -->
+                <div id="explanation-loading"
+                     class="htmx-indicator absolute inset-0 bg-white">
+                    <!-- Gebruik dezelfde loading placeholder als elders in de site -->
+                    <div class="animate-pulse">
+                        <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                        <div class="space-y-3 mt-4">
+                            <div class="h-4 bg-gray-200 rounded"></div>
+                            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                            <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+                        </div>
+                        <div class="mt-4 flex items-center space-x-1">
+                            <div class="h-2.5 w-2.5 rounded-full bg-gray-200"></div>
+                            <div class="h-3 bg-gray-200 rounded w-24"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- De daadwerkelijke content -->
+                <p>{{ explanation|safe }}</p>
+                {% if current_provider %}
+                    <div class="mt-2 text-xs text-gray-400 flex items-center">
+                        <span>Gegenereerd door {{ current_provider|capitalize }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 </div>

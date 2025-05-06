@@ -3,64 +3,43 @@
      id="engine-selection">
     <h1 class="text-gray-900 text-3xl font-semibold mb-5">Engine Selection</h1>
     <p class="mb-5">Select the engine that the portal should use:</p>
-    <form hx-post="/admin/set-engine"
-          hx-trigger="submit"
-          hx-target="#engine-selection"
-          hx-swap="outerHTML"
-          class="w-full">
-        <table class="min-w-full bg-white rounded-lg overflow-hidden mb-5">
-            <thead class="bg-gray-100 text-gray-600">
-                <tr>
-                    <th class="py-3 px-4 text-left">Engine</th>
-                    <th class="py-3 px-4 text-left">Description</th>
-                    <th class="py-3 px-4 text-left">Status</th>
-                    <th class="py-3 px-4 text-left">Select</th>
+    <table class="min-w-full bg-white rounded-lg overflow-hidden mb-5">
+        <thead class="bg-gray-100 text-gray-600">
+            <tr>
+                <th class="py-3 px-4 text-left">Engine</th>
+                <th class="py-3 px-4 text-left">Description</th>
+                <th class="py-3 px-4 text-left">Select</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for engine in engines %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4">{{ engine.name }}</td>
+                    <td class="py-3 px-4">{{ engine.description }}</td>
+                    <td class="py-3 px-4">
+                        <div id="engine_button_{{ engine.id }}">
+                            <form hx-post="/admin/set-engine"
+                                  hx-target="#engine-selection"
+                                  hx-swap="outerHTML"
+                                  class="m-0 p-0 inline">
+                                <input type="hidden" name="engine_id" value="{{ engine.id }}">
+                                <button type="submit"
+                                        class="{% if engine.id == current_engine_id %}bg-green-500 hover:bg-green-700{% else %}bg-gray-300 hover:bg-gray-400{% endif %} text-white font-bold py-1 px-3 rounded">
+                                    {% if engine.id == current_engine_id %}
+                                        Active
+                                    {% else %}
+                                        Activate
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for engine in engines %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-3 px-4">{{ engine.name }}</td>
-                        <td class="py-3 px-4">{{ engine.description }}</td>
-                        <td class="py-3 px-4">
-                            {% if engine.id == current_engine_id %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                            {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Inactive
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td class="py-3 px-4">
-                            <input type="radio"
-                                   name="engine_id"
-                                   value="{{ engine.id }}"
-                                   {% if engine.id == current_engine_id %}checked{% endif %}
-                                   class="form-radio h-4 w-4 text-blue-600">
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="4" class="py-4 px-4 text-center text-gray-500">No engines available</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button type="submit"
-                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors align-middle mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="w-5 h-5 mr-2 -ml-1"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
-                <path d="M19 9l-7 7-7-7" />
-            </svg>
-            Set Engine
-        </button>
-    </form>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="py-4 px-4 text-center text-gray-500">No engines available</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
