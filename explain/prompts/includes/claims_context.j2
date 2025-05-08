@@ -4,7 +4,7 @@
 De burger heeft eerder aanvragen gedaan en claims ingediend:
 
 {% for claim in claims %}
-- {{ claim.service }} ({{ claim.law }}): {{ claim.key|replace('_', ' ') }} = {{ claim.value }}{% if claim.approved %} [GOEDGEKEURD]{% elif claim.rejected %} [AFGEWEZEN]{% else %} [IN_BEHANDELING]{% endif %}{% if claim.submission_date %} (ingediend op {{ claim.submission_date }}){% endif %}
+- {{ claim.service }} ({{ claim.law }}): {{ claim.key|replace('_', ' ') }} = {{ claim.value }}{% if claim.approved %} [GOEDGEKEURD]{% elif claim.rejected %} [AFGEWEZEN]{% else %} [IN_BEHANDELING]{% endif %}{% if claim.submission_date %} (ingediend op {{ claim.submission_date }}){% endif %} {% if "inkomen" in claim.key|lower or "bedrag" in claim.key|lower %}(Bedrag in eurocenten){% endif %}
 {% endfor %}
 
 Gebruik deze informatie om de burger beter te helpen:
