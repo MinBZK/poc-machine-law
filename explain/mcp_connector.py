@@ -91,7 +91,7 @@ class MCPLawConnector:
         system_prompt_template = self.jinja_env.get_template("mcp_system_prompt.j2")
         return system_prompt_template.render(service_tools=service_tools)
 
-    async def get_cases_context(self, bsn: str) -> str:
+    def get_cases_context(self, bsn: str) -> str:
         """Get formatted context about a user's existing cases (applications).
 
         Args:
@@ -112,9 +112,7 @@ class MCPLawConnector:
         # Check if we have a profile for this BSN
         profile = None
         try:
-            from web.engines.py_engine.services.profiles import get_profile_data
-
-            profile = get_profile_data(bsn)
+            profile = self.services.get_profile_data(bsn)
         except Exception as e:
             logger.warning(f"Error fetching profile for BSN {bsn}: {e}")
 
@@ -157,9 +155,7 @@ class MCPLawConnector:
                 if profile and hasattr(case, "verified_result") and case.verified_result:
                     # Run a current calculation with approved=False to see current situation
                     parameters = {"BSN": bsn}
-                    result = await self.services.evaluate(
-                        case.service, law=case.law, parameters=parameters, approved=False
-                    )
+                    result = self.services.evaluate(case.service, law=case.law, parameters=parameters, approved=False)
 
                     if result and result.output:
                         current_result = result.output
@@ -319,7 +315,7 @@ class MCPLawConnector:
 
         return None
 
-    async def process_message(self, message: str, bsn: str) -> MCPResult:
+    def process_message(self, message: str, bsn: str) -> MCPResult:
         """Process a user message and execute any law services that might be referred to
 
         Args:
@@ -344,14 +340,14 @@ class MCPLawConnector:
         # Process any claims first
         if claim_refs:
             logger.info(f"Processing {len(claim_refs)} claims")
-            claims_result = await self.claim_processor.process_claims(claim_refs, bsn)
+            claims_result = self.claim_processor.process_claims(claim_refs, bsn)
             if claims_result:
                 results["claims"] = claims_result
 
         # Execute each referenced service
         if service_refs:
             logger.info(f"Executing {len(service_refs)} services")
-            service_results = await self.service_executor.execute_services(service_refs, bsn)
+            service_results = self.service_executor.execute_services(service_refs, bsn)
             # Add service results to the overall results
             for service_name, result in service_results.items():
                 results[service_name] = result
@@ -363,7 +359,7 @@ class MCPLawConnector:
 
         return results
 
-    async def format_results_for_llm(self, results: MCPResult) -> str:
+    def format_results_for_llm(self, results: MCPResult) -> str:
         """Format service results for inclusion in the LLM context
 
         Args:
@@ -372,4 +368,4 @@ class MCPLawConnector:
         Returns:
             Formatted results as markdown
         """
-        return await self.formatter.format_for_llm(results)
+        return self.formatter.format_for_llm(results)

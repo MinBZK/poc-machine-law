@@ -62,7 +62,7 @@ class CaseManagerInterface(ABC):
         """
 
     @abstractmethod
-    async def submit_case(
+    def submit_case(
         self,
         bsn: str,
         service: str,

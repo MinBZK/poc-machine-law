@@ -1,4 +1,3 @@
-import asyncio
 import json
 from typing import Any
 from unittest import TestCase
@@ -65,16 +64,15 @@ def step_impl(context, date):
 
 
 def evaluate_law(context, service, law, approved=True):
-    context.result = asyncio.run(
-        context.services.evaluate(
-            service,
-            law=law,
-            parameters=context.parameters,
-            reference_date=context.root_reference_date,
-            overwrite_input=context.test_data,
-            approved=approved
-        )
+    context.result = context.services.evaluate(
+        service,
+        law=law,
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+        overwrite_input=context.test_data,
+        approved=approved
     )
+
     context.service = service
     context.law = law
 
@@ -279,15 +277,13 @@ def step_impl(context):
 @when("de persoon dit aanvraagt")
 def step_impl(context):
     # Case indienen met de uitkomst van de vorige berekening
-    case_id = asyncio.run(
-        context.services.case_manager.submit_case(
-            bsn=context.parameters["BSN"],
-            service_type=context.service,
-            law=context.law,
-            parameters=context.result.input,
-            claimed_result=context.result.output,
-            approved_claims_only=True
-        )
+    case_id = context.services.case_manager.submit_case(
+        bsn=context.parameters["BSN"],
+        service_type=context.service,
+        law=context.law,
+        parameters=context.result.input,
+        claimed_result=context.result.output,
+        approved_claims_only=True
     )
 
     # Case ID opslaan voor volgende stappen

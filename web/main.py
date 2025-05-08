@@ -58,8 +58,6 @@ async def root(request: Request, bsn: str = "100000001", services: EngineInterfa
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
-    discoverable_service_laws = await services.get_sorted_discoverable_service_laws(bsn)
-
     return templates.TemplateResponse(
         "index.html",
         {
@@ -68,7 +66,7 @@ async def root(request: Request, bsn: str = "100000001", services: EngineInterfa
             "bsn": bsn,
             "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
-            "discoverable_service_laws": discoverable_service_laws,
+            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
         },
     )
 

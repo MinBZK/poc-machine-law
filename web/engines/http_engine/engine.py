@@ -63,7 +63,7 @@ class MachineService(EngineInterface):
 
             return content.data.to_dict()
 
-    async def evaluate(
+    def evaluate(
         self,
         service: str,
         law: str,

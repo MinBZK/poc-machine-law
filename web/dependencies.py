@@ -39,17 +39,17 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
 
-async def get_case_manager() -> CaseManagerInterface:
+def get_case_manager() -> CaseManagerInterface:
     """Dependency to get CaseManager instance"""
     return case_manager
 
 
-async def get_claim_manager() -> ClaimManagerInterface:
+def get_claim_manager() -> ClaimManagerInterface:
     """Dependency to get ClaimManager instance"""
     return claim_manager
 
 
-async def get_machine_service() -> EngineInterface:
+def get_machine_service() -> EngineInterface:
     """Dependency to get EngineInterface instance"""
     return machine_service
 

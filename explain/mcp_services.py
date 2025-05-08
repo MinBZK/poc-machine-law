@@ -4,7 +4,6 @@ This module wraps law execution engines as MCP-compatible services based on the
 Model Context Protocol specification: https://contextprovider.ai/
 """
 
-import asyncio
 from typing import Any
 
 from web.dependencies import TODAY
@@ -25,9 +24,9 @@ class MCPServiceRegistry:
         self.claim_manager = claim_manager
 
         self.law_services = {}
-        asyncio.create_task(self._initialize_services())
+        self._initialize_services()
 
-    async def _initialize_services(self):
+    def _initialize_services(self):
         """Initialize all available law services by discovering available laws"""
         self.law_services = {}
 
@@ -106,13 +105,13 @@ class MCPServiceRegistry:
         """Get a specific service by name"""
         return self.law_services.get(name)
 
-    async def execute_law(self, law_name: str, bsn: str, params: dict | None = None) -> dict[str, Any]:
+    def execute_law(self, law_name: str, bsn: str, params: dict | None = None) -> dict[str, Any]:
         """Execute a law for a specific BSN with optional additional parameters"""
         service = self.get_service(law_name)
         if not service:
             return {"error": f"Law service '{law_name}' not found"}
 
-        return await service.execute(bsn, params or {})
+        return service.execute(bsn, params or {})
 
 
 class BaseMCPService:
@@ -125,7 +124,7 @@ class BaseMCPService:
         self.law_path = ""
         self.service_type = ""
 
-    async def execute(self, bsn: str, params: dict) -> dict[str, Any]:
+    def execute(self, bsn: str, params: dict) -> dict[str, Any]:
         """Execute the law for a specific BSN with parameters"""
         # Get the rule specification
         rule_spec = self.services.get_rule_spec(self.law_path, TODAY, self.service_type)
@@ -134,7 +133,7 @@ class BaseMCPService:
 
         # Execute the law
         parameters = {"BSN": bsn, **params}
-        result = await self.services.evaluate(
+        result = self.services.evaluate(
             self.service_type, law=self.law_path, parameters=parameters, reference_date=TODAY, approved=False
         )
 

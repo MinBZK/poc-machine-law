@@ -4,7 +4,7 @@ from machine.logging_config import configure_logging
 
 
 def before_all(context) -> None:
-    log_level = context.config.userdata.get("log_level", "DEBUG")
+    log_level = context.config.userdata.get("log_level", "ERROR")
     context.loggers = configure_logging(log_level)
 
 

@@ -39,7 +39,7 @@ class PythonMachineService(EngineInterface):
         """
         return get_all_profiles()
 
-    async def evaluate(
+    def evaluate(
         self,
         service: str,
         law: str,
@@ -60,7 +60,7 @@ class PythonMachineService(EngineInterface):
 
         self.set_profile_data(parameters["BSN"])
 
-        result = await self.services.evaluate(
+        result = self.services.evaluate(
             service=service,
             law=law,
             parameters=parameters,

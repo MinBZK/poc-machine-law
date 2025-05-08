@@ -115,7 +115,7 @@ class CaseManager(CaseManagerInterface):
 
             return to_cases(response.parsed.data)
 
-    async def submit_case(
+    def submit_case(
         self,
         bsn: str,
         service: str,
