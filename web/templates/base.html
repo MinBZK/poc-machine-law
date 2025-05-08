@@ -122,6 +122,15 @@
                                         <div class="ml-3">
                                             <div class="font-medium text-gray-900">{{ profile_data.name }}</div>
                                             <div class="text-sm text-gray-500">{{ profile_data.description }}</div>
+                                            {% if profile_data.get('properties') %}
+                                                <div class="flex flex-wrap gap-1 mt-1">
+                                                    {% for property in profile_data.properties %}
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            {{ property }}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
                                             {% if profile_data.get('details') %}
                                                 <div class="text-xs text-gray-400 mt-1">{{ profile_data.details }}</div>
                                             {% endif %}

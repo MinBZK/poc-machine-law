@@ -1259,6 +1259,97 @@ def get_profile_data(bsn: str) -> dict[str, Any] | None:
     return PROFILES.get(bsn)
 
 
+def get_profile_properties(profile: dict) -> list[str]:
+    """Extract key properties from a profile with emoji representations"""
+    properties = []
+
+    # Check if sources and RvIG data exist
+    if not profile.get("sources") or not profile["sources"].get("RvIG"):
+        return properties
+
+    rvig_data = profile["sources"]["RvIG"]
+
+    # Extract person data
+    person_data = next(iter(rvig_data.get("personen", [])), {})
+    if not person_data:
+        return properties
+
+    # Add nationality
+    nationality = person_data.get("nationaliteit")
+    if nationality:
+        if nationality == "NEDERLANDS":
+            properties.append("🇳🇱 Nederlands")
+        elif nationality == "DUITS":
+            properties.append("🇩🇪 Duits")
+        elif nationality == "MAROKKAANS":
+            properties.append("🇲🇦 Marokkaans")
+        else:
+            properties.append(f"🌍 {nationality}")
+
+    # Add age
+    if "geboortedatum" in person_data:
+        birth_year = int(person_data["geboortedatum"].split("-")[0])
+        age = 2025 - birth_year  # Using 2025 as reference year
+        properties.append(f"🗓️ {age} jaar")
+
+    # Add children
+    children_data = rvig_data.get("CHILDREN_DATA", [])
+    for child_entry in children_data:
+        if "kinderen" in child_entry:
+            num_children = len(child_entry["kinderen"])
+            if num_children == 1:
+                properties.append("👶 1 kind")
+            elif num_children > 1:
+                properties.append(f"👨‍👩‍👧‍👦 {num_children} kinderen")
+
+    # Add housing status
+    address_data = next(iter(rvig_data.get("verblijfplaats", [])), {})
+    if address_data:
+        address_type = address_data.get("type")
+        if address_type == "WOONADRES":
+            properties.append("🏠 Vast woonadres")
+        elif address_type == "BRIEFADRES":
+            properties.append("📫 Briefadres")
+
+    # Add work status
+    is_entrepreneur = False
+    if "KVK" in profile["sources"]:
+        kvk_data = profile["sources"]["KVK"]
+        if any(entry.get("waarde") for entry in kvk_data.get("is_entrepreneur", [])):
+            is_entrepreneur = True
+            properties.append("💼 ZZP'er")
+
+    if "UWV" in profile["sources"]:
+        uwv_data = profile["sources"]["UWV"]
+        if "arbeidsverhoudingen" in uwv_data:
+            for relation in uwv_data["arbeidsverhoudingen"]:
+                if relation.get("dienstverband_type") != "GEEN" and not is_entrepreneur:
+                    properties.append("👔 In loondienst")
+
+    # Add student status
+    if "DUO" in profile["sources"]:
+        duo_data = profile["sources"]["DUO"]
+        if "inschrijvingen" in duo_data:
+            for enrollment in duo_data["inschrijvingen"]:
+                if enrollment.get("onderwijssoort") != "GEEN":
+                    properties.append("🎓 Student")
+
+    # Add disability status
+    if "UWV" in profile["sources"] and "arbeidsongeschiktheid" in profile["sources"]["UWV"]:
+        for disability in profile["sources"]["UWV"]["arbeidsongeschiktheid"]:
+            percentage = disability.get("percentage")
+            if percentage:
+                properties.append(f"♿ {percentage}% arbeidsongeschikt")
+
+    return properties
+
+
 def get_all_profiles() -> dict[str, dict[str, Any]]:
-    """Get all available profiles"""
-    return PROFILES
+    """Get all available profiles with properties"""
+    profiles = PROFILES.copy()
+
+    # Add properties to each profile
+    for bsn, profile in profiles.items():
+        profile["properties"] = get_profile_properties(profile)
+
+    return profiles
