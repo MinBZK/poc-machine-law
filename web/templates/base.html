@@ -88,16 +88,12 @@
                     <!-- Desktop User Switcher (Right Side with fixed width) -->
                     <div class="hidden lg:block relative"
                          x-data="{ profileSelectorOpen: false, selectedProfile: '{{ bsn }}' }">
-                        <!-- DigiD Indicator -->
+                        <!-- DigiD Indicator with integrated logo -->
                         <div class="flex items-center space-x-2 bg-white text-gray-900 px-4 py-2 rounded w-[350px] cursor-pointer border border-gray-300 hover:border-blue-500"
                              @click="profileSelectorOpen = !profileSelectorOpen">
-                            <div class="flex-shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     class="h-6 w-6 text-blue-600"
-                                     viewBox="0 0 24 24"
-                                     fill="currentColor">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
-                                </svg>
+                            <!-- DigiD logo -->
+                            <div class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
                             </div>
                             <div class="flex-grow truncate">
                                 <div class="font-semibold">{{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer profiel" }}</div>
@@ -112,8 +108,6 @@
                                 </svg>
                             </div>
                         </div>
-                        <!-- DigiD Login Indicator -->
-                        <div class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">DigiD</div>
                         <!-- Desktop Dropdown Menu -->
                         <div x-show="profileSelectorOpen"
                              x-cloak
@@ -182,17 +176,14 @@
                             </li>
                             <!-- Mobile Profile Switcher Header -->
                             <li class="pt-4 border-t border-blue-800">
-                                <div class="text-xs font-medium text-blue-300 uppercase py-2">DigiD Profiel Wisselen</div>
+                                <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">Profiel Wisselen</div>
                                 <div x-data="{ mobileProfilesOpen: false }" class="relative">
                                     <button @click="mobileProfilesOpen = !mobileProfilesOpen"
                                             class="w-full flex items-center justify-between bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded">
                                         <div class="flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 class="h-5 w-5 mr-2"
-                                                 viewBox="0 0 24 24"
-                                                 fill="currentColor">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
-                                            </svg>
+                                            <div class="w-6 h-6 mr-2 rounded-md overflow-hidden">
+                                                <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
+                                            </div>
                                             {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer profiel" }}
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg"
