@@ -1,4 +1,5 @@
 {% from "macros/render_path.html" import render_path, render_missing_required_form %}
+{% include "partials/wallet_modal.html" %}
 <!-- Start of Shared Application Form Section -->
 <div class="border border-blue-200 rounded-lg p-5 mb-6 bg-blue-50/30">
     <!-- Result Summary -->
@@ -94,3 +95,77 @@
     </div>
 </div>
 <!-- End of Shared Application Form Section -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function setupWalletButtonListeners() {
+        console.log('Setting up wallet button listeners');
+        // Elements
+        const walletModal = document.getElementById('wallet-modal');
+        const openWalletBtns = document.querySelectorAll('.open-wallet-btn');
+
+        // Event listeners for all wallet buttons (could be multiple forms)
+        openWalletBtns.forEach(btn => {
+            console.log('Found wallet button:', btn);
+            btn.addEventListener('click', function(e) {
+                console.log('Wallet button clicked');
+                e.preventDefault();
+                // Dispatch global event to ensure modal opens even if it's outside the current DOM context
+                window.dispatchEvent(new CustomEvent('open-wallet-modal'));
+                console.log('Modal event dispatched');
+            });
+        });
+    }
+
+    // Initial setup with a slight delay to ensure DOM is fully loaded
+    setTimeout(setupWalletButtonListeners, 500);
+
+    // Also set up on htmx:afterSwap events to handle dynamic content
+    document.body.addEventListener('htmx:afterSwap', function(e) {
+        setupWalletButtonListeners();
+    });
+
+    // Prevent the application panel from closing when interacting with the wallet
+    document.addEventListener('open-wallet-modal', function(e) {
+        // Stop any event that might be trying to close the panel
+        e.stopPropagation();
+        e.preventDefault();
+
+        // Prevent any parent handlers from closing the panel
+        const panel = document.getElementById('shared-application-panel');
+        if (panel) {
+            panel.classList.add('wallet-interaction');
+
+            // Make sure the panel doesn't get closed by click events
+            const preventPanelClose = function(evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                return false;
+            };
+
+            // Add click prevention temporarily
+            panel.addEventListener('click', preventPanelClose, true);
+
+            // Remove it after wallet interaction is done
+            setTimeout(function() {
+                panel.removeEventListener('click', preventPanelClose, true);
+            }, 500);
+        }
+
+        console.log('Prevented application panel from closing during wallet interaction');
+    });
+
+    // Global handler to keep wallet-interaction class
+    window.addEventListener('click', function(e) {
+        const walletModal = document.getElementById('wallet-modal');
+        const appPanel = document.getElementById('shared-application-panel');
+
+        if (walletModal && appPanel && walletModal.style.display !== 'none' && !walletModal.classList.contains('hidden')) {
+            // If the wallet is visible, prevent the panel from closing
+            e.stopPropagation();
+            appPanel.classList.add('wallet-interaction');
+            console.log('Global handler prevented panel closing');
+        }
+    }, true);
+
+});
+</script>
