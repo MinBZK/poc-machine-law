@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
 from web.engines import EngineInterface
-from web.routers import admin, chat, edit, importer, laws
+from web.routers import admin, chat, edit, importer, laws, wallet
 
 app = FastAPI(title="Burger.nl")
 
@@ -33,6 +33,8 @@ app.include_router(admin.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
 app.include_router(importer.router)
+app.include_router(wallet.router)
+
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
 app.mount(
     "/analysis/graph",

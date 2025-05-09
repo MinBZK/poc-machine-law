@@ -1,0 +1,755 @@
+{% from "macros/logos.html" import org_logo %}
+<!-- Wallet Modal -->
+<div id="wallet-modal"
+     class="fixed inset-0 bg-gray-800 bg-opacity-75 z-[200] hidden"
+     x-data="walletComponent()"
+     style="z-index: 9999;
+            display: none"
+     @click.stop>
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img alt="Wallet Logo"
+                         class="h-8 w-auto"
+                         src="data:image/png;base64,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" />
+                    <h3 class=" text-lg font-semibold">NL Wallet</h3>
+                </div>
+                <button id="close-wallet-modal"
+                        type="button"
+                        class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Content - Step 1: QR Code -->
+            <div x-show="step === 1" class="p-6">
+                <h4 class="text-lg font-medium text-center mb-4">Scan de QR-code met uw NL Wallet app</h4>
+                <div class="flex justify-center mb-6">
+                    <div class="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-300">
+                        <!-- Placeholder QR code - in production would be dynamically generated -->
+                        <svg class="w-56 h-56" viewBox="0 0 100 100">
+                            <path d="M0 0h30v30h-30z" fill="black" />
+                            <path d="M40 0h10v10h-10z" fill="black" />
+                            <path d="M60 0h30v30h-30z" fill="black" />
+                            <path d="M10 10h10v10h-10z" fill="white" />
+                            <path d="M70 10h10v10h-10z" fill="white" />
+                            <path d="M40 20h20v10h-20z" fill="black" />
+                            <path d="M0 40h10v20h-10z" fill="black" />
+                            <path d="M20 40h30v10h-30z" fill="black" />
+                            <path d="M60 40h10v10h-10z" fill="black" />
+                            <path d="M80 40h20v10h-20z" fill="black" />
+                            <path d="M30 50h10v10h-10z" fill="black" />
+                            <path d="M50 50h10v10h-10z" fill="black" />
+                            <path d="M70 50h10v10h-10z" fill="black" />
+                            <path d="M90 50h10v30h-10z" fill="black" />
+                            <path d="M0 60h30v10h-30z" fill="black" />
+                            <path d="M40 60h10v10h-10z" fill="black" />
+                            <path d="M60 60h10v10h-10z" fill="black" />
+                            <path d="M0 80h30v10h-30z" fill="black" />
+                            <path d="M40 80h10v10h-10z" fill="black" />
+                            <path d="M60 80h10v10h-10z" fill="black" />
+                            <path d="M80 80h10v10h-10z" fill="black" />
+                            <path d="M30 90h10v10h-10z" fill="black" />
+                            <path d="M50 90h10v10h-10z" fill="black" />
+                            <path d="M70 90h10v10h-10z" fill="black" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Content - Step 2: Loading -->
+            <div x-show="step === 2"
+                 class="p-6 text-center"
+                 x-init="setTimeout(() => step = 3, 3500)">
+                <div class="flex justify-center mb-4">
+                    <svg class="animate-spin h-12 w-12 text-blue-600"
+                         xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                </div>
+                <h4 class="text-lg font-medium mb-2">Verbinden met NL Wallet</h4>
+                <p class="text-sm text-gray-600">Een moment geduld alstublieft...</p>
+            </div>
+            <!-- Modal Content - Step 3: Login to burger.nl -->
+            <div x-show="step === 3" class="p-6">
+                <h4 class="text-lg font-medium mb-4 text-center">Inloggen bij burger.nl</h4>
+                <div class="p-4 bg-blue-50 rounded-lg mb-6">
+                    <p class="text-sm">burger.nl wil gegevens uit uw NL Wallet gebruiken om u te identificeren.</p>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button @click="step = 1"
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
+                        Annuleren
+                    </button>
+                    <button @click="goToStep4()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Toestaan
+                    </button>
+                </div>
+            </div>
+            <!-- Modal Content - Step 4: Data Sharing -->
+            <div x-show="step === 4" class="p-6" @click.stop>
+                <h4 class="text-lg font-medium mb-4 text-center">Gegevens delen</h4>
+                <div class="p-4 bg-blue-50 rounded-lg mb-6" @click.stop>
+                    <p class="text-sm mb-3">De volgende gegevens worden gedeeld:</p>
+                    <!-- Wallet data container - dynamically filled from API -->
+                    <div id="wallet-data-container" class="mb-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <h5 class="font-medium text-sm text-gray-700">Gegevens uit uw wallet</h5>
+                            <button type="button"
+                                    @click="fetchWalletData()"
+                                    class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
+                                <svg class="w-4 h-4 mr-1"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Vernieuwen
+                            </button>
+                        </div>
+                        <!-- This list will be dynamically populated with data from the API -->
+                        <ul id="wallet-data-list" class="text-sm space-y-2 pl-4">
+                            <!-- Loading indicator -->
+                            <li class="flex items-center justify-center py-4 text-gray-500">
+                                <svg class="animate-spin h-5 w-5 mr-2"
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                <span>Gegevens worden opgehaald...</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button @click="step = 1"
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
+                        Annuleren
+                    </button>
+                    <button @click="step = 5"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Gegevens delen
+                    </button>
+                </div>
+            </div>
+            <!-- Modal Content - Step 5: PIN Code -->
+            <div x-show="step === 5" class="p-6">
+                <h4 class="text-lg font-medium mb-4 text-center">Voer uw pincode in</h4>
+                <div class="mb-6">
+                    <div class="flex justify-center space-x-2 mb-4">
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mx-auto max-w-xs">
+                        {% for num in range(1, 10) %}
+                            <button @click="step = 6"
+                                    class="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-lg font-semibold">
+                                {{ num }}
+                            </button>
+                        {% endfor %}
+                        <div class="w-12 h-12"></div>
+                        <button @click="step = 6"
+                                class="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-lg font-semibold">
+                            0
+                        </button>
+                        <button class="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-lg font-semibold">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Content - Step 6: Success -->
+            <div x-show="step === 6" class="p-6 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="rounded-full bg-green-100 p-3">
+                        <svg class="w-12 h-12 text-green-600"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+                <h4 class="text-lg font-medium mb-2">Gegevens succesvol gedeeld</h4>
+                <p class="text-sm text-gray-600 mb-6">Uw gegevens zijn overgedragen aan burger.nl</p>
+                <button id="complete-wallet-flow"
+                        onclick="document.getElementById('wallet-modal').style.display='none'; console.log('Direct close!'); setTimeout(function() { document.dispatchEvent(new CustomEvent('wallet-data-received', { detail: { success: true, bsn: new URLSearchParams(window.location.search).get('bsn') || '{{ bsn }}', profile: window.lastWalletData || {} }})); }, 100);"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Sluiten
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Global variable to store wallet data
+    window.lastWalletData = null;
+
+    // Define the Alpine component for the wallet
+    function walletComponent() {
+        return {
+            step: 1,
+            service: '',
+            law: '',
+            isLoading: false,
+            errorMessage: '',
+            walletData: null,
+
+            init() {
+                console.log('🚀 Wallet component initialized');
+                this.initializeWalletServices();
+            },
+
+            initializeWalletServices() {
+                // Get service and law parameters from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                let serviceValue = urlParams.get('service') || '';
+                let lawValue = urlParams.get('law') || '';
+
+                // If not found in URL, check form inputs
+                if (!serviceValue || !lawValue) {
+                    const serviceInput = document.querySelector('input[name="service"]');
+                    const lawInput = document.querySelector('input[name="law"]');
+
+                    if (serviceInput) serviceValue = serviceInput.value;
+                    if (lawInput) lawValue = lawInput.value;
+                }
+
+                // Set these values in the component
+                this.service = serviceValue;
+                this.law = lawValue;
+                console.log(`Initialized wallet services - Service: ${serviceValue}, Law: ${lawValue}`);
+            },
+
+            // Function to go to step 4 and fetch data
+            goToStep4() {
+                console.log('👉 Moving to step 4 and fetching wallet data');
+                this.step = 4;
+                this.fetchWalletData();
+            },
+
+            // Function to fetch wallet data
+            fetchWalletData() {
+                console.log('📡 Fetching wallet data...');
+                this.isLoading = true;
+                this.errorMessage = '';
+
+                // Get BSN from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const defaultBsn = '{{ bsn }}' || '100000001';
+                let bsn = urlParams.get('bsn') || defaultBsn;
+
+                // Log the parameters we're using
+                console.log(`🔵 Fetching wallet data - BSN: ${bsn}, Service: ${this.service}, Law: ${this.law}`);
+
+                // Show loading indicator in the UI
+                const dataList = document.getElementById('wallet-data-list');
+                if (dataList) {
+                    dataList.innerHTML = `
+          <li class="flex items-center justify-center py-4 text-gray-500">
+            <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Gegevens worden opgehaald...</span>
+          </li>
+        `;
+                }
+
+                // Build the URL with parameters
+                const fetchUrl = `/wallet/get-data?bsn=${bsn}${this.service ? '&service=' + this.service : ''}${this.law ? '&law=' + this.law : ''}`;
+                console.log(`🌐 Final wallet data URL: ${fetchUrl}`);
+
+                // Make the network request
+                fetch(fetchUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Cache-Control': 'no-cache'
+                    }
+                })
+                    .then(response => {
+                        console.log(`🔄 Fetch response status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(`🔄 Received data:`, data);
+                        this.isLoading = false;
+
+                        if (data.success) {
+                            this.walletData = data.data;
+                            // Update the wallet display with the data
+                            window.lastWalletData = data.data;
+
+                            this.updateWalletDisplay(data.data);
+                        } else {
+                            this.errorMessage = data.message || 'Failed to fetch wallet data';
+                            throw new Error(this.errorMessage);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`❌ Error fetching wallet data:`, error);
+                        this.isLoading = false;
+                        this.errorMessage = error.message || 'Error communicating with NL Wallet';
+
+                        if (dataList) {
+                            dataList.innerHTML = `
+            <li class="flex items-start text-red-600">
+              <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>Fout bij ophalen gegevens: ${this.errorMessage}</span>
+            </li>
+          `;
+                        }
+                    });
+            },
+
+            // Function to update the wallet display with actual data
+// Function to update the wallet display with actual data
+            updateWalletDisplay(walletData) {
+                console.log('⭐ UPDATING WALLET DISPLAY WITH DATA:', walletData);
+
+                // Get the list element
+                const ul = document.getElementById('wallet-data-list');
+                if (!ul) {
+                    console.error('Wallet data list not found');
+                    return;
+                }
+
+                // Clear existing content
+                ul.innerHTML = '';
+
+                // We'll count how many items we add
+                let itemCount = 0;
+
+                // Format currency values from cents to euros
+                const formatEuros = (cents) => {
+                    const euros = cents / 100;
+                    return '€' + euros.toFixed(2).replace('.', ',');
+                };
+
+                try {
+                    // Function to get a nice display name for keys
+                    function getNiceDisplayName(key) {
+                        // Replace underscores with spaces and lowercase
+                        const name = key.replace(/_/g, ' ').toLowerCase();
+
+                        // Manual mappings for better display names
+                        const mappings = {
+                            'rent amount': 'Huur per maand',
+                            'service costs': 'Servicekosten',
+                            'eligible service costs': 'Subsidiabele servicekosten',
+                            'bruto inkomen': 'Bruto jaarinkomen',
+                            'belasting betaald': 'Betaalde belasting',
+                            'maandpremie': 'Maandpremie zorgverzekering',
+                            'eigen risico': 'Eigen risico',
+                            'aanvullend pakket': 'Aanvullend pakket',
+                            'huurwoning': 'Huurwoning gegevens',
+                            'jaaropgave': 'Jaaropgave gegevens',
+                            'verzekering': 'Zorgverzekering gegevens',
+                            'wonen': 'Wonen',
+                            'inkomen': 'Inkomen',
+                            'gezondheid': 'Gezondheid',
+                            'toeslagen': 'Toeslagen'
+                        };
+
+                        return mappings[name] || name;
+                    }
+
+                    // Create categories with icons and colors
+                    const categories = {
+                        wonen: {
+                            icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+                            color: 'blue'
+                        },
+                        inkomen: {
+                            icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                            color: 'green'
+                        },
+                        gezondheid: {
+                            icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+                            color: 'red'
+                        },
+                        toeslagen: {
+                            icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z',
+                            color: 'purple'
+                        },
+                        default: {
+                            icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                            color: 'blue'
+                        }
+                    };
+
+                    // Generic handling for any single object at root level
+                    if (walletData && typeof walletData === 'object' && !Array.isArray(walletData)) {
+                        // Check if we have a single property with a nested object
+                        const keys = Object.keys(walletData);
+
+                        // If there's only a single key at the root level and it points to an object
+                        if (keys.length === 1 && typeof walletData[keys[0]] === 'object' && !Array.isArray(walletData[keys[0]])) {
+                            const category = keys[0].toLowerCase();
+                            const categoryData = walletData[keys[0]];
+                            const categoryConfig = categories[category] || categories.default;
+
+                            // Create category heading
+                            const categoryHeading = document.createElement('div');
+                            categoryHeading.className = 'mb-3 mt-4 first:mt-0';
+                            categoryHeading.innerHTML = `
+                    <div class="flex items-center gap-2 font-medium text-${categoryConfig.color}-700 border-b border-${categoryConfig.color}-200 pb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${categoryConfig.icon}" />
+                        </svg>
+                        <span>${getNiceDisplayName(category)} gegevens</span>
+                    </div>
+                `;
+                            ul.appendChild(categoryHeading);
+
+                            // Add items directly
+                            const itemsList = document.createElement('ul');
+                            itemsList.className = 'ml-3 space-y-1.5 mb-3';
+
+                            for (const [key, value] of Object.entries(categoryData)) {
+                                let formattedValue = value;
+                                let displayKey = key.replace(/_/g, ' ').toLowerCase();
+
+                                // Format currencies
+                                if (typeof value === 'number' &&
+                                    (key.includes('AMOUNT') || key.includes('COST') ||
+                                        key.includes('PRICE') || key.includes('EURO'))) {
+                                    formattedValue = formatEuros(value);
+                                }
+
+                                const li = document.createElement('li');
+                                li.className = 'flex items-start';
+                                li.innerHTML = `
+                        <svg class="w-5 h-5 text-${categoryConfig.color}-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="flex justify-between w-full">
+                            <span class="text-gray-700">${displayKey}</span>
+                            <span class="font-medium ml-2">${formattedValue}</span>
+                        </div>
+                    `;
+
+                                itemsList.appendChild(li);
+                                itemCount++;
+                            }
+
+                            ul.appendChild(itemsList);
+
+                            // Process other data using the standard approach
+                            const remainingData = {};
+                            for (let i = 1; i < keys.length; i++) {
+                                remainingData[keys[i]] = walletData[keys[i]];
+                            }
+
+                            if (Object.keys(remainingData).length > 0) {
+                                // Process the remaining data categories
+                                for (const [category, data] of Object.entries(remainingData)) {
+                                    if (!categories[category]) continue; // Skip unknown categories
+
+                                    // Create category heading
+                                    const categoryHeading = document.createElement('div');
+                                    categoryHeading.className = 'mb-3 mt-4 first:mt-0';
+                                    categoryHeading.innerHTML = `
+                            <div class="flex items-center gap-2 font-medium text-${categories[category].color}-700 border-b border-${categories[category].color}-200 pb-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${categories[category].icon}" />
+                                </svg>
+                                <span>${getNiceDisplayName(category)}</span>
+                            </div>
+                        `;
+                                    ul.appendChild(categoryHeading);
+
+                                    // Process subcategories
+                                    processSubcategories(data, category);
+                                }
+                            }
+
+                            return; // We've processed the special case
+                        }
+                    }
+
+                    // Standard processing for multiple categories
+                    function processSubcategories(data, category) {
+                        if (typeof data !== 'object' || data === null) return;
+
+                        for (const [subcategory, items] of Object.entries(data)) {
+                            if (typeof items !== 'object' || items === null) continue;
+
+                            // Create subcategory heading if needed
+                            const subcategoryHeading = document.createElement('div');
+                            subcategoryHeading.className = 'mb-2 mt-2 ml-2 font-medium text-gray-600 text-sm';
+                            subcategoryHeading.textContent = getNiceDisplayName(subcategory);
+                            ul.appendChild(subcategoryHeading);
+
+                            // Create subcategory list
+                            const itemsList = document.createElement('ul');
+                            itemsList.className = 'ml-3 space-y-1.5 mb-3';
+
+                            // Add items
+                            for (const [key, value] of Object.entries(items)) {
+                                let formattedValue = value;
+
+                                // Format currencies
+                                if (typeof value === 'number' &&
+                                    (key.includes('AMOUNT') || key.includes('COST') ||
+                                        key.includes('PRICE') || key.includes('EURO') ||
+                                        key.includes('INKOMEN') || key.includes('BELASTING') ||
+                                        key.includes('RISICO') || key.includes('PREMIE'))) {
+                                    formattedValue = formatEuros(value);
+                                }
+
+                                const li = document.createElement('li');
+                                li.className = 'flex items-start';
+                                li.innerHTML = `
+                        <svg class="w-5 h-5 text-${categories[category].color}-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="flex justify-between w-full">
+                            <span class="text-gray-700">${getNiceDisplayName(key)}</span>
+                            <span class="font-medium ml-2">${formattedValue}</span>
+                        </div>
+                    `;
+
+                                itemsList.appendChild(li);
+                                itemCount++;
+                            }
+
+                            ul.appendChild(itemsList);
+                        }
+                    }
+
+                    // Process data by category
+                    for (const [category, data] of Object.entries(walletData)) {
+                        if (!categories[category]) continue; // Skip unknown categories
+
+                        // Create category heading
+                        const categoryHeading = document.createElement('div');
+                        categoryHeading.className = 'mb-3 mt-4 first:mt-0';
+                        categoryHeading.innerHTML = `
+            <div class="flex items-center gap-2 font-medium text-${categories[category].color}-700 border-b border-${categories[category].color}-200 pb-1">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${categories[category].icon}" />
+              </svg>
+              <span>${getNiceDisplayName(category)}</span>
+            </div>
+          `;
+                        ul.appendChild(categoryHeading);
+
+                        // Process subcategories
+                        processSubcategories(data, category);
+                    }
+
+                    // If no data was found, show a message
+                    if (itemCount === 0) {
+                        const li = document.createElement('li');
+                        li.className = 'flex items-start';
+                        li.innerHTML = `
+            <svg class="w-5 h-5 text-yellow-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Geen gegevens beschikbaar voor deze dienst.</span>
+          `;
+                        ul.appendChild(li);
+                    }
+
+                    console.log('✅ Wallet data display updated with', itemCount, 'items');
+                } catch (e) {
+                    console.error('Error updating wallet display:', e);
+                    // Show error in the list
+                    ul.innerHTML = `
+          <li class="flex items-start text-red-600">
+            <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Fout bij weergeven gegevens: ${e.message}</span>
+          </li>
+        `;
+                }
+            }
+        }
+    }
+
+    // Replace the complete-wallet-flow button handler in wallet_modal.html
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const completeWalletFlowBtn = document.getElementById('complete-wallet-flow');
+        if (completeWalletFlowBtn) {
+            completeWalletFlowBtn.addEventListener('click', function (e) {
+                console.log('🔴 SLUITEN BUTTON CLICKED - DIRECT MODAL CLOSE');
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Direct DOM manipulation to force close the modal
+                const modal = document.getElementById('wallet-modal');
+                if (modal) {
+                    // Force hide with inline style
+                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+
+                    // Force reset state
+                    if (modal.__x) {
+                        try {
+                            Alpine.raw(modal.__x.$data).step = 1;
+                        } catch (e) {
+                            console.log('Error resetting Alpine state:', e);
+                        }
+                    }
+
+                    // Get wallet data to dispatch
+                    let walletData = null;
+                    let service = '';
+                    let law = '';
+
+                    if (modal.__x) {
+                        const data = Alpine.raw(modal.__x.$data);
+                        walletData = data.walletData;
+                        service = data.service || '';
+                        law = data.law || '';
+                    }
+
+                    // Get BSN from URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const defaultBsn = '{{ bsn }}' || '100000001';
+                    let bsn = urlParams.get('bsn') || defaultBsn;
+
+                    // Dispatch wallet data event
+                    document.dispatchEvent(new CustomEvent('wallet-data-received', {
+                        detail: {
+                            success: true,
+                            bsn: bsn,
+                            service: service,
+                            law: law,
+                            profile: walletData
+                        }
+                    }));
+
+                    console.log('✅ Dispatched wallet-data-received event after forced modal close');
+                } else {
+                    console.error('Modal element not found!');
+                }
+            });
+        } else {
+            console.error('Complete wallet flow button not found!');
+        }
+
+        // Also improve the regular close button
+        const closeWalletModalBtn = document.getElementById('close-wallet-modal');
+        if (closeWalletModalBtn) {
+            closeWalletModalBtn.addEventListener('click', function () {
+                console.log('Close wallet button clicked');
+                const modal = document.getElementById('wallet-modal');
+
+                // Method 1: Use Alpine.js to reset step
+                if (modal && modal.__x) {
+                    Alpine.raw(modal.__x.$data).step = 1;
+                }
+
+                // Method 2: Set display to none
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }
+
+                // Method 3: Using the global wallet API
+                if (window.wallet && typeof window.wallet.close === 'function') {
+                    window.wallet.close();
+                }
+            });
+        }
+
+        window.wallet = {
+            open: function () {
+                const modal = document.getElementById('wallet-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'block';
+                    console.log('Modal opened via global wallet.open() function');
+                }
+            },
+            close: function () {
+                const modal = document.getElementById('wallet-modal');
+                if (modal) {
+                    // 1. Reset to step 1 for next time
+                    if (modal.__x) {
+                        try {
+                            Alpine.raw(modal.__x.$data).step = 1;
+                        } catch (e) {
+                            console.error('Error resetting step:', e);
+                        }
+                    }
+
+                    // 2. Hide the modal
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+
+                    console.log('Modal hidden via global wallet.close() function');
+
+                    // 3. Cleanup any state if needed
+                    document.body.classList.remove('modal-open');
+
+                    // 4. Force redraw/reflow if needed
+                    void modal.offsetWidth;
+                } else {
+                    console.error('Modal element not found during close attempt');
+                }
+            },
+            setStep: function (step) {
+                const modal = document.getElementById('wallet-modal');
+                if (modal && modal.__x) {
+                    try {
+                        const data = Alpine.raw(modal.__x.$data);
+                        data.step = step;
+                        console.log(`Step set to ${step} via global wallet.setStep() function`);
+
+                        // Auto-fetch data when going to step 4
+                        if (step === 4 && typeof data.fetchWalletData === 'function') {
+                            console.log('Auto-fetching wallet data for step 4');
+                            data.fetchWalletData();
+                        }
+                    } catch (e) {
+                        console.error('Error setting step:', e);
+                    }
+                } else {
+                    console.error('Modal or Alpine component not found');
+                }
+            },
+            fetchData: function () {
+                const modal = document.getElementById('wallet-modal');
+                if (modal && modal.__x) {
+                    try {
+                        const data = Alpine.raw(modal.__x.$data);
+                        if (typeof data.fetchWalletData === 'function') {
+                            data.fetchWalletData();
+                        }
+                    } catch (e) {
+                        console.error('Error fetching data:', e);
+                    }
+                } else {
+                    console.error('Modal or Alpine component not found');
+                }
+            }
+        };
+
+        // Log initial setup completion
+        console.log('✅ Wallet modal event handlers and global API initialized with improved close functionality');
+    });
+</script>
