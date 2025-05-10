@@ -24,6 +24,36 @@ PROFILES = {
     "100000001": {
         "name": "Merijn van der Meer",
         "description": "ZZP'er in de thuiszorg, alleenstaande ouder met twee jonge kinderen waarvan één met chronische aandoening",
+        # Wallet data direct op het rootniveau van het profiel
+        "wallet_data": {
+            "wonen": {
+                "huurwoning": {
+                    "RENT_AMOUNT": 71850,  # €718,50 kale huur
+                    "SERVICE_COSTS": 9520,  # €95,20 servicekosten
+                    "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                }
+            },
+            "toeslagen": {
+                "huurtoeslag": {
+                    "RENT_AMOUNT": 71850,  # €718,50 kale huur
+                    "SERVICE_COSTS": 9520,  # €95,20 servicekosten
+                    "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                }
+            },
+            "inkomen": {
+                "jaaropgave": {
+                    "BRUTO_INKOMEN": 1550000,  # €15.500,00 bruto inkomen
+                    "BELASTING_BETAALD": 285000,  # €2.850,00 betaalde belasting
+                }
+            },
+            "gezondheid": {
+                "verzekering": {
+                    "MAANDPREMIE": 13850,  # €138,50 maandpremie
+                    "EIGEN_RISICO": 38500,  # €385,00 eigen risico
+                    "AANVULLEND_PAKKET": "Basis+",
+                }
+            },
+        },
         "sources": {
             **GLOBAL_SERVICES,
             "RvIG": {
@@ -148,6 +178,36 @@ PROFILES = {
     "100000002": {
         "name": "Maria Rodriguez",
         "description": "Alleenstaande moeder, parttime werkend in de horeca met onregelmatige uren, vraagt alleen huurtoeslag aan",
+        # Wallet data direct op het rootniveau van het profiel
+        "wallet_data": {
+            "wonen": {
+                "huurwoning": {
+                    "RENT_AMOUNT": 62500,  # €625,00 kale huur
+                    "SERVICE_COSTS": 7500,  # €75,00 servicekosten
+                    "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                }
+            },
+            "toeslagen": {
+                "huurtoeslag": {
+                    "RENT_AMOUNT": 62500,  # €625,00 kale huur
+                    "SERVICE_COSTS": 7500,  # €75,00 servicekosten
+                    "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                }
+            },
+            "inkomen": {
+                "jaaropgave": {
+                    "BRUTO_INKOMEN": 1130000,  # €11.300,00 bruto inkomen
+                    "BELASTING_BETAALD": 195000,  # €1.950,00 betaalde belasting
+                }
+            },
+            "gezondheid": {
+                "verzekering": {
+                    "MAANDPREMIE": 12550,  # €125,50 maandpremie
+                    "EIGEN_RISICO": 38500,  # €385,00 eigen risico
+                    "AANVULLEND_PAKKET": "Basis",
+                }
+            },
+        },
         "sources": {
             **GLOBAL_SERVICES,
             "RvIG": {
@@ -286,6 +346,14 @@ PROFILES = {
                         "household_size": 3,  # Partner + kind + Omar
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 84500,  # €845,00 kale huur
+                        "SERVICE_COSTS": 11000,  # €110,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
                 "relaties": [
                     {
                         "bsn": "100000003",
@@ -430,6 +498,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 56250,  # €562,50 kale huur
+                        "SERVICE_COSTS": 6800,  # €68,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "BELASTINGDIENST": {
                 "box1": [
@@ -548,6 +624,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 59850,  # €598,50 kale huur
+                        "SERVICE_COSTS": 7200,  # €72,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "RVZ": {
                 "verzekeringen": [
@@ -643,6 +727,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 72300,  # €723,00 kale huur
+                        "SERVICE_COSTS": 9500,  # €95,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "SVB": {"verzekerde_tijdvakken": [{"bsn": "999993654", "woonperiodes": 50}]},
             "BELASTINGDIENST": {
@@ -713,6 +805,14 @@ PROFILES = {
                         "type": "BRIEFADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 54000,  # €540,00 kale huur
+                        "SERVICE_COSTS": 6000,  # €60,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "BELASTINGDIENST": {
                 "box1": [
@@ -781,6 +881,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 75000,  # €750,00 kale huur
+                        "SERVICE_COSTS": 9000,  # €90,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "BELASTINGDIENST": {
                 "box1": [
@@ -850,6 +958,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 64750,  # €647,50 kale huur
+                        "SERVICE_COSTS": 7800,  # €78,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "BELASTINGDIENST": {
                 "box1": [
@@ -919,6 +1035,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 58250,  # €582,50 kale huur
+                        "SERVICE_COSTS": 7000,  # €70,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "RVZ": {"verzekeringen": [{"bsn": "999993658", "polis_status": "ACTIEF"}]},
             "BELASTINGDIENST": {
@@ -983,6 +1107,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 67500,  # €675,00 kale huur
+                        "SERVICE_COSTS": 8100,  # €81,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "BELASTINGDIENST": {
                 "box1": [
@@ -1054,6 +1186,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 78500,  # €785,00 kale huur
+                        "SERVICE_COSTS": 9400,  # €94,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
                 "CHILDREN_DATA": [{"bsn": "999993660", "kinderen": [{"geboortedatum": "2020-01-01"}]}],
             },
             "BELASTINGDIENST": {
@@ -1129,6 +1269,14 @@ PROFILES = {
                         "type": "WOONADRES",
                     }
                 ],
+                # Wallet gegevens voor huurtoeslag
+                "nl_wallet": {
+                    "huurtoeslag": {
+                        "RENT_AMOUNT": 69500,  # €695,00 kale huur
+                        "SERVICE_COSTS": 8200,  # €82,00 servicekosten
+                        "ELIGIBLE_SERVICE_COSTS": 4800,  # €48,00 subsidiabele servicekosten (max)
+                    }
+                },
             },
             "RVZ": {
                 "verzekeringen": [
