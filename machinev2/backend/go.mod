@@ -2,6 +2,8 @@ module github.com/minbzk/poc-machine-law/machinev2/backend
 
 go 1.24.1
 
+replace github.com/minbzk/poc-machine-law/machinev2/machine => ../machine
+
 require (
 	github.com/alecthomas/kong v1.10.0
 	github.com/getkin/kin-openapi v0.132.0
