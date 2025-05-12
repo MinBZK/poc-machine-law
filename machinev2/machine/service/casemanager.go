@@ -24,17 +24,17 @@ import (
 
 // CaseManager manages service cases using the EventHorizon-based casemanager.
 type CaseManager struct {
-	logger      logging.Logger
-	Services    *Services
-	caseIndex   map[string]uuid.UUID // Maps (bsn:service:law) -> case_id
-	events      []model.Event
-	SampleRate  float64
-	mu          sync.RWMutex
-	commandBus  eh.CommandHandler
-	caseRepo    eh.ReadWriteRepo
-	eventBus    eh.EventBus
-	observerBus eh.EventBus
-	wg          *sync.WaitGroup
+	logger       logging.Logger
+	Services     *Services
+	caseIndex    map[string]uuid.UUID // Maps (bsn:service:law) -> case_id
+	SampleRate   float64
+	mu           sync.RWMutex
+	commandBus   eh.CommandHandler
+	caseRepo     eh.ReadWriteRepo
+	eventBus     eh.EventBus
+	observerBus  eh.EventBus
+	wg           *sync.WaitGroup
+	eventIndexer *casemanager.EventIndexer
 }
 
 var ErrCaseNotFound = errors.New("case_not_found")
@@ -68,26 +68,28 @@ func NewCaseManager(logger logging.Logger, services *Services) *CaseManager {
 	// Create the command bus
 	commandBus := bus.NewCommandHandler()
 
+	eventIndexer := casemanager.NewEventIndexer(logger)
+
 	// Create the read repository for cases
 	caseRepo := memory.NewRepo()
 	caseRepo.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
 
 	cm := &CaseManager{
-		logger:      logger.WithName("case_manager"),
-		Services:    services,
-		caseIndex:   make(map[string]uuid.UUID),
-		events:      make([]model.Event, 0),
-		SampleRate:  0.10, // 10% sample rate
-		commandBus:  commandBus,
-		caseRepo:    caseRepo,
-		eventBus:    eventBus,
-		observerBus: observerBus,
-		wg:          &sync.WaitGroup{},
+		logger:       logger.WithName("case_manager"),
+		Services:     services,
+		caseIndex:    make(map[string]uuid.UUID),
+		SampleRate:   0.10, // 10% sample rate
+		commandBus:   commandBus,
+		caseRepo:     caseRepo,
+		eventBus:     eventBus,
+		observerBus:  observerBus,
+		wg:           &sync.WaitGroup{},
+		eventIndexer: eventIndexer,
 	}
 
 	// Set up the case manager
 	ctx := context.Background()
-	if err := casemanager.Setup(ctx, logger, eventStore, eventBus, eventBus, commandBus, caseRepo, cm.recordEvent); err != nil {
+	if err := casemanager.Setup(ctx, logger, eventStore, eventBus, eventBus, commandBus, caseRepo, cm.recordEvent, eventIndexer); err != nil {
 		log.Fatalf("could not set up case manager: %s", err)
 	}
 
@@ -107,17 +109,12 @@ func (cm *CaseManager) indexCase(caseID uuid.UUID, bsn, service, law string) {
 
 // recordEvent records a new event
 func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[string]any) {
-	cm.mu.Lock()
-	defer cm.mu.Unlock()
-
 	event := model.Event{
 		CaseID:    caseID,
 		Timestamp: time.Now(),
 		EventType: eventType,
 		Data:      data,
 	}
-
-	cm.events = append(cm.events, event)
 
 	cm.wg.Add(1)
 	// Trigger rules in response to event
@@ -598,64 +595,13 @@ func (cm *CaseManager) GetCasesByBSN(ctx context.Context, bsn string) ([]*casema
 
 // GetEventsByUUID gets events, optionally filtered by case ID
 func (cm *CaseManager) GetEventsByUUID(caseID uuid.UUID) []model.Event {
-	cm.mu.RLock()
-	defer cm.mu.RUnlock()
-
-	if caseID == uuid.Nil {
-		// Return all events
-		return cm.events
-	}
-
-	// Filter events by case ID
-	var filteredEvents []model.Event
-	for _, event := range cm.events {
-		if event.CaseID == caseID {
-			filteredEvents = append(filteredEvents, event)
-		}
-	}
-
-	return filteredEvents
+	return cm.eventIndexer.GetEventsByUUID(caseID)
 }
 
 // GetEvents implements the CaseManagerAccessor interface
 // Converts internal event model to map format for use by dataframe
 func (cm *CaseManager) GetEvents(caseID any) []model.Event {
-	cm.mu.RLock()
-	defer cm.mu.RUnlock()
-
-	var events []model.Event
-
-	// Convert any case ID to UUID if provided
-	if caseID != nil {
-		var id uuid.UUID
-		switch v := caseID.(type) {
-		case uuid.UUID:
-			id = v
-		case string:
-			parsed, err := uuid.Parse(v)
-			if err == nil {
-				id = parsed
-			}
-		}
-
-		// Filter events by case ID
-		if id != uuid.Nil {
-			for _, event := range cm.events {
-				if event.CaseID == id {
-					events = append(events, event)
-				}
-			}
-		}
-	} else {
-		// Return all events
-		events = cm.events
-	}
-
-	return events
-}
-
-func (cm *CaseManager) Save(ctx context.Context, c *casemanager.Case) error {
-	return nil
+	return cm.eventIndexer.GetEvents(caseID)
 }
 
 func (cm *CaseManager) Wait() {

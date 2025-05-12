@@ -234,114 +234,88 @@ func (aggregate *CaseAggregate) HandleCommand(ctx context.Context, cmd eh.Comman
 
 // ApplyEvent implements the ApplyEvent method of the Aggregate interface.
 func (aggregate *CaseAggregate) ApplyEvent(ctx context.Context, event eh.Event) error {
-	switch event.EventType() {
-	case CaseSubmittedEvent:
-		if data, ok := event.Data().(*CaseSubmitted); ok {
-			// Create a new case with the data from the event
-			aggregate.c = NewCase(
-				data.BSN,
-				data.ServiceType,
-				data.Law,
-				data.Parameters,
-				data.ClaimedResult,
-				data.VerifiedResult,
-				data.RulespecUUID,
-				data.ApprovedClaimsOnly,
-			)
+	switch data := event.Data().(type) {
+	case *CaseSubmitted:
+		// Create a new case with the data from the event
+		aggregate.c = NewCase(
+			data.BSN,
+			data.ServiceType,
+			data.Law,
+			data.Parameters,
+			data.ClaimedResult,
+			data.VerifiedResult,
+			data.RulespecUUID,
+			data.ApprovedClaimsOnly,
+		)
 
-			// After case creation, we would normally check if results match and decide if manual review is needed
-			// This would be done in a separate command handler that processes the submitted case
-		}
+		// After case creation, we would normally check if results match and decide if manual review is needed
+		// This would be done in a separate command handler that processes the submitted case
+
 		return nil
 
-	case CaseResetEvent:
-		if data, ok := event.Data().(*CaseReset); ok {
-			// Reset the case
-			return aggregate.c.Reset(
-				data.Parameters,
-				data.ClaimedResult,
-				data.VerifiedResult,
-				data.ApprovedClaimsOnly,
-			)
-		}
-		return nil
+	case *CaseReset:
+		// Reset the case
+		return aggregate.c.Reset(
+			data.Parameters,
+			data.ClaimedResult,
+			data.VerifiedResult,
+			data.ApprovedClaimsOnly,
+		)
 
-	case CaseAutomaticallyDecidedEvent:
-		if data, ok := event.Data().(*CaseAutomaticallyDecided); ok {
-			// Decide the case automatically
-			return aggregate.c.DecideAutomatically(
-				data.VerifiedResult,
-				data.Parameters,
-				data.Approved,
-			)
-		}
-		return nil
+	case *CaseAutomaticallyDecided:
+		// Decide the case automatically
+		return aggregate.c.DecideAutomatically(
+			data.VerifiedResult,
+			data.Parameters,
+			data.Approved,
+		)
 
-	case CaseAddedToManualReviewEvent:
-		if data, ok := event.Data().(*CaseAddedToManualReview); ok {
-			// Add the case to manual review
-			return aggregate.c.SelectForManualReview(
-				data.VerifierID,
-				data.Reason,
-				data.ClaimedResult,
-				data.VerifiedResult,
-			)
-		}
-		return nil
+	case *CaseAddedToManualReview:
+		// Add the case to manual review
+		return aggregate.c.SelectForManualReview(
+			data.VerifierID,
+			data.Reason,
+			data.ClaimedResult,
+			data.VerifiedResult,
+		)
 
-	case CaseDecidedEvent:
-		if data, ok := event.Data().(*CaseDecided); ok {
-			// Decide the case
-			return aggregate.c.Decide(
-				data.VerifiedResult,
-				data.Reason,
-				data.VerifierID,
-				data.Approved,
-			)
-		}
-		return nil
+	case *CaseDecided:
+		// Decide the case
+		return aggregate.c.Decide(
+			data.VerifiedResult,
+			data.Reason,
+			data.VerifierID,
+			data.Approved,
+		)
 
-	case CaseObjectedEvent:
-		if data, ok := event.Data().(*CaseObjected); ok {
-			// Object to the case
-			return aggregate.c.Object(data.Reason)
-		}
-		return nil
+	case *CaseObjected:
+		return aggregate.c.Object(data.Reason)
 
-	case ObjectionStatusDeterminedEvent:
-		if data, ok := event.Data().(*ObjectionStatusDetermined); ok {
-			// Set objection status
-			return aggregate.c.DetermineObjectionStatus(
-				data.Possible,
-				data.NotPossibleReason,
-				data.ObjectionPeriod,
-				data.DecisionPeriod,
-				data.ExtensionPeriod,
-			)
-		}
-		return nil
+	case *ObjectionStatusDetermined:
+		// Set objection status
+		return aggregate.c.DetermineObjectionStatus(
+			data.Possible,
+			data.NotPossibleReason,
+			data.ObjectionPeriod,
+			data.DecisionPeriod,
+			data.ExtensionPeriod,
+		)
 
-	case ObjectionAdmissibilityDeterminedEvent:
-		if data, ok := event.Data().(*ObjectionAdmissibilityDetermined); ok {
-			// Set objection admissibility
-			return aggregate.c.DetermineObjectionAdmissibility(data.Admissible)
-		}
-		return nil
+	case *ObjectionAdmissibilityDetermined:
+		// Set objection admissibility
+		return aggregate.c.DetermineObjectionAdmissibility(data.Admissible)
 
-	case AppealStatusDeterminedEvent:
-		if data, ok := event.Data().(*AppealStatusDetermined); ok {
-			// Set appeal status
-			return aggregate.c.DetermineAppealStatus(
-				data.Possible,
-				data.NotPossibleReason,
-				data.AppealPeriod,
-				data.DirectAppeal,
-				data.DirectAppealReason,
-				data.CompetentCourt,
-				data.CourtType,
-			)
-		}
-		return nil
+	case *AppealStatusDetermined:
+		// Set appeal status
+		return aggregate.c.DetermineAppealStatus(
+			data.Possible,
+			data.NotPossibleReason,
+			data.AppealPeriod,
+			data.DirectAppeal,
+			data.DirectAppealReason,
+			data.CompetentCourt,
+			data.CourtType,
+		)
 	}
 
 	return fmt.Errorf("couldn't apply event: %s", event.EventType())

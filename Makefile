@@ -10,3 +10,6 @@ generate:
 		echo "Running go generate in $$dir"; \
 		(cd $$dir && go generate ./...); \
 	done
+
+fix-log-file:
+	\[\d{0,2}\dm

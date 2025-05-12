@@ -1,8 +1,15 @@
 package casemanager
 
 import (
+	"context"
+	"slices"
+	"sync"
+	"time"
+
 	"github.com/google/uuid"
 	eh "github.com/looplab/eventhorizon"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 )
 
 // Register event types with the EventHorizon ecosystem
@@ -89,4 +96,78 @@ type AppealStatusDetermined struct {
 	DirectAppealReason *string `json:"direct_appeal_reason,omitempty"`
 	CompetentCourt     *string `json:"competent_court,omitempty"`
 	CourtType          *string `json:"court_type,omitempty"`
+}
+
+var _ eh.EventHandler = &EventIndexer{}
+
+// Logger is a simple event handler for logging all events.
+type EventIndexer struct {
+	logger logging.Logger
+	events []model.Event
+	mutex  sync.RWMutex
+}
+
+func NewEventIndexer(logger logging.Logger) *EventIndexer {
+	return &EventIndexer{
+		logger: logger,
+		events: make([]model.Event, 0),
+	}
+}
+
+// HandlerType implements the HandlerType method of the eventhorizon.EventHandler interface.
+func (l *EventIndexer) HandlerType() eh.EventHandlerType {
+	return "event-indexer"
+}
+
+// HandleEvent implements the HandleEvent method of the EventHandler interface.
+func (l *EventIndexer) HandleEvent(ctx context.Context, event eh.Event) error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	l.events = append(l.events, model.Event{
+		CaseID:    event.AggregateID(),
+		Timestamp: time.Now(),
+		EventType: string(event.EventType()),
+		Data:      structToMap(event.Data()),
+	})
+
+	return nil
+}
+
+func (l *EventIndexer) GetEventsByUUID(caseID uuid.UUID) []model.Event {
+	l.mutex.RLock()
+	defer l.mutex.RUnlock()
+
+	if caseID == uuid.Nil {
+		// Return all events
+		return slices.Clone(l.events)
+	}
+
+	events := make([]model.Event, 0)
+	for _, event := range l.events {
+		if event.CaseID == caseID {
+			events = append(events, event)
+		}
+	}
+
+	return events
+}
+
+func (l *EventIndexer) GetEvents(caseID any) []model.Event {
+	if caseID == nil {
+		return l.GetEventsByUUID(uuid.Nil)
+	}
+
+	var id uuid.UUID
+	switch v := caseID.(type) {
+	case uuid.UUID:
+		id = v
+	case string:
+		parsed, err := uuid.Parse(v)
+		if err == nil {
+			id = parsed
+		}
+	}
+
+	return l.GetEventsByUUID(id)
 }

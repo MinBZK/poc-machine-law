@@ -34,6 +34,7 @@ func Setup(
 	commandBus *bus.CommandHandler,
 	caseRepo eh.ReadWriteRepo,
 	cb Callback,
+	handlers ...eh.EventHandler,
 ) error {
 
 	registerSync.Do(func() {
@@ -95,6 +96,13 @@ func Setup(
 	// Add a logger as an observer
 	if err := local.AddHandler(ctx, eh.MatchAll{}, NewLogger(logger)); err != nil {
 		return fmt.Errorf("could not add logger to event bus: %w", err)
+	}
+
+	for _, handler := range handlers {
+		if err := local.AddHandler(ctx, eh.MatchAll{}, handler); err != nil {
+			return fmt.Errorf("could not add logger to event bus: %w", err)
+		}
+
 	}
 
 	return nil
