@@ -6,8 +6,9 @@ permissions:
 
 on:
   push:
-    branches:
-      - "main"
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -15,22 +16,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{github.actor}}
-        password: ${{secrets.GITHUB_TOKEN}}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
 
-    - name: Lowercase the GitHub repository
-      id: lowercase-repository
-      run: |
-        echo "github_repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
+      - name: Lowercase the GitHub repository
+        id: lowercase-repository
+        run: |
+          echo "github_repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
 
-    - name: Build and Push Image with Kaniko
-      uses: int128/kaniko-action@v1
-      with:
-        push: true
-        tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+      - name: Set correct ref_name
+        id: tranform-ref-name
+        env:
+          name: "${{ github.ref_name }}"
+        run: |
+          echo "ref_name=${name/\//-}" >> ${GITHUB_OUTPUT}
+
+      - name: Build and Push Image with Kaniko
+        uses: int128/kaniko-action@v1
+        with:
+          push: true
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ github.sha }}-${{ steps.tranform-ref-name.outputs.ref_name }}-${{ github.run_id }}
+
+      - name: Build and Push Go Backend Image with Kaniko
+        uses: int128/kaniko-action@v1
+        with:
+          context: ./machinev2/backend
+          push: true
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/machinev2/backend:${{ github.sha }}-${{ steps.tranform-ref-name.outputs.ref_name }}-${{ github.run_id }}

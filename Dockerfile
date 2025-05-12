@@ -16,7 +16,6 @@ RUN pnpm run build
 
 
 # Copy and build importer
-
 WORKDIR /importer
 COPY importer/.eslintrc.cjs importer/.npmrc importer/.prettierrc importer/package.json importer/pnpm-lock.yaml importer/postcss.config.js importer/svelte.config.js importer/tailwind.config.js importer/tsconfig.json importer/vite.config.ts ./
 
