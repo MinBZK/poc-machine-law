@@ -23,3 +23,5 @@ simulation_summary.txt
 .aider*
 .env
 machinev2/backend/backend
+machinev2/machine/internal/engine/engine.go
+__debug_bin*

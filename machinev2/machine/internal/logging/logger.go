@@ -89,7 +89,10 @@ func New(name string, output io.Writer, level logrus.Level) *LoggerImpl {
 func (l *LoggerImpl) getIndent(ctx context.Context) string {
 	other := FromContext(ctx).(*LoggerImpl)
 
-	total := l.indentLvl + other.indentLvl
+	total := l.indentLvl
+	if l != other {
+		total += other.indentLvl
+	}
 
 	if total == 0 {
 		return ""
