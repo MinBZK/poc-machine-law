@@ -93,14 +93,14 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 	}
 
 	rc.Resolvers = []Resolver{
-		// NewClaimResolver(claims, propertySpecs),
-		// local,
-		// NewDefinitionsResolver(definitions),
-		// NewParametersResolver(parameters),
-		// output,
-		// NewPropertySpecOverwriteResolver(propertySpecs, overwriteInput),
-		// NewPropertySpecSourceResolver(rc, propertySpecs),
-		// NewPropertySpecServiceResolver(rc, propertySpecs),
+		NewClaimResolver(claims, propertySpecs),
+		local,
+		NewDefinitionsResolver(definitions),
+		NewParametersResolver(parameters),
+		output,
+		NewPropertySpecOverwriteResolver(propertySpecs, overwriteInput),
+		NewPropertySpecSourceResolver(rc, propertySpecs),
+		NewPropertySpecServiceResolver(rc, propertySpecs),
 	}
 
 	return rc
@@ -251,139 +251,21 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		return currentValue, nil
 	}
 
-	// for _, resolve := range rc.Resolvers {
-	// 	if resolved, ok := resolve.Resolve(ctx, strPath); ok {
-	// 		node.Result = resolved.Value
-	// 		node.ResolveType = resolve.ResolveType()
-	// 		node.Details = resolved.Details
-	// 		node.Required = resolved.Required
+	for _, resolve := range rc.Resolvers {
+		if resolved, ok := resolve.Resolve(ctx, strPath); ok {
+			node.Result = resolved.Value
+			node.ResolveType = resolve.ResolveType()
+			node.Details = resolved.Details
+			node.Required = resolved.Required
 
-	// 		logger.Debugf(ctx, "Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
-	// 	}
-	// }
+			logger.Debugf(ctx, "Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
 
-	// Lookup from claims
-	if rc.Claims != nil {
-		if claim, exists := rc.Claims[strPath]; exists {
-			value := claim.NewValue
-			logger.Debugf(ctx, "Resolving from CLAIM: %v", value)
-			node.Result = value
-			node.ResolveType = "CLAIM"
-
-			// Add type information for claims
-			if spec, exists := rc.PropertySpecs[strPath]; exists {
-				if typeVal, exists := spec["type"]; exists {
-					node.Details["type"] = typeVal
-				}
-				if typeSpec, exists := spec["type_spec"]; exists {
-					node.Details["type_spec"] = typeSpec
-				}
-				node.Required = getBoolFromMap(spec, "required", false)
-			}
-
-			return value, nil
+			return resolved.Value, nil
 		}
-	}
-
-	// Check local scope
-	if value, exists := rc.Local[strPath]; exists {
-		logger.Debugf(ctx, "Resolving from LOCAL: %v", value)
-		node.Result = value
-		node.ResolveType = "LOCAL"
-		return value, nil
-	}
-
-	// Check definitions
-	if value, exists := rc.Definitions[strPath]; exists {
-		logger.Debugf(ctx, "Resolving from DEFINITION: %v", value)
-		node.Result = value
-		node.ResolveType = "DEFINITION"
-		return value, nil
-	}
-
-	// Check parameters
-	if value, exists := rc.Parameters[strPath]; exists {
-		logger.Debugf(ctx, "Resolving from PARAMETERS: %v", value)
-		node.Result = value
-		node.ResolveType = "PARAMETER"
-		return value, nil
-	}
-
-	// Check outputs
-	if value, exists := rc.Outputs[strPath]; exists {
-		logger.Debugf(ctx, "Resolving from previous OUTPUT: %v", value)
-		node.Result = value
-		node.ResolveType = "OUTPUT"
-		return value, nil
 	}
 
 	// Handle property specs
 	if spec, exists := rc.PropertySpecs[strPath]; exists {
-		// Check overwrite data
-		if serviceRef, ok := spec["service_reference"].(map[string]any); ok {
-			serviceName, hasService := serviceRef["service"].(string)
-			fieldName, hasField := serviceRef["field"].(string)
-
-			if hasService && hasField && rc.OverwriteInput != nil {
-				if serviceOverwrites, ok := rc.OverwriteInput[serviceName]; ok {
-					if value, ok := serviceOverwrites[fieldName]; ok {
-						logger.Debugf(ctx, "Resolving from OVERWRITE: %v", value)
-						node.Result = value
-						node.ResolveType = "OVERWRITE"
-						return value, nil
-					}
-				}
-			}
-		}
-
-		// Check sources
-		if sourceRef, ok := spec["source_reference"].(map[string]any); ok {
-			value, err := rc.resolveFromSource(ctx, sourceRef, spec)
-			if err != nil {
-				logger.Debugf(ctx, "resolving from source: %s", err)
-			}
-
-			if err == nil && value != nil {
-				node.Result = value
-				node.ResolveType = "SOURCE"
-				node.Required = getBoolFromMap(spec, "required", false)
-
-				// Add type information to the node
-				if typeVal, exists := spec["type"]; exists {
-					node.Details["type"] = typeVal
-				}
-				if typeSpec, exists := spec["type_spec"]; exists {
-					node.Details["type_spec"] = typeSpec
-				}
-
-				logger.Debugf(ctx, "Resolving from SOURCE %v: %v", sourceRef["table"], value)
-
-				return value, nil
-			}
-		}
-
-		// Check services
-		if serviceRef, ok := spec["service_reference"].(map[string]any); ok && rc.ServiceProvider != nil {
-			value, err := rc.resolveFromService(ctx, strPath, serviceRef, spec)
-			if err == nil {
-				rc.logger.Debugf(ctx, "Result for $%s from %s field %s: %v",
-					strPath, serviceRef["service"], serviceRef["field"], value)
-				node.Result = value
-				node.ResolveType = "SERVICE"
-				node.Required = getBoolFromMap(spec, "required", false)
-
-				// Add type information to the node
-				if typeVal, exists := spec["type"]; exists {
-					node.Details["type"] = typeVal
-				}
-				if typeSpec, exists := spec["type_spec"]; exists {
-					node.Details["type_spec"] = typeSpec
-				}
-
-				return value, nil
-			}
-		}
-
 		// Handle required fields
 		node.Required = getBoolFromMap(spec, "required", false)
 		if node.Required {
