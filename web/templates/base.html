@@ -446,10 +446,11 @@
             return;
         }
 
-        // Store the wallet data in sessionStorage for later use
+        // Store the wallet data in sessionStorage for later use, keyed by BSN
         try {
-            sessionStorage.setItem('walletData', JSON.stringify(profile));
-            console.log('💾 Saved wallet data to sessionStorage for future forms');
+            const storageKey = `walletData-${bsn}`;
+            sessionStorage.setItem(storageKey, JSON.stringify(profile));
+            console.log(`💾 Saved wallet data to sessionStorage with key ${storageKey} for future forms`);
         } catch (e) {
             console.error('Could not save wallet data to sessionStorage:', e);
         }
@@ -692,12 +693,14 @@
 
     // Add MutationObserver and page load handlers to auto-fill forms
     document.addEventListener('DOMContentLoaded', function () {
-        // Try to fill forms on page load if wallet data exists
+        // Try to fill forms on page load if wallet data exists for current BSN
         try {
-            const savedData = sessionStorage.getItem('walletData');
+            const currentBsn = '{{ bsn }}';
+            const storageKey = `walletData-${currentBsn}`;
+            const savedData = sessionStorage.getItem(storageKey);
             if (savedData) {
                 const walletData = JSON.parse(savedData);
-                console.log('💾 Found saved wallet data, attempting to fill form on page load');
+                console.log(`💾 Found saved wallet data for BSN ${currentBsn}, attempting to fill form on page load`);
                 fillFormWithWalletData(walletData);
             }
         } catch (e) {
@@ -710,7 +713,9 @@
         document.body.addEventListener('htmx:afterSwap', function (e) {
             console.log('🔄 HTMX content swapped, checking for forms to fill');
             try {
-                const savedData = sessionStorage.getItem('walletData');
+                const currentBsn = '{{ bsn }}';
+                const storageKey = `walletData-${currentBsn}`;
+                const savedData = sessionStorage.getItem(storageKey);
                 if (savedData) {
                     setTimeout(() => {
                         const walletData = JSON.parse(savedData);
@@ -737,7 +742,9 @@
                     if (hasNewForms) {
                         console.log('🔍 New form detected in DOM, attempting to fill it');
                         try {
-                            const savedData = sessionStorage.getItem('walletData');
+                            const currentBsn = '{{ bsn }}';
+                            const storageKey = `walletData-${currentBsn}`;
+                            const savedData = sessionStorage.getItem(storageKey);
                             if (savedData) {
                                 setTimeout(() => {
                                     const walletData = JSON.parse(savedData);
