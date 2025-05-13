@@ -11,6 +11,8 @@ import (
 	"maps"
 
 	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
@@ -390,6 +392,29 @@ func (re *RulesEngine) Evaluate(
 	re.logger.Debugf(ctx, "Evaluating rules for %s %s (%s %s)",
 		re.ServiceName, re.Law, calculationDate, requestedOutput)
 
+	// Handle claims
+	var claims map[string]model.Claim
+	if bsn, ok := parameters["BSN"].(string); ok {
+		claimManager := re.ServiceProvider.GetClaimManager()
+		claimsList, err := claimManager.GetClaimsByBSN(bsn, approved, true)
+		if err != nil {
+			re.logger.WithIndent().Warningf(ctx, "Failed to get claims for BSN %s: %v", bsn, err)
+		} else {
+			// Convert claims list to map indexed by key
+			claims = make(map[string]model.Claim, len(claimsList))
+			for _, claim := range claimsList {
+				claims[claim.Key] = claim
+			}
+
+			// Also try to get any service/law specific claims
+			if serviceClaims, err := claimManager.GetClaimByBSNServiceLaw(
+				bsn, re.ServiceName, re.Law, approved, true); err == nil && serviceClaims != nil {
+				// Add service-specific claims to the map
+				maps.Copy(claims, serviceClaims)
+			}
+		}
+	}
+
 	// Create root node
 	root := &model.PathNode{
 		Type:   "root",
@@ -397,35 +422,10 @@ func (re *RulesEngine) Evaluate(
 		Result: nil,
 	}
 
-	// Handle claims
-	var claims map[string]model.Claim
-	if bsn, ok := parameters["BSN"].(string); ok {
-		// Get claims from the claim manager if ServiceProvider implements it
-		if provider, ok := re.ServiceProvider.(contexter.ClaimManagerProvider); ok {
-			claimManager := provider.GetClaimManager()
-			claimsList, err := claimManager.GetClaimsByBSN(bsn, approved, true)
-			if err != nil {
-				re.logger.WithIndent().Warningf(ctx, "Failed to get claims for BSN %s: %v", bsn, err)
-			} else {
-				// Convert claims list to map indexed by key
-				claims = make(map[string]model.Claim, len(claimsList))
-				for _, claim := range claimsList {
-					claims[claim.Key] = claim
-				}
+	p := path.NewWith(root)
+	ctx = path.WithPath(ctx, p)
 
-				// Also try to get any service/law specific claims
-				if serviceClaims, err := claimManager.GetClaimByBSNServiceLaw(
-					bsn, re.ServiceName, re.Law, approved, true); err == nil && serviceClaims != nil {
-					// Add service-specific claims to the map
-					maps.Copy(claims, serviceClaims)
-				}
-			}
-		} else {
-			// Fallback to an empty map if claim manager is not available
-			claims = make(map[string]model.Claim, 1)
-			claims["bsn"] = model.Claim{BSN: bsn}
-		}
-	}
+	ctx = tracker.WithTracker(ctx, tracker.New())
 
 	// Create context
 	ruleCtx := contexter.NewRuleContext(
@@ -436,7 +436,6 @@ func (re *RulesEngine) Evaluate(
 		re.PropertySpecs,
 		re.OutputSpecs,
 		sources,
-		[]*model.PathNode{root},
 		overwriteInput,
 		calculationDate,
 		re.ServiceName,
@@ -450,7 +449,8 @@ func (re *RulesEngine) Evaluate(
 		Name:   "Check all requirements",
 		Result: nil,
 	}
-	ruleCtx.AddToPath(requirementsNode)
+
+	p.Add(requirementsNode)
 
 	var requirementsMet bool
 	err := re.logger.IndentBlock(ctx, "", func(ctx context.Context) error {
@@ -463,7 +463,7 @@ func (re *RulesEngine) Evaluate(
 		return nil, err
 	}
 
-	ruleCtx.PopPath()
+	p.Pop()
 
 	outputValues := make(map[string]any)
 	if requirementsMet {
@@ -479,6 +479,7 @@ func (re *RulesEngine) Evaluate(
 				return nil, err
 			}
 
+			ruleCtx.OutputsResolver.Set(outputName, outputDef["value"])
 			ruleCtx.Outputs[outputName] = outputDef["value"]
 			outputValues[outputName] = outputDef
 
@@ -500,7 +501,7 @@ func (re *RulesEngine) Evaluate(
 	}
 
 	result := map[string]any{
-		"input":            ruleCtx.ResolvedPaths,
+		"input":            tracker.FromContext(ctx).ResolvedPaths(),
 		"output":           outputValues,
 		"requirements_met": requirementsMet,
 		"path":             root,
@@ -538,8 +539,9 @@ func (re *RulesEngine) evaluateAction(
 			Name:   fmt.Sprintf("Evaluate action for %s", outputName),
 			Result: nil,
 		}
-		ruleCtx.AddToPath(actionNode)
-		defer ruleCtx.PopPath()
+
+		ctx = path.WithPathNode(ctx, actionNode)
+		defer path.FromContext(ctx).Pop()
 
 		// Find output specification
 		if props, ok := re.Spec["properties"].(map[string]any); ok {
@@ -659,8 +661,9 @@ func (re *RulesEngine) evaluateRequirements(
 				Name:   nodeName,
 				Result: nil,
 			}
-			ruleCtx.AddToPath(node)
-			defer ruleCtx.PopPath()
+
+			ctx = path.WithPathNode(ctx, node)
+			defer path.FromContext(ctx).Pop()
 
 			if allConds, hasAll := reqMap["all"].([]any); hasAll {
 				results := []bool{}
@@ -771,8 +774,9 @@ func (re *RulesEngine) evaluateIfOperation(
 		Result:  nil,
 		Details: map[string]any{"condition_results": []any{}},
 	}
-	ruleCtx.AddToPath(ifNode)
-	defer ruleCtx.PopPath()
+
+	ctx = path.WithPathNode(ctx, ifNode)
+	defer path.FromContext(ctx).Pop()
 
 	var result any
 	conditions, ok := operation["conditions"].([]any)
@@ -897,10 +901,15 @@ func (re *RulesEngine) evaluateForeach(
 				// Set local to the item
 				switch v := item.(type) {
 				case map[string]any:
+					for k1, v1 := range v {
+						itemCtx.LocalResolver.Set(k1, v1)
+					}
 					itemCtx.Local = v
 				default:
 					// If not a map, create a map with "value" key
+					itemCtx.LocalResolver.Set("value", v)
 					itemCtx.Local = map[string]any{"value": v}
+
 				}
 
 				// Get the value to evaluate
@@ -1345,8 +1354,9 @@ func (re *RulesEngine) evaluateOperation(
 			Result:  nil,
 			Details: map[string]any{"raw_value": operation},
 		}
-		ruleCtx.AddToPath(node)
-		defer ruleCtx.PopPath()
+
+		ctx = path.WithPathNode(ctx, node)
+		defer path.FromContext(ctx).Pop()
 
 		value, err := re.evaluateValue(ctx, operation, ruleCtx)
 		if err != nil {
@@ -1365,8 +1375,9 @@ func (re *RulesEngine) evaluateOperation(
 			Result:  nil,
 			Details: map[string]any{"raw_value": val},
 		}
-		ruleCtx.AddToPath(node)
-		defer ruleCtx.PopPath()
+
+		ctx = path.WithPathNode(ctx, node)
+		defer path.FromContext(ctx).Pop()
 
 		value, err := re.evaluateValue(ctx, val, ruleCtx)
 		if err != nil {
@@ -1385,8 +1396,9 @@ func (re *RulesEngine) evaluateOperation(
 		Result:  nil,
 		Details: map[string]any{"operation_type": opType},
 	}
-	ruleCtx.AddToPath(node)
-	defer ruleCtx.PopPath()
+
+	ctx = path.WithPathNode(ctx, node)
+	defer path.FromContext(ctx).Pop()
 
 	var result any
 	var err error

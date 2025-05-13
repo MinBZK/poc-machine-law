@@ -3,117 +3,33 @@ package context
 import (
 	"context"
 	"fmt"
-	"math"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
 
+	"maps"
+
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 )
 
-// TypeSpec defines specifications for value types
-type TypeSpec struct {
-	Type      string   `json:"type,omitempty" yaml:"type,omitempty"`
-	Unit      *string  `json:"unit,omitempty" yaml:"unit,omitempty"`
-	Precision *int     `json:"precision,omitempty" yaml:"precision,omitempty"`
-	Min       *float64 `json:"min,omitempty" yaml:"min,omitempty"`
-	Max       *float64 `json:"max,omitempty" yaml:"max,omitempty"`
-}
-
-// Enforce applies type specifications to a value
-func (ts *TypeSpec) Enforce(value any) any {
-	if value == nil {
-		return value
-	}
-
-	if ts.Type == "string" {
-		return fmt.Sprintf("%v", value)
-	}
-
-	// Convert to numeric if needed
-	var floatVal float64
-	switch v := value.(type) {
-	case string:
-		var err error
-		floatVal, err = strconv.ParseFloat(v, 64)
-		if err != nil {
-			return value
-		}
-	case int:
-		floatVal = float64(v)
-	case int32:
-		floatVal = float64(v)
-	case int64:
-		floatVal = float64(v)
-	case float32:
-		floatVal = float64(v)
-	case float64:
-		floatVal = v
-	default:
-		return value
-	}
-
-	// Apply min/max constraints
-	if ts.Min != nil {
-		floatVal = math.Max(floatVal, *ts.Min)
-	}
-	if ts.Max != nil {
-		floatVal = math.Min(floatVal, *ts.Max)
-	}
-
-	// Apply precision
-	if ts.Precision != nil {
-		if *ts.Precision == 0 {
-			return int(math.Round(floatVal))
-		}
-
-		factor := math.Pow(10, float64(*ts.Precision))
-		floatVal = math.Round(floatVal*factor) / factor
-	}
-
-	// Convert to int for cent units
-	if ts.Unit != nil {
-		switch *ts.Unit {
-		case "eurocent":
-			return int(math.Round(floatVal))
-		}
-	}
-
-	return floatVal
-}
-
 // ServiceProvider interface defines what a service provider needs to implement
 type ServiceProvider interface {
 	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
 		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
-}
-
-// ServiceResolverProvider interface extends ServiceProvider with access to rule resolver
-type ServiceResolverProvider interface {
-	ServiceProvider
 	GetResolver() *utils.RuleResolver
+	GetCaseManager() CaseManagerAccessor
+	GetClaimManager() ClaimManagerAccessor
 }
 
 // CaseManagerAccessor interface for accessing case manager events
 type CaseManagerAccessor interface {
 	GetEvents(caseID any) []model.Event
-}
-
-// CaseManagerProvider interface extends ServiceProvider with access to case manager
-type CaseManagerProvider interface {
-	ServiceProvider
-	GetCaseManager() CaseManagerAccessor
-}
-
-// ClaimManagerProvider interface extends ServiceProvider with access to claim manager
-type ClaimManagerProvider interface {
-	ServiceProvider
-	GetClaimManager() ClaimManagerAccessor
 }
 
 // ClaimManagerAccessor interface for accessing claim manager functionality
@@ -131,33 +47,31 @@ type RuleContext struct {
 	OutputSpecs     map[string]TypeSpec
 	Sources         model.SourceDataFrame
 	Local           map[string]any
-	AccessedPaths   map[string]struct{}
 	ValuesCache     map[string]any
-	Path            []*model.PathNode
 	OverwriteInput  map[string]map[string]any
 	Outputs         map[string]any
 	CalculationDate string
-	ResolvedPaths   map[string]any
 	ServiceName     string
 	Claims          map[string]model.Claim
+	LocalResolver   *LocalResolver
+	OutputsResolver *OutputsResolver
+	Resolvers       []Resolver
 	Approved        bool
 	MissingRequired bool
-	// ctx             context.Context
-	logger logging.Logger
+	logger          logging.Logger
 }
 
 // NewRuleContext creates a new rule context
 func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProvider ServiceProvider,
 	parameters map[string]any, propertySpecs map[string]map[string]any,
-	outputSpecs map[string]TypeSpec, sources model.SourceDataFrame, path []*model.PathNode,
+	outputSpecs map[string]TypeSpec, sources model.SourceDataFrame,
 	overwriteInput map[string]map[string]any, calculationDate string,
 	serviceName string, claims map[string]model.Claim, approved bool) *RuleContext {
 
-	if path == nil {
-		path = make([]*model.PathNode, 0)
-	}
+	local := NewLocalResolver()
+	output := NewOutputsResolver()
 
-	return &RuleContext{
+	rc := &RuleContext{
 		Definitions:     definitions,
 		ServiceProvider: serviceProvider,
 		Parameters:      parameters,
@@ -165,39 +79,31 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 		OutputSpecs:     outputSpecs,
 		Sources:         sources,
 		Local:           make(map[string]any),
-		AccessedPaths:   make(map[string]struct{}),
 		ValuesCache:     make(map[string]any),
-		Path:            path,
 		OverwriteInput:  overwriteInput,
 		Outputs:         make(map[string]any),
 		CalculationDate: calculationDate,
-		ResolvedPaths:   make(map[string]any),
 		ServiceName:     serviceName,
 		Claims:          claims,
 		Approved:        approved,
 		MissingRequired: false,
+		LocalResolver:   local,
+		OutputsResolver: output,
 		logger:          logr.WithName("context"),
 	}
-}
 
-// TrackAccess tracks accessed data paths
-func (rc *RuleContext) TrackAccess(path string) {
-	rc.AccessedPaths[path] = struct{}{}
-}
-
-// AddToPath adds node to evaluation path
-func (rc *RuleContext) AddToPath(node *model.PathNode) {
-	if len(rc.Path) > 0 {
-		rc.Path[len(rc.Path)-1].AddChild(node)
+	rc.Resolvers = []Resolver{
+		// NewClaimResolver(claims, propertySpecs),
+		// local,
+		// NewDefinitionsResolver(definitions),
+		// NewParametersResolver(parameters),
+		// output,
+		// NewPropertySpecOverwriteResolver(propertySpecs, overwriteInput),
+		// NewPropertySpecSourceResolver(rc, propertySpecs),
+		// NewPropertySpecServiceResolver(rc, propertySpecs),
 	}
-	rc.Path = append(rc.Path, node)
-}
 
-// PopPath removes the last node from path
-func (rc *RuleContext) PopPath() {
-	if len(rc.Path) > 0 {
-		rc.Path = rc.Path[:len(rc.Path)-1]
-	}
+	return rc
 }
 
 // ResolveValue resolves a value from definitions, services, or sources
@@ -210,7 +116,7 @@ func (rc *RuleContext) ResolveValue(ctx context.Context, path any) (any, error) 
 		}
 
 		if strPath, ok := path.(string); ok {
-			rc.ResolvedPaths[strPath] = v
+			tracker.WithResolvedPath(ctx, strPath, value)
 		}
 
 		value = v
@@ -223,33 +129,30 @@ func (rc *RuleContext) ResolveValue(ctx context.Context, path any) (any, error) 
 	return value, nil
 }
 
-func (rc *RuleContext) resolveValueInternal(ctx context.Context, path any) (any, error) {
-
+func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, error) {
 	node := &model.PathNode{
 		Type:    "resolve",
-		Name:    fmt.Sprintf("Resolving value: %v", path),
+		Name:    fmt.Sprintf("Resolving value: %v", key),
 		Result:  nil,
-		Details: map[string]any{"path": path},
+		Details: map[string]any{"path": key},
 	}
-	rc.AddToPath(node)
 
-	defer rc.PopPath()
+	ctx = path.WithPathNode(ctx, node)
+	defer path.FromContext(ctx).Pop()
 
 	// If path is not a string or doesn't start with $, return it as is
-	strPath, ok := path.(string)
+	strPath, ok := key.(string)
 	if !ok || !strings.HasPrefix(strPath, "$") {
-		node.Result = path
-		return path, nil
+		node.Result = key
+		return key, nil
 	}
 
-	// Remove $ prefix
 	strPath = strPath[1:]
-	rc.TrackAccess(strPath)
 
-	logger := rc.logger
+	logger := logging.FromContext(ctx)
 
 	// Resolve dates first
-	dateValue, err := rc.resolveDate(strPath)
+	dateValue, err := resolveDate(strPath, rc.CalculationDate)
 	if err == nil && dateValue != nil {
 		logger.Debugf(ctx, "Resolved date $%s: %v", strPath, dateValue)
 		node.Result = dateValue
@@ -347,6 +250,17 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, path any) (any,
 		node.Result = currentValue
 		return currentValue, nil
 	}
+
+	// for _, resolve := range rc.Resolvers {
+	// 	if resolved, ok := resolve.Resolve(ctx, strPath); ok {
+	// 		node.Result = resolved.Value
+	// 		node.ResolveType = resolve.ResolveType()
+	// 		node.Details = resolved.Details
+	// 		node.Required = resolved.Required
+
+	// 		logger.Debugf(ctx, "Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
+	// 	}
+	// }
 
 	// Lookup from claims
 	if rc.Claims != nil {
@@ -493,13 +407,13 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, path any) (any,
 }
 
 // resolveDate handles special date-related paths
-func (rc *RuleContext) resolveDate(path string) (any, error) {
+func resolveDate(path string, date string) (any, error) {
 	if path == "calculation_date" {
-		return rc.CalculationDate, nil
+		return date, nil
 	}
 
 	if path == "january_first" {
-		calcDate, err := time.Parse("2006-01-02", rc.CalculationDate)
+		calcDate, err := time.Parse("2006-01-02", date)
 		if err != nil {
 			return nil, err
 		}
@@ -508,7 +422,7 @@ func (rc *RuleContext) resolveDate(path string) (any, error) {
 	}
 
 	if path == "prev_january_first" {
-		calcDate, err := time.Parse("2006-01-02", rc.CalculationDate)
+		calcDate, err := time.Parse("2006-01-02", date)
 		if err != nil {
 			return nil, err
 		}
@@ -517,8 +431,8 @@ func (rc *RuleContext) resolveDate(path string) (any, error) {
 	}
 
 	if path == "year" {
-		if len(rc.CalculationDate) >= 4 {
-			return rc.CalculationDate[:4], nil
+		if len(date) >= 4 {
+			return date[:4], nil
 		}
 	}
 
@@ -528,15 +442,13 @@ func (rc *RuleContext) resolveDate(path string) (any, error) {
 // resolveFromService resolves a value from a service
 func (rc *RuleContext) resolveFromService(
 	ctx context.Context,
-	path string,
+	ppath string,
 	serviceRef map[string]any,
 	spec map[string]any) (any, error) {
 
 	// Clone parameters
 	parameters := make(map[string]any)
-	for k, v := range rc.Parameters {
-		parameters[k] = v
-	}
+	maps.Copy(parameters, rc.Parameters)
 
 	// Add service reference parameters
 	if serviceParams, ok := serviceRef["parameters"].([]any); ok {
@@ -572,7 +484,7 @@ func (rc *RuleContext) resolveFromService(
 
 	// Check cache
 	var cacheKey strings.Builder
-	cacheKey.WriteString(path)
+	cacheKey.WriteString(ppath)
 	cacheKey.WriteString("(")
 
 	// Sort keys for consistency
@@ -605,7 +517,7 @@ func (rc *RuleContext) resolveFromService(
 		"field":          serviceRef["field"],
 		"reference_date": referenceDate,
 		"parameters":     parameters,
-		"path":           path,
+		"path":           ppath,
 	}
 
 	// Copy type information from spec to details
@@ -622,8 +534,9 @@ func (rc *RuleContext) resolveFromService(
 		Result:  nil,
 		Details: details,
 	}
-	rc.AddToPath(serviceNode)
-	defer rc.PopPath()
+
+	ctx = path.WithPathNode(ctx, serviceNode)
+	defer path.FromContext(ctx).Pop()
 
 	service, hasService := serviceRef["service"].(string)
 	law, hasLaw := serviceRef["law"].(string)
@@ -677,42 +590,32 @@ func (rc *RuleContext) resolveFromSource(
 		if sourceType == "laws" {
 			tableName = "laws"
 
-			// Get the rules DataFrame from the resolver via the service provider
-			if resolverProvider, ok := rc.ServiceProvider.(ServiceResolverProvider); ok {
-				df = dataframe.New(resolverProvider.GetResolver().RulesDataFrame())
-			} else {
-				return nil, fmt.Errorf("cannot resolve laws: service provider does not implement ServiceResolverProvider interface")
-			}
+			df = dataframe.New(rc.ServiceProvider.GetResolver().RulesDataFrame())
 		} else if sourceType == "events" {
 			tableName = "events"
 
-			// Get events from case manager via service provider
-			if cmProvider, ok := rc.ServiceProvider.(CaseManagerProvider); ok {
-				caseManager := cmProvider.GetCaseManager()
+			caseManager := rc.ServiceProvider.GetCaseManager()
 
-				// Get case ID from parameters if specified
-				var caseID any
-				if caseIDRef, ok := sourceRef["case_id"].(string); ok {
-					var err error
-					caseID, err = rc.ResolveValue(ctx, caseIDRef)
-					if err != nil {
-						return nil, fmt.Errorf("failed to resolve case_id: %w", err)
-					}
+			// Get case ID from parameters if specified
+			var caseID any
+			if caseIDRef, ok := sourceRef["case_id"].(string); ok {
+				var err error
+				caseID, err = rc.ResolveValue(ctx, caseIDRef)
+				if err != nil {
+					return nil, fmt.Errorf("failed to resolve case_id: %w", err)
 				}
-
-				// Get events from case manager
-				events := caseManager.GetEvents(caseID)
-
-				data := make([]map[string]any, 0, len(events))
-				for idx := range events {
-					data = append(data, events[idx].ToMap())
-				}
-
-				// Create a dataframe from events
-				df = dataframe.New(data)
-			} else {
-				return nil, fmt.Errorf("cannot access events: service provider does not implement CaseManagerProvider interface")
 			}
+
+			// Get events from case manager
+			events := caseManager.GetEvents(caseID)
+
+			data := make([]map[string]any, 0, len(events))
+			for idx := range events {
+				data = append(data, events[idx].ToMap())
+			}
+
+			// Create a dataframe from events
+			df = dataframe.New(data)
 		}
 	}
 
