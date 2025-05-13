@@ -142,34 +142,30 @@
                     </button>
                 </div>
             </div>
-            <!-- Modal Content - Step 5: PIN Code -->
-            <div x-show="step === 5" class="p-6">
+            <!-- Modal Content - Step 5: PIN Code with direct keyboard handling -->
+            <div x-show="step === 5"
+                 class="p-6"
+                 @keydown.window="handlePinKeypress($event)"
+                 @keydown.escape.window="step = 1">
                 <h4 class="text-lg font-medium mb-4 text-center">Voer uw pincode in</h4>
                 <div class="mb-6">
                     <div class="flex justify-center space-x-2 mb-4">
-                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
-                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
-                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
-                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
-                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold">•</div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold"
+                             x-text="pin.length >= 1 ? '•' : ''"></div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold"
+                             x-text="pin.length >= 2 ? '•' : ''"></div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold"
+                             x-text="pin.length >= 3 ? '•' : ''"></div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold"
+                             x-text="pin.length >= 4 ? '•' : ''"></div>
+                        <div class="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center text-2xl font-bold"
+                             x-text="pin.length >= 5 ? '•' : ''"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-4 mx-auto max-w-xs">
-                        {% for num in range(1, 10) %}
-                            <button @click="step = 6"
-                                    class="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-lg font-semibold">
-                                {{ num }}
-                            </button>
-                        {% endfor %}
-                        <div class="w-12 h-12"></div>
-                        <button @click="step = 6"
-                                class="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-lg font-semibold">
-                            0
-                        </button>
-                        <button class="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-lg font-semibold">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
-                            </svg>
-                        </button>
+                    <div class="flex justify-center">
+                        <div class="text-center bg-blue-50 p-3 rounded-md text-blue-800 text-sm max-w-xs">
+                            Gebruik uw toetsenbord om de pincode in te voeren (0-9)
+                            <div class="text-xs text-gray-600 mt-2">Druk op Enter om te bevestigen, Escape om te annuleren</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -204,6 +200,7 @@
     function walletComponent() {
         return {
             step: 1,
+            pin: '',
             service: '',
             law: '',
             isLoading: false,
@@ -214,6 +211,37 @@
                 console.log('🚀 Wallet component initialized');
                 this.initializeWalletServices();
             },
+
+            // Functie om toetsaanslagen te verwerken voor de pincode
+            handlePinKeypress(event) {
+                // Als stap 5 niet actief is, niet verwerken
+                if (this.step !== 5) return;
+
+                console.log('Key pressed:', event.key);
+
+                // Controleer of de toets een cijfer is (0-9)
+                if (/^[0-9]$/.test(event.key) && this.pin.length < 5) {
+                    this.pin += event.key;
+                    console.log('PIN updated:', this.pin);
+
+                    // Als we 5 cijfers hebben, ga na een korte vertraging naar het volgende scherm
+                    if (this.pin.length === 5) {
+                        setTimeout(() => {
+                            this.step = 6;
+                        }, 500);
+                    }
+                }
+                // Backspace verwerken
+                else if (event.key === 'Backspace' && this.pin.length > 0) {
+                    this.pin = this.pin.slice(0, -1);
+                    console.log('PIN after backspace:', this.pin);
+                }
+                // Enter verwerken (als pincode compleet is)
+                else if (event.key === 'Enter' && this.pin.length === 5) {
+                    this.step = 6;
+                }
+            },
+
 
             initializeWalletServices() {
                 // Get service and law parameters from URL
