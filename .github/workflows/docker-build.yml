@@ -37,6 +37,6 @@ jobs:
       - name: Build and Push Go Backend Image with Kaniko
         uses: int128/kaniko-action@v1
         with:
-          context: ./machinev2/backend
+          file: ./machinev2/backend/Dockerfile
           push: true
           tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/machinev2/backend:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
