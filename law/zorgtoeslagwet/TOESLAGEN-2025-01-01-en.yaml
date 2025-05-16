@@ -1,11 +1,10 @@
 $id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
-uuid: 60e71675-38bc-4297-87ac-0c145613e481
+uuid: 60e71675-38bc-4297-87ac-0c145613e4813
 name: Healthcare Allowance
 law: healthcare_allowance_act
 law_type: "FORMAL_LAW"
 legal_character: "DECISION"
 decision_type: "GRANT"
-discoverable: "CITIZEN"
 valid_from: 2025-01-01
 service: "ALLOWANCES"
 description: >
