@@ -350,7 +350,6 @@
             },
 
             // Function to update the wallet display with actual data
-// Function to update the wallet display with actual data
             updateWalletDisplay(walletData) {
                 console.log('⭐ UPDATING WALLET DISPLAY WITH DATA:', walletData);
 
@@ -374,243 +373,105 @@
                 };
 
                 try {
-                    // Function to get a nice display name for keys
-                    function getNiceDisplayName(key) {
-                        // Replace underscores with spaces and lowercase
-                        const name = key.replace(/_/g, ' ').toLowerCase();
+                    // DIRECT APPROACH FOR OUR SPECIFIC DATA STRUCTURE
+                    // We know the exact structure we're expecting:
+                    // { "TOESLAGEN": { "wet_op_de_huurtoeslag": { key-value pairs } } }
 
-                        // Manual mappings for better display names
-                        const mappings = {
-                            'rent amount': 'Huur per maand',
-                            'service costs': 'Servicekosten',
-                            'eligible service costs': 'Subsidiabele servicekosten',
-                            'bruto inkomen': 'Bruto jaarinkomen',
-                            'belasting betaald': 'Betaalde belasting',
-                            'maandpremie': 'Maandpremie zorgverzekering',
-                            'eigen risico': 'Eigen risico',
-                            'aanvullend pakket': 'Aanvullend pakket',
-                            'huurwoning': 'Huurwoning gegevens',
-                            'jaaropgave': 'Jaaropgave gegevens',
-                            'verzekering': 'Zorgverzekering gegevens',
-                            'wonen': 'Wonen',
-                            'inkomen': 'Inkomen',
-                            'gezondheid': 'Gezondheid',
-                            'toeslagen': 'Toeslagen'
-                        };
-
-                        return mappings[name] || name;
-                    }
-
-                    // Create categories with icons and colors
-                    const categories = {
-                        wonen: {
-                            icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
-                            color: 'blue'
-                        },
-                        inkomen: {
-                            icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                            color: 'green'
-                        },
-                        gezondheid: {
-                            icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-                            color: 'red'
-                        },
-                        toeslagen: {
-                            icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z',
-                            color: 'purple'
-                        },
-                        default: {
-                            icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                            color: 'blue'
-                        }
-                    };
-
-                    // Generic handling for any single object at root level
-                    if (walletData && typeof walletData === 'object' && !Array.isArray(walletData)) {
-                        // Check if we have a single property with a nested object
-                        const keys = Object.keys(walletData);
-
-                        // If there's only a single key at the root level and it points to an object
-                        if (keys.length === 1 && typeof walletData[keys[0]] === 'object' && !Array.isArray(walletData[keys[0]])) {
-                            const category = keys[0].toLowerCase();
-                            const categoryData = walletData[keys[0]];
-                            const categoryConfig = categories[category] || categories.default;
-
-                            // Create category heading
-                            const categoryHeading = document.createElement('div');
-                            categoryHeading.className = 'mb-3 mt-4 first:mt-0';
-                            categoryHeading.innerHTML = `
-                    <div class="flex items-center gap-2 font-medium text-${categoryConfig.color}-700 border-b border-${categoryConfig.color}-200 pb-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${categoryConfig.icon}" />
-                        </svg>
-                        <span>${getNiceDisplayName(category)} gegevens</span>
-                    </div>
-                `;
-                            ul.appendChild(categoryHeading);
-
-                            // Add items directly
-                            const itemsList = document.createElement('ul');
-                            itemsList.className = 'ml-3 space-y-1.5 mb-3';
-
-                            for (const [key, value] of Object.entries(categoryData)) {
-                                let formattedValue = value;
-                                let displayKey = key.replace(/_/g, ' ').toLowerCase();
-
-                                // Format currencies
-                                if (typeof value === 'number' &&
-                                    (key.includes('AMOUNT') || key.includes('COST') ||
-                                        key.includes('PRICE') || key.includes('EURO'))) {
-                                    formattedValue = formatEuros(value);
-                                }
-
-                                const li = document.createElement('li');
-                                li.className = 'flex items-start';
-                                li.innerHTML = `
-                        <svg class="w-5 h-5 text-${categoryConfig.color}-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div class="flex justify-between w-full">
-                            <span class="text-gray-700">${displayKey}</span>
-                            <span class="font-medium ml-2">${formattedValue}</span>
-                        </div>
-                    `;
-
-                                itemsList.appendChild(li);
-                                itemCount++;
-                            }
-
-                            ul.appendChild(itemsList);
-
-                            // Process other data using the standard approach
-                            const remainingData = {};
-                            for (let i = 1; i < keys.length; i++) {
-                                remainingData[keys[i]] = walletData[keys[i]];
-                            }
-
-                            if (Object.keys(remainingData).length > 0) {
-                                // Process the remaining data categories
-                                for (const [category, data] of Object.entries(remainingData)) {
-                                    if (!categories[category]) continue; // Skip unknown categories
-
-                                    // Create category heading
-                                    const categoryHeading = document.createElement('div');
-                                    categoryHeading.className = 'mb-3 mt-4 first:mt-0';
-                                    categoryHeading.innerHTML = `
-                            <div class="flex items-center gap-2 font-medium text-${categories[category].color}-700 border-b border-${categories[category].color}-200 pb-1">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${categories[category].icon}" />
-                                </svg>
-                                <span>${getNiceDisplayName(category)}</span>
-                            </div>
-                        `;
-                                    ul.appendChild(categoryHeading);
-
-                                    // Process subcategories
-                                    processSubcategories(data, category);
-                                }
-                            }
-
-                            return; // We've processed the special case
-                        }
-                    }
-
-                    // Standard processing for multiple categories
-                    function processSubcategories(data, category) {
-                        if (typeof data !== 'object' || data === null) return;
-
-                        for (const [subcategory, items] of Object.entries(data)) {
-                            if (typeof items !== 'object' || items === null) continue;
-
-                            // Create subcategory heading if needed
-                            const subcategoryHeading = document.createElement('div');
-                            subcategoryHeading.className = 'mb-2 mt-2 ml-2 font-medium text-gray-600 text-sm';
-                            subcategoryHeading.textContent = getNiceDisplayName(subcategory);
-                            ul.appendChild(subcategoryHeading);
-
-                            // Create subcategory list
-                            const itemsList = document.createElement('ul');
-                            itemsList.className = 'ml-3 space-y-1.5 mb-3';
-
-                            // Add items
-                            for (const [key, value] of Object.entries(items)) {
-                                let formattedValue = value;
-
-                                // Format currencies
-                                if (typeof value === 'number' &&
-                                    (key.includes('AMOUNT') || key.includes('COST') ||
-                                        key.includes('PRICE') || key.includes('EURO') ||
-                                        key.includes('INKOMEN') || key.includes('BELASTING') ||
-                                        key.includes('RISICO') || key.includes('PREMIE'))) {
-                                    formattedValue = formatEuros(value);
-                                }
-
-                                const li = document.createElement('li');
-                                li.className = 'flex items-start';
-                                li.innerHTML = `
-                        <svg class="w-5 h-5 text-${categories[category].color}-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div class="flex justify-between w-full">
-                            <span class="text-gray-700">${getNiceDisplayName(key)}</span>
-                            <span class="font-medium ml-2">${formattedValue}</span>
-                        </div>
-                    `;
-
-                                itemsList.appendChild(li);
-                                itemCount++;
-                            }
-
-                            ul.appendChild(itemsList);
-                        }
-                    }
-
-                    // Process data by category
-                    for (const [category, data] of Object.entries(walletData)) {
-                        if (!categories[category]) continue; // Skip unknown categories
-
-                        // Create category heading
+                    if (walletData && walletData.TOESLAGEN && walletData.TOESLAGEN.wet_op_de_huurtoeslag) {
+                        // Create the Toeslagen category heading
                         const categoryHeading = document.createElement('div');
                         categoryHeading.className = 'mb-3 mt-4 first:mt-0';
                         categoryHeading.innerHTML = `
-            <div class="flex items-center gap-2 font-medium text-${categories[category].color}-700 border-b border-${categories[category].color}-200 pb-1">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${categories[category].icon}" />
-              </svg>
-              <span>${getNiceDisplayName(category)}</span>
-            </div>
-          `;
+                            <div class="flex items-center gap-2 font-medium text-blue-700 border-b border-blue-200 pb-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span>Toeslagen</span>
+                            </div>
+                        `;
                         ul.appendChild(categoryHeading);
 
-                        // Process subcategories
-                        processSubcategories(data, category);
-                    }
+                        // Create the Huurtoeslag subcategory heading
+                        const subcategoryHeading = document.createElement('div');
+                        subcategoryHeading.className = 'mb-2 mt-2 ml-2 font-medium text-gray-600 text-sm';
+                        subcategoryHeading.textContent = 'Huurtoeslag';
+                        ul.appendChild(subcategoryHeading);
 
-                    // If no data was found, show a message
-                    if (itemCount === 0) {
+                        // Create list for huurtoeslag items
+                        const itemsList = document.createElement('ul');
+                        itemsList.className = 'ml-3 space-y-1.5 mb-3';
+
+                        // Direct access to the huurtoeslag data
+                        const huurtoeslagData = walletData.TOESLAGEN.wet_op_de_huurtoeslag;
+
+                        // Mapping for keys to display names
+                        const keyDisplayNames = {
+                            'RENT_AMOUNT': 'Huur per maand',
+                            'SERVICE_COSTS': 'Servicekosten',
+                            'ELIGIBLE_SERVICE_COSTS': 'Subsidiabele servicekosten'
+                        };
+
+                        // Process each field in huurtoeslag data
+                        for (const [key, value] of Object.entries(huurtoeslagData)) {
+                            // Format the value (convert currency)
+                            let formattedValue = value;
+                            if (typeof value === 'number') {
+                                formattedValue = formatEuros(value);
+                            }
+
+                            // Get display name for the key
+                            const displayKey = keyDisplayNames[key] || key.replace(/_/g, ' ').toLowerCase();
+
+                            // Create the list item
+                            const li = document.createElement('li');
+                            li.className = 'flex items-start';
+                            li.innerHTML = `
+                                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="flex justify-between w-full">
+                                    <span class="text-gray-700">${displayKey}</span>
+                                    <span class="font-medium ml-2">${formattedValue}</span>
+                                </div>
+                            `;
+
+                            // Add to the list
+                            itemsList.appendChild(li);
+                            itemCount++;
+                        }
+
+                        // Add the items list to the main list
+                        ul.appendChild(itemsList);
+                    } else {
+                        // Fallback message if the expected structure is not found
                         const li = document.createElement('li');
                         li.className = 'flex items-start';
                         li.innerHTML = `
-            <svg class="w-5 h-5 text-yellow-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>Geen gegevens beschikbaar voor deze dienst.</span>
-          `;
+                            <svg class="w-5 h-5 text-yellow-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Geen huurtoeslag gegevens beschikbaar.</span>
+                        `;
                         ul.appendChild(li);
+
+                        // Debug info
+                        console.error('Expected data structure not found:', walletData);
                     }
 
+                    // Debug output
                     console.log('✅ Wallet data display updated with', itemCount, 'items');
+
                 } catch (e) {
                     console.error('Error updating wallet display:', e);
                     // Show error in the list
                     ul.innerHTML = `
-          <li class="flex items-start text-red-600">
-            <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>Fout bij weergeven gegevens: ${e.message}</span>
-          </li>
-        `;
+                        <li class="flex items-start text-red-600">
+                            <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Fout bij weergeven gegevens: ${e.message}</span>
+                        </li>
+                    `;
                 }
             }
         }
