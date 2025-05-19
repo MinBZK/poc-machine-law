@@ -15,6 +15,7 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
+from web.feature_flags import is_chat_enabled
 from web.utils import format_message
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -262,6 +263,12 @@ async def get_chat_page(
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Render the chat interface page"""
+    # Check if chat feature is enabled
+    if not is_chat_enabled():
+        return templates.TemplateResponse(
+            "partials/feature_disabled.html", {"request": request, "feature_name": "Chat", "return_url": f"/?bsn={bsn}"}
+        )
+
     profile = services.get_profile_data(bsn)
     if not profile:
         return HTMLResponse("Profile not found", status_code=404)
@@ -298,6 +305,8 @@ async def get_chat_page(
             "all_profiles": services.get_all_profiles(),
             "llm_providers": available_providers,
             "current_provider": current_provider,
+            "chat_enabled": is_chat_enabled(),
+            "wallet_enabled": is_chat_enabled(),
         },
     )
 
@@ -328,6 +337,12 @@ async def websocket_endpoint(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
+    # Check if chat feature is enabled
+    if not is_chat_enabled():
+        await websocket.accept()
+        await websocket.send_text(json.dumps({"error": "Chat feature is currently disabled", "feature_disabled": True}))
+        await websocket.close()
+        return
     await manager.connect(websocket, client_id)
 
     try:

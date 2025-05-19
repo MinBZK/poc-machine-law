@@ -12,6 +12,7 @@
         <div class="container mx-auto px-4 py-8">
             {% include "admin/partials/engines.html" %}
             {% include "admin/partials/llm_providers.html" %}
+            <div id="feature-flags">{% include "admin/partials/feature_flags.html" %}</div>
             {# Reset Form #}
             <form hx-post="/admin/reset"
                   hx-trigger="submit"

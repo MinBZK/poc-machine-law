@@ -9,6 +9,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
 from web.engines import EngineInterface
+from web.feature_flags import is_chat_enabled, is_wallet_enabled
 from web.routers import admin, chat, edit, importer, laws, wallet
 
 app = FastAPI(title="Burger.nl")
@@ -69,6 +70,8 @@ async def root(request: Request, bsn: str = "100000001", services: EngineInterfa
             "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
             "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
+            "wallet_enabled": is_wallet_enabled(),
+            "chat_enabled": is_chat_enabled(),
         },
     )
 

@@ -18,6 +18,7 @@ from web.dependencies import (
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.engines.models import CaseStatus
+from web.feature_flags import FeatureFlags
 from web.routers.laws import evaluate_law
 
 config_loader = ConfigLoader()
@@ -107,6 +108,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     print(f"DEBUG SESSION: {dict(request.session)}")
 
     providers, current_provider = get_llm_providers(request)
+    feature_flags = FeatureFlags.get_all()
 
     return templates.TemplateResponse(
         "admin/control.html",
@@ -116,6 +118,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "current_engine_id": get_engine_id(),
             "providers": providers,
             "current_provider": current_provider,
+            "feature_flags": feature_flags,
         },
     )
 
@@ -203,6 +206,25 @@ async def post_clear_api_key(request: Request, provider_name: str = Form(...)):
         "/admin/partials/llm_providers.html",
         {"request": request, "providers": providers, "current_provider": current_provider},
     )
+
+
+@router.post("/set-feature-flag")
+async def post_set_feature_flag(request: Request, flag_name: str = Form(...), value: str = Form(...)):
+    """Set the value of a feature flag"""
+    try:
+        # Convert string value to boolean
+        bool_value = value.lower() in ("1", "true", "yes", "y")
+
+        # Set the feature flag
+        FeatureFlags.set(flag_name, bool_value)
+
+        # Redirect back to the control page
+        return RedirectResponse("/admin/control", status_code=303)
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=f"Error setting feature flag: {str(e)}")
 
 
 @router.post("/reset")

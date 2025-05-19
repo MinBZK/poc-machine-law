@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from web.engines.py_engine.services.profiles import get_profile_data
+from web.feature_flags import is_wallet_enabled
 
 router = APIRouter(prefix="/wallet", tags=["wallet"])
 
@@ -14,6 +15,11 @@ async def get_wallet_data(bsn: str, request: Request, service: str = None, law: 
 
     This is a generic endpoint that returns wallet data regardless of service or law.
     """
+    # Check if wallet feature is enabled
+    if not is_wallet_enabled():
+        return JSONResponse(
+            status_code=403, content={"success": False, "message": "Wallet feature is currently disabled"}
+        )
 
     # Debug information
     print(f"Retrieving wallet data for BSN={bsn}, service={service}, law={law}")

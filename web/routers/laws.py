@@ -10,6 +10,7 @@ from jinja2 import TemplateNotFound
 from explain.llm_factory import llm_factory
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
+from web.feature_flags import is_wallet_enabled
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 
@@ -352,6 +353,7 @@ async def application_panel(
                 "current_case": existing_case,
                 "claim_map": claim_map,
                 "missing_required": result.missing_required,
+                "wallet_enabled": is_wallet_enabled(),
             },
         )
     except Exception as e:

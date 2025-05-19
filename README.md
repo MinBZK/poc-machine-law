@@ -212,6 +212,27 @@ De applicatie ondersteunt meerdere LLM providers voor het genereren van uitleg e
 
 Je kunt ook de provider selecteren in de web-interface, op voorwaarde dat de benodigde API-sleutels zijn ingesteld.
 
+### Feature Flags
+
+De applicatie ondersteunt feature flags om bepaalde functionaliteiten aan of uit te zetten. Feature flags kunnen worden beheerd via het admin control panel op `/admin/control`.
+
+Momenteel ondersteunde feature flags:
+
+- `WALLET` - Bestuurt de NL Wallet integratie
+- `CHAT` - Bestuurt de chat interface
+
+Feature flags worden opgeslagen als environment variables met het prefix `FEATURE_`. Bijvoorbeeld, de wallet feature flag wordt opgeslagen als `FEATURE_WALLET`.
+
+Je kunt features in- en uitschakelen via de admin control panel UI of door de environment variables handmatig in te stellen:
+
+```bash
+# Wallet feature uitschakelen
+export FEATURE_WALLET=0
+
+# Chat feature inschakelen
+export FEATURE_CHAT=1
+```
+
 
 
 ## 📂 Repository structuur

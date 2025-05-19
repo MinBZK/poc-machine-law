@@ -1,0 +1,24 @@
+<div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
+     id="feature-flags">
+    <h1 class="text-gray-900 text-3xl font-semibold mb-5">Feature Flags</h1>
+    <p class="mb-5">Schakel features aan of uit voor de applicatie.</p>
+    <div class="space-y-4">
+        {% for name, enabled in feature_flags.items() %}
+            <div class="flex items-center space-x-4">
+                <button class="toggle-btn w-14 h-7 flex items-center rounded-full p-1 cursor-pointer {{ 'bg-green-500' if enabled else 'bg-gray-300' }} focus:outline-none"
+                        onclick="document.getElementById('form-{{ name }}').submit(); this.disabled = true; this.classList.add('opacity-50');">
+                    <div class="bg-white w-6 h-6 rounded-full shadow-md transform {{ 'translate-x-7' if enabled else '' }} transition-transform">
+                    </div>
+                </button>
+                <form id="form-{{ name }}"
+                      method="post"
+                      action="/admin/set-feature-flag"
+                      class="hidden">
+                    <input type="hidden" name="flag_name" value="{{ name }}">
+                    <input type="hidden" name="value" value="{{ '0' if enabled else '1' }}">
+                </form>
+                <label class="font-medium">{{ name|title }}</label>
+            </div>
+        {% endfor %}
+    </div>
+</div>
