@@ -1,4 +1,7 @@
+from datetime import datetime
 from typing import Any
+
+from dateutil.relativedelta import relativedelta
 
 # Global service data that applies to all profiles
 GLOBAL_SERVICES = {
@@ -1288,8 +1291,10 @@ def get_profile_properties(profile: dict) -> list[str]:
 
     # Add age
     if "geboortedatum" in person_data:
-        birth_year = int(person_data["geboortedatum"].split("-")[0])
-        age = 2025 - birth_year  # Using 2025 as reference year
+        birth_date_str = person_data["geboortedatum"]
+        birth_date = datetime.strptime(birth_date_str, "%Y-%m-%d")
+        current_date = datetime.now()
+        age = relativedelta(current_date, birth_date).years
         properties.append(f"🗓️ {age} jaar")
 
     # Add children
