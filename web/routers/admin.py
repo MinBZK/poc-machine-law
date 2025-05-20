@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 from uuid import UUID
 
+from context import logger
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
@@ -105,7 +106,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     """Show a button to reset the state of the application"""
 
     # DEBUG: Print session contents to see what's there
-    print(f"DEBUG SESSION: {dict(request.session)}")
+    logger.debug(f"DEBUG SESSION: {dict(request.session)}")
 
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
