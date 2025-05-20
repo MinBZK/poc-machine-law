@@ -371,90 +371,143 @@
                     return '€' + euros.toFixed(2).replace('.', ',');
                 };
 
+                // Convert snake_case to Title Case
+                const toTitleCase = (str) => {
+                    return str
+                        .replace(/_/g, ' ')
+                        .toLowerCase()
+                        .replace(/\b\w/g, s => s.toUpperCase());
+                };
+
+                // Generic mapping for common keys to display names
+                const keyDisplayNames = {
+                    'RENT_AMOUNT': 'Huur per maand',
+                    'SERVICE_COSTS': 'Servicekosten',
+                    'ELIGIBLE_SERVICE_COSTS': 'Subsidiabele servicekosten'
+                };
+
                 try {
-                    // DIRECT APPROACH FOR OUR SPECIFIC DATA STRUCTURE
-                    // We know the exact structure we're expecting:
-                    // { "TOESLAGEN": { "wet_op_de_huurtoeslag": { key-value pairs } } }
+                    if (walletData && typeof walletData === 'object') {
+                        for (const [category, categoryData] of Object.entries(walletData)) {
+                            if (typeof categoryData !== 'object' || categoryData === null) continue;
 
-                    if (walletData && walletData.TOESLAGEN && walletData.TOESLAGEN.wet_op_de_huurtoeslag) {
-                        // Create the Toeslagen category heading
-                        const categoryHeading = document.createElement('div');
-                        categoryHeading.className = 'mb-3 mt-4 first:mt-0';
-                        categoryHeading.innerHTML = `
-                            <div class="flex items-center gap-2 font-medium text-blue-700 border-b border-blue-200 pb-1">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                                <span>Toeslagen</span>
-                            </div>
-                        `;
-                        ul.appendChild(categoryHeading);
-
-                        // Create the Huurtoeslag subcategory heading
-                        const subcategoryHeading = document.createElement('div');
-                        subcategoryHeading.className = 'mb-2 mt-2 ml-2 font-medium text-gray-600 text-sm';
-                        subcategoryHeading.textContent = 'Huurtoeslag';
-                        ul.appendChild(subcategoryHeading);
-
-                        // Create list for huurtoeslag items
-                        const itemsList = document.createElement('ul');
-                        itemsList.className = 'ml-3 space-y-1.5 mb-3';
-
-                        // Direct access to the huurtoeslag data
-                        const huurtoeslagData = walletData.TOESLAGEN.wet_op_de_huurtoeslag;
-
-                        // Mapping for keys to display names
-                        const keyDisplayNames = {
-                            'RENT_AMOUNT': 'Huur per maand',
-                            'SERVICE_COSTS': 'Servicekosten',
-                            'ELIGIBLE_SERVICE_COSTS': 'Subsidiabele servicekosten'
-                        };
-
-                        // Process each field in huurtoeslag data
-                        for (const [key, value] of Object.entries(huurtoeslagData)) {
-                            // Format the value (convert currency)
-                            let formattedValue = value;
-                            if (typeof value === 'number') {
-                                formattedValue = formatEuros(value);
-                            }
-
-                            // Get display name for the key
-                            const displayKey = keyDisplayNames[key] || key.replace(/_/g, ' ').toLowerCase();
-
-                            // Create the list item
-                            const li = document.createElement('li');
-                            li.className = 'flex items-start';
-                            li.innerHTML = `
-                                <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div class="flex justify-between w-full">
-                                    <span class="text-gray-700">${displayKey}</span>
-                                    <span class="font-medium ml-2">${formattedValue}</span>
+                            // Create category heading
+                            const categoryHeading = document.createElement('div');
+                            categoryHeading.className = 'mb-3 mt-4 first:mt-0';
+                            categoryHeading.innerHTML = `
+                                <div class="flex items-center gap-2 font-medium text-blue-700 border-b border-blue-200 pb-1">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>${toTitleCase(category)}</span>
                                 </div>
                             `;
+                            ul.appendChild(categoryHeading);
 
-                            // Add to the list
-                            itemsList.appendChild(li);
-                            itemCount++;
+                            // Process subcategories or direct data
+                            for (const [subcategory, subcategoryData] of Object.entries(categoryData)) {
+                                if (typeof subcategoryData === 'object' && subcategoryData !== null) {
+                                    // This is a subcategory
+                                    const subcategoryHeading = document.createElement('div');
+                                    subcategoryHeading.className = 'mb-2 mt-2 ml-2 font-medium text-gray-600 text-sm';
+                                    subcategoryHeading.textContent = toTitleCase(subcategory);
+                                    ul.appendChild(subcategoryHeading);
+
+                                    // Create list for subcategory items
+                                    const itemsList = document.createElement('ul');
+                                    itemsList.className = 'ml-3 space-y-1.5 mb-3';
+
+                                    // Process each field in the subcategory
+                                    for (const [key, value] of Object.entries(subcategoryData)) {
+                                        // Skip if undefined or null
+                                        if (value === undefined || value === null) continue;
+
+                                        // Format the value (convert currency if it's a number)
+                                        let formattedValue = value;
+                                        if (typeof value === 'number') {
+                                            // If the key suggests it's money, format as euros
+                                            if (key.includes('AMOUNT') || key.includes('COST') ||
+                                                key.includes('PRICE') || key.includes('EURO') ||
+                                                key.includes('INCOME') || key.includes('PREMIE')) {
+                                                formattedValue = formatEuros(value);
+                                            }
+                                        }
+
+                                        // Get display name for the key
+                                        const displayKey = keyDisplayNames[key] || toTitleCase(key);
+
+                                        // Create the list item
+                                        const li = document.createElement('li');
+                                        li.className = 'flex items-start';
+                                        li.innerHTML = `
+                                            <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <div class="flex justify-between w-full">
+                                                <span class="text-gray-700">${displayKey}</span>
+                                                <span class="font-medium ml-2">${formattedValue}</span>
+                                            </div>
+                                        `;
+
+                                        // Add to the list
+                                        itemsList.appendChild(li);
+                                        itemCount++;
+                                    }
+
+                                    // Add the items list to the main list if we added any items
+                                    if (itemCount > 0) {
+                                        ul.appendChild(itemsList);
+                                    }
+                                } else {
+                                    // This is a direct property of the category
+                                    // Skip if undefined or null
+                                    if (subcategoryData === undefined || subcategoryData === null) continue;
+
+                                    // Format the value
+                                    let formattedValue = subcategoryData;
+                                    if (typeof subcategoryData === 'number') {
+                                        // If the key suggests it's money, format as euros
+                                        if (subcategory.includes('AMOUNT') || subcategory.includes('COST') ||
+                                            subcategory.includes('PRICE') || subcategory.includes('EURO') ||
+                                            subcategory.includes('INCOME') || subcategory.includes('PREMIE')) {
+                                            formattedValue = formatEuros(subcategoryData);
+                                        }
+                                    }
+
+                                    // Get display name
+                                    const displayKey = keyDisplayNames[subcategory] || toTitleCase(subcategory);
+
+                                    // Create list item directly under category
+                                    const li = document.createElement('li');
+                                    li.className = 'flex items-start ml-3';
+                                    li.innerHTML = `
+                                        <svg class="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div class="flex justify-between w-full">
+                                            <span class="text-gray-700">${displayKey}</span>
+                                            <span class="font-medium ml-2">${formattedValue}</span>
+                                        </div>
+                                    `;
+
+                                    ul.appendChild(li);
+                                    itemCount++;
+                                }
+                            }
                         }
+                    }
 
-                        // Add the items list to the main list
-                        ul.appendChild(itemsList);
-                    } else {
-                        // Fallback message if the expected structure is not found
+                    // If we didn't add any items, show a message
+                    if (itemCount === 0) {
                         const li = document.createElement('li');
                         li.className = 'flex items-start';
                         li.innerHTML = `
                             <svg class="w-5 h-5 text-yellow-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            <span>Geen huurtoeslag gegevens beschikbaar.</span>
+                            <span>Geen gegevens beschikbaar in de wallet.</span>
                         `;
                         ul.appendChild(li);
-
-                        // Debug info
-                        console.error('Expected data structure not found:', walletData);
                     }
 
                     // Debug output
