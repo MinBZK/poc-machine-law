@@ -2,7 +2,7 @@ import json
 import re
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 
 from web.dependencies import get_claim_manager, templates
 from web.engines import ClaimManagerInterface
@@ -366,82 +366,3 @@ async def update_missing_values(
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed, reload-page"
     return response
-
-
-@router.get("/get-profile-data")
-async def get_profile_data(bsn: str, request: Request, service: str = None, law: str = None):
-    """Get data from user profile by BSN - for NL Wallet simulation"""
-
-    from web.engines.py_engine.services.profiles import get_profile_data
-
-    # Debug information
-    print(f"Retrieving profile data for BSN={bsn}, service={service}, law={law}")
-
-    profile = get_profile_data(bsn)
-
-    if not profile:
-        print(f"Profile not found for BSN={bsn}")
-        return JSONResponse(content={"success": False, "message": "Profile not found"})
-
-    # Create a flattened dictionary of profile data with focus on required fields
-    flattened_data = {}
-
-    # Check if this is a huurtoeslag request (wet_op_de_huurtoeslag)
-    if service == "TOESLAGEN" and law == "wet_op_de_huurtoeslag":
-        print(f"Looking for huurtoeslag wallet data for BSN={bsn}")
-        if "sources" in profile and "RvIG" in profile["sources"]:
-            rvig_data = profile["sources"]["RvIG"]
-
-            # Check if we have huurtoeslag wallet data
-            if "nl_wallet" in rvig_data and "huurtoeslag" in rvig_data["nl_wallet"]:
-                wallet_data = rvig_data["nl_wallet"]["huurtoeslag"]
-                print(f"Found wallet data for huurtoeslag: {wallet_data}")
-
-                # Add these directly to flattened data
-                for key, value in wallet_data.items():
-                    flattened_data[key] = value
-
-                # Successfully found wallet data for this specific service
-                print(f"Returning wallet data: {flattened_data}")
-                return JSONResponse(content={"success": True, "profile": flattened_data})
-            else:
-                print(f"No wallet data found for huurtoeslag in profile {bsn}")
-        else:
-            print(f"No RvIG data found in profile {bsn}")
-
-    # If we didn't find specific wallet data for the requested service/law,
-    # or no service/law was specified, fall back to general profile data
-
-    # Extract basic personal info
-    if "sources" in profile and "RvIG" in profile["sources"]:
-        rvig_data = profile["sources"]["RvIG"]
-        if "personen" in rvig_data and len(rvig_data["personen"]) > 0:
-            person = rvig_data["personen"][0]
-            for key, value in person.items():
-                flattened_data[key] = value
-
-        # Extract address data
-        if "verblijfplaats" in rvig_data and len(rvig_data["verblijfplaats"]) > 0:
-            address = rvig_data["verblijfplaats"][0]
-            for key, value in address.items():
-                flattened_data[key] = value
-
-    # Extract income data
-    if "sources" in profile and "BELASTINGDIENST" in profile["sources"]:
-        tax_data = profile["sources"]["BELASTINGDIENST"]
-
-        # Extract box1 income
-        if "box1" in tax_data and len(tax_data["box1"]) > 0:
-            income = tax_data["box1"][0]
-            for key, value in income.items():
-                if key != "bsn":  # Skip BSN as it's already included
-                    flattened_data[key] = value
-
-        # Extract box3 assets
-        if "box3" in tax_data and len(tax_data["box3"]) > 0:
-            assets = tax_data["box3"][0]
-            for key, value in assets.items():
-                if key != "bsn":
-                    flattened_data[key] = value
-
-    return JSONResponse(content={"success": True, "profile": flattened_data})
