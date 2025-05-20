@@ -31,29 +31,14 @@ def get_wallet_data(bsn: str, service: str | None = None, law: str | None = None
     Returns:
         Dictionary with wallet data for the specified BSN
     """
-    # Check if this BSN has wallet data
     if bsn not in WALLET_DATA:
         return {}
 
-    # Start with the full data
     data = WALLET_DATA[bsn].copy()
 
-    # Filter by service if specified
-    if service:
-        service_upper = service.upper()
-        if service_upper in data:
-            # Keep only the specified service
-            data = {service_upper: data[service_upper]}
-        else:
-            # Service not found
-            return {}
-
-    # Filter by law if specified
     if law and service:
         service_upper = service.upper()
         if service_upper in data and law in data[service_upper]:
-            # Create a filtered version with just the relevant law
-            # return data[service_upper][law]
             return {service_upper: {law: data[service_upper][law]}}
 
     return {}
