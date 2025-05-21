@@ -8,79 +8,77 @@
                 <h1 class="text-2xl font-bold">Configuratie Panel</h1>
                 <div x-data="{ menuOpen: false }" class="relative">
                     <button @click="menuOpen = !menuOpen"
-                            class="flex items-center px-3 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-100 focus:outline-none">
+                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-5 w-5 mr-1"
+                             class="h-5 w-5 text-gray-600"
                              fill="none"
                              viewBox="0 0 24 24"
                              stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                        <span>Navigatie</span>
-                    </button>
-                    <div x-show="menuOpen"
-                         x-cloak
-                         @click.away="menuOpen = false"
-                         class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="/admin"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                            Zaaksysteem
-                        </a>
-                        <a href="/"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Homepage
-                        </a>
+                        </button>
+                        <div x-show="menuOpen"
+                             x-cloak
+                             @click.away="menuOpen = false"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="/admin"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-4 w-4 mr-2 text-gray-500"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                                Zaaksysteem
+                            </a>
+                            <a href="/"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-4 w-4 mr-2 text-gray-500"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Homepage
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+            {# Main content #}
+            <div class="container mx-auto px-4 py-8">
+                {% include "admin/partials/engines.html" %}
+                {% include "admin/partials/llm_providers.html" %}
+                <div id="feature-flags">{% include "admin/partials/feature_flags.html" %}</div>
+                {# Reset Form #}
+                <form hx-post="/admin/reset"
+                      hx-trigger="submit"
+                      hx-on::after-request="var btn = document.getElementById('reset-submit'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.href = '/admin', 7000)"
+                      class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
+                    <h1 class="text-gray-900 text-3xl font-semibold mb-5">Reset de applicatie-state</h1>
+                    <p class="mb-5">
+                        Dit zal de applicatie-state resetten naar de initiële staat. Weet je zeker dat je dit wilt
+                        doen?
+                    </p>
+                    <p class="mb-5">
+                        Dit betekent dat alle data die je hebt ingevoerd zal worden verwijderd. Dit kan niet
+                        ongedaan worden gemaakt.
+                    </p>
+                    <button id="reset-submit"
+                            class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 disabled:bg-red-400"
+                            type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-5 h-5 mr-2 -ml-1"
+                             viewBox="0 0 24 24">
+                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
+                            <path d="M20 4v5h-5" />
+                            </g>
+                        </svg>
+                        Reset state
+                    </button>
+                </form>
+            </div>
         </div>
-        {# Main content #}
-        <div class="container mx-auto px-4 py-8">
-            {% include "admin/partials/engines.html" %}
-            {% include "admin/partials/llm_providers.html" %}
-            <div id="feature-flags">{% include "admin/partials/feature_flags.html" %}</div>
-            {# Reset Form #}
-            <form hx-post="/admin/reset"
-                  hx-trigger="submit"
-                  hx-on::after-request="var btn = document.getElementById('reset-submit'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.href = '/admin', 7000)"
-                  class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
-                <h1 class="text-gray-900 text-3xl font-semibold mb-5">Reset de applicatie-state</h1>
-                <p class="mb-5">
-                    Dit zal de applicatie-state resetten naar de initiële staat. Weet je zeker dat je dit wilt
-                    doen?
-                </p>
-                <p class="mb-5">
-                    Dit betekent dat alle data die je hebt ingevoerd zal worden verwijderd. Dit kan niet
-                    ongedaan worden gemaakt.
-                </p>
-                <button id="reset-submit"
-                        class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 disabled:bg-red-400"
-                        type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5 mr-2 -ml-1"
-                         viewBox="0 0 24 24">
-                        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                        <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
-                        <path d="M20 4v5h-5" />
-                        </g>
-                    </svg>
-                    Reset state
-                </button>
-            </form>
-        </div>
-    </div>
-{% endblock %}
+    {% endblock %}
