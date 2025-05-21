@@ -1,6 +1,5 @@
 """API endpoints for the wallet module."""
 
-from context import logger
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
@@ -22,15 +21,10 @@ async def get_data(bsn: str, request: Request, service: str = None, law: str = N
             status_code=403, content={"success": False, "message": "Wallet feature is currently disabled"}
         )
 
-    # Debug information
-    logger.debug(f"Retrieving wallet data for BSN={bsn}, service={service}, law={law}")
-
     # Get wallet data from our mock wallet data service
     wallet_data = get_wallet_data(bsn, service, law)
 
     if wallet_data:
-        logger.debug(f"Found wallet data for BSN={bsn}")
         return JSONResponse(content={"success": True, "data": wallet_data})
-    else:
-        logger.debug(f"No wallet data found for BSN={bsn}")
-        return JSONResponse(content={"success": False, "message": "No wallet data found for this BSN"})
+
+    return JSONResponse(content={"success": False, "message": "No wallet data found for this BSN"})
