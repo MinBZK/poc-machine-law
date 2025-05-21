@@ -4,10 +4,22 @@
     <div class="min-h-screen bg-gray-50">
         {# Top navigation bar #}
         <div class="bg-white shadow">
-            <div class="px-6 py-4 flex justify-between items-center">
+            <div class="px-6 py-4 flex items-center">
                 <h1 class="text-2xl font-bold">Zaaksysteem - {{ current_service|replace('_', ' ') |title }}</h1>
-                <div class="-mt-2 -mr-2">{{ org_logo(current_service) }}</div>
+                <div class="-mt-2 ml-3">{{ org_logo(current_service) }}</div>
+                <div class="flex-grow"></div>
                 <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <select class="appearance-none bg-white border rounded-md py-2 pl-4 pr-10 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onchange="window.location.href = '/admin/' + this.value">
+                            {% for service_name in available_services %}
+                                <option value="{{ service_name }}"
+                                        {% if service_name== current_service %}selected{% endif %}>
+                                    {{ service_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div x-data="{ menuOpen: false }" class="relative">
                         <button @click="menuOpen = !menuOpen"
                                 class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 focus:outline-none">
@@ -47,17 +59,6 @@
                                 Homepage
                             </a>
                         </div>
-                    </div>
-                    <div class="relative">
-                        <select class="appearance-none bg-white border rounded-md py-2 pl-4 pr-10 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                onchange="window.location.href = '/admin/' + this.value">
-                            {% for service_name in available_services %}
-                                <option value="{{ service_name }}"
-                                        {% if service_name== current_service %}selected{% endif %}>
-                                    {{ service_name }}
-                                </option>
-                            {% endfor %}
-                        </select>
                     </div>
                 </div>
             </div>
