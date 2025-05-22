@@ -1,0 +1,85 @@
+<!-- Vertegenwoordiging -->
+<div class="space-y-4">
+    {% if result.is_wilsonbekwaam %}
+        <h4 class="text-sm font-medium text-gray-700 mb-3">
+            Status: <span class="text-yellow-600">Wilsonbekwaam</span>
+        </h4>
+        {% if result.has_legal_representative %}
+            <div>
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Uw wettelijke vertegenwoordiger(s):</h4>
+                <div class="space-y-2">
+                    {% for rep in result.legal_representatives %}
+                        <div class="border border-gray-200 rounded p-3 bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">{{ rep.naam }}</p>
+                                    <p class="text-xs text-gray-500">BSN: {{ rep.bsn }}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ result.representation_type }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% elif result.is_representative_for %}
+        <h4 class="text-sm font-medium text-indigo-700 mb-3">U bent wettelijk vertegenwoordiger voor:</h4>
+        <div class="space-y-2">
+            {% for person in result.representing_details %}
+                <div class="border border-gray-200 rounded p-3 bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium">{{ person.naam }}</p>
+                            <p class="text-xs text-gray-500">BSN: {{ person.bsn }}</p>
+                        </div>
+                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ person.type }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif result.parent_of_minor %}
+        <h4 class="text-sm font-medium text-indigo-700 mb-3">U heeft ouderlijk gezag over:</h4>
+        <div class="space-y-2">
+            {% for child in result.minor_children %}
+                <div class="border border-gray-200 rounded p-3 bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium">{{ child.naam }}</p>
+                            <p class="text-xs text-gray-500">BSN: {{ child.bsn }}</p>
+                            <p class="text-xs text-gray-500">Geboren: {{ child.geboortedatum|format_date }}</p>
+                        </div>
+                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ child.leeftijd|default(result.minor_children[0].age|default('') ) }} jaar</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif profile and profile.sources.RvIG and profile.sources.RvIG.personen and profile.sources.RvIG.personen[0].age < 18 %}
+        <div class="flex items-center justify-between mb-4">
+            <span class="text-sm text-gray-500">Status:</span>
+            <span class="text-sm font-medium text-yellow-600 bg-yellow-50 px-2 py-1 rounded">Minderjarig ({{ profile.sources.RvIG.personen[0].age }} jaar)</span>
+        </div>
+        {% if result.has_legal_representative %}
+            <div>
+                <h4 class="text-sm text-gray-500 mb-2">Uw wettelijke vertegenwoordiger(s):</h4>
+                <div class="space-y-2">
+                    {% for rep in result.legal_representatives %}
+                        <div class="border border-gray-200 rounded p-3 bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">{{ rep.naam }}</p>
+                                    <p class="text-xs text-gray-500">BSN: {{ rep.bsn }}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ result.representation_type }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Vertegenwoordiging:</span>
+            <span class="text-sm font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded">Geen</span>
+        </div>
+    {% endif %}
+</div>

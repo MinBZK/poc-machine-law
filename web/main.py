@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
 from web.engines import EngineInterface
-from web.feature_flags import is_chat_enabled, is_wallet_enabled
+from web.feature_flags import is_chat_enabled, is_vertegenwoordiging_enabled, is_wallet_enabled
 from web.routers import admin, chat, edit, importer, laws, wallet
 
 app = FastAPI(title="Burger.nl")
@@ -55,11 +55,29 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)):
+async def root(
+    request: Request,
+    bsn: str = "100000001",
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
+    services: EngineInterface = Depends(get_machine_service),
+):
     """Render the main dashboard page"""
     profile = services.get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = services.get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
 
     return templates.TemplateResponse(
         "index.html",
@@ -72,6 +90,8 @@ async def root(request: Request, bsn: str = "100000001", services: EngineInterfa
             "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
+            "vertegenwoordiging_enabled": is_vertegenwoordiging_enabled(),
+            "representative_info": representative_info,
         },
     )
 

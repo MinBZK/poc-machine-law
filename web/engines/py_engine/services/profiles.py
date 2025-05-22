@@ -1254,6 +1254,502 @@ PROFILES = {
             },
         },
     },
+    # Wilsonbekwame persoon en vertegenwoordiger
+    "999993800": {
+        "name": "Wil Sonbekwaam",
+        "description": "Wilsonbekwame persoon met wettelijke vertegenwoordiger",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993800",
+                        "geboortedatum": "1960-05-15",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 65,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Amsteldijk 128, 1078RS Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 1,
+                    }
+                ],
+                "relaties": [{"bsn": "999993800", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993800",
+                        "straat": "Amsteldijk",
+                        "huisnummer": "128",
+                        "postcode": "1078RS",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "JenV": {
+                "wilsbekwaamheid": [
+                    {
+                        "bsn": "999993800",
+                        "status": "WILSONBEKWAAM",
+                        "sinds": "2023-04-15",
+                    }
+                ],
+                "vertegenwoordiging": [
+                    {
+                        "bsn": "999993800",
+                        "type": "CURATELE",
+                        "vertegenwoordigers": [
+                            {
+                                "bsn": "999993801",
+                                "naam": "Jan Vertegenwoordiger",
+                                "sinds": "2023-05-01",
+                            }
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993800",
+                        "loon_uit_dienstbetrekking": 0,
+                        "uitkeringen_en_pensioenen": 1380000,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "999993800", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993800",
+                        "spaargeld": 4500000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993800", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993800", "persoonsgebonden_aftrek": 120000}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "999993800", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+        },
+    },
+    "999993801": {
+        "name": "Jan Vertegenwoordiger",
+        "description": "Wettelijke vertegenwoordiger van meerdere personen",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993801",
+                        "geboortedatum": "1965-03-20",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 60,
+                        "has_dutch_nationality": True,
+                        "has_partner": True,
+                        "residence_address": "Singel 42, 1015AB Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 2,
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "999993801",
+                        "partnerschap_type": "HUWELIJK",
+                        "partner_bsn": "999993802",
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993801",
+                        "straat": "Singel",
+                        "huisnummer": "42",
+                        "postcode": "1015AB",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "JenV": {
+                "vertegenwoordiging": [
+                    {
+                        "bsn": "999993801",
+                        "vertegenwoordigt_voor": [
+                            {
+                                "bsn": "999993800",
+                                "naam": "Wil Sonbekwaam",
+                                "type": "CURATELE",
+                                "sinds": "2023-05-01",
+                            },
+                            {
+                                "bsn": "999993805",
+                                "naam": "Sara Dementie",
+                                "type": "MENTORSCHAP",
+                                "sinds": "2022-11-15",
+                            },
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993801",
+                        "loon_uit_dienstbetrekking": 3850000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -95000,
+                    }
+                ],
+                "box2": [{"bsn": "999993801", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993801",
+                        "spaargeld": 3250000,
+                        "beleggingen": 1500000,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993801", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993801", "persoonsgebonden_aftrek": 210000}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "999993801", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+        },
+    },
+    # Ouder met minderjarig kind
+    "999993901": {
+        "name": "Peter Ouderman",
+        "description": "Ouder met minderjarig kind",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993901",
+                        "geboortedatum": "1980-05-15",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 45,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Prinsengracht 42, 1015DX Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 2,
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "999993901",
+                        "partnerschap_type": "GEEN",
+                        "partner_bsn": None,
+                        "children": [{"bsn": "999993902", "geboortedatum": "2015-03-20", "naam": "Kind Minderjarig"}],
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993901",
+                        "straat": "Prinsengracht",
+                        "huisnummer": "42",
+                        "postcode": "1015DX",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "JenV": {
+                "vertegenwoordiging": [
+                    {
+                        "bsn": "999993901",
+                        "vertegenwoordigt_voor": [
+                            {
+                                "bsn": "999993902",
+                                "naam": "Kind Minderjarig",
+                                "type": "OUDERLIJK_GEZAG",
+                                "sinds": "2015-03-20",
+                            }
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993901",
+                        "loon_uit_dienstbetrekking": 4250000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -120000,
+                    }
+                ],
+                "box2": [{"bsn": "999993901", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993901",
+                        "spaargeld": 2800000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993901", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993901", "persoonsgebonden_aftrek": 180000}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "999993901", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+        },
+    },
+    "999993902": {
+        "name": "Kind Minderjarig",
+        "description": "Minderjarig kind met twee ouders als wettelijke vertegenwoordigers",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993902",
+                        "geboortedatum": "2015-03-20",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 10,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Prinsengracht 42, 1015DX Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 3,
+                    }
+                ],
+                "relaties": [{"bsn": "999993902", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993902",
+                        "straat": "Prinsengracht",
+                        "huisnummer": "42",
+                        "postcode": "1015DX",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "JenV": {
+                "vertegenwoordiging": [
+                    {
+                        "bsn": "999993902",
+                        "type": "OUDERLIJK_GEZAG",
+                        "vertegenwoordigers": [
+                            {
+                                "bsn": "999993901",
+                                "naam": "Peter Ouderman",
+                                "sinds": "2015-03-20",
+                            },
+                            {
+                                "bsn": "999993903",
+                                "naam": "Maria Ouderman",
+                                "sinds": "2015-03-20",
+                            },
+                        ],
+                    }
+                ],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "999993902", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+        },
+    },
+    "999993903": {
+        "name": "Maria Ouderman",
+        "description": "Moeder met ouderlijk gezag",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993903",
+                        "geboortedatum": "1978-10-28",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 46,
+                        "has_dutch_nationality": True,
+                        "has_partner": True,
+                        "residence_address": "Prinsengracht 42, 1015DX Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 3,
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "999993903",
+                        "partnerschap_type": "HUWELIJK",
+                        "partner_bsn": "999993901",
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993903",
+                        "straat": "Prinsengracht",
+                        "huisnummer": "42",
+                        "postcode": "1015DX",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "JenV": {
+                "vertegenwoordiging": [
+                    {
+                        "bsn": "999993903",
+                        "vertegenwoordigt_voor": [
+                            {
+                                "bsn": "999993902",
+                                "naam": "Kind Minderjarig",
+                                "type": "OUDERLIJK_GEZAG",
+                                "sinds": "2015-03-20",
+                            }
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993903",
+                        "loon_uit_dienstbetrekking": 4560000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": -120000,
+                    }
+                ],
+                "box2": [{"bsn": "999993903", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993903",
+                        "spaargeld": 1950000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993903", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993903", "persoonsgebonden_aftrek": 150000}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "999993903", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+        },
+    },
+    "999993805": {
+        "name": "Sara Dementie",
+        "description": "Persoon met mentorschap wegens dementie",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993805",
+                        "geboortedatum": "1940-05-16",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 84,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Zorgcentrum De Linde, Lindestraat 10, 1015RS Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 1,
+                    }
+                ],
+                "relaties": [{"bsn": "999993805", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993805",
+                        "straat": "Lindestraat",
+                        "huisnummer": "10",
+                        "postcode": "1015RS",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+            },
+            "JenV": {
+                "wilsbekwaamheid": [
+                    {
+                        "bsn": "999993805",
+                        "status": "WILSONBEKWAAM",
+                        "sinds": "2022-10-28",
+                    }
+                ],
+                "vertegenwoordiging": [
+                    {
+                        "bsn": "999993805",
+                        "type": "MENTORSCHAP",
+                        "vertegenwoordigers": [
+                            {
+                                "bsn": "999993801",
+                                "naam": "Jan Vertegenwoordiger",
+                                "sinds": "2022-11-15",
+                            }
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993805",
+                        "loon_uit_dienstbetrekking": 0,
+                        "uitkeringen_en_pensioenen": 1950000,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "999993805", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "999993805",
+                        "spaargeld": 12500000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993805", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993805", "persoonsgebonden_aftrek": 450000}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "999993805", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+        },
+    },
 }
 
 
@@ -1345,6 +1841,38 @@ def get_profile_properties(profile: dict) -> list[str]:
             percentage = disability.get("percentage")
             if percentage:
                 properties.append(f"♿ {percentage}% arbeidsongeschikt")
+
+    # Add wilsonbekwaamheid (incapacity) status
+    if "JenV" in profile["sources"] and "wilsbekwaamheid" in profile["sources"]["JenV"]:
+        for wilsbekwaamheid in profile["sources"]["JenV"]["wilsbekwaamheid"]:
+            status = wilsbekwaamheid.get("status")
+            if status == "WILSONBEKWAAM":
+                properties.append("⚠️ Wilsonbekwaam")
+
+    # Add vertegenwoordiging (representation) status
+    if "JenV" in profile["sources"] and "vertegenwoordiging" in profile["sources"]["JenV"]:
+        # Check if person is being represented
+        if any(entry.get("vertegenwoordigers") for entry in profile["sources"]["JenV"]["vertegenwoordiging"]):
+            for entry in profile["sources"]["JenV"]["vertegenwoordiging"]:
+                rep_type = entry.get("type")
+                if rep_type == "CURATELE":
+                    properties.append("👨‍⚖️ Onder curatele")
+                elif rep_type == "MENTORSCHAP":
+                    properties.append("🧠 Onder mentorschap")
+                elif rep_type == "OUDERLIJK_GEZAG":
+                    properties.append("👪 Onder ouderlijk gezag")
+                else:
+                    properties.append("🔄 Heeft vertegenwoordiger")
+
+        # Check if person is a representative for others
+        if any(entry.get("vertegenwoordigt_voor") for entry in profile["sources"]["JenV"]["vertegenwoordiging"]):
+            for entry in profile["sources"]["JenV"]["vertegenwoordiging"]:
+                if "vertegenwoordigt_voor" in entry:
+                    num_represented = len(entry["vertegenwoordigt_voor"])
+                    if num_represented == 1:
+                        properties.append("⚖️ Vertegenwoordigt 1 persoon")
+                    elif num_represented > 1:
+                        properties.append(f"⚖️ Vertegenwoordigt {num_represented} personen")
 
     return properties
 
