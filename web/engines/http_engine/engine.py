@@ -102,7 +102,10 @@ class MachineService(EngineInterface):
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
         """
         Get laws discoverable by citizens using HTTP calls to the Go backend service.
+
+        Filters laws based on feature flags if they exist.
         """
+        from web.feature_flags import FeatureFlags
 
         # Instantiate the API client
         client = Client(base_url=self.base_url)
@@ -114,7 +117,10 @@ class MachineService(EngineInterface):
             result = defaultdict(set)
             for item in content.data:
                 for law in item.laws:
-                    result[item.name].add(law.name)
+                    # Check if the law is enabled in feature flags
+                    # If flag doesn't exist, law is enabled by default
+                    if FeatureFlags.is_law_enabled(item.name, law.name):
+                        result[item.name].add(law.name)
 
             return result
 

@@ -105,7 +105,10 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     """Show a button to reset the state of the application"""
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
-
+    # Get discoverable laws to create law feature flags
+    all_laws = services.services.get_discoverable_service_laws()
+    # Now get the feature flags for these laws
+    law_flags = FeatureFlags.get_law_flags(all_laws)
     return templates.TemplateResponse(
         "admin/control.html",
         {
@@ -115,6 +118,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "providers": providers,
             "current_provider": current_provider,
             "feature_flags": feature_flags,
+            "law_flags": law_flags,
         },
     )
 
@@ -205,8 +209,13 @@ async def post_clear_api_key(request: Request, provider_name: str = Form(...)):
 
 
 @router.post("/set-feature-flag")
-async def post_set_feature_flag(request: Request, flag_name: str = Form(...), value: str = Form(...)):
-    """Set the value of a feature flag"""
+async def post_set_feature_flag(
+    request: Request,
+    flag_name: str = Form(...),
+    value: str = Form(...),
+    services: EngineInterface = Depends(get_machine_service),
+):
+    """Set the value of a feature flag and return updated partial"""
     try:
         # Convert string value to boolean
         bool_value = value.lower() in ("1", "true", "yes", "y")
@@ -214,8 +223,24 @@ async def post_set_feature_flag(request: Request, flag_name: str = Form(...), va
         # Set the feature flag
         FeatureFlags.set(flag_name, bool_value)
 
-        # Redirect back to the control page
-        return RedirectResponse("/admin/control", status_code=303)
+        # Check if it's a law feature flag
+        if flag_name.startswith(FeatureFlags.LAW_PREFIX):
+            # Get all laws for law feature flags
+            all_laws = services.services.get_discoverable_service_laws()
+            # Now get the feature flags for these laws
+            law_flags = FeatureFlags.get_law_flags(all_laws)
+            # Return only the law feature flags partial
+            return templates.TemplateResponse(
+                "/admin/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}
+            )
+        else:
+            # Regular feature flag
+            feature_flags = FeatureFlags.get_all()
+
+            # Return only the feature flags partial
+            return templates.TemplateResponse(
+                "/admin/partials/feature_flags.html", {"request": request, "feature_flags": feature_flags}
+            )
     except Exception as e:
         import traceback
 

@@ -1,0 +1,44 @@
+<div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
+     id="law-feature-flags">
+    <h1 class="text-gray-900 text-3xl font-semibold mb-5">Wetten</h1>
+    <p class="mb-5">Schakel specifieke wetten aan of uit voor de applicatie.</p>
+    {% for service, laws in law_flags.items() %}
+        <div class="mb-5">
+            <h2 class="text-gray-800 text-xl font-medium mb-3">{{ service|replace('_', ' ') |title }}</h2>
+            <div class="space-y-4 pl-4">
+                {% for law_name, enabled in laws.items() %}
+                    <div class="flex items-center space-x-4">
+                        {% set safe_service_id = service|replace('_', '-') %}
+                        {% set safe_law_id = law_name|replace('/', '-')|replace('_', '-') %}
+                        {% set sanitized_law_name = law_name|replace('/', '__') %}
+                        <button class="toggle-btn w-14 h-7 flex items-center rounded-full p-1 cursor-pointer {{ 'bg-green-500' if enabled else 'bg-gray-300' }} focus:outline-none"
+                                hx-post="/admin/set-feature-flag"
+                                hx-target="#law-feature-flags"
+                                hx-swap="outerHTML"
+                                hx-indicator="#law-loading-{{ safe_service_id }}-{{ safe_law_id }}"
+                                hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}"}'>
+                            <div class="bg-white w-6 h-6 rounded-full shadow-md transform {{ 'translate-x-7' if enabled else '' }} transition-transform">
+                            </div>
+                        </button>
+                        <div id="law-loading-{{ safe_service_id }}-{{ safe_law_id }}"
+                             class="htmx-indicator">
+                            <div class="spinner w-6 h-6 border-2 border-t-2 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                        </div>
+                        <label class="font-medium">{{ law_name|replace('_', ' ') |title }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<style>
+    .htmx-indicator {
+        display: none;
+    }
+    .htmx-request .htmx-indicator {
+        display: inline-block;
+    }
+    .htmx-request.toggle-btn {
+        opacity: 0.5;
+    }
+</style>

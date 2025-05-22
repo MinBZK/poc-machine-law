@@ -83,8 +83,25 @@ class PythonMachineService(EngineInterface):
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
         """
         Get laws discoverable by citizens using the embedded Python machine.service library.
+
+        Filters laws based on feature flags if they exist.
         """
-        return self.services.get_discoverable_service_laws(discoverable_by)
+        from web.feature_flags import FeatureFlags
+
+        # Get discoverable laws from the service
+        all_laws = self.services.get_discoverable_service_laws(discoverable_by)
+
+        # Filter based on feature flags
+        result = {}
+        for service, laws in all_laws.items():
+            result[service] = []
+            for law in laws:
+                # Check if the law is enabled in feature flags
+                # If flag doesn't exist, law is enabled by default
+                if FeatureFlags.is_law_enabled(service, law):
+                    result[service].append(law)
+
+        return result
 
     def get_rule_spec(self, law: str, reference_date: str, service: str) -> dict[str, Any]:
         """

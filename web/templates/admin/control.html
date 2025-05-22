@@ -14,6 +14,7 @@
             {% include "admin/partials/engines.html" %}
             {% include "admin/partials/llm_providers.html" %}
             <div id="feature-flags">{% include "admin/partials/feature_flags.html" %}</div>
+            <div id="law-feature-flags">{% include "admin/partials/law_feature_flags.html" %}</div>
             {# Reset Form #}
             <form hx-post="/admin/reset"
                   hx-trigger="submit"

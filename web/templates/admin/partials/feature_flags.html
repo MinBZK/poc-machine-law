@@ -6,19 +6,30 @@
         {% for name, enabled in feature_flags.items() %}
             <div class="flex items-center space-x-4">
                 <button class="toggle-btn w-14 h-7 flex items-center rounded-full p-1 cursor-pointer {{ 'bg-green-500' if enabled else 'bg-gray-300' }} focus:outline-none"
-                        onclick="document.getElementById('form-{{ name }}').submit(); this.disabled = true; this.classList.add('opacity-50');">
+                        hx-post="/admin/set-feature-flag"
+                        hx-target="#feature-flags"
+                        hx-swap="outerHTML"
+                        hx-indicator="#feature-loading-{{ name }}"
+                        hx-vals='{"flag_name": "{{ name }}", "value": "{{ '0' if enabled else '1' }}"}'>
                     <div class="bg-white w-6 h-6 rounded-full shadow-md transform {{ 'translate-x-7' if enabled else '' }} transition-transform">
                     </div>
                 </button>
-                <form id="form-{{ name }}"
-                      method="post"
-                      action="/admin/set-feature-flag"
-                      class="hidden">
-                    <input type="hidden" name="flag_name" value="{{ name }}">
-                    <input type="hidden" name="value" value="{{ '0' if enabled else '1' }}">
-                </form>
+                <div id="feature-loading-{{ name }}" class="htmx-indicator">
+                    <div class="spinner w-6 h-6 border-2 border-t-2 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                </div>
                 <label class="font-medium">{{ name|title }}</label>
             </div>
         {% endfor %}
     </div>
 </div>
+<style>
+    .htmx-indicator {
+        display: none;
+    }
+    .htmx-request .htmx-indicator {
+        display: inline-block;
+    }
+    .htmx-request.toggle-btn {
+        opacity: 0.5;
+    }
+</style>
