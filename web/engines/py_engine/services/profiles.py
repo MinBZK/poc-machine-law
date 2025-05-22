@@ -3,6 +3,8 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
+from web.feature_flags import is_vertegenwoordiging_enabled
+
 # Global service data that applies to all profiles
 GLOBAL_SERVICES = {
     "CBS": {"levensverwachting": [{"jaar": 2025, "verwachting_65": 20.5}]},
@@ -1842,37 +1844,38 @@ def get_profile_properties(profile: dict) -> list[str]:
             if percentage:
                 properties.append(f"♿ {percentage}% arbeidsongeschikt")
 
-    # Add wilsonbekwaamheid (incapacity) status
-    if "JenV" in profile["sources"] and "wilsbekwaamheid" in profile["sources"]["JenV"]:
-        for wilsbekwaamheid in profile["sources"]["JenV"]["wilsbekwaamheid"]:
-            status = wilsbekwaamheid.get("status")
-            if status == "WILSONBEKWAAM":
-                properties.append("⚠️ Wilsonbekwaam")
+    if is_vertegenwoordiging_enabled():
+        # Add wilsonbekwaamheid (incapacity) status
+        if "JenV" in profile["sources"] and "wilsbekwaamheid" in profile["sources"]["JenV"]:
+            for wilsbekwaamheid in profile["sources"]["JenV"]["wilsbekwaamheid"]:
+                status = wilsbekwaamheid.get("status")
+                if status == "WILSONBEKWAAM":
+                    properties.append("⚠️ Wilsonbekwaam")
 
-    # Add vertegenwoordiging (representation) status
-    if "JenV" in profile["sources"] and "vertegenwoordiging" in profile["sources"]["JenV"]:
-        # Check if person is being represented
-        if any(entry.get("vertegenwoordigers") for entry in profile["sources"]["JenV"]["vertegenwoordiging"]):
-            for entry in profile["sources"]["JenV"]["vertegenwoordiging"]:
-                rep_type = entry.get("type")
-                if rep_type == "CURATELE":
-                    properties.append("👨‍⚖️ Onder curatele")
-                elif rep_type == "MENTORSCHAP":
-                    properties.append("🧠 Onder mentorschap")
-                elif rep_type == "OUDERLIJK_GEZAG":
-                    properties.append("👪 Onder ouderlijk gezag")
-                else:
-                    properties.append("🔄 Heeft vertegenwoordiger")
+        # Add vertegenwoordiging (representation) status
+        if "JenV" in profile["sources"] and "vertegenwoordiging" in profile["sources"]["JenV"]:
+            # Check if person is being represented
+            if any(entry.get("vertegenwoordigers") for entry in profile["sources"]["JenV"]["vertegenwoordiging"]):
+                for entry in profile["sources"]["JenV"]["vertegenwoordiging"]:
+                    rep_type = entry.get("type")
+                    if rep_type == "CURATELE":
+                        properties.append("👨‍⚖️ Onder curatele")
+                    elif rep_type == "MENTORSCHAP":
+                        properties.append("🧠 Onder mentorschap")
+                    elif rep_type == "OUDERLIJK_GEZAG":
+                        properties.append("👪 Onder ouderlijk gezag")
+                    else:
+                        properties.append("🔄 Heeft vertegenwoordiger")
 
-        # Check if person is a representative for others
-        if any(entry.get("vertegenwoordigt_voor") for entry in profile["sources"]["JenV"]["vertegenwoordiging"]):
-            for entry in profile["sources"]["JenV"]["vertegenwoordiging"]:
-                if "vertegenwoordigt_voor" in entry:
-                    num_represented = len(entry["vertegenwoordigt_voor"])
-                    if num_represented == 1:
-                        properties.append("⚖️ Vertegenwoordigt 1 persoon")
-                    elif num_represented > 1:
-                        properties.append(f"⚖️ Vertegenwoordigt {num_represented} personen")
+            # Check if person is a representative for others
+            if any(entry.get("vertegenwoordigt_voor") for entry in profile["sources"]["JenV"]["vertegenwoordiging"]):
+                for entry in profile["sources"]["JenV"]["vertegenwoordiging"]:
+                    if "vertegenwoordigt_voor" in entry:
+                        num_represented = len(entry["vertegenwoordigt_voor"])
+                        if num_represented == 1:
+                            properties.append("⚖️ Vertegenwoordigt 1 persoon")
+                        elif num_represented > 1:
+                            properties.append(f"⚖️ Vertegenwoordigt {num_represented} personen")
 
     return properties
 
