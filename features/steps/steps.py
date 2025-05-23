@@ -36,8 +36,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn"} else parse_value(v)
-            for k, v in row.items()
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn"} else parse_value(v) for k, v in row.items()
         }
         data.append(processed_row)
 
@@ -70,7 +69,7 @@ def evaluate_law(context, service, law, approved=True):
         parameters=context.parameters,
         reference_date=context.root_reference_date,
         overwrite_input=context.test_data,
-        approved=approved
+        approved=approved,
     )
 
     context.service = service
@@ -92,8 +91,9 @@ def step_impl(context, law, service):
         key = row.headings[0]
         value = row[key]
         # Special handling for JSON-like values
-        if value.startswith('[') or value.startswith('{'):
+        if value.startswith("[") or value.startswith("{"):
             import json
+
             try:
                 value = json.loads(value.replace("'", '"'))
             except json.JSONDecodeError:
@@ -209,16 +209,12 @@ def step_impl(context):
 
 @then("heeft de persoon stemrecht")
 def step_impl(context):
-    assertions.assertTrue(
-        context.result.requirements_met, "Expected the person to have voting rights"
-    )
+    assertions.assertTrue(context.result.requirements_met, "Expected the person to have voting rights")
 
 
 @then("heeft de persoon geen stemrecht")
 def step_impl(context):
-    assertions.assertFalse(
-        context.result.requirements_met, "Expected the person not to have voting rights"
-    )
+    assertions.assertFalse(context.result.requirements_met, "Expected the person not to have voting rights")
 
 
 @given("de volgende kandidaatgegevens")
@@ -283,7 +279,7 @@ def step_impl(context):
         law=context.law,
         parameters=context.result.input,
         claimed_result=context.result.output,
-        approved_claims_only=True
+        approved_claims_only=True,
     )
 
     # Case ID opslaan voor volgende stappen
@@ -301,9 +297,7 @@ def step_impl(context):
 def step_impl(context, status):
     case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertIsNotNone(case, "Expected case to exist")
-    assertions.assertEqual(
-        case.status, status, f"Expected status to be {status}, but was {case.status}"
-    )
+    assertions.assertEqual(case.status, status, f"Expected status to be {status}, but was {case.status}")
 
 
 @when('de beoordelaar de aanvraag afwijst met reden "{reason}"')
@@ -400,7 +394,7 @@ def step_impl(context, chance):
             case_id=None,
             evidence_path=row.get("bewijs"),
             law=row["law"],
-            bsn=context.parameters["BSN"]
+            bsn=context.parameters["BSN"],
         )
         context.claims.append(claim_id)
 
@@ -424,14 +418,12 @@ def step_impl(context, amount):
 
 @then("ontbreken er verplichte gegevens")
 def step_impl(context):
-    assertions.assertTrue(context.result.missing_required,
-                          "Er zouden gegevens moeten ontbreken.")
+    assertions.assertTrue(context.result.missing_required, "Er zouden gegevens moeten ontbreken.")
 
 
 @then("ontbreken er geen verplichte gegevens")
 def step_impl(context):
-    assertions.assertFalse(context.result.missing_required,
-                           "Er zouden geen gegevens moeten ontbreken.")
+    assertions.assertFalse(context.result.missing_required, "Er zouden geen gegevens moeten ontbreken.")
 
 
 @then('is het {field} "{amount}" eurocent')
@@ -439,9 +431,8 @@ def step_impl(context, field, amount):
     actual_amount = context.result.output[field]
     expected_amount = int(amount)
     assertions.assertEqual(
-        actual_amount,
-        expected_amount,
-        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent")
+        actual_amount, expected_amount, f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent"
+    )
 
 
 @then("heeft de persoon recht op kinderopvangtoeslag")
@@ -451,9 +442,120 @@ def step_impl(context):
         "Expected person to be eligible for childcare allowance, but they were not",
     )
 
+
 @then("heeft de persoon geen recht op kinderopvangtoeslag")
 def step_impl(context):
     assertions.assertTrue(
         "is_eligible" not in context.result.output or not context.result.output["is_eligible"],
         "Expected person to NOT be eligible for childcare allowance, but they were",
+    )
+
+
+@then('is "{variable}" gelijk aan "{value}"')
+def step_impl(context, variable, value):
+    """
+    Check if a variable in the output equals a specific value
+
+    :type context: behave.runner.Context
+    """
+    # Make sure the variable exists in the output
+    assertions.assertIn(
+        variable,
+        context.result.output,
+        f"Expected '{variable}' to be in the output, but it wasn't found"
+    )
+
+    # Parse the expected value
+    expected_value = parse_value(value)
+    actual_value = context.result.output[variable]
+
+    # Compare the values
+    assertions.assertEqual(
+        actual_value,
+        expected_value,
+        f"Expected '{variable}' to be {expected_value}, but was {actual_value}"
+    )
+
+
+@then('is "{variable}" van lengte {length}')
+def step_impl(context, variable, length):
+    """
+    Check if a variable in the output has a specific length
+
+    :type context: behave.runner.Context
+    """
+    # Make sure the variable exists in the output
+    assertions.assertIn(
+        variable,
+        context.result.output,
+        f"Expected '{variable}' to be in the output, but it wasn't found"
+    )
+
+    # Get the actual value and check if it's a collection with a length
+    actual_value = context.result.output[variable]
+
+    # Handle None values
+    if actual_value is None:
+        actual_value = []
+
+    assertions.assertTrue(
+        hasattr(actual_value, "__len__"),
+        f"Expected '{variable}' to be a collection with a length, but it was {type(actual_value)}"
+    )
+
+    # Compare the lengths
+    expected_length = int(length)
+    actual_length = len(actual_value)
+    assertions.assertEqual(
+        actual_length,
+        expected_length,
+        f"Expected '{variable}' to have length {expected_length}, but it had length {actual_length}"
+    )
+
+
+@then('is "{variable}" gelijk aan [{list}]')
+def step_impl(context, variable, list):
+    """
+    Check if a variable in the output equals a specific list
+
+    :type context: behave.runner.Context
+    """
+    # Make sure the variable exists in the output
+    assertions.assertIn(
+        variable,
+        context.result.output,
+        f"Expected '{variable}' to be in the output, but it wasn't found"
+    )
+
+    # Parse the expected list
+    # The list parameter comes in as a string like: "999993800" or "999993800", "999993801"
+    expected_list = []
+    if list.strip():  # Skip empty lists
+        for item in list.split(","):
+            # Remove any extra quotes and whitespace
+            cleaned_item = item.strip().strip('"\'')
+            expected_list.append(cleaned_item)
+
+    # Get the actual value
+    actual_value = context.result.output[variable]
+
+    # Special handling for the case when we have a list with a single None value
+    # This happens in the output of the law evaluation when something wasn't found
+    if actual_value is None:
+        actual_list_str = []
+    elif len(actual_value) == 1 and actual_value[0] is None:
+        # Force the comparison to fail with clear output
+        actual_list_str = ["None"]
+    else:
+        # Convert all items to strings for comparison
+        actual_list_str = [str(item) if item is not None else "None" for item in actual_value]
+
+    # Print debug information to help diagnose
+    print(f"DEBUG - Expected: {expected_list}, Actual: {actual_list_str}, Raw: {actual_value}")
+
+    # Compare the lists
+    assertions.assertListEqual(
+        actual_list_str,
+        expected_list,
+        f"Expected '{variable}' to be {expected_list}, but was {actual_list_str}"
     )

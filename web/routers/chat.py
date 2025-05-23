@@ -260,6 +260,9 @@ async def get_chat_page(
     request: Request,
     bsn: str = "100000001",
     llm: str = Query(None, description="LLM provider to use (claude or vlam)"),
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Render the chat interface page"""
@@ -272,6 +275,17 @@ async def get_chat_page(
     profile = services.get_profile_data(bsn)
     if not profile:
         return HTMLResponse("Profile not found", status_code=404)
+
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = services.get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
 
     # Get available and configured LLM providers
     available_providers = LLMFactory.get_available_providers()
@@ -307,6 +321,7 @@ async def get_chat_page(
             "current_provider": current_provider,
             "chat_enabled": is_chat_enabled(),
             "wallet_enabled": is_chat_enabled(),
+            "representative_info": representative_info,
         },
     )
 

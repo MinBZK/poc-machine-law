@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -84,6 +85,9 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^is het ([^"]*) "(\d+)" eurocent$`, isHetBedragEurocent)
 	ctx.Step(`^heeft de persoon geen recht op kinderopvangtoeslag$`, heeftDePersoonGeenRechtOpKinderopvangtoeslag)
 	ctx.Step(`^heeft de persoon recht op kinderopvangtoeslag$`, heeftDePersoonRechtOpKinderopvangtoeslag)
+	ctx.Step(`^is "([^"]*)" gelijk aan "([^"]*)"$`, isGelijkAan)
+	ctx.Step(`^is "([^"]*)" van lengte (\d+)$`, isVanLengte)
+	ctx.Step(`^is "([^"]*)" gelijk aan \[(.*)\]$`, isGelijkAanList)
 
 	ctx.StepContext().After(func(ctx context.Context, st *godog.Step, status godog.StepResultStatus, err error) (context.Context, error) {
 		services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
@@ -781,6 +785,103 @@ func heeftDePersoonGeenRechtOpKinderopvangtoeslag(ctx context.Context) error {
 	}
 
 	assert.False(godog.T(ctx), actual, "Expected person to NOT be eligible for childcare allowance, but they were")
+
+	return nil
+}
+
+func isGelijkAan(ctx context.Context, variable, value string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	assert.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[variable]
+	if !ok {
+		return fmt.Errorf("expected '%s' to be in the output, but it wasn't found", variable)
+	}
+
+	// Parse the expected value (handle bool, numeric, string)
+	var expectedValue any = value
+	if value == "true" || value == "false" {
+		expectedValue = value == "true"
+	} else if i, err := strconv.Atoi(value); err == nil {
+		expectedValue = i
+	} else if f, err := strconv.ParseFloat(value, 64); err == nil {
+		expectedValue = f
+	}
+
+	// Compare the values
+	assert.Equal(godog.T(ctx), expectedValue, v, "Expected '%s' to be %v, but was %v", variable, expectedValue, v)
+
+	return nil
+}
+
+func isVanLengte(ctx context.Context, variable string, length int) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	assert.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[variable]
+	if !ok {
+		return fmt.Errorf("expected '%s' to be in the output, but it wasn't found", variable)
+	}
+
+	// Handle nil values
+	if v == nil {
+		v = []any{}
+	}
+
+	// Check if the value is a collection
+	collection, ok := v.([]any)
+	if !ok {
+		return fmt.Errorf("expected '%s' to be a collection with a length, but it was %T", variable, v)
+	}
+
+	// Compare the lengths
+	assert.Equal(godog.T(ctx), length, len(collection), "Expected '%s' to have length %d, but it had length %d", variable, length, len(collection))
+
+	return nil
+}
+
+func isGelijkAanList(ctx context.Context, variable, listStr string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	assert.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[variable]
+	if !ok {
+		return fmt.Errorf("expected '%s' to be in the output, but it wasn't found", variable)
+	}
+
+	// Parse the expected list
+	expectedList := []string{}
+	if listStr != "" {
+		for _, item := range strings.Split(listStr, ",") {
+			// Remove any extra quotes and whitespace
+			cleanedItem := strings.TrimSpace(item)
+			cleanedItem = strings.Trim(cleanedItem, `"'`)
+			expectedList = append(expectedList, cleanedItem)
+		}
+	}
+
+	// Handle nil or empty values
+	if v == nil {
+		v = []any{}
+	}
+
+	// Convert the actual value to strings for comparison
+	actualList, ok := v.([]any)
+	if !ok {
+		return fmt.Errorf("expected '%s' to be a list, but it was %T", variable, v)
+	}
+
+	actualListStr := []string{}
+	for _, item := range actualList {
+		if item == nil {
+			actualListStr = append(actualListStr, "None")
+		} else {
+			actualListStr = append(actualListStr, fmt.Sprintf("%v", item))
+		}
+	}
+
+	// Compare the lists
+	assert.Equal(godog.T(ctx), expectedList, actualListStr, "Expected '%s' to be %v, but was %v", variable, expectedList, actualListStr)
 
 	return nil
 }

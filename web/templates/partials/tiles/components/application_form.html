@@ -71,7 +71,7 @@
             </div>
         {% else %}
             <!-- Standard panel submit button -->
-            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}{% if representative_info %}&acting_as={{ representative_info.name|urlencode }}&acting_as_bsn={{ representative_info.bsn }}&relationship_type={{ representative_info.relationship_type|urlencode }}{% endif %}"
                   hx-target="#tile-{{ law|replace('/', '-') }}"
                   hx-swap="outerHTML"
                   hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
@@ -82,7 +82,11 @@
                             :disabled="!isChecked"
                             :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
                             class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
-                        Bevestig aanvraag
+                        {% if representative_info %}
+                            Bevestig aanvraag namens {{ profile.name }}
+                        {% else %}
+                            Bevestig aanvraag
+                        {% endif %}
                     </button>
                     <button type="button"
                             @click="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"

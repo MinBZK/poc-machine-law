@@ -411,6 +411,14 @@
         <main class="container mx-auto px-4 py-8">
             <div id="dashboard-content">
                 {% block content %}{% endblock %}
+                <!-- Pass feature flags to Jinja templates -->
+                <script type="text/javascript">
+    window.featureFlags = {
+        WALLET_ENABLED: {{ "true" if wallet_enabled else "false" }},
+        CHAT_ENABLED: {{ "true" if chat_enabled else "false" }},
+        VERTEGENWOORDIGING_ENABLED: {{ "true" if vertegenwoordiging_enabled else "false" }}
+    };
+                </script>
             </div>
         </main>
         <!-- Shared Application Panel -->

@@ -10,7 +10,7 @@ from jinja2 import TemplateNotFound
 from explain.llm_factory import llm_factory
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
-from web.feature_flags import is_wallet_enabled
+from web.feature_flags import is_vertegenwoordiging_enabled, is_wallet_enabled
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 
@@ -64,16 +64,45 @@ async def execute_law(
     service: str,
     law: str,
     bsn: str,
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Execute a law and render its result"""
+    # Only allow representation if the feature flag is enabled
+    if (acting_as or acting_as_bsn or relationship_type) and not is_vertegenwoordiging_enabled():
+        acting_as = None
+        acting_as_bsn = None
+        relationship_type = None
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=False)
 
     except Exception as e:
         print(e)
+        # Get profile data for context
+        profile = None
+        try:
+            profile = machine_service.get_profile_data(bsn)
+        except:
+            pass  # Ignore errors when getting profile in the error handler
+
+        # Create representative info if possible
+        representative_info = None
+        if acting_as and acting_as_bsn:
+            try:
+                representative_profile = machine_service.get_profile_data(acting_as_bsn)
+                if representative_profile:
+                    representative_info = {
+                        "name": acting_as,
+                        "bsn": acting_as_bsn,
+                        "relationship_type": relationship_type,
+                    }
+            except:
+                pass  # Ignore errors when getting representative in the error handler
+
         return templates.TemplateResponse(
             get_tile_template(service, law),
             {
@@ -84,14 +113,30 @@ async def execute_law(
                 "rule_spec": {"name": law.split("/")[-1].replace("_", " ").title()},
                 "error": True,
                 "message": str(e),
+                "profile": profile,
+                "representative_info": representative_info,
             },
         )
 
     # Check if there's an existing case
     existing_case = case_manager.get_case(bsn, service, law)
 
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = machine_service.get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
+
     # Get the appropriate template
     template_path = get_tile_template(service, law)
+
+    # Get profile data for context
+    profile = machine_service.get_profile_data(bsn)
 
     rule_spec = machine_service.get_rule_spec(law, TODAY, service)
 
@@ -108,6 +153,8 @@ async def execute_law(
             "requirements_met": result.requirements_met,
             "missing_required": result.missing_required,
             "current_case": existing_case,
+            "representative_info": representative_info,
+            "profile": profile,  # Add profile data to the context
         },
     )
 
@@ -119,13 +166,29 @@ async def submit_case(
     law: str,
     bsn: str,
     approved: bool = False,
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit a new case"""
+    # Only allow representation if the feature flag is enabled
+    if (acting_as or acting_as_bsn or relationship_type) and not is_vertegenwoordiging_enabled():
+        acting_as = None
+        acting_as_bsn = None
+        relationship_type = None
     law = unquote(law)
 
     law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=approved)
+
+    # Add a note that this was submitted by a representative if applicable
+    representative_note = ""
+    if acting_as and acting_as_bsn:
+        representative_note = f"Ingediend door {acting_as} (BSN: {acting_as_bsn}) als {relationship_type}."
+        parameters["REPRESENTATIVE_BSN"] = acting_as_bsn
+        parameters["REPRESENTATIVE_NAME"] = acting_as
+        parameters["REPRESENTATIVE_TYPE"] = relationship_type
 
     case_id = case_manager.submit_case(
         bsn=bsn,
@@ -134,11 +197,26 @@ async def submit_case(
         parameters=parameters,
         claimed_result=result.output,
         approved_claims_only=approved,
+        note=representative_note,
     )
 
     case = case_manager.get_case_by_id(case_id)
 
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = machine_service.get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
+
     rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+    # Get profile data for context
+    profile = machine_service.get_profile_data(bsn)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(
@@ -153,6 +231,8 @@ async def submit_case(
             "input": result.input,
             "requirements_met": result.requirements_met,
             "current_case": case,
+            "representative_info": representative_info,
+            "profile": profile,  # Add profile data to the context
         },
     )
 
@@ -165,22 +245,51 @@ async def objection_case(
     law: str,
     bsn: str,
     reason: str = Form(...),  # Changed this line to use Form
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit an objection for an existing case"""
+    # Only allow representation if the feature flag is enabled
+    if (acting_as or acting_as_bsn or relationship_type) and not is_vertegenwoordiging_enabled():
+        acting_as = None
+        acting_as_bsn = None
+        relationship_type = None
     # First calculate the new result with disputed parameters
     law = unquote(law)
+
+    # Add a note if submitted by a representative
+    formatted_reason = reason
+    if acting_as and acting_as_bsn:
+        formatted_reason = (
+            f"{reason}\n\nBezwaar ingediend door {acting_as} (BSN: {acting_as_bsn}) als {relationship_type}."
+        )
 
     # Submit the objection with new claimed result
     case_manager.objection(
         case_id=case_id,
-        reason=reason,
+        reason=formatted_reason,
     )
 
     law, result, parameters = evaluate_law(bsn, law, service, machine_service)
 
     template_path = get_tile_template(service, law)
+
+    # Load representative information if needed
+    representative_info = None
+    if acting_as and acting_as_bsn:
+        representative_profile = machine_service.get_profile_data(acting_as_bsn)
+        if representative_profile:
+            representative_info = {
+                "name": acting_as,
+                "bsn": acting_as_bsn,
+                "relationship_type": relationship_type,
+            }
+
+    # Get profile data for context
+    profile = machine_service.get_profile_data(bsn)
 
     return templates.TemplateResponse(
         template_path,
@@ -194,6 +303,8 @@ async def objection_case(
             "input": result.input,
             "requirements_met": result.requirements_met,
             "current_case": case_manager.get_case_by_id(case_id),
+            "representative_info": representative_info,
+            "profile": profile,  # Add profile data to the context
         },
     )
 
@@ -321,11 +432,19 @@ async def application_panel(
     law: str,
     bsn: str,
     approved: bool = False,
+    acting_as: str = None,
+    acting_as_bsn: str = None,
+    relationship_type: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Get the application panel with tabs"""
+    # Only allow representation if the feature flag is enabled
+    if (acting_as or acting_as_bsn or relationship_type) and not is_vertegenwoordiging_enabled():
+        acting_as = None
+        acting_as_bsn = None
+        relationship_type = None
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=approved)
@@ -337,6 +456,20 @@ async def application_panel(
         claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
 
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+        # Get profile data for context
+        profile = machine_service.get_profile_data(bsn)
+
+        # Load representative information if needed
+        representative_info = None
+        if acting_as and acting_as_bsn:
+            representative_profile = machine_service.get_profile_data(acting_as_bsn)
+            if representative_profile:
+                representative_info = {
+                    "name": acting_as,
+                    "bsn": acting_as_bsn,
+                    "relationship_type": relationship_type,
+                }
 
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
@@ -354,10 +487,33 @@ async def application_panel(
                 "claim_map": claim_map,
                 "missing_required": result.missing_required,
                 "wallet_enabled": is_wallet_enabled(),
+                "profile": profile,  # Add profile data to the context
+                "representative_info": representative_info,  # Add representative info
             },
         )
     except Exception as e:
         print(f"Error in application panel: {e}")
+        # Get profile data for context
+        profile = None
+        try:
+            profile = machine_service.get_profile_data(bsn)
+        except:
+            pass  # Ignore errors when getting profile in the error handler
+
+        # Create representative info if possible
+        representative_info = None
+        if acting_as and acting_as_bsn:
+            try:
+                representative_profile = machine_service.get_profile_data(acting_as_bsn)
+                if representative_profile:
+                    representative_info = {
+                        "name": acting_as,
+                        "bsn": acting_as_bsn,
+                        "relationship_type": relationship_type,
+                    }
+            except:
+                pass  # Ignore errors when getting representative in the error handler
+
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
             {
@@ -365,5 +521,8 @@ async def application_panel(
                 "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
                 "service": service,
                 "law": law,
+                "bsn": bsn,
+                "profile": profile,
+                "representative_info": representative_info,
             },
         )

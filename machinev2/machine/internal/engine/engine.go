@@ -1336,6 +1336,19 @@ func (re *RulesEngine) evaluateOperation(
 	operation any,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
+	// Add panic recovery to prevent the whole evaluation from failing
+	defer func() {
+		if r := recover(); r != nil {
+			re.logger.WithIndent().Errorf(ctx, "Recovered from panic in evaluateOperation: %v", r)
+		}
+	}()
+
+	// If operation is nil, return safely
+	if operation == nil {
+		re.logger.WithIndent().Warningf(ctx, "Operation is nil")
+		return nil, nil
+	}
+
 	// If operation is not a map, evaluate as value
 	opMap, ok := operation.(map[string]any)
 	if !ok {
@@ -1681,6 +1694,11 @@ func (re *RulesEngine) evaluateValue(
 			return re.evaluateOperation(ctx, v, ruleCtx)
 		}
 	case []any:
+		// Fix index out of range panic by checking if the slice is empty
+		if len(v) == 0 {
+			// Return an empty slice rather than panicking
+			return []any{}, nil
+		}
 		return re.evaluateOperation(ctx, v[0], ruleCtx) // TODO this is a work in progress
 	}
 

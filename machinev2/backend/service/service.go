@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,12 +26,36 @@ type Service struct {
 }
 
 func New(logger *slog.Logger, cfg *config.Config) *Service {
-	return &Service{
+	svc := &Service{
 		logger:   logger,
 		cfg:      cfg,
 		service:  machine.NewServices(time.Now()),
 		profiles: make(map[string]model.Profile),
 	}
+
+	// Check if vertegenwoordiging feature is enabled
+	if isFeatureEnabled("VERTEGENWOORDIGING") {
+		svc.LoadTestProfiles()
+	}
+
+	return svc
+}
+
+// isFeatureEnabled checks if a feature flag is enabled via environment variables
+func isFeatureEnabled(flagName string) bool {
+	envKey := "FEATURE_" + flagName
+	value := getEnvOr(envKey, "0")
+
+	lowerValue := strings.ToLower(value)
+	return value == "1" || lowerValue == "true" || lowerValue == "yes" || lowerValue == "y"
+}
+
+// getEnvOr gets an environment variable value or returns a default
+func getEnvOr(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }
 
 func (service *Service) Shutdown(ctx context.Context) error {
