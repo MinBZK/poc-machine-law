@@ -106,7 +106,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
     # Get discoverable laws to create law feature flags
-    all_laws = services.services.get_discoverable_service_laws()
+    all_laws = services.get_discoverable_service_laws()
     # Now get the feature flags for these laws
     law_flags = FeatureFlags.get_law_flags(all_laws)
     return templates.TemplateResponse(
@@ -226,7 +226,7 @@ async def post_set_feature_flag(
         # Check if it's a law feature flag
         if flag_name.startswith(FeatureFlags.LAW_PREFIX):
             # Get all laws for law feature flags
-            all_laws = services.services.get_discoverable_service_laws()
+            all_laws = services.get_discoverable_service_laws()
             # Now get the feature flags for these laws
             law_flags = FeatureFlags.get_law_flags(all_laws)
             # Return only the law feature flags partial
