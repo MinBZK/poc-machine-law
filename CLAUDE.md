@@ -5,7 +5,7 @@
 - Run specific feature: `uv run behave features/zorgtoeslag.feature`
 - Lint code: `ruff check` and `ruff format`
 - Run pre-commit hooks: `pre-commit run --all-files`
-- Validate schemas: `./script/validate`
+- Validate schemas: `./script/validate.py`
 - Run web interface: `uv run web/main.py` (available at http://0.0.0.0:8000)
 - Run simulations: `uv run simulate.py`
 - Package management: `uv add [package]` to install dependencies
