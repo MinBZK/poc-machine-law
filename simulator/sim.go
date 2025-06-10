@@ -73,13 +73,18 @@ type LawSimulator struct {
 }
 
 // NewLawSimulator creates a new LawSimulator instance
-func NewLawSimulator(simulationDate time.Time) *LawSimulator {
+func NewLawSimulator(simulationDate time.Time) (*LawSimulator, error) {
+	services, err := service.NewServices(simulationDate)
+	if err != nil {
+		return nil, fmt.Errorf("new services: %w", err)
+	}
+
 	return &LawSimulator{
 		SimulationDate: simulationDate,
-		Services:       service.NewServices(simulationDate),
+		Services:       services,
 		Results:        make([]SimulationResult, 0),
 		UsedBSNs:       make(map[string]bool),
-	}
+	}, nil
 }
 
 // GenerateBSN generates a unique BSN (citizen identification number)

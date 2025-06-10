@@ -3,12 +3,13 @@ module github.com/minbzk/poc-machine-law/machinev2/machine
 go 1.24.1
 
 require (
+	github.com/gdexlab/go-render v1.0.1
+	github.com/goccy/go-yaml v1.18.0
 	github.com/google/uuid v1.6.0
 	github.com/looplab/eventhorizon v0.16.0
 	github.com/shopspring/decimal v1.4.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -20,4 +21,5 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

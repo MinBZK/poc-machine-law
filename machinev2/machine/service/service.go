@@ -12,14 +12,16 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/sirupsen/logrus"
 )
 
 // Services is the main service provider for rule evaluation
 type Services struct {
 	logger            logging.Logger
-	Resolver          *utils.RuleResolver
+	Resolver          *ruleresolver.RuleResolver
 	services          map[string]*RuleService
+	ServiceResolver   *utils.ServiceResolver
 	RootReferenceDate string
 	CaseManager       *CaseManager
 	ClaimManager      *ClaimManager
@@ -27,17 +29,33 @@ type Services struct {
 }
 
 // NewServices creates a new services instance
-func NewServices(referenceDate time.Time) *Services {
+func NewServices(referenceDate time.Time) (*Services, error) {
+	serviceResolver, err := utils.NewServiceResolver()
+	if err != nil {
+		return nil, fmt.Errorf("new service resolver: %w", err)
+	}
+
+	ruleResolver, err := ruleresolver.New()
+	if err != nil {
+		return nil, fmt.Errorf("new rule resolver: %w", err)
+	}
+
 	s := &Services{
-		logger:            logging.New("service", os.Stdout, logrus.DebugLevel),
-		Resolver:          utils.NewRuleResolver(),
+		logger:            logging.New("service", os.Stdout, logrus.ErrorLevel),
+		Resolver:          ruleResolver,
+		ServiceResolver:   serviceResolver,
 		services:          make(map[string]*RuleService),
 		RootReferenceDate: referenceDate.Format("2006-01-02"),
 	}
 
 	// Initialize services
 	for service := range s.Resolver.GetServiceLaws() {
-		s.services[service] = NewRuleService(s.logger, service, s)
+		svc, err := NewRuleService(s.logger, service, s)
+		if err != nil {
+			return nil, fmt.Errorf("new rule service: %w", err)
+		}
+
+		s.services[service] = svc
 	}
 
 	// Create managers
@@ -45,7 +63,15 @@ func NewServices(referenceDate time.Time) *Services {
 	s.ClaimManager = NewClaimManager(s)
 	s.ClaimManager.CaseManager = s.CaseManager
 
-	return s
+	return s, nil
+}
+
+func (s *Services) GetService(key string) (*RuleService, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	r, ok := s.services[key]
+	return r, ok
 }
 
 // GetDiscoverableServiceLaws returns discoverable services and laws
@@ -67,7 +93,7 @@ func (s *Services) Reset() {
 }
 
 // GetResolver returns the rule resolver
-func (s *Services) GetResolver() *utils.RuleResolver {
+func (s *Services) GetResolver() *ruleresolver.RuleResolver {
 	return s.Resolver
 }
 
@@ -92,9 +118,7 @@ func (s *Services) Evaluate(
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
-	s.mu.RLock()
-	svc, ok := s.services[service]
-	s.mu.RUnlock()
+	svc, ok := s.GetService(service)
 
 	if !ok {
 		return nil, fmt.Errorf("service not found: %s", service)
@@ -238,17 +262,7 @@ func (s *Services) ExtractValueTree(root *model.PathNode) map[string]any {
 // ApplyRules applies rules in response to events
 func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
 	for _, rule := range s.Resolver.Rules {
-		applies, ok := rule.Properties["applies"].([]any)
-		if !ok {
-			continue
-		}
-
-		for _, applyObj := range applies {
-			apply, ok := applyObj.(map[string]any)
-			if !ok {
-				continue
-			}
-
+		for _, apply := range rule.Properties.Applies {
 			if s.matchesEvent(event, apply) {
 				aggregateID := event.CaseID
 				aggregate, err := s.CaseManager.GetCaseByID(ctx, aggregateID)
@@ -257,7 +271,7 @@ func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
 				}
 
 				parameters := map[string]any{
-					apply["name"].(string): aggregate,
+					apply.Name: aggregate,
 				}
 
 				ctx := context.Background()
@@ -276,40 +290,19 @@ func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
 				}
 
 				// Apply updates back to aggregate
-				updates, ok := apply["update"].([]any)
-				if !ok {
-					continue
-				}
-
-				for _, updateObj := range updates {
-					update, ok := updateObj.(map[string]any)
-					if !ok {
-						continue
-					}
-
-					mappings, ok := update["mapping"].(map[string]any)
-					if !ok {
-						continue
-					}
-
+				for _, update := range apply.Update {
 					// Convert values
 					convertedMappings := make(map[string]any)
-					for name, valueRef := range mappings {
-						if valueStr, ok := valueRef.(string); ok && len(valueStr) > 0 && valueStr[0] == '$' {
+					for key, value := range update.Mapping {
+						if len(value) > 0 && value[0] == '$' {
 							// Strip $ from value
-							outputName := valueStr[1:]
-							convertedMappings[name] = result.Output[outputName]
+							outputName := value[1:]
+							convertedMappings[key] = result.Output[outputName]
 						}
 					}
 
-					// Apply method
-					method, ok := update["method"].(string)
-					if !ok {
-						continue
-					}
-
 					// Call method on case manager
-					switch method {
+					switch update.Method {
 					case "determine_objection_status":
 						var possible *bool
 						var objectionPeriod, decisionPeriod, extensionPeriod *int
@@ -404,42 +397,21 @@ func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
 }
 
 // matchesEvent checks if an event matches the applies spec
-func (s *Services) matchesEvent(event model.Event, applies map[string]any) bool {
+func (s *Services) matchesEvent(event model.Event, apply ruleresolver.Apply) bool {
 	// In a real implementation, we would match event types and filters
 	// For simplicity, we'll just do a very basic check
 
-	aggregate, ok := applies["aggregate"].(string)
-	if !ok || aggregate == "" {
+	aggregate := apply.Aggregate
+	if aggregate == "" {
 		return false
 	}
 
 	// Check if event type matches any specified event
-	events, ok := applies["events"].([]any)
-	if !ok {
-		return false
-	}
-
-	for _, eventObj := range events {
-		eventSpec, ok := eventObj.(map[string]any)
-		if !ok {
-			continue
-		}
-
-		eventType, ok := eventSpec["type"].(string)
-		if !ok {
-			continue
-		}
-
-		if strings.EqualFold(strings.ToLower(eventType), strings.ToLower(event.EventType)) {
-			// Check filters if any
-			filters, ok := eventSpec["filter"].(map[string]any)
-			if !ok {
-				return true // No filters, so it's a match
-			}
-
+	for _, eventObj := range apply.Events {
+		if strings.EqualFold(strings.ToLower(eventObj.Type), strings.ToLower(eventObj.Type)) {
 			// All filters must match
 			match := true
-			for key, filterValue := range filters {
+			for key, filterValue := range eventObj.Filter {
 				if eventValue, ok := event.Data[key]; !ok || eventValue != filterValue {
 					match = false
 					break

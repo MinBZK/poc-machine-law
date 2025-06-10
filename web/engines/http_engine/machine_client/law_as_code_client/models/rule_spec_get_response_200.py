@@ -15,7 +15,7 @@ T = TypeVar("T", bound="RuleSpecGetResponse200")
 class RuleSpecGetResponse200:
     """
     Attributes:
-        data (RuleSpec): Rule spec
+        data (RuleSpec):
     """
 
     data: "RuleSpec"

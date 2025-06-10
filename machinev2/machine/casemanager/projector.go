@@ -161,37 +161,14 @@ func (p *CaseProjector) Project(ctx context.Context, event eh.Event, entity eh.E
 		if !ok {
 			return nil, fmt.Errorf("projector: invalid event data type: %v", event.Data())
 		}
-		if c.AppealStatus == nil {
-			c.AppealStatus = make(map[string]any)
-		}
 
-		if data.Possible != nil {
-			c.AppealStatus["possible"] = *data.Possible
-		}
-
-		if data.NotPossibleReason != nil {
-			c.AppealStatus["not_possible_reason"] = *data.NotPossibleReason
-		}
-
-		if data.AppealPeriod != nil {
-			c.AppealStatus["appeal_period"] = *data.AppealPeriod
-		}
-
-		if data.DirectAppeal != nil {
-			c.AppealStatus["direct_appeal"] = *data.DirectAppeal
-		}
-
-		if data.DirectAppealReason != nil {
-			c.AppealStatus["direct_appeal_reason"] = *data.DirectAppealReason
-		}
-
-		if data.CompetentCourt != nil {
-			c.AppealStatus["competent_court"] = *data.CompetentCourt
-		}
-
-		if data.CourtType != nil {
-			c.AppealStatus["court_type"] = *data.CourtType
-		}
+		c.AppealStatus.Possible = data.Possible
+		c.AppealStatus.NotPossibleReason = data.NotPossibleReason
+		c.AppealStatus.AppealPeriod = data.AppealPeriod
+		c.AppealStatus.DirectAppeal = data.DirectAppeal
+		c.AppealStatus.DirectAppealReason = data.DirectAppealReason
+		c.AppealStatus.CompetentCourt = data.CompetentCourt
+		c.AppealStatus.CourtType = data.CourtType
 
 		c.UpdatedAt = time.Now()
 
