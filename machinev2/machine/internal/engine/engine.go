@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -16,26 +15,27 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 // RulesEngine evaluates business rules
 type RulesEngine struct {
 	logger          logging.Logger
-	Spec            map[string]any
+	Spec            ruleresolver.RuleSpec
 	ServiceName     string
 	Law             string
-	Requirements    []any
-	Actions         []any
-	ParameterSpecs  map[string]any
-	PropertySpecs   map[string]map[string]any
-	OutputSpecs     map[string]contexter.TypeSpec
+	Requirements    []ruleresolver.Requirement
+	Actions         []ruleresolver.Action
+	ParameterSpecs  []ruleresolver.ParameterField
+	PropertySpecs   map[string]ruleresolver.Field
+	OutputSpecs     map[string]model.TypeSpec
 	Definitions     map[string]any
 	ServiceProvider contexter.ServiceProvider
 	referenceDate   time.Time
 }
 
 // NewRulesEngine creates a new rules engine instance
-func NewRulesEngine(logger logging.Logger, spec map[string]any, serviceProvider contexter.ServiceProvider, referenceDate string) *RulesEngine {
+func NewRulesEngine(logger logging.Logger, spec ruleresolver.RuleSpec, serviceProvider contexter.ServiceProvider, referenceDate string) *RulesEngine {
 	t, err := time.Parse("2006-01-02", referenceDate)
 	if err != nil {
 		panic("invalid reference date")
@@ -45,75 +45,53 @@ func NewRulesEngine(logger logging.Logger, spec map[string]any, serviceProvider 
 		logger:          logger.WithName("rules_engine"),
 		Spec:            spec,
 		ServiceProvider: serviceProvider,
-		PropertySpecs:   make(map[string]map[string]any),
-		OutputSpecs:     make(map[string]contexter.TypeSpec),
+		PropertySpecs:   make(map[string]ruleresolver.Field),
+		OutputSpecs:     make(map[string]model.TypeSpec),
 		referenceDate:   t,
 	}
 
 	// Extract main components
-	if serviceName, ok := spec["service"].(string); ok {
-		engine.ServiceName = serviceName
-		engine.logger = engine.logger.WithService(serviceName)
-	}
 
-	if law, ok := spec["law"].(string); ok {
-		engine.Law = law
-		engine.logger = engine.logger.WithLaw(law)
-	}
+	serviceName := spec.Service
+	engine.ServiceName = serviceName
+	engine.logger = engine.logger.WithService(serviceName)
 
-	if requirements, ok := spec["requirements"].([]any); ok {
-		engine.Requirements = requirements
-	}
+	law := spec.Law
+	engine.Law = law
+	engine.logger = engine.logger.WithLaw(law)
 
-	if actions, ok := spec["actions"].([]any); ok {
-		engine.Actions = actions
-	}
+	engine.Requirements = spec.Requirements
+	engine.Actions = spec.Actions
+
+	engine.ParameterSpecs = spec.Properties.Parameters
 
 	// Extract properties
-	propertiesMap, _ := spec["properties"].(map[string]any)
-	if propertiesMap != nil {
-		// Get parameter specs
-		engine.ParameterSpecs, _ = propertiesMap["parameters"].(map[string]any)
+	engine.PropertySpecs = engine.buildPropertySpecs(spec.Properties)
 
-		// Build property specs
-		engine.PropertySpecs = engine.buildPropertySpecs(propertiesMap)
+	// Build output specs
+	engine.OutputSpecs = engine.buildOutputSpecs(spec.Properties)
 
-		// Build output specs
-		engine.OutputSpecs = engine.buildOutputSpecs(propertiesMap)
-
-		// Get definitions
-		engine.Definitions, _ = propertiesMap["definitions"].(map[string]any)
-		if engine.Definitions == nil {
-			engine.Definitions = make(map[string]any)
-		}
-	}
+	// Get definitions
+	engine.Definitions = spec.Properties.Definitions
 
 	return engine
 }
 
 // buildPropertySpecs builds a mapping of property paths to their specifications
-func (re *RulesEngine) buildPropertySpecs(properties map[string]any) map[string]map[string]any {
-	specs := make(map[string]map[string]any)
+func (re *RulesEngine) buildPropertySpecs(properties ruleresolver.Properties) map[string]ruleresolver.Field {
+	specs := make(map[string]ruleresolver.Field)
 
 	// Add input properties
-	if inputProps, ok := properties["input"].([]any); ok {
-		for _, prop := range inputProps {
-			if propMap, ok := prop.(map[string]any); ok {
-				if name, ok := propMap["name"].(string); ok {
-					specs[name] = propMap
-				}
-			}
+	for _, prop := range properties.Input {
+		specs[prop.Name] = ruleresolver.Field{
+			Input: &prop,
 		}
 	}
 
 	// Add source properties
-	if sources, ok := properties["sources"].([]any); ok {
-		for _, source := range sources {
-			if sourceMap, ok := source.(map[string]any); ok {
-				if name, ok := sourceMap["name"].(string); ok {
-					specs[name] = sourceMap
-				}
-			}
+	for _, source := range properties.Sources {
+		specs[source.Name] = ruleresolver.Field{
+			Source: &source,
 		}
 	}
 
@@ -121,53 +99,24 @@ func (re *RulesEngine) buildPropertySpecs(properties map[string]any) map[string]
 }
 
 // buildOutputSpecs builds a mapping of output names to their type specifications
-func (re *RulesEngine) buildOutputSpecs(properties map[string]any) map[string]contexter.TypeSpec {
-	specs := make(map[string]contexter.TypeSpec)
+func (re *RulesEngine) buildOutputSpecs(properties ruleresolver.Properties) map[string]model.TypeSpec {
+	specs := make(map[string]model.TypeSpec)
 
 	// Process output properties
-	if outputProps, ok := properties["output"].([]any); ok {
-		for _, output := range outputProps {
-			if outputMap, ok := output.(map[string]any); ok {
-				if name, ok := outputMap["name"].(string); ok {
-					var typeSpec contexter.TypeSpec
-
-					// Extract type
-					if typeVal, ok := outputMap["type"].(string); ok {
-						typeSpec.Type = typeVal
-					}
-
-					// Extract type_spec details
-					if typeSpecMap, ok := outputMap["type_spec"].(map[string]any); ok {
-						if unit, ok := typeSpecMap["unit"].(string); ok {
-							typeSpec.Unit = &unit
-						}
-
-						if precision, ok := typeSpecMap["precision"].(int); ok {
-							typeSpec.Precision = &precision
-						} else if precisionFloat, ok := typeSpecMap["precision"].(float64); ok {
-							precision := int(precisionFloat)
-							typeSpec.Precision = &precision
-						}
-
-						if min, ok := typeSpecMap["min"].(float64); ok {
-							typeSpec.Min = &min
-						} else if minInt, ok := typeSpecMap["min"].(int); ok {
-							min = float64(minInt)
-							typeSpec.Min = &min
-						}
-
-						if max, ok := typeSpecMap["max"].(float64); ok {
-							typeSpec.Max = &max
-						} else if maxInt, ok := typeSpecMap["max"].(int); ok {
-							max = float64(maxInt)
-							typeSpec.Max = &max
-						}
-					}
-
-					specs[name] = typeSpec
-				}
-			}
+	for _, output := range properties.Output {
+		typeSpec := model.TypeSpec{
+			Type: output.Type,
 		}
+
+		// Extract type_spec details
+		if output.TypeSpec != nil {
+			typeSpec.Unit = output.TypeSpec.Unit
+			typeSpec.Precision = output.TypeSpec.Precision
+			typeSpec.Min = output.TypeSpec.Min
+			typeSpec.Max = output.TypeSpec.Max
+		}
+
+		specs[output.Name] = typeSpec
 	}
 
 	return specs
@@ -176,7 +125,7 @@ func (re *RulesEngine) buildOutputSpecs(properties map[string]any) map[string]co
 // enforceOutputType enforces type specifications on an output value
 func (re *RulesEngine) enforceOutputType(ctx context.Context, name string, value any) any {
 	if spec, exists := re.OutputSpecs[name]; exists {
-		result := spec.Enforce(value)
+		result := Enforce(spec, value)
 
 		if equal, _ := utils.Equal(result, value); !equal {
 			re.logger.Debugf(ctx, "Enforcing type spec changed value from: %v to %v", value, result)
@@ -266,9 +215,10 @@ func (re *RulesEngine) topologicalSort(dependencies map[string]map[string]struct
 }
 
 // analyzeDependencies finds all outputs an action depends on
-func (re *RulesEngine) analyzeDependencies(action any) map[string]struct{} {
+func (re *RulesEngine) analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
 	deps := make(map[string]struct{})
 
+	// TODO verify that this is not broken
 	var traverse func(obj any)
 	traverse = func(obj any) {
 		switch v := obj.(type) {
@@ -288,6 +238,56 @@ func (re *RulesEngine) analyzeDependencies(action any) map[string]struct{} {
 			for _, item := range v {
 				traverse(item)
 			}
+		case ruleresolver.ActionValue:
+			if v.Action != nil {
+				traverse(*v.Action)
+			}
+			if v.Value != nil {
+				traverse(*v.Value)
+			}
+		case ruleresolver.ActionValues:
+			if v.ActionValues != nil {
+				for _, value := range *v.ActionValues {
+					traverse(value)
+				}
+			}
+
+			if v.Value != nil {
+				traverse(*v.Value)
+			}
+		case ruleresolver.Condition:
+			if v.Test != nil {
+				traverse(*v.Test)
+			}
+			if v.Then != nil {
+				traverse(*v.Then)
+			}
+			if v.Else != nil {
+				traverse(*v.Else)
+			}
+		case ruleresolver.Action:
+			traverse(v.Output)
+			if v.Value != nil {
+				traverse(*v.Value)
+			}
+			if v.Operation != nil {
+				traverse(*v.Operation)
+			}
+			if v.Subject != nil {
+				traverse(*v.Subject)
+			}
+			if v.Unit != nil {
+				traverse(*v.Unit)
+			}
+			if v.Combine != nil {
+				traverse(*v.Combine)
+			}
+			if v.Values != nil {
+				traverse(*v.Values)
+			}
+			for _, condition := range v.Conditions {
+				traverse(condition)
+			}
 		}
 	}
 
@@ -296,22 +296,18 @@ func (re *RulesEngine) analyzeDependencies(action any) map[string]struct{} {
 }
 
 // getRequiredActions gets all actions needed to compute requested output in dependency order
-func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []any) ([]any, error) {
+func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []ruleresolver.Action) ([]ruleresolver.Action, error) {
 	if requestedOutput == "" {
 		return actions, nil
 	}
 
 	// Build dependency graph
 	dependencies := make(map[string]map[string]struct{})
-	actionByOutput := make(map[string]any)
+	actionByOutput := make(map[string]ruleresolver.Action)
 
 	for _, action := range actions {
-		if actionMap, ok := action.(map[string]any); ok {
-			if output, ok := actionMap["output"].(string); ok {
-				actionByOutput[output] = action
-				dependencies[output] = re.analyzeDependencies(action)
-			}
-		}
+		actionByOutput[action.Output] = action
+		dependencies[action.Output] = re.analyzeDependencies(action)
 	}
 
 	// Find all required outputs
@@ -353,7 +349,7 @@ func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []any)
 	}
 
 	// Return actions in dependency order
-	var requiredActions []any
+	var requiredActions []ruleresolver.Action
 	for _, output := range orderedOutputs {
 		if action, ok := actionByOutput[output]; ok {
 			requiredActions = append(requiredActions, action)
@@ -372,18 +368,14 @@ func (re *RulesEngine) Evaluate(
 	calculationDate string,
 	requestedOutput string,
 	approved bool,
-) (map[string]any, error) {
+) (model.EvaluateResult, error) {
 
 	// Check required parameters
 	if re.ParameterSpecs != nil {
-		for _, p := range re.ParameterSpecs {
-			if paramMap, ok := p.(map[string]any); ok {
-				if required, ok := paramMap["required"].(bool); ok && required {
-					if name, ok := paramMap["name"].(string); ok {
-						if _, exists := parameters[name]; !exists {
-							re.logger.WithIndent().Warningf(ctx, "Required parameter %s not found in %v", name, parameters)
-						}
-					}
+		for _, spec := range re.ParameterSpecs {
+			if spec.Required != nil && *spec.Required {
+				if _, exists := parameters[spec.Name]; !exists {
+					re.logger.WithIndent().Warningf(ctx, "Required parameter %s not found in %v", spec.Name, parameters)
 				}
 			}
 		}
@@ -460,27 +452,26 @@ func (re *RulesEngine) Evaluate(
 		return err
 	})
 	if err != nil {
-		return nil, err
+		return model.EvaluateResult{}, err
 	}
 
 	p.Pop()
 
-	outputValues := make(map[string]any)
+	outputValues := make(map[string]model.EvaluateActionResult)
 	if requirementsMet {
 		// Get required actions including dependencies in order
 		requiredActions, err := re.getRequiredActions(requestedOutput, re.Actions)
 		if err != nil {
-			return nil, err
+			return model.EvaluateResult{}, err
 		}
 
 		for _, action := range requiredActions {
 			outputDef, outputName, err := re.evaluateAction(ctx, action, ruleCtx)
 			if err != nil {
-				return nil, err
+				return model.EvaluateResult{}, err
 			}
 
-			ruleCtx.OutputsResolver.Set(outputName, outputDef["value"])
-			ruleCtx.Outputs[outputName] = outputDef["value"]
+			ruleCtx.OutputsResolver.Set(outputName, outputDef.Value)
 			outputValues[outputName] = outputDef
 
 			if ruleCtx.MissingRequired {
@@ -492,7 +483,7 @@ func (re *RulesEngine) Evaluate(
 
 	if ruleCtx.MissingRequired {
 		re.logger.WithIndent().Warningf(ctx, "Missing required values, requirements not met, setting outputs to empty.")
-		outputValues = make(map[string]any)
+		outputValues = make(map[string]model.EvaluateActionResult)
 		requirementsMet = false
 	}
 
@@ -500,43 +491,28 @@ func (re *RulesEngine) Evaluate(
 		re.logger.WithIndent().Warningf(ctx, "No output values computed for %s %s", calculationDate, requestedOutput)
 	}
 
-	result := map[string]any{
-		"input":            tracker.FromContext(ctx).ResolvedPaths(),
-		"output":           outputValues,
-		"requirements_met": requirementsMet,
-		"path":             root,
-		"missing_required": ruleCtx.MissingRequired,
-	}
-
-	return result, nil
+	return model.EvaluateResult{
+		Input:           tracker.FromContext(ctx).ResolvedPaths(),
+		Output:          outputValues,
+		RequirementsMet: requirementsMet,
+		Path:            root,
+		MissingRequired: ruleCtx.MissingRequired,
+	}, nil
 }
 
 // evaluateAction evaluates a single action and returns its output
 func (re *RulesEngine) evaluateAction(
 	ctx context.Context,
-	action any,
+	action ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
-) (map[string]any, string, error) {
-	var outputName string
-	var err error
-
-	actionMap, ok := action.(map[string]any)
-	if !ok {
-		return nil, "", fmt.Errorf("action is not a map")
-	}
-
-	outputName, ok = actionMap["output"].(string)
-	if !ok {
-		return nil, "", fmt.Errorf("action does not have an output field")
-	}
-
+) (model.EvaluateActionResult, string, error) {
 	var result any
 
-	var outputSpec map[string]any
-	err = re.logger.IndentBlock(ctx, fmt.Sprintf("Computing %s", outputName), func(ctx context.Context) error {
+	var outputSpec *ruleresolver.OutputField
+	err := re.logger.IndentBlock(ctx, fmt.Sprintf("Computing %s", action.Output), func(ctx context.Context) error {
 		actionNode := &model.PathNode{
 			Type:   "action",
-			Name:   fmt.Sprintf("Evaluate action for %s", outputName),
+			Name:   fmt.Sprintf("Evaluate action for %s", action.Output),
 			Result: nil,
 		}
 
@@ -544,25 +520,19 @@ func (re *RulesEngine) evaluateAction(
 		defer path.FromContext(ctx).Pop()
 
 		// Find output specification
-		if props, ok := re.Spec["properties"].(map[string]any); ok {
-			if outputs, ok := props["output"].([]any); ok {
-				for _, spec := range outputs {
-					if specMap, ok := spec.(map[string]any); ok {
-						if name, ok := specMap["name"].(string); ok && name == outputName {
-							outputSpec = specMap
-							break
-						}
-					}
-				}
+		for _, output := range re.Spec.Properties.Output {
+			if output.Name == action.Output {
+				outputSpec = &output
+				break
 			}
 		}
 
 		// Check if we should use overwrite value
 		if ruleCtx.OverwriteInput != nil {
 			if serviceMap, ok := ruleCtx.OverwriteInput[re.ServiceName]; ok {
-				if val, ok := serviceMap[outputName]; ok {
+				if val, ok := serviceMap[action.Output]; ok {
 					re.logger.WithIndent().Debugf(ctx, "Resolving value %s/%s from OVERWRITE %v",
-						re.ServiceName, outputName, val)
+						re.ServiceName, action.Output, val)
 					result = val
 				}
 			}
@@ -570,15 +540,15 @@ func (re *RulesEngine) evaluateAction(
 
 		// If no overwrite, evaluate the action
 		if result == nil {
-			if _, hasOperation := actionMap["operation"]; hasOperation {
+			if action.Operation != nil {
 				var err error
-				result, err = re.evaluateOperation(ctx, actionMap, ruleCtx)
+				result, err = re.evaluateAction2(ctx, action, ruleCtx)
 				if err != nil {
 					return err
 				}
-			} else if _, hasValue := actionMap["value"]; hasValue {
+			} else if action.Value != nil {
 				var err error
-				result, err = re.evaluateValue(ctx, actionMap["value"], ruleCtx)
+				result, err = re.evaluateActionValue(ctx, ruleCtx, *action.Value)
 				if err != nil {
 					return err
 				}
@@ -588,49 +558,75 @@ func (re *RulesEngine) evaluateAction(
 		}
 
 		// Apply type enforcement
-		result = re.enforceOutputType(ctx, outputName, result)
+		result = re.enforceOutputType(ctx, action.Output, result)
 		actionNode.Result = result
 
 		return nil
 	})
 	if err != nil {
-		return nil, "", err
+		return model.EvaluateActionResult{}, "", err
 	}
 
-	re.logger.Debugf(ctx, "Result of %s: %v", outputName, result)
+	re.logger.Debugf(ctx, "Result of %s: %v", action.Output, result)
 
-	// Build output with metadata
-	outputDef := map[string]any{
-		"value": result,
-		"type":  "unknown",
+	outputDef := model.EvaluateActionResult{
+		Value: result,
+		Type:  "unknown",
 	}
 
 	// Add metadata from output spec if available
 	if outputSpec != nil {
-		if typeVal, ok := outputSpec["type"].(string); ok {
-			outputDef["type"] = typeVal
-		}
-
-		if desc, ok := outputSpec["description"].(string); ok {
-			outputDef["description"] = desc
-		}
-
-		if typeSpec, ok := outputSpec["type_spec"].(map[string]any); ok {
-			outputDef["type_spec"] = typeSpec
-		}
-
-		if temporal, ok := outputSpec["temporal"].(map[string]any); ok {
-			outputDef["temporal"] = temporal
-		}
+		outputDef.Type = outputSpec.Type
+		outputDef.Description = &outputSpec.Description
+		outputDef.TypeSpec = outputSpec.TypeSpec
+		outputDef.Temporal = outputSpec.Temporal
 	}
 
-	return outputDef, outputName, nil
+	return outputDef, action.Output, nil
+}
+
+func (re *RulesEngine) evaluateRequirementAction(
+	ctx context.Context,
+	ruleCtx *contexter.RuleContext,
+	r ruleresolver.ActionRequirement,
+) (bool, error) {
+	if r.Requirement != nil {
+		res, err := re.evaluateRequirements(ctx, []ruleresolver.Requirement{*r.Requirement}, ruleCtx)
+		if err != nil {
+			return false, err
+		}
+
+		return res, nil
+	} else if r.Action != nil {
+		res, err := re.evaluateAction2(ctx, *r.Action, ruleCtx)
+		if err != nil {
+			return false, err
+		}
+
+		var result bool
+		switch v := res.(type) {
+		case bool:
+			result = v
+		case int:
+			result = v != 0
+		case int64:
+			result = v != 0
+		case float64:
+			result = v != 0
+		default:
+			result = res != nil
+		}
+
+		return result, nil
+	}
+
+	return false, fmt.Errorf("action requirement is missing action")
 }
 
 // evaluateRequirements evaluates all requirements
 func (re *RulesEngine) evaluateRequirements(
 	ctx context.Context,
-	requirements []any,
+	requirements []ruleresolver.Requirement,
 	ruleCtx *contexter.RuleContext,
 ) (bool, error) {
 	if len(requirements) == 0 {
@@ -639,15 +635,10 @@ func (re *RulesEngine) evaluateRequirements(
 	}
 
 	for _, req := range requirements {
-		reqMap, ok := req.(map[string]any)
-		if !ok {
-			continue
-		}
-
 		var nodeName string
-		if _, hasAll := reqMap["all"]; hasAll {
+		if req.All != nil {
 			nodeName = "Check ALL conditions"
-		} else if _, hasOr := reqMap["or"]; hasOr {
+		} else if req.Or != nil {
 			nodeName = "Check OR conditions"
 		} else {
 			nodeName = "Test condition"
@@ -655,7 +646,7 @@ func (re *RulesEngine) evaluateRequirements(
 
 		var result bool
 
-		err := re.logger.IndentBlock(ctx, fmt.Sprintf("Requirements %v", req), func(ctx context.Context) error {
+		err := re.logger.IndentBlock(ctx, fmt.Sprintf("Requirements %+v", req), func(ctx context.Context) error {
 			node := &model.PathNode{
 				Type:   "requirement",
 				Name:   nodeName,
@@ -665,11 +656,11 @@ func (re *RulesEngine) evaluateRequirements(
 			ctx = path.WithPathNode(ctx, node)
 			defer path.FromContext(ctx).Pop()
 
-			if allConds, hasAll := reqMap["all"].([]any); hasAll {
+			if req.All != nil {
 				results := []bool{}
 
-				for _, r := range allConds {
-					res, err := re.evaluateRequirements(ctx, []any{r}, ruleCtx)
+				for _, r := range *req.All {
+					res, err := re.evaluateRequirementAction(ctx, ruleCtx, r)
 					if err != nil {
 						return err
 					}
@@ -694,11 +685,12 @@ func (re *RulesEngine) evaluateRequirements(
 						break
 					}
 				}
-			} else if orConds, hasOr := reqMap["or"].([]any); hasOr {
+
+			} else if req.Or != nil {
 				results := []bool{}
 
-				for _, r := range orConds {
-					res, err := re.evaluateRequirements(ctx, []any{r}, ruleCtx)
+				for _, r := range *req.Or {
+					res, err := re.evaluateRequirementAction(ctx, ruleCtx, r)
 					if err != nil {
 						return err
 					}
@@ -723,26 +715,6 @@ func (re *RulesEngine) evaluateRequirements(
 						break
 					}
 				}
-			} else {
-				var err error
-				resultVal, err := re.evaluateOperation(ctx, reqMap, ruleCtx)
-				if err != nil {
-					return err
-				}
-
-				// Convert to boolean
-				switch v := resultVal.(type) {
-				case bool:
-					result = v
-				case int:
-					result = v != 0
-				case int64:
-					result = v != 0
-				case float64:
-					result = v != 0
-				default:
-					result = resultVal != nil
-				}
 			}
 
 			node.Result = result
@@ -765,7 +737,7 @@ func (re *RulesEngine) evaluateRequirements(
 // evaluateIfOperation evaluates an IF operation
 func (re *RulesEngine) evaluateIfOperation(
 	ctx context.Context,
-	operation map[string]any,
+	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
 	ifNode := &model.PathNode{
@@ -779,27 +751,17 @@ func (re *RulesEngine) evaluateIfOperation(
 	defer path.FromContext(ctx).Pop()
 
 	var result any
-	conditions, ok := operation["conditions"].([]any)
-	if !ok {
-		return nil, fmt.Errorf("conditions not found or not an array")
-	}
-
 	conditionResults := make([]any, 0)
 
-	for i, condition := range conditions {
-		condMap, ok := condition.(map[string]any)
-		if !ok {
-			continue
-		}
-
+	for i, condition := range operation.Conditions {
 		conditionResult := map[string]any{
 			"condition_index": i,
 		}
 
-		if test, hasTest := condMap["test"]; hasTest && test != nil {
+		if condition.Test != nil {
 			conditionResult["type"] = "test"
 
-			testResult, err := re.evaluateOperation(ctx, test.(map[string]any), ruleCtx)
+			testResult, err := re.evaluateAction2(ctx, *condition.Test, ruleCtx)
 			if err != nil {
 				return nil, err
 			}
@@ -807,22 +769,22 @@ func (re *RulesEngine) evaluateIfOperation(
 			conditionResult["test_result"] = testResult
 
 			// Convert to boolean
-			testBool := false
+			test := false
 			switch v := testResult.(type) {
 			case bool:
-				testBool = v
+				test = v
 			case int:
-				testBool = v != 0
+				test = v != 0
 			case int64:
-				testBool = v != 0
+				test = v != 0
 			case float64:
-				testBool = v != 0
+				test = v != 0
 			default:
-				testBool = testResult != nil
+				test = testResult != nil
 			}
 
-			if testBool {
-				thenVal, err := re.evaluateValue(ctx, condMap["then"], ruleCtx)
+			if test {
+				thenVal, err := re.evaluateActionValue(ctx, ruleCtx, *condition.Then)
 				if err != nil {
 					return nil, err
 				}
@@ -832,10 +794,10 @@ func (re *RulesEngine) evaluateIfOperation(
 				conditionResults = append(conditionResults, conditionResult)
 				break
 			}
-		} else if elseVal, hasElse := condMap["else"]; hasElse {
+		} else if condition.Else != nil {
 			conditionResult["type"] = "else"
 
-			val, err := re.evaluateValue(ctx, elseVal, ruleCtx)
+			val, err := re.evaluateActionValue(ctx, ruleCtx, *condition.Else)
 			if err != nil {
 				return nil, err
 			}
@@ -858,22 +820,21 @@ func (re *RulesEngine) evaluateIfOperation(
 // evaluateForeach evaluates a FOREACH operation
 func (re *RulesEngine) evaluateForeach(
 	ctx context.Context,
-	operation map[string]any,
+	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
-	combine, ok := operation["combine"].(string)
-	if !ok {
+	if operation.Combine == nil {
 		return nil, fmt.Errorf("combine operation not specified for FOREACH")
 	}
 
-	arrayData, err := re.evaluateValue(ctx, operation["subject"], ruleCtx)
+	arrayData, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 	if err != nil {
 		return nil, err
 	}
 
 	if arrayData == nil {
 		re.logger.WithIndent().Warningf(ctx, "No data found to run FOREACH on")
-		return re.evaluateAggregateOps(ctx, combine, []any{}), nil
+		return re.evaluateAggregateOps(ctx, *operation.Subject, []any{}), nil
 	}
 
 	// Convert to array if not already
@@ -882,9 +843,9 @@ func (re *RulesEngine) evaluateForeach(
 	case []any:
 		arrayItems = v
 	case []map[string]any:
-		arrayItems = make([]any, len(v)) // TODO improve
-		for i, item := range v {
-			arrayItems[i] = item
+		arrayItems = make([]any, 0, len(v))
+		for _, item := range v {
+			arrayItems = append(arrayItems, item)
 		}
 	default:
 		arrayItems = []any{arrayData}
@@ -892,7 +853,7 @@ func (re *RulesEngine) evaluateForeach(
 
 	var values []any
 
-	err = re.logger.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", combine), func(ctx context.Context) error {
+	err = re.logger.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", *operation.Combine), func(ctx context.Context) error {
 		for _, item := range arrayItems {
 			err := re.logger.IndentBlock(ctx, fmt.Sprintf("Item %v", item), func(ctx context.Context) error {
 				// Create a new context with the item as local scope
@@ -904,26 +865,24 @@ func (re *RulesEngine) evaluateForeach(
 					for k1, v1 := range v {
 						itemCtx.LocalResolver.Set(k1, v1)
 					}
-					itemCtx.Local = v
 				default:
 					// If not a map, create a map with "value" key
 					itemCtx.LocalResolver.Set("value", v)
-					itemCtx.Local = map[string]any{"value": v}
-
 				}
 
-				// Get the value to evaluate
-				var valueToEvaluate any
-				if valueArray, ok := operation["value"].([]any); ok && len(valueArray) > 0 {
-					valueToEvaluate = valueArray[0]
+				var result any
+				if operation.Value.Action != nil {
+					// Evaluate the value
+					result, err = re.evaluateAction2(ctx, *operation.Value.Action, &itemCtx)
+					if err != nil {
+						return err
+					}
 				} else {
-					valueToEvaluate = operation["value"]
-				}
-
-				// Evaluate the value
-				result, err := re.evaluateValue(ctx, valueToEvaluate, &itemCtx)
-				if err != nil {
-					return err
+					// Evaluate the value
+					result, err = re.evaluateValue(ctx, operation.GetValue(), &itemCtx)
+					if err != nil {
+						return err
+					}
 				}
 
 				// Add to values
@@ -948,7 +907,7 @@ func (re *RulesEngine) evaluateForeach(
 	}
 
 	// Apply combine operation
-	result := re.evaluateAggregateOps(ctx, combine, values)
+	result := re.evaluateAggregateOps(ctx, *operation.Combine, values)
 	re.logger.WithIndent().Debugf(ctx, "Foreach result: %v", result)
 
 	return result, nil
@@ -1000,6 +959,12 @@ func convertToFloat(v any) (float64, error) {
 	case int32:
 		return float64(val), nil
 	case int64:
+		return float64(val), nil
+	case uint:
+		return float64(val), nil
+	case uint32:
+		return float64(val), nil
+	case uint64:
 		return float64(val), nil
 	case float32:
 		return float64(val), nil
@@ -1138,6 +1103,7 @@ func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, valu
 			for _, v := range filteredValues {
 				f, err := convertToFloat(v)
 				if err != nil {
+					re.logger.Warningf(ctx, "could not convert value to float: %w", err)
 					continue
 				}
 				prod *= f
@@ -1339,47 +1305,24 @@ func convertToTime(v any) (time.Time, error) {
 	}
 }
 
-// evaluateOperation evaluates an operation or condition
-func (re *RulesEngine) evaluateOperation(
+func (re *RulesEngine) evaluateAction2(
 	ctx context.Context,
-	operation any,
+	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
-	// If operation is not a map, evaluate as value
-	opMap, ok := operation.(map[string]any)
-	if !ok {
-		node := &model.PathNode{
-			Type:    "value",
-			Name:    "Direct value evaluation",
-			Result:  nil,
-			Details: map[string]any{"raw_value": operation},
-		}
-
-		ctx = path.WithPathNode(ctx, node)
-		defer path.FromContext(ctx).Pop()
-
-		value, err := re.evaluateValue(ctx, operation, ruleCtx)
-		if err != nil {
-			return nil, err
-		}
-
-		node.Result = value
-		return value, nil
-	}
-
 	// Direct value assignment - no operation needed
-	if val, hasValue := opMap["value"]; hasValue && opMap["operation"] == nil {
+	if operation.Value != nil && operation.Operation == nil {
 		node := &model.PathNode{
 			Type:    "direct_value",
 			Name:    "Direct value assignment",
 			Result:  nil,
-			Details: map[string]any{"raw_value": val},
+			Details: map[string]any{"raw_value": *operation.Value},
 		}
 
 		ctx = path.WithPathNode(ctx, node)
 		defer path.FromContext(ctx).Pop()
 
-		value, err := re.evaluateValue(ctx, val, ruleCtx)
+		value, err := re.evaluateActionValue(ctx, ruleCtx, *operation.Value)
 		if err != nil {
 			return nil, err
 		}
@@ -1388,13 +1331,17 @@ func (re *RulesEngine) evaluateOperation(
 		return value, nil
 	}
 
+	if operation.Operation == nil || *operation.Operation == "" {
+		re.logger.WithIndent().Warningf(ctx, "Operation type is nil (or missing).")
+		return nil, nil
+	}
+
 	// Handle operation
-	opType, _ := opMap["operation"].(string)
 	node := &model.PathNode{
 		Type:    "operation",
-		Name:    fmt.Sprintf("Operation: %s", opType),
+		Name:    fmt.Sprintf("Operation: %s", *operation.Operation),
 		Result:  nil,
-		Details: map[string]any{"operation_type": opType},
+		Details: map[string]any{"operation_type": *operation.Operation},
 	}
 
 	ctx = path.WithPathNode(ctx, node)
@@ -1403,30 +1350,25 @@ func (re *RulesEngine) evaluateOperation(
 	var result any
 	var err error
 
-	if opType == "" {
-		re.logger.WithIndent().Warningf(ctx, "Operation type is nil (or missing).")
-		return nil, nil
-	}
-
-	switch opType {
+	switch *operation.Operation {
 	case "IF":
-		result, err = re.evaluateIfOperation(ctx, opMap, ruleCtx)
+		result, err = re.evaluateIfOperation(ctx, operation, ruleCtx)
 
 	case "FOREACH":
-		result, err = re.evaluateForeach(ctx, opMap, ruleCtx)
+		result, err = re.evaluateForeach(ctx, operation, ruleCtx)
 		if err == nil {
-			node.Details["raw_values"] = opMap["value"]
-			node.Details["arithmetic_type"] = opType
+			node.Details["raw_values"] = operation.GetValue()
+			node.Details["arithmetic_type"] = *operation.Operation
 		}
 
 	case "IN", "NOT_IN":
-		err = re.logger.IndentBlock(ctx, opType, func(ctx context.Context) error {
-			subject, err := re.evaluateValue(ctx, opMap["subject"], ruleCtx)
+		err = re.logger.IndentBlock(ctx, *operation.Operation, func(ctx context.Context) error {
+			subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 			if err != nil {
 				return err
 			}
 
-			allowedValues, err := re.evaluateValue(ctx, opMap["values"], ruleCtx)
+			allowedValues, err := re.evaluateActionValues(ctx, ruleCtx, *operation.Values)
 			if err != nil {
 				return err
 			}
@@ -1442,6 +1384,12 @@ func (re *RulesEngine) evaluateOperation(
 				for key := range v {
 					valuesList = append(valuesList, key)
 				}
+			case map[string]any:
+				valuesList = make([]any, 0, len(v))
+
+				for _, key := range v {
+					valuesList = append(valuesList, key)
+				}
 
 			default:
 				valuesList = []any{allowedValues}
@@ -1450,13 +1398,13 @@ func (re *RulesEngine) evaluateOperation(
 			// Check if subject is in the list
 			found := false
 			for _, val := range valuesList {
-				if reflect.DeepEqual(subject, val) {
+				if equal, _ := utils.Equal(subject, val); equal {
 					found = true
 					break
 				}
 			}
 
-			if opType == "NOT_IN" {
+			if *operation.Operation == "NOT_IN" {
 				found = !found
 			}
 
@@ -1464,12 +1412,12 @@ func (re *RulesEngine) evaluateOperation(
 			node.Details["subject_value"] = subject
 			node.Details["allowed_values"] = allowedValues
 
-			re.logger.Debugf(ctx, "Result %v %s %v: %v", subject, opType, allowedValues, result)
+			re.logger.Debugf(ctx, "Result %v %s %v: %v", subject, *operation.Operation, allowedValues, result)
 			return nil
 		})
 
 	case "NOT_NULL":
-		subject, err := re.evaluateValue(ctx, opMap["subject"], ruleCtx)
+		subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 		if err != nil {
 			return nil, err
 		}
@@ -1477,7 +1425,7 @@ func (re *RulesEngine) evaluateOperation(
 		result = subject != nil
 		node.Details["subject_value"] = subject
 	case "IS_NULL":
-		subject, err := re.evaluateValue(ctx, opMap["subject"], ruleCtx)
+		subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 		if err != nil {
 			return nil, err
 		}
@@ -1487,13 +1435,9 @@ func (re *RulesEngine) evaluateOperation(
 	case "AND":
 		err = re.logger.IndentBlock(ctx, "AND", func(ctx context.Context) error {
 			values := []any{}
-			vals, ok := opMap["values"].([]any)
-			if !ok {
-				return fmt.Errorf("AND operation requires values array")
-			}
 
-			for _, v := range vals {
-				r, err := re.evaluateValue(ctx, v, ruleCtx)
+			for _, v := range *operation.Values.ActionValues {
+				r, err := re.evaluateActionValue(ctx, ruleCtx, v)
 				if err != nil {
 					return err
 				}
@@ -1524,13 +1468,8 @@ func (re *RulesEngine) evaluateOperation(
 	case "OR":
 		err = re.logger.IndentBlock(ctx, "OR", func(ctx context.Context) error {
 			values := []any{}
-			vals, ok := opMap["values"].([]any)
-			if !ok {
-				return fmt.Errorf("OR operation requires values array")
-			}
-
-			for _, v := range vals {
-				r, err := re.evaluateValue(ctx, v, ruleCtx)
+			for _, v := range *operation.Values.ActionValues {
+				r, err := re.evaluateActionValue(ctx, ruleCtx, v)
 				if err != nil {
 					return err
 				}
@@ -1560,22 +1499,20 @@ func (re *RulesEngine) evaluateOperation(
 
 	case "SUBTRACT_DATE":
 		var values []any
-		if vals, ok := opMap["values"].([]any); ok {
-			for _, v := range vals {
-				val, err := re.evaluateValue(ctx, v, ruleCtx)
-				if err != nil {
-					return nil, err
-				}
-				values = append(values, val)
+		for _, v := range *operation.Values.ActionValues {
+			val, err := re.evaluateActionValue(ctx, ruleCtx, v)
+			if err != nil {
+				return nil, err
 			}
+			values = append(values, val)
 		}
 
-		unit, _ := opMap["unit"].(string)
-		if unit == "" {
-			unit = "days" // Default unit
+		unit := "days" // Default unit
+		if operation.Unit != nil {
+			unit = *operation.Unit
 		}
 
-		intResult, err := re.evaluateDateOperation(ctx, opType, values, unit)
+		intResult, err := re.evaluateDateOperation(ctx, *operation.Operation, values, unit)
 		if err != nil {
 			return nil, err
 		}
@@ -1588,23 +1525,25 @@ func (re *RulesEngine) evaluateOperation(
 		// Get values to compare
 		var subject, value any
 
-		if subj, hasSubject := opMap["subject"]; hasSubject {
-			subject, err = re.evaluateValue(ctx, subj, ruleCtx)
+		if operation.Subject != nil {
+			subject, err = re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 			if err != nil {
 				return nil, err
 			}
 
-			value, err = re.evaluateValue(ctx, opMap["value"], ruleCtx)
+			value, err = re.evaluateValue(ctx, operation.GetValue(), ruleCtx)
 			if err != nil {
 				return nil, err
 			}
-		} else if vals, hasValues := opMap["values"].([]any); hasValues && len(vals) >= 2 {
-			values := make([]any, len(vals))
-			for i, v := range vals {
-				values[i], err = re.evaluateValue(ctx, v, ruleCtx)
+		} else if len(*operation.Values.ActionValues) >= 2 { // TODO verify that this should be greator or equal instead of equal
+			values := make([]any, 0, len(*operation.Values.ActionValues))
+			for _, v := range *operation.Values.ActionValues {
+				value, err := re.evaluateActionValue(ctx, ruleCtx, v)
 				if err != nil {
 					return nil, err
 				}
+
+				values = append(values, value)
 			}
 
 			subject = values[0]
@@ -1614,7 +1553,7 @@ func (re *RulesEngine) evaluateOperation(
 			return nil, fmt.Errorf("invalid comparison format")
 		}
 
-		boolResult, err := re.evaluateComparison(ctx, opType, subject, value)
+		boolResult, err := re.evaluateComparison(ctx, *operation.Operation, subject, value)
 		if err != nil {
 			return nil, err
 		}
@@ -1622,29 +1561,48 @@ func (re *RulesEngine) evaluateOperation(
 		result = boolResult
 		node.Details["subject_value"] = subject
 		node.Details["comparison_value"] = value
-		node.Details["comparison_type"] = opType
+		node.Details["comparison_type"] = *operation.Operation
+	case "GET":
+		subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
+		if err != nil {
+			return nil, err
+		}
 
-	default:
-		// Check if it's an aggregate operation
-		if vals, hasValues := opMap["values"].([]any); hasValues {
-			// This is probably an arithmetic operation
-			values := make([]any, len(vals))
-			for i, v := range vals {
-				values[i], err = re.evaluateValue(ctx, v, ruleCtx)
-				if err != nil {
-					return nil, err
-				}
+		values, err := re.evaluateValue(ctx, operation.GetValue(), ruleCtx)
+		if err != nil {
+			return nil, err
+		}
+
+		switch t := values.(type) {
+		case map[any]any:
+			result = t[subject]
+		default:
+			return nil, fmt.Errorf("invalid type: %t", t)
+		}
+
+		node.Details["subject_value"] = subject
+		node.Details["allowed_values"] = values
+	case "MIN", "MAX", "ADD", "CONCAT", "MULTIPLY", "SUBTRACT", "DIVIDE":
+		// This is probably an arithmetic operation
+		values := make([]any, 0, len(*operation.Values.ActionValues))
+		for _, v := range *operation.Values.ActionValues {
+			value, err := re.evaluateActionValue(ctx, ruleCtx, v)
+			if err != nil {
+				return nil, err
 			}
 
-			result = re.evaluateAggregateOps(ctx, opType, values)
-			node.Details["raw_values"] = opMap["values"]
-			node.Details["evaluated_values"] = values
-			node.Details["arithmetic_type"] = opType
-		} else {
-			result = nil
-			node.Details["error"] = "Invalid operation format"
-			re.logger.WithIndent().Warningf(ctx, "Not matched to any operation %s", opType)
+			values = append(values, value)
 		}
+
+		result = re.evaluateAggregateOps(ctx, *operation.Operation, values)
+
+		node.Details["raw_values"] = operation.Values.GetValue()
+		node.Details["evaluated_values"] = values
+		node.Details["arithmetic_type"] = *operation.Operation
+	default:
+		result = nil
+		node.Details["error"] = "Invalid operation format"
+		re.logger.WithIndent().Errorf(ctx, "Not matched to any operation %s", *operation.Operation)
 	}
 
 	node.Result = result
@@ -1687,15 +1645,34 @@ func (re *RulesEngine) evaluateValue(
 	switch v := value.(type) {
 	case int, int64, float64, bool, time.Time:
 		return v, nil
-	case map[string]any:
-		// todo why do we need this
-		if _, hasOp := v["operation"]; hasOp {
-			return re.evaluateOperation(ctx, v, ruleCtx)
-		}
 	case []any:
-		return re.evaluateOperation(ctx, v[0], ruleCtx) // TODO this is a work in progress
+		return re.evaluateValue(ctx, v[0], ruleCtx) // TODO this is a work in progress
 	}
 
 	// Otherwise, resolve from context
 	return ruleCtx.ResolveValue(ctx, value)
+}
+
+func (re *RulesEngine) evaluateActionValue(
+	ctx context.Context,
+	ruleCtx *contexter.RuleContext,
+	value ruleresolver.ActionValue,
+) (any, error) {
+	if value.Action != nil {
+		return re.evaluateAction2(ctx, *value.Action, ruleCtx)
+	}
+
+	return re.evaluateValue(ctx, *value.Value, ruleCtx)
+}
+
+func (re *RulesEngine) evaluateActionValues(
+	ctx context.Context,
+	ruleCtx *contexter.RuleContext,
+	values ruleresolver.ActionValues,
+) (any, error) {
+	if values.ActionValues != nil {
+		return re.evaluateActionValue(ctx, ruleCtx, (*values.ActionValues)[0])
+	}
+
+	return re.evaluateValue(ctx, *values.Value, ruleCtx)
 }

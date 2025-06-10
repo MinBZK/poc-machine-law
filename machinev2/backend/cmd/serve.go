@@ -30,7 +30,11 @@ func (opt *ServeCmd) Run(ctx *Context) error {
 
 	// services := service.NewServices(time.Now())
 
-	svc := service.New(logger, &config)
+	svc, err := service.New(logger, &config)
+	if err != nil {
+		logger.Error("service new", "err", err)
+		return fmt.Errorf("service new: %w", err)
+	}
 
 	if opt.InputFile != "" {
 		input, err := parseInputFile(opt.InputFile)

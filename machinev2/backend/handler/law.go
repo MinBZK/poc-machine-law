@@ -41,7 +41,7 @@ func (handler *Handler) RuleSpecGet(ctx context.Context, request api.RuleSpecGet
 
 	return api.RuleSpecGet200JSONResponse{
 		RuleSpecResponseJSONResponse: api.RuleSpecResponseJSONResponse{
-			Data: spec,
+			Data: adapter.FromRuleSpec(spec),
 		},
 	}, nil
 }

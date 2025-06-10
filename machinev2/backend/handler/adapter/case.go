@@ -29,7 +29,7 @@ func FromCase(case_ model.Case) api.Case {
 		Service:            case_.Service,
 		Status:             api.CaseStatus(case_.Status),
 		VerifiedResult:     case_.VerifiedResult,
-		AppealStatus:       case_.AppealStatus,
+		AppealStatus:       FromCaseAppealStatus(case_.AppealStatus),
 		ObjectionStatus:    FromCaseObjectionStatus(case_.ObjectionStatus),
 	}
 }
@@ -52,5 +52,17 @@ func FromCaseObjectionStatus(objection model.CaseObjectionStatus) *api.CaseObjec
 		NotPossibleReason: objection.NotPossibleReason,
 		ObjectionPeriod:   objection.ObjectionPeriod,
 		Possible:          objection.Possible,
+	}
+}
+
+func FromCaseAppealStatus(appeal model.CaseAppealStatus) *api.CaseAppealStatus {
+	return &api.CaseAppealStatus{
+		Possible:           appeal.Possible,
+		AppealPeriod:       appeal.AppealPeriod,
+		CompetentCourt:     appeal.CompetentCourt,
+		CourtType:          appeal.CourtType,
+		DirectAppeal:       appeal.DirectAppeal,
+		DirectAppealReason: appeal.DirectAppealReason,
+		NotPossibleReason:  appeal.NotPossibleReason,
 	}
 }

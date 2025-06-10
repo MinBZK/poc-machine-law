@@ -9,6 +9,7 @@ from ..models.case_status import CaseStatus
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
+    from ..models.case_appeal_status import CaseAppealStatus
     from ..models.case_objection_status import CaseObjectionStatus
 
 
@@ -32,7 +33,7 @@ class Case:
         status (CaseStatus):
         approved (Union[Unset, bool]):
         objection_status (Union[Unset, CaseObjectionStatus]): Parameters to set the objection status
-        appeal_status (Union[Unset, Any]):
+        appeal_status (Union[Unset, CaseAppealStatus]): Parameters to set the objection status
     """
 
     id: UUID
@@ -47,7 +48,7 @@ class Case:
     status: CaseStatus
     approved: Union[Unset, bool] = UNSET
     objection_status: Union[Unset, "CaseObjectionStatus"] = UNSET
-    appeal_status: Union[Unset, Any] = UNSET
+    appeal_status: Union[Unset, "CaseAppealStatus"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -77,7 +78,9 @@ class Case:
         if not isinstance(self.objection_status, Unset):
             objection_status = self.objection_status.to_dict()
 
-        appeal_status = self.appeal_status
+        appeal_status: Union[Unset, dict[str, Any]] = UNSET
+        if not isinstance(self.appeal_status, Unset):
+            appeal_status = self.appeal_status.to_dict()
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -106,6 +109,7 @@ class Case:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.case_appeal_status import CaseAppealStatus
         from ..models.case_objection_status import CaseObjectionStatus
 
         d = dict(src_dict)
@@ -138,7 +142,12 @@ class Case:
         else:
             objection_status = CaseObjectionStatus.from_dict(_objection_status)
 
-        appeal_status = d.pop("appealStatus", UNSET)
+        _appeal_status = d.pop("appealStatus", UNSET)
+        appeal_status: Union[Unset, CaseAppealStatus]
+        if isinstance(_appeal_status, Unset):
+            appeal_status = UNSET
+        else:
+            appeal_status = CaseAppealStatus.from_dict(_appeal_status)
 
         case = cls(
             id=id,

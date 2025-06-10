@@ -564,8 +564,461 @@ components:
       items:
         $ref: "#/components/schemas/Service"
     RuleSpec:
-      description: Rule spec
       type: object
+      required:
+        - uuid
+        - name
+        - law
+        - valid_from
+        - service
+        - description
+        - properties
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier for the rule specification
+        name:
+          type: string
+          description: Name of the rule specification
+        law:
+          type: string
+          description: Associated law reference
+        law_type:
+          type: string
+          nullable: true
+          description: Type of law
+        legal_character:
+          type: string
+          nullable: true
+          description: Legal character of the rule
+        decision_type:
+          type: string
+          nullable: true
+          description: Type of decision
+        discoverable:
+          type: string
+          nullable: true
+          description: Discoverability setting
+        valid_from:
+          type: string
+          format: date-time
+          description: Date from which the rule is valid
+        service:
+          type: string
+          description: Associated service identifier
+        description:
+          type: string
+          description: Description of the rule specification
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reference"
+          description: Legal references
+        properties:
+          $ref: "#/components/schemas/Properties"
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/Requirement"
+          description: Requirements for the rule
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Action"
+          description: Actions associated with the rule
+
+    Reference:
+      type: object
+      required:
+        - law
+        - article
+        - url
+      properties:
+        law:
+          type: string
+          description: Law reference
+        article:
+          type: string
+          description: Article reference
+        url:
+          type: string
+          format: uri
+          description: URL to the legal reference
+
+    Properties:
+      type: object
+      properties:
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParameterField"
+          description: Parameter fields
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceField"
+          description: Source fields
+        input:
+          type: array
+          items:
+            $ref: "#/components/schemas/InputField"
+          description: Input fields
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/OutputField"
+          description: Output fields
+        definitions:
+          type: object
+          additionalProperties: true
+          description: Additional definitions
+        applies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Apply"
+          description: Application rules
+
+    Apply:
+      type: object
+      required:
+        - name
+        - aggregate
+        - events
+        - update
+      properties:
+        name:
+          type: string
+          description: Name of the application rule
+        aggregate:
+          type: string
+          description: Aggregate identifier
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplyEvent"
+          description: Associated events
+        update:
+          type: array
+          items:
+            $ref: "#/components/schemas/Update"
+          description: Update rules
+
+    ApplyEvent:
+      type: object
+      required:
+        - type
+        - filter
+      properties:
+        type:
+          type: string
+          description: Event type
+        filter:
+          type: object
+          additionalProperties: true
+          description: Event filter criteria
+
+    Update:
+      type: object
+      required:
+        - method
+        - mapping
+      properties:
+        method:
+          type: string
+          description: Update method
+        mapping:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field mapping configuration
+
+    BaseField:
+      type: object
+      required:
+        - name
+        - description
+        - type
+      properties:
+        name:
+          type: string
+          description: Field name
+        description:
+          type: string
+          description: Field description
+        type:
+          type: string
+          description: Field type
+        type_spec:
+          $ref: "#/components/schemas/TypeSpec"
+        temporal:
+          $ref: "#/components/schemas/Temporal"
+        required:
+          type: boolean
+          nullable: true
+          description: Whether the field is required
+
+    TypeSpec:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specific type definition
+        unit:
+          type: string
+          nullable: true
+          description: Unit of measurement
+        precision:
+          type: integer
+          nullable: true
+          description: Precision for numeric types
+        min:
+          type: number
+          format: double
+          nullable: true
+          description: Minimum value
+        max:
+          type: number
+          format: double
+          nullable: true
+          description: Maximum value
+      required:
+        - type
+
+    Temporal:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          description: Temporal type
+        period_type:
+          type: string
+          nullable: true
+          description: Period type specification
+        reference:
+          description: Reference (can be string or VariableReference)
+          type: string
+          nullable: true
+        immutable_after:
+          type: string
+          nullable: true
+          description: Immutability rule
+
+    ParameterField:
+      allOf:
+        - $ref: "#/components/schemas/BaseField"
+      description: Parameter field extending BaseField
+
+    SourceField:
+      allOf:
+        - $ref: "#/components/schemas/BaseField"
+        - type: object
+          properties:
+            source_reference:
+              $ref: "#/components/schemas/SourceReference"
+            service_reference:
+              $ref: "#/components/schemas/ServiceReference"
+      description: Source field extending BaseField
+
+    InputField:
+      allOf:
+        - $ref: "#/components/schemas/BaseField"
+        - type: object
+          required:
+            - service_reference
+          properties:
+            service_reference:
+              $ref: "#/components/schemas/ServiceReference"
+      description: Input field extending BaseField
+
+    OutputField:
+      allOf:
+        - $ref: "#/components/schemas/BaseField"
+        - type: object
+          required:
+            - citizen_relevance
+          properties:
+            citizen_relevance:
+              type: string
+
+      description: Output field extending BaseField
+
+    Field:
+      type: object
+      properties:
+        input:
+          $ref: "#/components/schemas/InputField"
+        source:
+          $ref: "#/components/schemas/SourceField"
+      description: Field containing input or source field
+
+    SourceReference:
+      type: object
+      properties:
+        source_type:
+          type: string
+          description: Type of the data source
+        table:
+          type: string
+          description: Table name in the source
+        field:
+          type: string
+          nullable: true
+          description: Specific field to reference
+        fields:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Multiple fields to reference
+        select_on:
+          type: array
+          items:
+            $ref: "#/components/schemas/SelectField"
+          description: Selection criteria
+
+    SelectField:
+      type: object
+      required:
+        - name
+        - description
+        - type
+        - value
+      properties:
+        name:
+          type: string
+          description: Field name
+        description:
+          type: string
+          description: Field description
+        type:
+          type: string
+          description: Field type
+        value:
+          $ref: "#/components/schemas/ActionValue"
+
+    ServiceReference:
+      type: object
+      required:
+        - service
+        - field
+        - law
+      properties:
+        service:
+          type: string
+          description: Referenced service identifier
+        field:
+          type: string
+          description: Field in the referenced service
+        law:
+          type: string
+          description: Associated law
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/Parameter"
+          description: Service parameters
+
+    Parameter:
+      type: object
+      required:
+        - name
+        - reference
+      properties:
+        name:
+          type: string
+          description: Parameter name
+        reference:
+          type: string
+          description: Parameter reference
+
+    Action:
+      type: object
+      required:
+        - output
+      properties:
+        output:
+          type: string
+          description: Action output
+        value:
+          $ref: "#/components/schemas/ActionValue"
+        operation:
+          type: string
+          nullable: true
+          description: Operation to perform
+        subject:
+          type: string
+          nullable: true
+          description: Subject of the action
+        unit:
+          type: string
+          nullable: true
+          description: Unit for the action
+        combine:
+          type: string
+          nullable: true
+          description: Combination method
+        values:
+          $ref: "#/components/schemas/ActionValues"
+        conditions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Condition"
+          description: Conditional logic
+
+    ActionValue:
+      description: Represents a value in an operation (can be a primitive value or nested action)
+      oneOf:
+        - $ref: "#/components/schemas/Action"
+        - {}
+
+    ActionValues:
+      description: Represents multiple values or a single value
+      oneOf:
+        - type: array
+          items:
+            $ref: "#/components/schemas/ActionValue"
+        - {}
+
+    Condition:
+      type: object
+      properties:
+        test:
+          $ref: "#/components/schemas/Action"
+        then:
+          $ref: "#/components/schemas/ActionValue"
+        else:
+          $ref: "#/components/schemas/ActionValue"
+      description: Conditional logic with test, then, and optional else
+
+    Requirement:
+      type: object
+      properties:
+        all:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionRequirement"
+          nullable: true
+          description: All requirements must be met (AND logic)
+        or:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionRequirement"
+          nullable: true
+          description: Any requirement must be met (OR logic)
+      description: Logical requirements with AND/OR operations
+
+    ActionRequirement:
+      description: Either a nested requirement or an action
+      oneOf:
+        - $ref: "#/components/schemas/Requirement"
+        - $ref: "#/components/schemas/Action"
+
+    VariableReference:
+      type: object
+      description: Variable reference (structure not fully defined)
       additionalProperties: true
     Claim:
       description: Claim
@@ -783,7 +1236,7 @@ components:
         objectionStatus:
           $ref: "#/components/schemas/CaseObjectionStatus"
         appealStatus:
-          additionalProperties: true
+          $ref: "#/components/schemas/CaseAppealStatus"
     CaseObjectionStatus:
       description: Parameters to set the objection status
       type: object
@@ -800,6 +1253,24 @@ components:
           type: integer
         admissable:
           type: boolean
+    CaseAppealStatus:
+      description: Parameters to set the objection status
+      type: object
+      properties:
+        possible:
+          type: boolean
+        notPossibleReason:
+          type: string
+        appealPeriod:
+          type: integer
+        directAppeal:
+          type: boolean
+        directAppealReason:
+          type: string
+        competentCourt:
+          type: string
+        courtType:
+          type: string
     CaseList:
       description: List of all cases
       type: array

@@ -187,7 +187,7 @@ class Services:
         self.runner.stop()
 
     @staticmethod
-    def extract_value_tree(root):
+    def extract_value_tree(root: PathNode):
         flattened = {}
         stack = [(root, None)]
 

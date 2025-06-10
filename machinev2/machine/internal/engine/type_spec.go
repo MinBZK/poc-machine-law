@@ -1,22 +1,15 @@
-package context
+package engine
 
 import (
 	"fmt"
 	"math"
 	"strconv"
+
+	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 )
 
-// TypeSpec defines specifications for value types
-type TypeSpec struct {
-	Type      string   `json:"type,omitempty" yaml:"type,omitempty"`
-	Unit      *string  `json:"unit,omitempty" yaml:"unit,omitempty"`
-	Precision *int     `json:"precision,omitempty" yaml:"precision,omitempty"`
-	Min       *float64 `json:"min,omitempty" yaml:"min,omitempty"`
-	Max       *float64 `json:"max,omitempty" yaml:"max,omitempty"`
-}
-
 // Enforce applies type specifications to a value
-func (ts *TypeSpec) Enforce(value any) any {
+func Enforce(ts model.TypeSpec, value any) any {
 	if value == nil {
 		return value
 	}

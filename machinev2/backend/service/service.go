@@ -10,6 +10,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/backend/config"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	machine "github.com/minbzk/poc-machine-law/machinev2/machine/service"
 )
 
@@ -23,13 +24,18 @@ type Service struct {
 	input    model.Input
 }
 
-func New(logger *slog.Logger, cfg *config.Config) *Service {
+func New(logger *slog.Logger, cfg *config.Config) (*Service, error) {
+	services, err := machine.NewServices(time.Now())
+	if err != nil {
+		return nil, fmt.Errorf("new services: %w", err)
+	}
+
 	return &Service{
 		logger:   logger,
 		cfg:      cfg,
-		service:  machine.NewServices(time.Now()),
+		service:  services,
 		profiles: make(map[string]model.Profile),
-	}
+	}, nil
 }
 
 func (service *Service) Shutdown(ctx context.Context) error {
@@ -80,7 +86,7 @@ type Servicer interface {
 	Profile(ctx context.Context, bsn string) (model.Profile, error)
 
 	ServiceLawsDiscoverableList(ctx context.Context, discoverableBy string) ([]model.Service, error)
-	GetRuleSpec(service, law string, referenceDate string) (map[string]any, error)
+	GetRuleSpec(service, law string, referenceDate string) (ruleresolver.RuleSpec, error)
 
 	ClaimListBasedOnBSN(ctx context.Context, bsn string, filter ClaimListFilter) ([]model.Claim, error)
 	ClaimListBasedOnBSNServiceLaw(ctx context.Context, bsn, service, law string, filter ClaimListFilter) (map[string]model.Claim, error)
@@ -129,10 +135,10 @@ func (service *Service) ServiceLawsDiscoverableList(ctx context.Context, discove
 	return services, nil
 }
 
-func (service *Service) GetRuleSpec(svc, law string, referenceDate string) (map[string]any, error) {
+func (service *Service) GetRuleSpec(svc, law string, referenceDate string) (ruleresolver.RuleSpec, error) {
 	rule, err := service.service.Resolver.GetRuleSpec(law, referenceDate, svc)
 	if err != nil {
-		return nil, fmt.Errorf("get rule spec: %w", err)
+		return ruleresolver.RuleSpec{}, fmt.Errorf("get rule spec: %w", err)
 	}
 
 	return rule, nil

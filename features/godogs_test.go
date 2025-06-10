@@ -20,6 +20,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // godogsCtxKey is the key used to store the available godogs in the context.Context.
@@ -124,7 +125,7 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 	params := ctx.Value(paramsCtxKey{}).(map[string]any)
 
 	result, err := services.Evaluate(ctx, svc, law, params, "", nil, "", approved)
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	ctx = context.WithValue(ctx, serviceCtxKey{}, svc)
 	ctx = context.WithValue(ctx, lawCtxKey{}, law)
@@ -199,7 +200,12 @@ func deDatumIs(ctx context.Context, arg1 string) (context.Context, error) {
 		return nil, fmt.Errorf("could not parse time: %w", err)
 	}
 
-	return context.WithValue(ctx, servicesCtxKey{}, service.NewServices(t1)), nil
+	services, err := service.NewServices(t1)
+	if err != nil {
+		return nil, fmt.Errorf("new services: %w", err)
+	}
+
+	return context.WithValue(ctx, servicesCtxKey{}, services), nil
 }
 
 func eenPersoonMetBSN(ctx context.Context, bsn string) (context.Context, error) {
@@ -448,10 +454,10 @@ func isDeAanvraagAfgewezen(ctx context.Context) error {
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatusDecided))
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatusDecided, c.Status, "Expected case to be decided")
 	assert.NotNil(godog.T(ctx), c.Approved, "Expected approved status to be set")
@@ -467,10 +473,10 @@ func isDeAanvraagToegekend(ctx context.Context) error {
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatusDecided))
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatusDecided, c.Status, "Expected case to be decided")
 	assert.NotNil(godog.T(ctx), c.Approved, "Expected approved status to be set")
@@ -481,13 +487,13 @@ func isDeAanvraagToegekend(ctx context.Context) error {
 
 func isDeHuurtoeslagEuro(ctx context.Context, expected float64) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	v, ok := result.Output["subsidy_amount"]
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	compareMonitaryValue(ctx, expected, actual)
 
@@ -501,10 +507,10 @@ func isDeStatus(ctx context.Context, expected string) error {
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatus(expected)))
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatus(expected), c.Status,
 		fmt.Sprintf("Expected status to be %s, but was %s", expected, c.Status))
@@ -514,13 +520,13 @@ func isDeStatus(ctx context.Context, expected string) error {
 
 func isDeWoonkostentoeslagEuro(ctx context.Context, expected float64) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	v, ok := result.Output["housing_assistance"]
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	compareMonitaryValue(ctx, expected, actual)
 
@@ -585,20 +591,16 @@ func kanDeBurgerInBeroepGaanBij(ctx context.Context, competentCourt string) erro
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseCanAppeal)
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	assert.True(godog.T(ctx), c.CanAppeal(), "Expected to be able to appeal")
 
-	courtValue, ok := c.AppealStatus["competent_court"]
-	assert.True(godog.T(ctx), ok, "Expected competent court to be set")
+	require.True(godog.T(ctx), c.AppealStatus.CompetentCourt != nil, "Expected competent court to be set")
 
-	court, ok := courtValue.(string)
-	assert.True(godog.T(ctx), ok, "Expected competent court to be a string")
-
-	assert.Equal(godog.T(ctx), competentCourt, court, "Expected another competent court")
+	assert.Equal(godog.T(ctx), competentCourt, *c.AppealStatus.CompetentCourt, "Expected another competent court")
 
 	return nil
 }
@@ -610,10 +612,10 @@ func kanDeBurgerInBezwaarGaan(ctx context.Context) error {
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
-	assert.True(godog.T(ctx), ok)
+	require.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseCanObject)
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	assert.True(godog.T(ctx), c.CanObject(), "Expected case to be objectable")
 
@@ -630,12 +632,13 @@ func kanDeBurgerNietInBezwaarGaanMetReden(ctx context.Context, expectedReason st
 	assert.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseCanNotObject)
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
+	require.NotNil(godog.T(ctx), c)
 
 	assert.False(godog.T(ctx), c.CanObject(), "Expected case not to be objectable")
 
 	reason := c.ObjectionStatus.NotPossibleReason
-	assert.True(godog.T(ctx), reason != nil, "Expected reason to be set")
+	require.True(godog.T(ctx), reason != nil, "Expected reason to be set")
 
 	assert.Equal(godog.T(ctx), expectedReason, *reason, "Expected reasons to match")
 
@@ -670,7 +673,7 @@ func wordtDeAanvraagToegevoegdAanHandmatigeBeoordeling(ctx context.Context) erro
 	assert.True(godog.T(ctx), ok)
 
 	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatusInReview))
-	assert.NoError(godog.T(ctx), err)
+	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatusInReview, c.Status, "Expected case to be in review")
 
@@ -718,7 +721,7 @@ func getCaseByID(ctx context.Context, cm *service.CaseManager, caseID uuid.UUID,
 	var c *casemanager.Case
 	for range 500 {
 		c, err = cm.GetCaseByID(ctx, caseID)
-		if err == nil && fn(c) {
+		if err == nil && c != nil && fn(c) {
 			return c, nil
 		}
 

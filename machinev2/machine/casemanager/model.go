@@ -46,7 +46,7 @@ type Case struct {
 	Reason             string              `json:"reason,omitempty"`
 	VerifierID         string              `json:"verifier_id,omitempty"`
 	ObjectionStatus    CaseObjectionStatus `json:"objection_status,omitempty"`
-	AppealStatus       map[string]any      `json:"appeal_status,omitempty"`
+	AppealStatus       CaseAppealStatus    `json:"appeal_status,omitempty"`
 	Approved           *bool               `json:"approved,omitempty"`
 	Status             CaseStatus          `json:"status"`
 	CreatedAt          time.Time           `json:"created_at"`
@@ -66,9 +66,9 @@ type CaseAppealStatus struct {
 	Possible           *bool
 	NotPossibleReason  *string
 	AppealPeriod       *int
-	DirectAppeal       *int
+	DirectAppeal       *bool
 	DirectAppealReason *string
-	CompetenCourt      *string
+	CompetentCourt     *string
 	CourtType          *string
 }
 
@@ -263,50 +263,25 @@ func (c *Case) DetermineAppealStatus(
 	competentCourt *string,
 	courtType *string,
 ) error {
-	if c.AppealStatus == nil {
-		c.AppealStatus = make(map[string]any)
-	}
-
-	if possible != nil {
-		c.AppealStatus["possible"] = *possible
-	}
-
-	if notPossibleReason != nil {
-		c.AppealStatus["not_possible_reason"] = notPossibleReason
-	}
-
-	if appealPeriod != nil {
-		c.AppealStatus["appeal_period"] = *appealPeriod
-	}
-
-	if directAppeal != nil {
-		c.AppealStatus["direct_appeal"] = *directAppeal
-	}
-
-	if directAppealReason != nil {
-		c.AppealStatus["direct_appeal_reason"] = directAppealReason
-	}
-
-	if competentCourt != nil {
-		c.AppealStatus["competent_court"] = competentCourt
-	}
-
-	if courtType != nil {
-		c.AppealStatus["court_type"] = courtType
-	}
-
+	c.AppealStatus.Possible = possible
+	c.AppealStatus.NotPossibleReason = notPossibleReason
+	c.AppealStatus.AppealPeriod = appealPeriod
+	c.AppealStatus.DirectAppeal = directAppeal
+	c.AppealStatus.DirectAppealReason = directAppealReason
+	c.AppealStatus.CompetentCourt = competentCourt
+	c.AppealStatus.CourtType = courtType
 	c.UpdatedAt = time.Now()
+
 	return nil
 }
 
 // CanAppeal checks if appeal is possible for this case
 func (c *Case) CanAppeal() bool {
-	if c.AppealStatus == nil {
-		return false
+	if c.AppealStatus.Possible != nil {
+		return *c.AppealStatus.Possible
 	}
 
-	possible, ok := c.AppealStatus["possible"].(bool)
-	return ok && possible
+	return false
 }
 
 // AddClaim records when a new claim is created for this case

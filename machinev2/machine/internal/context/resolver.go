@@ -2,10 +2,15 @@ package context
 
 import (
 	"context"
+	"fmt"
+	"maps"
+	"strings"
 	"sync"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 type Resolved struct {
@@ -23,10 +28,10 @@ var _ Resolver = &ClaimResolver{}
 
 type ClaimResolver struct {
 	claims       map[string]model.Claim
-	propertySpec map[string]map[string]any
+	propertySpec map[string]ruleresolver.Field
 }
 
-func NewClaimResolver(claims map[string]model.Claim, propertySpec map[string]map[string]any) *ClaimResolver {
+func NewClaimResolver(claims map[string]model.Claim, propertySpec map[string]ruleresolver.Field) *ClaimResolver {
 	return &ClaimResolver{
 		claims:       claims,
 		propertySpec: propertySpec,
@@ -47,15 +52,25 @@ func (c *ClaimResolver) Resolve(ctx context.Context, key string) (*Resolved, boo
 
 	// Add type information for claims
 	if spec, ok := c.propertySpec[key]; ok {
-		if typeVal, exists := spec["type"]; exists {
-			resolved.Details["type"] = typeVal
+		if spec.GetBase().Type != "" {
+			resolved.Details["type"] = spec.GetBase().Type
 		}
 
-		if typeSpec, exists := spec["type_spec"]; exists {
-			resolved.Details["type_spec"] = typeSpec
+		if spec.GetBase().TypeSpec != nil {
+			resolved.Details["type_spec"] = map[string]any{
+				"type":      spec.GetBase().TypeSpec.Type,
+				"unit":      spec.GetBase().TypeSpec.Unit,
+				"precision": spec.GetBase().TypeSpec.Precision,
+				"min":       spec.GetBase().TypeSpec.Min,
+				"max":       spec.GetBase().TypeSpec.Max,
+			}
 		}
 
-		resolved.Required = getBoolFromMap(spec, "required", false)
+		required := false
+		if spec.GetBase().Required != nil {
+			required = *spec.GetBase().Required
+		}
+		resolved.Required = required
 	}
 
 	return resolved, true
@@ -172,11 +187,11 @@ func (lr *OutputsResolver) Set(key string, data any) {
 var _ Resolver = &PropertySpecOverwriteResolver{}
 
 type PropertySpecOverwriteResolver struct {
-	propertySpec   map[string]map[string]any
+	propertySpec   map[string]ruleresolver.Field
 	overwriteInput map[string]map[string]any
 }
 
-func NewPropertySpecOverwriteResolver(propertySpec map[string]map[string]any, overwriteInput map[string]map[string]any) *PropertySpecOverwriteResolver {
+func NewPropertySpecOverwriteResolver(propertySpec map[string]ruleresolver.Field, overwriteInput map[string]map[string]any) *PropertySpecOverwriteResolver {
 	return &PropertySpecOverwriteResolver{
 		propertySpec:   propertySpec,
 		overwriteInput: overwriteInput,
@@ -190,24 +205,27 @@ func (l *PropertySpecOverwriteResolver) Resolve(ctx context.Context, key string)
 		return nil, false
 	}
 
-	serviceRef, ok := spec["service_reference"].(map[string]any)
+	var serviceRef *ruleresolver.ServiceReference
+	if spec.Input != nil {
+		serviceRef = &spec.Input.ServiceReference
+	} else if spec.Source != nil {
+		serviceRef = spec.Source.ServiceReference
+	}
+
+	if serviceRef == nil {
+		return nil, false
+	}
+
+	if serviceRef.Service == "" || serviceRef.Field == "" || l.overwriteInput == nil {
+		return nil, false
+	}
+
+	serviceOverwrites, ok := l.overwriteInput[serviceRef.Service]
 	if !ok {
 		return nil, false
 	}
 
-	serviceName, hasService := serviceRef["service"].(string)
-	fieldName, hasField := serviceRef["field"].(string)
-
-	if !hasService || !hasField || l.overwriteInput == nil {
-		return nil, false
-	}
-
-	serviceOverwrites, ok := l.overwriteInput[serviceName]
-	if !ok {
-		return nil, false
-	}
-
-	value, ok := serviceOverwrites[fieldName]
+	value, ok := serviceOverwrites[serviceRef.Field]
 	if !ok {
 		return nil, false
 	}
@@ -224,10 +242,10 @@ var _ Resolver = &PropertySpecSourceResolver{}
 
 type PropertySpecSourceResolver struct {
 	rc           *RuleContext
-	propertySpec map[string]map[string]any
+	propertySpec map[string]ruleresolver.Field
 }
 
-func NewPropertySpecSourceResolver(rc *RuleContext, propertySpec map[string]map[string]any) *PropertySpecSourceResolver {
+func NewPropertySpecSourceResolver(rc *RuleContext, propertySpec map[string]ruleresolver.Field) *PropertySpecSourceResolver {
 	return &PropertySpecSourceResolver{
 		rc:           rc,
 		propertySpec: propertySpec,
@@ -241,13 +259,17 @@ func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*
 		return nil, false
 	}
 
+	var sourceRef *ruleresolver.SourceReference
+	if spec.Source != nil {
+		sourceRef = spec.Source.SourceReference
+	}
+
 	// Check sources
-	sourceRef, ok := spec["source_reference"].(map[string]any)
-	if !ok {
+	if sourceRef == nil {
 		return nil, false
 	}
 
-	value, err := l.rc.resolveFromSource(ctx, sourceRef, spec)
+	value, err := l.rc.resolveFromSource(ctx, *sourceRef, spec)
 	if err != nil {
 		// logger.Debugf(ctx, "resolving from source: %s", err)
 		return nil, false
@@ -257,21 +279,27 @@ func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*
 		return nil, false
 	}
 
+	required := false
+	if spec.GetBase().Required != nil {
+		required = *spec.GetBase().Required
+	}
+
 	resolved := &Resolved{
 		Value:    value,
-		Required: getBoolFromMap(spec, "required", false),
+		Required: required,
 		Details:  make(map[string]any),
 	}
 
 	// Add type information to the node
-	if typeVal, exists := spec["type"]; exists {
-		resolved.Details["type"] = typeVal
-	}
-	if typeSpec, exists := spec["type_spec"]; exists {
-		resolved.Details["type_spec"] = typeSpec
+	if spec.GetBase().Type != "" {
+		resolved.Details["type"] = spec.GetBase().Type
 	}
 
-	logging.FromContext(ctx).Debugf(ctx, "Resolving from SOURCE %v: %v", sourceRef["table"], value)
+	if spec.GetBase().TypeSpec != nil {
+		resolved.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
+	}
+
+	logging.FromContext(ctx).Debugf(ctx, "Resolving from SOURCE %v: %v", sourceRef.Table, value)
 
 	return resolved, true
 
@@ -285,11 +313,11 @@ func (l *PropertySpecSourceResolver) ResolveType() string {
 var _ Resolver = &PropertySpecServiceResolver{}
 
 type PropertySpecServiceResolver struct {
-	propertySpec map[string]map[string]any
+	propertySpec map[string]ruleresolver.Field
 	rc           *RuleContext
 }
 
-func NewPropertySpecServiceResolver(rc *RuleContext, propertySpec map[string]map[string]any) *PropertySpecServiceResolver {
+func NewPropertySpecServiceResolver(rc *RuleContext, propertySpec map[string]ruleresolver.Field) *PropertySpecServiceResolver {
 	return &PropertySpecServiceResolver{
 		propertySpec: propertySpec,
 		rc:           rc,
@@ -303,38 +331,176 @@ func (l *PropertySpecServiceResolver) Resolve(ctx context.Context, key string) (
 		return nil, false
 	}
 
-	serviceRef, ok := spec["service_reference"].(map[string]any)
-	if !ok {
+	var serviceRef *ruleresolver.ServiceReference
+	if spec.Input != nil {
+		serviceRef = &spec.Input.ServiceReference
+	} else if spec.Source != nil {
+		serviceRef = spec.Source.ServiceReference
+	}
+
+	if serviceRef == nil {
 		return nil, false
 	}
 
-	value, err := l.rc.resolveFromService(ctx, key, serviceRef, spec)
+	value, err := resolveFromService(ctx, l.rc, key, *serviceRef, spec)
 	if err != nil {
 		return nil, false
 	}
 
 	logging.FromContext(ctx).
-		Debugf(ctx, "Result for $%s from %s field %s: %v", key, serviceRef["service"], serviceRef["field"], value)
+		Debugf(ctx, "Result for $%s from %s field %s: %v", key, serviceRef.Service, serviceRef.Field, value)
+
+	required := false
+	if spec.GetBase().Required != nil {
+		required = *spec.GetBase().Required
+	}
 
 	resolved := &Resolved{
 		Value:    value,
-		Required: getBoolFromMap(spec, "required", false),
+		Required: required,
 		Details:  make(map[string]any),
 	}
 
 	// Add type information to the node
-	if typeVal, exists := spec["type"]; exists {
-		resolved.Details["type"] = typeVal
+	if spec.GetBase().Type != "" {
+		resolved.Details["type"] = spec.GetBase().Type
 	}
-	if typeSpec, exists := spec["type_spec"]; exists {
-		resolved.Details["type_spec"] = typeSpec
+
+	if spec.GetBase().TypeSpec != nil {
+		resolved.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
 	}
 
 	return resolved, true
 
 }
 
+// resolveFromService resolves a value from a service
+func resolveFromService(
+	ctx context.Context,
+	rc *RuleContext,
+	ppath string,
+	serviceRef ruleresolver.ServiceReference,
+	spec ruleresolver.Field,
+) (any, error) {
+
+	// Clone parameters
+	parameters := make(map[string]any)
+	maps.Copy(parameters, rc.Parameters)
+
+	// Add service reference parameters
+	for _, param := range serviceRef.Parameters {
+		value, err := rc.ResolveValue(ctx, param.Reference)
+		if err != nil {
+			return nil, err
+		}
+		parameters[param.Name] = value
+	}
+
+	// Get reference date
+	referenceDate := rc.CalculationDate
+	if spec.GetBase().Temporal != nil {
+		if reference, ok := spec.GetBase().Temporal.Reference.(string); ok {
+			refDate, err := rc.ResolveValue(ctx, reference)
+			if err != nil {
+				return nil, err
+			}
+
+			if refDateStr, ok := refDate.(string); ok {
+				referenceDate = refDateStr
+			}
+		}
+	}
+
+	cacheKeyStr := getCacheKey(ppath, referenceDate, parameters)
+	if cachedVal, exists := rc.ValuesCache.Load(cacheKeyStr); exists {
+		rc.logger.WithIndent().Debugf(ctx, "Resolving from CACHE with key '%s': %v", cacheKeyStr, cachedVal)
+		return cachedVal, nil
+	}
+
+	// Create service evaluation node
+	details := map[string]any{
+		"service":        serviceRef.Service,
+		"law":            serviceRef.Law,
+		"field":          serviceRef.Field,
+		"reference_date": referenceDate,
+		"parameters":     parameters,
+		"path":           ppath,
+	}
+
+	// Copy type information from spec to details
+	if spec.GetBase().Type != "" {
+		details["type"] = spec.GetBase().Type
+	}
+
+	if spec.GetBase().TypeSpec != nil {
+		details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
+	}
+
+	serviceNode := &model.PathNode{
+		Type:    "service_evaluation",
+		Name:    fmt.Sprintf("Service call: %s.%s", serviceRef.Service, serviceRef.Law),
+		Result:  nil,
+		Details: details,
+	}
+
+	ctx = path.WithPathNode(ctx, serviceNode)
+	defer path.FromContext(ctx).Pop()
+
+	result, err := rc.ServiceProvider.Evaluate(
+		ctx,
+		serviceRef.Service,
+		serviceRef.Law,
+		parameters,
+		referenceDate,
+		rc.OverwriteInput,
+		serviceRef.Field,
+		rc.Approved,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	value := result.Output[serviceRef.Field]
+	rc.ValuesCache.Store(cacheKeyStr, value)
+
+	// Update the service node with the result and add child path
+	serviceNode.Result = value
+	if result.Path != nil {
+		serviceNode.AddChild(result.Path)
+	}
+
+	rc.MissingRequired = rc.MissingRequired || result.MissingRequired
+
+	return value, nil
+}
+
 // ResolveType implements Resolver.
 func (l *PropertySpecServiceResolver) ResolveType() string {
 	return "SERVICE"
+}
+
+func getCacheKey(path string, referenceDate string, parameters map[string]any) string {
+	// Check cache
+	var cacheKey strings.Builder
+	cacheKey.WriteString(path)
+	cacheKey.WriteString("(")
+
+	// Sort keys for consistency
+	paramKeys := make([]string, 0, len(parameters))
+	for k := range parameters {
+		paramKeys = append(paramKeys, k)
+	}
+
+	// Stable sorting would be better but this works for simple keys
+	for i, k := range paramKeys {
+		if i > 0 {
+			cacheKey.WriteString(",")
+		}
+		cacheKey.WriteString(fmt.Sprintf("%s:%v", k, parameters[k]))
+	}
+	cacheKey.WriteString(",")
+	cacheKey.WriteString(referenceDate)
+	cacheKey.WriteString(")")
+
+	return cacheKey.String()
 }

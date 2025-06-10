@@ -20,7 +20,7 @@ type Case struct {
 	VerifiedResult     map[string]any
 	Parameters         map[string]any
 	RuleSpecID         uuid.UUID
-	AppealStatus       *map[string]any
+	AppealStatus       CaseAppealStatus
 	ObjectionStatus    CaseObjectionStatus
 }
 
@@ -31,6 +31,16 @@ type CaseObjectionStatus struct {
 	DecisionPeriod    *int
 	ExtensionPeriod   *int
 	Admissable        *bool
+}
+
+type CaseAppealStatus struct {
+	Possible           *bool
+	NotPossibleReason  *string
+	AppealPeriod       *int
+	DirectAppeal       *bool
+	DirectAppealReason *string
+	CompetentCourt     *string
+	CourtType          *string
 }
 
 type CaseSubmit struct {

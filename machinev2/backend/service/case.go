@@ -104,7 +104,7 @@ func ToCase(case_ *casemanager.Case) model.Case {
 		VerifiedResult:     case_.VerifiedResult,
 		Parameters:         case_.Parameters,
 		RuleSpecID:         case_.RulespecID,
-		AppealStatus:       &case_.AppealStatus,
+		AppealStatus:       ToCaseAppealStatus(case_.AppealStatus),
 		ObjectionStatus:    ToCaseObjectionStatus(case_.ObjectionStatus),
 	}
 }
@@ -127,5 +127,17 @@ func ToCaseObjectionStatus(objection casemanager.CaseObjectionStatus) model.Case
 		DecisionPeriod:    objection.DecisionPeriod,
 		ExtensionPeriod:   objection.ExtensionPeriod,
 		Admissable:        objection.Admissable,
+	}
+}
+
+func ToCaseAppealStatus(objection casemanager.CaseAppealStatus) model.CaseAppealStatus {
+	return model.CaseAppealStatus{
+		Possible:           objection.Possible,
+		NotPossibleReason:  objection.NotPossibleReason,
+		AppealPeriod:       objection.AppealPeriod,
+		DirectAppeal:       objection.DirectAppeal,
+		DirectAppealReason: objection.DirectAppealReason,
+		CompetentCourt:     objection.CompetentCourt,
+		CourtType:          objection.CourtType,
 	}
 }

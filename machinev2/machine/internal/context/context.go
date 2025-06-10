@@ -3,26 +3,26 @@ package context
 import (
 	"context"
 	"fmt"
+	"maps"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 	"unicode"
-
-	"maps"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 // ServiceProvider interface defines what a service provider needs to implement
 type ServiceProvider interface {
 	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
 		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
-	GetResolver() *utils.RuleResolver
+	GetResolver() *ruleresolver.RuleResolver
 	GetCaseManager() CaseManagerAccessor
 	GetClaimManager() ClaimManagerAccessor
 }
@@ -38,21 +38,24 @@ type ClaimManagerAccessor interface {
 	GetClaimByBSNServiceLaw(bsn string, service string, law string, approved bool, includeRejected bool) (map[string]model.Claim, error)
 }
 
-// RuleContext holds context for rule evaluation
-type RuleContext struct {
-	Definitions     map[string]any
+type RuleContextData struct {
 	ServiceProvider ServiceProvider
 	Parameters      map[string]any
-	PropertySpecs   map[string]map[string]any
-	OutputSpecs     map[string]TypeSpec
+	PropertySpecs   map[string]ruleresolver.Field
 	Sources         model.SourceDataFrame
-	Local           map[string]any
-	ValuesCache     map[string]any
-	OverwriteInput  map[string]map[string]any
-	Outputs         map[string]any
 	CalculationDate string
-	ServiceName     string
-	Claims          map[string]model.Claim
+	Approved        bool
+}
+
+// RuleContext holds context for rule evaluation
+type RuleContext struct {
+	ServiceProvider ServiceProvider
+	Parameters      map[string]any
+	PropertySpecs   map[string]ruleresolver.Field
+	Sources         model.SourceDataFrame
+	ValuesCache     sync.Map
+	OverwriteInput  map[string]map[string]any
+	CalculationDate string
 	LocalResolver   *LocalResolver
 	OutputsResolver *OutputsResolver
 	Resolvers       []Resolver
@@ -63,8 +66,8 @@ type RuleContext struct {
 
 // NewRuleContext creates a new rule context
 func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProvider ServiceProvider,
-	parameters map[string]any, propertySpecs map[string]map[string]any,
-	outputSpecs map[string]TypeSpec, sources model.SourceDataFrame,
+	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
+	outputSpecs map[string]model.TypeSpec, sources model.SourceDataFrame,
 	overwriteInput map[string]map[string]any, calculationDate string,
 	serviceName string, claims map[string]model.Claim, approved bool) *RuleContext {
 
@@ -72,19 +75,13 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 	output := NewOutputsResolver()
 
 	rc := &RuleContext{
-		Definitions:     definitions,
 		ServiceProvider: serviceProvider,
 		Parameters:      parameters,
 		PropertySpecs:   propertySpecs,
-		OutputSpecs:     outputSpecs,
 		Sources:         sources,
-		Local:           make(map[string]any),
-		ValuesCache:     make(map[string]any),
+		ValuesCache:     sync.Map{},
 		OverwriteInput:  overwriteInput,
-		Outputs:         make(map[string]any),
 		CalculationDate: calculationDate,
-		ServiceName:     serviceName,
-		Claims:          claims,
 		Approved:        approved,
 		MissingRequired: false,
 		LocalResolver:   local,
@@ -106,20 +103,32 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 	return rc
 }
 
+func (rc *RuleContext) ResolveAction(ctx context.Context, action ruleresolver.Action) (any, error) {
+	if action.Value != nil {
+		return *action.Value, nil
+	} else if action.Values != nil {
+		if action.Values.ActionValues != nil {
+			return *action.Values.ActionValues, nil
+		} else if action.Values.Value != nil {
+			return *action.Values.Value, nil
+		}
+	}
+
+	return nil, fmt.Errorf("action not set")
+}
+
 // ResolveValue resolves a value from definitions, services, or sources
 func (rc *RuleContext) ResolveValue(ctx context.Context, path any) (any, error) {
 	var value any
 	if err := rc.logger.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
-		v, err := rc.resolveValueInternal(ctx, path)
-		if err != nil {
+		var err error
+		if value, err = rc.resolveValueInternal(ctx, path); err != nil {
 			return err
 		}
 
 		if strPath, ok := path.(string); ok {
 			tracker.WithResolvedPath(ctx, strPath, value)
 		}
-
-		value = v
 
 		return nil
 	}); err != nil {
@@ -255,8 +264,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		if resolved, ok := resolve.Resolve(ctx, strPath); ok {
 			node.Result = resolved.Value
 			node.ResolveType = resolve.ResolveType()
-			node.Details = resolved.Details
-			node.Required = resolved.Required
+			maps.Copy(node.Details, resolved.Details)
 
 			logger.Debugf(ctx, "Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
 
@@ -267,17 +275,22 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 	// Handle property specs
 	if spec, exists := rc.PropertySpecs[strPath]; exists {
 		// Handle required fields
-		node.Required = getBoolFromMap(spec, "required", false)
+		node.Required = false
+		if spec.GetBase().Required != nil {
+			node.Required = *spec.GetBase().Required
+		}
+
 		if node.Required {
 			rc.MissingRequired = true
 		}
 
 		// Add type information
-		if typeVal, exists := spec["type"]; exists {
-			node.Details["type"] = typeVal
+		if spec.GetBase().Type != "" {
+			node.Details["type"] = spec.GetBase().Type
 		}
-		if typeSpec, exists := spec["type_spec"]; exists {
-			node.Details["type_spec"] = typeSpec
+
+		if spec.GetBase().TypeSpec != nil {
+			node.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
 		}
 	}
 
@@ -321,195 +334,42 @@ func resolveDate(path string, date string) (any, error) {
 	return nil, fmt.Errorf("not a date path")
 }
 
-// resolveFromService resolves a value from a service
-func (rc *RuleContext) resolveFromService(
-	ctx context.Context,
-	ppath string,
-	serviceRef map[string]any,
-	spec map[string]any) (any, error) {
-
-	// Clone parameters
-	parameters := make(map[string]any)
-	maps.Copy(parameters, rc.Parameters)
-
-	// Add service reference parameters
-	if serviceParams, ok := serviceRef["parameters"].([]any); ok {
-		for _, paramObj := range serviceParams {
-			if param, ok := paramObj.(map[string]any); ok {
-				name, hasName := param["name"].(string)
-				reference, hasRef := param["reference"].(string)
-
-				if hasName && hasRef {
-					value, err := rc.ResolveValue(ctx, reference)
-					if err != nil {
-						return nil, err
-					}
-					parameters[name] = value
-				}
-			}
-		}
-	}
-
-	// Get reference date
-	referenceDate := rc.CalculationDate
-	if temporal, ok := spec["temporal"].(map[string]any); ok {
-		if reference, ok := temporal["reference"].(string); ok {
-			refDate, err := rc.ResolveValue(ctx, reference)
-			if err != nil {
-				return nil, err
-			}
-			if refDateStr, ok := refDate.(string); ok {
-				referenceDate = refDateStr
-			}
-		}
-	}
-
-	// Check cache
-	var cacheKey strings.Builder
-	cacheKey.WriteString(ppath)
-	cacheKey.WriteString("(")
-
-	// Sort keys for consistency
-	paramKeys := make([]string, 0, len(parameters))
-	for k := range parameters {
-		paramKeys = append(paramKeys, k)
-	}
-
-	// Stable sorting would be better but this works for simple keys
-	for i, k := range paramKeys {
-		if i > 0 {
-			cacheKey.WriteString(",")
-		}
-		cacheKey.WriteString(fmt.Sprintf("%s:%v", k, parameters[k]))
-	}
-	cacheKey.WriteString(",")
-	cacheKey.WriteString(referenceDate)
-	cacheKey.WriteString(")")
-
-	cacheKeyStr := cacheKey.String()
-	if cachedVal, exists := rc.ValuesCache[cacheKeyStr]; exists {
-		rc.logger.WithIndent().Debugf(ctx, "Resolving from CACHE with key '%s': %v", cacheKeyStr, cachedVal)
-		return cachedVal, nil
-	}
-
-	// Create service evaluation node
-	details := map[string]any{
-		"service":        serviceRef["service"],
-		"law":            serviceRef["law"],
-		"field":          serviceRef["field"],
-		"reference_date": referenceDate,
-		"parameters":     parameters,
-		"path":           ppath,
-	}
-
-	// Copy type information from spec to details
-	if typeVal, exists := spec["type"]; exists {
-		details["type"] = typeVal
-	}
-	if typeSpec, exists := spec["type_spec"]; exists {
-		details["type_spec"] = typeSpec
-	}
-
-	serviceNode := &model.PathNode{
-		Type:    "service_evaluation",
-		Name:    fmt.Sprintf("Service call: %s.%s", serviceRef["service"], serviceRef["law"]),
-		Result:  nil,
-		Details: details,
-	}
-
-	ctx = path.WithPathNode(ctx, serviceNode)
-	defer path.FromContext(ctx).Pop()
-
-	service, hasService := serviceRef["service"].(string)
-	law, hasLaw := serviceRef["law"].(string)
-	field, hasField := serviceRef["field"].(string)
-
-	if !hasService || !hasLaw || !hasField {
-		return nil, fmt.Errorf("invalid service reference format")
-	}
-
-	result, err := rc.ServiceProvider.Evaluate(
-		ctx,
-		service,
-		law,
-		parameters,
-		referenceDate,
-		rc.OverwriteInput,
-		field,
-		rc.Approved,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	value := result.Output[field]
-	rc.ValuesCache[cacheKeyStr] = value
-
-	// Update the service node with the result and add child path
-	serviceNode.Result = value
-	if result.Path != nil {
-		serviceNode.AddChild(result.Path)
-	}
-
-	rc.MissingRequired = rc.MissingRequired || result.MissingRequired
-
-	return value, nil
-}
-
 // resolveFromSource resolves a value from a data source
 func (rc *RuleContext) resolveFromSource(
 	ctx context.Context,
-	sourceRef map[string]any,
-	spec map[string]any) (any, error) {
+	sourceRef ruleresolver.SourceReference,
+	spec ruleresolver.Field) (any, error) {
 
 	var df model.DataFrame
 	tableName := ""
 
-	sourceType, hasSourceType := sourceRef["source_type"].(string)
-
 	// Determine the DataFrame to use
-	if hasSourceType {
-		if sourceType == "laws" {
-			tableName = "laws"
+	if sourceRef.SourceType == "laws" {
+		tableName = "laws"
 
-			df = dataframe.New(rc.ServiceProvider.GetResolver().RulesDataFrame())
-		} else if sourceType == "events" {
-			tableName = "events"
+		df = dataframe.New(rc.ServiceProvider.GetResolver().RulesDataFrame())
+	} else if sourceRef.SourceType == "events" {
+		tableName = "events"
 
-			caseManager := rc.ServiceProvider.GetCaseManager()
+		caseManager := rc.ServiceProvider.GetCaseManager()
 
-			// Get case ID from parameters if specified
-			var caseID any
-			if caseIDRef, ok := sourceRef["case_id"].(string); ok {
-				var err error
-				caseID, err = rc.ResolveValue(ctx, caseIDRef)
-				if err != nil {
-					return nil, fmt.Errorf("failed to resolve case_id: %w", err)
-				}
-			}
+		// Get events from case manager
+		events := caseManager.GetEvents(nil)
 
-			// Get events from case manager
-			events := caseManager.GetEvents(caseID)
-
-			data := make([]map[string]any, 0, len(events))
-			for idx := range events {
-				data = append(data, events[idx].ToMap())
-			}
-
-			// Create a dataframe from events
-			df = dataframe.New(data)
+		data := make([]map[string]any, 0, len(events))
+		for idx := range events {
+			data = append(data, events[idx].ToMap())
 		}
-	}
 
-	// Try to find from provided sources
-	if df == nil && rc.Sources != nil {
-		if table, ok := sourceRef["table"].(string); ok {
-			tableName = table
-			var exists bool
-			df, exists = rc.Sources.Get(table)
-			if !exists {
-				return nil, fmt.Errorf("table %s not found in sources", table)
-			}
+		// Create a dataframe from events
+		df = dataframe.New(data)
+	} else {
+		tableName = sourceRef.Table
+
+		var exists bool
+		df, exists = rc.Sources.Get(tableName)
+		if !exists {
+			return nil, fmt.Errorf("table %s not found in sources", tableName)
 		}
 	}
 
@@ -518,53 +378,49 @@ func (rc *RuleContext) resolveFromSource(
 	}
 
 	// Apply filters
-	if selectOn, ok := sourceRef["select_on"].([]any); ok {
-		for _, selectCond := range selectOn {
-			if cond, ok := selectCond.(map[string]any); ok {
-				nameVal, hasName := cond["name"].(string)
-				valueRef, hasValue := cond["value"]
+	for _, selectCond := range sourceRef.SelectOn {
+		var value any
+		var err error
+		operation := "="
 
-				if hasName && hasValue {
-					value, err := rc.ResolveValue(ctx, valueRef)
-					if err != nil {
-						return nil, err
-					}
-
-					// Handle special operations
-					if valueMap, isMap := value.(map[string]any); isMap {
-						if op, hasOp := valueMap["operation"].(string); hasOp && op == "IN" {
-							if valuesRef, hasValues := valueMap["values"]; hasValues {
-								allowedValues, err := rc.ResolveValue(ctx, valuesRef)
-								if err != nil {
-									return nil, err
-								}
-								df, err = df.Filter(nameVal, "in", allowedValues)
-								if err != nil {
-									return nil, err
-								}
-							}
-						}
-					} else {
-						// Standard equality filter
-						df, err = df.Filter(nameVal, "=", value)
-						if err != nil {
-							return nil, err
-						}
-					}
-				}
+		if selectCond.Value.Action != nil {
+			action, err := rc.ResolveAction(ctx, *selectCond.Value.Action)
+			if err != nil {
+				return nil, err
 			}
+
+			value, err = rc.ResolveValue(ctx, action)
+			if err != nil {
+				return nil, err
+			}
+
+			if *selectCond.Value.Action.Operation == "IN" {
+				operation = "in"
+			}
+
+		} else if selectCond.Value.Value != nil {
+			value, err = rc.ResolveValue(ctx, *selectCond.Value.Value)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		// Standard equality filter
+		df, err = df.Filter(selectCond.Name, operation, value)
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	// Get results according to requested fields
 	var result any
 
-	if fields, ok := sourceRef["fields"].([]any); ok && len(fields) > 0 {
+	if sourceRef.Fields != nil {
 		// Check if all requested fields exist
 		missingFields := []string{}
-		for _, f := range fields {
-			if !df.HasColumn(f.(string)) {
-				missingFields = append(missingFields, f.(string))
+		for _, field := range *sourceRef.Fields {
+			if !df.HasColumn(field) {
+				missingFields = append(missingFields, field)
 			}
 		}
 
@@ -574,19 +430,19 @@ func (rc *RuleContext) resolveFromSource(
 
 		// Get existing fields
 		existingFields := []string{}
-		for _, f := range fields {
-			if df.HasColumn(f.(string)) {
-				existingFields = append(existingFields, f.(string))
+		for _, field := range *sourceRef.Fields {
+			if df.HasColumn(field) {
+				existingFields = append(existingFields, field)
 			}
 		}
 
 		result = df.Select(existingFields).ToRecords()
-	} else if field, ok := sourceRef["field"].(string); ok {
-		if !df.HasColumn(field) {
-			rc.logger.WithIndent().Warningf(ctx, "Field %s not found in source for table %s", field, tableName)
+	} else if sourceRef.Field != nil {
+		if !df.HasColumn(*sourceRef.Field) {
+			rc.logger.WithIndent().Warningf(ctx, "Field %s not found in source for table %s", *sourceRef.Field, tableName)
 			return nil, nil
 		}
-		result = df.GetColumnValues(field)
+		result = df.GetColumnValues(*sourceRef.Field)
 	} else {
 		result = df.ToRecords()
 	}
@@ -614,14 +470,4 @@ func (rc *RuleContext) resolveFromSource(
 	}
 
 	return result, nil
-}
-
-// Helper function to safely get a boolean from a map
-func getBoolFromMap(m map[string]any, key string, defaultValue bool) bool {
-	if val, exists := m[key]; exists {
-		if boolVal, ok := val.(bool); ok {
-			return boolVal
-		}
-	}
-	return defaultValue
 }

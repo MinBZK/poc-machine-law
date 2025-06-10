@@ -12,6 +12,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestService(t *testing.T) {
@@ -25,7 +26,8 @@ func TestService(t *testing.T) {
 
 	// Initialize services with current date
 	currentDate := time.Now()
-	services := service.NewServices(currentDate)
+	services, err := service.NewServices(currentDate)
+	assert.NoError(t, err)
 
 	logger.Infof(ctx, "Direct rules engine evaluation example:")
 
@@ -157,7 +159,10 @@ func BenchmarkService(b *testing.B) {
 
 	// Initialize services with current date
 	currentDate := time.Now()
-	services := service.NewServices(currentDate)
+	services, err := service.NewServices(currentDate)
+	if err != nil {
+		b.Errorf("new services: %v", err)
+	}
 
 	evalParams := map[string]any{
 		"BSN": "999993653",

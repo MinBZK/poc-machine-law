@@ -38,11 +38,104 @@ const (
 	REJECTED ClaimStatus = "REJECTED"
 )
 
+// Action defines model for Action.
+type Action struct {
+	// Combine Combination method
+	Combine *string `json:"combine"`
+
+	// Conditions Conditional logic
+	Conditions *[]Condition `json:"conditions,omitempty"`
+
+	// Operation Operation to perform
+	Operation *string `json:"operation"`
+
+	// Output Action output
+	Output string `json:"output"`
+
+	// Subject Subject of the action
+	Subject *string `json:"subject"`
+
+	// Unit Unit for the action
+	Unit *string `json:"unit"`
+
+	// Value Represents a value in an operation (can be a primitive value or nested action)
+	Value *ActionValue `json:"value,omitempty"`
+
+	// Values Represents multiple values or a single value
+	Values *ActionValues `json:"values,omitempty"`
+}
+
+// ActionRequirement Either a nested requirement or an action
+type ActionRequirement struct {
+	union json.RawMessage
+}
+
+// ActionValue Represents a value in an operation (can be a primitive value or nested action)
+type ActionValue struct {
+	union json.RawMessage
+}
+
+// ActionValue1 defines model for .
+type ActionValue1 = interface{}
+
+// ActionValues Represents multiple values or a single value
+type ActionValues struct {
+	union json.RawMessage
+}
+
+// ActionValues0 defines model for .
+type ActionValues0 = []ActionValue
+
+// ActionValues1 defines model for .
+type ActionValues1 = interface{}
+
+// Apply defines model for Apply.
+type Apply struct {
+	// Aggregate Aggregate identifier
+	Aggregate string `json:"aggregate"`
+
+	// Events Associated events
+	Events []ApplyEvent `json:"events"`
+
+	// Name Name of the application rule
+	Name string `json:"name"`
+
+	// Update Update rules
+	Update []Update `json:"update"`
+}
+
+// ApplyEvent defines model for ApplyEvent.
+type ApplyEvent struct {
+	// Filter Event filter criteria
+	Filter map[string]interface{} `json:"filter"`
+
+	// Type Event type
+	Type string `json:"type"`
+}
+
+// BaseField defines model for BaseField.
+type BaseField struct {
+	// Description Field description
+	Description string `json:"description"`
+
+	// Name Field name
+	Name string `json:"name"`
+
+	// Required Whether the field is required
+	Required *bool     `json:"required"`
+	Temporal *Temporal `json:"temporal,omitempty"`
+
+	// Type Field type
+	Type     string    `json:"type"`
+	TypeSpec *TypeSpec `json:"type_spec,omitempty"`
+}
+
 // Case Case
 type Case struct {
-	AppealStatus       *map[string]interface{} `json:"appealStatus,omitempty"`
-	Approved           *bool                   `json:"approved,omitempty"`
-	ApprovedClaimsOnly bool                    `json:"approvedClaimsOnly"`
+	// AppealStatus Parameters to set the objection status
+	AppealStatus       *CaseAppealStatus `json:"appealStatus,omitempty"`
+	Approved           *bool             `json:"approved,omitempty"`
+	ApprovedClaimsOnly bool              `json:"approvedClaimsOnly"`
 
 	// Bsn Burgerservicenummer of a Dutch citizen
 	Bsn           Bsn                    `json:"bsn"`
@@ -69,6 +162,17 @@ type Case struct {
 
 // CaseStatus defines model for Case.Status.
 type CaseStatus string
+
+// CaseAppealStatus Parameters to set the objection status
+type CaseAppealStatus struct {
+	AppealPeriod       *int    `json:"appealPeriod,omitempty"`
+	CompetentCourt     *string `json:"competentCourt,omitempty"`
+	CourtType          *string `json:"courtType,omitempty"`
+	DirectAppeal       *bool   `json:"directAppeal,omitempty"`
+	DirectAppealReason *string `json:"directAppealReason,omitempty"`
+	NotPossibleReason  *string `json:"notPossibleReason,omitempty"`
+	Possible           *bool   `json:"possible,omitempty"`
+}
 
 // CaseList List of all cases
 type CaseList = []Case
@@ -198,6 +302,16 @@ type ClaimSubmit struct {
 	Service string `json:"service"`
 }
 
+// Condition Conditional logic with test, then, and optional else
+type Condition struct {
+	// Else Represents a value in an operation (can be a primitive value or nested action)
+	Else *ActionValue `json:"else,omitempty"`
+	Test *Action      `json:"test,omitempty"`
+
+	// Then Represents a value in an operation (can be a primitive value or nested action)
+	Then *ActionValue `json:"then,omitempty"`
+}
+
 // DataFrame defines model for DataFrame.
 type DataFrame struct {
 	// Data Column definitions for the data frame
@@ -261,6 +375,24 @@ type Event struct {
 // EventList List of all events
 type EventList = []Event
 
+// InputField defines model for InputField.
+type InputField struct {
+	// Description Field description
+	Description string `json:"description"`
+
+	// Name Field name
+	Name string `json:"name"`
+
+	// Required Whether the field is required
+	Required         *bool            `json:"required"`
+	ServiceReference ServiceReference `json:"service_reference"`
+	Temporal         *Temporal        `json:"temporal,omitempty"`
+
+	// Type Field type
+	Type     string    `json:"type"`
+	TypeSpec *TypeSpec `json:"type_spec,omitempty"`
+}
+
 // Law Law
 type Law struct {
 	// DiscoverableBy Who can discover this law
@@ -269,6 +401,37 @@ type Law struct {
 	// Name Name of the law
 	Name string `json:"name"`
 }
+
+// OutputField defines model for OutputField.
+type OutputField struct {
+	CitizenRelevance string `json:"citizen_relevance"`
+
+	// Description Field description
+	Description string `json:"description"`
+
+	// Name Field name
+	Name string `json:"name"`
+
+	// Required Whether the field is required
+	Required *bool     `json:"required"`
+	Temporal *Temporal `json:"temporal,omitempty"`
+
+	// Type Field type
+	Type     string    `json:"type"`
+	TypeSpec *TypeSpec `json:"type_spec,omitempty"`
+}
+
+// Parameter defines model for Parameter.
+type Parameter struct {
+	// Name Parameter name
+	Name string `json:"name"`
+
+	// Reference Parameter reference
+	Reference string `json:"reference"`
+}
+
+// ParameterField defines model for ParameterField.
+type ParameterField = BaseField
 
 // PathNode path node
 type PathNode struct {
@@ -299,8 +462,105 @@ type Profile struct {
 // ProfileList List of all burgers
 type ProfileList = []Profile
 
-// RuleSpec Rule spec
-type RuleSpec map[string]interface{}
+// Properties defines model for Properties.
+type Properties struct {
+	// Applies Application rules
+	Applies *[]Apply `json:"applies,omitempty"`
+
+	// Definitions Additional definitions
+	Definitions *map[string]interface{} `json:"definitions,omitempty"`
+
+	// Input Input fields
+	Input *[]InputField `json:"input,omitempty"`
+
+	// Output Output fields
+	Output *[]OutputField `json:"output,omitempty"`
+
+	// Parameters Parameter fields
+	Parameters *[]ParameterField `json:"parameters,omitempty"`
+
+	// Sources Source fields
+	Sources *[]SourceField `json:"sources,omitempty"`
+}
+
+// Reference defines model for Reference.
+type Reference struct {
+	// Article Article reference
+	Article string `json:"article"`
+
+	// Law Law reference
+	Law string `json:"law"`
+
+	// Url URL to the legal reference
+	Url string `json:"url"`
+}
+
+// Requirement Logical requirements with AND/OR operations
+type Requirement struct {
+	// All All requirements must be met (AND logic)
+	All *[]ActionRequirement `json:"all"`
+
+	// Or Any requirement must be met (OR logic)
+	Or *[]ActionRequirement `json:"or"`
+}
+
+// RuleSpec defines model for RuleSpec.
+type RuleSpec struct {
+	// Actions Actions associated with the rule
+	Actions *[]Action `json:"actions,omitempty"`
+
+	// DecisionType Type of decision
+	DecisionType *string `json:"decision_type"`
+
+	// Description Description of the rule specification
+	Description string `json:"description"`
+
+	// Discoverable Discoverability setting
+	Discoverable *string `json:"discoverable"`
+
+	// Law Associated law reference
+	Law string `json:"law"`
+
+	// LawType Type of law
+	LawType *string `json:"law_type"`
+
+	// LegalCharacter Legal character of the rule
+	LegalCharacter *string `json:"legal_character"`
+
+	// Name Name of the rule specification
+	Name       string     `json:"name"`
+	Properties Properties `json:"properties"`
+
+	// References Legal references
+	References *[]Reference `json:"references,omitempty"`
+
+	// Requirements Requirements for the rule
+	Requirements *[]Requirement `json:"requirements,omitempty"`
+
+	// Service Associated service identifier
+	Service string `json:"service"`
+
+	// Uuid Unique identifier for the rule specification
+	Uuid openapi_types.UUID `json:"uuid"`
+
+	// ValidFrom Date from which the rule is valid
+	ValidFrom time.Time `json:"valid_from"`
+}
+
+// SelectField defines model for SelectField.
+type SelectField struct {
+	// Description Field description
+	Description string `json:"description"`
+
+	// Name Field name
+	Name string `json:"name"`
+
+	// Type Field type
+	Type string `json:"type"`
+
+	// Value Represents a value in an operation (can be a primitive value or nested action)
+	Value ActionValue `json:"value"`
+}
 
 // Service Service
 type Service struct {
@@ -313,8 +573,102 @@ type Service struct {
 // ServiceList List of all services
 type ServiceList = []Service
 
+// ServiceReference defines model for ServiceReference.
+type ServiceReference struct {
+	// Field Field in the referenced service
+	Field string `json:"field"`
+
+	// Law Associated law
+	Law string `json:"law"`
+
+	// Parameters Service parameters
+	Parameters *[]Parameter `json:"parameters,omitempty"`
+
+	// Service Referenced service identifier
+	Service string `json:"service"`
+}
+
 // Source A source
 type Source map[string][]map[string]interface{}
+
+// SourceField defines model for SourceField.
+type SourceField struct {
+	// Description Field description
+	Description string `json:"description"`
+
+	// Name Field name
+	Name string `json:"name"`
+
+	// Required Whether the field is required
+	Required         *bool             `json:"required"`
+	ServiceReference *ServiceReference `json:"service_reference,omitempty"`
+	SourceReference  *SourceReference  `json:"source_reference,omitempty"`
+	Temporal         *Temporal         `json:"temporal,omitempty"`
+
+	// Type Field type
+	Type     string    `json:"type"`
+	TypeSpec *TypeSpec `json:"type_spec,omitempty"`
+}
+
+// SourceReference defines model for SourceReference.
+type SourceReference struct {
+	// Field Specific field to reference
+	Field *string `json:"field"`
+
+	// Fields Multiple fields to reference
+	Fields *[]string `json:"fields"`
+
+	// SelectOn Selection criteria
+	SelectOn *[]SelectField `json:"select_on,omitempty"`
+
+	// SourceType Type of the data source
+	SourceType *string `json:"source_type,omitempty"`
+
+	// Table Table name in the source
+	Table *string `json:"table,omitempty"`
+}
+
+// Temporal defines model for Temporal.
+type Temporal struct {
+	// ImmutableAfter Immutability rule
+	ImmutableAfter *string `json:"immutable_after"`
+
+	// PeriodType Period type specification
+	PeriodType *string `json:"period_type"`
+
+	// Reference Reference (can be string or VariableReference)
+	Reference *string `json:"reference"`
+
+	// Type Temporal type
+	Type string `json:"type"`
+}
+
+// TypeSpec defines model for TypeSpec.
+type TypeSpec struct {
+	// Max Maximum value
+	Max *float64 `json:"max"`
+
+	// Min Minimum value
+	Min *float64 `json:"min"`
+
+	// Precision Precision for numeric types
+	Precision *int `json:"precision"`
+
+	// Type Specific type definition
+	Type string `json:"type"`
+
+	// Unit Unit of measurement
+	Unit *string `json:"unit"`
+}
+
+// Update defines model for Update.
+type Update struct {
+	// Mapping Field mapping configuration
+	Mapping map[string]string `json:"mapping"`
+
+	// Method Update method
+	Method string `json:"method"`
+}
 
 // Bsn Burgerservicenummer of a Dutch citizen
 type Bsn = string
@@ -464,7 +818,6 @@ type ResourceNotFoundErrorResponse struct {
 
 // RuleSpecResponse defines model for RuleSpecResponse.
 type RuleSpecResponse struct {
-	// Data Rule spec
 	Data RuleSpec `json:"data"`
 }
 
@@ -623,6 +976,192 @@ type EvaluateJSONRequestBody EvaluateJSONBody
 
 // SetSourceDataFrameJSONRequestBody defines body for SetSourceDataFrame for application/json ContentType.
 type SetSourceDataFrameJSONRequestBody SetSourceDataFrameJSONBody
+
+// AsRequirement returns the union data inside the ActionRequirement as a Requirement
+func (t ActionRequirement) AsRequirement() (Requirement, error) {
+	var body Requirement
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromRequirement overwrites any union data inside the ActionRequirement as the provided Requirement
+func (t *ActionRequirement) FromRequirement(v Requirement) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeRequirement performs a merge with any union data inside the ActionRequirement, using the provided Requirement
+func (t *ActionRequirement) MergeRequirement(v Requirement) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAction returns the union data inside the ActionRequirement as a Action
+func (t ActionRequirement) AsAction() (Action, error) {
+	var body Action
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAction overwrites any union data inside the ActionRequirement as the provided Action
+func (t *ActionRequirement) FromAction(v Action) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAction performs a merge with any union data inside the ActionRequirement, using the provided Action
+func (t *ActionRequirement) MergeAction(v Action) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ActionRequirement) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ActionRequirement) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsAction returns the union data inside the ActionValue as a Action
+func (t ActionValue) AsAction() (Action, error) {
+	var body Action
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAction overwrites any union data inside the ActionValue as the provided Action
+func (t *ActionValue) FromAction(v Action) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAction performs a merge with any union data inside the ActionValue, using the provided Action
+func (t *ActionValue) MergeAction(v Action) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsActionValue1 returns the union data inside the ActionValue as a ActionValue1
+func (t ActionValue) AsActionValue1() (ActionValue1, error) {
+	var body ActionValue1
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromActionValue1 overwrites any union data inside the ActionValue as the provided ActionValue1
+func (t *ActionValue) FromActionValue1(v ActionValue1) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeActionValue1 performs a merge with any union data inside the ActionValue, using the provided ActionValue1
+func (t *ActionValue) MergeActionValue1(v ActionValue1) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ActionValue) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ActionValue) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsActionValues0 returns the union data inside the ActionValues as a ActionValues0
+func (t ActionValues) AsActionValues0() (ActionValues0, error) {
+	var body ActionValues0
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromActionValues0 overwrites any union data inside the ActionValues as the provided ActionValues0
+func (t *ActionValues) FromActionValues0(v ActionValues0) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeActionValues0 performs a merge with any union data inside the ActionValues, using the provided ActionValues0
+func (t *ActionValues) MergeActionValues0(v ActionValues0) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsActionValues1 returns the union data inside the ActionValues as a ActionValues1
+func (t ActionValues) AsActionValues1() (ActionValues1, error) {
+	var body ActionValues1
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromActionValues1 overwrites any union data inside the ActionValues as the provided ActionValues1
+func (t *ActionValues) FromActionValues1(v ActionValues1) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeActionValues1 performs a merge with any union data inside the ActionValues, using the provided ActionValues1
+func (t *ActionValues) MergeActionValues1(v ActionValues1) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ActionValues) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ActionValues) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -1653,7 +2192,6 @@ type ResourceNotFoundErrorResponseJSONResponse struct {
 }
 
 type RuleSpecResponseJSONResponse struct {
-	// Data Rule spec
 	Data RuleSpec `json:"data"`
 }
 
@@ -3290,73 +3828,97 @@ func (sh *strictHandler) SetSourceDataFrame(w http.ResponseWriter, r *http.Reque
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"agAA",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
