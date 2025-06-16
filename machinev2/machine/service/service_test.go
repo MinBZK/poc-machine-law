@@ -12,7 +12,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestService(t *testing.T) {
@@ -27,7 +27,7 @@ func TestService(t *testing.T) {
 	// Initialize services with current date
 	currentDate := time.Now()
 	services, err := service.NewServices(currentDate, service.WithRuleServiceInMemory())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	logger.Infof(ctx, "Direct rules engine evaluation example:")
 
