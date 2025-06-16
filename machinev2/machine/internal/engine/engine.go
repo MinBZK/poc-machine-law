@@ -219,7 +219,6 @@ func topologicalSort(dependencies map[string]map[string]struct{}) ([]string, err
 func analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
 	deps := make(map[string]struct{})
 
-	// TODO verify that this is not broken
 	var traverse func(obj any)
 	traverse = func(obj any) {
 		switch v := obj.(type) {

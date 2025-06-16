@@ -22,6 +22,7 @@ var (
 	lawsByService             map[string]map[string]struct{}
 	discoverableLawsByService map[string]map[string]map[string]struct{}
 	once                      sync.Once
+	ruleSpecCache             sync.Map
 )
 
 // RuleResolver handles rule resolution and lookup
@@ -30,7 +31,6 @@ type RuleResolver struct {
 	Rules                     []RuleSpec
 	LawsByService             map[string]map[string]struct{}
 	DiscoverableLawsByService map[string]map[string]map[string]struct{}
-	RuleSpecCache             sync.Map
 	mu                        sync.RWMutex
 }
 
@@ -58,7 +58,6 @@ func New() (resolver *RuleResolver, err error) {
 		Rules:                     ruleSpec,
 		LawsByService:             lawsByService,
 		DiscoverableLawsByService: discoverableLawsByService,
-		RuleSpecCache:             sync.Map{},
 	}, nil
 }
 
@@ -235,7 +234,7 @@ func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (R
 		return RuleSpec{}, err
 	}
 
-	if data, ok := r.RuleSpecCache.Load(rule.Path); ok {
+	if data, ok := ruleSpecCache.Load(rule.Path); ok {
 		return data.(RuleSpec), nil
 	}
 
@@ -251,7 +250,7 @@ func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (R
 		return RuleSpec{}, fmt.Errorf("error parsing rule YAML: %w", err)
 	}
 
-	r.RuleSpecCache.Store(rule.Path, result)
+	ruleSpecCache.Store(rule.Path, result)
 
 	return result, nil
 }

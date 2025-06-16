@@ -3,6 +3,8 @@ package dataframe
 import (
 	"fmt"
 
+	"maps"
+
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 )
 
@@ -16,55 +18,72 @@ type SimpleDataFrame struct {
 
 // Append implements model.DataFrame.
 func (df *SimpleDataFrame) Append(other model.DataFrame) (model.DataFrame, error) {
-	// Get the data from the other dataframe
 	otherData := other.ToRecords()
 	if len(otherData) == 0 {
-		// If other dataframe is empty, just return a copy of the current one
 		return New(df.data), nil
 	}
 
-	// Get all columns from both dataframes
-	otherColumns := other.GetColumns()
+	// Pre-calculate total size and allocate once
+	totalRows := len(df.data) + len(otherData)
+	newData := make([]map[string]any, totalRows)
+
+	// Get column sets once
 	currentColumns := df.GetColumns()
+	otherColumns := other.GetColumns()
 
-	// Create a map of all unique columns
-	allColumns := make(map[string]struct{}, 0)
+	// Use slices instead of map for better performance when column count is small
+	var allColumns []string
+	columnSet := make(map[string]struct{}, len(currentColumns)+len(otherColumns))
+
+	// Add current columns
 	for _, col := range currentColumns {
-		allColumns[col] = struct{}{}
+		if _, exists := columnSet[col]; !exists {
+			columnSet[col] = struct{}{}
+			allColumns = append(allColumns, col)
+		}
 	}
+
+	// Add other columns
 	for _, col := range otherColumns {
-		allColumns[col] = struct{}{}
+		if _, exists := columnSet[col]; !exists {
+			columnSet[col] = struct{}{}
+			allColumns = append(allColumns, col)
+		}
 	}
 
-	// Create new data with all columns
-	newData := make([]map[string]any, len(df.data)+len(otherData))
-
-	// Copy current dataframe data
+	// Process current dataframe rows
 	for i, row := range df.data {
-		newRow := make(map[string]any)
-		for col := range allColumns {
-			if val, exists := row[col]; exists {
-				newRow[col] = val
-			} else {
-				// Column doesn't exist in this row, use zero value
+		newRow := make(map[string]any, len(allColumns))
+
+		// Copy existing values
+		maps.Copy(newRow, row)
+
+		// Add nil for missing columns
+		for _, col := range allColumns {
+			if _, exists := newRow[col]; !exists {
 				newRow[col] = nil
 			}
 		}
+
 		newData[i] = newRow
 	}
 
-	// Copy other dataframe data
+	// Process other dataframe rows
+	offset := len(df.data)
 	for i, row := range otherData {
-		newRow := make(map[string]any)
-		for col := range allColumns {
-			if val, exists := row[col]; exists {
-				newRow[col] = val
-			} else {
-				// Column doesn't exist in this row, use zero value
+		newRow := make(map[string]any, len(allColumns))
+
+		// Copy existing values
+		maps.Copy(newRow, row)
+
+		// Add nil for missing columns
+		for _, col := range allColumns {
+			if _, exists := newRow[col]; !exists {
 				newRow[col] = nil
 			}
 		}
-		newData[len(df.data)+i] = newRow
+
+		newData[offset+i] = newRow
 	}
 
 	return New(newData), nil

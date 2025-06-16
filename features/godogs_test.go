@@ -129,8 +129,6 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 	result, err := services.Evaluate(ctx, svc, law, params, "", nil, "", approved)
 	require.NoError(godog.T(ctx), err)
 
-	fmt.Printf("result: %#+v\n", result)
-
 	ctx = context.WithValue(ctx, serviceCtxKey{}, svc)
 	ctx = context.WithValue(ctx, lawCtxKey{}, law)
 
