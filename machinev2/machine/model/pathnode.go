@@ -16,5 +16,6 @@ func (p *PathNode) AddChild(child *PathNode) {
 	if p.Children == nil {
 		p.Children = make([]*PathNode, 0)
 	}
+
 	p.Children = append(p.Children, child)
 }

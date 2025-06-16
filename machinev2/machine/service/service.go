@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -10,27 +11,56 @@ import (
 
 	internalContext "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
 	"github.com/sirupsen/logrus"
 )
 
 // Services is the main service provider for rule evaluation
 type Services struct {
 	logger            logging.Logger
-	Resolver          *ruleresolver.RuleResolver
-	services          map[string]*RuleService
-	ServiceResolver   *utils.ServiceResolver
+	RuleResolver      *ruleresolver.RuleResolver
+	services          map[string]ruleservice.RuleServicer
+	ServiceResolver   *serviceresolver.ServiceResolver
 	RootReferenceDate string
 	CaseManager       *CaseManager
 	ClaimManager      *ClaimManager
 	mu                sync.RWMutex
+
+	ruleServiceInMemory bool
+
+	organization   *string
+	standAloneMode bool
+}
+
+type Option func(*Services)
+
+func WithRuleServiceInMemory() Option {
+	return func(s *Services) {
+		s.logger.Warning(context.Background(), "running service in memory only mode")
+		s.ruleServiceInMemory = true
+	}
+}
+
+func WithOrganizationName(organization string) Option {
+	return func(s *Services) {
+		s.logger.Warningf(context.Background(), "starting as organization: %s", organization)
+		s.organization = &organization
+	}
+}
+
+func SetStandaloneMode() Option {
+	return func(s *Services) {
+		s.logger.Warningf(context.Background(), "setup in standalone mode")
+		s.standAloneMode = true
+	}
 }
 
 // NewServices creates a new services instance
-func NewServices(referenceDate time.Time) (*Services, error) {
-	serviceResolver, err := utils.NewServiceResolver()
+func NewServices(referenceDate time.Time, options ...Option) (*Services, error) {
+	serviceResolver, err := serviceresolver.New()
 	if err != nil {
 		return nil, fmt.Errorf("new service resolver: %w", err)
 	}
@@ -41,16 +71,24 @@ func NewServices(referenceDate time.Time) (*Services, error) {
 	}
 
 	s := &Services{
-		logger:            logging.New("service", os.Stdout, logrus.ErrorLevel),
-		Resolver:          ruleResolver,
-		ServiceResolver:   serviceResolver,
-		services:          make(map[string]*RuleService),
-		RootReferenceDate: referenceDate.Format("2006-01-02"),
+		logger:              logging.New("service", os.Stdout, logrus.DebugLevel),
+		RuleResolver:        ruleResolver,
+		ServiceResolver:     serviceResolver,
+		services:            make(map[string]ruleservice.RuleServicer),
+		RootReferenceDate:   referenceDate.Format("2006-01-02"),
+		ruleServiceInMemory: false,
+		organization:        nil,
+		standAloneMode:      false,
+	}
+
+	// Apply all the functional options to configure the client.
+	for _, opt := range options {
+		opt(s)
 	}
 
 	// Initialize services
-	for service := range s.Resolver.GetServiceLaws() {
-		svc, err := NewRuleService(s.logger, service, s)
+	for service := range s.RuleResolver.GetServiceLaws() {
+		svc, err := ruleservice.New(s.logger, service, s)
 		if err != nil {
 			return nil, fmt.Errorf("new rule service: %w", err)
 		}
@@ -66,7 +104,7 @@ func NewServices(referenceDate time.Time) (*Services, error) {
 	return s, nil
 }
 
-func (s *Services) GetService(key string) (*RuleService, bool) {
+func (s *Services) GetService(key string) (ruleservice.RuleServicer, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -76,25 +114,43 @@ func (s *Services) GetService(key string) (*RuleService, bool) {
 
 // GetDiscoverableServiceLaws returns discoverable services and laws
 func (s *Services) GetDiscoverableServiceLaws(discoverableBy string) map[string][]string {
-	return s.Resolver.GetDiscoverableServiceLaws(discoverableBy)
+	return s.RuleResolver.GetDiscoverableServiceLaws(discoverableBy)
 }
 
 // SetSourceDataFrame sets a source DataFrame for a service
-func (s *Services) SetSourceDataFrame(service, table string, df model.DataFrame) {
-	if srv, ok := s.services[service]; ok {
-		srv.SetSourceDataFrame(table, df)
+func (s *Services) SetSourceDataFrame(ctx context.Context, service, table string, df model.DataFrame) error {
+	if srv, ok := s.GetService(service); ok {
+		if err := srv.SetSourceDataFrame(ctx, table, df); err != nil {
+			return fmt.Errorf("set source dataframe: %w", err)
+		}
 	}
+
+	return nil
 }
 
-func (s *Services) Reset() {
+func (s *Services) Reset(ctx context.Context) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var errs error
+
 	for key := range s.services {
-		s.services[key].Reset()
+		if err := s.services[key].Reset(ctx); err != nil {
+			errs = errors.Join(errs, err)
+		}
 	}
+
+	return errs
 }
 
-// GetResolver returns the rule resolver
-func (s *Services) GetResolver() *ruleresolver.RuleResolver {
-	return s.Resolver
+// GetRuleResolver returns the rule resolver
+func (s *Services) GetRuleResolver() *ruleresolver.RuleResolver {
+	return s.RuleResolver
+}
+
+// GetRuleResolver returns the rule resolver
+func (s *Services) GetServiceResolver() *serviceresolver.ServiceResolver {
+	return s.ServiceResolver
 }
 
 // GetCaseManager returns the case manager with access to events
@@ -261,7 +317,7 @@ func (s *Services) ExtractValueTree(root *model.PathNode) map[string]any {
 
 // ApplyRules applies rules in response to events
 func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
-	for _, rule := range s.Resolver.Rules {
+	for _, rule := range s.RuleResolver.Rules {
 		for _, apply := range rule.Properties.Applies {
 			if s.matchesEvent(event, apply) {
 				aggregateID := event.CaseID
@@ -425,4 +481,24 @@ func (s *Services) matchesEvent(event model.Event, apply ruleresolver.Apply) boo
 	}
 
 	return false
+}
+
+func (s Services) HasOrganizationName() bool {
+	return s.organization != nil
+}
+
+func (s Services) GetOrganizationName() string {
+	if s.organization == nil {
+		return ""
+	}
+
+	return *s.organization
+}
+
+func (s Services) RuleServicesInMemory() bool {
+	return s.ruleServiceInMemory
+}
+
+func (s Services) InStandAloneMode() bool {
+	return s.standAloneMode
 }

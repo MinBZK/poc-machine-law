@@ -74,7 +74,7 @@ type LawSimulator struct {
 
 // NewLawSimulator creates a new LawSimulator instance
 func NewLawSimulator(simulationDate time.Time) (*LawSimulator, error) {
-	services, err := service.NewServices(simulationDate)
+	services, err := service.NewServices(simulationDate, service.WithRuleServiceInMemory())
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
@@ -181,9 +181,9 @@ func (ls *LawSimulator) GeneratePairedPeople(numPeople int, people chan Person) 
 }
 
 // SetupTestData prepares all the data sources for simulation
-func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
+func (ls *LawSimulator) SetupTestData(ctx context.Context, people <-chan Person, data chan Person) {
 
-	ls.Services.SetSourceDataFrame("CBS", "levensverwachting", dataframe.New([]map[string]any{
+	ls.Services.SetSourceDataFrame(ctx, "CBS", "levensverwachting", dataframe.New([]map[string]any{
 		{
 			"jaar":           "2025",
 			"verwachting_65": 20.5,
@@ -191,7 +191,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 	}))
 
 	for person := range people {
-		ls.Services.SetSourceDataFrame("RvIG", "personen", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "RvIG", "personen", dataframe.New([]map[string]any{
 			{
 				"bsn":            person.BSN,
 				"geboortedatum":  person.BirthDate.Format("2006-01-02"),
@@ -205,7 +205,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			partnershipType = "HUWELIJK"
 		}
 
-		ls.Services.SetSourceDataFrame("RvIG", "relaties", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "RvIG", "relaties", dataframe.New([]map[string]any{
 			{
 				"bsn":               person.BSN,
 				"partnerschap_type": partnershipType,
@@ -213,7 +213,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("BELASTINGDIENST", "inkomen", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "inkomen", dataframe.New([]map[string]any{
 			{
 				"bsn":         person.BSN,
 				"box1":        person.AnnualIncome,
@@ -223,7 +223,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("BELASTINGDIENST", "vermogen", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "vermogen", dataframe.New([]map[string]any{
 			{
 				"bsn":         person.BSN,
 				"bezittingen": person.NetWorth,
@@ -231,7 +231,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("BELASTINGDIENST", "dienstverbanden", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "dienstverbanden", dataframe.New([]map[string]any{
 			{
 				"bsn":        person.BSN,
 				"start_date": person.BirthDate.Format("2006-01-02"),
@@ -239,7 +239,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("SVB", "verzekerde_tijdvakken", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "SVB", "verzekerde_tijdvakken", dataframe.New([]map[string]any{
 			{
 				"bsn":          person.BSN,
 				"woonperiodes": person.ResidenceYears,
@@ -251,21 +251,21 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			status = "INACTIEF"
 		}
 
-		ls.Services.SetSourceDataFrame("RVZ", "verzekeringen", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "RVZ", "verzekeringen", dataframe.New([]map[string]any{
 			{
 				"bsn":          person.BSN,
 				"polis_status": status,
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("RVZ", "verdragsverzekeringen", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "RVZ", "verdragsverzekeringen", dataframe.New([]map[string]any{
 			{
 				"bsn":         person.BSN,
 				"registratie": "INACTIEF",
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("DJI", "detenties", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "DJI", "detenties", dataframe.New([]map[string]any{
 			{
 				"bsn":             person.BSN,
 				"status":          "VRIJ",
@@ -273,7 +273,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			},
 		}))
 
-		ls.Services.SetSourceDataFrame("DJI", "forensische_zorg", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "DJI", "forensische_zorg", dataframe.New([]map[string]any{
 			{
 				"bsn":              person.BSN,
 				"zorgtype":         "GEEN",
@@ -286,7 +286,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			onderwijstype = "HBO"
 		}
 
-		ls.Services.SetSourceDataFrame("DUO", "inschrijvingen", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "DUO", "inschrijvingen", dataframe.New([]map[string]any{
 			{
 				"bsn":           person.BSN,
 				"onderwijstype": onderwijstype,
@@ -298,7 +298,7 @@ func (ls *LawSimulator) SetupTestData(people <-chan Person, data chan Person) {
 			aantalStuderend = rand.Intn(4)
 		}
 
-		ls.Services.SetSourceDataFrame("DUO", "studiefinanciering", dataframe.New([]map[string]any{
+		ls.Services.SetSourceDataFrame(ctx, "DUO", "studiefinanciering", dataframe.New([]map[string]any{
 			{
 				"bsn":                    person.BSN,
 				"aantal_studerend_gezin": aantalStuderend,
@@ -393,14 +393,14 @@ func (ls *LawSimulator) SimulatePerson(person Person) error {
 }
 
 // RunSimulation runs the full simulation
-func (ls *LawSimulator) RunSimulation(numPeople int) []SimulationResult {
+func (ls *LawSimulator) RunSimulation(ctx context.Context, numPeople int) []SimulationResult {
 	// Generate people with partnerships
 	people := make(chan Person)
 	go ls.GeneratePairedPeople(numPeople, people)
 
 	// Set up test data
 	data := make(chan Person)
-	ls.SetupTestData(people, data)
+	ls.SetupTestData(ctx, people, data)
 
 	// Use a wait group to wait for all simulations to complete
 	wp := workerpool.New(32)

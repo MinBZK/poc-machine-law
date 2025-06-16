@@ -26,7 +26,7 @@ func TestService(t *testing.T) {
 
 	// Initialize services with current date
 	currentDate := time.Now()
-	services, err := service.NewServices(currentDate)
+	services, err := service.NewServices(currentDate, service.WithRuleServiceInMemory())
 	assert.NoError(t, err)
 
 	logger.Infof(ctx, "Direct rules engine evaluation example:")
@@ -35,14 +35,14 @@ func TestService(t *testing.T) {
 		"BSN": "999993653",
 	}
 
-	services.SetSourceDataFrame("CBS", "levensverwachting", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "CBS", "levensverwachting", dataframe.New([]map[string]any{
 		{
 			"jaar":           "2025",
 			"verwachting_65": "20.5",
 		},
 	}))
 
-	services.SetSourceDataFrame("IND", "verblijfsvergunningen", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "IND", "verblijfsvergunningen", dataframe.New([]map[string]any{
 		{
 			"bsn":          "999993653",
 			"type":         "ONBEPAALDE_TIJD_REGULIER",
@@ -52,7 +52,7 @@ func TestService(t *testing.T) {
 		},
 	}))
 
-	services.SetSourceDataFrame("RvIG", "personen", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "RvIG", "personen", dataframe.New([]map[string]any{
 		{
 			"bsn":            "999993653",
 			"geboortedatum":  "1990-01-01",
@@ -60,7 +60,7 @@ func TestService(t *testing.T) {
 		},
 	}))
 
-	services.SetSourceDataFrame("RvIG", "relaties", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "RvIG", "relaties", dataframe.New([]map[string]any{
 		{
 			"bsn":               "999993653",
 			"partnerschap_type": "GEEN",
@@ -68,7 +68,7 @@ func TestService(t *testing.T) {
 		},
 	}))
 
-	services.SetSourceDataFrame("BELASTINGDIENST", "box1", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "box1", dataframe.New([]map[string]any{
 		{
 			"bsn":                             "999993653",
 			"loon_uit_dienstbetrekking":       0,
@@ -79,7 +79,7 @@ func TestService(t *testing.T) {
 		},
 	}))
 
-	services.SetSourceDataFrame("BELASTINGDIENST", "box3", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "box3", dataframe.New([]map[string]any{
 		{
 			"bsn":            "999993653",
 			"spaargeld":      "5000",
@@ -89,7 +89,7 @@ func TestService(t *testing.T) {
 		},
 	}))
 
-	services.SetSourceDataFrame("RvIG", "verblijfplaats", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "RvIG", "verblijfplaats", dataframe.New([]map[string]any{
 		{
 			"bsn":        "999993653",
 			"straat":     "Kalverstraat",
@@ -100,7 +100,7 @@ func TestService(t *testing.T) {
 		},
 	}))
 
-	services.SetSourceDataFrame("GEMEENTE_AMSTERDAM", "werk_en_re_integratie", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "GEMEENTE_AMSTERDAM", "werk_en_re_integratie", dataframe.New([]map[string]any{
 		{
 			"bsn":                   "999993653",
 			"arbeidsvermogen":       "VOLLEDIG",
@@ -159,7 +159,7 @@ func BenchmarkService(b *testing.B) {
 
 	// Initialize services with current date
 	currentDate := time.Now()
-	services, err := service.NewServices(currentDate)
+	services, err := service.NewServices(currentDate, service.WithRuleServiceInMemory())
 	if err != nil {
 		b.Errorf("new services: %v", err)
 	}
@@ -168,14 +168,16 @@ func BenchmarkService(b *testing.B) {
 		"BSN": "999993653",
 	}
 
-	services.SetSourceDataFrame("CBS", "levensverwachting", dataframe.New([]map[string]any{
+	ctx := b.Context()
+
+	services.SetSourceDataFrame(ctx, "CBS", "levensverwachting", dataframe.New([]map[string]any{
 		{
 			"jaar":           "2025",
 			"verwachting_65": "20.5",
 		},
 	}))
 
-	services.SetSourceDataFrame("IND", "verblijfsvergunningen", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "IND", "verblijfsvergunningen", dataframe.New([]map[string]any{
 		{
 			"bsn":          "999993653",
 			"type":         "ONBEPAALDE_TIJD_REGULIER",
@@ -185,7 +187,7 @@ func BenchmarkService(b *testing.B) {
 		},
 	}))
 
-	services.SetSourceDataFrame("RvIG", "personen", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "RvIG", "personen", dataframe.New([]map[string]any{
 		{
 			"bsn":            "999993653",
 			"geboortedatum":  "1990-01-01",
@@ -193,7 +195,7 @@ func BenchmarkService(b *testing.B) {
 		},
 	}))
 
-	services.SetSourceDataFrame("RvIG", "relaties", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "RvIG", "relaties", dataframe.New([]map[string]any{
 		{
 			"bsn":               "999993653",
 			"partnerschap_type": "GEEN",
@@ -201,7 +203,7 @@ func BenchmarkService(b *testing.B) {
 		},
 	}))
 
-	services.SetSourceDataFrame("BELASTINGDIENST", "box1", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "box1", dataframe.New([]map[string]any{
 		{
 			"bsn":                             "999993653",
 			"loon_uit_dienstbetrekking":       0,
@@ -212,7 +214,7 @@ func BenchmarkService(b *testing.B) {
 		},
 	}))
 
-	services.SetSourceDataFrame("BELASTINGDIENST", "box3", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "BELASTINGDIENST", "box3", dataframe.New([]map[string]any{
 		{
 			"bsn":            "999993653",
 			"spaargeld":      "5000",
@@ -222,7 +224,7 @@ func BenchmarkService(b *testing.B) {
 		},
 	}))
 
-	services.SetSourceDataFrame("RvIG", "verblijfplaats", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "RvIG", "verblijfplaats", dataframe.New([]map[string]any{
 		{
 			"bsn":        "999993653",
 			"straat":     "Kalverstraat",
@@ -233,7 +235,7 @@ func BenchmarkService(b *testing.B) {
 		},
 	}))
 
-	services.SetSourceDataFrame("GEMEENTE_AMSTERDAM", "werk_en_re_integratie", dataframe.New([]map[string]any{
+	services.SetSourceDataFrame(ctx, "GEMEENTE_AMSTERDAM", "werk_en_re_integratie", dataframe.New([]map[string]any{
 		{
 			"bsn":                   "999993653",
 			"arbeidsvermogen":       "VOLLEDIG",
@@ -245,7 +247,7 @@ func BenchmarkService(b *testing.B) {
 
 	for b.Loop() {
 		evalResult, _ := services.Evaluate(
-			b.Context(),
+			ctx,
 			"GEMEENTE_AMSTERDAM",
 			"participatiewet/bijstand",
 			evalParams,

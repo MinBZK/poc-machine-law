@@ -20,7 +20,7 @@ paths:
         $ref: "#/components/requestBodies/EvaluateRequest"
       responses:
         "201":
-          $ref: "#/components/responses/EvaluateResponse"
+          $ref: "#/components/responses/ResponseEvaluate"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -33,7 +33,7 @@ paths:
       operationId: profileList
       responses:
         "200":
-          $ref: "#/components/responses/ProfileListResponse"
+          $ref: "#/components/responses/ResponseProfileList"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -98,7 +98,7 @@ paths:
         $ref: "#/components/requestBodies/ClaimSubmitRequest"
       responses:
         "201":
-          $ref: "#/components/responses/ClaimSubmitResponse"
+          $ref: "#/components/responses/ResponseClaimSubmit"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -116,7 +116,7 @@ paths:
         $ref: "#/components/requestBodies/ClaimRejectRequest"
       responses:
         "200":
-          $ref: "#/components/responses/ClaimRejectResponse"
+          $ref: "#/components/responses/ResponseClaimReject"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -136,7 +136,7 @@ paths:
         $ref: "#/components/requestBodies/ClaimApproveRequest"
       responses:
         "200":
-          $ref: "#/components/responses/ClaimApproveResponse"
+          $ref: "#/components/responses/ResponseClaimApprove"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -189,7 +189,7 @@ paths:
         $ref: "#/components/requestBodies/CaseSubmitRequest"
       responses:
         "201":
-          $ref: "#/components/responses/CaseSubmitResponse"
+          $ref: "#/components/responses/ResponseCaseSubmit"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -204,7 +204,7 @@ paths:
       operationId: caseGet
       responses:
         "200":
-          $ref: "#/components/responses/CaseResponse"
+          $ref: "#/components/responses/ResponseCase"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -224,7 +224,7 @@ paths:
         $ref: "#/components/requestBodies/CaseReviewRequest"
       responses:
         "200":
-          $ref: "#/components/responses/CaseReviewResponse"
+          $ref: "#/components/responses/ResponseCaseReview"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -244,7 +244,7 @@ paths:
         $ref: "#/components/requestBodies/CaseObjectRequest"
       responses:
         "200":
-          $ref: "#/components/responses/CaseObjectResponse"
+          $ref: "#/components/responses/ResponseCaseObject"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -261,7 +261,7 @@ paths:
       operationId: caseListBasedOnBSN
       responses:
         "200":
-          $ref: "#/components/responses/CaseListResponse"
+          $ref: "#/components/responses/ResponseCaseList"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -280,7 +280,7 @@ paths:
       operationId: caseBasedOnBSNServiceLaw
       responses:
         "200":
-          $ref: "#/components/responses/CaseResponse"
+          $ref: "#/components/responses/ResponseCase"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -298,7 +298,7 @@ paths:
       operationId: caseListBasedOnServiceLaw
       responses:
         "200":
-          $ref: "#/components/responses/CaseListResponse"
+          $ref: "#/components/responses/ResponseCaseList"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -314,7 +314,7 @@ paths:
       operationId: eventListBasedOnCaseID
       responses:
         "200":
-          $ref: "#/components/responses/EventListResponse"
+          $ref: "#/components/responses/ResponseEventList"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "404":
@@ -329,7 +329,7 @@ paths:
       operationId: eventList
       responses:
         "200":
-          $ref: "#/components/responses/EventListResponse"
+          $ref: "#/components/responses/ResponseEventList"
         "400":
           $ref: "#/components/responses/BadRequestErrorResponse"
         "500":
@@ -432,7 +432,7 @@ components:
       example:
         service: "TOESLAGEN"
         law: "zorgtoeslagwet"
-    EvaluateResponseSchema:
+    ResponseEvaluateSchema:
       description: Evaluate response
       type: object
       properties:
@@ -1554,7 +1554,7 @@ components:
             example:
               errors:
                 - message: foo went wrong
-    EvaluateResponse:
+    ResponseEvaluate:
       description: Evaluate response
       content:
         application/json:
@@ -1562,7 +1562,7 @@ components:
             type: object
             properties:
               data:
-                $ref: "#/components/schemas/EvaluateResponseSchema"
+                $ref: "#/components/schemas/ResponseEvaluateSchema"
             required:
               - data
     ProfileResponse:
@@ -1576,7 +1576,7 @@ components:
                 $ref: "#/components/schemas/Profile"
             required:
               - data
-    ProfileListResponse:
+    ResponseProfileList:
       description: Profile list response
       content:
         application/json:
@@ -1609,7 +1609,7 @@ components:
                 $ref: "#/components/schemas/RuleSpec"
             required:
               - data
-    ClaimSubmitResponse:
+    ResponseClaimSubmit:
       description: Claim submit response
       content:
         application/json:
@@ -1644,7 +1644,7 @@ components:
                   $ref: "#/components/schemas/Claim"
             required:
               - data
-    CaseResponse:
+    ResponseCase:
       description: Case response
       content:
         application/json:
@@ -1655,7 +1655,7 @@ components:
                 $ref: "#/components/schemas/Case"
             required:
               - data
-    CaseListResponse:
+    ResponseCaseList:
       description: Case list response
       content:
         application/json:
@@ -1666,7 +1666,7 @@ components:
                 $ref: "#/components/schemas/CaseList"
             required:
               - data
-    EventListResponse:
+    ResponseEventList:
       description: Event list response
       content:
         application/json:
@@ -1677,7 +1677,7 @@ components:
                 $ref: "#/components/schemas/EventList"
             required:
               - data
-    CaseSubmitResponse:
+    ResponseCaseSubmit:
       description: Case submit response
       content:
         application/json:
@@ -1688,7 +1688,7 @@ components:
                 $ref: "#/components/schemas/caseID"
             required:
               - data
-    CaseReviewResponse:
+    ResponseCaseReview:
       description: Case submit response
       content:
         application/json:
@@ -1699,7 +1699,7 @@ components:
                 $ref: "#/components/schemas/caseID"
             required:
               - data
-    CaseObjectResponse:
+    ResponseCaseObject:
       description: Case submit response
       content:
         application/json:
@@ -1710,7 +1710,7 @@ components:
                 $ref: "#/components/schemas/caseID"
             required:
               - data
-    ClaimApproveResponse:
+    ResponseClaimApprove:
       description: Claim approve response
       content:
         application/json:
@@ -1721,7 +1721,7 @@ components:
                 $ref: "#/components/schemas/claimID"
             required:
               - data
-    ClaimRejectResponse:
+    ResponseClaimReject:
       description: Claim reject response
       content:
         application/json:

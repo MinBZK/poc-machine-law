@@ -1,4 +1,4 @@
-package utils
+package serviceresolver
 
 import (
 	"fmt"
@@ -35,7 +35,7 @@ type ServiceResolver struct {
 	mu       sync.RWMutex
 }
 
-func NewServiceResolver() (*ServiceResolver, error) {
+func New() (*ServiceResolver, error) {
 	var err error
 
 	serviceOnce.Do(func() {

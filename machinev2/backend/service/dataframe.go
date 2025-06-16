@@ -9,7 +9,5 @@ import (
 
 // SetSourceDataFrame implements Servicer.
 func (service *Service) SetSourceDataFrame(ctx context.Context, df model.DataFrame) error {
-	service.service.SetSourceDataFrame(df.Service, df.Table, dataframe.New(df.Data))
-
-	return nil
+	return service.service.SetSourceDataFrame(ctx, df.Service, df.Table, dataframe.New(df.Data))
 }

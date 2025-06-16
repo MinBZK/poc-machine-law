@@ -1,10 +1,11 @@
-package service
+package memory
 
 import (
 	"context"
 	"fmt"
 	"sync"
 
+	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/engine"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
@@ -15,15 +16,17 @@ import (
 type RuleService struct {
 	logger           logging.Logger
 	ServiceName      string
-	Services         *Services
+	Services         contexter.ServiceProvider
 	Resolver         *ruleresolver.RuleResolver
 	engines          map[string]map[string]*engine.RulesEngine
 	SourceDataFrames model.SourceDataFrame
 	mu               sync.RWMutex
 }
 
-// NewRuleService creates a new rule service instance
-func NewRuleService(logger logging.Logger, serviceName string, services *Services) (*RuleService, error) {
+// New creates a new rule service instance
+func New(logger logging.Logger, serviceName string, services contexter.ServiceProvider) (*RuleService, error) {
+	logger.Warningf(context.Background(), "creating inmemory ruleservice: %s", serviceName)
+
 	resolver, err := ruleresolver.New()
 	if err != nil {
 		return nil, fmt.Errorf("new rule resolver: %w", err)
@@ -120,11 +123,15 @@ func (rs *RuleService) GetRuleInfo(law, referenceDate string) map[string]any {
 }
 
 // SetSourceDataFrame sets a source DataFrame
-func (rs *RuleService) SetSourceDataFrame(table string, df model.DataFrame) {
+func (rs *RuleService) SetSourceDataFrame(_ context.Context, table string, df model.DataFrame) error {
 	rs.SourceDataFrames.Set(table, df)
+
+	return nil
 }
 
 // Reset removes all data in the rule service
-func (rs *RuleService) Reset() {
+func (rs *RuleService) Reset(_ context.Context) error {
 	rs.SourceDataFrames.Reset()
+
+	return nil
 }

@@ -13,22 +13,26 @@ import (
 )
 
 type ServeCmd struct {
-	BackendListenAddress string `env:"APP_BACKEND_LISTEN_ADDRESS" default:":8080" name:"backend-listen-address" help:"Address to listen  on."`
-	InputFile            string `env:"APP_INPUT_FILE" name:"input-file"`
+	BackendListenAddress    string `env:"APP_BACKEND_LISTEN_ADDRESS" default:":8080" name:"backend-listen-address" help:"Address to listen  on."`
+	InputFile               string `env:"APP_INPUT_FILE" name:"input-file"`
+	Organization            string `env:"APP_ORGANIZATION" name:"organization"`
+	StandaloneMode          bool   `env:"APP_STANDALONE_MODE" name:"stand-alone" help:"Will set the engine into stand alone mode"`
+	WithRuleServiceInMemory bool   `env:"APP_RULE_SERVICE_IN_MEMORY" name:"rule-service-in-memory" help:"Will only use inmemory rule services"`
 }
 
 func (opt *ServeCmd) Run(ctx *Context) error {
 	proc := process.New()
 
 	config := config.Config{
-		Debug:                ctx.Debug,
-		BackendListenAddress: opt.BackendListenAddress,
+		Debug:                   ctx.Debug,
+		BackendListenAddress:    opt.BackendListenAddress,
+		Organization:            opt.Organization,
+		StandaloneMode:          opt.StandaloneMode,
+		WithRuleServiceInMemory: opt.WithRuleServiceInMemory,
 	}
 
 	logger := ctx.Logger.With("application", "http_server")
 	logger.Info("starting uwv backend", "config", config)
-
-	// services := service.NewServices(time.Now())
 
 	svc, err := service.New(logger, &config)
 	if err != nil {
@@ -44,7 +48,7 @@ func (opt *ServeCmd) Run(ctx *Context) error {
 
 		logger.Debug("successfully parsed input file", "services", len(input.GlobalServices), "profiles", len(input.Profiles))
 
-		svc.AppendInput(input)
+		svc.AppendInput(context.Background(), input)
 	}
 
 	app, err := handler.New(logger, &config, svc)

@@ -13,6 +13,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
@@ -66,10 +67,10 @@ func NewRulesEngine(logger logging.Logger, spec ruleresolver.RuleSpec, servicePr
 	engine.ParameterSpecs = spec.Properties.Parameters
 
 	// Extract properties
-	engine.PropertySpecs = engine.buildPropertySpecs(spec.Properties)
+	engine.PropertySpecs = buildPropertySpecs(spec.Properties)
 
 	// Build output specs
-	engine.OutputSpecs = engine.buildOutputSpecs(spec.Properties)
+	engine.OutputSpecs = buildOutputSpecs(spec.Properties)
 
 	// Get definitions
 	engine.Definitions = spec.Properties.Definitions
@@ -78,7 +79,7 @@ func NewRulesEngine(logger logging.Logger, spec ruleresolver.RuleSpec, servicePr
 }
 
 // buildPropertySpecs builds a mapping of property paths to their specifications
-func (re *RulesEngine) buildPropertySpecs(properties ruleresolver.Properties) map[string]ruleresolver.Field {
+func buildPropertySpecs(properties ruleresolver.Properties) map[string]ruleresolver.Field {
 	specs := make(map[string]ruleresolver.Field)
 
 	// Add input properties
@@ -99,7 +100,7 @@ func (re *RulesEngine) buildPropertySpecs(properties ruleresolver.Properties) ma
 }
 
 // buildOutputSpecs builds a mapping of output names to their type specifications
-func (re *RulesEngine) buildOutputSpecs(properties ruleresolver.Properties) map[string]model.TypeSpec {
+func buildOutputSpecs(properties ruleresolver.Properties) map[string]model.TypeSpec {
 	specs := make(map[string]model.TypeSpec)
 
 	// Process output properties
@@ -125,7 +126,7 @@ func (re *RulesEngine) buildOutputSpecs(properties ruleresolver.Properties) map[
 // enforceOutputType enforces type specifications on an output value
 func (re *RulesEngine) enforceOutputType(ctx context.Context, name string, value any) any {
 	if spec, exists := re.OutputSpecs[name]; exists {
-		result := Enforce(spec, value)
+		result := typespec.Enforce(spec, value)
 
 		if equal, _ := utils.Equal(result, value); !equal {
 			re.logger.Debugf(ctx, "Enforcing type spec changed value from: %v to %v", value, result)
@@ -139,7 +140,7 @@ func (re *RulesEngine) enforceOutputType(ctx context.Context, name string, value
 
 // topologicalSort performs topological sort on dependencies
 // Returns outputs in order they should be calculated
-func (re *RulesEngine) topologicalSort(dependencies map[string]map[string]struct{}) ([]string, error) {
+func topologicalSort(dependencies map[string]map[string]struct{}) ([]string, error) {
 	// First create complete set of all nodes including leaf nodes
 	allNodes := make(map[string]struct{})
 	for node := range dependencies {
@@ -215,7 +216,7 @@ func (re *RulesEngine) topologicalSort(dependencies map[string]map[string]struct
 }
 
 // analyzeDependencies finds all outputs an action depends on
-func (re *RulesEngine) analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
+func analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
 	deps := make(map[string]struct{})
 
 	// TODO verify that this is not broken
@@ -296,7 +297,7 @@ func (re *RulesEngine) analyzeDependencies(action ruleresolver.Action) map[strin
 }
 
 // getRequiredActions gets all actions needed to compute requested output in dependency order
-func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []ruleresolver.Action) ([]ruleresolver.Action, error) {
+func getRequiredActions(requestedOutput string, actions []ruleresolver.Action) ([]ruleresolver.Action, error) {
 	if requestedOutput == "" {
 		return actions, nil
 	}
@@ -307,7 +308,7 @@ func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []rule
 
 	for _, action := range actions {
 		actionByOutput[action.Output] = action
-		dependencies[action.Output] = re.analyzeDependencies(action)
+		dependencies[action.Output] = analyzeDependencies(action)
 	}
 
 	// Find all required outputs
@@ -343,7 +344,7 @@ func (re *RulesEngine) getRequiredActions(requestedOutput string, actions []rule
 		}
 	}
 
-	orderedOutputs, err := re.topologicalSort(filteredDeps)
+	orderedOutputs, err := topologicalSort(filteredDeps)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +461,7 @@ func (re *RulesEngine) Evaluate(
 	outputValues := make(map[string]model.EvaluateActionResult)
 	if requirementsMet {
 		// Get required actions including dependencies in order
-		requiredActions, err := re.getRequiredActions(requestedOutput, re.Actions)
+		requiredActions, err := getRequiredActions(requestedOutput, re.Actions)
 		if err != nil {
 			return model.EvaluateResult{}, err
 		}
@@ -542,7 +543,7 @@ func (re *RulesEngine) evaluateAction(
 		if result == nil {
 			if action.Operation != nil {
 				var err error
-				result, err = re.evaluateAction2(ctx, action, ruleCtx)
+				result, err = re.evaluateOperation(ctx, action, ruleCtx)
 				if err != nil {
 					return err
 				}
@@ -598,7 +599,7 @@ func (re *RulesEngine) evaluateRequirementAction(
 
 		return res, nil
 	} else if r.Action != nil {
-		res, err := re.evaluateAction2(ctx, *r.Action, ruleCtx)
+		res, err := re.evaluateOperation(ctx, *r.Action, ruleCtx)
 		if err != nil {
 			return false, err
 		}
@@ -761,7 +762,7 @@ func (re *RulesEngine) evaluateIfOperation(
 		if condition.Test != nil {
 			conditionResult["type"] = "test"
 
-			testResult, err := re.evaluateAction2(ctx, *condition.Test, ruleCtx)
+			testResult, err := re.evaluateOperation(ctx, *condition.Test, ruleCtx)
 			if err != nil {
 				return nil, err
 			}
@@ -873,7 +874,7 @@ func (re *RulesEngine) evaluateForeach(
 				var result any
 				if operation.Value.Action != nil {
 					// Evaluate the value
-					result, err = re.evaluateAction2(ctx, *operation.Value.Action, &itemCtx)
+					result, err = re.evaluateOperation(ctx, *operation.Value.Action, &itemCtx)
 					if err != nil {
 						return err
 					}
@@ -1305,7 +1306,7 @@ func convertToTime(v any) (time.Time, error) {
 	}
 }
 
-func (re *RulesEngine) evaluateAction2(
+func (re *RulesEngine) evaluateOperation(
 	ctx context.Context,
 	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
@@ -1659,7 +1660,7 @@ func (re *RulesEngine) evaluateActionValue(
 	value ruleresolver.ActionValue,
 ) (any, error) {
 	if value.Action != nil {
-		return re.evaluateAction2(ctx, *value.Action, ruleCtx)
+		return re.evaluateOperation(ctx, *value.Action, ruleCtx)
 	}
 
 	return re.evaluateValue(ctx, *value.Value, ruleCtx)

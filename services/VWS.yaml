@@ -1,0 +1,4 @@
+$id:
+uuid: 8f96c54f-0658-4a36-9590-393b5b3dc25a
+name: VWS
+endpoint: http://localhost:8096

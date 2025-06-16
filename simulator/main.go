@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"time"
@@ -20,7 +21,7 @@ func main() {
 
 	// Run the simulation for 1000 people
 	fmt.Printf("Running simulation on: %d people\n", *numPeople)
-	results := simulator.RunSimulation(*numPeople)
+	results := simulator.RunSimulation(context.Background(), *numPeople)
 
 	// Write results to CSV file
 

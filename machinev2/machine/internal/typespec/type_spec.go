@@ -1,4 +1,4 @@
-package engine
+package typespec
 
 import (
 	"fmt"

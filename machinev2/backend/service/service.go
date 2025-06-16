@@ -25,7 +25,19 @@ type Service struct {
 }
 
 func New(logger *slog.Logger, cfg *config.Config) (*Service, error) {
-	services, err := machine.NewServices(time.Now())
+	options := []machine.Option{
+		machine.WithOrganizationName(cfg.Organization),
+	}
+
+	if cfg.StandaloneMode {
+		options = append(options, machine.SetStandaloneMode())
+	}
+
+	if cfg.WithRuleServiceInMemory {
+		options = append(options, machine.WithRuleServiceInMemory())
+	}
+
+	services, err := machine.NewServices(time.Now(), options...)
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
@@ -46,22 +58,30 @@ func (service *Service) Status(ctx context.Context) error {
 	return nil
 }
 
-func (service *Service) AppendInput(input model.Input) {
+func (service *Service) AppendInput(ctx context.Context, input model.Input) error {
 	service.input = input
-	service.setInput()
+	if err := service.setInput(ctx); err != nil {
+		return fmt.Errorf("set input: %w", err)
+	}
+
+	return nil
 }
 
-func (service *Service) setInput() {
+func (service *Service) setInput(ctx context.Context) error {
 	for svc, tables := range service.input.GlobalServices {
 		for table, data := range tables {
-			service.service.SetSourceDataFrame(svc, table, dataframe.New(data))
+			if err := service.service.SetSourceDataFrame(ctx, svc, table, dataframe.New(data)); err != nil {
+				return fmt.Errorf("set source dataframe: %w", err)
+			}
 		}
 	}
 
 	for bsn, profile := range service.input.Profiles {
 		for svc, tables := range profile.Sources {
 			for table, data := range tables {
-				service.service.SetSourceDataFrame(svc, table, dataframe.New(data))
+				if err := service.service.SetSourceDataFrame(ctx, svc, table, dataframe.New(data)); err != nil {
+					return fmt.Errorf("set source dataframe: %w", err)
+				}
 			}
 		}
 
@@ -72,6 +92,8 @@ func (service *Service) setInput() {
 			Sources:     profile.Sources,
 		}
 	}
+
+	return nil
 }
 
 type ClaimListFilter struct {
@@ -136,7 +158,7 @@ func (service *Service) ServiceLawsDiscoverableList(ctx context.Context, discove
 }
 
 func (service *Service) GetRuleSpec(svc, law string, referenceDate string) (ruleresolver.RuleSpec, error) {
-	rule, err := service.service.Resolver.GetRuleSpec(law, referenceDate, svc)
+	rule, err := service.service.RuleResolver.GetRuleSpec(law, referenceDate, svc)
 	if err != nil {
 		return ruleresolver.RuleSpec{}, fmt.Errorf("get rule spec: %w", err)
 	}

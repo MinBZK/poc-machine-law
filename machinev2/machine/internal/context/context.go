@@ -16,15 +16,21 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
 )
 
 // ServiceProvider interface defines what a service provider needs to implement
 type ServiceProvider interface {
 	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
 		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
-	GetResolver() *ruleresolver.RuleResolver
+	GetRuleResolver() *ruleresolver.RuleResolver
+	GetServiceResolver() *serviceresolver.ServiceResolver
 	GetCaseManager() CaseManagerAccessor
 	GetClaimManager() ClaimManagerAccessor
+	RuleServicesInMemory() bool
+	HasOrganizationName() bool
+	GetOrganizationName() string
+	InStandAloneMode() bool
 }
 
 // CaseManagerAccessor interface for accessing case manager events
@@ -337,8 +343,7 @@ func resolveDate(path string, date string) (any, error) {
 // resolveFromSource resolves a value from a data source
 func (rc *RuleContext) resolveFromSource(
 	ctx context.Context,
-	sourceRef ruleresolver.SourceReference,
-	spec ruleresolver.Field) (any, error) {
+	sourceRef ruleresolver.SourceReference) (any, error) {
 
 	var df model.DataFrame
 	tableName := ""
@@ -347,7 +352,7 @@ func (rc *RuleContext) resolveFromSource(
 	if sourceRef.SourceType == "laws" {
 		tableName = "laws"
 
-		df = dataframe.New(rc.ServiceProvider.GetResolver().RulesDataFrame())
+		df = dataframe.New(rc.ServiceProvider.GetRuleResolver().RulesDataFrame())
 	} else if sourceRef.SourceType == "events" {
 		tableName = "events"
 

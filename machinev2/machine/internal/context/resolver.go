@@ -269,7 +269,7 @@ func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*
 		return nil, false
 	}
 
-	value, err := l.rc.resolveFromSource(ctx, *sourceRef, spec)
+	value, err := l.rc.resolveFromSource(ctx, *sourceRef)
 	if err != nil {
 		// logger.Debugf(ctx, "resolving from source: %s", err)
 		return nil, false
