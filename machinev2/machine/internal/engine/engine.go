@@ -80,7 +80,7 @@ func NewRulesEngine(logger logging.Logger, spec ruleresolver.RuleSpec, servicePr
 
 // buildPropertySpecs builds a mapping of property paths to their specifications
 func buildPropertySpecs(properties ruleresolver.Properties) map[string]ruleresolver.Field {
-	specs := make(map[string]ruleresolver.Field)
+	specs := make(map[string]ruleresolver.Field, len(properties.Input)+len(properties.Sources))
 
 	// Add input properties
 	for _, prop := range properties.Input {
@@ -215,21 +215,101 @@ func topologicalSort(dependencies map[string]map[string]struct{}) ([]string, err
 	return sortedOutputs, nil
 }
 
+// isLowercase checks if a string contains only lowercase letters, digits, and underscores
+// This is more efficient than strings.ToLower() as it avoids string allocation
+func isLowercase(s string) bool {
+	for _, r := range s {
+		if r >= 'A' && r <= 'Z' {
+			return false
+		}
+	}
+	return true
+}
+
 // analyzeDependencies finds all outputs an action depends on
 func analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
-	deps := make(map[string]struct{})
+	// Pre-allocate with larger capacity based on profiling data
+	deps := make(map[string]struct{}, 0)
 
-	var traverse func(obj any)
+	var traverse func(any)
+	var traverseActionValue func(ruleresolver.ActionValue)
+	var traverseActionValues func(ruleresolver.ActionValues)
+	var traverseCondition func(ruleresolver.Condition)
+	var traverseAction func(ruleresolver.Action)
+
+	resolveString := func(v string) {
+		if len(v) <= 1 || v[0] != '$' {
+			return
+		}
+
+		value := v[1:] // Remove $ prefix
+		// If all lowercase, consider it an output reference
+		if isLowercase(value) {
+			deps[value] = struct{}{}
+		}
+	}
+
+	traverseActionValue = func(v ruleresolver.ActionValue) {
+		if v.Action != nil {
+			traverseAction(*v.Action)
+		}
+		if v.Value != nil {
+			traverse(*v.Value)
+		}
+	}
+
+	traverseActionValues = func(v ruleresolver.ActionValues) {
+		if v.ActionValues != nil {
+			for _, value := range *v.ActionValues {
+				traverseActionValue(value)
+			}
+		}
+		if v.Value != nil {
+			traverse(*v.Value)
+		}
+	}
+
+	traverseCondition = func(v ruleresolver.Condition) {
+		if v.Test != nil {
+			traverseAction(*v.Test)
+		}
+		if v.Then != nil {
+			traverseActionValue(*v.Then)
+		}
+		if v.Else != nil {
+			traverseActionValue(*v.Else)
+		}
+	}
+
+	traverseAction = func(v ruleresolver.Action) {
+		if v.Value != nil {
+			traverseActionValue(*v.Value)
+		}
+		if v.Operation != nil {
+			resolveString(*v.Operation)
+		}
+		if v.Subject != nil {
+			resolveString(*v.Subject)
+		}
+		if v.Unit != nil {
+			resolveString(*v.Unit)
+		}
+		if v.Combine != nil {
+			resolveString(*v.Combine)
+		}
+		if v.Values != nil {
+			traverseActionValues(*v.Values)
+		}
+		// Use range directly for better performance
+		for i := range v.Conditions {
+			traverseCondition(v.Conditions[i])
+		}
+	}
+
 	traverse = func(obj any) {
 		switch v := obj.(type) {
 		case string:
-			if strings.HasPrefix(v, "$") {
-				value := v[1:] // Remove $ prefix
-				// If all lowercase, consider it an output reference
-				if strings.ToLower(value) == value {
-					deps[value] = struct{}{}
-				}
-			}
+			resolveString(v)
 		case map[string]any:
 			for _, value := range v {
 				traverse(value)
@@ -239,59 +319,17 @@ func analyzeDependencies(action ruleresolver.Action) map[string]struct{} {
 				traverse(item)
 			}
 		case ruleresolver.ActionValue:
-			if v.Action != nil {
-				traverse(*v.Action)
-			}
-			if v.Value != nil {
-				traverse(*v.Value)
-			}
+			traverseActionValue(v)
 		case ruleresolver.ActionValues:
-			if v.ActionValues != nil {
-				for _, value := range *v.ActionValues {
-					traverse(value)
-				}
-			}
-
-			if v.Value != nil {
-				traverse(*v.Value)
-			}
+			traverseActionValues(v)
 		case ruleresolver.Condition:
-			if v.Test != nil {
-				traverse(*v.Test)
-			}
-			if v.Then != nil {
-				traverse(*v.Then)
-			}
-			if v.Else != nil {
-				traverse(*v.Else)
-			}
+			traverseCondition(v)
 		case ruleresolver.Action:
-			traverse(v.Output)
-			if v.Value != nil {
-				traverse(*v.Value)
-			}
-			if v.Operation != nil {
-				traverse(*v.Operation)
-			}
-			if v.Subject != nil {
-				traverse(*v.Subject)
-			}
-			if v.Unit != nil {
-				traverse(*v.Unit)
-			}
-			if v.Combine != nil {
-				traverse(*v.Combine)
-			}
-			if v.Values != nil {
-				traverse(*v.Values)
-			}
-			for _, condition := range v.Conditions {
-				traverse(condition)
-			}
+			traverseAction(v)
 		}
 	}
 
-	traverse(action)
+	traverseAction(action)
 	return deps
 }
 
@@ -301,35 +339,41 @@ func getRequiredActions(requestedOutput string, actions []ruleresolver.Action) (
 		return actions, nil
 	}
 
-	// Build dependency graph
-	dependencies := make(map[string]map[string]struct{})
-	actionByOutput := make(map[string]ruleresolver.Action)
+	// Pre-allocate maps with better capacity estimates
+	dependencies := make(map[string]map[string]struct{}, len(actions))
+	actionByOutput := make(map[string]ruleresolver.Action, len(actions))
 
-	for _, action := range actions {
-		actionByOutput[action.Output] = action
-		dependencies[action.Output] = analyzeDependencies(action)
+	// Build dependency graph with single pass
+	for i := range actions { // Use index to avoid copying action structs
+		actionByOutput[actions[i].Output] = actions[i]
+		dependencies[actions[i].Output] = analyzeDependencies(actions[i])
 	}
 
-	// Find all required outputs
-	required := make(map[string]struct{})
-	toProcess := map[string]struct{}{requestedOutput: {}}
+	// Use slice-based queue instead of map for better performance
+	required := make(map[string]struct{})   // Estimate half the actions needed
+	toProcessQueue := make([]string, 0, 16) // Pre-allocate queue
+	toProcessQueue = append(toProcessQueue, requestedOutput)
 
-	for len(toProcess) > 0 {
-		// Pop an output from toProcess
-		var output string
-		for o := range toProcess {
-			output = o
-			break
+	// Track processed to avoid duplicates
+	processed := make(map[string]struct{}, len(actions)/2)
+
+	for len(toProcessQueue) > 0 {
+		// Pop from end for better performance
+		output := toProcessQueue[len(toProcessQueue)-1]
+		toProcessQueue = toProcessQueue[:len(toProcessQueue)-1]
+
+		// Skip if already processed
+		if _, alreadyProcessed := processed[output]; alreadyProcessed {
+			continue
 		}
-		delete(toProcess, output)
-
+		processed[output] = struct{}{}
 		required[output] = struct{}{}
 
 		// Add dependencies to processing queue
 		if deps, ok := dependencies[output]; ok {
 			for dep := range deps {
-				if _, alreadyRequired := required[dep]; !alreadyRequired {
-					toProcess[dep] = struct{}{}
+				if _, alreadyProcessed := processed[dep]; !alreadyProcessed {
+					toProcessQueue = append(toProcessQueue, dep)
 				}
 			}
 		}

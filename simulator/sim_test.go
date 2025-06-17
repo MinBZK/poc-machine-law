@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func TestBlah(t *testing.T) {
-	numPeople := 10000
+func TestMain(t *testing.T) {
+	numPeople := 1000000
 
 	// Create a new law simulator with simulation date
 	simulator, err := NewLawSimulator(time.Date(2025, 03, 01, 0, 0, 0, 0, time.UTC))
@@ -19,7 +19,6 @@ func TestBlah(t *testing.T) {
 
 	// Run the simulation for 1000 people
 	fmt.Printf("Running simulation on: %d people\n", numPeople)
-	results := simulator.RunSimulation(context.Background(), numPeople)
+	simulator.RunSimulation(context.Background(), numPeople)
 	// Print statistics
-	CalculateStatistics(results)
 }

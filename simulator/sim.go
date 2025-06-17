@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -41,18 +40,18 @@ type Person struct {
 
 // SimulationResult represents the outcome of a person's simulation
 type SimulationResult struct {
+	HasPartner          bool
+	IsStudent           bool
+	ZorgtoeslagEligible bool
+	AOWEligible         bool
 	BSN                 string
 	Age                 int
-	HasPartner          bool
 	Income              float64
 	NetWorth            float64
 	WorkYears           float64
 	ResidenceYears      float64
-	IsStudent           bool
 	StudyGrant          float64
-	ZorgtoeslagEligible bool
 	ZorgtoeslagAmount   float64
-	AOWEligible         bool
 	AOWAmount           float64
 	AOWAccrual          float64
 }
@@ -91,7 +90,7 @@ func (ls *LawSimulator) GenerateBSN() string {
 	defer ls.mutex.Unlock()
 
 	for {
-		bsn := fmt.Sprintf("999%06d", rand.Intn(900000)+100000)
+		bsn := fmt.Sprintf("99%07d", rand.Intn(9000000)+1000000)
 		if !ls.UsedBSNs[bsn] {
 			ls.UsedBSNs[bsn] = true
 			return bsn
@@ -403,11 +402,15 @@ func (ls *LawSimulator) SimulatePerson(res Res) error {
 		ls.mutex.Unlock()
 	}
 
+	res.services.CaseManager.Close()
+
 	return nil
 }
 
 // RunSimulation runs the full simulation
 func (ls *LawSimulator) RunSimulation(ctx context.Context, numPeople int) []SimulationResult {
+	ls.Results = make([]SimulationResult, 0, numPeople)
+
 	// Generate people with partnerships
 	people := make(chan []Person)
 	go ls.GeneratePairedPeople(numPeople, people)
@@ -428,8 +431,8 @@ func (ls *LawSimulator) RunSimulation(ctx context.Context, numPeople int) []Simu
 				fmt.Printf("simulate person: %v", err)
 			}
 
-			if err := bar.Add(len(result.persons)); err != nil {
-				log.Fatalf("bar add: %v\n", err)
+			for range len(result.persons) {
+				bar.Add(1)
 			}
 		})
 	}
