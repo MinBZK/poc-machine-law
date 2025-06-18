@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: rijksoverheid-mijnoverheid-frontend
+          image: rijksoverheid-mijnoverheid-frontend-image
+          ports:
+            - name: http
+              containerPort: 5173
+          volumeMounts:
+            - mountPath: /build/static/config.json
+              name: config-json
+              subPath: config.json
+            - mountPath: /usr/share/nginx/html/config.json
+              name: config-json
+              subPath: config.json
+      volumes:
+        - name: config-json
+          configMap:
+            name: frontend-cm

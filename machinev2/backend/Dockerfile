@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.24.1-alpine AS builder
+FROM digilabpublic.azurecr.io/golang:1.24.4-alpine3.22 AS builder
 
 # Set working directory
 WORKDIR /build
@@ -31,7 +31,7 @@ COPY ./machinev2/backend/ .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o server .
 
 # Final stage
-FROM alpine:3.21
+FROM alpine:3.22
 
 # Add non-root user for security
 RUN adduser -D -g '' appuser

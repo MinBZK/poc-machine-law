@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: lac
+namePrefix: rijksoverheid-
+
+resources:
+  - ../../base
+  - secret-fsc-internal-ca.yaml
+  - secret-fsc-inway-group-tls.yaml
+  - secret-fsc-manager-group-tls.yaml
+
+patches:
+  - target:
+      kind: Ingress
+      name: mijnoverheid-frontend-ing
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: rijksoverheid-mijnoverheid.127-0-0-1.nip.io
+      - op: remove
+        path: /spec/tls
+  - target:
+      kind: Ingress
+      name: burger-ing
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: burger.127-0-0-1.nip.io
+      - op: remove
+        path: /spec/tls
+
+configMapGenerator:
+  - name: frontend-cm
+    files:
+      - config.json=frontend-config.json
+  - name: config-web-cm
+    files:
+      - config.yaml=web-config.yaml

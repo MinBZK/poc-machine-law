@@ -1,0 +1,4 @@
+$id:
+uuid: d28ebfb8-4f7a-4393-9b1d-a16f53ea980e
+name: JenV
+endpoint: http://jenv-backend-svc.lac.svc.cluster.local

@@ -1,0 +1,19 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: flux
+  namespace: kube-system
+spec:
+  repo: https://fluxcd-community.github.io/helm-charts
+  chart: flux2
+  targetNamespace: flux-system
+  createNamespace: true
+  valuesContent: |-
+    imageAutomationController:
+      create: false
+    imageReflectionController:
+      create: false
+    kustomizeController:
+      create: false
+    notificationController:
+      create: false

@@ -1,0 +1,4 @@
+$id:
+uuid: 12e8d2b5-371e-4a71-9a50-9dab462a8bd7
+name: DJI
+endpoint: http://dji-backend-svc.lac.svc.cluster.local

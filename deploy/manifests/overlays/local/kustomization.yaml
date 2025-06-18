@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: lac
+
+resources:
+  - ../../belastingdienst/overlays/local
+  - ../../cbs/overlays/local
+  - ../../dji/overlays/local
+  - ../../duo/overlays/local
+  - ../../gemeente-amsterdam/overlays/local
+  - ../../ind/overlays/local
+  - ../../jenv/overlays/local
+  - ../../justid/overlays/local
+  - ../../kiesraad/overlays/local
+  - ../../kvk/overlays/local
+  - ../../rvig/overlays/local
+  - ../../rvz/overlays/local
+  - ../../svb/overlays/local
+  - ../../szw/overlays/local
+  - ../../toeslagen/overlays/local
+  - ../../uwv/overlays/local
+  - ../../vws/overlays/local
+
+configMapGenerator:
+  - name: services-cm
+    files:
+      - services/Belastingdienst.yaml
+      - services/CBS.yaml
+      - services/DJI.yaml
+      - services/DUO.yaml
+      - services/gemeente_amsterdam.yaml
+      - services/IND.yaml
+      - services/JenV.yaml
+      - services/JUSTID.yaml
+      - services/Kiesraad.yaml
+      - services/KVK.yaml
+      - services/RvIG.yaml
+      - services/RVZ.yaml
+      - services/SVB.yaml
+      - services/SZW.yaml
+      - services/Toeslagen.yaml
+      - services/UWV.yaml
+      - services/VWS.yaml

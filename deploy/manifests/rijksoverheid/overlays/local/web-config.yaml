@@ -1,0 +1,11 @@
+engines:
+  - id: py
+    name: Python engine
+    description: default processing engine
+    type: internal
+    default: true
+  - id: go
+    name: Go engine
+    description: typed processing engine (beta 0.1)
+    type: http
+    domain: http://toeslagen-backend-svc/v0

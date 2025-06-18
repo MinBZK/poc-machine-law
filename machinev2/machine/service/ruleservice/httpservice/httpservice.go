@@ -26,7 +26,7 @@ type HTTPService struct {
 }
 
 func New(logger logging.Logger, service string, services contexter.ServiceProvider, svcresolver serviceresolver.ServiceSpec, standaloneMode bool) (*HTTPService, error) {
-	logger.Warningf(context.Background(), "creating http ruleservice: %s", service)
+	logger.Warningf(context.Background(), "creating http ruleservice: %s @ %s", service, svcresolver.Endpoint)
 	client, err := api.NewClientWithResponses(fmt.Sprintf("%s/v0", svcresolver.Endpoint))
 	if err != nil {
 		return nil, fmt.Errorf("new client with responses: %w", err)
@@ -57,7 +57,7 @@ func (h *HTTPService) Evaluate(
 		return nil, fmt.Errorf("reference date parse: %w", err)
 	}
 
-	h.logger.Debugf(ctx, "sending evaluate to: %s", h.svcresolver.Endpoint)
+	h.logger.Debugf(ctx, "sending evaluate to: %s", h.svcresolver.Name)
 
 	body := api.EvaluateJSONRequestBody{
 		Data: api.Evaluate{

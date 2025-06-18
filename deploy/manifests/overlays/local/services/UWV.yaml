@@ -1,0 +1,4 @@
+$id:
+uuid: efaf6273-03bc-4cb4-b403-c8f4da592f82
+name: UWV
+endpoint: http://uwv-backend-svc.lac.svc.cluster.local

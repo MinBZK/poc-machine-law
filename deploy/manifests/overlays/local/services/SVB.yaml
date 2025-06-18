@@ -1,0 +1,4 @@
+$id:
+uuid: 374abe02-5b8f-45ab-bee2-b88a5155403d
+name: SVB
+endpoint: http://svb-backend-svc.lac.svc.cluster.local

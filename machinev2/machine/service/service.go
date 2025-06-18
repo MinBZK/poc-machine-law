@@ -71,7 +71,7 @@ func NewServices(referenceDate time.Time, options ...Option) (*Services, error) 
 	}
 
 	s := &Services{
-		logger:              logging.New("service", os.Stdout, logrus.ErrorLevel),
+		logger:              logging.New("service", os.Stdout, logrus.DebugLevel),
 		RuleResolver:        ruleResolver,
 		ServiceResolver:     serviceResolver,
 		services:            make(map[string]ruleservice.RuleServicer),

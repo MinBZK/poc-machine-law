@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - mijnoverheid
+  - burger
+
+configurations:
+  - kustomize-config.yaml
+
+images:
+  - name: rijksoverheid-mijnoverheid-frontend-image
+    newName: digilabpublic.azurecr.io/digilab.overheid.nl/ecosystem/logboek-dataverwerkingen/ldv-referentie-implementatie/apps/rijksoverheid/mijnoverheid/frontend
+    newTag: 047f4c35-main-5

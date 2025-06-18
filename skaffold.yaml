@@ -1,0 +1,38 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: lac
+build:
+  local:
+    push: false
+    useDockerCLI: true
+  artifacts:
+    - image: go-engine-backend-image
+      context: .
+      docker:
+        dockerfile: machinev2/backend/dev.Dockerfile
+      sync:
+        manual:
+          - src: "machinev2/**/*.go"
+            dest: /build
+            strip: "machinev2"
+    - image: web-image
+      context: .
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.go"
+            dest: /build
+          - src: "**/*.py"
+            dest: /build
+          - src: "**/*.svelte"
+            dest: /build
+          - src: "**/*.ts"
+            dest: /build
+
+manifests:
+  kustomize:
+    paths:
+      - deploy/manifests/rijksoverheid/overlays/local
+      - deploy/manifests/overlays/local

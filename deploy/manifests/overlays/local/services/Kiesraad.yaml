@@ -1,0 +1,4 @@
+$id:
+uuid: f2d0f530-1e95-46b9-827b-4ce89972adfa
+name: Kiesraad
+endpoint: http://kiesraad-backend-svc.lac.svc.cluster.local

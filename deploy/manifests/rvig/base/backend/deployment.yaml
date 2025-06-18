@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: rvig-backend
+          image: go-engine-backend-image
+          env:
+            - name: APP_DEBUG
+              value: "true"
+            - name: APP_ORGANIZATION
+              value: "RvIG"
+            - name: APP_STANDALONE_MODE
+              value: "true"
+            - name: APP_RULE_SERVICE_IN_MEMORY
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: services-config
+              mountPath: /build/services
+              readOnly: true
+      volumes:
+        - name: services-config
+          configMap:
+            name: services-cm

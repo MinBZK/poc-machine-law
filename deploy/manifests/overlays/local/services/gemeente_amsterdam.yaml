@@ -1,0 +1,4 @@
+$id:
+uuid: da438482-47b0-4403-bc89-e81749a72de9
+name: GEMEENTE_AMSTERDAM
+endpoint: http://gemeente-amsterdam-backend-svc.lac.svc.cluster.local

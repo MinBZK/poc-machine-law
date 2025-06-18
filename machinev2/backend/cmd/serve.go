@@ -48,7 +48,9 @@ func (opt *ServeCmd) Run(ctx *Context) error {
 
 		logger.Debug("successfully parsed input file", "services", len(input.GlobalServices), "profiles", len(input.Profiles))
 
-		svc.AppendInput(context.Background(), input)
+		if err := svc.AppendInput(context.Background(), input); err != nil {
+			logger.Error("append input", "err", err)
+		}
 	}
 
 	app, err := handler.New(logger, &config, svc)

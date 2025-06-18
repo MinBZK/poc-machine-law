@@ -1,0 +1,33 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: clickhouse
+  namespace: kube-system
+spec:
+  repo: https://charts.bitnami.com/bitnami
+  chart: clickhouse
+  version: 9.2.2
+  targetNamespace: lac
+  createNamespace: true
+  valuesContent: |-
+    auth:
+      username: clickhouse
+      password: clickhouse
+    replicaCount: 1
+    resources:
+      requests:
+        memory: 1Gi
+      limits:
+        memory: 2Gi
+    zookeeper:
+      enabled: false
+    shards: 1
+    initdbScripts:
+      init_script.sh: |
+        #!/bin/bash
+
+        clickhouse-client --allow_suspicious_fixed_string_types 1 --user clickhouse --password clickhouse -n <<-EOSQL
+          CREATE DATABASE IF NOT EXISTS orga;
+
+          CREATE DATABASE IF NOT EXISTS orgb;
+        EOSQL

@@ -1,0 +1,4 @@
+$id:
+uuid: 6a3328b4-6550-4e11-9f8c-ec796fe920ca
+name: JUSTID
+endpoint: http://justid-backend-svc.lac.svc.cluster.local

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: web-image
+          ports:
+            - name: http
+              containerPort: 8000
+          volumeMounts:
+            - name: config-yaml
+              mountPath: /web/config/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config-yaml
+          configMap:
+            name: config-web-cm

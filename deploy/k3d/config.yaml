@@ -1,0 +1,25 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: lac
+ports:
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+      - arg: --kubelet-arg=max-pods=250
+        nodeFilters:
+          - server:*
+          - agent:*
+volumes:
+  - volume: ${PWD}/deploy/k3d/resources/cloudnative-pg.yaml:/var/lib/rancher/k3s/server/manifests/cloudnative-pg.yaml
+  - volume: ${PWD}/deploy/k3d/resources/flux.yaml:/var/lib/rancher/k3s/server/manifests/flux.yaml
+  - volume: ${PWD}/deploy/k3d/resources/cert-manager.yaml:/var/lib/rancher/k3s/server/manifests/cert-manager.yaml
+  - volume: ${PWD}/deploy/k3d/resources/opentelemetry-operator.yaml:/var/lib/rancher/k3s/server/manifests/opentelemetry-operator.yaml
+  - volume: ${PWD}/deploy/k3d/resources/clickhouse.yaml:/var/lib/rancher/k3s/server/manifests/clickhouse.yaml
+  - volume: ${PWD}/deploy/k3d/resources/ingress-nginx.yaml:/var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml

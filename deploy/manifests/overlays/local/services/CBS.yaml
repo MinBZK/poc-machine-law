@@ -1,0 +1,4 @@
+$id:
+uuid: 9a144988-2b80-4e8a-adfb-43aa761a5ac4
+name: CBS
+endpoint: http://cbs-backend-svc.lac.svc.cluster.local
