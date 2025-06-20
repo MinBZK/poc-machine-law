@@ -71,6 +71,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - otlp-collector.yaml
 
 labels:
   - includeSelectors: true
@@ -100,6 +101,8 @@ spec:
     metadata:
       labels:
         app: backend
+      annotations:
+        sidecar.opentelemetry.io/inject: "${service_id}-backend-otlp-collector"
     spec:
       containers:
         - name: ${service_id}-backend
@@ -113,6 +116,10 @@ spec:
               value: "true"
             - name: APP_RULE_SERVICE_IN_MEMORY
               value: "false"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://localhost:4317"
+            - name: OTEL_SERVICE_NAME
+              value: "${service_name}"
           ports:
             - name: http
               containerPort: 8080
@@ -182,6 +189,43 @@ spec:
 EOF
 }
 
+# Function to generate otlp-collector.yaml
+generate_otlp_collector() {
+    backend_dir="$1"
+    service_name="$2"
+
+    cat > "${backend_dir}/otlp-collector.yaml" << EOF
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otlp-collector
+spec:
+  image: otel/opentelemetry-collector-contrib:0.128.0
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+
+    exporters:
+      clickhouse:
+        endpoint: tcp://clickhouse:9000?dial_timeout=10s&compress=lz4
+        username: clickhouse
+        password: clickhouse
+        database: ${service_name}
+        traces_table_name: otel_traces
+      debug:
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [debug, clickhouse]
+EOF
+}
+
 # Function to generate local overlay kustomization.yaml
 generate_local_overlay_kustomization() {
     overlay_dir="$1"
@@ -238,6 +282,7 @@ setup_service_structure() {
     generate_deployment "$backend_dir" "$service_name" "$service_id"
     generate_service "$backend_dir"
     generate_ingress "$backend_dir" "$service_id"
+    generate_otlp_collector "$backend_dir" "$service_name"
 
     # Generate local overlay
     generate_local_overlay_kustomization "$local_overlay_dir" "$service_id" "$service_uuid" "$service_name"
@@ -319,7 +364,7 @@ clean_manifests_directory() {
     manifests_dir="$1"
 
     # Whitelist of directories/files that should not be deleted
-    whitelist="rijksoverheid"
+    whitelist="rijksoverheid toeslagen"
 
     echo "🧹 Cleaning manifests directory: $manifests_dir"
 

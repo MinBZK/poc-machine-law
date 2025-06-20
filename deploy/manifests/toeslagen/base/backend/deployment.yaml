@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: backend
+      annotations:
+        sidecar.opentelemetry.io/inject: "toeslagen-backend-otlp-collector"
     spec:
       containers:
         - name: toeslagen-backend
@@ -26,6 +28,10 @@ spec:
               value: "false"
             - name: APP_RULE_SERVICE_IN_MEMORY
               value: "false"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://localhost:4317"
+            - name: OTEL_SERVICE_NAME
+              value: "Toeslagen"
           ports:
             - name: http
               containerPort: 8080

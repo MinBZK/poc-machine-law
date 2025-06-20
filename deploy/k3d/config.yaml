@@ -23,3 +23,4 @@ volumes:
   - volume: ${PWD}/deploy/k3d/resources/opentelemetry-operator.yaml:/var/lib/rancher/k3s/server/manifests/opentelemetry-operator.yaml
   - volume: ${PWD}/deploy/k3d/resources/clickhouse.yaml:/var/lib/rancher/k3s/server/manifests/clickhouse.yaml
   - volume: ${PWD}/deploy/k3d/resources/ingress-nginx.yaml:/var/lib/rancher/k3s/server/manifests/ingress-nginx.yaml
+  - volume: ${PWD}/deploy/k3d/resources/grafana.yaml:/var/lib/rancher/k3s/server/manifests/grafana.yaml

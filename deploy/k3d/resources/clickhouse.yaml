@@ -27,7 +27,7 @@ spec:
         #!/bin/bash
 
         clickhouse-client --allow_suspicious_fixed_string_types 1 --user clickhouse --password clickhouse -n <<-EOSQL
-          CREATE DATABASE IF NOT EXISTS orga;
+          CREATE DATABASE IF NOT EXISTS toeslagen;
 
-          CREATE DATABASE IF NOT EXISTS orgb;
+          CREATE DATABASE IF NOT EXISTS belastingdienst;
         EOSQL

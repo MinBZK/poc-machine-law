@@ -1,0 +1,88 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: grafana
+  namespace: kube-system
+spec:
+  repo: https://grafana.github.io/helm-charts
+  chart: grafana
+  version: 8.8.3
+  targetNamespace: lac
+  createNamespace: true
+  valuesContent: |-
+    adminUser: admin
+    adminPassword: admin
+
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana.127-0-0-1.nip.io
+      path: /
+      pathType: Prefix
+
+    persistence:
+      enabled: true
+      size: 1Gi
+
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+
+    grafana.ini:
+      server:
+        domain: grafana.127-0-0-1.nip.io
+        root_url: http://grafana.127-0-0-1.nip.io
+      feature_toggles:
+        enable: traceqlEditor
+
+    plugins:
+      - grafana-clickhouse-datasource
+      - grafana-polystat-panel
+      - grafana-piechart-panel
+
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: ClickHouse
+            type: grafana-clickhouse-datasource
+            url: clickhouse-headless.lac.svc.cluster.local:9000
+            access: proxy
+            basicAuth: false
+            jsonData:
+              defaultDatabase: toeslagen
+              username: clickhouse
+              port: 9000
+              host: clickhouse
+              protocol: native
+              secure: false
+              traces:
+                defaultTable: otel_traces
+                otelEnabled: true
+            secureJsonData:
+              password: clickhouse
+            isDefault: true
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+
+    dashboards:
+      default:
+        otel-overview:
+          gnetId: 17648
+          revision: 1
+          datasource: ClickHouse

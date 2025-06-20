@@ -6,6 +6,7 @@ require (
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/gdexlab/go-render v1.0.1
 	github.com/google/uuid v1.6.0
+	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/looplab/eventhorizon v0.16.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/shopspring/decimal v1.4.0
@@ -20,6 +21,7 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/google/flatbuffers v23.5.26+incompatible // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect

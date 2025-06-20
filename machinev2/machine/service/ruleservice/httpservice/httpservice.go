@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/oapi-codegen/runtime/types"
+
 	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
@@ -13,7 +16,6 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice/httpservice/api"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
-	"github.com/oapi-codegen/runtime/types"
 )
 
 type HTTPService struct {
@@ -27,7 +29,11 @@ type HTTPService struct {
 
 func New(logger logging.Logger, service string, services contexter.ServiceProvider, svcresolver serviceresolver.ServiceSpec, standaloneMode bool) (*HTTPService, error) {
 	logger.Warningf(context.Background(), "creating http ruleservice: %s @ %s", service, svcresolver.Endpoint)
-	client, err := api.NewClientWithResponses(fmt.Sprintf("%s/v0", svcresolver.Endpoint))
+
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 10
+
+	client, err := api.NewClientWithResponses(fmt.Sprintf("%s/v0", svcresolver.Endpoint), api.WithHTTPClient(retryClient.StandardClient()))
 	if err != nil {
 		return nil, fmt.Errorf("new client with responses: %w", err)
 	}

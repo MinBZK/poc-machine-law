@@ -1,0 +1,28 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otlp-collector
+spec:
+  image: otel/opentelemetry-collector-contrib:0.128.0
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+
+    exporters:
+      clickhouse:
+        endpoint: tcp://clickhouse:9000?dial_timeout=10s&compress=lz4
+        username: clickhouse
+        password: clickhouse
+        database: KVK
+        traces_table_name: otel_traces
+      debug:
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [debug, clickhouse]
