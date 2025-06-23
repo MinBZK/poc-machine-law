@@ -16,16 +16,29 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.retrievers import TavilySearchAPIRetriever
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.utils import (
+    convert_to_secret_str,
+    get_from_dict_or_env,
+)
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Command, interrupt
 
+from script.validate import (
+    collect_defined_variables,
+    collect_service_outputs,
+    collect_service_references,
+    find_variables_in_dict,
+)
+
+# If this is a production environment, we use more resources / tokens
+is_production = os.getenv("IS_PRODUCTION", "false").lower() == "true"
+
 router = APIRouter(prefix="/importer", tags=["importer"])
 
-
 model = ChatAnthropic(
-    model="claude-3-5-sonnet-latest",
+    model="claude-3-7-sonnet-latest",
     temperature=0,
     max_retries=2,
     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
@@ -41,11 +54,14 @@ class State(TypedDict):
     should_retry: bool
     law_url: str
     law_url_approved: bool | None  # Can be True, False, or None
+    anthropic_api_key: str | None  # Optional, can be None if not provided by the user. Also below
+    tavily_api_key: str | None
 
 
 class WebSocketMessage(TypedDict):
     id: str
-    content: str
+    type: str  # E.g. "progress". Default: chunk
+    content: str | int
     quick_replies: list[str]
 
 
@@ -57,17 +73,69 @@ nest_asyncio.apply()
 loop = asyncio.get_event_loop()
 
 
-def validate_schema(yaml_content: str) -> str | None:
+def validate_schema(yaml_data: any) -> str | None:
     """Validate a YAML file against the JSON schema."""
     schema = json.loads(schema_content)
-
-    yaml_data = yaml.safe_load(yaml_content)
 
     try:
         validate(instance=yaml_data, schema=schema)
         return None
     except jsonschema.exceptions.ValidationError as err:
-        return f"Error: {err.message}"
+        return str(err.message)
+
+
+# Get all law YAML files
+laws_dir = os.path.join(os.path.dirname(__file__), "../../law")
+examples = []
+for root, _, files in os.walk(laws_dir):
+    for file in files:
+        if file.endswith(".yaml"):  # Return only YAML files
+            # law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
+            with open(os.path.join(root, file)) as f:
+                examples.append(f.read())
+
+
+def validate_service_references(
+    yaml_data: any,
+) -> list[str]:  # Note: somewhat similar to the function with the same name in script/validate
+    """Validate that all service references have corresponding outputs."""
+
+    # Collect references from this block
+    references = collect_service_references(yaml_data)
+
+    # Collect outputs from this block file and existing files
+    all_outputs = collect_service_outputs(yaml_data)
+    for example in examples:
+        example_data = yaml.safe_load(example)
+        all_outputs.update(collect_service_outputs(example_data))
+
+    # Check for missing references
+    missing_references = references - all_outputs
+
+    return list(
+        {
+            f"non-existing output that is referenced: {service}.{field} (law: {law})"
+            for service, law, field in sorted(missing_references)
+        }
+    )  # Return as a list for consistency with the function signature
+
+
+def validate_variable_definitions(
+    yaml_data: any,
+) -> list[str]:  # Note: somewhat similar to the function with the same name in script/validate
+    """Validate that all $VARIABLES are defined."""
+
+    defined = collect_defined_variables(yaml_data)
+    referenced = find_variables_in_dict(yaml_data)
+
+    # calculation_date is implicitly defined
+    referenced.discard("$calculation_date")
+
+    undefined = {v.replace("$", "") for v in referenced} - defined
+
+    return list(
+        {f"undefined variable: {var}" for var in sorted(undefined)}
+    )  # Return as a list for consistency with the function signature
 
 
 def ask_law(state: State, config: dict) -> dict:
@@ -87,8 +155,9 @@ def check_law_input(state: State, config: dict) -> dict:
 
     resp = interrupt("check_law_input")
 
+    thread_id = config["configurable"]["thread_id"]
+
     if len(resp) < 4:
-        thread_id = config["configurable"]["thread_id"]
         loop.run_until_complete(
             manager.send_message(
                 WebSocketMessage(
@@ -100,6 +169,31 @@ def check_law_input(state: State, config: dict) -> dict:
         )
         return {"should_retry": True, "law": resp}
 
+    # If the API keys are unset or empty, return an error message
+    if (not state.get("anthropic_api_key")) or (not state.get("tavily_api_key")):
+        loop.run_until_complete(
+            manager.send_message(
+                WebSocketMessage(
+                    id=str(uuid.uuid4()),
+                    content="Je moet eerst hierboven API-keys invoeren om verder te kunnen.",
+                ),
+                thread_id,
+            )
+        )
+        return {"should_retry": True, "law": resp}
+
+    # Send a mesage to the frontend to update the progress to the next step
+    loop.run_until_complete(
+        manager.send_message(
+            WebSocketMessage(
+                id=str(uuid.uuid4()),
+                type="progress",
+                content=1,
+            ),
+            thread_id,
+        )
+    )
+
     return {"should_retry": False, "law": resp}
 
 
@@ -107,6 +201,7 @@ def ask_law_confirmation(state: State, config: dict) -> dict:
     print("----> ask_law_confirmation")
 
     # Find the law URL
+    retriever.api_key = get_from_dict_or_env(state, "tavily_api_key", "TAVILY_API_KEY")
     docs = retriever.invoke(state["law"])
 
     if len(docs) == 0:
@@ -134,8 +229,9 @@ def ask_law_confirmation(state: State, config: dict) -> dict:
 def handle_law_confirmation(state: State, config: dict) -> dict:
     print("----> handle_law_confirmation")
 
+    thread_id = config["configurable"]["thread_id"]
+
     if state["law_url"] is None:
-        thread_id = config["configurable"]["thread_id"]
         loop.run_until_complete(
             manager.send_message(
                 WebSocketMessage(
@@ -154,6 +250,18 @@ def handle_law_confirmation(state: State, config: dict) -> dict:
     if resp.lower() in ("ja", "j"):
         is_approved = True
 
+        # Send a mesage to the frontend to update the progress to the next step
+        loop.run_until_complete(
+            manager.send_message(
+                WebSocketMessage(
+                    id=str(uuid.uuid4()),
+                    type="progress",
+                    content=2,
+                ),
+                thread_id,
+            )
+        )
+
     return {"law_url_approved": is_approved}
 
 
@@ -163,28 +271,8 @@ def fetch_and_format_data(url: str) -> str:
 
 
 # Get the schema content
-with open("schema/v0.1.3/schema.json") as sf:
+with open("schema/v0.1.4/schema.json") as sf:
     schema_content = sf.read()
-
-# Get all law YAML files
-laws_dir = os.path.join(os.path.dirname(__file__), "../../law")
-examples = []
-for root, _, files in os.walk(laws_dir):
-    for file in files:
-        if file.endswith(".yaml"):  # Return only YAML files
-            # law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
-            with open(os.path.join(root, file)) as f:
-                examples.append(
-                    {
-                        "type": "document",
-                        "title": "Voorbeeld",
-                        "text": f.read(),
-                    }
-                )
-
-# Limit to 2 YAML files for testing purposes to reduce costs. TODO: remove this
-if len(examples) > 2:
-    examples = examples[:2]
 
 analyize_law_prompt = ChatPromptTemplate(
     [
@@ -198,7 +286,18 @@ analyize_law_prompt = ChatPromptTemplate(
                     "type": "text",
                     "text": "Ik heb deze wetten zo gemodelleerd in YAML.",
                 },
-                *examples,  # Use the * operator to unpack the examples list
+                *[  # Use the * operator to unpack the examples list
+                    {
+                        "type": "document",
+                        "title": "Voorbeeld",
+                        "text": example,
+                    }
+                    for example in (
+                        examples
+                        if is_production
+                        else examples[:2]  # Limit to the first 2 examples for testing purposes to reduce tokens / costs
+                    )
+                ],
             ],
         ),
         (
@@ -228,7 +327,7 @@ def process_law(state: State, config: dict) -> dict:
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
-                content="De wettekst wordt nu opgehaald en geanalyseerd, dit kan even duren…",
+                content="De wettekst wordt nu opgehaald en geïnterpreteerd, dit kan even duren…",
                 quick_replies=[],
             ),
             thread_id,
@@ -241,15 +340,30 @@ def process_law(state: State, config: dict) -> dict:
     # Remove duplicate whitespace from the content
     content = re.sub(r"\s+", " ", content)
 
-    # Cap the law content for testing purposes to reduce costs. TODO: remove this
-    if len(content) > 1000:
+    # Cap the law content for testing purposes to reduce costs when not on pro
+    if (not is_production) and len(content) > 1000:
         content = content[:1000]
 
     # Add a human message to process the law
+    model.anthropic_api_key = convert_to_secret_str(
+        get_from_dict_or_env(state, "anthropic_api_key", "ANTHROPIC_API_KEY")
+    )
     result = model.invoke(
         analyize_law_prompt.format_messages(
             schema_content=schema_content,
             content=content,
+        )
+    )
+
+    # Send a mesage to the frontend to update the progress to the next step
+    loop.run_until_complete(
+        manager.send_message(
+            WebSocketMessage(
+                id=str(uuid.uuid4()),
+                type="progress",
+                content=3,
+            ),
+            thread_id,
         )
     )
 
@@ -277,31 +391,56 @@ def process_law_feedback(state: State, config: dict) -> dict:
         yaml_blocks = [match.group(1) for match in matches]
         for block in yaml_blocks:
             print("----> YAML block found")
-            err = validate_schema(block)
 
+            yaml_data = yaml.safe_load(block)
+
+            # If the YAML data is not a dictionary, skip it (since it is most likely a subset of a larger block, included as explanation)
+            if not isinstance(yaml_data, dict):
+                print("----> skipping YAML block, not a dictionary")
+                continue
+
+            err = validate_schema(yaml_data)
             if err:
                 validation_errors.append(err)
 
+            validation_errors.extend(validate_service_references(yaml_data))
+            validation_errors.extend(validate_variable_definitions(yaml_data))
+
         if validation_errors:
-            user_input = f"Er zijn fouten gevonden in de YAML output:\n```\n{'\n'.join(validation_errors)}\n```"
+            user_input = f"Er zijn fouten gevonden in de YAML output:\n```\n{'\n'.join(f'- {error}' for error in validation_errors)}\n```"
         else:
             user_input = "De YAML output lijkt correct."  # IMPROVE: validate agains the Girkin tables
 
-    thread_id = config["configurable"]["thread_id"]
+        thread_id = config["configurable"]["thread_id"]
 
-    loop.run_until_complete(
-        manager.send_message(
-            WebSocketMessage(
-                id=str(uuid.uuid4()),
-                content=user_input,
-                quick_replies=[],
-            ),
-            thread_id,
+        # Send a mesage to the frontend to update the progress to the next step
+        loop.run_until_complete(
+            manager.send_message(
+                WebSocketMessage(
+                    id=str(uuid.uuid4()),
+                    type="progress",
+                    content=4,
+                ),
+                thread_id,
+            )
         )
-    )  # IMPROVE: send/show this as user message instead of AI message in the frontend
+
+        loop.run_until_complete(
+            manager.send_message(
+                WebSocketMessage(
+                    id=str(uuid.uuid4()),
+                    content=user_input,
+                    quick_replies=[],
+                ),
+                thread_id,
+            )
+        )  # IMPROVE: send/show this as user message instead of AI message in the frontend
 
     state["messages"].append(HumanMessage(user_input))
 
+    model.anthropic_api_key = convert_to_secret_str(
+        get_from_dict_or_env(state, "anthropic_api_key", "ANTHROPIC_API_KEY")
+    )
     result = model.invoke(state["messages"])
 
     return {"messages": result}
@@ -374,13 +513,13 @@ class ConnectionManager:
         if thread_id in self.active_connections:
             del self.active_connections[thread_id]
 
-    async def broadcast(self, message: WebSocketMessage):
-        for websocket in self.active_connections.values():
-            await websocket.send_text(message)
+    # async def broadcast(self, message: WebSocketMessage):
+    #     for websocket in self.active_connections.values():
+    #         await websocket.send_json(message)
 
     async def send_message(self, message: WebSocketMessage, thread_id: uuid.UUID):
         if thread_id in self.active_connections:
-            await self.active_connections[thread_id].send_text(json.dumps(message))
+            await self.active_connections[thread_id].send_json(message)
 
 
 manager = ConnectionManager()
@@ -389,38 +528,53 @@ manager = ConnectionManager()
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     thread_id = await manager.connect(websocket)
+    # IMPROVE: implement functionality similar to the 'Stop generating' functionality in ChatGPT. Use an AbortController, so the API will actually stop generating? See https://community.openai.com/t/chatgpts-stop-generating-function-how-to-implement/235121 and https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 
     try:
-        while True:
-            user_input = await websocket.receive_text()
+        async for user_input in websocket.iter_json():
+            # # Process the received data through the workflow
+            # print("message received:", user_input)
 
-            # Process the received data through the workflow
-            print("message received:", user_input)
-
-            contains_yaml = False
-            chunk_content_so_far = ""
-            for chunk, _ in graph.stream(
-                Command(resume=user_input),
-                {"configurable": {"thread_id": thread_id}},
-                stream_mode="messages",
-            ):
-                if not contains_yaml:
-                    chunk_content_so_far += chunk.content
-                    if "```yaml" in chunk_content_so_far:
-                        contains_yaml = True
-
-                # If the chunk contains response_metadata.stop_reason "max_tokens", then add a quick reply to continue
-                quick_replies = []
-                stop_reason = chunk.response_metadata.get("stop_reason")
-                if stop_reason == "max_tokens":
-                    quick_replies = ["Ga door"]
-                elif contains_yaml and stop_reason == "end_turn":
-                    quick_replies = ["Analyseer deze YAML-code"]
-
-                await manager.send_message(
-                    WebSocketMessage(id=chunk.id, content=chunk.content, quick_replies=quick_replies),
-                    thread_id,
+            if user_input.get("type") == "keys":
+                # Store the keys in the state
+                graph.update_state(
+                    {"configurable": {"thread_id": thread_id}},
+                    {
+                        "anthropic_api_key": user_input["anthropicApiKey"],
+                        "tavily_api_key": user_input["tavilyApiKey"],
+                    },
                 )
+
+            elif user_input.get("type") == "text":
+                contains_yaml = False
+                chunk_content_so_far = ""
+
+                async for chunk, _ in graph.astream(
+                    Command(resume=user_input.get("content")),
+                    {"configurable": {"thread_id": thread_id}},
+                    stream_mode="messages",
+                ):
+                    if not contains_yaml:
+                        chunk_content_so_far += chunk.content
+                        if "```yaml" in chunk_content_so_far:
+                            contains_yaml = True
+
+                    # If the chunk contains response_metadata.stop_reason "max_tokens", then add a quick reply to continue
+                    quick_replies = []
+                    stop_reason = chunk.response_metadata.get("stop_reason")
+                    if stop_reason == "max_tokens":
+                        quick_replies = ["Ga door"]
+                    elif contains_yaml and stop_reason == "end_turn":
+                        quick_replies = ["Analyseer deze YAML-code"]
+
+                    await manager.send_message(
+                        WebSocketMessage(
+                            id=chunk.id,
+                            content=chunk.content,
+                            quick_replies=quick_replies,
+                        ),
+                        thread_id,
+                    )
 
     except WebSocketDisconnect:
         manager.disconnect(thread_id)
