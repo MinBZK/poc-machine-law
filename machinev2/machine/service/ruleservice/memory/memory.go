@@ -108,20 +108,6 @@ func (rs *RuleService) Evaluate(
 	return model.NewRuleResult(result, ruleEngine.Spec.UUID), nil
 }
 
-// GetRuleInfo gets metadata about the rule that would be applied for given law and date
-func (rs *RuleService) GetRuleInfo(law, referenceDate string) map[string]any {
-	rule, err := rs.Resolver.FindRule(law, referenceDate, rs.ServiceName)
-	if err != nil {
-		return nil
-	}
-
-	return map[string]any{
-		"uuid":       rule.UUID,
-		"name":       rule.Name,
-		"valid_from": rule.ValidFrom.Format("2006-01-02"),
-	}
-}
-
 // SetSourceDataFrame sets a source DataFrame
 func (rs *RuleService) SetSourceDataFrame(_ context.Context, table string, df model.DataFrame) error {
 	rs.SourceDataFrames.Set(table, df)

@@ -1,6 +1,22 @@
 {
   "backendAddresses": [
-    "http://orga-ldv-inzicht-api.127-0-0-1.nip.io:8080",
-    "http://orgb-ldv-inzicht-api.127-0-0-1.nip.io:8080"
+    "http://belastingdienst-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://cbs-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://dji-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://duo-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://gemeente-amsterdam-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://ind-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://jenv-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://justid-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://kiesraad-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://kvk-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://rvig-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://rvz-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://svb-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://szw-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://toeslagen-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://uwv-inzicht-backend.127-0-0-1.nip.io:8080",
+    "http://vws-inzicht-backend.127-0-0-1.nip.io:8080"
+
   ]
 }

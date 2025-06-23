@@ -9,13 +9,18 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	internalContext "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
+	tracer "github.com/minbzk/poc-machine-law/machinev2/machine/trace"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Services is the main service provider for rule evaluation
@@ -27,12 +32,17 @@ type Services struct {
 	RootReferenceDate string
 	CaseManager       *CaseManager
 	ClaimManager      *ClaimManager
-	mu                sync.RWMutex
+	tracer            trace.Tracer
+
+	mu sync.RWMutex
+
+	shutdownFns []func(context.Context) error
 
 	ruleServiceInMemory bool
-
-	organization   *string
-	standAloneMode bool
+	organization        *string
+	standAloneMode      bool
+	ldvEnabled          bool
+	rvaIDs              map[string]uuid.UUID
 }
 
 type Option func(*Services)
@@ -48,6 +58,21 @@ func WithOrganizationName(organization string) Option {
 	return func(s *Services) {
 		s.logger.Warningf(context.Background(), "starting as organization: %s", organization)
 		s.organization = &organization
+	}
+}
+
+func WithLogboekDataVerwerking(endpoint string, name string) Option {
+	return func(s *Services) {
+		s.logger.Warningf(context.Background(), "starting with ldv enabled")
+		sh, err := setupOTelSDK(endpoint, name)
+		if err != nil {
+			s.logger.Errorf(context.Background(), "could not setup otel sdk, disabling LDV", "err", err)
+			return
+		}
+
+		s.ldvEnabled = true
+		s.tracer = otel.Tracer(name)
+		s.shutdownFns = append(s.shutdownFns, sh)
 	}
 }
 
@@ -79,6 +104,9 @@ func NewServices(referenceDate time.Time, options ...Option) (*Services, error) 
 		ruleServiceInMemory: false,
 		organization:        nil,
 		standAloneMode:      false,
+		rvaIDs: map[string]uuid.UUID{
+			"evaluate-do": uuid.MustParse("f8d630ae-86e5-4f14-a889-644108429933"),
+		},
 	}
 
 	// Apply all the functional options to configure the client.
@@ -174,8 +202,55 @@ func (s *Services) Evaluate(
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
-	svc, ok := s.GetService(service)
+	var span trace.Span
 
+	if referenceDate == "" {
+		referenceDate = s.RootReferenceDate
+	}
+
+	if s.ldvEnabled {
+		spec, err := s.RuleResolver.GetRuleSpec(law, referenceDate, service)
+		if err != nil {
+			return nil, fmt.Errorf("get rule spec: %w", err)
+		}
+
+		ctx, span = tracer.Action(ctx, s.tracer,
+			fmt.Sprintf("uri://%s.example/activities/evaluate-do", strings.ToLower(s.GetOrganizationName())),
+			tracer.SetAttributeBSN(parameters["BSN"].(string)),
+			tracer.SetAttributeActivityID(s.rvaIDs["evaluate-do"].String()),
+			tracer.SetAlgorithmID(spec.UUID.String()),
+		)
+
+		defer span.End()
+	}
+
+	result, err := s.evaluate(ctx, service, law, parameters, referenceDate, overwriteInput, requestedOutput, approved)
+	if err != nil {
+		if span != nil {
+			span.SetStatus(codes.Error, err.Error())
+		}
+
+		return nil, err
+	}
+
+	if span != nil {
+		span.SetStatus(codes.Ok, "")
+	}
+
+	return result, nil
+}
+
+func (s *Services) evaluate(
+	ctx context.Context,
+	service string,
+	law string,
+	parameters map[string]any,
+	referenceDate string,
+	overwriteInput map[string]map[string]any,
+	requestedOutput string,
+	approved bool,
+) (*model.RuleResult, error) {
+	svc, ok := s.GetService(service)
 	if !ok {
 		return nil, fmt.Errorf("service not found: %s", service)
 	}
@@ -483,11 +558,11 @@ func (s *Services) matchesEvent(event model.Event, apply ruleresolver.Apply) boo
 	return false
 }
 
-func (s Services) HasOrganizationName() bool {
+func (s *Services) HasOrganizationName() bool {
 	return s.organization != nil
 }
 
-func (s Services) GetOrganizationName() string {
+func (s *Services) GetOrganizationName() string {
 	if s.organization == nil {
 		return ""
 	}
@@ -495,10 +570,10 @@ func (s Services) GetOrganizationName() string {
 	return *s.organization
 }
 
-func (s Services) RuleServicesInMemory() bool {
+func (s *Services) RuleServicesInMemory() bool {
 	return s.ruleServiceInMemory
 }
 
-func (s Services) InStandAloneMode() bool {
+func (s *Services) InStandAloneMode() bool {
 	return s.standAloneMode
 }

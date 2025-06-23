@@ -11,7 +11,7 @@ spec:
           image: rijksoverheid-mijnoverheid-frontend-image
           ports:
             - name: http
-              containerPort: 5173
+              containerPort: 80
           volumeMounts:
             - mountPath: /build/static/config.json
               name: config-json

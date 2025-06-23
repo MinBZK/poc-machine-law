@@ -15,6 +15,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/backend/config"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/interface/api"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/service"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/trace"
 )
 
 var _ api.StrictServerInterface = &Handler{}
@@ -52,6 +53,11 @@ func router(handler *Handler) (http.Handler, error) {
 	r.Use(NewStructuredLogger(handler.logger))
 	r.Use(middleware.Recoverer)
 	r.Use(handler.Heartbeat("/healthz"))
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			next.ServeHTTP(w, r.WithContext(trace.Extract(r.Context(), r.Header)))
+		})
+	})
 
 	// Metrics middleware example
 	r.Use(func(next http.Handler) http.Handler {

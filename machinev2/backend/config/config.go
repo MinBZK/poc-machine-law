@@ -6,4 +6,10 @@ type Config struct {
 	Organization            string
 	StandaloneMode          bool
 	WithRuleServiceInMemory bool
+	LDV                     LDV
+}
+
+type LDV struct {
+	Enabled  bool
+	Endpoint string
 }

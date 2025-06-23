@@ -26,10 +26,10 @@ spec:
               value: "true"
             - name: APP_RULE_SERVICE_IN_MEMORY
               value: "false"
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://localhost:4317"
-            - name: OTEL_SERVICE_NAME
-              value: "GEMEENTE_AMSTERDAM"
+            - name: APP_LDV_ENABLED
+              value: "true"
+            - name: APP_LDV_ENDPOINT
+              value: "localhost:4317"
           ports:
             - name: http
               containerPort: 8080

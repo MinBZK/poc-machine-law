@@ -41,3 +41,58 @@ configMapGenerator:
       - services/Toeslagen.yaml
       - services/UWV.yaml
       - services/VWS.yaml
+  - name: belastingdienst-rva-config-cm
+    files:
+      - rva-configs/belastingdienst-rva-config.yaml
+  - name: cbs-rva-config-cm
+    files:
+      - rva-configs/cbs-rva-config.yaml
+  - name: dji-rva-config-cm
+    files:
+      - rva-configs/dji-rva-config.yaml
+  - name: duo-rva-config-cm
+    files:
+      - rva-configs/duo-rva-config.yaml
+  - name: gemeente-amsterdam-rva-config-cm
+    files:
+      - rva-configs/gemeente-amsterdam-rva-config.yaml
+  - name: ind-rva-config-cm
+    files:
+      - rva-configs/ind-rva-config.yaml
+  - name: jenv-rva-config-cm
+    files:
+      - rva-configs/jenv-rva-config.yaml
+  - name: justid-rva-config-cm
+    files:
+      - rva-configs/justid-rva-config.yaml
+  - name: kiesraad-rva-config-cm
+    files:
+      - rva-configs/kiesraad-rva-config.yaml
+  - name: kvk-rva-config-cm
+    files:
+      - rva-configs/kvk-rva-config.yaml
+  - name: rvig-rva-config-cm
+    files:
+      - rva-configs/rvig-rva-config.yaml
+  - name: rvz-rva-config-cm
+    files:
+      - rva-configs/rvz-rva-config.yaml
+  - name: svb-rva-config-cm
+    files:
+      - rva-configs/svb-rva-config.yaml
+  - name: szw-rva-config-cm
+    files:
+      - rva-configs/szw-rva-config.yaml
+  - name: toeslagen-rva-config-cm
+    files:
+      - rva-configs/toeslagen-rva-config.yaml
+  - name: uwv-rva-config-cm
+    files:
+      - rva-configs/uwv-rva-config.yaml
+  - name: vws-rva-config-cm
+    files:
+      - rva-configs/vws-rva-config.yaml
+images:
+  - name: ldv-inzicht-backend-image
+    newName: digilabpublic.azurecr.io/digilab.overheid.nl/ecosystem/logboek-dataverwerkingen/logboek-dataverwerkingen/backend
+    newTag: 3729bd7f-main-106

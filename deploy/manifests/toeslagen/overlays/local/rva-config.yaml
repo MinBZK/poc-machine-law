@@ -1,0 +1,28 @@
+activities:
+  355d0e30-b942-4dfe-808a-d613e1339a19:
+    name: Kindertoeslag registratie
+    personaldatacategories:
+      - Burgerservicenummer
+
+  e447c7cc-f262-48a3-858f-b769362d2a1c:
+    name: Inzage persoonsgegevens
+    personaldatacategories:
+      - Burgerservicenummer
+      - Naam
+      - Geboortedatum
+      - Partners
+      - Kinderen
+
+  706180bc-bb80-4a56-8e40-58c1507ea1e0:
+    name: Bereken toeslag
+    personaldatacategories:
+      - Burgerservicenummer
+      - Kinderen
+      - Vermogen
+
+  9ddd47b8-6d2d-46da-a73f-6c60a1af9aaf:
+    name: Verifier toeslag
+    personaldatacategories:
+      - Burgerservicenummer
+      - Kinderen
+      - Vermogen

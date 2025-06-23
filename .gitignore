@@ -24,3 +24,5 @@ simulation_summary.txt
 .env
 machinev2/backend/backend
 __debug_bin*
+
+.claude

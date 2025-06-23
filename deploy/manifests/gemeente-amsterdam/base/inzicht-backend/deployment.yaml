@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: inzicht-backend
+          image: ldv-inzicht-backend-image
+          env:
+            - name: APP_ORGANIZATION
+              value: "GEMEENTE_AMSTERDAM"
+            - name: APP_QUERY_ENDPOINT
+              value: "clickhouse:9000"
+            - name: APP_QUERY_DATABASE
+              value: "GEMEENTE_AMSTERDAM"
+            - name: APP_QUERY_USER
+              value: "clickhouse"
+            - name: APP_QUERY_PASSWORD
+              value: "clickhouse"
+            - name: APP_RVA_CURRENT
+              value: "static"
+            - name: APP_RVA_STATIC_FILEPATH
+              value: "/app/rva-config.yaml"
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - mountPath: /app/rva-config.yaml
+              name: rva-config
+              subPath: gemeente-amsterdam-rva-config.yaml
+      volumes:
+        - name: rva-config
+          configMap:
+            name: gemeente-amsterdam-rva-config-cm

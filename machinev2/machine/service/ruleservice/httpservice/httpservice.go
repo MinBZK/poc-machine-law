@@ -16,6 +16,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice/httpservice/api"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/trace"
 )
 
 type HTTPService struct {
@@ -27,13 +28,21 @@ type HTTPService struct {
 	standaloneMode bool
 }
 
-func New(logger logging.Logger, service string, services contexter.ServiceProvider, svcresolver serviceresolver.ServiceSpec, standaloneMode bool) (*HTTPService, error) {
+func New(logger logging.Logger, service string, services contexter.ServiceProvider, svcresolver serviceresolver.ServiceSpec) (*HTTPService, error) {
 	logger.Warningf(context.Background(), "creating http ruleservice: %s @ %s", service, svcresolver.Endpoint)
 
 	retryClient := retryablehttp.NewClient()
 	retryClient.RetryMax = 10
 
-	client, err := api.NewClientWithResponses(fmt.Sprintf("%s/v0", svcresolver.Endpoint), api.WithHTTPClient(retryClient.StandardClient()))
+	opts := []api.ClientOption{
+		api.WithHTTPClient(retryClient.StandardClient()),
+		api.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+			trace.Inject(ctx, req.Header)
+			return nil
+		}),
+	}
+
+	client, err := api.NewClientWithResponses(fmt.Sprintf("%s/v0", svcresolver.Endpoint), opts...)
 	if err != nil {
 		return nil, fmt.Errorf("new client with responses: %w", err)
 	}
@@ -44,11 +53,10 @@ func New(logger logging.Logger, service string, services contexter.ServiceProvid
 		client:         client,
 		services:       services,
 		svcresolver:    svcresolver,
-		standaloneMode: standaloneMode,
+		standaloneMode: services.InStandAloneMode(),
 	}, nil
 }
 
-// Evaluate implements ruleservice.RuleServicer.
 func (h *HTTPService) Evaluate(
 	ctx context.Context,
 	law string,
@@ -77,14 +85,14 @@ func (h *HTTPService) Evaluate(
 		},
 	}
 
-	response, err := h.client.EvaluateWithResponse(ctx, body)
+	resp, err := h.client.EvaluateWithResponse(ctx, body)
 
 	if err != nil {
 		return nil, fmt.Errorf("evaluate: %w", err)
 	}
 
-	if response.StatusCode() != http.StatusCreated {
-		return nil, fmt.Errorf("evaluete incorrect status code: %s", string(response.Body))
+	if resp.StatusCode() != http.StatusCreated {
+		return nil, fmt.Errorf("evaluete incorrect status code: %d body: %s", resp.StatusCode(), string(resp.Body))
 	}
 
 	rulespec, err := h.services.GetRuleResolver().GetRuleSpec(law, referenceDate, h.service)
@@ -93,12 +101,12 @@ func (h *HTTPService) Evaluate(
 	}
 
 	rs := &model.RuleResult{
-		Input:           response.JSON201.Data.Input,
-		Output:          toOutput(response.JSON201.Data.Output, rulespec.Properties.Output),
-		RequirementsMet: response.JSON201.Data.RequirementsMet,
-		Path:            toPathNode(response.JSON201.Data.Path),
-		MissingRequired: response.JSON201.Data.MissingRequired,
-		RulespecUUID:    response.JSON201.Data.RulespecId,
+		Input:           resp.JSON201.Data.Input,
+		Output:          toOutput(resp.JSON201.Data.Output, rulespec.Properties.Output),
+		RequirementsMet: resp.JSON201.Data.RequirementsMet,
+		Path:            toPathNode(resp.JSON201.Data.Path),
+		MissingRequired: resp.JSON201.Data.MissingRequired,
+		RulespecUUID:    resp.JSON201.Data.RulespecId,
 	}
 
 	h.logger.Debugf(ctx, "evaluate done: %#+v", rs)
@@ -118,7 +126,7 @@ func (h *HTTPService) Reset(ctx context.Context) error {
 	}
 
 	if resp.StatusCode() != http.StatusCreated {
-		return fmt.Errorf("incorrect status code: %s", string(resp.Body))
+		return fmt.Errorf("evaluete incorrect status code: %d body: %s", resp.StatusCode(), string(resp.Body))
 	}
 
 	return nil
@@ -145,7 +153,7 @@ func (h *HTTPService) SetSourceDataFrame(ctx context.Context, table string, df m
 	}
 
 	if resp.StatusCode() != http.StatusCreated {
-		return fmt.Errorf("incorrect status code: %s", string(resp.Body))
+		return fmt.Errorf("evaluete incorrect status code: %d body: %s", resp.StatusCode(), string(resp.Body))
 	}
 
 	return nil

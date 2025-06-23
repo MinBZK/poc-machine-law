@@ -37,6 +37,10 @@ func New(logger *slog.Logger, cfg *config.Config) (*Service, error) {
 		options = append(options, machine.WithRuleServiceInMemory())
 	}
 
+	if cfg.LDV.Enabled {
+		options = append(options, machine.WithLogboekDataVerwerking(cfg.LDV.Endpoint, cfg.Organization))
+	}
+
 	services, err := machine.NewServices(time.Now(), options...)
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)

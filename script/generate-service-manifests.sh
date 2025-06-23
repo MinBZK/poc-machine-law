@@ -53,6 +53,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - backend
+  - inzicht-backend
 EOF
 }
 
@@ -116,10 +117,10 @@ spec:
               value: "true"
             - name: APP_RULE_SERVICE_IN_MEMORY
               value: "false"
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://localhost:4317"
-            - name: OTEL_SERVICE_NAME
-              value: "${service_name}"
+            - name: APP_LDV_ENABLED
+              value: "true"
+            - name: APP_LDV_ENDPOINT
+              value: "localhost:4317"
           ports:
             - name: http
               containerPort: 8080
@@ -160,6 +161,132 @@ generate_ingress() {
     service_id="$2"
 
     cat > "${backend_dir}/ingress.yaml" << EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ing
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET,HEAD,OPTIONS,TRACE,PUT,DELETE,POST,PATCH,CONNECT"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-Dpl-Core-User,X-Username"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: placeholder
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc
+                port:
+                  name: http
+  tls:
+    - secretName: backend-tls
+      hosts: []
+EOF
+}
+
+# Function to generate inzicht-backend kustomization.yaml
+generate_inzicht_backend_kustomization() {
+    inzicht_backend_dir="$1"
+    service_name="$2"
+
+    cat > "${inzicht_backend_dir}/kustomization.yaml" << EOF
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namePrefix: inzicht-backend-
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: inzicht-backend
+      service: ${service_name}
+EOF
+}
+
+# Function to generate inzicht-backend deployment.yaml
+generate_inzicht_backend_deployment() {
+    inzicht_backend_dir="$1"
+    service_name="$2"
+    service_id="$3"
+
+    cat > "${inzicht_backend_dir}/deployment.yaml" << EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: inzicht-backend
+          image: ldv-inzicht-backend-image
+          env:
+            - name: APP_ORGANIZATION
+              value: "${service_name}"
+            - name: APP_QUERY_ENDPOINT
+              value: "clickhouse:9000"
+            - name: APP_QUERY_DATABASE
+              value: "${service_name}"
+            - name: APP_QUERY_USER
+              value: "clickhouse"
+            - name: APP_QUERY_PASSWORD
+              value: "clickhouse"
+            - name: APP_RVA_CURRENT
+              value: "static"
+            - name: APP_RVA_STATIC_FILEPATH
+              value: "/app/rva-config.yaml"
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - mountPath: /app/rva-config.yaml
+              name: rva-config
+              subPath: ${service_id}-rva-config.yaml
+      volumes:
+        - name: rva-config
+          configMap:
+            name: ${service_id}-rva-config-cm
+EOF
+}
+
+# Function to generate inzicht-backend service.yaml
+generate_inzicht_backend_service() {
+    inzicht_backend_dir="$1"
+
+    cat > "${inzicht_backend_dir}/service.yaml" << 'EOF'
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc
+spec:
+  selector:
+    app: inzicht-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+      name: http
+EOF
+}
+
+# Function to generate inzicht-backend ingress.yaml
+generate_inzicht_backend_ingress() {
+    inzicht_backend_dir="$1"
+    service_id="$2"
+
+    cat > "${inzicht_backend_dir}/ingress.yaml" << EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -250,6 +377,15 @@ patches:
         value: ${service_id}-backend.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
+  - target:
+      kind: Ingress
+      name: inzicht-backend-ing
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: ${service_id}-inzicht-backend.127-0-0-1.nip.io
+      - op: remove
+        path: /spec/tls
 
 resources:
   - ../../base
@@ -270,10 +406,12 @@ setup_service_structure() {
     service_dir="${MANIFESTS_DIR}/${service_id}"
     base_dir="${service_dir}/base"
     backend_dir="${base_dir}/backend"
+    inzicht_backend_dir="${base_dir}/inzicht-backend"
     overlays_dir="${service_dir}/overlays"
     local_overlay_dir="${overlays_dir}/local"
 
     mkdir -p "$backend_dir"
+    mkdir -p "$inzicht_backend_dir"
     mkdir -p "$local_overlay_dir"
 
     # Generate base files
@@ -284,10 +422,94 @@ setup_service_structure() {
     generate_ingress "$backend_dir" "$service_id"
     generate_otlp_collector "$backend_dir" "$service_name"
 
+    # Generate inzicht-backend files
+    generate_inzicht_backend_kustomization "$inzicht_backend_dir" "$service_name"
+    generate_inzicht_backend_deployment "$inzicht_backend_dir" "$service_name" "$service_id"
+    generate_inzicht_backend_service "$inzicht_backend_dir"
+    generate_inzicht_backend_ingress "$inzicht_backend_dir" "$service_id"
+
     # Generate local overlay
     generate_local_overlay_kustomization "$local_overlay_dir" "$service_id" "$service_uuid" "$service_name"
 
     echo "✅ Structure created for: $service_name (ID: $service_id)"
+}
+
+# Function to update rijksoverheid frontend-config.json with all inzicht-backend URLs
+update_rijksoverheid_frontend_config() {
+    manifests_dir="$1"
+    services_dir="$2"
+    shift 2
+    service_ids="$@"
+
+    frontend_config_file="${manifests_dir}/rijksoverheid/overlays/local/frontend-config.json"
+
+    echo "📝 Updating rijksoverheid frontend-config.json with inzicht-backend URLs"
+
+    # Start building the JSON file
+    cat > "$frontend_config_file" << 'EOF'
+{
+  "backendAddresses": [
+EOF
+
+    # Add each service's inzicht-backend URL
+    for service_id in $service_ids; do
+      echo "    \"http://${service_id}-inzicht-backend.127-0-0-1.nip.io:8080\"" >> "$frontend_config_file"
+    done
+
+    # Go back and add commas to all lines except the last one
+    sed -i '3,$s/$/,/' "$frontend_config_file"
+    sed -i '$s/,$//' "$frontend_config_file"
+
+    # Close the JSON structure
+    cat >> "$frontend_config_file" << 'EOF'
+
+  ]
+}
+EOF
+
+    echo "   📝 Updated rijksoverheid frontend-config.json with $(echo "$service_ids" | wc -w) inzicht-backend URLs"
+}
+
+# Function to generate org-specific rva-config files
+generate_rva_config_files() {
+    manifests_dir="$1"
+    services_dir="$2"
+    shift 2
+    service_ids="$@"
+
+    local_overlay_dir="${manifests_dir}/overlays/local"
+    rva_configs_dir="${local_overlay_dir}/rva-configs"
+
+    echo "📝 Generating org-specific rva-config files"
+
+    # Create rva-configs directory
+    mkdir -p "$rva_configs_dir"
+
+    # Process each service to create its rva-config
+    for service_file in "$services_dir"/*.yaml "$services_dir"/*.yml; do
+        [ ! -f "$service_file" ] && continue
+
+        service_name=$(parse_yaml "$service_file" "name")
+        if [ -n "$service_name" ]; then
+            service_name_k8s=$(echo "$service_name" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+            rva_config_file="${rva_configs_dir}/${service_name_k8s}-rva-config.yaml"
+
+            # Only create if it doesn't exist to avoid overwriting existing configs
+            if [ ! -f "$rva_config_file" ]; then
+                # Create a basic rva-config template for each organization
+                cat > "$rva_config_file" << EOF
+activities:
+  example-activity-id:
+    name: Example Activity for ${service_name}
+    personaldatacategories:
+      - Burgerservicenummer
+EOF
+                echo "   📝 Created rva-config for $service_name: rva-configs/${service_name_k8s}-rva-config.yaml"
+            else
+                echo "   ✅ Using existing rva-config for $service_name: rva-configs/${service_name_k8s}-rva-config.yaml"
+            fi
+        fi
+    done
 }
 
 # Function to generate main kustomization.yaml
@@ -343,7 +565,7 @@ EOF
         fi
     done
 
-    # Add configmap generator for services
+    # Add configmap generators for services and rva-configs
     cat >> "${local_overlay_dir}/kustomization.yaml" << EOF
 
 configMapGenerator:
@@ -351,47 +573,58 @@ configMapGenerator:
     files:
 EOF
 
-    # Add all service files to the configmap
+    # Add all service files to the services configmap
     for service_file in "$services_local_dir"/*.yaml "$services_local_dir"/*.yml; do
         [ ! -f "$service_file" ] && continue
         service_filename=$(basename "$service_file")
         echo "      - services/${service_filename}" >> "${local_overlay_dir}/kustomization.yaml"
     done
+
+    # Add individual configmaps for each org's rva-config
+    for service_id in $service_ids; do
+        cat >> "${local_overlay_dir}/kustomization.yaml" << EOF
+  - name: ${service_id}-rva-config-cm
+    files:
+      - rva-configs/${service_id}-rva-config.yaml
+EOF
+    done
+
+    cat >> "${local_overlay_dir}/kustomization.yaml" << EOF
+images:
+  - name: ldv-inzicht-backend-image
+    newName: digilabpublic.azurecr.io/digilab.overheid.nl/ecosystem/logboek-dataverwerkingen/logboek-dataverwerkingen/backend
+    newTag: 3729bd7f-main-106
+EOF
+
 }
 
-# Function to clean manifests directory (with whitelist protection)
+# Function to clean manifests directory (with skiplist protection)
 clean_manifests_directory() {
     manifests_dir="$1"
 
-    # Whitelist of directories/files that should not be deleted
-    whitelist="rijksoverheid toeslagen"
+    # Skiplist of directories/files that should not be deleted
+    skiplist="rijksoverheid toeslagen overlays"
 
     echo "🧹 Cleaning manifests directory: $manifests_dir"
 
     if [ -d "$manifests_dir" ]; then
-        # Remove overlays directory if it exists
-        if [ -d "$manifests_dir/overlays" ]; then
-            echo "   🗑️  Removing: overlays/"
-            rm -rf "$manifests_dir/overlays"
-        fi
-
-        # Remove all directories except those in whitelist
+        # Remove all directories except those in skiplist
         for item in "$manifests_dir"/*; do
             [ ! -e "$item" ] && continue  # Skip if no files match
 
             item_name=$(basename "$item")
             skip_item=false
 
-            # Check if item is in whitelist
-            for whitelisted in $whitelist; do
-                if [ "$item_name" = "$whitelisted" ]; then
-                    echo "   ⚠️  Skipping whitelisted item: $item_name"
+            # Check if item is in skiplist
+            for skiplisted in $skiplist; do
+                if [ "$item_name" = "$skiplisted" ]; then
+                    echo "   ⚠️  Skipping listed item: $item_name"
                     skip_item=true
                     break
                 fi
             done
 
-            # Remove item if not whitelisted
+            # Remove item if not skiplisted
             if [ "$skip_item" = false ]; then
                 echo "   🗑️  Removing: $item_name"
                 rm -rf "$item"
@@ -468,9 +701,11 @@ main() {
         echo "⚠️  No valid service files found in '$SERVICES_DIR'"
         echo "💡 Service files should have .yaml or .yml extension and contain: id, uuid, name, endpoint"
     else
-        # Generate main kustomization.yaml
+        # Generate org-specific rva-config files, update rijksoverheid frontend-config.json, and main kustomization.yaml
         if [ -n "$service_ids" ]; then
-            generate_main_kustomization "$MANIFESTS_DIR" "$SERVICES_DIR" $service_ids
+            update_rijksoverheid_frontend_config "$MANIFESTS_DIR" "$SERVICES_DIR" "$service_ids"
+            generate_rva_config_files "$MANIFESTS_DIR" "$SERVICES_DIR" "$service_ids"
+            generate_main_kustomization "$MANIFESTS_DIR" "$SERVICES_DIR" "$service_ids"
         fi
 
         echo ""
@@ -496,7 +731,8 @@ main() {
             service_name=$(parse_yaml "$service_file" "name")
             if [ -n "$service_name" ]; then
                 service_name_k8s=$(echo "$service_name" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-                echo "   http://$service_name_k8s-backend.127-0-0-1.nip.io"
+                echo "   Backend: http://$service_name_k8s-backend.127-0-0-1.nip.io:8080"
+                echo "   Inzicht Backend: http://$service_name_k8s-inzicht-backend.127-0-0-1.nip.io:8080"
             fi
         done
     fi
@@ -536,7 +772,12 @@ DIRECTORY STRUCTURE:
     ├── cbs/
     │   ├── base/
     │   │   ├── kustomization.yaml
-    │   │   └── backend/
+    │   │   ├── backend/
+    │   │   │   ├── kustomization.yaml
+    │   │   │   ├── deployment.yaml
+    │   │   │   ├── service.yaml
+    │   │   │   └── ingress.yaml
+    │   │   └── inzicht-backend/
     │   │       ├── kustomization.yaml
     │   │       ├── deployment.yaml
     │   │       ├── service.yaml
@@ -547,7 +788,12 @@ DIRECTORY STRUCTURE:
     └── dji/
         ├── base/
         │   ├── kustomization.yaml
-        │   └── backend/
+        │   ├── backend/
+        │   │   ├── kustomization.yaml
+        │   │   ├── deployment.yaml
+        │   │   ├── service.yaml
+        │   │   └── ingress.yaml
+        │   └── inzicht-backend/
         │       ├── kustomization.yaml
         │       ├── deployment.yaml
         │       ├── service.yaml
@@ -566,7 +812,7 @@ SERVICE YAML FORMAT:
 
 FEATURES:
     - Creates separate namespace per service
-    - Service-specific hostnames (e.g., cbs-backend.127-0-0-1.nip.io)
+    - Service-specific hostnames (e.g., cbs-backend.127-0-0-1.nip.io:8080)
     - Configures APP_ORGANIZATION environment variable
     - Removes TLS for local development in local overlay
     - Adds service labels to all resources

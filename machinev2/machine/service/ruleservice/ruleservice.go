@@ -30,7 +30,7 @@ func New(logger logging.Logger, service string, services contexter.ServiceProvid
 
 	for _, svc := range resolver.Services {
 		if strings.Compare(strings.ToLower(svc.Name), strings.ToLower(service)) == 0 {
-			return httpservice.New(logger, service, services, svc, services.InStandAloneMode())
+			return httpservice.New(logger, service, services, svc)
 		}
 	}
 

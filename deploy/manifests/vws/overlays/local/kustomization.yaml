@@ -14,6 +14,15 @@ patches:
         value: vws-backend.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
+  - target:
+      kind: Ingress
+      name: inzicht-backend-ing
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: vws-inzicht-backend.127-0-0-1.nip.io
+      - op: remove
+        path: /spec/tls
 
 resources:
   - ../../base
