@@ -20,7 +20,7 @@ spec:
               containerPort: 8000
           volumeMounts:
             - name: config-yaml
-              mountPath: /web/config/config.yaml
+              mountPath: /app/web/config/config.yaml
               subPath: config.yaml
       volumes:
         - name: config-yaml

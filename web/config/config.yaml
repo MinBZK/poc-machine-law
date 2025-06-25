@@ -9,3 +9,11 @@ engines:
     description: typed processing engine (beta)
     type: http
     domain: http://localhost:8081/v0
+    service_routing:
+      enabled: false
+      # When enabled, routes requests to different services based on service name
+      # services:
+      #   TOESLAGEN:
+      #     domain: http://localhost:8082/v0
+      #   BELASTINGDIENST:
+      #     domain: http://localhost:8083/v0

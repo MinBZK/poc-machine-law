@@ -19,17 +19,11 @@ build:
     - image: web-image
       context: .
       docker:
-        dockerfile: Dockerfile
+        dockerfile: dev.Dockerfile
       sync:
         manual:
-          - src: "**/*.go"
-            dest: /build
           - src: "**/*.py"
-            dest: /build
-          - src: "**/*.svelte"
-            dest: /build
-          - src: "**/*.ts"
-            dest: /build
+            dest: /app
 
 manifests:
   kustomize:

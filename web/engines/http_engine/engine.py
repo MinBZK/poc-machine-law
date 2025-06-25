@@ -4,6 +4,7 @@ from typing import Any
 
 import httpx
 import pandas as pd
+from config_loader import ServiceRoutingConfig
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
 from .machine_client.law_as_code_client import Client
@@ -31,11 +32,29 @@ from .machine_client.law_as_code_client.types import UNSET
 class MachineService(EngineInterface):
     """
     Implementation of EngineInterface using HTTP calls to the Go backend service.
+    Supports service-based routing when enabled in configuration.
     """
 
-    def __init__(self, base_url: str = "http://localhost:8081/v0"):
+    def __init__(
+        self, base_url: str = "http://localhost:8081/v0", service_routing_config: ServiceRoutingConfig | None = None
+    ):
         self.base_url = base_url
         self.client = httpx.AsyncClient(base_url=self.base_url)
+        self.service_routing_enabled = False
+        self.service_routes = {}
+
+        if service_routing_config and service_routing_config.enabled:
+            self.service_routes = service_routing_config.services
+
+    def _get_base_url_for_service(self, service: str) -> str:
+        """
+        Get the appropriate base URL for a service.
+        If service routing is enabled and service has a specific route, use that.
+        Otherwise, use the default base URL.
+        """
+        if self.service_routing_enabled and service in self.service_routes:
+            return self.service_routes[service].get("domain", self.base_url)
+        return self.base_url
 
     def get_rule_spec(self, law: str, reference_date: str, service: str) -> dict[str, Any]:
         """
@@ -50,8 +69,9 @@ class MachineService(EngineInterface):
             Dictionary containing the rule specification
         """
 
-        # Instantiate the API client
-        client = Client(base_url=self.base_url)
+        # Instantiate the API client with service-specific base URL
+        service_base_url = self._get_base_url_for_service(service)
+        client = Client(base_url=service_base_url)
 
         reference_date = datetime.strptime(reference_date, "%Y-%m-%d").date()
 
@@ -77,8 +97,9 @@ class MachineService(EngineInterface):
         Evaluate rules using HTTP calls to the Go backend service.
         """
 
-        # Instantiate the API client
-        client = Client(base_url=self.base_url)
+        # Instantiate the API client with service-specific base URL
+        service_base_url = self._get_base_url_for_service(service)
+        client = Client(base_url=service_base_url)
 
         data = Evaluate(
             service=service, law=law, parameters=EvaluateParameters().from_dict(parameters), approved=approved
@@ -107,7 +128,7 @@ class MachineService(EngineInterface):
         """
         from web.feature_flags import FeatureFlags
 
-        # Instantiate the API client
+        # Instantiate the API client (uses default base URL for discovery)
         client = Client(base_url=self.base_url)
 
         with client as client:
@@ -125,7 +146,7 @@ class MachineService(EngineInterface):
             return result
 
     def get_all_profiles(self) -> dict[str, dict[str, Any]]:
-        # Instantiate the API client
+        # Instantiate the API client (uses default base URL for profiles)
         client = Client(base_url=self.base_url)
 
         with client as client:
@@ -139,7 +160,7 @@ class MachineService(EngineInterface):
             return result
 
     def get_profile_data(self, bsn: str) -> dict[str, Any] | None:
-        # Instantiate the API client
+        # Instantiate the API client (uses default base URL for profiles)
         client = Client(base_url=self.base_url)
 
         with client as client:
@@ -149,8 +170,9 @@ class MachineService(EngineInterface):
             return profile_transform(content.data)
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
-        # Instantiate the API client
-        client = Client(base_url=self.base_url)
+        # Instantiate the API client with service-specific base URL
+        service_base_url = self._get_base_url_for_service(service)
+        client = Client(base_url=service_base_url)
 
         data = DataFrame(
             service=service,

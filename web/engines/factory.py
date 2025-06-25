@@ -49,14 +49,14 @@ class MachineFactory:
         """
 
         engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.get("type"))
+        engine_type = MachineType(engine.type)
 
         if engine_type == MachineType.INTERNAL:
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
             return PythonMachineService(services)
         elif engine_type == MachineType.HTTP:
-            return HTTPMachineService(base_url=engine.get("domain"))
+            return HTTPMachineService(base_url=engine.domain, service_routing_config=engine.service_routing)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")
 
@@ -82,14 +82,14 @@ class CaseManagerFactory:
         """
 
         engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.get("type"))
+        engine_type = MachineType(engine.type)
 
         if engine_type == MachineType.INTERNAL:
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
             return PythonCaseManager(services)
         elif engine_type == MachineType.HTTP:
-            return HTTPCaseManager(base_url=engine.get("domain"))
+            return HTTPCaseManager(base_url=engine.domain)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")
 
@@ -115,13 +115,13 @@ class ClaimManagerFactory:
         """
 
         engine = config_loader.get_engine(engine_id)
-        engine_type = MachineType(engine.get("type"))
+        engine_type = MachineType(engine.type)
 
         if engine_type == MachineType.INTERNAL:
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
             return PythonClaimManager(services)
         elif engine_type == MachineType.HTTP:
-            return HTTPClaimManager(base_url=engine.get("domain"))
+            return HTTPClaimManager(base_url=engine.domain)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")

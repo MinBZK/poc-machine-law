@@ -11,7 +11,7 @@ set_k8s_context:
 .PHONY: k3d
 k3d:
 	@if [ $(CLUSTER_EXISTS) -eq 0 ]; then \
-		k3d cluster create --config=deploy/k3d/config.yaml --image=rancher/k3s:v1.33.0-k3s1; \
+		k3d cluster create --config=deploy/k3d/config.yaml --image=rancher/k3s:v1.33.1-k3s1; \
 	else \
 		k3d cluster start "$(PROJECT_NAME)"; \
 	fi

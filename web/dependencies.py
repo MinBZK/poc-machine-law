@@ -75,7 +75,7 @@ engine = config_loader.config.get_default_engine()
 if engine is None:
     raise ValueError("Default engine not set")
 
-set_engine_id(engine.get("id"))
+set_engine_id(engine.id)
 
 
 def get_engine_id() -> str:

@@ -3,9 +3,54 @@ engines:
     name: Python engine
     description: default processing engine
     type: internal
-    default: true
-  - id: go
+  - id: http-go
     name: Go engine
-    description: typed processing engine (beta 0.1)
+    description: typed processing engine (beta)
     type: http
     domain: http://toeslagen-backend-svc/v0
+    service_routing:
+      enabled: false
+  - id: http-go-routing
+    name: Go engine with routing
+    description: typed processing engine (beta)
+    type: http
+    domain: http://toeslagen-backend-svc/v0
+    default: true
+    service_routing:
+      enabled: true
+      # When enabled, routes requests to different services based on service name
+      services:
+        BELASTINGDIENST:
+          domain: http://belastingdienst-backend-svc.lac.svc.cluster.local/v0
+        CBS:
+          domain: http://cbs-backend-svc.lac.svc.cluster.local/v0
+        DJI:
+          domain: http://dji-backend-svc.lac.svc.cluster.local/v0
+        DUO:
+          domain: http://duo-backend-svc.lac.svc.cluster.local/v0
+        GEMEENTE_AMSTERDAM:
+          domain: http://gemeente-amsterdam-backend-svc.lac.svc.cluster.local/v0
+        IND:
+          domain: http://ind-backend-svc.lac.svc.cluster.local/v0
+        JUSTID:
+          domain: http://justid-backend-svc.lac.svc.cluster.local/v0
+        JenV:
+          domain: http://jenv-backend-svc.lac.svc.cluster.local/v0
+        KIESRAAD:
+          domain: http://kiesraad-backend-svc.lac.svc.cluster.local/v0
+        KVK:
+          domain: http://kvk-backend-svc.lac.svc.cluster.local/v0
+        RVZ:
+          domain: http://rvz-backend-svc.lac.svc.cluster.local/v0
+        RvIG:
+          domain: http://rvig-backend-svc.lac.svc.cluster.local/v0
+        SVB:
+          domain: http://svb-backend-svc.lac.svc.cluster.local/v0
+        SZW:
+          domain: http://szw-backend-svc.lac.svc.cluster.local/v0
+        TOESLAGEN:
+          domain: http://toeslagen-backend-svc.lac.svc.cluster.local/v0
+        UWV:
+          domain: http://uwv-backend-svc.lac.svc.cluster.local/v0
+        VWS:
+          domain: http://vws-backend-svc.lac.svc.cluster.local/v0

@@ -1,17 +1,52 @@
 import os
 from dataclasses import dataclass
-from typing import Any, TypedDict
+from typing import Any, Optional
 
 import yaml
 
 
-class EngineConfig(TypedDict):
+@dataclass
+class Service:
+    domain: str
+
+
+@dataclass
+class ServiceRoutingConfig:
+    enabled: bool
+    services: dict[str, Service]
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Optional["ServiceRoutingConfig"]:
+        if not data:
+            return None
+        services = {
+            service_name: Service(domain=service_data["domain"])
+            for service_name, service_data in data.get("services", {}).items()
+        }
+        return cls(enabled=data.get("enabled", False), services=services)
+
+
+@dataclass
+class EngineConfig:
     id: str
     name: str
     description: str
     type: str
     default: bool
     domain: str | None
+    service_routing: ServiceRoutingConfig | None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EngineConfig":
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            description=data["description"],
+            type=data["type"],
+            default=data.get("default", False),
+            domain=data.get("domain"),
+            service_routing=ServiceRoutingConfig.from_dict(data.get("service_routing", {})),
+        )
 
 
 @dataclass
@@ -21,12 +56,16 @@ class AppConfig:
     def get_default_engine(self) -> EngineConfig | None:
         """Get the default engine configuration"""
         for engine in self.engines:
-            if engine.get("default", False):
+            if engine.default:
                 return engine
         return None if not self.engines else self.engines[0]
 
-    def get_engines(self) -> EngineConfig | None:
-        return self.engines
+    def get_engine_by_id(self, engine_id: str) -> EngineConfig | None:
+        """Get a specific engine by id"""
+        for engine in self.engines:
+            if engine.id == engine_id:
+                return engine
+        return None
 
 
 class ConfigLoader:
@@ -51,12 +90,13 @@ class ConfigLoader:
 
     def _parse_config(self) -> AppConfig:
         """Parse raw config into typed AppConfig"""
-        engines = self._raw_config.get("engines", [])
+        engines_raw = self._raw_config.get("engines", [])
+        engines = [EngineConfig.from_dict(engine_data) for engine_data in engines_raw]
         return AppConfig(engines=engines)
 
-    def get_engine(self, id: str) -> EngineConfig | None:
+    def get_engine(self, engine_id: str) -> EngineConfig | None:
         """Get a specific engine by id"""
-        for engine in self.config.engines:
-            if engine.get("id") == id:
-                return engine
-        return None
+        return self.config.get_engine_by_id(engine_id)
+
+    def get_engines(self) -> EngineConfig | None:
+        return self.config.engines

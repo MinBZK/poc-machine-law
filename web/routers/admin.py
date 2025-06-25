@@ -113,7 +113,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
         "admin/control.html",
         {
             "request": request,
-            "engines": config_loader.config.get_engines(),
+            "engines": config_loader.get_engines(),
             "current_engine_id": get_engine_id(),
             "providers": providers,
             "current_provider": current_provider,
@@ -128,7 +128,7 @@ async def post_set_engine(
     request: Request, engine_id: str = Form(...), services: EngineInterface = Depends(get_machine_service)
 ):
     # Validate engine exists
-    engine_exists = any(engine.get("id") == engine_id for engine in config_loader.config.get_engines())
+    engine_exists = any(engine.id == engine_id for engine in config_loader.get_engines())
     if not engine_exists:
         raise HTTPException(status_code=404, detail="Selected engine not found")
 
@@ -137,7 +137,7 @@ async def post_set_engine(
     # Redirect back to admin dashboard
     return templates.TemplateResponse(
         "/admin/partials/engines.html",
-        {"request": request, "engines": config_loader.config.get_engines(), "current_engine_id": get_engine_id()},
+        {"request": request, "engines": config_loader.get_engines(), "current_engine_id": get_engine_id()},
     )
 
 
