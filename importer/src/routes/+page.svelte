@@ -5,6 +5,8 @@
   import { highlightPlugin } from './highlight-plugin';
   import 'highlight.js/styles/github-dark.css';
   import PreWithCopyButton from './PreWithCopyButton.svelte';
+  import { browser } from '$app/environment';
+
   const copyButtonPlugin = {
     renderer: { pre: PreWithCopyButton },
   };
@@ -16,6 +18,11 @@
     timestamp: Date;
   };
 
+  let anthropicApiKey = localStorage.getItem('anthropic-api-key') || '';
+  let tavilyApiKey = localStorage.getItem('tavily-api-key') || '';
+  let apiFormIsShown = anthropicApiKey === '' || tavilyApiKey === '';
+  let anthropicApiKeyInput: HTMLInputElement | undefined;
+
   let messages: Message[] = [];
   let input = '';
   let messagesContainer: HTMLDivElement;
@@ -23,29 +30,82 @@
 
   let quickReplies: string[] = [];
 
+  let progress = 0;
+
+  let messageIdToIgnore: string | undefined;
+
+  // Loading / busy indicator
+  let isLoading = false;
+
+  function handleKeySubmit() {
+    if (browser) {
+      localStorage.setItem('anthropic-api-key', anthropicApiKey);
+      localStorage.setItem('tavily-api-key', tavilyApiKey);
+    }
+
+    // Send the keys to the server
+    socket.send(
+      JSON.stringify({
+        type: 'keys',
+        anthropicApiKey,
+        tavilyApiKey,
+      }),
+    );
+
+    apiFormIsShown = false;
+  }
+
   // Initialize WebSocket connection
   const socket = new WebSocket('/importer/ws');
 
   // Connection opened
   socket.addEventListener('open', function (event) {
     console.log('Connected to server');
+
+    // If the API keys are already set, send them to the server
+    if (anthropicApiKey && tavilyApiKey) {
+      socket.send(
+        JSON.stringify({
+          type: 'keys',
+          anthropicApiKey,
+          tavilyApiKey,
+        }),
+      );
+    }
   });
 
   // Listen for messages
   socket.addEventListener('message', function (event) {
     // Parse the event data
-    const data = JSON.parse(event.data) as { id: string; content: string; quick_replies: string[] };
+    const data = JSON.parse(event.data) as {
+      id: string;
+      type?: string;
+      content: string | number;
+      quick_replies: string[];
+    };
+
+    // If the message is a progress update, update the progress
+    if (data.type === 'progress') {
+      progress = data.content as number;
+      return;
+    }
 
     // If the message ID equals the ID of the previous message, append it to the previous message
+    if (data.id === messageIdToIgnore) {
+      return; // Skip this message
+    }
+
     if (messages.length && messages[messages.length - 1].id === data.id) {
       messages[messages.length - 1].content += `${data.content}`; // IMPROVE: also look at earlier messages, since the user may post a message in between?
       messages = [...messages];
     } else {
+      isLoading = false; // Clear loading state
+
       messages = [
         ...messages,
         {
           id: data.id,
-          content: data.content,
+          content: data.content as string,
           isOwn: false,
           timestamp: new Date(),
         },
@@ -63,7 +123,20 @@
   // Submit handler
   function handleSubmit() {
     if (input && socket.readyState === WebSocket.OPEN) {
-      socket.send(input);
+      if (
+        input.toLocaleLowerCase() === 'stop' &&
+        messages.length &&
+        messages[messages.length - 1].id
+      ) {
+        // Abort the current processing (note: only client-side, see the comments in the backend code). IMPROVE: improve this functionality, use a button that is only visible when streaming, etc.
+        input = '';
+        messageIdToIgnore = messages[messages.length - 1].id;
+
+        return;
+      }
+
+      isLoading = true; // Set loading state
+      socket.send(JSON.stringify({ type: 'text', content: input }));
 
       messages = [
         ...messages,
@@ -87,62 +160,337 @@
 </script>
 
 <svelte:head>
-  <title>Machine law importer</title>
+  <title>Wet-importer</title>
 </svelte:head>
 
 <main class="fixed left-0 top-0 flex h-full w-full flex-col px-6 py-4">
-  <h1 class="mb-2 text-2xl">⚡️ Machine law importer</h1>
+  <h1 class="mb-2.5 flex items-center gap-2.5 text-2xl font-medium">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" viewBox="0 0 24 24"
+      ><path
+        fill="currentColor"
+        fill-rule="evenodd"
+        d="M12 2.25a.75.75 0 0 1 .75.75v.756a49 49 0 0 1 9.152 1a.75.75 0 0 1-.152 1.485h-1.918l2.474 10.124a.75.75 0 0 1-.375.84A6.7 6.7 0 0 1 18.75 18a6.7 6.7 0 0 1-3.181-.795a.75.75 0 0 1-.375-.84l2.474-10.124H12.75v13.28c1.293.076 2.534.343 3.697.776a.75.75 0 0 1-.262 1.453h-8.37a.75.75 0 0 1-.262-1.453c1.162-.433 2.404-.7 3.697-.775V6.24H6.332l2.474 10.124a.75.75 0 0 1-.375.84A6.7 6.7 0 0 1 5.25 18a6.7 6.7 0 0 1-3.181-.795a.75.75 0 0 1-.375-.84L4.168 6.241H2.25a.75.75 0 0 1-.152-1.485a49 49 0 0 1 9.152-1V3a.75.75 0 0 1 .75-.75m4.878 13.543l1.872-7.662l1.872 7.662zm-9.756 0L5.25 8.131l-1.872 7.662z"
+        clip-rule="evenodd"
+      /></svg
+    > Wet-importer
+  </h1>
 
-  <div
-    bind:this={messagesContainer}
-    class="mb-2 flex flex-grow flex-col overflow-y-auto scroll-smooth rounded-md bg-gray-100 p-4"
-  >
-    {#each messages as message}
-      {#if message.isOwn}
-        <div class="message own">{message.content}</div>
-      {:else}
-        <div class="message">
-          <Markdown md={message.content} plugins={[highlightPlugin, copyButtonPlugin]} />
+  {#if apiFormIsShown}
+    <form
+      on:submit|preventDefault={handleKeySubmit}
+      class="mb-5 grid grid-cols-5 gap-4 rounded-md border border-gray-300 bg-gray-50 p-4"
+    >
+      <div class="col-span-2 flex flex-col">
+        <label class="mb-2 inline-block font-medium" for="api-key">Claude / Anthropic API key</label
+        >
+
+        <input
+          bind:value={anthropicApiKey}
+          bind:this={anthropicApiKeyInput}
+          placeholder="sk-…"
+          id="api-key"
+          type="text"
+          class="mt-auto block w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 focus:border-blue-500 focus:ring-blue-500"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="col-span-2 flex flex-col">
+        <label class="mb-2 inline-block font-medium" for="tavily-api-key">Tavily API key</label>
+
+        <input
+          bind:value={tavilyApiKey}
+          placeholder="tvly-…"
+          id="tavily-api-key"
+          type="text"
+          class="mt-auto block w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 focus:border-blue-500 focus:ring-blue-500"
+          autocomplete="off"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="mt-auto cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
+      >
+        Gebruiken
+      </button>
+
+      <small class="col-span-5 text-sm text-gray-600"
+        >Verplicht, worden niet opgeslagen, alleen in de browser. Meer informatie: <a
+          class="text-blue-700 underline hover:no-underline"
+          href="https://console.anthropic.com/"
+          target="_blank"
+          rel="nofollow">Anthropic</a
+        >,
+        <a
+          class="text-blue-700 underline hover:no-underline"
+          href="https://tavily.com/#faq"
+          target="_blank"
+          rel="nofollow">Tavily</a
+        >.</small
+      >
+    </form>
+  {:else}
+    <div
+      class="mb-5 flex items-center rounded-md border border-emerald-700/25 bg-emerald-50 px-3 py-2"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="mr-1.5 h-5 w-5 text-emerald-600"
+        viewBox="0 0 24 24"
+        ><g
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          ><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0" /><path d="m9 12l2 2l4-4" /></g
+        ></svg
+      >
+      Claude / Anthropic en Tavily API keys ingesteld
+
+      <button
+        on:click={async () => {
+          apiFormIsShown = true;
+          await tick();
+          anthropicApiKeyInput?.focus();
+        }}
+        type="button"
+        class="ml-3 cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-2 py-1 text-sm text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
+      >
+        Aanpassen
+      </button>
+    </div>
+  {/if}
+
+  <div class="grid min-h-0 flex-grow grid-cols-3 gap-4">
+    <div
+      bind:this={messagesContainer}
+      class="col-span-2 mb-2 flex flex-col overflow-y-auto scroll-smooth rounded-md bg-gray-100 p-4"
+    >
+      {#each messages as message}
+        {#if message.isOwn}
+          <div class="message own">{message.content}</div>
+        {:else}
+          <div class="message">
+            <Markdown
+              md={message.content as string}
+              plugins={[highlightPlugin, copyButtonPlugin]}
+            />
+          </div>
+        {/if}
+      {/each}
+
+      {#if isLoading}
+        <div class="message flex items-center gap-2">
+          <svg
+            class="h-5 w-5 animate-spin text-blue-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+            ></circle>
+            <path
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <span class="text-sm text-gray-600">Bericht wordt gegenereerd…</span>
         </div>
       {/if}
-    {/each}
 
-    <div class="self-start">
-      {#each quickReplies as quickReply}
-        <button
-          on:click={() => {
-            input = quickReply;
-            handleSubmit();
-          }}
-          class="mr-1.5 inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
-          type="button"
-        >
-          {#if quickReply === 'Ja'}
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
-              ><path
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m5 12l5 5L20 7"
-              /></svg
-            >
-          {:else if quickReply === 'Nee'}
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
-              ><path
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M18 6L6 18M6 6l12 12"
-              /></svg
-            >
-          {/if}
-          {quickReply}</button
-        >
-      {/each}
+      <div class="self-start">
+        {#each quickReplies as quickReply}
+          <button
+            on:click={() => {
+              input = quickReply;
+              handleSubmit();
+            }}
+            class="mr-1.5 inline-flex cursor-pointer items-center rounded-full border border-blue-600 bg-white px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
+            type="button"
+          >
+            {#if quickReply === 'Ja'}
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m5 12l5 5L20 7"
+                /></svg
+              >
+            {:else if quickReply === 'Nee'}
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M18 6L6 18M6 6l12 12"
+                /></svg
+              >
+            {/if}
+            {quickReply}</button
+          >
+        {/each}
+      </div>
+    </div>
+
+    <div class="mb-2 overflow-y-auto">
+      <ol class="relative ml-4 border-s border-gray-200 text-gray-500">
+        <li class="mb-10 ms-6">
+          <span
+            class="absolute -start-4 flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white {progress >=
+            1
+              ? 'bg-emerald-100 text-emerald-600'
+              : 'bg-gray-100 text-gray-600'}"
+          >
+            {#if progress >= 1}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m5 12l5 5L20 7"
+                /></svg
+              >
+            {:else}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                ><path
+                  fill="currentColor"
+                  d="m12.999 2l-.001 1.278l5 1.668l3.633-1.21l.632 1.896l-3.031 1.011l3.095 8.512A5.98 5.98 0 0 1 17.998 17a5.98 5.98 0 0 1-4.328-1.845l3.094-8.512l-3.766-1.256V19h4v2h-10v-2h4V5.387L7.232 6.643l3.095 8.512A5.98 5.98 0 0 1 6 17a5.98 5.98 0 0 1-4.33-1.845l3.095-8.512l-3.03-1.01l.632-1.898L6 4.945l4.999-1.667V2zm5 7.103l-1.959 5.386a4 4 0 0 0 1.959.511c.7 0 1.37-.18 1.958-.51zm-12 0L4.04 14.489A4 4 0 0 0 5.999 15c.7 0 1.37-.18 1.958-.51z"
+                /></svg
+              >
+            {/if}
+          </span>
+          <h3 class="font-medium leading-tight">Wetnaam</h3>
+          <p class="text-sm">Identificatie van de wet</p>
+        </li>
+        <li class="mb-10 ms-6">
+          <span
+            class="absolute -start-4 flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white {progress >=
+            2
+              ? 'bg-emerald-100 text-emerald-600'
+              : 'bg-gray-100 text-gray-600'}"
+          >
+            {#if progress >= 2}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m5 12l5 5L20 7"
+                /></svg
+              >
+            {:else}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-500"
+                viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m9 15l6-6m-4-3l.463-.536a5 5 0 0 1 7.071 7.072L18 13m-5 5l-.397.534a5.07 5.07 0 0 1-7.127 0a4.97 4.97 0 0 1 0-7.071L6 11"
+                /></svg
+              >
+            {/if}
+          </span>
+          <h3 class="font-medium leading-tight">Wet URL</h3>
+          <p class="text-sm">Plek waar de wet online staat</p>
+        </li>
+        <li class="mb-10 ms-6">
+          <span
+            class="absolute -start-4 flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white {progress >=
+            3
+              ? 'bg-emerald-100 text-emerald-600'
+              : 'bg-gray-100 text-gray-600'}"
+          >
+            {#if progress >= 3}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m5 12l5 5L20 7"
+                /></svg
+              >
+            {:else}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-500"
+                viewBox="0 0 24 24"
+                ><g
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  ><path
+                    d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"
+                  /><path
+                    d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2m0 9h.01M9 17h.01M12 16l1 1l3-3"
+                  /></g
+                ></svg
+              >
+            {/if}
+          </span>
+          <h3 class="font-medium leading-tight">Controle</h3>
+          <p class="text-sm">Controle of de output voldoet</p>
+        </li>
+        <li class="ms-6">
+          <span
+            class="absolute -start-4 flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white {progress >=
+            4
+              ? 'bg-emerald-100 text-emerald-600'
+              : 'bg-gray-100 text-gray-600'}"
+          >
+            {#if progress >= 4}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                ><path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m5 12l5 5L20 7"
+                /></svg
+              >
+            {:else}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-500"
+                viewBox="0 0 24 24"
+                ><g
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  ><path
+                    d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"
+                  /><path
+                    d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2m0 9l2 2l4-4"
+                  /></g
+                ></svg
+              >
+            {/if}
+          </span>
+          <h3 class="font-medium leading-tight">Output</h3>
+          <p class="text-sm">Model van de wet in YAML-formaat</p>
+        </li>
+      </ol>
     </div>
   </div>
 
