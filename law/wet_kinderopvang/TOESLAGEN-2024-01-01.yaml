@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: f8e7d6c5-4321-4f0f-bbbb-123456789abc
 name: Bepalen kinderopvangtoeslag
 law: wet_kinderopvang
@@ -155,16 +155,115 @@ properties:
       citizen_relevance: primary
 
   definitions:
-    MAX_HOURLY_RATE_DAYCARE: 902  # €9,02
-    MAX_HOURLY_RATE_BSO: 766      # €7,66
-    MAX_HOURS_PER_YEAR: 2760      # 230 uur per maand * 12
-    INCOME_THRESHOLD_1: 3500000   # €35.000
-    INCOME_THRESHOLD_2: 7000000   # €70.000
-    PERCENTAGE_1: 0.96            # 96% vergoeding
-    PERCENTAGE_2: 0.80            # 80% vergoeding
-    PERCENTAGE_3: 0.33            # 33% vergoeding
-    MIN_HOURS_PARTNER: 1040       # Minimaal 20 uur per week * 52 weken
-    MIN_HOURS_PER_WEEK: 20        # Minimum werkuren per week
+    MAX_HOURLY_RATE_DAYCARE: 
+      value: 902  # €9,02
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.7"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+        description: "Maximaal uurtarief dagopvang"
+    
+    MAX_HOURLY_RATE_BSO: 
+      value: 766      # €7,66
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.7"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+        description: "Maximaal uurtarief buitenschoolse opvang"
+    
+    MAX_HOURS_PER_YEAR: 
+      value: 2760      # 230 uur per maand * 12
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.7"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+        description: "Maximaal aantal uren kinderopvang per jaar"
+    
+    INCOME_THRESHOLD_1: 
+      value: 3500000   # €35.000
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.8"
+        description: "Eerste inkomensdrempel voor kinderopvangtoeslag"
+    
+    INCOME_THRESHOLD_2: 
+      value: 7000000   # €70.000
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.8"
+        description: "Tweede inkomensdrempel voor kinderopvangtoeslag"
+    
+    PERCENTAGE_1: 
+      value: 0.96            # 96% vergoeding
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.8"
+        description: "Tegemoetkoming percentage bij laag inkomen"
+    
+    PERCENTAGE_2: 
+      value: 0.80            # 80% vergoeding
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.8"
+        description: "Tegemoetkoming percentage bij midden inkomen"
+    
+    PERCENTAGE_3: 
+      value: 0.33            # 33% vergoeding
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.8"
+        description: "Tegemoetkoming percentage bij hoog inkomen"
+    
+    MIN_HOURS_PARTNER: 
+      value: 1040       # Minimaal 20 uur per week * 52 weken
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.6"
+        paragraph: "1a"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=1&onderdeel=a"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+        description: "Minimaal aantal werkuren partner per jaar"
+    
+    MIN_HOURS_PER_WEEK: 
+      value: 20        # Minimum werkuren per week
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.6"
+        paragraph: "1a"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=1&onderdeel=a"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+        description: "Minimaal aantal werkuren per week"
 
 requirements:
   - all:
@@ -177,21 +276,61 @@ requirements:
               - subject: "$PARTNER_WORKED_HOURS"
                 operation: GREATER_OR_EQUAL
                 value: "$MIN_HOURS_PARTNER"
+                legal_basis:
+                  law: "Wet kinderopvang"
+                  bwb_id: "BWBR0017017"
+                  article: "1.6"
+                  paragraph: "1a"
+                  juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=1&onderdeel=a"
+                  url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+                  description: "Werkeis partner - gewerkte uren"
               - subject: "$EXPECTED_PARTNER_HOURS"
                 operation: GREATER_OR_EQUAL
                 value: "$MIN_HOURS_PER_WEEK"
+                legal_basis:
+                  law: "Wet kinderopvang"
+                  bwb_id: "BWBR0017017"
+                  article: "1.6"
+                  paragraph: "1a"
+                  juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=1&onderdeel=a"
+                  url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+                  description: "Werkeis partner - verwachte uren"
       - subject: "$WORKED_HOURS"
         operation: GREATER_THAN
         value: 0
+        legal_basis:
+          law: "Wet kinderopvang"
+          bwb_id: "BWBR0017017"
+          article: "1.6"
+          paragraph: "1a"
+          juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=1&onderdeel=a"
+          url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+          description: "Werkeis aanvrager"
 
 actions:
   - output: "is_eligible"
     value: true
+    legal_basis:
+      law: "Wet kinderopvang"
+      bwb_id: "BWBR0017017"
+      article: "1.5"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+      description: "Recht op kinderopvangtoeslag"
 
   - output: "yearly_amount"
     operation: FOREACH
     combine: ADD
     subject: "$DECLARED_HOURS"
+    legal_basis:
+      law: "Wet kinderopvang"
+      bwb_id: "BWBR0017017"
+      article: "1.7"
+      paragraph: "1-2"
+      juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0017017/2024-01-01#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+      description: "Berekening hoogte kinderopvangtoeslag"
     value:
       - operation: MULTIPLY
         values:

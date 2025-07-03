@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: 60e71675-38bc-4297-87ac-0c145613e481
 name: Zorgtoeslag
 law: zorgtoeslagwet
@@ -168,31 +168,153 @@ properties:
         min: 0
 
   definitions:
-    MINIMUM_AGE: 18
-    PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.04273
-    PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.01896
-    AFBOUWPERCENTAGE_MINIMUM: 0.13700
-    AFBOUWPERCENTAGE_BOVEN_DREMPEL: 0.13700
-    DREMPELINKOMEN_ALLEENSTAANDE: 3971900
-    DREMPELINKOMEN_TOESLAGPARTNER: 5020600
-    VERMOGENSGRENS_ALLEENSTAANDE: 14189600
-    VERMOGENSGRENS_TOESLAGPARTNER: 17942900
+    MINIMUM_AGE: 
+      value: 18
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "1"
+        paragraph: "c"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=1&onderdeel=c"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf1_Artikel1"
+        description: "Leeftijdsgrens voor zorgtoeslag"
+    
+    PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 
+      value: 0.04273
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "2"
+        paragraph: "3a"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3&onderdeel=a"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+        description: "Percentage drempelinkomen voor toeslagpartners"
+    
+    PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 
+      value: 0.01896
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "2"
+        paragraph: "3b"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3&onderdeel=b"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+        description: "Percentage drempelinkomen voor alleenstaanden"
+    
+    AFBOUWPERCENTAGE_MINIMUM: 
+      value: 0.13700
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "2"
+        paragraph: "3"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+        description: "Afbouwpercentage voor inkomen boven drempel"
+    
+    AFBOUWPERCENTAGE_BOVEN_DREMPEL: 
+      value: 0.13700
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "2"
+        paragraph: "3"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+        description: "Afbouwpercentage voor inkomen boven drempel"
+    
+    DREMPELINKOMEN_ALLEENSTAANDE: 
+      value: 3971900
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "1"
+        paragraph: "f"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=1&onderdeel=f"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf1_Artikel1"
+        description: "Drempelinkomen voor alleenstaanden"
+    
+    DREMPELINKOMEN_TOESLAGPARTNER: 
+      value: 5020600
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "1"
+        paragraph: "f"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=1&onderdeel=f"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf1_Artikel1"
+        description: "Drempelinkomen voor toeslagpartners"
+    
+    VERMOGENSGRENS_ALLEENSTAANDE: 
+      value: 14189600
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "3"
+        paragraph: "1a"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=3&lid=1&onderdeel=a"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel3"
+        description: "Vermogensgrens voor alleenstaanden"
+    
+    VERMOGENSGRENS_TOESLAGPARTNER: 
+      value: 17942900
+      legal_basis:
+        law: "Wet op de zorgtoeslag"
+        bwb_id: "BWBR0018451"
+        article: "3"
+        paragraph: "1b"
+        juriconnect: "jci1.3:c:BWBR0018451&artikel=3&lid=1&onderdeel=b"
+        url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel3"
+        description: "Vermogensgrens voor toeslagpartners"
 
 requirements:
   - all:
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
         value: "$MINIMUM_AGE"
+        legal_basis:
+          law: "Wet op de zorgtoeslag"
+          bwb_id: "BWBR0018451"
+          article: "1"
+          paragraph: "c"
+          juriconnect: "jci1.3:c:BWBR0018451&artikel=1&onderdeel=c"
+          url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf1_Artikel1"
+          description: "Leeftijdsgrens voor zorgtoeslag"
+        
       - subject: "$IS_VERZEKERDE"
         operation: EQUALS
         value: true
+        legal_basis:
+          law: "Wet op de zorgtoeslag"
+          bwb_id: "BWBR0018451"
+          article: "1"
+          paragraph: "c"
+          juriconnect: "jci1.3:c:BWBR0018451&artikel=1&onderdeel=c"
+          url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf1_Artikel1"
+          description: "Definitie verzekerde"
 
 actions:
   - output: "is_verzekerde_zorgtoeslag"
     value: true
+    legal_basis:
+      law: "Wet op de zorgtoeslag"
+      bwb_id: "BWBR0018451"
+      article: "2"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+      description: "Recht op zorgtoeslag"
 
   - output: "hoogte_toeslag"
     operation: IF
+    legal_basis:
+      law: "Wet op de zorgtoeslag"
+      bwb_id: "BWBR0018451"
+      article: "2"
+      paragraph: "1-3"
+      juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+      description: "Berekening hoogte zorgtoeslag"
     conditions:
       - test:
           subject: "$HAS_PARTNER"
@@ -206,18 +328,59 @@ actions:
                 operation: GREATER_THAN
                 value: "$DREMPELINKOMEN_ALLEENSTAANDE"
               then: 0
+              legal_basis:
+                law: "Wet op de zorgtoeslag"
+                bwb_id: "BWBR0018451"
+                article: "2"
+                paragraph: "2"
+                juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=2"
+                url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                description: "Geen toeslag bij hoog inkomen"
+              
             - test:
                 subject: "$NET_WORTH"
                 operation: GREATER_THAN
                 value: "$VERMOGENSGRENS_ALLEENSTAANDE"
               then: 0
+              legal_basis:
+                law: "Wet op de zorgtoeslag"
+                bwb_id: "BWBR0018451"
+                article: "3"
+                paragraph: "1a"
+                juriconnect: "jci1.3:c:BWBR0018451&artikel=3&lid=1&onderdeel=a"
+                url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel3"
+                description: "Vermogensgrens alleenstaanden"
             - else:
                 operation: SUBTRACT
+                legal_basis:
+                  law: "Wet op de zorgtoeslag"
+                  bwb_id: "BWBR0018451"
+                  article: "2"
+                  paragraph: "1"
+                  juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=1"
+                  url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                  description: "Zorgtoeslag berekening standaardpremie minus normpremie"
                 values:
                   - "$STANDAARDPREMIE"
                   - operation: ADD
+                    legal_basis:
+                      law: "Wet op de zorgtoeslag"
+                      bwb_id: "BWBR0018451"
+                      article: "2"
+                      paragraph: "2"
+                      juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=2"
+                      url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                      description: "Berekening normpremie"
                     values:
                       - operation: MULTIPLY
+                        legal_basis:
+                          law: "Wet op de zorgtoeslag"
+                          bwb_id: "BWBR0018451"
+                          article: "2"
+                          paragraph: "3b"
+                          juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3&onderdeel=b"
+                          url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                          description: "Percentage drempelinkomen alleenstaande"
                         values:
                           - "$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
                           - operation: MIN
@@ -233,6 +396,14 @@ actions:
                                 - "$DREMPELINKOMEN_ALLEENSTAANDE"
                             then:
                               operation: MULTIPLY
+                              legal_basis:
+                                law: "Wet op de zorgtoeslag"
+                                bwb_id: "BWBR0018451"
+                                article: "2"
+                                paragraph: "3b"
+                                juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3&onderdeel=b"
+                                url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                                description: "Afbouwpercentage boven drempel"
                               values:
                                 - operation: SUBTRACT
                                   values:
@@ -256,21 +427,69 @@ actions:
                       - "$PARTNER_INCOME"
                   - "$DREMPELINKOMEN_TOESLAGPARTNER"
               then: 0
+              legal_basis:
+                law: "Wet op de zorgtoeslag"
+                bwb_id: "BWBR0018451"
+                article: "2"
+                paragraph: "2"
+                juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=2"
+                url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                description: "Geen toeslag bij hoog gezamenlijk inkomen"
             - test:
                 subject: "$COMBINED_NET_WORTH"
                 operation: GREATER_THAN
                 value: "$VERMOGENSGRENS_TOESLAGPARTNER"
               then: 0
+              legal_basis:
+                law: "Wet op de zorgtoeslag"
+                bwb_id: "BWBR0018451"
+                article: "3"
+                paragraph: "1b"
+                juriconnect: "jci1.3:c:BWBR0018451&artikel=3&lid=1&onderdeel=b"
+                url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel3"
+                description: "Vermogensgrens toeslagpartners"
             - else:
                 operation: SUBTRACT
+                legal_basis:
+                  law: "Wet op de zorgtoeslag"
+                  bwb_id: "BWBR0018451"
+                  article: "2"
+                  paragraph: "1"
+                  juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=1"
+                  url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                  description: "Zorgtoeslag berekening voor toeslagpartners"
                 values:
                   - operation: MULTIPLY
+                    legal_basis:
+                      law: "Wet op de zorgtoeslag"
+                      bwb_id: "BWBR0018451"
+                      article: "2"
+                      paragraph: "1"
+                      juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=1"
+                      url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                      description: "Dubbele standaardpremie voor toeslagpartners"
                     values:
                       - "$STANDAARDPREMIE"
                       - 2
                   - operation: ADD
+                    legal_basis:
+                      law: "Wet op de zorgtoeslag"
+                      bwb_id: "BWBR0018451"
+                      article: "2"
+                      paragraph: "2"
+                      juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=2"
+                      url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                      description: "Normpremie berekening toeslagpartners"
                     values:
                       - operation: MULTIPLY
+                        legal_basis:
+                          law: "Wet op de zorgtoeslag"
+                          bwb_id: "BWBR0018451"
+                          article: "2"
+                          paragraph: "3a"
+                          juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3&onderdeel=a"
+                          url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                          description: "Percentage drempelinkomen toeslagpartners"
                         values:
                           - "$PERCENTAGE_DREMPELINKOMEN_MET_PARTNER"
                           - operation: MIN
@@ -292,6 +511,14 @@ actions:
                                 - "$DREMPELINKOMEN_TOESLAGPARTNER"
                             then:
                               operation: MULTIPLY
+                              legal_basis:
+                                law: "Wet op de zorgtoeslag"
+                                bwb_id: "BWBR0018451"
+                                article: "2"
+                                paragraph: "3a"
+                                juriconnect: "jci1.3:c:BWBR0018451&artikel=2&lid=3&onderdeel=a"
+                                url: "https://wetten.overheid.nl/BWBR0018451/2025-01-01#Paragraaf2_Artikel2"
+                                description: "Afbouwpercentage boven drempel toeslagpartners"
                               values:
                                 - operation: SUBTRACT
                                   values:

@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: c00f6a8b-b387-45d0-ab15-6f5aa34b7287
 name: Bepalen recht op bijstand landelijk
 law: participatiewet/bijstand
@@ -248,20 +248,89 @@ properties:
         reference: "$calculation_date"
 
   definitions:
-    MINIMUM_AGE: 18
-    BASE_AMOUNT_SINGLE_21_PLUS: 108900  # 1089 euro
-    BASE_AMOUNT_PARTNERS_21_PLUS: 155600 # 1556 euro
+    MINIMUM_AGE: 
+      value: 18
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "9"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=9&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9"
+        description: "Leeftijdsgrens voor bijstand"
+    
+    BASE_AMOUNT_SINGLE_21_PLUS: 
+      value: 108900  # 1089 euro
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "21"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=21&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+        description: "Bijstandsnorm voor alleenstaanden van 21 jaar en ouder"
+    
+    BASE_AMOUNT_PARTNERS_21_PLUS: 
+      value: 155600 # 1556 euro
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "21"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=21&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+        description: "Bijstandsnorm voor gehuwden en samenwonenden van 21 jaar en ouder"
+    
     VALID_RESIDENCE_PERMITS:
-      - "PERMANENT"
-      - "EU"
-      - "FAMILY_REUNIFICATION"
-    ASSET_LIMIT_SINGLE: 750000  # 7500 euro
-    ASSET_LIMIT_PARTNER: 1500000 # 15000 euro
+      value:
+        - "PERMANENT"
+        - "EU"
+        - "FAMILY_REUNIFICATION"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "11"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=11&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+        description: "Rechtmatig verblijf als voorwaarde voor bijstand"
+    
+    ASSET_LIMIT_SINGLE: 
+      value: 750000  # 7500 euro
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "34"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=34&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.3_Artikel34"
+        description: "Vermogensgrens voor alleenstaanden"
+    
+    ASSET_LIMIT_PARTNER: 
+      value: 1500000 # 15000 euro
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "34"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=34&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.3_Artikel34"
+        description: "Vermogensgrens voor gehuwden en samenwonenden"
+    
     KOSTENDELERSNORM_FACTORS:
-      1: 1.00
-      2: 0.50
-      3: 0.43
-      4: 0.40
+      value:
+        1: 1.00
+        2: 0.50
+        3: 0.43
+        4: 0.40
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "22"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=22&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel22"
+        description: "Kostendelersnorm voor personen in huishouden"
 
 requirements:
   - all:
@@ -269,39 +338,114 @@ requirements:
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
         value: "$MINIMUM_AGE"
+        legal_basis:
+          law: "Participatiewet"
+          bwb_id: "BWBR0015703"
+          article: "9"
+          paragraph: "1"
+          juriconnect: "jci1.3:c:BWBR0015703&artikel=9&lid=1"
+          url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9"
+          description: "Minimumleeftijd voor bijstand"
+      
       - subject: "$AGE"
         operation: LESS_THAN
         value: "$RETIREMENT_AGE"
+        legal_basis:
+          law: "Participatiewet"
+          bwb_id: "BWBR0015703"
+          article: "9"
+          paragraph: "1"
+          juriconnect: "jci1.3:c:BWBR0015703&artikel=9&lid=1"
+          url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9"
+          description: "Maximumleeftijd voor bijstand (AOW-leeftijd)"
 
       # Rechtmatig verblijf
       - or:
           - subject: "$HAS_DUTCH_NATIONALITY"
             operation: EQUALS
             value: true
+            legal_basis:
+              law: "Participatiewet"
+              bwb_id: "BWBR0015703"
+              article: "11"
+              paragraph: "1"
+              juriconnect: "jci1.3:c:BWBR0015703&artikel=11&lid=1"
+              url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+              description: "Nederlandse nationaliteit als grondslag voor bijstand"
+          
           - operation: IN
             subject: "$RESIDENCE_PERMIT_TYPE"
             values: "$VALID_RESIDENCE_PERMITS"
+            legal_basis:
+              law: "Participatiewet"
+              bwb_id: "BWBR0015703"
+              article: "11"
+              paragraph: "1"
+              juriconnect: "jci1.3:c:BWBR0015703&artikel=11&lid=1"
+              url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+              description: "Rechtmatig verblijf als voorwaarde voor bijstand"
 
       # Woonplaats Nederland
       - subject: "$RESIDENCE_ADDRESS"
         operation: NOT_NULL
+        legal_basis:
+          law: "Participatiewet"
+          bwb_id: "BWBR0015703"
+          article: "11"
+          paragraph: "1"
+          juriconnect: "jci1.3:c:BWBR0015703&artikel=11&lid=1"
+          url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+          description: "Woonplaats in Nederland als voorwaarde voor bijstand"
 
       # Geen student met studiefinanciering
       - or:
           - subject: "$IS_STUDENT"
             operation: EQUALS
             value: false
+            legal_basis:
+              law: "Participatiewet"
+              bwb_id: "BWBR0015703"
+              article: "13"
+              paragraph: "1"
+              juriconnect: "jci1.3:c:BWBR0015703&artikel=13&lid=1"
+              url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13"
+              description: "Uitsluiting van bijstand voor studenten"
+          
           - subject: "$RECEIVES_STUDY_GRANT"
             operation: EQUALS
             value: false
+            legal_basis:
+              law: "Participatiewet"
+              bwb_id: "BWBR0015703"
+              article: "13"
+              paragraph: "1"
+              juriconnect: "jci1.3:c:BWBR0015703&artikel=13&lid=1"
+              url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13"
+              description: "Uitsluiting van bijstand bij studiefinanciering"
 
       # Niet gedetineerd
       - subject: "$IS_DETAINEE"
         operation: EQUALS
         value: false
+        legal_basis:
+          law: "Participatiewet"
+          bwb_id: "BWBR0015703"
+          article: "13"
+          paragraph: "2"
+          juriconnect: "jci1.3:c:BWBR0015703&artikel=13&lid=2"
+          url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13"
+          description: "Uitsluiting van bijstand voor gedetineerden"
 
       # Vermogenstoets
       - operation: IF
+        legal_basis:
+          law: "Participatiewet"
+          bwb_id: "BWBR0015703"
+          article: "34"
+          paragraph: "1-2"
+          juriconnect: "jci1.3:c:BWBR0015703&artikel=34&lid=1"
+          url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.3_Artikel34"
+          description: "Vermogenstoets voor bijstand"
         conditions:
           - test:
               subject: "$HAS_PARTNER"
@@ -324,9 +468,25 @@ requirements:
 actions:
   - output: "is_eligible"
     value: true
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "11"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=11&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+      description: "Vaststelling van het recht op bijstand"
 
   - output: "base_amount"
     operation: IF
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "21"
+      paragraph: "1-2"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=21&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+      description: "Vaststelling van de bijstandsnorm"
     conditions:
       - test:
           subject: "$HAS_PARTNER"
@@ -337,6 +497,14 @@ actions:
 
   - output: "kostendelersnorm"
     operation: IF
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "22"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=22&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel22"
+      description: "Toepassing van de kostendelersnorm"
     conditions:
       - test:
           operation: IN

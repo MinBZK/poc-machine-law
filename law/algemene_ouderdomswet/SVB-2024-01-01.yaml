@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
 name: AOW-uitkering
 law: algemene_ouderdomswet
@@ -278,19 +278,97 @@ properties:
       citizen_relevance: primary
 
   definitions:
-    YEARS_FOR_FULL_PENSION: 50
-    ACCRUAL_PER_YEAR: 0.02
-    BASE_AMOUNT_SINGLE: 138000
-    BASE_AMOUNT_SHARED: 95200
-    PARTNER_ALLOWANCE_MAX: 25800
-    INCOME_THRESHOLD_PARTNER: 280000
-    REDUCTION_RATE: 0.02
+    YEARS_FOR_FULL_PENSION: 
+      value: 50
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "13"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+        description: "Volledige opbouwperiode voor AOW"
+    
+    ACCRUAL_PER_YEAR: 
+      value: 0.02
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "13"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+        description: "Opbouwpercentage per jaar (2%)"
+    
+    BASE_AMOUNT_SINGLE: 
+      value: 138000
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "9"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+        description: "Basis AOW-bedrag alleenstaande"
+    
+    BASE_AMOUNT_SHARED: 
+      value: 95200
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "9"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+        description: "Basis AOW-bedrag gehuwde/samenwonende"
+    
+    PARTNER_ALLOWANCE_MAX: 
+      value: 25800
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+        description: "Maximum partnertoeslag"
+    
+    INCOME_THRESHOLD_PARTNER: 
+      value: 280000
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "10"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=10&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel10"
+        description: "Inkomensgrens partnertoeslag"
+    
+    REDUCTION_RATE: 
+      value: 0.02
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "10"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=10&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel10"
+        description: "Kortingspercentage partnertoeslag"
 
 requirements:
   - all:
       - subject: "$AGE"
         operation: GREATER_OR_EQUAL
         value: "$RETIREMENT_AGE"
+        legal_basis:
+          law: "Algemene Ouderdomswet"
+          bwb_id: "BWBR0002221"
+          article: "7"
+          paragraph: "1"
+          juriconnect: "jci1.3:c:BWBR0002221&artikel=7&lid=1"
+          url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+          description: "Leeftijdsvoorwaarde AOW"
+      
       - operation: GREATER_THAN
         values:
           - operation: ADD
@@ -298,10 +376,26 @@ requirements:
               - "$RESIDENCE_INSURED_YEARS"
               - "$EMPLOYMENT_INSURED_YEARS"
           - 0
+        legal_basis:
+          law: "Algemene Ouderdomswet"
+          bwb_id: "BWBR0002221"
+          article: "7"
+          paragraph: "1"
+          juriconnect: "jci1.3:c:BWBR0002221&artikel=7&lid=1"
+          url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+          description: "Minimaal verzekerd geweest"
 
 actions:
   - output: "is_eligible"
     value: true
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "7"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=7&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+      description: "Recht op AOW bij voldoen aan voorwaarden"
 
   - output: "base_amount"
     operation: IF
@@ -312,6 +406,14 @@ actions:
           value: true
         then: "$BASE_AMOUNT_SHARED"
       - else: "$BASE_AMOUNT_SINGLE"
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "9"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+      description: "Basis AOW-bedrag afhankelijk van leefsituatie"
 
   - output: "accrual_percentage"
     operation: DIVIDE
@@ -324,6 +426,14 @@ actions:
               - "$EMPLOYMENT_INSURED_YEARS"
           - "$YEARS_FOR_FULL_PENSION"
       - "$YEARS_FOR_FULL_PENSION"
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "13"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+      description: "Berekening opbouwpercentage AOW"
 
   - output: "pension_amount"
     operation: MULTIPLY
@@ -369,3 +479,11 @@ actions:
                               - "$REDUCTION_RATE"
                     - else: 0
           - else: 1
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "9"
+      paragraph: "1"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+      description: "Berekening uiteindelijke AOW-uitkering inclusief partnertoeslag"

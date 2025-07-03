@@ -1,3 +1,4 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
 name: Huurtoeslag
 law: wet_op_de_huurtoeslag
@@ -259,22 +260,181 @@ properties:
       citizen_relevance: primary
 
   definitions:
-    MINIMUM_AGE: 18
-    KWALITEITSKORTINGSGRENS: 47720  # 477,20 euro
-    AFTOPPINGSGRENS_1_2: 68296      # 682,96 euro (1-2 personen)
-    AFTOPPINGSGRENS_3_PLUS: 73193   # 731,93 euro (3 of meer personen)
-    MAXIMALE_HUURGRENS: 88571       # 885,71 euro
-    VERMOGENSGRENS_ALLEENSTAANDE: 3695200   # 36.952 euro
-    VERMOGENSGRENS_PARTNERS: 7390400        # 73.904 euro
-    INKOMENSGRENS_ALLEENSTAANDE: 4400000    # 44.000 euro
-    INKOMENSGRENS_PARTNERS: 5400000         # 54.000 euro
-    SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS: 1.00    # 100%
-    SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP: 0.65          # 65%
-    SUBSIDIEPERCENTAGE_BOVEN_AFTOP: 0.40                     # 40%
-    MINIMUM_BASISHUUR_PERCENTAGE: 0.0486                      # 4,86% van inkomen
-    MAX_SERVICE_COSTS: 4800  # 48,00 euro
-    KIND_VRIJSTELLING: 543200  # 5.432,00 euro (kind vrijstellingsbedrag)
-    LEEFTIJDSGRENS_KIND_INKOMEN: 23  # Leeftijdsgrens voor kind inkomen
+    MINIMUM_AGE: 
+      value: 18
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "8"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=8&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf4_Artikel8"
+        description: "Leeftijdsgrens voor huurtoeslag"
+    
+    KWALITEITSKORTINGSGRENS: 
+      value: 47720  # 477,20 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "20"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=20&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel20"
+        description: "Kwaliteitskortingsgrens voor huursubsidieberekening"
+    
+    AFTOPPINGSGRENS_1_2: 
+      value: 68296      # 682,96 euro (1-2 personen)
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "20"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=20&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel20"
+        description: "Aftoppingsgrens voor huishoudens van 1-2 personen"
+    
+    AFTOPPINGSGRENS_3_PLUS: 
+      value: 73193   # 731,93 euro (3 of meer personen)
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "20"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=20&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel20"
+        description: "Aftoppingsgrens voor huishoudens van 3 of meer personen"
+    
+    MAXIMALE_HUURGRENS: 
+      value: 88571       # 885,71 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "13"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=13&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel13"
+        description: "Maximale huurgrens voor huurtoeslag"
+    
+    VERMOGENSGRENS_ALLEENSTAANDE: 
+      value: 3695200   # 36.952 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "15"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=15&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel15"
+        description: "Vermogensgrens voor alleenstaanden"
+    
+    VERMOGENSGRENS_PARTNERS: 
+      value: 7390400        # 73.904 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "15"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=15&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel15"
+        description: "Vermogensgrens voor partners"
+    
+    INKOMENSGRENS_ALLEENSTAANDE: 
+      value: 4400000    # 44.000 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "14"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=14&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel14"
+        description: "Inkomensgrens voor alleenstaanden"
+    
+    INKOMENSGRENS_PARTNERS: 
+      value: 5400000         # 54.000 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "14"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=14&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel14"
+        description: "Inkomensgrens voor partners"
+    
+    SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS: 
+      value: 1.00    # 100%
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "21"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=21&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel21"
+        description: "Subsidiepercentage onder kwaliteitskortingsgrens"
+    
+    SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP: 
+      value: 0.65          # 65%
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "21"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=21&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel21"
+        description: "Subsidiepercentage tussen kwaliteitskortingsgrens en aftoppingsgrens"
+    
+    SUBSIDIEPERCENTAGE_BOVEN_AFTOP: 
+      value: 0.40                     # 40%
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "21"
+        paragraph: "3"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=21&lid=3"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel21"
+        description: "Subsidiepercentage boven aftoppingsgrens"
+    
+    MINIMUM_BASISHUUR_PERCENTAGE: 
+      value: 0.0486                      # 4,86% van inkomen
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "18"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=18&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf6_Artikel18"
+        description: "Minimale basishuur percentage van inkomen"
+    
+    MAX_SERVICE_COSTS: 
+      value: 4800  # 48,00 euro
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "12"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=12&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel12"
+        description: "Maximale servicekosten voor huurtoeslag"
+    
+    KIND_VRIJSTELLING: 
+      value: 543200  # 5.432,00 euro (kind vrijstellingsbedrag)
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "17"
+        paragraph: "1"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=17&lid=1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel17"
+        description: "Vrijstellingsbedrag voor kinderen"
+    
+    LEEFTIJDSGRENS_KIND_INKOMEN: 
+      value: 23  # Leeftijdsgrens voor kind inkomen
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "17"
+        paragraph: "2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=17&lid=2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf5_Artikel17"
+        description: "Leeftijdsgrens voor kind inkomen vrijstelling"
 
 requirements:
   - all:
