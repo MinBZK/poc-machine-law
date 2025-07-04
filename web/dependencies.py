@@ -12,18 +12,22 @@ config_loader = ConfigLoader()
 
 # Set Dutch locale
 try:
-    locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
+    locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
+    locale.setlocale(
+        locale.LC_MONETARY, "it_IT.UTF-8"
+    )  # Use Italian locale for monetary formatting, which is similar to Dutch but has better thousand separators and places the minus sign correctly
 except locale.Error:
     # Fallback for CI environments where Dutch locale might not be installed
     try:
-        locale.setlocale(locale.LC_TIME, "nl_NL")
+        locale.setlocale(locale.LC_ALL, "nl_NL")
+        locale.setlocale(locale.LC_MONETARY, "it_IT")  # See comment above
     except locale.Error:
         try:
             # Try C.UTF-8 which is often available in Docker/CI
-            locale.setlocale(locale.LC_TIME, "C.UTF-8")
+            locale.setlocale(locale.LC_ALL, "C.UTF-8")
         except locale.Error:
             # If all else fails, use system default
-            locale.setlocale(locale.LC_TIME, "")
+            locale.setlocale(locale.LC_ALL, "")
             print("WARNING: Could not set Dutch locale, using system default")
 
 TODAY = datetime.today().strftime("%Y-%m-%d")
@@ -100,6 +104,17 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
             return date_obj.strftime("%d %B %Y")
 
     templates.env.filters["format_date"] = format_date
+
+    def format_currency(value: float) -> str:
+        """Format a number as currency with locale settings."""
+        if value is None:
+            return ""
+
+        # Use locale.currency for proper formatting. Note: on some systems, the locale definitions use 'Eu' as the currency symbol instead of the actual euro sign €, so we replace it
+        return locale.currency(value, grouping=True).replace("Eu", "€")
+
+    templates.env.filters["format_currency"] = format_currency
+
     return templates
 
 

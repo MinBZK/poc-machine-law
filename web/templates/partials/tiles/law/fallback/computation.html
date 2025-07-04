@@ -9,7 +9,7 @@
                         {{ 'Ja' if value else 'Nee' }}
                     {% elif value is number %}
                         {% if 'euro' in key.lower() or 'toeslag' in key.lower() %}
-                            €{{ '%.2f'|format(value/100) }}
+                            {{ (value / 100) | format_currency }}
                         {% else %}
                             {{ value }}
                         {% endif %}
