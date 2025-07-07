@@ -2,189 +2,115 @@ package ruleresolver
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 	"sync"
 	"time"
-
-	// "github.com/goccy/go-yaml"
-	"gopkg.in/yaml.v3"
 )
 
+// SourceType represents the source of rule data.
+type SourceType string
+
 const (
-	LawBaseDir = "law"
+	SourceTypeDisk SourceType = "disk"
+	SourceTypeURL  SourceType = "url"
 )
 
 var (
-	loaded                    bool = false
-	ruleSpec                  []RuleSpec
-	lawsByService             map[string]map[string]struct{}
-	discoverableLawsByService map[string]map[string]map[string]struct{}
-	once                      sync.Once
-	ruleSpecCache             sync.Map
+	ruleResolver *RuleResolver
+	mu           sync.Mutex
 )
 
-// RuleResolver handles rule resolution and lookup
+// RuleResolver handles rule resolution and lookup.
 type RuleResolver struct {
-	RulesDir                  string
 	Rules                     []RuleSpec
-	LawsByService             map[string]map[string]struct{}
-	DiscoverableLawsByService map[string]map[string]map[string]struct{}
-	mu                        sync.RWMutex
+	LawsByService             map[string][]string
+	DiscoverableLawsByService map[string]map[string][]string
 }
 
-// New creates a new rule resolver
-func New() (resolver *RuleResolver, err error) {
-	once.Do(func() {
-		ruleSpec, lawsByService, discoverableLawsByService, err = rulesLoad(LawBaseDir)
-		if err != nil {
-			return
-		}
-
-		loaded = true
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf("load rules: %w", err)
-	}
-
-	if !loaded {
-		return nil, fmt.Errorf("rules not loaded yet")
-	}
-
-	return &RuleResolver{
-		RulesDir:                  LawBaseDir,
-		Rules:                     ruleSpec,
-		LawsByService:             lawsByService,
-		DiscoverableLawsByService: discoverableLawsByService,
-	}, nil
+type RuleResolverConfig struct {
+	Provider RuleSpecProvider
+	URL      *string
+	DIR      *string
 }
 
-func rulesLoad(dir string) ([]RuleSpec, map[string]map[string]struct{}, map[string]map[string]map[string]struct{}, error) {
-	// Clear existing data
-	lawsByService := make(map[string]map[string]struct{})
-	lawsByServiceWithDiscoverable := make(map[string]map[string]map[string]struct{})
+func New(cfg RuleResolverConfig) (*RuleResolver, error) {
+	mu.Lock()
+	defer mu.Unlock()
 
-	// Find all .yaml and .yml files recursively
-	var yamlFiles []string
-
-	err := func() error {
-		// First, evaluate the symlink to get the actual path
-		realPath, err := filepath.EvalSymlinks(dir)
+	if ruleResolver == nil {
+		provider, err := ProviderFactory(cfg)
 		if err != nil {
-			return fmt.Errorf("failed to evaluate symlink %s: %w", dir, err)
+			return nil, fmt.Errorf("provider factory: %w", err)
 		}
 
-		// Now walk the real path
-		return filepath.Walk(realPath, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
+		rules, err := provider.Fetch()
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch YAML files: %w", err)
+		}
 
-			if !info.IsDir() {
-				ext := strings.ToLower(filepath.Ext(path))
-				if ext == ".yaml" || ext == ".yml" {
-					yamlFiles = append(yamlFiles, path)
-				}
-			}
+		lawsByService, discoverableLawsByService := index(rules)
 
-			return nil
-		})
-	}()
-
-	if err != nil {
-		return nil, nil, nil, err
+		ruleResolver = &RuleResolver{
+			Rules:                     rules,
+			LawsByService:             lawsByService,
+			DiscoverableLawsByService: discoverableLawsByService,
+		}
 	}
 
-	rules := make([]RuleSpec, 0, len(yamlFiles))
-	// Load each rule file
-	for _, path := range yamlFiles {
-		data, err := os.ReadFile(path)
-		if err != nil {
-			fmt.Printf("Error reading file %s: %v\n", path, err)
-			continue
-		}
+	return ruleResolver, nil
+}
 
-		rule := RuleSpec{}
-		if err := yaml.Unmarshal(data, &rule); err != nil {
-			fmt.Printf("Error parsing YAML from %s: %v\n", path, err)
-			continue
-		}
+func index(rules []RuleSpec) (map[string][]string, map[string]map[string][]string) {
+	// clear current values
+	lawsByService := make(map[string][]string)
+	discoverableLawsByService := make(map[string]map[string][]string)
 
-		rule.Path = path
-
-		rules = append(rules, rule)
-
+	for _, rule := range rules {
 		// Index by service and law
-		if rule.Service != "" {
-			if _, exists := lawsByService[rule.Service]; !exists {
-				lawsByService[rule.Service] = make(map[string]struct{})
-			}
-
-			lawsByService[rule.Service][rule.Law] = struct{}{}
-
-			// Index discoverable laws
-			if rule.Discoverable != nil {
-				if _, exists := lawsByServiceWithDiscoverable[*rule.Discoverable]; !exists {
-					lawsByServiceWithDiscoverable[*rule.Discoverable] = make(map[string]map[string]struct{})
-				}
-
-				if _, exists := lawsByServiceWithDiscoverable[*rule.Discoverable][rule.Service]; !exists {
-					lawsByServiceWithDiscoverable[*rule.Discoverable][rule.Service] = make(map[string]struct{})
-				}
-
-				lawsByServiceWithDiscoverable[*rule.Discoverable][rule.Service][rule.Law] = struct{}{}
-			}
+		if rule.Service == "" {
+			continue
 		}
+
+		if _, exists := lawsByService[rule.Service]; !exists {
+			lawsByService[rule.Service] = make([]string, 0, 1)
+		}
+
+		lawsByService[rule.Service] = append(lawsByService[rule.Service], rule.Law)
+
+		// Index discoverable laws
+		if rule.Discoverable == nil {
+			continue
+		}
+
+		if _, exists := discoverableLawsByService[*rule.Discoverable]; !exists {
+			discoverableLawsByService[*rule.Discoverable] = make(map[string][]string)
+		}
+
+		if _, exists := discoverableLawsByService[*rule.Discoverable][rule.Service]; !exists {
+			discoverableLawsByService[*rule.Discoverable][rule.Service] = make([]string, 1)
+		}
+
+		discoverableLawsByService[*rule.Discoverable][rule.Service] = append(discoverableLawsByService[*rule.Discoverable][rule.Service], rule.Law)
 	}
 
-	return rules, lawsByService, lawsByServiceWithDiscoverable, nil
+	return lawsByService, discoverableLawsByService
 }
 
-// GetServiceLaws returns a map of services to their laws
+// GetServiceLaws returns a map of services to their laws.
 func (r *RuleResolver) GetServiceLaws() map[string][]string {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	result := make(map[string][]string, len(r.LawsByService))
-
-	for service, laws := range r.LawsByService {
-		lawsList := make([]string, 0, len(laws))
-		for law := range laws {
-			lawsList = append(lawsList, law)
-		}
-		result[service] = lawsList
-	}
-
-	return result
+	return r.LawsByService
 }
 
-// GetDiscoverableServiceLaws returns a map of discoverable services to their laws
+// GetDiscoverableServiceLaws returns a map of discoverable services to their laws.
 func (r *RuleResolver) GetDiscoverableServiceLaws(discoverableBy string) map[string][]string {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	result := make(map[string][]string, 0)
-
 	if serviceMap, ok := r.DiscoverableLawsByService[discoverableBy]; ok {
-		for service, laws := range serviceMap {
-			lawsList := make([]string, 0, len(laws))
-			for law := range laws {
-				lawsList = append(lawsList, law)
-			}
-			result[service] = lawsList
-		}
+		return serviceMap
 	}
 
-	return result
+	return nil
 }
 
-// FindRule finds the applicable rule for a given law and reference date
-func (r *RuleResolver) FindRule(law, referenceDate string, service string) (RuleSpec, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
+// findRule finds the applicable rule for a given law and reference date.
+func (r *RuleResolver) findRule(law, referenceDate string, service string) (RuleSpec, error) {
 	refDate, err := time.Parse("2006-01-02", referenceDate)
 	if err != nil {
 		return RuleSpec{}, fmt.Errorf("invalid reference date: %s", referenceDate)
@@ -227,32 +153,14 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 	return result, nil
 }
 
-// GetRuleSpec gets the rule specification as a map
+// GetRuleSpec gets the rule specification as a map.
 func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (RuleSpec, error) {
-	rule, err := r.FindRule(law, referenceDate, service)
+	rule, err := r.findRule(law, referenceDate, service)
 	if err != nil {
 		return RuleSpec{}, err
 	}
 
-	if data, ok := ruleSpecCache.Load(rule.Path); ok {
-		return data.(RuleSpec), nil
-	}
-
-	// Read the rule spec
-	data, err := os.ReadFile(rule.Path)
-	if err != nil {
-		return RuleSpec{}, fmt.Errorf("error reading rule file: %w", err)
-	}
-
-	// Parse to map
-	var result RuleSpec
-	if err := yaml.Unmarshal(data, &result); err != nil {
-		return RuleSpec{}, fmt.Errorf("error parsing rule YAML: %w", err)
-	}
-
-	ruleSpecCache.Store(rule.Path, result)
-
-	return result, nil
+	return rule, nil
 }
 
 func deptr[T any](a *T, def T) T {
@@ -262,11 +170,12 @@ func deptr[T any](a *T, def T) T {
 	return *a
 }
 
-// RulesDataFrame returns a slice of maps representing all rules
-func (r *RuleResolver) RulesDataFrame() []map[string]any {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
+func ptr[T any](a T) *T {
+	return &a
+}
 
+// RulesDataFrame returns a slice of maps representing all rules.
+func (r *RuleResolver) RulesDataFrame() []map[string]any {
 	result := make([]map[string]any, 0, len(r.Rules))
 
 	for _, rule := range r.Rules {

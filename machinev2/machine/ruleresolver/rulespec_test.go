@@ -13,8 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func TestDecodeLaw(t *testing.T) {
-
+func TestDecodeLaw(_ *testing.T) {
 	data, err := os.ReadFile("test.yaml")
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
@@ -25,7 +24,6 @@ func TestDecodeLaw(t *testing.T) {
 	rule := ruleresolver.RuleSpec{}
 	if err := yaml.Unmarshal(data, &rule); err != nil {
 		fmt.Printf("Error parsing YAML from: %v\n", err)
-
 	}
 
 	render.Render(rule)
@@ -55,7 +53,7 @@ sources:
 `
 
 	var av struct {
-		Sources []ruleresolver.SourceField
+		Sources []ruleresolver.SourceField `yaml:"sources"`
 	}
 	err := yaml.Unmarshal([]byte(data), &av)
 	require.NoError(t, err)
@@ -87,6 +85,7 @@ properties:
 	var av struct {
 		Properties ruleresolver.Properties `yaml:"properties"`
 	}
+
 	err := yaml.Unmarshal([]byte(data), &av)
 	require.NoError(t, err)
 

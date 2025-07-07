@@ -9,15 +9,13 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/engine"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 // RuleService interface for executing business rules for a specific service
 type RuleService struct {
 	logger           logging.Logger
 	ServiceName      string
-	Services         contexter.ServiceProvider
-	Resolver         *ruleresolver.RuleResolver
+	services         contexter.ServiceProvider
 	engines          map[string]map[string]*engine.RulesEngine
 	SourceDataFrames model.SourceDataFrame
 	mu               sync.RWMutex
@@ -27,16 +25,10 @@ type RuleService struct {
 func New(logger logging.Logger, serviceName string, services contexter.ServiceProvider) (*RuleService, error) {
 	logger.Warningf(context.Background(), "creating inmemory ruleservice: %s", serviceName)
 
-	resolver, err := ruleresolver.New()
-	if err != nil {
-		return nil, fmt.Errorf("new rule resolver: %w", err)
-	}
-
 	return &RuleService{
 		logger:           logger.WithName("service"),
 		ServiceName:      serviceName,
-		Services:         services,
-		Resolver:         resolver,
+		services:         services,
 		engines:          make(map[string]map[string]*engine.RulesEngine),
 		SourceDataFrames: NewSourceDataFrame(),
 	}, nil
@@ -57,7 +49,7 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 	}
 
 	// Create new engine
-	spec, err := rs.Resolver.GetRuleSpec(law, referenceDate, rs.ServiceName)
+	spec, err := rs.services.GetRuleResolver().GetRuleSpec(law, referenceDate, rs.ServiceName)
 	if err != nil {
 		return nil, err
 	}
@@ -66,15 +58,10 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 		return nil, fmt.Errorf("rule spec service '%s' does not match service '%s'", spec.Service, rs.ServiceName)
 	}
 
-	ruleEngine := engine.NewRulesEngine(rs.logger, spec, rs.Services, referenceDate)
+	ruleEngine := engine.NewRulesEngine(rs.logger, spec, rs.services, referenceDate)
 	rs.engines[law][referenceDate] = ruleEngine
 
 	return ruleEngine, nil
-}
-
-// GetResolver returns the rule resolver
-func (rs *RuleService) GetResolver() *ruleresolver.RuleResolver {
-	return rs.Resolver
 }
 
 // Evaluate evaluates rules for given law and reference date

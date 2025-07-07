@@ -85,12 +85,12 @@ func SetStandaloneMode() Option {
 
 // NewServices creates a new services instance
 func NewServices(referenceDate time.Time, options ...Option) (*Services, error) {
-	serviceResolver, err := serviceresolver.New()
+	serviceResolver, err := serviceresolver.New(serviceresolver.DefaultServiceResolverCfg)
 	if err != nil {
 		return nil, fmt.Errorf("new service resolver: %w", err)
 	}
 
-	ruleResolver, err := ruleresolver.New()
+	ruleResolver, err := ruleresolver.New(ruleresolver.DefaultRuleResolverCfg)
 	if err != nil {
 		return nil, fmt.Errorf("new rule resolver: %w", err)
 	}
