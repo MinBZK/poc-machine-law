@@ -59,7 +59,7 @@ type RuleContext struct {
 	Parameters      map[string]any
 	PropertySpecs   map[string]ruleresolver.Field
 	Sources         model.SourceDataFrame
-	ValuesCache     sync.Map
+	ValuesCache     *sync.Map
 	OverwriteInput  map[string]map[string]any
 	CalculationDate string
 	LocalResolver   *LocalResolver
@@ -85,7 +85,7 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 		Parameters:      parameters,
 		PropertySpecs:   propertySpecs,
 		Sources:         sources,
-		ValuesCache:     sync.Map{},
+		ValuesCache:     new(sync.Map),
 		OverwriteInput:  overwriteInput,
 		CalculationDate: calculationDate,
 		Approved:        approved,
@@ -104,6 +104,7 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 		NewPropertySpecOverwriteResolver(propertySpecs, overwriteInput),
 		NewPropertySpecSourceResolver(rc, propertySpecs),
 		NewPropertySpecServiceResolver(rc, propertySpecs),
+		NewExternalClaimResolver("http://belastingdienst-backend-svc/box1/1", parameters["BSN"].(string), propertySpecs),
 	}
 
 	return rc

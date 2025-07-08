@@ -1,4 +1,4 @@
 $id:
 uuid: d143f8ad-08e8-4da3-8f60-1f4c7d2ff17b
 name: DUO
-endpoint: http://duo-backend-svc.lac.svc.cluster.local
+endpoint: http://duo-machine-svc.lac.svc.cluster.local

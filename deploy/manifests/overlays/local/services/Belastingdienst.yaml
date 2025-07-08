@@ -1,4 +1,4 @@
 $id:
 uuid: 34e50b87-5e86-4dcf-b65a-ddfc44228f6e
 name: Belastingdienst
-endpoint: http://belastingdienst-backend-svc.lac.svc.cluster.local
+endpoint: http://belastingdienst-machine-svc.lac.svc.cluster.local

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: machine
+  template:
+    metadata:
+      labels:
+        app: machine
+      annotations:
+        sidecar.opentelemetry.io/inject: "jenv-machine-otlp-collector"
+    spec:
+      containers:
+        - name: jenv-machine
+          image: go-engine-image
+          env:
+            - name: APP_DEBUG
+              value: "true"
+            - name: APP_ORGANIZATION
+              value: "JenV"
+            - name: APP_STANDALONE_MODE
+              value: "true"
+            - name: APP_RULE_SERVICE_IN_MEMORY
+              value: "false"
+            - name: APP_LDV_ENABLED
+              value: "true"
+            - name: APP_LDV_ENDPOINT
+              value: "localhost:4317"
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: services-config
+              mountPath: /build/services
+              readOnly: true
+      volumes:
+        - name: services-config
+          configMap:
+            name: services-cm

@@ -7,11 +7,11 @@ namePrefix: dji-
 patches:
   - target:
       kind: Ingress
-      name: backend-ing
+      name: machine-ing
     patch: |
       - op: replace
         path: /spec/rules/0/host
-        value: dji-backend.127-0-0-1.nip.io
+        value: dji-machine.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
   - target:

@@ -1,0 +1,18 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: db
+spec:
+  instances: 1
+  bootstrap:
+    initdb:
+      database: common
+      secret:
+        name: belastingdienst-db-app
+      postInitSQL:
+        - "CREATE DATABASE app WITH OWNER common"
+
+  storage:
+    size: 5Gi
+
+  enablePDB: false

@@ -7,11 +7,11 @@ namePrefix: jenv-
 patches:
   - target:
       kind: Ingress
-      name: backend-ing
+      name: machine-ing
     patch: |
       - op: replace
         path: /spec/rules/0/host
-        value: jenv-backend.127-0-0-1.nip.io
+        value: jenv-machine.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
   - target:

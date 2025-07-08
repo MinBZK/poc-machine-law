@@ -16,6 +16,15 @@ patches:
         path: /spec/tls
   - target:
       kind: Ingress
+      name: machine-ing
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: belastingdienst-machine.127-0-0-1.nip.io
+      - op: remove
+        path: /spec/tls
+  - target:
+      kind: Ingress
       name: inzicht-backend-ing
     patch: |
       - op: replace

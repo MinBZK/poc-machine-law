@@ -52,21 +52,21 @@ generate_base_kustomization() {
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - backend
+  - machine
   - inzicht-backend
 EOF
 }
 
-# Function to generate backend kustomization.yaml
-generate_backend_kustomization() {
-    backend_dir="$1"
+# Function to generate machine kustomization.yaml
+generate_machine_kustomization() {
+    machine_dir="$1"
     service_name="$2"
 
-    cat > "${backend_dir}/kustomization.yaml" << EOF
+    cat > "${machine_dir}/kustomization.yaml" << EOF
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namePrefix: backend-
+namePrefix: machine-
 
 resources:
   - deployment.yaml
@@ -77,18 +77,18 @@ resources:
 labels:
   - includeSelectors: true
     pairs:
-      app: backend
+      app: machine
       service: ${service_name}
 EOF
 }
 
 # Function to generate deployment.yaml
 generate_deployment() {
-    backend_dir="$1"
+    machine_dir="$1"
     service_name="$2"
     service_id="$3"
 
-    cat > "${backend_dir}/deployment.yaml" << EOF
+    cat > "${machine_dir}/deployment.yaml" << EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -97,17 +97,17 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: machine
   template:
     metadata:
       labels:
-        app: backend
+        app: machine
       annotations:
-        sidecar.opentelemetry.io/inject: "${service_id}-backend-otlp-collector"
+        sidecar.opentelemetry.io/inject: "${service_id}-machine-otlp-collector"
     spec:
       containers:
-        - name: ${service_id}-backend
-          image: go-engine-backend-image
+        - name: ${service_id}-machine
+          image: go-engine-image
           env:
             - name: APP_DEBUG
               value: "true"
@@ -137,16 +137,16 @@ EOF
 
 # Function to generate service.yaml
 generate_service() {
-    backend_dir="$1"
+    machine_dir="$1"
 
-    cat > "${backend_dir}/service.yaml" << 'EOF'
+    cat > "${machine_dir}/service.yaml" << 'EOF'
 apiVersion: v1
 kind: Service
 metadata:
   name: svc
 spec:
   selector:
-    app: backend
+    app: machine
   ports:
     - protocol: TCP
       port: 80
@@ -157,10 +157,10 @@ EOF
 
 # Function to generate ingress.yaml
 generate_ingress() {
-    backend_dir="$1"
+    machine_dir="$1"
     service_id="$2"
 
-    cat > "${backend_dir}/ingress.yaml" << EOF
+    cat > "${machine_dir}/ingress.yaml" << EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -190,7 +190,7 @@ spec:
 EOF
 }
 
-# Function to generate inzicht-backend kustomization.yaml
+# Function to generate inzicht-machine kustomization.yaml
 generate_inzicht_backend_kustomization() {
     inzicht_backend_dir="$1"
     service_name="$2"
@@ -318,10 +318,10 @@ EOF
 
 # Function to generate otlp-collector.yaml
 generate_otlp_collector() {
-    backend_dir="$1"
+    machine_dir="$1"
     service_name="$2"
 
-    cat > "${backend_dir}/otlp-collector.yaml" << EOF
+    cat > "${machine_dir}/otlp-collector.yaml" << EOF
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
@@ -370,11 +370,11 @@ namePrefix: ${service_id}-
 patches:
   - target:
       kind: Ingress
-      name: backend-ing
+      name: machine-ing
     patch: |
       - op: replace
         path: /spec/rules/0/host
-        value: ${service_id}-backend.127-0-0-1.nip.io
+        value: ${service_id}-machine.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
   - target:
@@ -405,22 +405,22 @@ setup_service_structure() {
     # Create service directories
     service_dir="${MANIFESTS_DIR}/${service_id}"
     base_dir="${service_dir}/base"
-    backend_dir="${base_dir}/backend"
+    machine_dir="${base_dir}/machine"
     inzicht_backend_dir="${base_dir}/inzicht-backend"
     overlays_dir="${service_dir}/overlays"
     local_overlay_dir="${overlays_dir}/local"
 
-    mkdir -p "$backend_dir"
+    mkdir -p "$machine_dir"
     mkdir -p "$inzicht_backend_dir"
     mkdir -p "$local_overlay_dir"
 
     # Generate base files
     generate_base_kustomization "$base_dir"
-    generate_backend_kustomization "$backend_dir" "$service_name"
-    generate_deployment "$backend_dir" "$service_name" "$service_id"
-    generate_service "$backend_dir"
-    generate_ingress "$backend_dir" "$service_id"
-    generate_otlp_collector "$backend_dir" "$service_name"
+    generate_machine_kustomization "$machine_dir" "$service_name"
+    generate_deployment "$machine_dir" "$service_name" "$service_id"
+    generate_service "$machine_dir"
+    generate_ingress "$machine_dir" "$service_id"
+    generate_otlp_collector "$machine_dir" "$service_name"
 
     # Generate inzicht-backend files
     generate_inzicht_backend_kustomization "$inzicht_backend_dir" "$service_name"
@@ -557,8 +557,8 @@ EOF
 
         # Copy file and replace endpoint with correct internal service URL
         if [ -n "$service_name_k8s" ]; then
-            sed "s|^endpoint:.*|endpoint: http://${service_name_k8s}-backend-svc.lac.svc.cluster.local|g" "$service_file" > "$services_local_dir/$service_filename"
-            echo "   📝 Updated endpoint for $service_name to http://${service_name_k8s}-backend-svc.lac.svc.cluster.local"
+            sed "s|^endpoint:.*|endpoint: http://${service_name_k8s}-machine-svc.lac.svc.cluster.local|g" "$service_file" > "$services_local_dir/$service_filename"
+            echo "   📝 Updated endpoint for $service_name to http://${service_name_k8s}-machine-svc.lac.svc.cluster.local"
         else
             echo "   ⚠️  No service_name found for $service_filename, copying without modification"
             cp "$service_file" "$services_local_dir/"
@@ -731,7 +731,7 @@ main() {
             service_name=$(parse_yaml "$service_file" "name")
             if [ -n "$service_name" ]; then
                 service_name_k8s=$(echo "$service_name" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-                echo "   Backend: http://$service_name_k8s-backend.127-0-0-1.nip.io:8080"
+                echo "   Machine: http://$service_name_k8s-machine.127-0-0-1.nip.io:8080"
                 echo "   Inzicht Backend: http://$service_name_k8s-inzicht-backend.127-0-0-1.nip.io:8080"
             fi
         done
@@ -772,7 +772,7 @@ DIRECTORY STRUCTURE:
     ├── cbs/
     │   ├── base/
     │   │   ├── kustomization.yaml
-    │   │   ├── backend/
+    │   │   ├── machine/
     │   │   │   ├── kustomization.yaml
     │   │   │   ├── deployment.yaml
     │   │   │   ├── service.yaml
@@ -788,7 +788,7 @@ DIRECTORY STRUCTURE:
     └── dji/
         ├── base/
         │   ├── kustomization.yaml
-        │   ├── backend/
+        │   ├── machine/
         │   │   ├── kustomization.yaml
         │   │   ├── deployment.yaml
         │   │   ├── service.yaml
@@ -812,7 +812,7 @@ SERVICE YAML FORMAT:
 
 FEATURES:
     - Creates separate namespace per service
-    - Service-specific hostnames (e.g., cbs-backend.127-0-0-1.nip.io:8080)
+    - Service-specific hostnames (e.g., cbs-machine.127-0-0-1.nip.io:8080)
     - Configures APP_ORGANIZATION environment variable
     - Removes TLS for local development in local overlay
     - Adds service labels to all resources
