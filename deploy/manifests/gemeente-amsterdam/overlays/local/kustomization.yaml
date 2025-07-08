@@ -7,11 +7,11 @@ namePrefix: gemeente-amsterdam-
 patches:
   - target:
       kind: Ingress
-      name: backend-ing
+      name: machine-ing
     patch: |
       - op: replace
         path: /spec/rules/0/host
-        value: gemeente-amsterdam-backend.127-0-0-1.nip.io
+        value: gemeente-amsterdam-machine.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
   - target:

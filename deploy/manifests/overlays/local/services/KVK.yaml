@@ -1,4 +1,4 @@
 $id:
 uuid: cde25aea-8312-4f11-891b-d9f2733e6224
 name: KVK
-endpoint: http://kvk-backend-svc.lac.svc.cluster.local
+endpoint: http://kvk-machine-svc.lac.svc.cluster.local

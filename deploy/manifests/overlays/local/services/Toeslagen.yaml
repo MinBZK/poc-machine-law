@@ -1,4 +1,4 @@
 $id:
 uuid: 6470fe5d-3ba8-4b23-ab28-f1c3f97510ba
 name: Toeslagen
-endpoint: http://toeslagen-backend-svc.lac.svc.cluster.local
+endpoint: http://toeslagen-machine-svc.lac.svc.cluster.local

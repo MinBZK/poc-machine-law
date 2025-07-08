@@ -45,15 +45,20 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync
 
 # Copy the entire project
-COPY . .
 
 # Copy built SvelteKit static files from node_builder stage
 
-WORKDIR /app/web
 
 COPY ./schema /app/web/schema
 COPY ./law /app/web/law
+COPY ./law /app/law
 COPY ./services /app/web/services
+COPY ./machine /app/machine
+COPY ./explain /app/explain
+COPY ./web /app/web
+
+WORKDIR /app/web
+
 COPY --from=node_builder /analysis-graph/build analysis/graph/build
 COPY --from=node_builder /importer/build importer/build
 

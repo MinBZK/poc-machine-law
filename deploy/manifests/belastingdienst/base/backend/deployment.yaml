@@ -6,30 +6,40 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: machine
   template:
     metadata:
       labels:
-        app: backend
+        app: machine
       annotations:
-        sidecar.opentelemetry.io/inject: "belastingdienst-backend-otlp-collector"
+        sidecar.opentelemetry.io/inject: "belastingdienst-machine-otlp-collector"
     spec:
       containers:
-        - name: belastingdienst-backend
-          image: go-engine-backend-image
+        - name: belastingdienst-machine
+          image: belastingdienst-backend-image
           env:
             - name: APP_DEBUG
               value: "true"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: belastingdienst-db-app
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: belastingdienst-db-app
+                  key: password
+            - name: DB_HOST
+              value: "belastingdienst-db-rw"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "app"
             - name: APP_ORGANIZATION
               value: "Belastingdienst"
-            - name: APP_STANDALONE_MODE
-              value: "true"
-            - name: APP_RULE_SERVICE_IN_MEMORY
-              value: "false"
-            - name: APP_LDV_ENABLED
-              value: "true"
-            - name: APP_LDV_ENDPOINT
-              value: "localhost:4317"
+            - name: DATABASE_URL
+              value: "postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
           ports:
             - name: http
               containerPort: 8080

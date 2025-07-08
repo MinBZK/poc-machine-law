@@ -7,7 +7,15 @@ build:
     push: false
     useDockerCLI: true
   artifacts:
-    - image: go-engine-backend-image
+    - image: belastingdienst-backend-image
+      context: apps/belastingdienst/backend
+      docker:
+        dockerfile: apps/belastingdienst/backend/dev.Dockerfile
+      sync:
+        manual:
+          - src: "**/*.go"
+            dest: /build
+    - image: go-engine-image
       context: .
       docker:
         dockerfile: machinev2/backend/dev.Dockerfile

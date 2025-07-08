@@ -7,11 +7,11 @@ namePrefix: kiesraad-
 patches:
   - target:
       kind: Ingress
-      name: backend-ing
+      name: machine-ing
     patch: |
       - op: replace
         path: /spec/rules/0/host
-        value: kiesraad-backend.127-0-0-1.nip.io
+        value: kiesraad-machine.127-0-0-1.nip.io
       - op: remove
         path: /spec/tls
   - target:

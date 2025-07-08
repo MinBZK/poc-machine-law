@@ -1,4 +1,4 @@
 $id:
 uuid: 3180e589-4750-4ffd-9e2f-d9fb52b41b08
 name: IND
-endpoint: http://ind-backend-svc.lac.svc.cluster.local
+endpoint: http://ind-machine-svc.lac.svc.cluster.local

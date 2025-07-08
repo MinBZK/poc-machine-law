@@ -1,4 +1,4 @@
 $id:
 uuid: 248a8b63-a596-4db5-aeca-225ede1131a3
 name: RVZ
-endpoint: http://rvz-backend-svc.lac.svc.cluster.local
+endpoint: http://rvz-machine-svc.lac.svc.cluster.local

@@ -1,4 +1,4 @@
 $id:
 uuid: 8691ef71-6db0-444a-a87a-3369bdecdb44
 name: RvIG
-endpoint: http://rvig-backend-svc.lac.svc.cluster.local
+endpoint: http://rvig-machine-svc.lac.svc.cluster.local
