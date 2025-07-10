@@ -256,7 +256,7 @@ func isHetToeslagbedragEuro(ctx context.Context, expected float64) error {
 
 	v, ok := result.Output["hoogte_toeslag"]
 	if !ok {
-		v, ok = result.Output["yearly_amount"]
+		v, ok = result.Output["jaarbedrag"]
 	}
 
 	require.True(godog.T(ctx), ok, "No toeslag amount found in output")
@@ -492,7 +492,7 @@ func isDeHuurtoeslagEuro(ctx context.Context, expected float64) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["subsidy_amount"]
+	v, ok := result.Output["subsidiebedrag"]
 	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
@@ -525,7 +525,7 @@ func isDeWoonkostentoeslagEuro(ctx context.Context, expected float64) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["housing_assistance"]
+	v, ok := result.Output["woonkostentoeslag"]
 	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
@@ -540,7 +540,7 @@ func isHetBijstandsuitkeringsbedragEuro(ctx context.Context, expected float64) e
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["benefit_amount"]
+	v, ok := result.Output["uitkeringsbedrag"]
 	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
@@ -555,7 +555,7 @@ func isHetPensioenEuro(ctx context.Context, expected float64) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["pension_amount"]
+	v, ok := result.Output["pensioenbedrag"]
 	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
@@ -570,7 +570,7 @@ func isHetStartkapitaalEuro(ctx context.Context, expected float64) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["startup_assistance"]
+	v, ok := result.Output["startkapitaal"]
 	require.True(godog.T(ctx), ok)
 
 	actual, ok := v.(int)
@@ -757,14 +757,14 @@ func heeftDePersoonRechtOpKinderopvangtoeslag(ctx context.Context) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["is_eligible"]
+	v, ok := result.Output["is_gerechtigd"]
 	if !ok {
-		return fmt.Errorf("could not find: 'is_eligible'")
+		return fmt.Errorf("could not find: 'is_gerechtigd'")
 	}
 
 	actual, ok := v.(bool)
 	if !ok {
-		return fmt.Errorf("could not convert 'is_eligible' to bool")
+		return fmt.Errorf("could not convert 'is_gerechtigd' to bool")
 	}
 
 	assert.True(godog.T(ctx), actual, "Expected person to be eligible for childcare allowance, but they were not")
@@ -776,14 +776,14 @@ func heeftDePersoonGeenRechtOpKinderopvangtoeslag(ctx context.Context) error {
 	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
 	require.True(godog.T(ctx), ok)
 
-	v, ok := result.Output["is_eligible"]
+	v, ok := result.Output["is_gerechtigd"]
 	if !ok {
 		return nil
 	}
 
 	actual, ok := v.(bool)
 	if !ok {
-		return fmt.Errorf("could not convert 'is_eligible' to bool")
+		return fmt.Errorf("could not convert 'is_gerechtigd' to bool")
 	}
 
 	assert.False(godog.T(ctx), actual, "Expected person to NOT be eligible for childcare allowance, but they were")
