@@ -1,8 +1,8 @@
 <div>
-    {% if result.benefit_amount %}
+    {% if result.uitkeringsbedrag %}
         <h4 class="text-sm font-medium text-gray-600 mb-2">Uw bijstandsuitkering is waarschijnlijk</h4>
         <div class="flex items-baseline">
-            <span class="text-4xl font-bold text-purple-600">{{ (result.benefit_amount / 100) | format_currency }}</span>
+            <span class="text-4xl font-bold text-purple-600">{{ (result.uitkeringsbedrag / 100) | format_currency }}</span>
             <span class="ml-2 text-gray-600">per maand</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
@@ -16,25 +16,23 @@
             <div class="grid grid-cols-2 gap-1 text-sm">
                 <div class="text-gray-600">Basisbedrag (met kostendelersnorm):</div>
                 <div class="text-right font-medium">
-                    {{ ((result.benefit_amount - result.housing_assistance) / 100) | format_currency }}
+                    {{ ((result.uitkeringsbedrag - result.woonkostentoeslag) / 100) | format_currency }}
                 </div>
-                {% if result.housing_assistance > 0 %}
+                {% if result.woonkostentoeslag > 0 %}
                     <div class="text-gray-600">Woonkostentoeslag (briefadres):</div>
-                    <div class="text-right font-medium text-purple-600">{{ (result.housing_assistance / 100) | format_currency }}</div>
+                    <div class="text-right font-medium text-purple-600">{{ (result.woonkostentoeslag / 100) | format_currency }}</div>
                 {% endif %}
-                {% if result.startup_assistance > 0 %}
+                {% if result.startkapitaal > 0 %}
                     <div class="text-gray-600">ZZP vrijlating:</div>
                     <div class="text-right font-medium text-purple-600">inkomsten vrijlating 20%</div>
                 {% endif %}
                 <div class="text-gray-800 font-medium mt-2 pt-2 border-t border-gray-200">Totaal uitkering per maand:</div>
                 <div class="text-right font-medium mt-2 pt-2 border-t border-gray-200">
-                    {{ (result.benefit_amount / 100) | format_currency }}
+                    {{ (result.uitkeringsbedrag / 100) | format_currency }}
                 </div>
-                {% if result.startup_assistance > 0 %}
+                {% if result.startkapitaal > 0 %}
                     <div class="text-gray-800 font-medium mt-2">Eenmalig bedrijfskapitaal:</div>
-                    <div class="text-right font-medium mt-2 text-purple-600">
-                        {{ (result.startup_assistance / 100) | format_currency }}
-                    </div>
+                    <div class="text-right font-medium mt-2 text-purple-600">{{ (result.startkapitaal / 100) | format_currency }}</div>
                 {% endif %}
             </div>
         </div>

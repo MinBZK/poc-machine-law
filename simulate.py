@@ -1093,29 +1093,29 @@ class LawSimulator:
                 "zorgtoeslag_amount": zorgtoeslag.output.get("hoogte_toeslag", 0) / 100,
                 # AOW
                 "aow_eligible": aow.requirements_met,
-                "aow_amount": aow.output.get("pension_amount", 0) / 100,
-                "aow_accrual": aow.output.get("accrual_percentage", 0),
+                "aow_amount": aow.output.get("pensioenbedrag", 0) / 100,
+                "aow_accrual": aow.output.get("opbouwpercentage", 0),
                 # # Huurtoeslag
                 # "huurtoeslag_eligible": huurtoeslag.requirements_met,
                 # "huurtoeslag_amount": huurtoeslag.output.get("subsidy_amount", 0) / 100,
                 # "huurtoeslag_base_rent": huurtoeslag.output.get("base_rent", 0) / 100,
                 # Bijstand
-                "bijstand_eligible": bijstand.requirements_met,
-                "bijstand_amount": bijstand.output.get("benefit_amount", 0) / 100,
-                "bijstand_housing": bijstand.output.get("housing_assistance", 0) / 100,
-                "bijstand_startup": bijstand.output.get("startup_assistance", 0) / 100,
+                "bijstand_eligible": bijstand.requirements_met if bijstand else False,
+                "bijstand_amount": bijstand.output.get("uitkeringsbedrag", 0) / 100 if bijstand else 0,
+                "bijstand_housing": bijstand.output.get("woonkostentoeslag", 0) / 100 if bijstand else 0,
+                "bijstand_startup": bijstand.output.get("startkapitaal", 0) / 100 if bijstand else 0,
                 # # Kinderopvangtoeslag
                 # "kinderopvangtoeslag_eligible": kinderopvangtoeslag.requirements_met if kinderopvangtoeslag else False,
                 # "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("yearly_amount",
                 #                                                              0) / 100 / 12 if kinderopvangtoeslag else 0,
                 # Kiesrecht
-                "voting_rights": kiesrecht.output.get("has_voting_rights", False),
+                "voting_rights": kiesrecht.output.get("heeft_stemrecht", False),
                 # Belasting
-                "tax_due": inkomstenbelasting.output.get("total_tax_due", 0) / 100,
-                "tax_credits": inkomstenbelasting.output.get("total_tax_credits", 0) / 100,
-                "tax_box1": inkomstenbelasting.output.get("box1_tax", 0) / 100,
-                "tax_box2": inkomstenbelasting.output.get("box2_tax", 0) / 100,
-                "tax_box3": inkomstenbelasting.output.get("box3_tax", 0) / 100,
+                "tax_due": inkomstenbelasting.output.get("totale_belastingschuld", 0) / 100,
+                "tax_credits": inkomstenbelasting.output.get("totale_heffingskortingen", 0) / 100,
+                "tax_box1": inkomstenbelasting.output.get("box1_belasting", 0) / 100,
+                "tax_box2": inkomstenbelasting.output.get("box2_belasting", 0) / 100,
+                "tax_box3": inkomstenbelasting.output.get("box3_belasting", 0) / 100,
             }
         )
 

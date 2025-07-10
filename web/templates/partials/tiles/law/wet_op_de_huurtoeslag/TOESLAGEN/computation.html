@@ -1,8 +1,8 @@
 <div>
-    {% if result.is_eligible %}
+    {% if result.is_gerechtigd %}
         <h4 class="text-sm font-medium text-gray-600 mb-2">Uw huurtoeslag is waarschijnlijk</h4>
         <div class="flex items-baseline">
-            <span class="text-4xl font-bold text-indigo-600">{{ (result.subsidy_amount / 100) | format_currency }}</span>
+            <span class="text-4xl font-bold text-indigo-600">{{ (result.subsidiebedrag / 100) | format_currency }}</span>
             <span class="ml-2 text-gray-600">per maand</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
                     hx-target="#shared-application-panel"

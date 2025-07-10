@@ -1,8 +1,8 @@
 <div>
-    {% if result.total_tax_due %}
+    {% if result.totale_belastingschuld %}
         <h4 class="text-sm font-medium text-gray-600 mb-2">Uw verschuldigde inkomstenbelasting is waarschijnlijk</h4>
         <div class="flex items-baseline">
-            <span class="text-4xl font-bold text-blue-600">{{ (result.total_tax_due / 100) | format_currency }}</span>
+            <span class="text-4xl font-bold text-blue-600">{{ (result.totale_belastingschuld / 100) | format_currency }}</span>
             <span class="ml-2 text-gray-600">dit jaar</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
@@ -15,18 +15,18 @@
             <h5 class="text-sm font-medium text-gray-700 mb-2">Specificatie belasting</h5>
             <div class="grid grid-cols-2 gap-1 text-sm">
                 <div class="text-gray-600">Box 1 (werk en woning):</div>
-                <div class="text-right font-medium">{{ (result.box1_tax / 100) | format_currency }}</div>
+                <div class="text-right font-medium">{{ (result.box1_belasting / 100) | format_currency }}</div>
                 <div class="text-gray-600">Box 2 (aanmerkelijk belang):</div>
-                <div class="text-right font-medium">{{ (result.box2_tax / 100) | format_currency }}</div>
+                <div class="text-right font-medium">{{ (result.box2_belasting / 100) | format_currency }}</div>
                 <div class="text-gray-600">Box 3 (sparen en beleggen):</div>
-                <div class="text-right font-medium">{{ (result.box3_tax / 100) | format_currency }}</div>
+                <div class="text-right font-medium">{{ (result.box3_belasting / 100) | format_currency }}</div>
                 <div class="text-gray-600 mt-1">Totaal heffingskortingen:</div>
                 <div class="text-right font-medium mt-1 text-green-600">
-                    - {{ (result.total_tax_credits / 100) | format_currency }}
+                    - {{ (result.totale_heffingskortingen / 100) | format_currency }}
                 </div>
                 <div class="text-gray-800 font-medium mt-2 pt-2 border-t border-gray-200">Totaal verschuldigd:</div>
                 <div class="text-right font-medium mt-2 pt-2 border-t border-gray-200">
-                    {{ (result.total_tax_due / 100) | format_currency }}
+                    {{ (result.totale_belastingschuld / 100) | format_currency }}
                 </div>
             </div>
         </div>

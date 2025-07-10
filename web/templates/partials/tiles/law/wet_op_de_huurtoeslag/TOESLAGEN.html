@@ -1,6 +1,6 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
-    {% if result.is_eligible %}
+    {% if result.is_gerechtigd %}
         {% include "partials/tiles/law/wet_op_de_huurtoeslag/TOESLAGEN/computation.html" %}
     {% else %}
         <div class="text-sm leading-6 text-gray-700 mt-4">
@@ -21,12 +21,12 @@
             </p>
         </div>
     {% endif %}
-    {% if result.is_eligible and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
-        {% if result.subsidy_amount != current_case.claimed_result.subsidy_amount %}
+    {% if result.is_gerechtigd and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+        {% if result.subsidiebedrag != current_case.claimed_result.subsidiebedrag %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
                 <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
                 <p class="text-sm text-gray-600 mb-4">
-                    U vroeg eerder {{ (current_case.claimed_result.subsidy_amount / 100) | format_currency }} huurtoeslag aan.
+                    U vroeg eerder {{ (current_case.claimed_result.subsidiebedrag / 100) | format_currency }} huurtoeslag aan.
                 </p>
                 <button type="button"
                         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"

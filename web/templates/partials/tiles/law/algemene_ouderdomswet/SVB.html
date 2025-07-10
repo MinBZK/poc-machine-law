@@ -1,12 +1,12 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
     {% include "partials/tiles/law/algemene_ouderdomswet/SVB/computation.html" %}
-    {% if result.hoogte_toeslag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
-        {% if result.pension_amount != current_case.claimed_result.pension_amount %}
+    {% if result.pensioenbedrag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+        {% if result.pensioenbedrag != current_case.claimed_result.pensioenbedrag %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
                 <p class="text-sm text-gray-600 mb-4">
-                    U vroeg eerder {{ (current_case.claimed_result.pension_amount / 100) | format_currency }} AOW aan.
+                    U vroeg eerder {{ (current_case.claimed_result.pensioenbedrag / 100) | format_currency }} AOW aan.
                 </p>
                 <button type="button"
                         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"

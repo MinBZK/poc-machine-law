@@ -1,12 +1,12 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
     {% include "partials/tiles/law/wet_inkomstenbelasting/BELASTINGDIENST/computation.html" %}
-    {% if result.total_tax_due and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
-        {% if result.total_tax_due != current_case.claimed_result.total_tax_due %}
+    {% if result.totale_belastingschuld and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+        {% if result.totale_belastingschuld != current_case.claimed_result.totale_belastingschuld %}
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aangifte</h4>
                 <p class="text-sm text-gray-600 mb-4">
-                    Uw eerdere aangegeven bedrag was {{ (current_case.claimed_result.total_tax_due / 100) | format_currency }}.
+                    Uw eerdere aangegeven bedrag was {{ (current_case.claimed_result.totale_belastingschuld / 100) | format_currency }}.
                 </p>
                 <button type="button"
                         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"

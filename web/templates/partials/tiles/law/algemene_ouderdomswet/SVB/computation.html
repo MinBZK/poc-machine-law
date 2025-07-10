@@ -1,8 +1,8 @@
 <div>
-    {% if result.pension_amount %}
+    {% if result.pensioenbedrag %}
         <h4 class="text-sm font-medium text-gray-500 mb-1">Uw AOW pensioen is waarschijnlijk</h4>
         <div class="flex items-baseline space-x-2">
-            <span class="text-4xl font-bold text-blue-600">{{ (result.pension_amount / 100) | format_currency }}</span>
+            <span class="text-4xl font-bold text-blue-600">{{ (result.pensioenbedrag / 100) | format_currency }}</span>
             <span class="text-gray-500">per maand</span>
             <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
                     hx-target="#shared-application-panel"
