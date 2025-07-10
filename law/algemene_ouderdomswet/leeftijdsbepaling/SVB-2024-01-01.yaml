@@ -23,13 +23,13 @@ references:
 
 properties:
   parameters:
-    - name: "BIRTH_DATE"
+    - name: "GEBOORTEDATUM"
       description: "Geboortedatum van de persoon"
       type: "date"
       required: true
 
   input:
-    - name: "LIFE_EXPECTANCY_65"
+    - name: "LEVENSVERWACHTING_65"
       description: "Resterende levensverwachting op 65-jarige leeftijd"
       type: "number"
       type_spec:
@@ -38,13 +38,13 @@ properties:
       service_reference:
         service: "CBS"
         law: "wet_op_het_centraal_bureau_voor_de_statistiek"
-        field: "life_expectancy_65"
+        field: "levensverwachting_65"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
 
   output:
-    - name: "retirement_age"
+    - name: "pensioenleeftijd"
       description: "AOW-leeftijd voor deze persoon"
       type: "number"
       type_spec:
@@ -56,178 +56,178 @@ properties:
         reference: "$calculation_date"
 
   definitions:
-    BASE_RETIREMENT_AGE: 65
+    BASIS_PENSIOENLEEFTIJD: 65
     # Verhogingen per jaar in maanden
-    INCREASE_2013: 1    # 65 jaar + 1 maand
-    INCREASE_2014: 2    # 65 jaar + 2 maanden
-    INCREASE_2015: 3    # 65 jaar + 3 maanden
-    INCREASE_2016: 6    # 65 jaar + 6 maanden
-    INCREASE_2017: 9    # 65 jaar + 9 maanden
-    INCREASE_2018: 12   # 66 jaar
-    INCREASE_2019: 16   # 66 jaar + 4 maanden
-    INCREASE_2020: 16   # 66 jaar + 4 maanden (temporisering)
-    INCREASE_2021: 18   # 66 jaar + 6 maanden
-    INCREASE_2022: 21   # 66 jaar + 9 maanden
-    INCREASE_2023: 24   # 67 jaar
-    INCREASE_2024: 24   # 67 jaar
-    INCREASE_2025: 24   # 67 jaar
+    VERHOGING_2013: 1    # 65 jaar + 1 maand
+    VERHOGING_2014: 2    # 65 jaar + 2 maanden
+    VERHOGING_2015: 3    # 65 jaar + 3 maanden
+    VERHOGING_2016: 6    # 65 jaar + 6 maanden
+    VERHOGING_2017: 9    # 65 jaar + 9 maanden
+    VERHOGING_2018: 12   # 66 jaar
+    VERHOGING_2019: 16   # 66 jaar + 4 maanden
+    VERHOGING_2020: 16   # 66 jaar + 4 maanden (temporisering)
+    VERHOGING_2021: 18   # 66 jaar + 6 maanden
+    VERHOGING_2022: 21   # 66 jaar + 9 maanden
+    VERHOGING_2023: 24   # 67 jaar
+    VERHOGING_2024: 24   # 67 jaar
+    VERHOGING_2025: 24   # 67 jaar
     # Referentiewaarden voor levensverwachting
-    REFERENCE_AGE: 65
-    REFERENCE_LIFE_EXPECTANCY: 20.00  # Referentiewaarde uit de wet
-    MONTHS_INCREASE_PER_YEAR: 3       # Maximaal 3 maanden verhoging per jaar
+    REFERENTIE_LEEFTIJD: 65
+    REFERENTIE_LEVENSVERWACHTING: 20.00  # Referentiewaarde uit de wet
+    MAANDEN_VERHOGING_PER_JAAR: 3       # Maximaal 3 maanden verhoging per jaar
     # Periode tussen aankondiging en implementatie
-    ANNOUNCEMENT_PERIOD_YEARS: 5
+    AANKONDIGINGSPERIODE_JAREN: 5
 
 requirements:
   - all:
-      - subject: "$BIRTH_DATE"
+      - subject: "$GEBOORTEDATUM"
         operation: NOT_NULL
 
 actions:
-  - output: "retirement_age"
+  - output: "pensioenleeftijd"
     operation: ADD
     values:
-      - "$BASE_RETIREMENT_AGE"
+      - "$BASIS_PENSIOENLEEFTIJD"
       - operation: IF
         conditions:
           # Voor 1948 geboren: 65 jaar
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1948-01-01"
             then: 0
           # 1948: 65 + 1 maand
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1949-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2013"
+                - "$VERHOGING_2013"
                 - 12
           # 1949: 65 + 2 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1950-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2014"
+                - "$VERHOGING_2014"
                 - 12
           # 1950: 65 + 3 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1951-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2015"
+                - "$VERHOGING_2015"
                 - 12
           # 1951: 65 + 6 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1952-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2016"
+                - "$VERHOGING_2016"
                 - 12
           # 1952: 65 + 9 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1953-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2017"
+                - "$VERHOGING_2017"
                 - 12
           # 1953: 66 jaar
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1954-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2018"
+                - "$VERHOGING_2018"
                 - 12
           # 1954: 66 + 4 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1955-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2019"
+                - "$VERHOGING_2019"
                 - 12
           # 1955: 66 + 4 maanden (temporisering)
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1956-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2020"
+                - "$VERHOGING_2020"
                 - 12
           # 1956: 66 + 7 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1957-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2021"
+                - "$VERHOGING_2021"
                 - 12
           # 1957: 66 + 10 maanden
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1958-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2022"
+                - "$VERHOGING_2022"
                 - 12
           # 1958: 67 jaar
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1959-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2023"
+                - "$VERHOGING_2023"
                 - 12
           # 1959: 67 jaar
           - test:
               operation: LESS_THAN
               values:
-                - "$BIRTH_DATE"
+                - "$GEBOORTEDATUM"
                 - "1960-01-01"
             then:
               operation: DIVIDE
               values:
-                - "$INCREASE_2024"
+                - "$VERHOGING_2024"
                 - 12
           # Na 1960: koppeling aan levensverwachting
           - else:
@@ -236,8 +236,8 @@ actions:
                 - test:
                     operation: GREATER_THAN
                     values:
-                      - "$LIFE_EXPECTANCY_65"
-                      - "$REFERENCE_LIFE_EXPECTANCY"
+                      - "$LEVENSVERWACHTING_65"
+                      - "$REFERENTIE_LEVENSVERWACHTING"
                   then:
                     operation: MIN
                     values:
@@ -245,11 +245,11 @@ actions:
                         values:
                           - operation: SUBTRACT
                             values:
-                              - "$LIFE_EXPECTANCY_65"
-                              - "$REFERENCE_LIFE_EXPECTANCY"
+                              - "$LEVENSVERWACHTING_65"
+                              - "$REFERENTIE_LEVENSVERWACHTING"
                           - operation: DIVIDE
                             values:
-                              - "$MONTHS_INCREASE_PER_YEAR"
+                              - "$MAANDEN_VERHOGING_PER_JAAR"
                               - 12
                       - 2  # Maximaal 2 jaar extra verhoging
                   else: 0

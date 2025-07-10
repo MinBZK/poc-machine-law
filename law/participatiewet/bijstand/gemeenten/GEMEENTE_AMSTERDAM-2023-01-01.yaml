@@ -26,7 +26,7 @@ properties:
       required: true
 
   sources:
-    - name: "WORK_CAPABILITY"
+    - name: "ARBEIDSVERMOGEN"
       description: "Arbeidsvermogen en re-integratie gegevens"
       type: "object"
       temporal:
@@ -42,18 +42,18 @@ properties:
             value: "$BSN"
 
   input:
-    - name: "MEETS_NATIONAL_REQUIREMENTS"
+    - name: "VOLDOET_AAN_LANDELIJKE_VOORWAARDEN"
       description: "Voldoet aan landelijke voorwaarden"
       type: "boolean"
       service_reference:
         service: "SZW"
-        field: "is_eligible"
+        field: "is_gerechtigd"
         law: "participatiewet/bijstand"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "NATIONAL_BASE_AMOUNT"
+    - name: "LANDELIJK_BASISBEDRAG"
       description: "Landelijke bijstandsnorm"
       type: "amount"
       type_spec:
@@ -62,7 +62,7 @@ properties:
         min: 0
       service_reference:
         service: "SZW"
-        field: "base_amount"
+        field: "basisbedrag"
         law: "participatiewet/bijstand"
         parameters:
           - name: "BSN"
@@ -79,51 +79,51 @@ properties:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "AGE"
+    - name: "LEEFTIJD"
       description: "Leeftijd van de aanvrager"
       type: "number"
       service_reference:
         service: "RvIG"
-        field: "age"
+        field: "leeftijd"
         law: "wet_brp"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "HAS_FIXED_ADDRESS"
+    - name: "HEEFT_VAST_ADRES"
       description: "Heeft vast woonadres"
       type: "boolean"
       service_reference:
         service: "RvIG"
-        field: "has_fixed_address"
+        field: "heeft_vast_adres"
         law: "wet_brp"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "POSTAL_ADDRESS"
+    - name: "POSTADRES"
       description: "Postadres"
       type: "string"
       service_reference:
         service: "RvIG"
-        field: "postal_address"
+        field: "postadres"
         law: "wet_brp"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "IS_ENTREPRENEUR"
+    - name: "IS_ONDERNEMER"
       description: "Is ondernemer/ZZP-er"
       type: "boolean"
       service_reference:
         service: "KVK"
-        field: "is_active_entrepreneur"
+        field: "is_actieve_ondernemer"
         law: "handelsregisterwet"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "BUSINESS_INCOME"
+    - name: "BEDRIJFSINKOMEN"
       description: "Inkomsten uit onderneming"
       type: "amount"
       type_spec:
@@ -132,14 +132,14 @@ properties:
         min: 0
       service_reference:
         service: "BELASTINGDIENST"
-        field: "business_income"
+        field: "bedrijfsinkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
   output:
-    - name: "is_eligible"
+    - name: "is_gerechtigd"
       description: "Voldoet aan Amsterdamse voorwaarden"
       type: "boolean"
       temporal:
@@ -147,7 +147,7 @@ properties:
         reference: "$calculation_date"
       citizen_relevance: secondary
 
-    - name: "benefit_amount"
+    - name: "uitkeringsbedrag"
       description: "Uitkeringsbedrag inclusief toeslagen"
       type: "amount"
       type_spec:
@@ -159,7 +159,7 @@ properties:
         period_type: "month"
       citizen_relevance: primary
 
-    - name: "housing_assistance"
+    - name: "woonkostentoeslag"
       description: "Woonkostentoeslag bij briefadres"
       type: "amount"
       type_spec:
@@ -171,7 +171,7 @@ properties:
         period_type: "month"
       citizen_relevance: primary
 
-    - name: "startup_assistance"
+    - name: "startkapitaal"
       description: "Bedrag voor bedrijfskapitaal ZZP"
       type: "amount"
       type_spec:
@@ -184,53 +184,53 @@ properties:
       citizen_relevance: primary
 
   definitions:
-    YOUTH_SUPPLEMENT: 25000  # 250 euro voor jongeren
-    YOUTH_MAX_AGE: 27
-    ZZP_INCOME_DISREGARD_PERCENTAGE: 0.20  # 20% vrijlating ondernemersinkomen
-    MONTHS_IN_YEAR: 12  # Aantal maanden in een jaar voor omrekening
-    HOUSING_ASSISTANCE_AMOUNT: 60000  # 600 euro woonkostentoeslag
-    STARTUP_ASSISTANCE_MAX: 200000  # 2000 euro max bedrijfskapitaal
-    RE_INTEGRATION_SUPPLEMENT: 15000  # 150 euro toeslag tijdens re-integratie
-    VALID_POSTAL_ADDRESSES: # TODO: dit hoort eigenlijk een BAG adres te zijn
+    JEUGD_TOESLAG: 25000  # 250 euro voor jongeren
+    JEUGD_MAX_LEEFTIJD: 27
+    ZZP_INKOMEN_VRIJLATING_PERCENTAGE: 0.20  # 20% vrijlating ondernemersinkomen
+    MAANDEN_PER_JAAR: 12  # Aantal maanden in een jaar voor omrekening
+    WOONKOSTENTOESLAG_BEDRAG: 60000  # 600 euro woonkostentoeslag
+    STARTKAPITAAL_MAXIMUM: 200000  # 2000 euro max bedrijfskapitaal
+    RE_INTEGRATIE_TOESLAG: 15000  # 150 euro toeslag tijdens re-integratie
+    GELDIGE_POST_ADRESSEN: # TODO: dit hoort eigenlijk een BAG adres te zijn
       - "De Regenboog Groep 1, 1012NX Amsterdam"
       - "HVO-Querido"
       - "Leger des Heils Amsterdam"
-    FULL_EXEMPTION_REASONS:
+    VOLLEDIGE_ONTHEFFING_REDENEN:
       - "MEDISCH_VOLLEDIG"
       - "MANTELZORG_VOLLEDIG"
       - "SOCIALE_OMSTANDIGHEDEN_VOLLEDIG"
 
 requirements:
   - all:
-      - subject: "$MEETS_NATIONAL_REQUIREMENTS"
+      - subject: "$VOLDOET_AAN_LANDELIJKE_VOORWAARDEN"
         operation: EQUALS
         value: true
       - or:
-          - subject: "$HAS_FIXED_ADDRESS"
+          - subject: "$HEEFT_VAST_ADRES"
             operation: EQUALS
             value: true
           - operation: IN
-            subject: "$POSTAL_ADDRESS"
-            values: "$VALID_POSTAL_ADDRESSES"
+            subject: "$POSTADRES"
+            values: "$GELDIGE_POST_ADRESSEN"
       # Arbeidsverplichting check
       - or:
           - operation: IN
-            subject: "$WORK_CAPABILITY.arbeidsvermogen"
-            values: "$FULL_EXEMPTION_REASONS"
+            subject: "$ARBEIDSVERMOGEN.arbeidsvermogen"
+            values: "$VOLLEDIGE_ONTHEFFING_REDENEN"
           - operation: NOT_NULL
-            subject: "$WORK_CAPABILITY.re_integratie_traject"
+            subject: "$ARBEIDSVERMOGEN.re_integratie_traject"
 
 actions:
-  - output: "is_eligible"
+  - output: "is_gerechtigd"
     value: true
 
-  - output: "benefit_amount"
+  - output: "uitkeringsbedrag"
     operation: ADD
     values:
       # Basis bedrag met kostendelersnorm
       - operation: MULTIPLY
         values:
-          - "$NATIONAL_BASE_AMOUNT"
+          - "$LANDELIJK_BASISBEDRAG"
           - "$KOSTENDELERSNORM"
       # Jongerentoeslag
       - operation: IF
@@ -240,12 +240,12 @@ actions:
               values:
                 - operation: LESS_OR_EQUAL
                   values:
-                    - "$AGE"
-                    - "$YOUTH_MAX_AGE"
+                    - "$LEEFTIJD"
+                    - "$JEUGD_MAX_LEEFTIJD"
                 - operation: EQUALS
-                  subject: "$HAS_FIXED_ADDRESS"
+                  subject: "$HEEFT_VAST_ADRES"
                   value: true
-            then: "$YOUTH_SUPPLEMENT"
+            then: "$JEUGD_TOESLAG"
           - else: 0
       # ZZP vrijlating
       - operation: IF
@@ -253,23 +253,23 @@ actions:
           - test:
               operation: AND
               values:
-                - subject: "$IS_ENTREPRENEUR"
+                - subject: "$IS_ONDERNEMER"
                   operation: EQUALS
                   value: true
                 - operation: GREATER_THAN
                   values:
-                    - "$BUSINESS_INCOME"
+                    - "$BEDRIJFSINKOMEN"
                     - 0
                 - operation: LESS_THAN
                   values:
                     # Maandinkomen berekenen en vergelijken met bijstandsnorm
                     - operation: DIVIDE
                       values:
-                        - "$BUSINESS_INCOME"
-                        - "$MONTHS_IN_YEAR"
+                        - "$BEDRIJFSINKOMEN"
+                        - "$MAANDEN_PER_JAAR"
                     - operation: MULTIPLY
                       values:
-                        - "$NATIONAL_BASE_AMOUNT"
+                        - "$LANDELIJK_BASISBEDRAG"
                         - "$KOSTENDELERSNORM"
             then:
               # Alleen 20% van het maandinkomen vrijlaten
@@ -277,52 +277,52 @@ actions:
               values:
                 - operation: DIVIDE
                   values:
-                    - "$BUSINESS_INCOME"
-                    - "$MONTHS_IN_YEAR"
-                - "$ZZP_INCOME_DISREGARD_PERCENTAGE"
+                    - "$BEDRIJFSINKOMEN"
+                    - "$MAANDEN_PER_JAAR"
+                - "$ZZP_INKOMEN_VRIJLATING_PERCENTAGE"
           - else: 0
       # Re-integratie toeslag
       - operation: IF
         conditions:
           - test:
             operation: NOT_NULL
-            subject: "$WORK_CAPABILITY.re_integratie_traject"
-            then: "$RE_INTEGRATION_SUPPLEMENT"
+            subject: "$ARBEIDSVERMOGEN.re_integratie_traject"
+            then: "$RE_INTEGRATIE_TOESLAG"
           - else: 0
 
-  - output: "housing_assistance"
+  - output: "woonkostentoeslag"
     operation: IF
     conditions:
       - test:
           operation: AND
           values:
-            - subject: "$HAS_FIXED_ADDRESS"
+            - subject: "$HEEFT_VAST_ADRES"
               operation: EQUALS
               value: false
             - operation: IN
-              subject: "$POSTAL_ADDRESS"
-              values: "$VALID_POSTAL_ADDRESSES"
-        then: "$HOUSING_ASSISTANCE_AMOUNT"
+              subject: "$POSTADRES"
+              values: "$GELDIGE_POST_ADRESSEN"
+        then: "$WOONKOSTENTOESLAG_BEDRAG"
       - else: 0
 
-  - output: "startup_assistance"
+  - output: "startkapitaal"
     operation: IF
     conditions:
       - test:
           operation: AND
           values:
-            - subject: "$IS_ENTREPRENEUR"
+            - subject: "$IS_ONDERNEMER"
               operation: EQUALS
               value: true
             - operation: LESS_THAN
               values:
                 - operation: DIVIDE
                   values:
-                    - "$BUSINESS_INCOME"
-                    - "$MONTHS_IN_YEAR"
+                    - "$BEDRIJFSINKOMEN"
+                    - "$MAANDEN_PER_JAAR"
                 - operation: MULTIPLY
                   values:
-                    - "$NATIONAL_BASE_AMOUNT"
+                    - "$LANDELIJK_BASISBEDRAG"
                     - "$KOSTENDELERSNORM"
-        then: "$STARTUP_ASSISTANCE_MAX"
+        then: "$STARTKAPITAAL_MAXIMUM"
       - else: 0

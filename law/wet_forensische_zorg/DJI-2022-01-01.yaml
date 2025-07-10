@@ -25,7 +25,7 @@ properties:
       required: true
 
   sources:
-    - name: "CARE_TYPE"
+    - name: "ZORGTYPE"
       description: "Type zorg die wordt verleend"
       type: "string"
       temporal:
@@ -40,7 +40,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "LEGAL_BASIS"
+    - name: "JURIDISCHE_GRONDSLAG"
       description: "Juridische titel voor zorgverlening"
       type: "string"
       temporal:
@@ -56,7 +56,7 @@ properties:
             value: "$BSN"
 
   output:
-    - name: "is_forensic"
+    - name: "is_forensisch"
       description: "Ontvangt de persoon forensische zorg"
       type: "boolean"
       temporal:
@@ -64,11 +64,11 @@ properties:
         reference: "$calculation_date"
 
   definitions:
-    FORENSIC_CARE_TYPES:
+    FORENSISCHE_ZORGTYPEN:
       - "GGZ"
       - "VERSLAVINGSZORG"
       - "VG_ZORG"
-    VALID_LEGAL_TITLES:
+    GELDIGE_JURIDISCHE_TITELS:
       - "VOORWAARDELIJKE_VEROORDELING"
       - "TBS"
       - "PIJ_MAATREGEL"
@@ -79,12 +79,12 @@ properties:
       - "VOORLOPIGE_HECHTENIS"
 
 actions:
-  - output: "is_forensic"
+  - output: "is_forensisch"
     operation: AND
     values:
       - operation: IN
-        subject: "$CARE_TYPE"
-        values: "$FORENSIC_CARE_TYPES"
+        subject: "$ZORGTYPE"
+        values: "$FORENSISCHE_ZORGTYPEN"
       - operation: IN
-        subject: "$LEGAL_BASIS"
-        values: "$VALID_LEGAL_TITLES"
+        subject: "$JURIDISCHE_GRONDSLAG"
+        values: "$GELDIGE_JURIDISCHE_TITELS"

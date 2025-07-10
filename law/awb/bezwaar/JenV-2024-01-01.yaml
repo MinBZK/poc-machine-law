@@ -24,7 +24,7 @@ references:
 
 properties:
   applies:
-    - name: "CASE"
+    - name: "ZAAK"
       aggregate: "Case"
       events:
         - type: "Decided"
@@ -40,7 +40,7 @@ properties:
             extension_period: "$verdagingstermijn"
 
   sources:
-    - name: "LAW"
+    - name: "WET"
       description: "De wet waar dit besluit op gebaseerd is"
       type: "object"
       temporal:
@@ -62,9 +62,9 @@ properties:
           - name: "uuid"
             description: "UUID van de wet"
             type: "string"
-            value: "$CASE.rulespec_uuid"
+            value: "$ZAAK.rulespec_uuid"
 
-    - name: "EVENTS"
+    - name: "GEBEURTENISSEN"
       description: "De gebeurtenissen rondom deze zaak"
       type: "object"
       temporal:
@@ -81,7 +81,7 @@ properties:
           - name: "case_id"
             description: "Zaak identifier"
             type: "string"
-            value: "$CASE.id"
+            value: "$ZAAK.id"
 
   output:
     - name: "bezwaar_mogelijk"
@@ -137,15 +137,15 @@ actions:
     operation: AND
     values:
       - operation: NOT_IN
-        subject: "$LAW.decision_type"
+        subject: "$WET.decision_type"
         values: "$EXCLUDED_DECISION_TYPES"
       - operation: IN
-        subject: "$LAW.legal_character"
+        subject: "$WET.legal_character"
         values: "$REQUIRED_LEGAL_CHARACTER"
       - operation: EQUALS
         values:
           - operation: FOREACH
-            subject: "$EVENTS"
+            subject: "$GEBEURTENISSEN"
             combine: ADD
             value:
               - operation: EQUALS
@@ -158,19 +158,19 @@ actions:
     conditions:
       - test:
           operation: IN
-          subject: "$LAW.decision_type"
+          subject: "$WET.decision_type"
           values: "$EXCLUDED_DECISION_TYPES"
         then: "tegen dit type besluit is geen bezwaar mogelijk"
       - test:
           operation: NOT_IN
-          subject: "$LAW.legal_character"
+          subject: "$WET.legal_character"
           values: "$REQUIRED_LEGAL_CHARACTER"
         then: "dit is geen besluit in de zin van de AWB"
       - test:
           operation: NOT_EQUALS
           values:
             - operation: FOREACH
-              subject: "$EVENTS"
+              subject: "$GEBEURTENISSEN"
               combine: ADD
               value:
                 - operation: EQUALS
@@ -184,25 +184,25 @@ actions:
     operation: IF
     conditions:
       - test:
-          subject: "$LAW.bezwaartermijn_weken"
+          subject: "$WET.bezwaartermijn_weken"
           operation: NOT_NULL
-        then: "$LAW.bezwaartermijn_weken"
+        then: "$WET.bezwaartermijn_weken"
       - else: "$DEFAULT_TERMIJN_BEZWAAR_WEKEN"
 
   - output: "beslistermijn"
     operation: IF
     conditions:
       - test:
-          subject: "$LAW.beslistermijn_weken"
+          subject: "$WET.beslistermijn_weken"
           operation: NOT_NULL
-        then: "$LAW.beslistermijn_weken"
+        then: "$WET.beslistermijn_weken"
       - else: "$DEFAULT_TERMIJN_BESLISSING_WEKEN"
 
   - output: "verdagingstermijn"
     operation: IF
     conditions:
       - test:
-          subject: "$LAW.verdagingstermijn_weken"
+          subject: "$WET.verdagingstermijn_weken"
           operation: NOT_NULL
-        then: "$LAW.verdagingstermijn_weken"
+        then: "$WET.verdagingstermijn_weken"
       - else: "$DEFAULT_TERMIJN_VERDAGING_WEKEN"

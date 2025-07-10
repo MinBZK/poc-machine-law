@@ -28,11 +28,11 @@ Feature: Berekening Inkomstenbelasting
       | 999993653 | 350000                  |
     When de wet_inkomstenbelasting wordt uitgevoerd door BELASTINGDIENST
     Then is voldaan aan de voorwaarden
-    And is het box1_income "6380000" eurocent
-    And is het box2_income "500000" eurocent
-    And is het box3_income "1213626" eurocent
-    And is het taxable_income "7743626" eurocent
-    And is het total_tax_due "2309416" eurocent
+    And is het box1_inkomen "6380000" eurocent
+    And is het box2_inkomen "500000" eurocent
+    And is het box3_inkomen "1213626" eurocent
+    And is het belastbaar_inkomen "7743626" eurocent
+    And is het totale_belastingschuld "2309416" eurocent
 
   Scenario: Berekening inkomstenbelasting voor gepensioneerde met AOW
     Given de volgende RvIG personen gegevens:
@@ -52,10 +52,10 @@ Feature: Berekening Inkomstenbelasting
       | 999993653 | 8000000   | 2000000     | 0              | 0        |
     When de wet_inkomstenbelasting wordt uitgevoerd door BELASTINGDIENST
     Then is voldaan aan de voorwaarden
-    And is het box1_income "2250000" eurocent
-    And is het box2_income "0" eurocent
-    And is het box3_income "253626" eurocent
-    And is het total_tax_due "40075" eurocent
+    And is het box1_inkomen "2250000" eurocent
+    And is het box2_inkomen "0" eurocent
+    And is het box3_inkomen "253626" eurocent
+    And is het totale_belastingschuld "40075" eurocent
 
   Scenario: Berekening inkomstenbelasting voor werkende ouder met heffingskortingen
     Given de volgende RvIG personen gegevens:
@@ -78,8 +78,8 @@ Feature: Berekening Inkomstenbelasting
       | 999993653 | 2000000   | 0           | 0              | 0        |
     When de wet_inkomstenbelasting wordt uitgevoerd door BELASTINGDIENST
     Then is voldaan aan de voorwaarden
-    And is het box1_income "2910000" eurocent
-    And is het box2_income "0" eurocent
-    And is het box3_income "0" eurocent
-    And is het total_tax_credits "727646" eurocent
-    And is het total_tax_due "347017" eurocent
+    And is het box1_inkomen "2910000" eurocent
+    And is het box2_inkomen "0" eurocent
+    And is het box3_inkomen "0" eurocent
+    And is het totale_heffingskortingen "727646" eurocent
+    And is het totale_belastingschuld "347017" eurocent

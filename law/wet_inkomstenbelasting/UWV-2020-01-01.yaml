@@ -25,7 +25,7 @@ properties:
       required: true
 
   input:
-    - name: "BOX1_INCOME"
+    - name: "BOX1_INKOMEN"
       description: "Inkomen uit werk en woning"
       type: "amount"
       type_spec:
@@ -36,10 +36,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "box1_income"
+        field: "box1_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "BOX2_INCOME"
+    - name: "BOX2_INKOMEN"
       description: "Inkomen uit aanmerkelijk belang"
       type: "amount"
       type_spec:
@@ -50,10 +50,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "box2_income"
+        field: "box2_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "BOX3_INCOME"
+    - name: "BOX3_INKOMEN"
       description: "Inkomen uit sparen en beleggen"
       type: "amount"
       type_spec:
@@ -64,10 +64,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "box3_income"
+        field: "box3_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "FOREIGN_INCOME"
+    - name: "BUITENLANDS_INKOMEN"
       description: "Niet in Nederland belastbaar inkomen"
       type: "amount"
       type_spec:
@@ -78,10 +78,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "foreign_income"
+        field: "buitenlands_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "PARTNER_BOX1_INCOME"
+    - name: "PARTNER_BOX1_INKOMEN"
       description: "Partner inkomen uit werk en woning"
       type: "amount"
       type_spec:
@@ -92,10 +92,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "partner_box1_income"
+        field: "partner_box1_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "PARTNER_BOX2_INCOME"
+    - name: "PARTNER_BOX2_INKOMEN"
       description: "Partner inkomen uit aanmerkelijk belang"
       type: "amount"
       type_spec:
@@ -106,10 +106,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "partner_box2_income"
+        field: "partner_box2_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "PARTNER_BOX3_INCOME"
+    - name: "PARTNER_BOX3_INKOMEN"
       description: "Partner inkomen uit sparen en beleggen"
       type: "amount"
       type_spec:
@@ -120,10 +120,10 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "partner_box3_income"
+        field: "partner_box3_inkomen"
         law: "wet_inkomstenbelasting"
 
-    - name: "PARTNER_FOREIGN_INCOME"
+    - name: "PARTNER_BUITENLANDS_INKOMEN"
       description: "Partner niet in Nederland belastbaar inkomen"
       type: "amount"
       type_spec:
@@ -134,11 +134,11 @@ properties:
         period_type: "year"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "partner_foreign_income"
+        field: "partner_buitenlands_inkomen"
         law: "wet_inkomstenbelasting"
 
   output:
-    - name: "income"
+    - name: "inkomen"
       description: "Toetsingsinkomen"
       type: "amount"
       type_spec:
@@ -149,7 +149,7 @@ properties:
         type: "period"
         period_type: "year"
 
-    - name: "partner_income"
+    - name: "partner_inkomen"
       description: "Toetsingsinkomen van de partner"
       type: "amount"
       type_spec:
@@ -161,18 +161,18 @@ properties:
         period_type: "year"
 
 actions:
-  - output: "income"
+  - output: "inkomen"
     operation: ADD
     values:
-      - "$BOX1_INCOME"
-      - "$BOX2_INCOME"
-      - "$BOX3_INCOME"
-      - "$FOREIGN_INCOME"
+      - "$BOX1_INKOMEN"
+      - "$BOX2_INKOMEN"
+      - "$BOX3_INKOMEN"
+      - "$BUITENLANDS_INKOMEN"
 
-  - output: "partner_income"
+  - output: "partner_inkomen"
     operation: ADD
     values:
-      - "$PARTNER_BOX1_INCOME"
-      - "$PARTNER_BOX2_INCOME"
-      - "$PARTNER_BOX3_INCOME"
-      - "$PARTNER_FOREIGN_INCOME"
+      - "$PARTNER_BOX1_INKOMEN"
+      - "$PARTNER_BOX2_INKOMEN"
+      - "$PARTNER_BOX3_INKOMEN"
+      - "$PARTNER_BUITENLANDS_INKOMEN"

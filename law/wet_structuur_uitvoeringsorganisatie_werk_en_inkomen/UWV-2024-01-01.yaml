@@ -22,7 +22,7 @@ properties:
       required: true
 
   sources:
-    - name: "EMPLOYMENT_PERIODS"
+    - name: "DIENSTVERBANDPERIODES"
       description: "Periodes van werk in Nederland en verzekerde buitenlandse arbeid"
       type: "array"
       temporal:
@@ -37,7 +37,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "BENEFIT_PERIODS"
+    - name: "UITKERINGSPERIODES"
       description: "Periodes van uitkeringen die meetellen voor de AOW"
       type: "array"
       temporal:
@@ -56,10 +56,10 @@ properties:
             type: "string"
             value:
               operation: IN
-              values: "$VALID_BENEFIT_TYPES"
+              values: "$GELDIGE_UITKERING_TYPEN"
 
   output:
-    - name: "insured_years"
+    - name: "verzekerde_jaren"
       description: "Aantal verzekerde jaren voor AOW-opbouw op basis van werk en uitkeringen"
       type: "number"
       type_spec:
@@ -70,7 +70,7 @@ properties:
         type: "period"
         period_type: "continuous"
 
-    - name: "worked_hours"
+    - name: "gewerkte_uren"
       description: "Totaal gewerkte uren per jaar"
       type: "number"
       type_spec:
@@ -80,17 +80,17 @@ properties:
         period_type: "year"
 
   definitions:
-    VALID_BENEFIT_TYPES:
+    GELDIGE_UITKERING_TYPEN:
       - "WW"
       - "WIA"
       - "WAO"
       - "ZW"
       - "WAZO"
-    DAYS_PER_YEAR: 365.25
-    HOURS_PER_DAY: 8
+    DAGEN_PER_JAAR: 365.25
+    UREN_PER_DAG: 8
 
 actions:
-  - output: "insured_years"
+  - output: "verzekerde_jaren"
     operation: DIVIDE
     values:
       - operation: ADD
@@ -98,7 +98,7 @@ actions:
           # Add up employment periodss
           - operation: FOREACH
             combine: ADD
-            subject: "$EMPLOYMENT_PERIODS"
+            subject: "$DIENSTVERBANDPERIODES"
             value:
               - operation: SUBTRACT_DATE
                 unit: "days"
@@ -108,25 +108,25 @@ actions:
           # Add up benefit periods
           - operation: FOREACH
             combine: ADD
-            subject: "$BENEFIT_PERIODS"
+            subject: "$UITKERINGSPERIODES"
             value:
               - operation: SUBTRACT_DATE
                 unit: "days"
                 values:
                   - "$end_date"
                   - "$start_date"
-      - "$DAYS_PER_YEAR"
+      - "$DAGEN_PER_JAAR"
 
-  - output: "worked_hours"
+  - output: "gewerkte_uren"
     operation: MULTIPLY
     values:
       - operation: FOREACH
         combine: ADD
-        subject: "$EMPLOYMENT_PERIODS"
+        subject: "$DIENSTVERBANDPERIODES"
         value:
           - operation: SUBTRACT_DATE
             unit: "days"
             values:
               - "$end_date"
               - "$start_date"
-      - "$HOURS_PER_DAY"
+      - "$UREN_PER_DAG"

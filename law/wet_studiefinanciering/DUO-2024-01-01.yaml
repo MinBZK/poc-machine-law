@@ -28,7 +28,7 @@ properties:
       required: true
 
   sources:
-    - name: "EDUCATION_TYPE"
+    - name: "OPLEIDING_TYPE"
       description: "Type onderwijs (MBO/HBO/WO)"
       type: "string"
       temporal:
@@ -43,7 +43,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "SIBLINGS_STUDYING"
+    - name: "STUDEREND_GEZIN"
       description: "Aantal studerende broers/zussen"
       type: "number"
       temporal:
@@ -57,7 +57,7 @@ properties:
             description: "Burgerservicenummer van de persoon"
             type: "string"
             value: "$BSN"
-    - name: "PARTNER_EDUCATION_TYPE"
+    - name: "PARTNER_OPLEIDING_TYPE"
       description: "Type onderwijs (MBO/HBO/WO) van partner"
       type: "string"
       temporal:
@@ -72,7 +72,7 @@ properties:
             type: "string"
             value: "$PARTNER_BSN"
 
-    - name: "PARTNER_SIBLINGS_STUDYING"
+    - name: "PARTNER_STUDEREND_GEZIN"
       description: "Aantal studerende broers/zussen van partner"
       type: "number"
       temporal:
@@ -87,12 +87,12 @@ properties:
             type: "string"
             value: "$PARTNER_BSN"
   input:
-    - name: "LIVING_SITUATION"
+    - name: "WOONSITUATIE"
       description: "Woonsituatie (uit/thuis) op basis van RvIG adres"
       type: "string"
       service_reference:
         service: "RvIG"
-        field: "living_situation"
+        field: "woonsituatie"
         law: "wet_brp"
         parameters:
           - name: "BSN"
@@ -101,7 +101,7 @@ properties:
         type: "period"
         period_type: "month"
 
-    - name: "PARENT1_INCOME"
+    - name: "OUDER1_INKOMEN"
       description: "Inkomen eerste ouder"
       type: "amount"
       type_spec:
@@ -110,7 +110,7 @@ properties:
         min: 0
       service_reference:
         service: "BELASTINGDIENST"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
@@ -119,7 +119,7 @@ properties:
         type: "period"
         period_type: "year"
 
-    - name: "PARENT2_INCOME"
+    - name: "OUDER2_INKOMEN"
       description: "Inkomen tweede ouder"
       type: "amount"
       type_spec:
@@ -128,7 +128,7 @@ properties:
         min: 0
       service_reference:
         service: "BELASTINGDIENST"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
@@ -148,12 +148,12 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "PARTNER_LIVING_SITUATION"
+    - name: "PARTNER_WOONSITUATIE"
       description: "Woonsituatie (uit/thuis) op basis van RvIG adres"
       type: "string"
       service_reference:
         service: "RvIG"
-        field: "living_situation"
+        field: "woonsituatie"
         law: "wet_brp"
         parameters:
           - name: "BSN"
@@ -162,7 +162,7 @@ properties:
         type: "period"
         period_type: "month"
 
-    - name: "PARTNER_PARENT1_INCOME"
+    - name: "PARTNER_OUDER1_INKOMEN"
       description: "Inkomen eerste ouder"
       type: "amount"
       type_spec:
@@ -171,7 +171,7 @@ properties:
         min: 0
       service_reference:
         service: "BELASTINGDIENST"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
@@ -180,7 +180,7 @@ properties:
         type: "period"
         period_type: "year"
 
-    - name: "PARTNER_PARENT2_INCOME"
+    - name: "PARTNER_OUDER2_INKOMEN"
       description: "Inkomen tweede ouder"
       type: "amount"
       type_spec:
@@ -189,7 +189,7 @@ properties:
         min: 0
       service_reference:
         service: "BELASTINGDIENST"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
@@ -199,7 +199,7 @@ properties:
         period_type: "year"
 
   output:
-    - name: "study_grant"
+    - name: "studiefinanciering"
       description: "Totale studiefinanciering"
       type: "amount"
       type_spec:
@@ -210,7 +210,7 @@ properties:
         type: "period"
         period_type: "year"
 
-    - name: "partner_study_grant"
+    - name: "partner_studiefinanciering"
       description: "Totale studiefinanciering partner"
       type: "amount"
       type_spec:
@@ -228,7 +228,7 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "receives_study_grant"
+    - name: "ontvangt_studiefinanciering"
       description: "Ontvangt studiefinanciering"
       type: "boolean"
       temporal:
@@ -251,46 +251,46 @@ properties:
     VERHOGING_DREMPEL_PER_KIND: 350000
 
 actions:
-  - output: "study_grant"
+  - output: "studiefinanciering"
     operation: ADD
     values:
       - operation: IF
         conditions:
           - test:
-              subject: "$EDUCATION_TYPE"
+              subject: "$OPLEIDING_TYPE"
               operation: EQUALS
               value: "WO"
             then:
               operation: IF
               conditions:
                 - test:
-                    subject: "$LIVING_SITUATION"
+                    subject: "$WOONSITUATIE"
                     operation: EQUALS
                     value: "UIT"
                   then: "$BASISBEURS_WO_UIT"
                 - else: "$BASISBEURS_WO_THUIS"
           - test:
-              subject: "$EDUCATION_TYPE"
+              subject: "$OPLEIDING_TYPE"
               operation: EQUALS
               value: "HBO"
             then:
               operation: IF
               conditions:
                 - test:
-                    subject: "$LIVING_SITUATION"
+                    subject: "$WOONSITUATIE"
                     operation: EQUALS
                     value: "UIT"
                   then: "$BASISBEURS_HBO_UIT"
                 - else: "$BASISBEURS_HBO_THUIS"
           - test:
-              subject: "$EDUCATION_TYPE"
+              subject: "$OPLEIDING_TYPE"
               operation: EQUALS
               value: "MBO"
             then:
               operation: IF
               conditions:
                 - test:
-                    subject: "$LIVING_SITUATION"
+                    subject: "$WOONSITUATIE"
                     operation: EQUALS
                     value: "UIT"
                   then: "$BASISBEURS_MBO_UIT"
@@ -302,8 +302,8 @@ actions:
               values:
                 - operation: ADD
                   values:
-                    - "$PARENT1_INCOME"
-                    - "$PARENT2_INCOME"
+                    - "$OUDER1_INKOMEN"
+                    - "$OUDER2_INKOMEN"
                 - "$INKOMEN_GRENS_GEEN_BEURS"
             then:
               operation: MULTIPLY
@@ -311,17 +311,17 @@ actions:
                 - operation: IF
                   conditions:
                     - test:
-                        subject: "$EDUCATION_TYPE"
+                        subject: "$OPLEIDING_TYPE"
                         operation: EQUALS
                         value: "WO"
                       then: "$MAX_AANVULLENDE_BEURS_WO"
                     - test:
-                        subject: "$EDUCATION_TYPE"
+                        subject: "$OPLEIDING_TYPE"
                         operation: EQUALS
                         value: "HBO"
                       then: "$MAX_AANVULLENDE_BEURS_HBO"
                     - test:
-                        subject: "$EDUCATION_TYPE"
+                        subject: "$OPLEIDING_TYPE"
                         operation: EQUALS
                         value: "MBO"
                       then: "$MAX_AANVULLENDE_BEURS_MBO"
@@ -334,12 +334,12 @@ actions:
                           values:
                             - operation: ADD
                               values:
-                                - "$PARENT1_INCOME"
-                                - "$PARENT2_INCOME"
+                                - "$OUDER1_INKOMEN"
+                                - "$OUDER2_INKOMEN"
                             - "$INKOMENSDREMPEL_BASIS"
                             - operation: MULTIPLY
                               values:
-                                - "$SIBLINGS_STUDYING"
+                                - "$STUDEREND_GEZIN"
                                 - "$VERHOGING_DREMPEL_PER_KIND"
                         - operation: SUBTRACT
                           values:
@@ -348,46 +348,46 @@ actions:
             else: 0
 
 
-  - output: "partner_study_grant"
+  - output: "partner_studiefinanciering"
     operation: ADD
     values:
       - operation: IF
         conditions:
           - test:
-              subject: "$PARTNER_EDUCATION_TYPE"
+              subject: "$PARTNER_OPLEIDING_TYPE"
               operation: EQUALS
               value: "WO"
             then:
               operation: IF
               conditions:
                 - test:
-                    subject: "$PARTNER_LIVING_SITUATION"
+                    subject: "$PARTNER_WOONSITUATIE"
                     operation: EQUALS
                     value: "UIT"
                   then: "$BASISBEURS_WO_UIT"
                 - else: "$BASISBEURS_WO_THUIS"
           - test:
-              subject: "$PARTNER_EDUCATION_TYPE"
+              subject: "$PARTNER_OPLEIDING_TYPE"
               operation: EQUALS
               value: "HBO"
             then:
               operation: IF
               conditions:
                 - test:
-                    subject: "$PARTNER_LIVING_SITUATION"
+                    subject: "$PARTNER_WOONSITUATIE"
                     operation: EQUALS
                     value: "UIT"
                   then: "$BASISBEURS_HBO_UIT"
                 - else: "$BASISBEURS_HBO_THUIS"
           - test:
-              subject: "$PARTNER_EDUCATION_TYPE"
+              subject: "$PARTNER_OPLEIDING_TYPE"
               operation: EQUALS
               value: "MBO"
             then:
               operation: IF
               conditions:
                 - test:
-                    subject: "$PARTNER_LIVING_SITUATION"
+                    subject: "$PARTNER_WOONSITUATIE"
                     operation: EQUALS
                     value: "UIT"
                   then: "$BASISBEURS_MBO_UIT"
@@ -399,8 +399,8 @@ actions:
               values:
                 - operation: ADD
                   values:
-                    - "$PARTNER_PARENT1_INCOME"
-                    - "$PARTNER_PARENT2_INCOME"
+                    - "$PARTNER_OUDER1_INKOMEN"
+                    - "$PARTNER_OUDER2_INKOMEN"
                 - "$INKOMEN_GRENS_GEEN_BEURS"
             then:
               operation: MULTIPLY
@@ -408,17 +408,17 @@ actions:
                 - operation: IF
                   conditions:
                     - test:
-                        subject: "$PARTNER_EDUCATION_TYPE"
+                        subject: "$PARTNER_OPLEIDING_TYPE"
                         operation: EQUALS
                         value: "WO"
                       then: "$MAX_AANVULLENDE_BEURS_WO"
                     - test:
-                        subject: "$PARTNER_EDUCATION_TYPE"
+                        subject: "$PARTNER_OPLEIDING_TYPE"
                         operation: EQUALS
                         value: "HBO"
                       then: "$MAX_AANVULLENDE_BEURS_HBO"
                     - test:
-                        subject: "$PARTNER_EDUCATION_TYPE"
+                        subject: "$PARTNER_OPLEIDING_TYPE"
                         operation: EQUALS
                         value: "MBO"
                       then: "$MAX_AANVULLENDE_BEURS_MBO"
@@ -431,12 +431,12 @@ actions:
                           values:
                             - operation: ADD
                               values:
-                                - "$PARTNER_PARENT1_INCOME"
-                                - "$PARTNER_PARENT2_INCOME"
+                                - "$PARTNER_OUDER1_INKOMEN"
+                                - "$PARTNER_OUDER2_INKOMEN"
                             - "$INKOMENSDREMPEL_BASIS"
                             - operation: MULTIPLY
                               values:
-                                - "$PARTNER_SIBLINGS_STUDYING"
+                                - "$PARTNER_STUDEREND_GEZIN"
                                 - "$VERHOGING_DREMPEL_PER_KIND"
                         - operation: SUBTRACT
                           values:
@@ -446,10 +446,10 @@ actions:
 
   - output: "is_student"
     operation: NOT_NULL
-    subject: "$EDUCATION_TYPE"
+    subject: "$OPLEIDING_TYPE"
 
-  - output: "receives_study_grant"
+  - output: "ontvangt_studiefinanciering"
     operation: GREATER_THAN
     values:
-      - "$study_grant"
+      - "$studiefinanciering"
       - 0

@@ -25,14 +25,14 @@ properties:
       required: true
 
   sources:
-    - name: "CHILDCARE_KVK"
+    - name: "KINDEROPVANG_KVK"
       required: true
       description: "KVK nummer van de kinderopvangorganisatie"
       type: "string"
       source_reference:
         source_type: "claim"
 
-    - name: "DECLARED_HOURS"
+    - name: "AANGEGEVEN_UREN"
       required: true
       description: "Opgegeven opvanguren per kind per jaar"
       type: "array"
@@ -40,7 +40,7 @@ properties:
         fields:
           - name: "kind_bsn"
             type: "enum"
-            enum: "$CHILDREN_BSNS"
+            enum: "$KINDEREN_BSNS"
           - name: "uren_per_jaar"
             type: "number"
           - name: "uurtarief"
@@ -53,7 +53,7 @@ properties:
       source_reference:
         source_type: "claim"
 
-    - name: "EXPECTED_PARTNER_HOURS"
+    - name: "VERWACHTE_PARTNER_UREN"
       required: true
       description: "Verwachte werkuren partner per week volgens contract/werkgeversverklaring"
       type: "number"
@@ -63,14 +63,14 @@ properties:
         source_type: "claim"
 
   input:
-    - name: "INCOME"
+    - name: "INKOMEN"
       description: "Toetsingsinkomen"
       type: "amount"
       type_spec:
         unit: "eurocent"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
@@ -87,54 +87,54 @@ properties:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "PARTNER_INCOME"
+    - name: "PARTNER_INKOMEN"
       description: "Toetsingsinkomen partner"
       type: "amount"
       type_spec:
         unit: "eurocent"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
         parameters:
           - name: "BSN"
             reference: "$PARTNER_BSN"
 
-    - name: "CHILDREN_BSNS"
+    - name: "KINDEREN_BSNS"
       description: "BSNs van de kinderen van de aanvrager"
       type: "array"
       service_reference:
         service: "RvIG"
-        field: "children_bsns"
+        field: "kinderen_bsns"
         law: "wet_brp"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "WORKED_HOURS"
+    - name: "GEWERKTE_UREN"
       description: "Totaal gewerkte uren per jaar"
       type: "number"
       service_reference:
         service: "UWV"
-        field: "worked_hours"
+        field: "gewerkte_uren"
         law: "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "PARTNER_WORKED_HOURS"
+    - name: "PARTNER_GEWERKTE_UREN"
       description: "Totaal gewerkte uren partner per jaar"
       type: "number"
       service_reference:
         service: "UWV"
-        field: "worked_hours"
+        field: "gewerkte_uren"
         law: "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen"
         parameters:
           - name: "BSN"
             reference: "$PARTNER_BSN"
 
   output:
-    - name: "is_eligible"
+    - name: "is_gerechtigd"
       description: "Recht op toeslag"
       type: "boolean"
       temporal:
@@ -142,7 +142,7 @@ properties:
         period_type: "year"
       citizen_relevance: secondary
 
-    - name: "yearly_amount"
+    - name: "jaarbedrag"
       description: "Hoogte toeslag per jaar"
       type: "amount"
       type_spec:
@@ -155,11 +155,11 @@ properties:
       citizen_relevance: primary
 
   definitions:
-    MAX_HOURLY_RATE_DAYCARE: 902  # €9,02
-    MAX_HOURLY_RATE_BSO: 766      # €7,66
+    MAX_UURTARIEF_DAGOPVANG: 902  # €9,02
+    MAX_UURTARIEF_BSO: 766      # €7,66
     MAX_HOURS_PER_YEAR: 2760      # 230 uur per maand * 12
-    INCOME_THRESHOLD_1: 3500000   # €35.000
-    INCOME_THRESHOLD_2: 7000000   # €70.000
+    INKOMENSDREMPEL_1: 3500000   # €35.000
+    INKOMENSDREMPEL_2: 7000000   # €70.000
     PERCENTAGE_1: 0.96            # 96% vergoeding
     PERCENTAGE_2: 0.80            # 80% vergoeding
     PERCENTAGE_3: 0.33            # 33% vergoeding
@@ -174,24 +174,24 @@ requirements:
             operation: "IS_NULL"
           - operation: OR
             values:
-              - subject: "$PARTNER_WORKED_HOURS"
+              - subject: "$PARTNER_GEWERKTE_UREN"
                 operation: GREATER_OR_EQUAL
                 value: "$MIN_HOURS_PARTNER"
-              - subject: "$EXPECTED_PARTNER_HOURS"
+              - subject: "$VERWACHTE_PARTNER_UREN"
                 operation: GREATER_OR_EQUAL
                 value: "$MIN_HOURS_PER_WEEK"
-      - subject: "$WORKED_HOURS"
+      - subject: "$GEWERKTE_UREN"
         operation: GREATER_THAN
         value: 0
 
 actions:
-  - output: "is_eligible"
+  - output: "is_gerechtigd"
     value: true
 
-  - output: "yearly_amount"
+  - output: "jaarbedrag"
     operation: FOREACH
     combine: ADD
-    subject: "$DECLARED_HOURS"
+    subject: "$AANGEGEVEN_UREN"
     value:
       - operation: MULTIPLY
         values:
@@ -203,8 +203,8 @@ actions:
                       subject: "$soort_opvang"
                       operation: EQUALS
                       value: "DAGOPVANG"
-                    then: "$MAX_HOURLY_RATE_DAYCARE"
-                  - else: "$MAX_HOURLY_RATE_BSO"
+                    then: "$MAX_UURTARIEF_DAGOPVANG"
+                  - else: "$MAX_UURTARIEF_BSO"
               - "$uurtarief"
           - operation: MIN
             values:
@@ -217,29 +217,29 @@ actions:
                   values:
                     - operation: ADD
                       values:
-                        - "$INCOME"
+                        - "$INKOMEN"
                         - operation: IF
                           conditions:
                             - test:
                                 subject: "$PARTNER_BSN"
                                 operation: NOT_NULL
-                              then: "$PARTNER_INCOME"
+                              then: "$PARTNER_INKOMEN"
                             - else: 0
-                    - "$INCOME_THRESHOLD_1"
+                    - "$INKOMENSDREMPEL_1"
                 then: "$PERCENTAGE_1"
               - test:
                   operation: LESS_THAN
                   values:
                     - operation: ADD
                       values:
-                        - "$INCOME"
+                        - "$INKOMEN"
                         - operation: IF
                           conditions:
                             - test:
                                 subject: "$PARTNER_BSN"
                                 operation: NOT_NULL
-                              then: "$PARTNER_INCOME"
+                              then: "$PARTNER_INKOMEN"
                             - else: 0
-                    - "$INCOME_THRESHOLD_2"
+                    - "$INKOMENSDREMPEL_2"
                 then: "$PERCENTAGE_2"
               - else: "$PERCENTAGE_3"

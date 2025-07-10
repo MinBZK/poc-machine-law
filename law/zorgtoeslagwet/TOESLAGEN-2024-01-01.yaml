@@ -52,12 +52,12 @@ properties:
       citizen_relevance: primary
 
   input:
-    - name: "AGE"
+    - name: "LEEFTIJD"
       description: "Leeftijd van de aanvrager"
       type: "number"
       service_reference:
         service: "RvIG"
-        field: "age"
+        field: "leeftijd"
         law: "wet_brp"
       type_spec:
         unit: "years"
@@ -67,67 +67,67 @@ properties:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "HAS_PARTNER"
+    - name: "HEEFT_PARTNER"
       description: "Partnerschap status"
       type: "boolean"
       service_reference:
         service: "RvIG"
-        field: "has_partner"
+        field: "heeft_partner"
         law: "wet_brp"
       temporal:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "HAS_INSURANCE"
+    - name: "HEEFT_VERZEKERING"
       description: "Verzekeringsstatus"
       type: "boolean"
       service_reference:
         service: "RVZ"
-        field: "has_insurance"
+        field: "heeft_verzekering"
         law: "zvw"
       temporal:
         type: "period"
         period_type: "month"
 
-    - name: "HAS_ACT_INSURANCE"
+    - name: "HEEFT_VERDRAGSVERZEKERING"
       description: "Verdragsverzekering status"
       type: "boolean"
       service_reference:
         service: "RVZ"
-        field: "has_act_insurance"
+        field: "heeft_zorgverzekering"
         law: "zvw"
       temporal:
         type: "period"
         period_type: "month"
 
-    - name: "IS_INCARCERATED"
+    - name: "IS_GEDETINEERD"
       description: "Detentiestatus"
       type: "boolean"
       service_reference:
         service: "DJI"
-        field: "is_incarcerated"
+        field: "is_gedetineerd"
         law: "penitentiaire_beginselenwet"
       temporal:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "IS_FORENSIC"
+    - name: "IS_FORENSISCH"
       description: "Forensische status"
       type: "boolean"
       service_reference:
         service: "DJI"
-        field: "is_forensic"
+        field: "is_forensisch"
         law: "wet_forensische_zorg"
       temporal:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "INCOME"
+    - name: "INKOMEN"
       description: "Toetsingsinkomen"
       type: "amount"
       service_reference:
         service: "UWV"
-        field: "income"
+        field: "inkomen"
         law: "wet_inkomstenbelasting"
       type_spec:
         unit: "eurocent"
@@ -138,12 +138,12 @@ properties:
         period_type: "year"
         immutable_after: "P2Y"
 
-    - name: "NET_WORTH"
+    - name: "VERMOGEN"
       description: "Vermogen"
       type: "amount"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "net_worth"
+        field: "vermogen"
         law: "wet_inkomstenbelasting"
       type_spec:
         unit: "eurocent"
@@ -153,12 +153,12 @@ properties:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "COMBINED_NET_WORTH"
+    - name: "GEZAMENLIJK_VERMOGEN"
       description: "Gezamenlijk vermogen"
       type: "amount"
       service_reference:
         service: "BELASTINGDIENST"
-        field: "combined_net_worth"
+        field: "gezamenlijk_vermogen"
         law: "wet_inkomstenbelasting"
       type_spec:
         unit: "eurocent"
@@ -168,12 +168,12 @@ properties:
         type: "point_in_time"
         reference: "$prev_january_first"
 
-    - name: "PARTNER_INCOME"
+    - name: "PARTNER_INKOMEN"
       description: "Partnerinkomen"
       type: "amount"
       service_reference:
         service: "UWV"
-        field: "partner_income"
+        field: "partner_inkomen"
         law: "wet_inkomstenbelasting"
       type_spec:
         unit: "eurocent"
@@ -189,7 +189,7 @@ properties:
       type: "amount"
       service_reference:
         service: "VWS"
-        field: "standard_premium"
+        field: "standaardpremie"
         law: "zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies"
       type_spec:
         unit: "eurocent"
@@ -197,7 +197,7 @@ properties:
         min: 0
 
   definitions:
-    MINIMUM_AGE: 18
+    MINIMUM_LEEFTIJD: 18
     PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.0486
     PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.0486
     AFBOUWPERCENTAGE_MINIMUM: 0.13670
@@ -210,19 +210,19 @@ properties:
 requirements:
   - all:
       - or:
-          - subject: "$HAS_INSURANCE"
+          - subject: "$HEEFT_VERZEKERING"
             operation: EQUALS
             value: true
-          - subject: "$HAS_ACT_INSURANCE"
+          - subject: "$HEEFT_VERDRAGSVERZEKERING"
             operation: EQUALS
             value: true
-      - subject: "$AGE"
+      - subject: "$LEEFTIJD"
         operation: GREATER_OR_EQUAL
-        value: "$MINIMUM_AGE"
-      - subject: "$IS_INCARCERATED"
+        value: "$MINIMUM_LEEFTIJD"
+      - subject: "$IS_GEDETINEERD"
         operation: EQUALS
         value: false
-      - subject: "$IS_FORENSIC"
+      - subject: "$IS_FORENSISCH"
         operation: EQUALS
         value: false
 
@@ -234,19 +234,19 @@ actions:
     operation: IF
     conditions:
       - test:
-          subject: "$HAS_PARTNER"
+          subject: "$HEEFT_PARTNER"
           operation: EQUALS
           value: false
         then:
           operation: IF
           conditions:
             - test:
-                subject: "$INCOME"
+                subject: "$INKOMEN"
                 operation: GREATER_THAN
                 value: "$DREMPELINKOMEN_ALLEENSTAANDE"
               then: 0
             - test:
-                subject: "$NET_WORTH"
+                subject: "$VERMOGEN"
                 operation: GREATER_THAN
                 value: "$VERMOGENSGRENS_ALLEENSTAANDE"
               then: 0
@@ -261,26 +261,26 @@ actions:
                           - "$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
                           - operation: MIN
                             values:
-                              - "$INCOME"
+                              - "$INKOMEN"
                               - "$DREMPELINKOMEN_ALLEENSTAANDE"
                       - operation: IF
                         conditions:
                           - test:
                               operation: GREATER_THAN
                               values:
-                                - "$INCOME"
+                                - "$INKOMEN"
                                 - "$DREMPELINKOMEN_ALLEENSTAANDE"
                             then:
                               operation: MULTIPLY
                               values:
                                 - operation: SUBTRACT
                                   values:
-                                    - "$INCOME"
+                                    - "$INKOMEN"
                                     - "$DREMPELINKOMEN_ALLEENSTAANDE"
                                 - "$AFBOUWPERCENTAGE_MINIMUM"
                           - else: 0
       - test:
-          subject: "$HAS_PARTNER"
+          subject: "$HEEFT_PARTNER"
           operation: EQUALS
           value: true
         then:
@@ -291,12 +291,12 @@ actions:
                 values:
                   - operation: ADD
                     values:
-                      - "$INCOME"
-                      - "$PARTNER_INCOME"
+                      - "$INKOMEN"
+                      - "$PARTNER_INKOMEN"
                   - "$DREMPELINKOMEN_TOESLAGPARTNER"
               then: 0
             - test:
-                subject: "$COMBINED_NET_WORTH"
+                subject: "$GEZAMENLIJK_VERMOGEN"
                 operation: GREATER_THAN
                 value: "$VERMOGENSGRENS_TOESLAGPARTNER"
               then: 0
@@ -316,8 +316,8 @@ actions:
                             values:
                               - operation: ADD
                                 values:
-                                  - "$INCOME"
-                                  - "$PARTNER_INCOME"
+                                  - "$INKOMEN"
+                                  - "$PARTNER_INKOMEN"
                               - "$DREMPELINKOMEN_TOESLAGPARTNER"
                       - operation: IF
                         conditions:
@@ -326,8 +326,8 @@ actions:
                               values:
                                 - operation: ADD
                                   values:
-                                    - "$INCOME"
-                                    - "$PARTNER_INCOME"
+                                    - "$INKOMEN"
+                                    - "$PARTNER_INKOMEN"
                                 - "$DREMPELINKOMEN_TOESLAGPARTNER"
                             then:
                               operation: MULTIPLY
@@ -336,8 +336,8 @@ actions:
                                   values:
                                     - operation: ADD
                                       values:
-                                        - "$INCOME"
-                                        - "$PARTNER_INCOME"
+                                        - "$INKOMEN"
+                                        - "$PARTNER_INKOMEN"
                                     - "$DREMPELINKOMEN_TOESLAGPARTNER"
                                 - "$AFBOUWPERCENTAGE_BOVEN_DREMPEL"
                           - else: 0

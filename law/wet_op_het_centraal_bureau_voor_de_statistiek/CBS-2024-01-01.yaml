@@ -22,7 +22,7 @@ properties:
       required: true
 
   sources:
-    - name: "LIFE_EXPECTANCY_DATA"
+    - name: "LEVENSVERWACHTING_GEGEVENS"
       description: "Levensverwachting op 65-jarige leeftijd"
       type: "number"
       type_spec:
@@ -41,7 +41,7 @@ properties:
             value: "$year"
 
   output:
-    - name: "life_expectancy_65"
+    - name: "levensverwachting_65"
       description: "Resterende levensverwachting op 65-jarige leeftijd"
       type: "number"
       type_spec:
@@ -53,5 +53,5 @@ properties:
         reference: "$calculation_date"
 
 actions:
-  - output: "life_expectancy_65"
-    value: "$LIFE_EXPECTANCY_DATA"
+  - output: "levensverwachting_65"
+    value: "$LEVENSVERWACHTING_GEGEVENS"

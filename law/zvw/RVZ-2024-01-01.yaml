@@ -32,7 +32,7 @@ properties:
       required: true
 
   sources:
-    - name: "INSURANCE_POLICY"
+    - name: "VERZEKERINGSPOLIS"
       description: "Actieve zorgverzekeringspolis"
       type: "object"
       temporal:
@@ -47,7 +47,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "TREATY_REGISTRATION"
+    - name: "VERDRAGSINSCHRIJVING"
       description: "Registratie verdragsverzekering"
       type: "object"
       temporal:
@@ -63,37 +63,37 @@ properties:
             value: "$BSN"
 
   input:
-    - name: "RESIDENCE_COUNTRY"
+    - name: "VERBLIJFSLAND"
       description: "Land van verblijf"
       type: "string"
       service_reference:
         service: "RvIG"
-        field: "country_of_residence"
+        field: "land_van_verblijf"
         law: "wet_brp"
       temporal:
         type: "period"
         period_type: "continuous"
 
-    - name: "IS_INCARCERATED"
+    - name: "IS_GEDETINEERD"
       description: "Detentiestatus"
       type: "boolean"
       service_reference:
         service: "DJI"
-        field: "is_incarcerated"
+        field: "is_gedetineerd"
         law: "penitentiaire_beginselenwet"
       temporal:
         type: "point_in_time"
         reference: "$prev_january_first"
 
   output:
-    - name: "has_insurance"
+    - name: "heeft_verzekering"
       description: "Heeft de persoon een Nederlandse zorgverzekering"
       type: "boolean"
       temporal:
         type: "period"
         period_type: "month"
 
-    - name: "has_act_insurance"
+    - name: "heeft_zorgverzekering"
       description: "Heeft de persoon een verdragsverzekering"
       type: "boolean"
       temporal:
@@ -108,10 +108,10 @@ properties:
         period_type: "month"
 
   definitions:
-    ACTIVE_POLICY_STATUSES:
+    ACTIEVE_POLIS_STATUSSEN:
       - "ACTIEF"
       - "GESCHORST_MET_TERUGWERKENDE_KRACHT"
-    VALID_TREATY_COUNTRIES:
+    GELDIGE_VERDRAGSLANDEN:
       - "BELGIE"
       - "DUITSLAND"
       - "FRANKRIJK"
@@ -119,25 +119,25 @@ properties:
       - "ZWITSERLAND"
 
 actions:
-  - output: "has_insurance"
+  - output: "heeft_verzekering"
     operation: AND
     values:
       - operation: NOT_NULL
-        subject: "$INSURANCE_POLICY"
+        subject: "$VERZEKERINGSPOLIS"
       - operation: IN
-        subject: "$INSURANCE_POLICY"
-        values: "$ACTIVE_POLICY_STATUSES"
+        subject: "$VERZEKERINGSPOLIS"
+        values: "$ACTIEVE_POLIS_STATUSSEN"
 
-  - output: "has_act_insurance"
+  - output: "heeft_zorgverzekering"
     operation: AND
     values:
       - operation: NOT_NULL
-        subject: "$TREATY_REGISTRATION"
+        subject: "$VERDRAGSINSCHRIJVING"
       - operation: IN
-        subject: "$RESIDENCE_COUNTRY"
-        values: "$VALID_TREATY_COUNTRIES"
+        subject: "$VERBLIJFSLAND"
+        values: "$GELDIGE_VERDRAGSLANDEN"
       - operation: EQUALS
-        subject: "$TREATY_REGISTRATION"
+        subject: "$VERDRAGSINSCHRIJVING"
         value: "ACTIEF"
 
   - output: "is_verzekerde"
@@ -145,12 +145,12 @@ actions:
     values:
       - operation: OR
         values:
-          - subject: "$has_insurance"
+          - subject: "$heeft_verzekering"
             operation: EQUALS
             value: true
-          - subject: "$has_act_insurance"
+          - subject: "$heeft_zorgverzekering"
             operation: EQUALS
             value: true
-      - subject: "$IS_INCARCERATED"
+      - subject: "$IS_GEDETINEERD"
         operation: NOT_EQUALS
         value: true

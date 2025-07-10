@@ -23,7 +23,7 @@ properties:
       required: true
 
   sources:
-    - name: "ELECTION_DATE"
+    - name: "VERKIEZINGSDATUM"
       description: "Datum van de verkiezingen"
       type: "date"
       temporal:
@@ -39,89 +39,89 @@ properties:
             type: "string"
 
   input:
-    - name: "AGE"
+    - name: "LEEFTIJD"
       description: "Leeftijd op dag van stemming"
       type: "number"
       service_reference:
         service: "RvIG"
-        field: "age"
+        field: "leeftijd"
         law: "wet_brp"
         parameters:
           - name: "BSN"
             reference: "$BSN"
-          - name: "REFERENCE_DATE"
-            reference: "$ELECTION_DATE"
+          - name: "REFERENTIEDATUM"
+            reference: "$VERKIEZINGSDATUM"
 
-    - name: "NATIONALITY"
+    - name: "NATIONALITEIT"
       description: "Heeft persoon de Nederlandse nationaliteit"
       type: "boolean"
       service_reference:
         service: "RvIG"
-        field: "has_dutch_nationality"
+        field: "heeft_nederlandse_nationaliteit"
         law: "wet_brp"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "IS_DETAINED"
+    - name: "IS_GEDETINEERD"
       description: "Is persoon gedetineerd"
       type: "boolean"
       service_reference:
         service: "DJI"
-        field: "is_incarcerated"
+        field: "is_gedetineerd"
         law: "penitentiaire_beginselenwet"
         parameters:
           - name: "BSN"
             reference: "$BSN"
 
-    - name: "JUDICIAL_EXCLUSION"
+    - name: "GERECHTELIJKE_UITSLUITING"
       description: "Is persoon uitgesloten van kiesrecht door rechterlijke uitspraak"
       type: "boolean"
       service_reference:
         service: "JUSTID"
-        field: "has_voting_exclusion"
+        field: "heeft_stemrecht_uitsluiting"
         law: "wetboek_van_strafrecht"
         parameters:
           - name: "BSN"
             reference: "$BSN"
       temporal:
         type: "point_in_time"
-        reference: "$ELECTION_DATE"
+        reference: "$VERKIEZINGSDATUM"
 
   output:
-    - name: "has_voting_rights"
+    - name: "heeft_stemrecht"
       description: "Heeft de persoon stemrecht"
       type: "boolean"
       temporal:
         type: "point_in_time"
-        reference: "$ELECTION_DATE"
+        reference: "$VERKIEZINGSDATUM"
       citizen_relevance: primary
 
   definitions:
-    MINIMUM_AGE: 18
+    MINIMUM_LEEFTIJD: 18
 
 requirements:
   - all:
-      - subject: "$NATIONALITY"
+      - subject: "$NATIONALITEIT"
         operation: EQUALS
         value: true
-      - subject: "$AGE"
+      - subject: "$LEEFTIJD"
         operation: GREATER_OR_EQUAL
-        value: "$MINIMUM_AGE"
-      - subject: "$JUDICIAL_EXCLUSION"
+        value: "$MINIMUM_LEEFTIJD"
+      - subject: "$GERECHTELIJKE_UITSLUITING"
         operation: EQUALS
         value: false
 
 actions:
-  - output: "has_voting_rights"
+  - output: "heeft_stemrecht"
     operation: AND
     values:
-      - subject: "$NATIONALITY"
+      - subject: "$NATIONALITEIT"
         operation: EQUALS
         value: true
-      - subject: "$AGE"
+      - subject: "$LEEFTIJD"
         operation: GREATER_OR_EQUAL
-        value: "$MINIMUM_AGE"
-      - subject: "$JUDICIAL_EXCLUSION"
+        value: "$MINIMUM_LEEFTIJD"
+      - subject: "$GERECHTELIJKE_UITSLUITING"
         operation: EQUALS
         value: false

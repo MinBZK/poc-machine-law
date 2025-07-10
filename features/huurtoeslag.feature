@@ -33,9 +33,9 @@ Feature: Berekening Huurtoeslag
     And is niet voldaan aan de voorwaarden
     When de burger deze gegevens indient:
       | service   | law                   | key                    | nieuwe_waarde | reden               | bewijs |
-      | TOESLAGEN | wet_op_de_huurtoeslag | RENT_AMOUNT            | 72000         | verplichte gegevens |        |
-      | TOESLAGEN | wet_op_de_huurtoeslag | SERVICE_COSTS          | 5000          | verplichte gegevens |        |
-      | TOESLAGEN | wet_op_de_huurtoeslag | ELIGIBLE_SERVICE_COSTS | 4800          | verplichte gegevens |        |
+      | TOESLAGEN | wet_op_de_huurtoeslag | HUURPRIJS            | 72000         | verplichte gegevens |        |
+      | TOESLAGEN | wet_op_de_huurtoeslag | SERVICEKOSTEN          | 5000          | verplichte gegevens |        |
+      | TOESLAGEN | wet_op_de_huurtoeslag | SUBSIDIABELE_SERVICEKOSTEN | 4800          | verplichte gegevens |        |
     When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then ontbreken er geen verplichte gegevens
     And heeft de persoon recht op huurtoeslag
@@ -54,8 +54,8 @@ Feature: Berekening Huurtoeslag
       | 333333333 | 4500000                   |
     When de burger deze gegevens indient:
       | service   | law                   | key                    | nieuwe_waarde | reden               | bewijs |
-      | TOESLAGEN | wet_op_de_huurtoeslag | RENT_AMOUNT            | 65000         | verplichte gegevens |        |
-      | TOESLAGEN | wet_op_de_huurtoeslag | SERVICE_COSTS          | 5000          | verplichte gegevens |        |
-      | TOESLAGEN | wet_op_de_huurtoeslag | ELIGIBLE_SERVICE_COSTS | 4800          | verplichte gegevens |        |
+      | TOESLAGEN | wet_op_de_huurtoeslag | HUURPRIJS            | 65000         | verplichte gegevens |        |
+      | TOESLAGEN | wet_op_de_huurtoeslag | SERVICEKOSTEN          | 5000          | verplichte gegevens |        |
+      | TOESLAGEN | wet_op_de_huurtoeslag | SUBSIDIABELE_SERVICEKOSTEN | 4800          | verplichte gegevens |        |
     When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then is niet voldaan aan de voorwaarden

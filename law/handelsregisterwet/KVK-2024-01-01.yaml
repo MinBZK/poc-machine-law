@@ -22,7 +22,7 @@ properties:
       required: true
 
   sources:
-    - name: "REGISTRATIONS"
+    - name: "INSCHRIJVINGEN"
       description: "Inschrijvingen in handelsregister"
       type: "array"
       temporal:
@@ -37,7 +37,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "POSITIONS"
+    - name: "POSITIES"
       description: "Functies bij bedrijven"
       type: "array"
       temporal:
@@ -53,7 +53,7 @@ properties:
             value: "$BSN"
 
   output:
-    - name: "is_active_entrepreneur"
+    - name: "is_actieve_ondernemer"
       description: "Is actief als ondernemer"
       type: "boolean"
       temporal:
@@ -61,41 +61,41 @@ properties:
         reference: "$calculation_date"
 
   definitions:
-    ACTIVE_STATUSES:
+    ACTIEVE_STATUSSEN:
       - "ACTIEF"
       - "TIJDELIJK_GESTAAKT"
 
-    ENTREPRENEUR_FORMS:
+    ONDERNEMERSVORMEN:
       - "EENMANSZAAK"
       - "VOF"
       - "MAATSCHAP"
       - "COMMANDITAIRE_VENNOOTSCHAP"
 
-    ENTREPRENEUR_POSITIONS:
+    ONDERNEMERS_POSITIES:
       - "EIGENAAR"
       - "VENNOOT"
       - "MAAT"
       - "BEHEREND_VENNOOT"
 
 actions:
-  - output: "is_active_entrepreneur"
+  - output: "is_actieve_ondernemer"
     operation: OR
     values:
       # Check eigen onderneming
       - operation: AND
         values:
           - operation: IN
-            subject: "$REGISTRATIONS.rechtsvorm"
-            values: "$ENTREPRENEUR_FORMS"
+            subject: "$INSCHRIJVINGEN.rechtsvorm"
+            values: "$ONDERNEMERSVORMEN"
           - operation: IN
-            subject: "$REGISTRATIONS.status"
-            values: "$ACTIVE_STATUSES"
+            subject: "$INSCHRIJVINGEN.status"
+            values: "$ACTIEVE_STATUSSEN"
       # Check functie bij andere onderneming
       - operation: AND
         values:
           - operation: IN
-            subject: "$POSITIONS.functie"
-            values: "$ENTREPRENEUR_POSITIONS"
+            subject: "$POSITIES.functie"
+            values: "$ONDERNEMERS_POSITIES"
           - operation: IN
-            subject: "$POSITIONS.status"
-            values: "$ACTIVE_STATUSES"
+            subject: "$POSITIES.status"
+            values: "$ACTIEVE_STATUSSEN"

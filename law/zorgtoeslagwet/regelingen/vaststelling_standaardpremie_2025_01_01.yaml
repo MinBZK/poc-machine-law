@@ -22,7 +22,7 @@ references:
 
 properties:
   output:
-  - name: "standard_premium"
+  - name: "standaardpremie"
     description: "De standaardpremie, bedoeld in de Wet op de zorgtoeslag voor het berekeningsjaar 2025"
     type: "amount"
     type_spec:
@@ -34,5 +34,5 @@ properties:
     STANDAARDPREMIE_2025: 211200
 
 actions:
-  - output: "standard_premium"
+  - output: "standaardpremie"
     value: $STANDAARDPREMIE_2025

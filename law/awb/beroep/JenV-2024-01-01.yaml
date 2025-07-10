@@ -21,7 +21,7 @@ references:
 
 properties:
   applies:
-    - name: "CASE"
+    - name: "ZAAK"
       aggregate: "Case"
       events:
         - type: "Decided"
@@ -39,7 +39,7 @@ properties:
             court_type: "$type_rechter"
 
   sources:
-    - name: "LAW"
+    - name: "WET"
       description: "De wet waar dit besluit op gebaseerd is"
       type: "object"
       temporal:
@@ -62,9 +62,9 @@ properties:
           - name: "uuid"
             description: "UUID van de wet"
             type: "string"
-            value: "$CASE.rulespec_uuid"
+            value: "$ZAAK.rulespec_uuid"
 
-    - name: "ADDRESS"
+    - name: "ADRES"
       description: "Woonadres van de persoon"
       type: "object"
       temporal:
@@ -76,9 +76,9 @@ properties:
         law: "wet_brp"
         parameters:
           - name: "BSN"
-            reference: "$CASE.bsn"
+            reference: "$ZAAK.bsn"
 
-    - name: "JURISDICTION"
+    - name: "JURISDICTIE"
       description: "Mapping van gemeentes naar rechtbank arrondissementen"
       type: "object"
       temporal:
@@ -92,9 +92,9 @@ properties:
           - name: "gemeente"
             description: "Gemeente waar persoon woont"
             type: "string"
-            value: "$ADDRESS"
+            value: "$ADRES"
 
-    - name: "EVENTS"
+    - name: "GEBEURTENISSEN"
       description: "De gebeurtenissen rondom deze zaak"
       type: "object"
       temporal:
@@ -108,7 +108,7 @@ properties:
           - name: "case_id"
             description: "Zaak identifier"
             type: "string"
-            value: "$CASE.id"
+            value: "$ZAAK.id"
 
   output:
     - name: "beroep_mogelijk"
@@ -167,22 +167,22 @@ actions:
     conditions:
       - test:
           operation: EQUALS
-          subject: "$LAW.name"
+          subject: "$WET.name"
           value: "wet_studiefinanciering"
         then: "CENTRALE_RAAD_VAN_BEROEP"
       - test:
           operation: EQUALS
-          subject: "$LAW.name"
+          subject: "$WET.name"
           value: "wet_inkomstenbelasting"
         then: "GERECHTSHOF"
       - test:
           operation: EQUALS
-          subject: "$LAW.name"
+          subject: "$WET.name"
           value: "vreemdelingenwet"
         then: "$DEFAULT_COURT"
       - test:
           operation: EQUALS
-          subject: "$LAW.name"
+          subject: "$WET.name"
           value: "wet_marktordening_gezondheidszorg"
         then: "COLLEGE_VAN_BEROEP_BEDRIJFSLEVEN"
       - else: "$DEFAULT_COURT_TYPE"
@@ -200,8 +200,8 @@ actions:
           conditions:
             - test:
                 operation: NOT_NULL
-                subject: "$ADDRESS"
-              then: "$JURISDICTION.rechtbank"
+                subject: "$ADRES"
+              then: "$JURISDICTIE.rechtbank"
             - else: "$DEFAULT_COURT"
       - test:
           operation: EQUALS
@@ -212,22 +212,22 @@ actions:
           operation: EQUALS
           subject: "$type_rechter"
           value: "GERECHTSHOF"
-        then: "$LAW.competent_court"
+        then: "$WET.competent_court"
       - else: "$type_rechter"
   - output: "beroep_mogelijk"
     operation: AND
     values:
       - operation: NOT_IN
-        subject: "$LAW.decision_type"
+        subject: "$WET.decision_type"
         values: "$EXCLUDED_DECISION_TYPES"
       - operation: IN
-        subject: "$LAW.legal_character"
+        subject: "$WET.legal_character"
         values: "$REQUIRED_LEGAL_CHARACTER"
       # Of direct beroep, of bezwaar is afgewezen
       - operation: OR
         values:
           - operation: EQUALS
-            subject: "$LAW.voorbereidingsprocedure"
+            subject: "$WET.voorbereidingsprocedure"
             value: "UITGEBREID"
           - operation: AND
             values:
@@ -235,7 +235,7 @@ actions:
               - operation: GREATER_THAN
                 values:
                   - operation: FOREACH
-                    subject: "$EVENTS"
+                    subject: "$GEBEURTENISSEN"
                     combine: ADD
                     value:
                       - operation: EQUALS
@@ -246,10 +246,10 @@ actions:
               - operation: AND
                 values:
                   - operation: EQUALS
-                    subject: "$CASE.status"
+                    subject: "$ZAAK.status"
                     value: "DECIDED"
                   - operation: EQUALS
-                    subject: "$CASE.approved"
+                    subject: "$ZAAK.approved"
                     value: false
 
   - output: "reden_niet_mogelijk"
@@ -257,12 +257,12 @@ actions:
     conditions:
       - test:
           operation: IN
-          subject: "$LAW.decision_type"
+          subject: "$WET.decision_type"
           values: "$EXCLUDED_DECISION_TYPES"
         then: "tegen dit type besluit is geen beroep mogelijk"
       - test:
           operation: NOT_IN
-          subject: "$LAW.legal_character"
+          subject: "$WET.legal_character"
           values: "$REQUIRED_LEGAL_CHARACTER"
         then: "dit is geen besluit in de zin van de AWB"
       # Check of er bezwaar is als er geen direct beroep mogelijk is
@@ -270,12 +270,12 @@ actions:
           operation: AND
           values:
             - operation: NOT_EQUALS
-              subject: "$LAW.voorbereidingsprocedure"
+              subject: "$WET.voorbereidingsprocedure"
               value: "UITGEBREID"
             - operation: EQUALS
               values:
                 - operation: FOREACH
-                  subject: "$EVENTS"
+                  subject: "$GEBEURTENISSEN"
                   combine: ADD
                   value:
                     - operation: EQUALS
@@ -290,7 +290,7 @@ actions:
             - operation: GREATER_THAN
               values:
                 - operation: FOREACH
-                  subject: "$EVENTS"
+                  subject: "$GEBEURTENISSEN"
                   combine: ADD
                   value:
                     - operation: EQUALS
@@ -300,10 +300,10 @@ actions:
             - operation: OR
               values:
                 - operation: NOT_EQUALS
-                  subject: "$CASE.status"
+                  subject: "$ZAAK.status"
                   value: "DECIDED"
                 - operation: NOT_EQUALS
-                  subject: "$CASE.approved"
+                  subject: "$ZAAK.approved"
                   value: false
         then: "er is nog geen afwijzende beslissing op bezwaar"
       - else: null
@@ -312,14 +312,14 @@ actions:
     operation: IF
     conditions:
       - test:
-          subject: "$LAW.beroepstermijn_weken"
+          subject: "$WET.beroepstermijn_weken"
           operation: NOT_NULL
-        then: "$LAW.beroepstermijn_weken"
+        then: "$WET.beroepstermijn_weken"
       - else: "$DEFAULT_TERMIJN_BEROEP_WEKEN"
 
   - output: "direct_beroep"
     operation: EQUALS
-    subject: "$LAW.voorbereidingsprocedure"
+    subject: "$WET.voorbereidingsprocedure"
     value: "UITGEBREID"
 
   - output: "reden_direct_beroep"
@@ -327,7 +327,7 @@ actions:
     conditions:
       - test:
           operation: EQUALS
-          subject: "$LAW.voorbereidingsprocedure"
+          subject: "$WET.voorbereidingsprocedure"
           value: "UITGEBREID"
         then: "besluit is voorbereid met uitgebreide procedure"
       - else: null

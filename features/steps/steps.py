@@ -60,7 +60,7 @@ def step_impl(context, bsn):
 
 @given('de datum van de verkiezingen is "{date}"')
 def step_impl(context, date):
-    context.parameters["ELECTION_DATE"] = date
+    context.parameters["VERKIEZINGSDATUM"] = date
 
 
 def evaluate_law(context, service, law, approved=True):
@@ -164,8 +164,8 @@ def compare_euro_amount(actual_amount, amount):
 def step_impl(context, amount):
     if "hoogte_toeslag" in context.result.output:
         actual_amount = context.result.output["hoogte_toeslag"]
-    elif "yearly_amount" in context.result.output:
-        actual_amount = context.result.output["yearly_amount"]
+    elif "jaarbedrag" in context.result.output:
+        actual_amount = context.result.output["jaarbedrag"]
     else:
         raise ValueError("No toeslag amount found in output")
     compare_euro_amount(actual_amount, amount)
@@ -173,7 +173,7 @@ def step_impl(context, amount):
 
 @then('is het pensioen "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["pension_amount"]
+    actual_amount = context.result.output["pensioenbedrag"]
     compare_euro_amount(actual_amount, amount)
 
 
@@ -253,19 +253,19 @@ def step_impl(context):
 
 @then('is het bijstandsuitkeringsbedrag "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["benefit_amount"]
+    actual_amount = context.result.output["uitkeringsbedrag"]
     compare_euro_amount(actual_amount, amount)
 
 
 @then('is de woonkostentoeslag "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["housing_assistance"]
+    actual_amount = context.result.output["woonkostentoeslag"]
     compare_euro_amount(actual_amount, amount)
 
 
 @then('is het startkapitaal "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["startup_assistance"]
+    actual_amount = context.result.output["startkapitaal"]
     compare_euro_amount(actual_amount, amount)
 
 
@@ -418,7 +418,7 @@ def step_impl(context):
 
 @then('is de huurtoeslag "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["subsidy_amount"]
+    actual_amount = context.result.output["subsidiebedrag"]
     compare_euro_amount(actual_amount, amount)
 
 
@@ -447,13 +447,13 @@ def step_impl(context, field, amount):
 @then("heeft de persoon recht op kinderopvangtoeslag")
 def step_impl(context):
     assertions.assertTrue(
-        "is_eligible" in context.result.output and context.result.output["is_eligible"],
+        "is_gerechtigd" in context.result.output and context.result.output["is_gerechtigd"],
         "Expected person to be eligible for childcare allowance, but they were not",
     )
 
 @then("heeft de persoon geen recht op kinderopvangtoeslag")
 def step_impl(context):
     assertions.assertTrue(
-        "is_eligible" not in context.result.output or not context.result.output["is_eligible"],
+        "is_gerechtigd" not in context.result.output or not context.result.output["is_gerechtigd"],
         "Expected person to NOT be eligible for childcare allowance, but they were",
     )

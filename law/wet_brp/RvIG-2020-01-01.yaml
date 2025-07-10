@@ -31,7 +31,7 @@ properties:
       required: true
 
   sources:
-    - name: "BIRTH_DATE"
+    - name: "GEBOORTEDATUM"
       description: "Geboortedatum van de persoon"
       type: "date"
       temporal:
@@ -46,7 +46,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "PARTNER_BIRTH_DATE"
+    - name: "PARTNER_GEBOORTEDATUM"
       description: "Geboortedatum van de partner"
       type: "date"
       temporal:
@@ -61,7 +61,7 @@ properties:
             type: "string"
             value: "$PARTNER_BSN"
 
-    - name: "PARTNER_TYPE"
+    - name: "PARTNERTYPE"
       description: "Type partnerschap registratie"
       type: "object"
       temporal:
@@ -91,19 +91,19 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "CHILDREN_DATA"
+    - name: "KINDEREN_GEGEVENS"
       description: "Gegevens van de kinderen van de persoon"
       type: "array"
       source_reference:
         table: "relaties"
-        field: "children"
+        field: "kinderen"
         select_on:
           - name: "bsn"
             description: "Burgerservicenummer van de persoon"
             type: "string"
             value: "$BSN"
 
-    - name: "RESIDENCE_ADDRESS"
+    - name: "VERBLIJFSADRES"
       description: "Woonadres van de persoon"
       type: "object"
       temporal:
@@ -118,7 +118,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "PARENT_ADDRESSES"
+    - name: "OUDER_ADRESSEN"
       description: "Woonadressen van de ouders"
       type: "array"
       temporal:
@@ -133,7 +133,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "COUNTRY_OF_RESIDENCE"
+    - name: "LAND_VAN_VERBLIJF"
       description: "Land van verblijf"
       type: "string"
       temporal:
@@ -148,7 +148,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "NATIONALITY"
+    - name: "NATIONALITEIT"
       description: "Nationaliteit"
       type: "string"
       temporal:
@@ -163,7 +163,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "ADDRESS"
+    - name: "ADRES"
       description: "Adresgegevens"
       type: "object"
       temporal:
@@ -178,7 +178,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "HOUSEHOLD"
+    - name: "HUISHOUDEN"
       description: "Huishoudgegevens"
       type: "array"
       temporal:
@@ -189,16 +189,16 @@ properties:
         field: "medebewoners"
         select_on:
           - name: "postcode"
-            value: "$ADDRESS.postcode"
+            value: "$ADRES.postcode"
             description: "Postcode van het adres van de persoon"
             type: "string"
           - name: "huisnummer"
-            value: "$ADDRESS.huisnummer"
+            value: "$ADRES.huisnummer"
             description: "Huisnummer van het adres van de persoon"
             type: "string"
 
   output:
-    - name: "age"
+    - name: "leeftijd"
       description: "Leeftijd van de persoon in jaren"
       type: "number"
       type_spec:
@@ -209,7 +209,7 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "has_partner"
+    - name: "heeft_partner"
       description: "Heeft de persoon een partner volgens RvIG"
       type: "boolean"
       temporal:
@@ -223,62 +223,62 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "living_situation"
+    - name: "woonsituatie"
       description: "Woonsituatie van de persoon (UIT/THUIS)"
       type: "string"
       temporal:
         type: "period"
         period_type: "month"
 
-    - name: "country_of_residence"
+    - name: "land_van_verblijf"
       description: "Land van verblijf volgens RvIG"
       type: "string"
       temporal:
         type: "period"
         reference: "$calculation_date"
 
-    - name: "has_dutch_nationality"
+    - name: "heeft_nederlandse_nationaliteit"
       description: "Heeft Nederlandse nationaliteit"
       type: "boolean"
       temporal:
         type: "period"
         reference: "$calculation_date"
 
-    - name: "birth_date"
+    - name: "geboortedatum"
       description: "Geboortedatum van de persoon"
       type: "date"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "partner_birth_date"
+    - name: "partner_geboortedatum"
       description: "Geboortedatum van de persoon"
       type: "date"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
-    - name: "has_fixed_address"
+    - name: "heeft_vast_adres"
       description: "Heeft vast woonadres"
       type: "boolean"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "children_bsns"
+    - name: "kinderen_bsns"
       description: "BSNs van de kinderen van de aanvrager"
       type: "array"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "residence_address"
+    - name: "verblijfsadres"
       description: "Volledig adres"
       type: "string"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "postal_address"
+    - name: "postadres"
       description: "Volledig post adres"
       type: "string"
       temporal:
@@ -292,7 +292,7 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "household_size"
+    - name: "huishoudgrootte"
       description: "Aantal personen in huishouden"
       type: "number"
       type_spec:
@@ -302,14 +302,14 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "household_members"
+    - name: "huishoudleden"
       description: "Lijst met gegevens van medebewoners"
       type: "array"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
 
-    - name: "children"
+    - name: "kinderen"
       description: "Lijst met gegevens van kinderen"
       type: "array"
       temporal:
@@ -317,7 +317,7 @@ properties:
         reference: "$calculation_date"
 
     # Nieuwe output voor de inkomstenbelastingwet
-    - name: "has_children_under_12"
+    - name: "heeft_kinderen_onder_12"
       description: "Heeft de persoon kinderen jonger dan 12 jaar"
       type: "boolean"
       temporal:
@@ -325,155 +325,155 @@ properties:
         reference: "$calculation_date"
 
   definitions:
-    DUTCH_NATIONALITIES:
+    NEDERLANDSE_NATIONALITEITEN:
       - "NEDERLANDS"
     ADDRESS_MATCH_DISTANCE_M: 100
-    VALID_PARTNER_TYPES:
+    GELDIGE_PARTNERTYPEN:
       - "HUWELIJK"
       - "GEREGISTREERD_PARTNERSCHAP"
-    FIXED_ADDRESS_TYPES:
+    VASTE_ADRES_TYPEN:
       - "WOONADRES"
-    POSTAL_ADDRESS_TYPES:
+    POST_ADRES_TYPEN:
       - "BRIEFADRES"
-    CHILD_MAX_AGE_COMBINATIEKORTING: 12
+    KIND_MAX_LEEFTIJD_COMBINATIEKORTING: 12
 
 requirements:
   - all:
-      - subject: "$BIRTH_DATE"
+      - subject: "$GEBOORTEDATUM"
         operation: NOT_NULL
 
 actions:
-  - output: "birth_date"
-    value: "$BIRTH_DATE"
-  - output: "partner_birth_date"
-    value: "$PARTNER_BIRTH_DATE"
+  - output: "geboortedatum"
+    value: "$GEBOORTEDATUM"
+  - output: "partner_geboortedatum"
+    value: "$PARTNER_GEBOORTEDATUM"
   - output: "partner_bsn"
     operation: IF
     conditions:
         - test:
-            subject: "$PARTNER_TYPE"
+            subject: "$PARTNERTYPE"
             operation: IN
-            values: "$VALID_PARTNER_TYPES"
+            values: "$GELDIGE_PARTNERTYPEN"
           then: "$PARTNER_BSN"
         - else: null
-  - output: "age"
+  - output: "leeftijd"
     operation: SUBTRACT_DATE
     unit: "years"
     values:
       - "$calculation_date"
-      - "$BIRTH_DATE"
+      - "$GEBOORTEDATUM"
     reference: "Wet BRP Art. 1.6"
-  - output: "children_bsns"
+  - output: "kinderen_bsns"
     operation: FOREACH
-    subject: "$CHILDREN_DATA"
+    subject: "$KINDEREN_GEGEVENS"
     value: "$bsn"
-  - output: "has_partner"
-    subject: "$PARTNER_TYPE"
+  - output: "heeft_partner"
+    subject: "$PARTNERTYPE"
     operation: IN
-    values: "$VALID_PARTNER_TYPES"
+    values: "$GELDIGE_PARTNERTYPEN"
     reference: "Wet BRP Art. 1.7"
 
-  - output: "living_situation"
+  - output: "woonsituatie"
     operation: IF
     conditions:
       - test:
-          subject: "$RESIDENCE_ADDRESS"
+          subject: "$VERBLIJFSADRES"
           operation: EQUALS
-          value: "$PARENT_ADDRESSES"
+          value: "$OUDER_ADRESSEN"
         then: "THUIS"
       - else: "UIT"
     reference: "Wet BRP Art. 2.4"
 
-  - output: "country_of_residence"
-    value: "$COUNTRY_OF_RESIDENCE"
+  - output: "land_van_verblijf"
+    value: "$LAND_VAN_VERBLIJF"
     reference: "Wet BRP Art. 2.7"
 
-  - output: "has_dutch_nationality"
-    subject: "$NATIONALITY"
+  - output: "heeft_nederlandse_nationaliteit"
+    subject: "$NATIONALITEIT"
     operation: IN
-    values: "$DUTCH_NATIONALITIES"
+    values: "$NEDERLANDSE_NATIONALITEITEN"
 
-  - output: "has_fixed_address"
+  - output: "heeft_vast_adres"
     operation: IN
-    subject: "$ADDRESS.type"
-    values: "$FIXED_ADDRESS_TYPES"
+    subject: "$ADRES.type"
+    values: "$VASTE_ADRES_TYPEN"
 
-  - output: "residence_address"
+  - output: "verblijfsadres"
     operation: IF
     conditions:
       - test:
-          subject: "$ADDRESS"
+          subject: "$ADRES"
           operation: NOT_NULL
         then:
           operation: CONCAT
           values:
-            - "$ADDRESS.straat"
+            - "$ADRES.straat"
             - " "
-            - "$ADDRESS.huisnummer"
+            - "$ADRES.huisnummer"
             - ", "
-            - "$ADDRESS.postcode"
+            - "$ADRES.postcode"
             - " "
-            - "$ADDRESS.woonplaats"
+            - "$ADRES.woonplaats"
       - else: null
 
-  - output: "household_size"
+  - output: "huishoudgrootte"
     operation: IF
     conditions:
       - test:
-          subject: "$HOUSEHOLD"
+          subject: "$HUISHOUDEN"
           operation: NOT_NULL
         then:
           operation: ADD
           values:
             - 1  # De persoon zelf
             - operation: FOREACH
-              subject: "$HOUSEHOLD"
+              subject: "$HUISHOUDEN"
               combine: "ADD"
               value: 1
       - else: 1
 
-  - output: "postal_address"
+  - output: "postadres"
     operation: IF
     conditions:
       - test:
-          subject: "$ADDRESS.type"
+          subject: "$ADRES.type"
           operation: IN
-          values: "$POSTAL_ADDRESS_TYPES"
+          values: "$POST_ADRES_TYPEN"
         then:
           operation: CONCAT
           values:
-            - "$ADDRESS.straat"
+            - "$ADRES.straat"
             - " "
-            - "$ADDRESS.huisnummer"
+            - "$ADRES.huisnummer"
             - ", "
-            - "$ADDRESS.postcode"
+            - "$ADRES.postcode"
             - " "
-            - "$ADDRESS.woonplaats"
+            - "$ADRES.woonplaats"
       - else: null
 
   - output: "woonplaats"
-    value: "$ADDRESS.woonplaats"
+    value: "$ADRES.woonplaats"
 
-  - output: "household_members"
+  - output: "huishoudleden"
     operation: IF
     conditions:
       - test:
-          subject: "$HOUSEHOLD"
+          subject: "$HUISHOUDEN"
           operation: NOT_NULL
-        then: "$HOUSEHOLD"
+        then: "$HUISHOUDEN"
       - else:
           value: null  # Leeg resultaat
     reference: "Wet BRP Art. 2.4"
 
-  - output: "children"
+  - output: "kinderen"
     operation: IF
     conditions:
       - test:
-          subject: "$HOUSEHOLD"
+          subject: "$HUISHOUDEN"
           operation: NOT_NULL
         then:
           operation: FOREACH  # Gebruik FOREACH voor filtering
-          subject: "$HOUSEHOLD"
+          subject: "$HUISHOUDEN"
           combine: "ADD"      # Combineer resultaten in een array
           value:
             operation: IF
@@ -481,7 +481,7 @@ actions:
               - test:
                   operation: LESS_THAN
                   values:
-                    - "$age"
+                    - "$leeftijd"
                     - 18
                 then: "$item"  # Voeg dit item toe als kind
               - else: null     # Anders niets toevoegen
@@ -490,15 +490,15 @@ actions:
     reference: "Wet BRP Art. 1.6"
 
   # Nieuwe actie voor het bepalen of de persoon kinderen jonger dan 12 jaar heeft
-  - output: "has_children_under_12"
+  - output: "heeft_kinderen_onder_12"
     operation: IF
     conditions:
       - test:
-          subject: "$CHILDREN_DATA"
+          subject: "$KINDEREN_GEGEVENS"
           operation: NOT_NULL
         then:
           operation: EXISTS
-          subject: "$CHILDREN_DATA"
+          subject: "$KINDEREN_GEGEVENS"
           value:
             operation: LESS_THAN
             values:
@@ -507,6 +507,6 @@ actions:
                 values:
                   - "$calculation_date"
                   - "$item.geboortedatum"
-              - "$CHILD_MAX_AGE_COMBINATIEKORTING"
+              - "$KIND_MAX_LEEFTIJD_COMBINATIEKORTING"
       - else: false
     reference: "Wet BRP Art. 1.6"

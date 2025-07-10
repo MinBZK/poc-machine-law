@@ -25,7 +25,7 @@ properties:
       required: true
 
   sources:
-    - name: "DETENTION_STATUS"
+    - name: "DETENTIESTATUS"
       description: "Status van detentie"
       type: "string"
       temporal:
@@ -40,7 +40,7 @@ properties:
             type: "string"
             value: "$BSN"
 
-    - name: "FACILITY_TYPE"
+    - name: "INRICHTING_TYPE"
       description: "Type inrichting"
       type: "string"
       temporal:
@@ -56,7 +56,7 @@ properties:
             value: "$BSN"
 
   output:
-    - name: "is_incarcerated"
+    - name: "is_gedetineerd"
       description: "Is de persoon gedetineerd"
       type: "boolean"
       temporal:
@@ -64,16 +64,16 @@ properties:
         reference: "$calculation_date"
 
 actions:
-  - output: "is_incarcerated"
+  - output: "is_gedetineerd"
     operation: AND
     values:
       - operation: IN
-        subject: "$FACILITY_TYPE"
+        subject: "$INRICHTING_TYPE"
         values:
           - "PENITENTIAIRE_INRICHTING"
           - "HUIS_VAN_BEWARING"
       - operation: IN
-        subject: "$DETENTION_STATUS"
+        subject: "$DETENTIESTATUS"
         values:
           - "INGESLOTEN"
           - "TIJDELIJK_AFWEZIG"

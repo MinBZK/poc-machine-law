@@ -21,7 +21,7 @@ properties:
       required: true
 
   sources:
-    - name: "VOTING_EXCLUSIONS"
+    - name: "STEMRECHT_UITSLUITINGEN"
       description: "Rechterlijke uitspraken met ontzetting uit kiesrecht"
       type: "array"
       temporal:
@@ -41,7 +41,7 @@ properties:
             value: "KIESRECHT"
 
   output:
-    - name: "has_voting_exclusion"
+    - name: "heeft_stemrecht_uitsluiting"
       description: "Is de persoon uitgesloten van kiesrecht"
       type: "boolean"
       temporal:
@@ -49,15 +49,15 @@ properties:
         reference: "$calculation_date"
 
 actions:
-  - output: "has_voting_exclusion"
+  - output: "heeft_stemrecht_uitsluiting"
     operation: IF
     conditions:
       - test:
-          subject: "$VOTING_EXCLUSIONS"
+          subject: "$STEMRECHT_UITSLUITINGEN"
           operation: NOT_NULL
         then:
           operation: FOREACH
-          subject: "$VOTING_EXCLUSIONS"
+          subject: "$STEMRECHT_UITSLUITINGEN"
           combine: "OR"
           value:
             - operation: AND
