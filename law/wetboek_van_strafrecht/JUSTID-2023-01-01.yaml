@@ -5,7 +5,6 @@ law: wetboek_van_strafrecht
 law_type: "FORMELE_WET"
 legal_character: "BESCHIKKING"
 decision_type: "TOEKENNING"
-discoverable: "CITIZEN"
 valid_from: 2023-01-01
 service: "JUSTID"
 legal_basis:

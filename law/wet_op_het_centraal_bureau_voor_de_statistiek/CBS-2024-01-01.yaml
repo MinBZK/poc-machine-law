@@ -5,7 +5,6 @@ law: wet_op_het_centraal_bureau_voor_de_statistiek
 law_type: "FORMELE_WET"
 legal_character: "BESCHIKKING"
 decision_type: "TOEKENNING"
-discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "CBS"
 legal_basis:

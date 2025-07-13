@@ -5,7 +5,6 @@ law: penitentiaire_beginselenwet
 law_type: "FORMELE_WET"
 legal_character: "BESCHIKKING"
 decision_type: "TOEKENNING"
-discoverable: "CITIZEN"
 valid_from: 2022-01-01
 service: "DJI"
 legal_basis:

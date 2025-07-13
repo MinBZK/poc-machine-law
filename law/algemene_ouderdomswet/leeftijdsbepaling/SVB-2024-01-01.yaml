@@ -5,7 +5,6 @@ law: algemene_ouderdomswet/leeftijdsbepaling
 law_type: "FORMELE_WET"
 legal_character: "BESCHIKKING"
 decision_type: "TOEKENNING"
-discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "SVB"
 legal_basis:
