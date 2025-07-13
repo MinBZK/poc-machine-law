@@ -1,10 +1,17 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: 96d926a0-b45f-4cf3-92af-01b167221a00
 name: Kiesrecht Tweede Kamer
 law: kieswet
 discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "KIESRAAD"
+legal_basis:
+  law: "Kieswet"
+  bwb_id: "BWBR0004627"
+  article: "B1"
+  url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+  juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+  explanation: "Deze service implementeert artikel B1 van de Kieswet die bepaalt wie kiesgerechtigd zijn voor de Tweede Kamerverkiezingen"
 description: >
   Regels voor het bepalen van kiesrecht voor de Tweede Kamerverkiezingen volgens
   de Kieswet. Het kiesrecht is afhankelijk van leeftijd, nationaliteit en
@@ -21,6 +28,13 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B1"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+        explanation: "BSN is nodig om de persoonsgegevens op te vragen voor vaststelling van kiesgerechtigdheid conform artikel B1"
 
   sources:
     - name: "VERKIEZINGSDATUM"
@@ -37,6 +51,13 @@ properties:
             value: "TWEEDE_KAMER"
             description: "Type verkiezing"
             type: "string"
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B1"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+        explanation: "Artikel B1 bepaalt dat de leeftijd van 18 jaar moet zijn bereikt op de dag van de stemming"
 
   input:
     - name: "LEEFTIJD"
@@ -51,6 +72,13 @@ properties:
             reference: "$BSN"
           - name: "REFERENTIEDATUM"
             reference: "$VERKIEZINGSDATUM"
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B1"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+        explanation: "Artikel B1 vereist dat men op de dag van de stemming de leeftijd van achttien jaar heeft bereikt"
 
     - name: "NATIONALITEIT"
       description: "Heeft persoon de Nederlandse nationaliteit"
@@ -62,6 +90,13 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B1"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+        explanation: "Artikel B1 bepaalt dat kiezers voor de Tweede Kamer Nederlander moeten zijn op de dag van de kandidaatstelling"
 
     - name: "IS_GEDETINEERD"
       description: "Is persoon gedetineerd"
@@ -73,6 +108,13 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B1"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+        explanation: "Gedetineerd zijn op zich sluit kiesrecht niet uit volgens de Kieswet, alleen bij rechterlijke uitspraak"
 
     - name: "GERECHTELIJKE_UITSLUITING"
       description: "Is persoon uitgesloten van kiesrecht door rechterlijke uitspraak"
@@ -87,6 +129,13 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$VERKIEZINGSDATUM"
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B3"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB3"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B3&z=2025-02-12&g=2025-02-12"
+        explanation: "Artikel B3 bepaalt dat van het kiesrecht zijn uitgesloten zij die bij onherroepelijke rechterlijke uitspraak van het kiesrecht zijn ontzet"
 
   output:
     - name: "heeft_stemrecht"
@@ -96,12 +145,26 @@ properties:
         type: "point_in_time"
         reference: "$VERKIEZINGSDATUM"
       citizen_relevance: primary
+      legal_basis:
+        law: "Kieswet"
+        bwb_id: "BWBR0004627"
+        article: "B1"
+        url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+        juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+        explanation: "Het stemrecht wordt bepaald volgens artikel B1 van de Kieswet waarbij nationaliteit, leeftijd en uitsluiting worden beoordeeld"
 
   definitions:
-    MINIMUM_LEEFTIJD: 18
+    MINIMUM_LEEFTIJD: 18  # Artikel B1 Kieswet - kiezers moeten op de dag van de stemming 18 jaar zijn
 
 requirements:
-  - all:
+  - legal_basis:
+      law: "Kieswet"
+      bwb_id: "BWBR0004627"
+      article: "B1"
+      url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+      juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+      explanation: "De vereisten voor kiesrecht zijn bepaald in artikel B1 en B3 van de Kieswet"
+    all:
       - subject: "$NATIONALITEIT"
         operation: EQUALS
         value: true
@@ -113,15 +176,43 @@ requirements:
         value: false
 
 actions:
-  - output: "heeft_stemrecht"
+  - legal_basis:
+      law: "Kieswet"
+      bwb_id: "BWBR0004627"
+      article: "B1"
+      url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+      juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+      explanation: "De bepaling van stemrecht gebeurt volgens de cumulatieve voorwaarden uit artikel B1 en B3 van de Kieswet"
+    output: "heeft_stemrecht"
     operation: AND
     values:
       - subject: "$NATIONALITEIT"
         operation: EQUALS
         value: true
+        legal_basis:
+          law: "Kieswet"
+          bwb_id: "BWBR0004627"
+          article: "B1"
+          url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+          juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+          explanation: "Artikel B1 lid 1 vereist dat kiezers voor de Tweede Kamer Nederlander zijn op de dag van de kandidaatstelling"
       - subject: "$LEEFTIJD"
         operation: GREATER_OR_EQUAL
         value: "$MINIMUM_LEEFTIJD"
+        legal_basis:
+          law: "Kieswet"
+          bwb_id: "BWBR0004627"
+          article: "B1"
+          url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB1"
+          juriconnect: "jci1.3:c:BWBR0004627&artikel=B1&z=2025-02-12&g=2025-02-12"
+          explanation: "Artikel B1 lid 1 bepaalt dat kiezers op de dag van de stemming de leeftijd van achttien jaar hebben bereikt"
       - subject: "$GERECHTELIJKE_UITSLUITING"
         operation: EQUALS
         value: false
+        legal_basis:
+          law: "Kieswet"
+          bwb_id: "BWBR0004627"
+          article: "B3"
+          url: "https://wetten.overheid.nl/BWBR0004627/2025-02-12#AfdelingII_HoofdstukB_ArtikelB3"
+          juriconnect: "jci1.3:c:BWBR0004627&artikel=B3&z=2025-02-12&g=2025-02-12"
+          explanation: "Artikel B3 bepaalt dat van het kiesrecht zijn uitgesloten zij die bij onherroepelijke rechterlijke uitspraak van het kiesrecht zijn ontzet"

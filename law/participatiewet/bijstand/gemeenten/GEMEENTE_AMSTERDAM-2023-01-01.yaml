@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: b1d3a15b-45a2-44a3-b26a-d636785032c0
 name: Bijstand Gemeente Amsterdam
 law: participatiewet/bijstand
@@ -8,6 +8,13 @@ decision_type: "TOEKENNING"
 discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "GEMEENTE_AMSTERDAM"
+legal_basis:
+  law: "Participatiewet"
+  bwb_id: "BWBR0015703"
+  article: "11"
+  url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+  juriconnect: "jci1.3:c:BWBR0015703&artikel=11&z=2025-01-01&g=2025-01-01"
+  explanation: "Deze service implementeert artikel 11 van de Participatiewet voor de gemeente Amsterdam met aanvullende gemeentelijke regels"
 description: >
   Regels voor het bepalen van bijstand in Amsterdam. Amsterdam heeft specifiek beleid voor
   jongeren (jongerentoeslag), ZZP-ers (inkomensberekening), dak- en thuislozen
@@ -24,6 +31,13 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "11"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=11&z=2025-01-01&g=2025-01-01"
+        explanation: "BSN is nodig voor identificatie van de bijstandsgerechtigde conform artikel 11"
 
   sources:
     - name: "ARBEIDSVERMOGEN"
@@ -40,6 +54,14 @@ properties:
             description: "BSN van de persoon"
             type: "string"
             value: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "9"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=9&lid=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 9 lid 2 bepaalt de arbeidsverplichting en mogelijke ontheffingsgronden voor bijstandsgerechtigden"
 
   input:
     - name: "VOLDOET_AAN_LANDELIJKE_VOORWAARDEN"
@@ -52,6 +74,13 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "11"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=11&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 11 bepaalt de landelijke voorwaarden voor recht op bijstand"
 
     - name: "LANDELIJK_BASISBEDRAG"
       description: "Landelijke bijstandsnorm"
@@ -67,6 +96,13 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "22"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel22"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=22&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 22 bepaalt de hoogte van de bijstandsnorm"
 
     - name: "KOSTENDELERSNORM"
       description: "Landelijke kostendelersnorm"
@@ -78,6 +114,13 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "22a"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel22a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=22a&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 22a regelt de toepassing van de kostendelersnorm"
 
     - name: "LEEFTIJD"
       description: "Leeftijd van de aanvrager"
@@ -89,6 +132,14 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "9"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=9&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 9 lid 1 bepaalt de leeftijdsgrens voor recht op bijstand"
 
     - name: "HEEFT_VAST_ADRES"
       description: "Heeft vast woonadres"
@@ -100,6 +151,14 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "13"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel13"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=13&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 13 lid 1 bepaalt de woonplaatsvereisten voor recht op bijstand"
 
     - name: "POSTADRES"
       description: "Postadres"
@@ -111,6 +170,11 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Beleidsregels Participatiewet Amsterdam"
+        article: "2.1"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR645455/1"
+        explanation: "Het gemeentelijke beleid bepaalt welke postadressen geldig zijn voor daklozen"
 
     - name: "IS_ONDERNEMER"
       description: "Is ondernemer/ZZP-er"
@@ -122,6 +186,14 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "31"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.4_Artikel31"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=31&lid=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 31 lid 2 regelt de inkomensberekening voor zelfstandigen"
 
     - name: "BEDRIJFSINKOMEN"
       description: "Inkomsten uit onderneming"
@@ -137,6 +209,14 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "31"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.4_Artikel31"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=31&lid=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 31 lid 2 bepaalt hoe het inkomen uit onderneming wordt meegenomen bij de bijstandsberekening"
 
   output:
     - name: "is_gerechtigd"
@@ -146,6 +226,13 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
       citizen_relevance: secondary
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "11"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=11&z=2025-01-01&g=2025-01-01"
+        explanation: "Het recht op bijstand wordt bepaald volgens artikel 11 Participatiewet met aanvullende gemeentelijke regels"
 
     - name: "uitkeringsbedrag"
       description: "Uitkeringsbedrag inclusief toeslagen"
@@ -158,6 +245,13 @@ properties:
         type: "period"
         period_type: "month"
       citizen_relevance: primary
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "22"
+        url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk3_Paragraaf3.2_Artikel22"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=22&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 22 bepaalt de hoogte van de bijstandsnorm aangevuld met gemeentelijke toeslagen"
 
     - name: "woonkostentoeslag"
       description: "Woonkostentoeslag bij briefadres"
@@ -170,6 +264,11 @@ properties:
         type: "period"
         period_type: "month"
       citizen_relevance: primary
+      legal_basis:
+        law: "Beleidsregels Participatiewet Amsterdam"
+        article: "3.1"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR645455/1"
+        explanation: "Het gemeentelijke beleid bepaalt de woonkostentoeslag voor daklozen met briefadres"
 
     - name: "startkapitaal"
       description: "Bedrag voor bedrijfskapitaal ZZP"
@@ -182,6 +281,11 @@ properties:
         type: "period"
         period_type: "month"
       citizen_relevance: primary
+      legal_basis:
+        law: "Beleidsregels Participatiewet Amsterdam"
+        article: "4.1"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR645455/1"
+        explanation: "Het gemeentelijke beleid bepaalt ondersteuning voor startende ondernemers"
 
   definitions:
     JEUGD_TOESLAG: 25000  # 250 euro voor jongeren

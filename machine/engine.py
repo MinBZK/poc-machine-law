@@ -656,6 +656,8 @@ class RulesEngine:
             )
 
         elif op_type in self.AGGREGATE_OPS and "values" in operation:
+            # The operation dict has legal_basis as metadata alongside operation/values
+            # but we only need to evaluate the 'values' list, ignoring legal_basis metadata
             values = [self._evaluate_value(v, context) for v in operation["values"]]
             result = self._evaluate_aggregate_ops(op_type, values)
             node.details.update(

@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
 name: Inkomstenbelasting
 law: wet_inkomstenbelasting
@@ -8,6 +8,13 @@ legal_character: "BESCHIKKING"
 decision_type: "AANSLAG"
 discoverable: "CITIZEN"
 service: "BELASTINGDIENST"
+legal_basis:
+  law: "Wet inkomstenbelasting 2001"
+  bwb_id: "BWBR0011353"
+  article: "2.1"
+  url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.1"
+  juriconnect: "jci1.3:c:BWBR0011353&artikel=2.1&z=2025-01-01&g=2025-01-01"
+  explanation: "Artikel 2.1 Wet IB 2001 bepaalt dat inkomstenbelasting wordt geheven over het inkomen uit werk en woning, inkomen uit aanmerkelijk belang en inkomen uit sparen en beleggen"
 description: >
   Regels voor het berekenen van de inkomstenbelasting volgens de Wet inkomstenbelasting.
   De inkomstenbelasting wordt opgelegd op inkomen dat natuurlijke personen ontvangen,
@@ -44,6 +51,14 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+      legal_basis:
+        law: "Wet inkomstenbelasting 2001"
+        bwb_id: "BWBR0011353"
+        article: "2.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.14"
+        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.14&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 2.14 lid 1 Wet IB 2001 bepaalt dat binnenlandse belastingplichtigen worden geïdentificeerd via hun BSN"
 
   sources:
     # Box 1 bronnen

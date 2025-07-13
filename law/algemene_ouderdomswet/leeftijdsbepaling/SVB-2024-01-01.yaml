@@ -1,9 +1,20 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: 47fa262a-b8f7-43bf-a5dd-5f9b2d2c1228
 name: Bepalen AOW-leeftijd 2025
 law: algemene_ouderdomswet/leeftijdsbepaling
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "SVB"
+legal_basis:
+  law: "Algemene Ouderdomswet"
+  bwb_id: "BWBR0002221"
+  article: "7a"
+  url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+  juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 7a AOW bepaalt de pensioengerechtigde leeftijd die wordt verhoogd op basis van de stijging van de levensverwachting"
 description: >
   Regels voor het bepalen van de AOW-leeftijd volgens de Algemene Ouderdomswet.
   De AOW-leeftijd is sinds 2013 stapsgewijs verhoogd van 65 jaar naar 67 jaar en wordt
@@ -27,11 +38,27 @@ properties:
       description: "Geboortedatum van de persoon"
       type: "date"
       required: true
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7a"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7a lid 1 AOW koppelt de pensioengerechtigde leeftijd aan het geboortejaar"
 
   input:
     - name: "LEVENSVERWACHTING_65"
       description: "Resterende levensverwachting op 65-jarige leeftijd"
       type: "number"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7a"
+        paragraph: "6"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&lid=6&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7a lid 6 AOW bepaalt dat de pensioengerechtigde leeftijd wordt aangepast aan de hand van de geraamde macro gemiddelde resterende levensverwachting op 65-jarige leeftijd"
       type_spec:
         unit: "years"
         precision: 2
@@ -47,6 +74,13 @@ properties:
     - name: "pensioenleeftijd"
       description: "AOW-leeftijd voor deze persoon"
       type: "number"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7a"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7a AOW bepaalt de pensioengerechtigde leeftijd per geboortejaar"
       type_spec:
         unit: "years"
         precision: 2

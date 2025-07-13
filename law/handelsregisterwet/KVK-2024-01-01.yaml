@@ -1,9 +1,20 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: 8b59ef92-03f8-4294-bce9-4eaac01ba0ed
 name: Bepalen ondernemerschap
 law: handelsregisterwet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "KVK"
+legal_basis:
+  law: "Handelsregisterwet 2007"
+  bwb_id: "BWBR0021777"
+  article: "2"
+  url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk1_Artikel2"
+  juriconnect: "jci1.3:c:BWBR0021777&artikel=2&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 2 Handelsregisterwet 2007 definieert de werkingssfeer en bepaalt wie ingeschreven moeten zijn in het handelsregister"
 description: >
   Regels voor het bepalen van actief ondernemerschap op basis van het Handelsregister.
   Dit wordt gebruikt om te bepalen of iemand een actieve onderneming heeft voor
@@ -20,11 +31,26 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "12"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel12"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 12 lid 1 Handelsregisterwet verplicht opgave van BSN voor natuurlijke personen in het handelsregister"
 
   sources:
     - name: "INSCHRIJVINGEN"
       description: "Inschrijvingen in handelsregister"
       type: "array"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "5"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=5&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 Handelsregisterwet verplicht ondernemingen en rechtspersonen zich in te schrijven"
       temporal:
         type: "period"
         period_type: "continuous"
@@ -40,6 +66,13 @@ properties:
     - name: "POSITIES"
       description: "Functies bij bedrijven"
       type: "array"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=14&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 Handelsregisterwet bepaalt welke functionarissen moeten worden ingeschreven"
       temporal:
         type: "period"
         period_type: "continuous"
@@ -56,6 +89,13 @@ properties:
     - name: "is_actieve_ondernemer"
       description: "Is actief als ondernemer"
       type: "boolean"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "7"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=7&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7 Handelsregisterwet bepaalt de inschrijfplicht voor ondernemingen en definieert wanneer sprake is van een onderneming"
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
@@ -87,15 +127,64 @@ actions:
           - operation: IN
             subject: "$INSCHRIJVINGEN.rechtsvorm"
             values: "$ONDERNEMERSVORMEN"
+            legal_basis:
+              law: "Handelsregisterwet 2007"
+              bwb_id: "BWBR0021777"
+              article: "6"
+              url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel6"
+              juriconnect: "jci1.3:c:BWBR0021777&artikel=6&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 6 Handelsregisterwet bepaalt welke rechtsvormen ondernemingen zijn"
           - operation: IN
             subject: "$INSCHRIJVINGEN.status"
             values: "$ACTIEVE_STATUSSEN"
+            legal_basis:
+              law: "Handelsregisterwet 2007"
+              bwb_id: "BWBR0021777"
+              article: "18"
+              url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel18"
+              juriconnect: "jci1.3:c:BWBR0021777&artikel=18&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 18 Handelsregisterwet bepaalt dat wijzigingen zoals beëindiging moeten worden opgegeven"
+        legal_basis:
+          law: "Handelsregisterwet 2007"
+          bwb_id: "BWBR0021777"
+          article: "7"
+          url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel7"
+          juriconnect: "jci1.3:c:BWBR0021777&artikel=7&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 7 Handelsregisterwet bepaalt actief ondernemerschap bij eigen onderneming"
       # Check functie bij andere onderneming
       - operation: AND
         values:
           - operation: IN
             subject: "$POSITIES.functie"
             values: "$ONDERNEMERS_POSITIES"
+            legal_basis:
+              law: "Handelsregisterwet 2007"
+              bwb_id: "BWBR0021777"
+              article: "14"
+              url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+              juriconnect: "jci1.3:c:BWBR0021777&artikel=14&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 14 Handelsregisterwet bepaalt welke functionarissen als ondernemer gelden"
           - operation: IN
             subject: "$POSITIES.status"
             values: "$ACTIEVE_STATUSSEN"
+            legal_basis:
+              law: "Handelsregisterwet 2007"
+              bwb_id: "BWBR0021777"
+              article: "18"
+              url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel18"
+              juriconnect: "jci1.3:c:BWBR0021777&artikel=18&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 18 Handelsregisterwet bepaalt dat wijzigingen in functionarissen moeten worden opgegeven"
+        legal_basis:
+          law: "Handelsregisterwet 2007"
+          bwb_id: "BWBR0021777"
+          article: "14"
+          url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+          juriconnect: "jci1.3:c:BWBR0021777&artikel=14&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 14 Handelsregisterwet bepaalt actief ondernemerschap bij functies in ondernemingen"
+    legal_basis:
+      law: "Handelsregisterwet 2007"
+      bwb_id: "BWBR0021777"
+      article: "7"
+      url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel7"
+      juriconnect: "jci1.3:c:BWBR0021777&artikel=7&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 7 Handelsregisterwet bepaalt wanneer sprake is van actief ondernemerschap"

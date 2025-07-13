@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: f8e7d6c5-4321-4f0f-bbbb-123456789abc
 name: Bepalen kinderopvangtoeslag
 law: wet_kinderopvang
@@ -8,6 +8,13 @@ decision_type: "TOEKENNING"
 discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "TOESLAGEN"
+legal_basis:
+  law: "Wet kinderopvang"
+  bwb_id: "BWBR0017017"
+  article: "1.5"
+  url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+  juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&z=2024-12-11&g=2024-12-11"
+  explanation: "Artikel 1.5 Wet kinderopvang bepaalt het recht op kinderopvangtoeslag voor ouders die werken, studeren of reïntegreren"
 description: >
   Regels voor het bepalen van recht op en hoogte van kinderopvangtoeslag volgens
   de Wet kinderopvang voor het jaar 2025.
@@ -23,12 +30,26 @@ properties:
       description: "BSN van de aanvrager"
       type: "string"
       required: true
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "26"
+        url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Hoofdstuk3_Paragraaf3.5_Artikel26"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=26&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 26 AWIR bepaalt dat aanvragen persoonsgegevens moeten bevatten waaronder BSN"
 
   sources:
     - name: "KINDEROPVANG_KVK"
       required: true
       description: "KVK nummer van de kinderopvangorganisatie"
       type: "string"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.48"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling3_Paragraaf1_Artikel1.48"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.48&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.48 Wet kinderopvang bepaalt registratie van kinderopvangorganisaties in het handelsregister"
       source_reference:
         source_type: "claim"
 
@@ -36,6 +57,14 @@ properties:
       required: true
       description: "Opgegeven opvanguren per kind per jaar"
       type: "array"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.6"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=1&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.6 lid 1 Wet kinderopvang bepaalt dat de hoogte van de toeslag afhangt van het aantal uren kinderopvang"
       type_spec:
         fields:
           - name: "kind_bsn"
@@ -57,6 +86,14 @@ properties:
       required: true
       description: "Verwachte werkuren partner per week volgens contract/werkgeversverklaring"
       type: "number"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&lid=1&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.5 lid 1 Wet kinderopvang vereist dat beide ouders werken, studeren of reïntegreren"
       type_spec:
         min: 0
       source_reference:
@@ -66,6 +103,14 @@ properties:
     - name: "INKOMEN"
       description: "Toetsingsinkomen"
       type: "amount"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.6"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=2&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.6 lid 2 Wet kinderopvang bepaalt dat de hoogte van de toeslag inkomensafhankelijk is"
       type_spec:
         unit: "eurocent"
       service_reference:
@@ -79,6 +124,13 @@ properties:
     - name: "PARTNER_BSN"
       description: "BSN van de partner"
       type: "string"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=3&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 3 AWIR definieert wie als partner wordt aangemerkt voor toeslagen"
       service_reference:
         service: "RvIG"
         field: "partner_bsn"
@@ -90,6 +142,14 @@ properties:
     - name: "PARTNER_INKOMEN"
       description: "Toetsingsinkomen partner"
       type: "amount"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.6"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=2&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.6 lid 2 Wet kinderopvang bepaalt dat gezamenlijk inkomen meetelt voor toeslaghoogte"
       type_spec:
         unit: "eurocent"
       service_reference:
@@ -103,6 +163,14 @@ properties:
     - name: "KINDEREN_BSNS"
       description: "BSNs van de kinderen van de aanvrager"
       type: "array"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.5"
+        paragraph: "3"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&lid=3&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.5 lid 3 Wet kinderopvang bepaalt voor welke kinderen recht op toeslag bestaat"
       service_reference:
         service: "RvIG"
         field: "kinderen_bsns"
@@ -114,6 +182,14 @@ properties:
     - name: "GEWERKTE_UREN"
       description: "Totaal gewerkte uren per jaar"
       type: "number"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&lid=1&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.5 lid 1 Wet kinderopvang vereist dat ouders werken voor recht op toeslag"
       service_reference:
         service: "UWV"
         field: "gewerkte_uren"
@@ -125,6 +201,14 @@ properties:
     - name: "PARTNER_GEWERKTE_UREN"
       description: "Totaal gewerkte uren partner per jaar"
       type: "number"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&lid=1&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.5 lid 1 Wet kinderopvang vereist dat beide ouders werken voor recht op toeslag"
       service_reference:
         service: "UWV"
         field: "gewerkte_uren"
@@ -137,6 +221,13 @@ properties:
     - name: "is_gerechtigd"
       description: "Recht op toeslag"
       type: "boolean"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.5"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.5"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.5&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.5 Wet kinderopvang bepaalt wanneer een ouder recht heeft op kinderopvangtoeslag"
       temporal:
         type: "period"
         period_type: "year"
@@ -145,6 +236,13 @@ properties:
     - name: "jaarbedrag"
       description: "Hoogte toeslag per jaar"
       type: "amount"
+      legal_basis:
+        law: "Wet kinderopvang"
+        bwb_id: "BWBR0017017"
+        article: "1.6"
+        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&z=2024-12-11&g=2024-12-11"
+        explanation: "Artikel 1.6 Wet kinderopvang bepaalt de berekening van de hoogte van de kinderopvangtoeslag"
       type_spec:
         unit: "eurocent"
         precision: 0
@@ -192,8 +290,22 @@ actions:
     operation: FOREACH
     combine: ADD
     subject: "$AANGEGEVEN_UREN"
+    legal_basis:
+      law: "Wet kinderopvang"
+      bwb_id: "BWBR0017017"
+      article: "1.6"
+      url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+      juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&z=2024-12-11&g=2024-12-11"
+      explanation: "Artikel 1.6 Wet kinderopvang bepaalt optelling toeslag voor alle kinderen"
     value:
       - operation: MULTIPLY
+        legal_basis:
+          law: "Wet kinderopvang"
+          bwb_id: "BWBR0017017"
+          article: "1.6"
+          url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+          juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&z=2024-12-11&g=2024-12-11"
+          explanation: "Artikel 1.6 Wet kinderopvang bepaalt berekening toeslaghoogte per kind"
         values:
           - operation: MIN
             values:
@@ -203,13 +315,44 @@ actions:
                       subject: "$soort_opvang"
                       operation: EQUALS
                       value: "DAGOPVANG"
+                      legal_basis:
+                        law: "Wet kinderopvang"
+                        bwb_id: "BWBR0017017"
+                        article: "1.7"
+                        paragraph: "2"
+                        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+                        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=2&z=2024-12-11&g=2024-12-11"
+                        explanation: "Artikel 1.7 lid 2 Wet kinderopvang bepaalt maximum uurtarief dagopvang"
                     then: "$MAX_UURTARIEF_DAGOPVANG"
                   - else: "$MAX_UURTARIEF_BSO"
+                legal_basis:
+                  law: "Wet kinderopvang"
+                  bwb_id: "BWBR0017017"
+                  article: "1.7"
+                  paragraph: "2"
+                  url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+                  juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=2&z=2024-12-11&g=2024-12-11"
+                  explanation: "Artikel 1.7 lid 2 Wet kinderopvang bepaalt maximum uurtarieven per soort opvang"
               - "$uurtarief"
+            legal_basis:
+              law: "Wet kinderopvang"
+              bwb_id: "BWBR0017017"
+              article: "1.7"
+              paragraph: "2"
+              url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+              juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=2&z=2024-12-11&g=2024-12-11"
+              explanation: "Artikel 1.7 lid 2 Wet kinderopvang bepaalt dat toeslag gebaseerd is op laagste van werkelijk en maximum uurtarief"
           - operation: MIN
             values:
               - "$uren_per_jaar"
               - "$MAX_HOURS_PER_YEAR"
+            legal_basis:
+              law: "Wet kinderopvang"
+              bwb_id: "BWBR0017017"
+              article: "1.9"
+              url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.9"
+              juriconnect: "jci1.3:c:BWBR0017017&artikel=1.9&z=2024-12-11&g=2024-12-11"
+              explanation: "Artikel 1.9 Wet kinderopvang bepaalt maximum aantal vergoede uren per jaar"
           - operation: IF
             conditions:
               - test:
@@ -223,9 +366,32 @@ actions:
                             - test:
                                 subject: "$PARTNER_BSN"
                                 operation: NOT_NULL
+                                legal_basis:
+                                  law: "Algemene wet inkomensafhankelijke regelingen"
+                                  bwb_id: "BWBR0018472"
+                                  article: "3"
+                                  url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+                                  juriconnect: "jci1.3:c:BWBR0018472&artikel=3&z=2024-01-01&g=2024-01-01"
+                                  explanation: "Artikel 3 AWIR bepaalt wanneer partnerinkomen meetelt voor toeslagen"
                               then: "$PARTNER_INKOMEN"
                             - else: 0
+                      legal_basis:
+                        law: "Wet kinderopvang"
+                        bwb_id: "BWBR0017017"
+                        article: "1.6"
+                        paragraph: "2"
+                        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+                        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=2&z=2024-12-11&g=2024-12-11"
+                        explanation: "Artikel 1.6 lid 2 Wet kinderopvang bepaalt gezamenlijk toetsingsinkomen"
                     - "$INKOMENSDREMPEL_1"
+                  legal_basis:
+                    law: "Wet kinderopvang"
+                    bwb_id: "BWBR0017017"
+                    article: "1.7"
+                    paragraph: "3"
+                    url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+                    juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=3&z=2024-12-11&g=2024-12-11"
+                    explanation: "Artikel 1.7 lid 3 Wet kinderopvang bepaalt vergoedingspercentage bij inkomen tot eerste drempel"
                 then: "$PERCENTAGE_1"
               - test:
                   operation: LESS_THAN
@@ -238,8 +404,39 @@ actions:
                             - test:
                                 subject: "$PARTNER_BSN"
                                 operation: NOT_NULL
+                                legal_basis:
+                                  law: "Algemene wet inkomensafhankelijke regelingen"
+                                  bwb_id: "BWBR0018472"
+                                  article: "3"
+                                  url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+                                  juriconnect: "jci1.3:c:BWBR0018472&artikel=3&z=2024-01-01&g=2024-01-01"
+                                  explanation: "Artikel 3 AWIR bepaalt wanneer partnerinkomen meetelt voor toeslagen"
                               then: "$PARTNER_INKOMEN"
                             - else: 0
+                      legal_basis:
+                        law: "Wet kinderopvang"
+                        bwb_id: "BWBR0017017"
+                        article: "1.6"
+                        paragraph: "2"
+                        url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.6"
+                        juriconnect: "jci1.3:c:BWBR0017017&artikel=1.6&lid=2&z=2024-12-11&g=2024-12-11"
+                        explanation: "Artikel 1.6 lid 2 Wet kinderopvang bepaalt gezamenlijk toetsingsinkomen"
                     - "$INKOMENSDREMPEL_2"
+                  legal_basis:
+                    law: "Wet kinderopvang"
+                    bwb_id: "BWBR0017017"
+                    article: "1.7"
+                    paragraph: "3"
+                    url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+                    juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=3&z=2024-12-11&g=2024-12-11"
+                    explanation: "Artikel 1.7 lid 3 Wet kinderopvang bepaalt vergoedingspercentage bij inkomen tot tweede drempel"
                 then: "$PERCENTAGE_2"
               - else: "$PERCENTAGE_3"
+            legal_basis:
+              law: "Wet kinderopvang"
+              bwb_id: "BWBR0017017"
+              article: "1.7"
+              paragraph: "3"
+              url: "https://wetten.overheid.nl/BWBR0017017/2024-12-11#Hoofdstuk1_Afdeling1_Paragraaf4_Artikel1.7"
+              juriconnect: "jci1.3:c:BWBR0017017&artikel=1.7&lid=3&z=2024-12-11&g=2024-12-11"
+              explanation: "Artikel 1.7 lid 3 Wet kinderopvang bepaalt vergoedingspercentages per inkomenscategorie"

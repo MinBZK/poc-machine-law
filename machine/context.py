@@ -189,10 +189,23 @@ class RuleContext:
 
                 # Check definitions
                 if path in self.definitions:
-                    logger.debug(f"Resolving from DEFINITION: {self.definitions[path]}")
-                    node.result = self.definitions[path]
-                    node.resolve_type = "DEFINITION"
-                    return self.definitions[path]
+                    definition_value = self.definitions[path]
+                    # If definition contains both 'value' and 'legal_basis', extract only the value
+                    if (
+                        isinstance(definition_value, dict)
+                        and "value" in definition_value
+                        and "legal_basis" in definition_value
+                    ):
+                        actual_value = definition_value["value"]
+                        logger.debug(f"Resolving from DEFINITION (extracted value): {actual_value}")
+                        node.result = actual_value
+                        node.resolve_type = "DEFINITION"
+                        return actual_value
+                    else:
+                        logger.debug(f"Resolving from DEFINITION: {definition_value}")
+                        node.result = definition_value
+                        node.resolve_type = "DEFINITION"
+                        return definition_value
 
                 # Check parameters
                 if path in self.parameters:

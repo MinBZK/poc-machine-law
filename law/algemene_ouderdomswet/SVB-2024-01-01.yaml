@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
 uuid: 13dc8a31-91eb-4598-998c-012c9129b9ea
 name: AOW-uitkering
 law: algemene_ouderdomswet
@@ -8,6 +8,13 @@ decision_type: "TOEKENNING"
 discoverable: "CITIZEN"
 valid_from: 2024-01-01
 service: "SVB"
+legal_basis:
+  law: "Algemene Ouderdomswet"
+  bwb_id: "BWBR0002221"
+  article: "7"
+  url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+  juriconnect: "jci1.3:c:BWBR0002221&artikel=7&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 7 AOW bepaalt het recht op ouderdomspensioen bij het bereiken van de pensioengerechtigde leeftijd en minimaal één kalenderjaar verzekerd zijn"
 description: >
   Regels voor het bepalen van het recht op en de hoogte van de AOW-uitkering volgens
   de Algemene Ouderdomswet. De AOW is een basispensioen voor mensen die de AOW-leeftijd
@@ -31,6 +38,13 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "17"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIV_Artikel17"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=17&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 17 AOW vereist aanvraag door verzekerde voor toekenning ouderdomspensioen, BSN nodig voor identificatie"
 
   sources:
     - name: "WOONACHTIGE_VERZEKERDE_JAREN"
@@ -51,6 +65,14 @@ properties:
             description: "Burgerservicenummer van de persoon"
             type: "string"
             value: "$BSN"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "6"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukII_Artikel6"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=6&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 6 lid 1 AOW bepaalt wie verzekerd is: ingezetenen van Nederland zijn verplicht verzekerd"
 
   input:
     - name: "WERKZAME_VERZEKERDE_JAREN"
@@ -70,6 +92,14 @@ properties:
       temporal:
         type: "period"
         period_type: "continuous"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "6"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukII_Artikel6"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=6&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 6 lid 1 sub a AOW: werknemers in Nederland zijn verzekerd voor AOW"
 
     - name: "GEBOORTEDATUM"
       description: "Geboortedatum van de aanvrager"
@@ -84,6 +114,13 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7a"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7a AOW bepaalt de pensioengerechtigde leeftijd op basis van geboortedatum"
 
     - name: "PARTNER_GEBOORTEDATUM"
       description: "Geboortedatum van de partner"
@@ -98,6 +135,14 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8 lid 1 AOW bepaalt recht op toeslag als partner jonger is dan pensioengerechtigde leeftijd"
 
     - name: "LEEFTIJD"
       description: "Leeftijd van de aanvrager"
@@ -116,6 +161,14 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7 lid 1 AOW vereist het bereiken van de pensioengerechtigde leeftijd voor recht op ouderdomspensioen"
 
     - name: "HEEFT_PARTNER"
       description: "Heeft de persoon een partner volgens RvIG"
@@ -130,6 +183,14 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "1"
+        paragraph: "3"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukI_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=1&lid=3&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1 lid 3 AOW definieert gehuwde als persoon die gehuwd is of met wie een geregistreerd partnerschap is aangegaan"
 
     - name: "PARTNER_BSN"
       description: "BSN van de partner"
@@ -141,6 +202,14 @@ properties:
         parameters:
           - name: "BSN"
             reference: "$BSN"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8 AOW vereist informatie over partner voor toepassing van toeslag"
 
     - name: "PARTNER_LEEFTIJD"
       description: "Leeftijd van de partner"
@@ -159,6 +228,14 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8 lid 1 AOW bepaalt dat toeslag alleen mogelijk is als partner jonger is dan pensioengerechtigde leeftijd"
 
     - name: "INKOMEN"
       description: "Toetsingsinkomen"
@@ -177,6 +254,14 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "9"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 9 lid 2 AOW gebruikt inkomen voor vaststelling van toepasselijke bedragen"
 
     - name: "PARTNER_INKOMEN"
       description: "Toetsingsinkomen partner"
@@ -195,6 +280,14 @@ properties:
       temporal:
         type: "period"
         period_type: "year"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "8"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8 lid 2 AOW bepaalt dat de toeslag verminderd wordt bij inkomen van de partner"
 
     - name: "PENSIOENLEEFTIJD"
       description: "AOW-leeftijd voor deze persoon"
@@ -213,6 +306,13 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7a"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7a AOW bepaalt de verhoging van de pensioengerechtigde leeftijd naar gelang geboortejaar"
 
     - name: "PARTNER_PENSIOENLEEFTIJD"
       description: "AOW-leeftijd voor de partner"
@@ -231,6 +331,13 @@ properties:
       temporal:
         type: "point_in_time"
         reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7a"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7a AOW bepaalt de pensioengerechtigde leeftijd voor partner relevant voor toeslag"
 
   output:
     - name: "is_gerechtigd"
@@ -240,6 +347,14 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
       citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7 lid 1 AOW bepaalt recht op ouderdomspensioen vanaf pensioengerechtigde leeftijd en minimaal één kalenderjaar verzekerd"
 
     - name: "basisbedrag"
       description: "Basis AOW-bedrag voor opbouw"
@@ -252,6 +367,14 @@ properties:
         type: "period"
         period_type: "month"
       citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "9"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 9 lid 1 AOW bepaalt het bruto-ouderdomspensioen: ongehuwde 70% en gehuwde 50% van netto-minimumloon"
 
     - name: "opbouwpercentage"
       description: "Opbouwpercentage AOW"
@@ -264,6 +387,14 @@ properties:
         type: "point_in_time"
         reference: "$calculation_date"
       citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "13"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 13 lid 1 AOW bepaalt korting van 2% per niet-verzekerd kalenderjaar tussen aanvangs- en pensioengerechtigde leeftijd"
 
     - name: "pensioenbedrag"
       description: "Uiteindelijke AOW-uitkering"
@@ -276,15 +407,22 @@ properties:
         type: "period"
         period_type: "month"
       citizen_relevance: primary
+      legal_basis:
+        law: "Algemene Ouderdomswet"
+        bwb_id: "BWBR0002221"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0002221&artikel=9&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 9 AOW bepaalt het totale ouderdomspensioen inclusief eventuele toeslag volgens artikel 8"
 
   definitions:
-    JAREN_VOOR_VOLLEDIG_PENSIOEN: 50
-    OPBOUW_PER_JAAR: 0.02
-    BASISBEDRAG_ALLEENSTAAND: 138000
-    BASISBEDRAG_GEDEELD: 95200
-    PARTNER_TOESLAG_MAXIMUM: 25800
-    INKOMENSGRENS_PARTNER: 280000
-    KORTINGSPERCENTAGE: 0.02
+    JAREN_VOOR_VOLLEDIG_PENSIOEN: 50  # Artikel 13 lid 1 AOW - 50 jaar voor volledige opbouw (2% per jaar)
+    OPBOUW_PER_JAAR: 0.02  # Artikel 13 lid 1 AOW - 2% opbouw per verzekerd kalenderjaar
+    BASISBEDRAG_ALLEENSTAAND: 138000  # Artikel 9 lid 5 AOW - ongehuwde 70% van netto-minimumloon (2024)
+    BASISBEDRAG_GEDEELD: 95200  # Artikel 9 lid 5 AOW - gehuwde 50% van netto-minimumloon (2024)
+    PARTNER_TOESLAG_MAXIMUM: 25800  # Artikel 8 lid 3 AOW - maximale toeslag voor partner jonger dan pensioenleeftijd
+    INKOMENSGRENS_PARTNER: 280000  # Artikel 8 lid 2 AOW - inkomensgrens partner voor vermindering toeslag
+    KORTINGSPERCENTAGE: 0.02  # Artikel 13 lid 1 AOW - 2% korting per niet-verzekerd kalenderjaar
 
 requirements:
   - all:
@@ -302,6 +440,14 @@ requirements:
 actions:
   - output: "is_gerechtigd"
     value: true
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "7"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=7&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 7 lid 1 AOW: toekenning recht op ouderdomspensioen"
 
   - output: "basisbedrag"
     operation: IF
@@ -312,6 +458,14 @@ actions:
           value: true
         then: "$BASISBEDRAG_GEDEELD"
       - else: "$BASISBEDRAG_ALLEENSTAAND"
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "9"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 9 lid 1 AOW bepaalt bruto-ouderdomspensioen: gehuwde 50%, ongehuwde 70% van netto-minimumloon"
 
   - output: "opbouwpercentage"
     operation: DIVIDE
@@ -322,8 +476,32 @@ actions:
             values:
               - "$WOONACHTIGE_VERZEKERDE_JAREN"
               - "$WERKZAME_VERZEKERDE_JAREN"
+            legal_basis:
+              law: "Algemene Ouderdomswet"
+              bwb_id: "BWBR0002221"
+              article: "13"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+              juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 13 lid 1 AOW: optelling verzekerde jaren voor pensioenopbouw"
           - "$JAREN_VOOR_VOLLEDIG_PENSIOEN"
+        legal_basis:
+          law: "Algemene Ouderdomswet"
+          bwb_id: "BWBR0002221"
+          article: "13"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+          juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 13 lid 1 AOW: maximum 50 jaar voor volledige opbouw"
       - "$JAREN_VOOR_VOLLEDIG_PENSIOEN"
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "13"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel13"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=13&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 13 lid 1 AOW: pensioen verminderd met 2% voor elk niet-verzekerd jaar"
 
   - output: "pensioenbedrag"
     operation: MULTIPLY
@@ -349,10 +527,34 @@ actions:
                             values:
                               - "$PARTNER_LEEFTIJD"
                               - "$PARTNER_PENSIOENLEEFTIJD"
+                            legal_basis:
+                              law: "Algemene Ouderdomswet"
+                              bwb_id: "BWBR0002221"
+                              article: "8"
+                              paragraph: "1"
+                              url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                              juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1&z=2024-01-01&g=2024-01-01"
+                              explanation: "Artikel 8 lid 1 AOW: toeslag alleen als partner jonger is dan pensioengerechtigde leeftijd"
                           - operation: LESS_THAN
                             values:
                               - "$PARTNER_INKOMEN"
                               - "$INKOMENSGRENS_PARTNER"
+                            legal_basis:
+                              law: "Algemene Ouderdomswet"
+                              bwb_id: "BWBR0002221"
+                              article: "8"
+                              paragraph: "2"
+                              url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                              juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=2&z=2024-01-01&g=2024-01-01"
+                              explanation: "Artikel 8 lid 2 AOW: toeslag wordt verminderd bij inkomen partner"
+                        legal_basis:
+                          law: "Algemene Ouderdomswet"
+                          bwb_id: "BWBR0002221"
+                          article: "8"
+                          paragraph: "1"
+                          url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                          juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1&z=2024-01-01&g=2024-01-01"
+                          explanation: "Artikel 8 lid 1 AOW: voorwaarden voor recht op toeslag"
                       then:
                         operation: MIN
                         values:
@@ -360,12 +562,74 @@ actions:
                             values:
                               - "$PARTNER_TOESLAG_MAXIMUM"
                               - "$BASISBEDRAG_GEDEELD"
+                            legal_basis:
+                              law: "Algemene Ouderdomswet"
+                              bwb_id: "BWBR0002221"
+                              article: "8"
+                              paragraph: "3"
+                              url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                              juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=3&z=2024-01-01&g=2024-01-01"
+                              explanation: "Artikel 8 lid 3 AOW: maximale toeslag als percentage van basisbedrag"
                           - operation: MULTIPLY
                             values:
                               - operation: SUBTRACT
                                 values:
                                   - "$INKOMENSGRENS_PARTNER"
                                   - "$PARTNER_INKOMEN"
+                                legal_basis:
+                                  law: "Algemene Ouderdomswet"
+                                  bwb_id: "BWBR0002221"
+                                  article: "8"
+                                  paragraph: "2"
+                                  url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                                  juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=2&z=2024-01-01&g=2024-01-01"
+                                  explanation: "Artikel 8 lid 2 AOW: vermindering toeslag op basis van inkomen partner"
                               - "$KORTINGSPERCENTAGE"
+                            legal_basis:
+                              law: "Algemene Ouderdomswet"
+                              bwb_id: "BWBR0002221"
+                              article: "8"
+                              paragraph: "2"
+                              url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                              juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=2&z=2024-01-01&g=2024-01-01"
+                              explanation: "Artikel 8 lid 2 AOW: toepassing kortingspercentage op partner inkomen"
+                        legal_basis:
+                          law: "Algemene Ouderdomswet"
+                          bwb_id: "BWBR0002221"
+                          article: "8"
+                          paragraph: "3"
+                          url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                          juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=3&z=2024-01-01&g=2024-01-01"
+                          explanation: "Artikel 8 lid 3 AOW: beperking toeslag tot maximum"
                     - else: 0
+                  legal_basis:
+                    law: "Algemene Ouderdomswet"
+                    bwb_id: "BWBR0002221"
+                    article: "8"
+                    url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                    juriconnect: "jci1.3:c:BWBR0002221&artikel=8&z=2024-01-01&g=2024-01-01"
+                    explanation: "Artikel 8 AOW: berekening partnertoeslag"
+              legal_basis:
+                law: "Algemene Ouderdomswet"
+                bwb_id: "BWBR0002221"
+                article: "8"
+                paragraph: "1"
+                url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel8"
+                juriconnect: "jci1.3:c:BWBR0002221&artikel=8&lid=1&z=2024-01-01&g=2024-01-01"
+                explanation: "Artikel 8 lid 1 AOW: gehuwde kan toeslag ontvangen voor jongere partner"
           - else: 1
+        legal_basis:
+          law: "Algemene Ouderdomswet"
+          bwb_id: "BWBR0002221"
+          article: "9"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+          juriconnect: "jci1.3:c:BWBR0002221&artikel=9&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 9 lid 1 AOW: toepassing basisbedrag met opbouwpercentage en eventuele toeslag"
+    legal_basis:
+      law: "Algemene Ouderdomswet"
+      bwb_id: "BWBR0002221"
+      article: "9"
+      url: "https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel9"
+      juriconnect: "jci1.3:c:BWBR0002221&artikel=9&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 9 AOW: berekening totaal ouderdomspensioen inclusief eventuele toeslag volgens artikel 8"
