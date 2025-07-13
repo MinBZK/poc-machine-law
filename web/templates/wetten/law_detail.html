@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ law.title }} - wetten.nl</title>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
+        @font-face {
+            font-family: "RO Sans";
+            src: url("/static/fonts/ROsanswebtextregular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: "RO Sans";
+            src: url("/static/fonts/ROsanswebtextbold.woff") format("woff");
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "RO Sans", Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: #01689b;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header .breadcrumb {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .header .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-dropdown {
+            position: relative;
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            background: #01689b;
+        }
+
+        .nav-tabs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            padding: 0 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .nav-tab:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Breadcrumb section (below header) */
+        .breadcrumb-section {
+            background: #f3f3f3;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .breadcrumb-section a {
+            color: #01689b;
+            text-decoration: none;
+        }
+
+        .breadcrumb-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main layout */
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr 200px;
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        /* Left sidebar - Table of Contents */
+        .sidebar {
+            background: white;
+            border: 1px solid #e5e5e5;
+            padding: 1rem;
+            font-size: 0.875rem;
+            position: sticky;
+            top: 1rem;
+            height: fit-content;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            font-weight: 700;
+            color: #01689b;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .toc {
+            list-style: none;
+        }
+
+        .toc-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-link {
+            color: #01689b;
+            text-decoration: none;
+            display: block;
+            padding: 0.25rem 0;
+            font-size: 0.813rem;
+        }
+
+        .toc-link:hover {
+            text-decoration: underline;
+        }
+
+        .toc-nested {
+            list-style: none;
+            margin-left: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Content area */
+        .content {
+            background: white;
+            padding: 1.5rem;
+            border: 1px solid #e5e5e5;
+        }
+
+        .law-header {
+            margin-bottom: 2rem;
+        }
+
+        .law-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 0.5rem;
+        }
+
+        .law-meta {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .law-dates {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .date-item {
+            font-size: 0.813rem;
+        }
+
+        .date-label {
+            font-weight: 700;
+        }
+
+        /* Article styles */
+        .article {
+            margin-bottom: 2rem;
+            scroll-margin-top: 1rem;
+        }
+
+        .article-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 1rem;
+        }
+
+        .article-content {
+            line-height: 1.6;
+        }
+
+        .paragraph {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .paragraph-number {
+            position: absolute;
+            left: 0;
+            font-weight: 700;
+        }
+
+        /* Right sidebar - Tools */
+        .tools-sidebar {
+            font-size: 0.875rem;
+        }
+
+        .tools-section {
+            background: white;
+            border: 1px solid #e5e5e5;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tools-title {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .tool-link {
+            display: block;
+            padding: 0.5rem 0;
+            color: #01689b;
+            text-decoration: none;
+            font-size: 0.813rem;
+            border-bottom: 1px solid #f3f3f3;
+        }
+
+        .tool-link:last-child {
+            border-bottom: none;
+        }
+
+        .tool-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Machine implementations button */
+        .implementations-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #01689b;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .implementations-btn:hover {
+            background: #154273;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .impl-count {
+            background: white;
+            color: #01689b;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+        }
+
+        /* Implementations panel */
+        .implementations-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 3px solid #007bc7;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            max-height: 400px;
+            display: none;
+        }
+
+        .implementations-panel.open {
+            display: block;
+            transform: translateY(0);
+        }
+
+        .panel-header {
+            background: #f3f3f3;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #154273;
+        }
+
+        .panel-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .panel-close:hover {
+            color: #154273;
+        }
+
+        .panel-content {
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .impl-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .impl-card {
+            background: #f8f9fa;
+            border: 1px solid #e5e5e5;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .impl-name {
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 0.5rem;
+        }
+
+        .impl-service {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .impl-link {
+            color: #01689b;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .impl-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background: #e5f1f9;
+            border-top: 3px solid #007bc7;
+            margin-top: 4rem;
+            padding: 2rem 0;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #01689b;
+            text-decoration: none;
+            font-size: 0.813rem;
+        }
+
+        .footer-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* YAML Reference Styles */
+        .yaml-reference-indicator {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.125rem 0.375rem;
+            margin-left: 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            vertical-align: middle;
+        }
+
+        .yaml-reference-indicator:hover {
+            background: #1976d2;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .yaml-refs-container {
+            margin-top: 0.75rem;
+            background: #f8f9fa;
+            border: 1px solid #e3f2fd;
+            border-radius: 4px;
+            padding: 0.75rem;
+            font-size: 0.813rem;
+        }
+
+        .yaml-ref-header {
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .yaml-ref-item {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .yaml-ref-item::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #1976d2;
+        }
+
+        .yaml-ref-link {
+            color: #01689b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .yaml-ref-link:hover {
+            text-decoration: underline;
+        }
+
+        .yaml-ref-section {
+            color: #666;
+            font-family: monospace;
+            font-size: 0.75rem;
+            background: #e8f4f8;
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+        }
+
+        /* Paragraph with references styling */
+        .paragraph-with-refs {
+            position: relative;
+            background: #fafafa;
+            border-left: 3px solid #e3f2fd;
+            padding-left: 2.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar, .tools-sidebar {
+                display: none;
+            }
+        }
+
+        /* Ensure Alpine.js cloak works */
+        [x-cloak] {
+            display: none !important;
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Header -->
+        {% set header_title = law.title %}
+        {% set breadcrumb_extra = "Regeling" %}
+        {% include "wetten/partials/header.html" %}
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb-section">
+            <div class="breadcrumb-container">
+                <a href="/">U bent hier:</a>
+                <a href="/wetten">Zoeken</a> /
+                Regeling
+            </div>
+        </nav>
+        <!-- Main Content -->
+        <main class="main-wrapper">
+            <!-- Left Sidebar - Table of Contents -->
+            <aside class="sidebar">
+                <div class="sidebar-header">{{ law.title }}</div>
+                <div style="font-size: 0.75rem; color: #666; margin-bottom: 1rem;">Geldend van {{ law.valid_from }} t/m heden</div>
+                <nav>
+                    <ul class="toc">
+                        <li class="toc-item">
+                            <a href="#opschrift" class="toc-link">Regeling</a>
+                        </li>
+                        {% if law.structure.chapters %}
+                            {% for chapter in law.structure.chapters %}
+                                <li class="toc-item">
+                                    <a href="#chapter-{{ loop.index }}" class="toc-link">{{ chapter.title }}</a>
+                                    {% if chapter.sections %}
+                                        <ul class="toc-nested">
+                                            {% for section in chapter.sections %}
+                                                {% for article in section.articles %}
+                                                    <li class="toc-item">
+                                                        <a href="#{{ article.id }}" class="toc-link">{{ article.id }}</a>
+                                                    </li>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        {% elif law.structure.articles %}
+                            {% for article in law.structure.articles %}
+                                <li class="toc-item">
+                                    <a href="#{{ article.id }}" class="toc-link">{{ article.title or article.id }}</a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </nav>
+            </aside>
+            <!-- Content Area -->
+            <div class="content">
+                <div class="law-header" id="opschrift">
+                    <h1 class="law-title">{{ law.title }}</h1>
+                    <div class="law-meta">
+                        <div>Geldend van {{ law.valid_from }} t/m heden</div>
+                        <div class="law-dates">
+                            <div class="date-item">
+                                <span class="date-label">Geraadpleegd op</span> {{ today }}
+                            </div>
+                            <div class="date-item">
+                                <span class="date-label">Geldig op</span> {{ law.valid_from }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Law Content -->
+                {% if law.structure.chapters %}
+                    <!-- Nested chapter structure -->
+                    {% for chapter in law.structure.chapters %}
+                        <section id="chapter-{{ loop.index }}">
+                            <h2 style="font-size: 1.25rem;
+                                       font-weight: 700;
+                                       color: #154273;
+                                       margin: 2rem 0 1rem">{{ chapter.title }}</h2>
+                            {% for section in chapter.sections %}
+                                {% if section.title %}
+                                    <h3 style="font-size: 1.125rem;
+                                               font-weight: 700;
+                                               color: #154273;
+                                               margin: 1.5rem 0 1rem">{{ section.title }}</h3>
+                                {% endif %}
+                                {% for article in section.articles %}
+                                    <article class="article" id="{{ article.id }}">
+                                        <h4 class="article-title">{{ article.title or article.id }}</h4>
+                                        {% if article.paragraphs %}
+                                            {% for paragraph in article.paragraphs %}
+                                                <div class="paragraph{% if paragraph.yaml_references %} paragraph-with-refs{% endif %}">
+                                                    <span class="paragraph-number">{{ paragraph.number }}.</span>
+                                                    <span>{{ paragraph.content }}</span>
+                                                    {% if paragraph.yaml_references %}
+                                                        <a href="#yaml-refs-{{ article.id }}-{{ paragraph.number }}"
+                                                           class="yaml-reference-indicator"
+                                                           onclick="toggleYamlRefs(event, '{{ article.id }}-{{ paragraph.number }}')">
+                                                            ⚙ {{ paragraph.yaml_references|length }} regel{{ 's' if paragraph.yaml_references|length > 1 else '' }}
+                                                        </a>
+                                                        <div id="yaml-refs-{{ article.id }}-{{ paragraph.number }}"
+                                                             class="yaml-refs-container"
+                                                             style="display: none">
+                                                            <div class="yaml-ref-header">Machine-uitvoerbare regels:</div>
+                                                            {% for ref in paragraph.yaml_references %}
+                                                                <div class="yaml-ref-item">
+                                                                    <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file|urlencode }}#{{ ref.section|replace('.', '-') }}"
+                                                                       class="yaml-ref-link">{{ ref.description }}</a>
+                                                                    <span class="yaml-ref-section">{{ ref.section }}</span>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="article-content">{{ article.content }}</div>
+                                        {% endif %}
+                                    </article>
+                                {% endfor %}
+                                {% for subsection in section.sections %}
+                                    {% if subsection.title %}
+                                        <h4 style="font-size: 1rem;
+                                                   font-weight: 700;
+                                                   color: #154273;
+                                                   margin: 1rem 0 0.75rem">{{ subsection.title }}</h4>
+                                    {% endif %}
+                                    {% for article in subsection.articles %}
+                                        <article class="article" id="{{ article.id }}">
+                                            <h5 class="article-title">{{ article.title or article.id }}</h5>
+                                            {% if article.paragraphs %}
+                                                {% for paragraph in article.paragraphs %}
+                                                    <div class="paragraph{% if paragraph.yaml_references %} paragraph-with-refs{% endif %}">
+                                                        <span class="paragraph-number">{{ paragraph.number }}.</span>
+                                                        <span>{{ paragraph.content }}</span>
+                                                        {% if paragraph.yaml_references %}
+                                                            <a href="#yaml-refs-{{ article.id }}-{{ paragraph.number }}"
+                                                               class="yaml-reference-indicator"
+                                                               onclick="toggleYamlRefs(event, '{{ article.id }}-{{ paragraph.number }}')">
+                                                                ⚙ {{ paragraph.yaml_references|length }} regel{{ 's' if paragraph.yaml_references|length > 1 else '' }}
+                                                            </a>
+                                                            <div id="yaml-refs-{{ article.id }}-{{ paragraph.number }}"
+                                                                 class="yaml-refs-container"
+                                                                 style="display: none">
+                                                                <div class="yaml-ref-header">Machine-uitvoerbare regels:</div>
+                                                                {% for ref in paragraph.yaml_references %}
+                                                                    <div class="yaml-ref-item">
+                                                                        <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file|urlencode }}#{{ ref.section|replace('.', '-') }}"
+                                                                           class="yaml-ref-link">{{ ref.description }}</a>
+                                                                        <span class="yaml-ref-section">{{ ref.section }}</span>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div class="article-content">{{ article.content }}</div>
+                                            {% endif %}
+                                        </article>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                        </section>
+                    {% endfor %}
+                {% elif law.structure.articles %}
+                    <!-- Flat article structure -->
+                    {% for article in law.structure.articles %}
+                        <article class="article" id="{{ article.id }}">
+                            <h4 class="article-title">{{ article.title or article.id }}</h4>
+                            {% if article.paragraphs %}
+                                {% for paragraph in article.paragraphs %}
+                                    <div class="paragraph{% if paragraph.yaml_references %} paragraph-with-refs{% endif %}">
+                                        <span class="paragraph-number">{{ paragraph.number }}.</span>
+                                        <span>{{ paragraph.content }}</span>
+                                        {% if paragraph.yaml_references %}
+                                            <a href="#yaml-refs-{{ article.id }}-{{ paragraph.number }}"
+                                               class="yaml-reference-indicator"
+                                               onclick="toggleYamlRefs(event, '{{ article.id }}-{{ paragraph.number }}')">
+                                                ⚙ {{ paragraph.yaml_references|length }} regel{{ 's' if paragraph.yaml_references|length > 1 else '' }}
+                                            </a>
+                                            <div id="yaml-refs-{{ article.id }}-{{ paragraph.number }}"
+                                                 class="yaml-refs-container"
+                                                 style="display: none">
+                                                <div class="yaml-ref-header">Regelspraak implementaties:</div>
+                                                {% for ref in paragraph.yaml_references %}
+                                                    <div class="yaml-ref-item">
+                                                        <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file|urlencode }}#{{ ref.section|replace('.', '-') }}"
+                                                           class="yaml-ref-link">{{ ref.description }}</a>
+                                                        <span class="yaml-ref-section">{{ ref.section }}</span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="article-content">{{ article.content }}</div>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <!-- Right Sidebar - Tools -->
+            <aside class="tools-sidebar">
+                <div class="tools-section">
+                    <h3 class="tools-title">Origineel opschrift en aanhef</h3>
+                    <a href="#" class="tool-link">⊞ Toon</a>
+                </div>
+                <div class="tools-section">
+                    <h3 class="tools-title">Delen</h3>
+                    <a href="#" class="tool-link">📋 Kopieer link</a>
+                    <a href="#" class="tool-link">📧 E-mail</a>
+                </div>
+                <div class="tools-section">
+                    <h3 class="tools-title">Afdrukken</h3>
+                    <a href="#" class="tool-link">🖨️ Print deze regeling</a>
+                </div>
+                <div class="tools-section">
+                    <h3 class="tools-title">Downloaden</h3>
+                    <a href="#" class="tool-link">⬇️ XML</a>
+                    <a href="#" class="tool-link">⬇️ PDF</a>
+                </div>
+            </aside>
+        </main>
+        <!-- Regelspraak Button -->
+        {% if implementations %}
+            <div class="implementations-btn" onclick="togglePanel()">
+                <span>Regelspraak</span>
+                <span class="impl-count">{{ implementations|length }}</span>
+            </div>
+            <div class="implementations-panel" id="implPanel">
+                <div class="panel-header">
+                    <h3 class="panel-title">Regelspraak Implementaties</h3>
+                    <button class="panel-close" onclick="togglePanel()">×</button>
+                </div>
+                <div class="panel-content">
+                    <div class="impl-grid">
+                        {% for impl in implementations %}
+                            <div class="impl-card">
+                                <div class="impl-name">{{ impl.name }}</div>
+                                <div class="impl-service">Service: {{ impl.service }}</div>
+                                <a href="/wetten/{{ bwb_id }}/yaml/{{ impl.path|urlencode }}"
+                                   class="impl-link">Bekijk regelspraak →</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Over deze website</h3>
+                    <ul>
+                        <li>
+                            <a href="#">Contact</a>
+                        </li>
+                        <li>
+                            <a href="#">Copyright</a>
+                        </li>
+                        <li>
+                            <a href="#">Privacy en cookies</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Machine Law Project</h3>
+                    <ul>
+                        <li>
+                            <a href="/">Burger.nl</a>
+                        </li>
+                        <li>
+                            <a href="/laws/list">Regelspraak overzicht</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+        <script>
+            function togglePanel() {
+                const panel = document.getElementById('implPanel');
+                panel.classList.toggle('open');
+            }
+
+            function toggleYamlRefs(event, refId) {
+                event.preventDefault();
+                const container = document.getElementById('yaml-refs-' + refId);
+                if (container) {
+                    const isVisible = container.style.display !== 'none';
+                    container.style.display = isVisible ? 'none' : 'block';
+
+                    // Update indicator style
+                    const indicator = event.target;
+                    if (isVisible) {
+                        indicator.style.background = '#e3f2fd';
+                        indicator.style.color = '#1976d2';
+                    } else {
+                        indicator.style.background = '#1976d2';
+                        indicator.style.color = 'white';
+                    }
+                }
+            }
+
+            // Smooth scroll for navigation
+            document.querySelectorAll('.toc-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.querySelector(link.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

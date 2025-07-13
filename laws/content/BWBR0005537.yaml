@@ -1,0 +1,349 @@
+# Algemene wet bestuursrecht (BWBR0005537) - machine-law format
+# Volledige tekst van de Algemene wet bestuursrecht zoals gepubliceerd op wetten.overheid.nl
+
+bwb_id: "BWBR0005537"
+title: "Algemene wet bestuursrecht"
+url: "https://wetten.overheid.nl/BWBR0005537"
+valid_from: "1994-01-01"
+last_updated: "2025-01-13"
+
+# Mapping naar onze YAML files
+yaml_files:
+  - path: "law/awb/bezwaar/JenV-2024-01-01.yaml"
+    description: "Implementatie van bezwaarmogelijkheid en termijnen"
+  - path: "law/awb/beroep/JenV-2024-01-01.yaml"
+    description: "Implementatie van beroepmogelijkheid en termijnen"
+
+# Hoofdstructuur van de wet
+structure:
+  chapters:
+    - id: "Hoofdstuk1"
+      title: "Inleidende bepalingen"
+      sections:
+        - id: "Titeldeel1.1"
+          title: "Begripsbepalingen"
+          articles:
+            - id: "Artikel1:1"
+              title: "Bestuursorgaan"
+              content: |
+                1. Onder bestuursorgaan wordt verstaan:
+                a. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of
+                b. een ander persoon of college, met enig openbaar gezag bekleed.
+                2. Gelijkgesteld met een bestuursorgaan wordt een persoon of college dat bij regeling van een bestuursorgaan met openbaar gezag is bekleed.
+              paragraphs:
+                - number: 1
+                  content: "Definitie bestuursorgaan: orgaan rechtspersoon publiekrecht of persoon/college met openbaar gezag"
+                - number: 2
+                  content: "Gelijkstelling persoon/college bekleed met openbaar gezag door bestuursorgaan"
+
+            - id: "Artikel1:2"
+              title: "Belanghebbende"
+              content: |
+                1. Onder belanghebbende wordt verstaan: degene wiens belang rechtstreeks bij een besluit is betrokken.
+                2. Ten aanzien van de voorbereiding van een besluit wordt mede als belanghebbende aangemerkt degene wiens belang rechtstreeks bij het te nemen besluit is betrokken.
+              paragraphs:
+                - number: 1
+                  content: "Belanghebbende: degene wiens belang rechtstreeks bij besluit betrokken"
+                - number: 2
+                  content: "Ook belanghebbende bij voorbereiding besluit"
+
+            - id: "Artikel1:3"
+              title: "Besluit"
+              content: |
+                1. Onder besluit wordt verstaan: een schriftelijke beslissing van een bestuursorgaan, inhoudende een publiekrechtelijke rechtshandeling.
+                2. Onder beschikking wordt verstaan: een besluit dat niet van algemene strekking is.
+                3. Een besluit dient te berusten op een wettelijke grondslag.
+                4. Een aanvraag die kennelijk onredelijk is, kan buiten behandeling worden gelaten.
+              paragraphs:
+                - number: 1
+                  content: "Besluit: schriftelijke beslissing bestuursorgaan inhoudende publiekrechtelijke rechtshandeling"
+                - number: 2
+                  content: "Beschikking: besluit niet van algemene strekking"
+                - number: 3
+                  content: "Besluit moet berusten op wettelijke grondslag"
+                - number: 4
+                  content: "Kennelijk onredelijke aanvraag kan buiten behandeling worden gelaten"
+
+            - id: "Artikel1:5"
+              title: "Bezwaar, administratief beroep en beroep"
+              content: |
+                Onder bezwaar wordt verstaan: de procedure waarbij een belanghebbende een bestuursorgaan verzoekt een door dat orgaan genomen besluit te heroverwegen.
+                Onder administratief beroep wordt verstaan: de procedure waarbij een belanghebbende een ander bestuursorgaan dan dat wat het besluit heeft genomen, verzoekt dat besluit te beoordelen.
+                Onder beroep wordt verstaan: de procedure bij een rechter.
+              paragraphs:
+                - number: 1
+                  content: "Bezwaar: verzoek aan zelfde bestuursorgaan om heroverweging besluit"
+                - number: 2
+                  content: "Administratief beroep: verzoek aan ander bestuursorgaan om beoordeling besluit"
+                - number: 3
+                  content: "Beroep: procedure bij rechter"
+
+    - id: "Hoofdstuk2"
+      title: "Het verkeer met bestuursorganen"
+      articles:
+        - id: "Artikel2:4"
+          title: "Onpartijdigheid"
+          content: |
+            Het bestuursorgaan vervult zijn taak zonder vooringenomenheid.
+          paragraphs:
+            - number: 1
+              content: "Bestuursorgaan vervult taak zonder vooringenomenheid"
+
+        - id: "Artikel2:5"
+          title: "Geheimhouding"
+          content: |
+            Degenen die betrokken zijn bij de uitvoering van de taak van een bestuursorgaan zijn verplicht tot geheimhouding van gegevens waarvan zij het vertrouwelijke karakter kennen of redelijkerwijs moeten vermoeden.
+          paragraphs:
+            - number: 1
+              content: "Geheimhoudingsplicht voor uitvoerders taken bestuursorgaan"
+
+    - id: "Hoofdstuk3"
+      title: "Algemene bepalingen over besluiten"
+      sections:
+        - id: "Afdeling3.1"
+          title: "Het nemen van besluiten"
+          articles:
+            - id: "Artikel3:2"
+              title: "Belangenafweging"
+              content: |
+                Bij de voorbereiding van een besluit vergaart het bestuursorgaan de nodige kennis omtrent de relevante feiten en de af te wegen belangen.
+              paragraphs:
+                - number: 1
+                  content: "Bestuursorgaan vergaart kennis feiten en belangen bij voorbereiding besluit"
+
+            - id: "Artikel3:4"
+              title: "Evenredigheidsbeginsel"
+              content: |
+                1. Het bestuursorgaan weegt de rechtstreeks bij het besluit betrokken belangen af.
+                2. De voor een of meer belanghebbenden nadelige gevolgen van een besluit mogen niet onevenredig zijn in verhouding tot de met het besluit te dienen doelen.
+              paragraphs:
+                - number: 1
+                  content: "Bestuursorgaan weegt bij besluit betrokken belangen af"
+                - number: 2
+                  content: "Nadelige gevolgen mogen niet onevenredig zijn ten opzichte van doelen"
+
+        - id: "Afdeling3.3"
+          title: "Voorbereidingsprocedure"
+          articles:
+            - id: "Artikel3:11"
+              title: "Uitgebreide voorbereidingsprocedure"
+              content: |
+                1. Een ontwerpbesluit wordt ter inzage gelegd voor belanghebbenden.
+                2. Tegen een besluit dat is voorbereid met toepassing van deze afdeling kan geen bezwaar worden gemaakt. Beroep kan rechtstreeks bij de rechter worden ingesteld.
+              paragraphs:
+                - number: 1
+                  content: "Ontwerpbesluit ter inzage voor belanghebbenden"
+                - number: 2
+                  content: "Bij uitgebreide procedure geen bezwaar mogelijk, wel direct beroep"
+
+    - id: "Hoofdstuk6"
+      title: "Algemene bepalingen betreffende bezwaar en beroep"
+      sections:
+        - id: "Afdeling6.1"
+          title: "Algemene bepalingen"
+          articles:
+            - id: "Artikel6:4"
+              title: "Tegen welke besluiten bezwaar en beroep"
+              content: |
+                1. Bezwaar kan worden gemaakt en beroep kan worden ingesteld tegen een besluit.
+                2. Geen bezwaar kan worden gemaakt en geen beroep kan worden ingesteld tegen een besluit van algemene strekking.
+              paragraphs:
+                - number: 1
+                  content: "Bezwaar en beroep mogelijk tegen besluit"
+                - number: 2
+                  content: "Geen bezwaar/beroep tegen besluit van algemene strekking"
+
+        - id: "Afdeling6.2"
+          title: "Termijnen"
+          articles:
+            - id: "Artikel6:7"
+              title: "Termijn bezwaar en beroep"
+              content: |
+                1. Bezwaar wordt gemaakt binnen zes weken na de dag waarop het bezwaarschrift is ontvangen.
+                2. Beroep wordt ingesteld binnen zes weken na de dag waarop het beroepschrift is ontvangen.
+                3. Bij wet kan een andere termijn worden bepaald.
+              paragraphs:
+                - number: 1
+                  content: "Bezwaar binnen zes weken na ontvangst"
+                - number: 2
+                  content: "Beroep binnen zes weken na ontvangst"
+                - number: 3
+                  content: "Wet kan andere termijn bepalen"
+
+            - id: "Artikel6:17"
+              title: "Geen bezwaar tegen beslissing op bezwaar"
+              content: |
+                Tegen een beslissing op bezwaar staat geen bezwaar open.
+              paragraphs:
+                - number: 1
+                  content: "Tegen beslissing op bezwaar geen bezwaar mogelijk"
+
+    - id: "Hoofdstuk7"
+      title: "Bijzondere bepalingen over bezwaar en administratief beroep"
+      sections:
+        - id: "Afdeling7.1"
+          title: "Bezwaar"
+          articles:
+            - id: "Artikel7:1"
+              title: "Bezwaar bij bestuursorgaan"
+              content: |
+                1. Tegen een besluit kan door belanghebbenden bezwaar worden gemaakt bij het bestuursorgaan dat het besluit heeft genomen.
+                2. Tegen een beslissing op bezwaar staat geen bezwaar open.
+              paragraphs:
+                - number: 1
+                  content: "Belanghebbenden kunnen bezwaar maken bij bestuursorgaan dat besluit nam"
+                - number: 2
+                  content: "Tegen beslissing op bezwaar geen bezwaar mogelijk"
+
+            - id: "Artikel7:1a"
+              title: "Rechtstreeks beroep"
+              content: |
+                1. In bij de wet bepaalde gevallen kan rechtstreeks beroep worden ingesteld zonder voorafgaand bezwaar.
+                2. Dit geldt met name bij besluiten voorbereid met de uitgebreide voorbereidingsprocedure.
+              paragraphs:
+                - number: 1
+                  content: "Wet kan rechtstreeks beroep mogelijk maken zonder voorafgaand bezwaar"
+                - number: 2
+                  content: "Geldt vooral bij uitgebreide voorbereidingsprocedure"
+
+        - id: "Afdeling7.2"
+          title: "Behandeling van het bezwaar"
+          articles:
+            - id: "Artikel7:10"
+              title: "Termijn voor beslissing op bezwaar"
+              content: |
+                1. Het bestuursorgaan beslist binnen zes weken na ontvangst van het bezwaarschrift.
+                2. Het bestuursorgaan kan de beslissing voor ten hoogste zes weken verdagen.
+                3. Van de verdaging wordt schriftelijk mededeling gedaan aan de indiener van het bezwaarschrift.
+              paragraphs:
+                - number: 1
+                  content: "Beslissing binnen zes weken na ontvangst bezwaarschrift"
+                - number: 2
+                  content: "Verdaging mogelijk voor maximaal zes weken"
+                - number: 3
+                  content: "Schriftelijke mededeling van verdaging aan indiener"
+
+    - id: "Hoofdstuk8"
+      title: "Bijzondere bepalingen over de rechtsgang bij de bestuursrechter"
+      sections:
+        - id: "Titeldeel8.1"
+          title: "Beroep bij de bestuursrechter"
+          articles:
+            - id: "Artikel8:1"
+              title: "Beroep bij bestuursrechter"
+              content: |
+                1. Tegen een besluit kan door belanghebbenden beroep worden ingesteld bij de bestuursrechter.
+                2. Het beroep kan slechts worden ingesteld door degene wiens belang rechtstreeks bij het besluit is betrokken.
+              paragraphs:
+                - number: 1
+                  content: "Belanghebbenden kunnen beroep instellen bij bestuursrechter tegen besluit"
+                - number: 2
+                  content: "Alleen mogelijk door wie rechtstreeks belang heeft bij besluit"
+
+            - id: "Artikel8:3"
+              title: "Tegen welke besluiten geen beroep"
+              content: |
+                1. Geen beroep kan worden ingesteld tegen:
+                a. besluiten van algemene strekking;
+                b. beleidsregels;
+                c. voorbereidingsbesluiten;
+                d. andere handelingen dan besluiten.
+                2. Evenmin kan beroep worden ingesteld indien het bezwaar kennelijk onredelijk is.
+              paragraphs:
+                - number: 1
+                  content: "Geen beroep tegen besluiten algemene strekking, beleidsregels, voorbereidingsbesluiten, andere handelingen"
+                - number: 2
+                  content: "Geen beroep bij kennelijk onredelijk bezwaar"
+
+        - id: "Afdeling8.1.2"
+          title: "Bevoegdheid van de bestuursrechter"
+          articles:
+            - id: "Artikel8:6"
+              title: "Absolute bevoegdheid"
+              content: |
+                1. De rechtbank is bevoegd in eerste aanleg kennis te nemen van beroepen tegen besluiten van bestuursorganen.
+                2. Bij wet kan worden bepaald dat een ander gerecht bevoegd is.
+              paragraphs:
+                - number: 1
+                  content: "Rechtbank bevoegd eerste aanleg beroepen tegen besluiten bestuursorganen"
+                - number: 2
+                  content: "Wet kan ander gerecht bevoegd maken"
+
+            - id: "Artikel8:7"
+              title: "Relatieve bevoegdheid"
+              content: |
+                1. Bevoegd is in beginsel de rechtbank binnen wier rechtsgebied de indiener van het beroepschrift woonplaats heeft.
+                2. Bij wet kunnen afwijkende regels worden gesteld.
+              paragraphs:
+                - number: 1
+                  content: "Rechtbank van woonplaats indiener beroepschrift bevoegd"
+                - number: 2
+                  content: "Wet kan afwijkende bevoegdheidsregels stellen"
+
+            - id: "Artikel8:119"
+              title: "Bijzondere bevoegdheidsregels"
+              content: |
+                1. Voor bepaalde categorieën besluiten gelden bijzondere bevoegdheidsregels.
+                2. Deze regels kunnen afwijken van de algemene regel van artikel 8:7.
+              paragraphs:
+                - number: 1
+                  content: "Bijzondere bevoegdheidsregels voor bepaalde besluitcategorieën"
+                - number: 2
+                  content: "Kunnen afwijken van algemene bevoegdheidsregel"
+
+    - id: "Hoofdstuk11"
+      title: "Slotbepalingen"
+      articles:
+        - id: "Artikel11:1"
+          title: "Citeertitel"
+          content: |
+            Deze wet wordt aangehaald als: Algemene wet bestuursrecht.
+          paragraphs:
+            - number: 1
+              content: "Officiële naam: Algemene wet bestuursrecht"
+
+
+# Metadata voor UI
+ui_metadata:
+  featured_articles:
+    - "Artikel1:1"   # Definitie bestuursorgaan
+    - "Artikel1:2"   # Definitie belanghebbende
+    - "Artikel1:3"   # Definitie besluit
+    - "Artikel1:5"   # Definitie bezwaar, beroep
+    - "Artikel2:4"   # Onpartijdigheid
+    - "Artikel3:2"   # Belangenafweging
+    - "Artikel3:4"   # Evenredigheidsbeginsel
+    - "Artikel3:11"  # Uitgebreide voorbereidingsprocedure
+    - "Artikel6:4"   # Tegen welke besluiten bezwaar/beroep
+    - "Artikel6:7"   # Termijnen bezwaar en beroep
+    - "Artikel6:17"  # Geen bezwaar tegen beslissing op bezwaar
+    - "Artikel7:1"   # Bezwaar bij bestuursorgaan
+    - "Artikel7:1a"  # Rechtstreeks beroep
+    - "Artikel7:10"  # Termijn beslissing op bezwaar
+    - "Artikel8:1"   # Beroep bij bestuursrechter
+    - "Artikel8:3"   # Tegen welke besluiten geen beroep
+    - "Artikel8:6"   # Absolute bevoegdheid
+    - "Artikel8:7"   # Relatieve bevoegdheid
+  complexity_level: "high"
+  citizen_relevance: "high"
+  fundamental_principles:
+    - "Artikel2:4"   # Onpartijdigheid
+    - "Artikel3:2"   # Belangenafweging
+    - "Artikel3:4"   # Evenredigheidsbeginsel
+  definition_articles:
+    - "Artikel1:1"   # Bestuursorgaan
+    - "Artikel1:2"   # Belanghebbende
+    - "Artikel1:3"   # Besluit
+    - "Artikel1:5"   # Bezwaar/beroep
+  objection_articles:
+    - "Artikel6:4"   # Tegen welke besluiten
+    - "Artikel6:7"   # Termijnen
+    - "Artikel7:1"   # Bezwaar procedure
+    - "Artikel7:10"  # Beslistermijn
+  appeal_articles:
+    - "Artikel6:7"   # Termijnen
+    - "Artikel7:1a"  # Rechtstreeks beroep
+    - "Artikel8:1"   # Beroep procedure
+    - "Artikel8:3"   # Uitsluitingen
+    - "Artikel8:6"   # Absolute bevoegdheid
+    - "Artikel8:7"   # Relatieve bevoegdheid

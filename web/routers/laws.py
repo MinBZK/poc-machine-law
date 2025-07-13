@@ -11,6 +11,7 @@ from explain.llm_factory import llm_factory
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
+from web.utils import get_law_url
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 
@@ -282,6 +283,9 @@ async def explanation(
         # Format provider info for the template
         providers = [{"name": p, "is_configured": p in configured_providers} for p in available_providers]
 
+        # Get the specific law URL
+        law_url = get_law_url(law, service)
+
         # Create a response
         response = templates.TemplateResponse(
             "partials/tiles/components/explanation.html",
@@ -290,6 +294,7 @@ async def explanation(
                 "explanation": explanation_text,
                 "service": service,
                 "law": law,
+                "law_url": law_url,
                 "bsn": bsn,
                 "providers": providers,
                 "current_provider": current_provider,

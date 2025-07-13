@@ -1,0 +1,322 @@
+# Algemene Ouderdomswet (BWBR0002221) - machine-law format
+# Volledige tekst van de AOW zoals gepubliceerd op wetten.overheid.nl
+
+bwb_id: "BWBR0002221"
+title: "Algemene Ouderdomswet"
+url: "https://wetten.overheid.nl/BWBR0002221"
+valid_from: "2025-01-01"
+last_updated: "2025-01-01"
+
+# Mapping naar onze YAML files
+yaml_files:
+  - path: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+    description: "Hoofdimplementatie van de AOW-berekening"
+  - path: "law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml"
+    description: "Bepaling van de AOW-leeftijd"
+
+# Hoofdstructuur van de wet
+structure:
+  chapters:
+    - id: "HoofdstukI"
+      title: "Algemene bepalingen"
+      articles:
+        - id: "Artikel1"
+          title: "Begripsbepalingen"
+          content: |
+            In deze wet en de daarop berustende bepalingen wordt verstaan onder:
+            a. Onze Minister: de Minister van Sociale Zaken en Werkgelegenheid;
+            b. lichamen: rechtspersonen, vennootschappen onder firma, commanditaire vennootschappen en alle andere niet in deze wet als natuurlijk persoon aangemerkte samenwerkingsvormen;
+            c. vreemdeling: hetgeen daaronder wordt verstaan in de Vreemdelingenwet 2000;
+            d. brutominimumloon: het bedrag, bedoeld in artikel 8, eerste lid, onderdeel a, van de Wet minimumloon en minimumvakantiebijslag;
+            e. vrijheidsbeneming: het op grond van een wettelijk voorschrift of een rechterlijke uitspraak zijn opgenomen in een justitiële inrichting;
+            f. justitiële inrichting: een penitentiaire inrichting als bedoeld in artikel 1, onderdeel b, van de Penitentiaire beginselenwet, of een inrichting voor de opvang van vreemdelingen als bedoeld in artikel 1, onderdeel h, van de Vreemdelingenwet 2000;
+            g. continentaal plat: het continentaal plat, bedoeld in artikel 1 van de Wet op het continentaal plat, en de exclusieve economische zone van het Koninkrijk;
+            h. gevangenisstraf of hechtenis: een bij onherroepelijke rechterlijke uitspraak opgelegde vrijheidsstraf onderscheidenlijk vrijheidsbenemende maatregel;
+            i. pensioengerechtigde leeftijd: de leeftijd, bedoeld in artikel 7a, eerste lid;
+            j. aanvangsleeftijd: de leeftijd van 15 jaar;
+            k. CBS: het Centraal Bureau voor de Statistiek;
+            l. vertrekker: degene die Nederland heeft verlaten en van wie redelijkerwijs kan worden aangenomen dat hij zich heeft begeven naar het grondgebied van een organisatie die bij of krachtens de Sanctiewet 1977 is aangewezen of een persoon die daaraan leiding geeft, daarvan deel uitmaakt, daarvoor werkt of die anderszins steun verleent aan de activiteiten van een dergelijke organisatie;
+          paragraphs:
+            - number: 1
+              content: "Begripsbepalingen zoals hierboven omschreven"
+              yaml_references:
+                - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                  section: "legal_basis"
+                  description: "Definities gebruikt in AOW-berekening"
+                  line_reference: "legal_basis.bwb_id"
+            - number: 2
+              content: "Voor de toepassing van deze wet wordt onder gehuwde mede verstaan een ongehuwde die met een andere ongehuwde een gezamenlijke huishouding voert, tenzij het betreft een bloedverwant in de eerste graad."
+            - number: 3
+              content: "Voor de toepassing van deze wet wordt onder gehuwde niet verstaan degene die duurzaam gescheiden leeft van zijn echtgenoot."
+            - number: 4
+              content: "Voor de toepassing van deze wet wordt gelijkgesteld met een echtgenoot de geregistreerde partner."
+            - number: 5
+              content: "Voor de toepassing van deze wet wordt onder alleenstaande verstaan degene die niet gehuwd is."
+
+        - id: "Artikel2"
+          title: "Ingezetene"
+          content: |
+            Ingezetene in de zin van deze wet is hij die in Nederland woont.
+          paragraphs:
+            - number: 1
+              content: "Definitie van ingezetene als basis voor verzekering"
+
+        - id: "Artikel3"
+          title: "Woonplaats en verblijf"
+          content: |
+            1. Het hebben van woonplaats en het hebben van werkelijke verblijfplaats in Nederland wordt naar de omstandigheden beoordeeld.
+            2. Als woonplaats in Nederland wordt mede aangemerkt het zich bevinden aan boord van een zeeschip dat zijn thuishaven heeft in Nederland, indien en voor zover de opvarende behoort tot de bemanning van dat schip.
+            3. Degene die Nederland heeft verlaten en binnen een jaar na zijn vertrek naar Nederland terugkeert, wordt geacht gedurende zijn afwezigheid ingezetene te zijn gebleven.
+          paragraphs:
+            - number: 1
+              content: "Beoordeling woonplaats naar omstandigheden"
+            - number: 2
+              content: "Zeeschip met Nederlandse thuishaven geldt als Nederlandse woonplaats"
+            - number: 3
+              content: "Terugkeer binnen een jaar behoudt ingezetenenschap"
+
+    - id: "HoofdstukII"
+      title: "Kring der verzekerden"
+      articles:
+        - id: "Artikel6"
+          title: "Verplichte verzekering"
+          content: |
+            1. Verzekerd krachtens deze wet zijn zij die:
+            a. ingezetene zijn;
+            b. niet ingezetene zijn, doch ter zake van in Nederland in dienstbetrekking verrichte arbeid, ter zake van in Nederland uitgeoefend beroep of bedrijf dan wel ter zake van het in Nederland gevestigd zijn van de werkgever onderworpen zijn aan de loonbelasting krachtens de Wet inkomstenbelasting 2001.
+            2. Niet verzekerd zijn zij die in verband met hun werkzaamheden ten behoeve van een volkenrechtelijke organisatie zijn vrijgesteld van de in het eerste lid, onderdeel b, bedoelde belastingplicht.
+          paragraphs:
+            - number: 1
+              content: "Verplichte verzekering voor ingezetenen en werkenden in Nederland"
+              yaml_references:
+                - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                  section: "sources.WOONACHTIGE_VERZEKERDE_JAREN"
+                  description: "Verzekerde jaren op basis van ingezetenschap"
+                  line_reference: "sources.WOONACHTIGE_VERZEKERDE_JAREN.legal_basis"
+            - number: 2
+              content: "Uitzondering voor werknemers volkenrechtelijke organisaties"
+
+        - id: "Artikel6a"
+          title: "Einde verzekering bij vertrek"
+          content: |
+            1. De verzekering op grond van artikel 6, eerste lid, onderdeel a, eindigt, behoudens bij ministeriële regeling te bepalen uitzonderingen, met ingang van de dag waarop betrokkene ophoudt ingezetene te zijn.
+            2. De verzekering op grond van artikel 6, eerste lid, onderdeel b, eindigt met ingang van de dag waarop betrokkene niet langer voldoet aan de in dat onderdeel gestelde voorwaarden.
+          paragraphs:
+            - number: 1
+              content: "Einde verzekering bij ophouden ingezetene te zijn"
+            - number: 2
+              content: "Einde verzekering bij wegvallen werkvoorwaarden"
+
+    - id: "HoofdstukIII"
+      title: "Het ouderdomspensioen en de toeslag"
+      sections:
+        - id: "Paragraaf1"
+          title: "Het recht op ouderdomspensioen en toeslag"
+          articles:
+            - id: "Artikel7"
+              title: "Recht op ouderdomspensioen"
+              content: |
+                1. Recht op ouderdomspensioen heeft de verzekerde die de pensioengerechtigde leeftijd heeft bereikt en die onmiddellijk voorafgaande aan het bereiken van die leeftijd gedurende ten minste een kalenderjaar verzekerd is geweest.
+                2. Eveneens recht op ouderdomspensioen heeft degene die de pensioengerechtigde leeftijd heeft bereikt en die tussen de aanvangsleeftijd en de pensioengerechtigde leeftijd gedurende ten minste een kalenderjaar verzekerd is geweest.
+              paragraphs:
+                - number: 1
+                  content: "Recht op ouderdomspensioen bij bereiken pensioenleeftijd en minimaal één jaar verzekerd"
+                  yaml_references:
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "legal_basis"
+                      description: "Hoofdartikel voor AOW-recht"
+                      line_reference: "legal_basis.article"
+                - number: 2
+                  content: "Alternatieve route: minimaal één jaar verzekerd tussen 15 jaar en pensioenleeftijd"
+
+            - id: "Artikel7a"
+              title: "Pensioengerechtigde leeftijd"
+              content: |
+                1. De pensioengerechtigde leeftijd bedraagt 67 jaar.
+                2. Voor personen geboren voor 1 januari 1960 gelden overgangsregelingen zoals vastgesteld in artikel 59a.
+              paragraphs:
+                - number: 1
+                  content: "Pensioengerechtigde leeftijd is 67 jaar"
+                  yaml_references:
+                    - file: "law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml"
+                      section: "actions"
+                      description: "Bepaling van individuele pensioenleeftijd"
+                      line_reference: "actions.0"
+                - number: 2
+                  content: "Overgangsregelingen voor personen geboren voor 1960"
+
+            - id: "Artikel8"
+              title: "Toeslag"
+              content: |
+                1. Aan de gehuwde verzekerde die recht heeft op ouderdomspensioen wordt een toeslag toegekend, indien zijn echtgenoot de pensioengerechtigde leeftijd nog niet heeft bereikt.
+                2. De toeslag wordt verminderd met het bedrag waarmee het inkomen van de echtgenoot een bij ministeriële regeling vast te stellen grens overschrijdt.
+                3. De toeslag bedraagt ten hoogste het verschil tussen het bedrag van het ouderdomspensioen waarop de ongehuwde en dat waarop de gehuwde verzekerde aanspraak heeft.
+              paragraphs:
+                - number: 1
+                  content: "Toeslag voor gehuwde met partner jonger dan AOW-leeftijd"
+                  yaml_references:
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "input.PARTNER_LEEFTIJD"
+                      description: "Leeftijd partner voor toeslagberekening"
+                      line_reference: "input.PARTNER_LEEFTIJD.legal_basis"
+                - number: 2
+                  content: "Vermindering toeslag bij inkomen partner"
+                - number: 3
+                  content: "Maximum toeslag is verschil tussen alleenstaand en gehuwd tarief"
+
+            - id: "Artikel9"
+              title: "Hoogte van het ouderdomspensioen"
+              content: |
+                1. Het bruto-ouderdomspensioen bedraagt per maand:
+                a. voor de ongehuwde verzekerde: 70 percent van het netto-minimumloon per maand;
+                b. voor de gehuwde verzekerde: 50 percent van het netto-minimumloon per maand.
+                2. Bij de vaststelling van het netto-minimumloon wordt uitgegaan van het brutominimumloon en de daarover verschuldigde belasting en premies.
+              paragraphs:
+                - number: 1
+                  content: "Bruto-ouderdomspensioen: ongehuwd 70%, gehuwd 50% van netto-minimumloon"
+                  yaml_references:
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "definitions.BASISBEDRAG_ALLEENSTAAND"
+                      description: "Basisbedrag voor alleenstaanden (70%)"
+                      line_reference: "definitions.BASISBEDRAG_ALLEENSTAAND"
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "definitions.BASISBEDRAG_GEDEELD"
+                      description: "Basisbedrag voor gehuwden (50%)"
+                      line_reference: "definitions.BASISBEDRAG_GEDEELD"
+                - number: 2
+                  content: "Netto-minimumloon is bruto minus belasting en premies"
+
+            - id: "Artikel13"
+              title: "Korting wegens niet-verzekerde tijdvakken"
+              content: |
+                1. Het ouderdomspensioen wordt verminderd met 2 percent voor elk kalenderjaar, gelegen tussen de aanvangsleeftijd en de pensioengerechtigde leeftijd, waarover de verzekerde niet verzekerd is geweest.
+                2. Voor de vrouw die is geboren vóór 1 januari 1950 en die tussen 1 januari 1957 en 1 januari 1985 niet verzekerd is geweest uitsluitend op grond van het feit dat zij gehuwd was, geldt de korting niet over die periode.
+              paragraphs:
+                - number: 1
+                  content: "Korting van 2% per niet-verzekerd kalenderjaar"
+                  yaml_references:
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "definitions.OPBOUW_PER_JAAR"
+                      description: "2% opbouw per verzekerd jaar"
+                      line_reference: "definitions.OPBOUW_PER_JAAR"
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "actions.1.operation"
+                      description: "Berekening opbouwpercentage"
+                      line_reference: "actions.1"
+                - number: 2
+                  content: "Uitzondering voor gehuwde vrouwen 1957-1985"
+
+        - id: "Paragraaf2"
+          title: "Toekenning, ingang, intrekking, herziening en betaling van het ouderdomspensioen"
+          articles:
+            - id: "Artikel14"
+              title: "Aanvraag"
+              content: |
+                1. Het ouderdomspensioen wordt op aanvraag toegekend.
+                2. Een aanvraag wordt ingediend bij de Sociale verzekeringsbank.
+              paragraphs:
+                - number: 1
+                  content: "Ouderdomspensioen wordt toegekend op aanvraag"
+                - number: 2
+                  content: "Aanvraag bij Sociale verzekeringsbank (SVB)"
+
+            - id: "Artikel17"
+              title: "Indiening aanvraag"
+              content: |
+                1. De aanvraag om ouderdomspensioen wordt ingediend door de verzekerde.
+                2. Een aanvraag kan worden ingediend vanaf 4 maanden voor het bereiken van de pensioengerechtigde leeftijd.
+              paragraphs:
+                - number: 1
+                  content: "Aanvraag door verzekerde zelf"
+                  yaml_references:
+                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+                      section: "properties.parameters.BSN"
+                      description: "BSN vereist voor aanvraag"
+                      line_reference: "properties.parameters.BSN.legal_basis"
+                - number: 2
+                  content: "Aanvraag mogelijk vanaf 4 maanden voor pensioenleeftijd"
+
+# Cross-referentie index voor snelle lookup
+cross_references:
+  # Vanuit YAML naar wettekst
+  yaml_to_law:
+    "law/algemene_ouderdomswet/SVB-2024-01-01.yaml":
+      legal_basis.article:
+        article: "Artikel7"
+        paragraph: 1
+        description: "Hoofdartikel voor recht op AOW"
+      definitions.BASISBEDRAG_ALLEENSTAAND:
+        article: "Artikel9"
+        paragraph: 1
+        description: "70% van netto-minimumloon voor alleenstaanden"
+      definitions.BASISBEDRAG_GEDEELD:
+        article: "Artikel9"
+        paragraph: 1
+        description: "50% van netto-minimumloon voor gehuwden"
+      definitions.OPBOUW_PER_JAAR:
+        article: "Artikel13"
+        paragraph: 1
+        description: "2% opbouw per verzekerd kalenderjaar"
+      sources.WOONACHTIGE_VERZEKERDE_JAREN:
+        article: "Artikel6"
+        paragraph: 1
+        description: "Verzekering op basis van ingezetenschap"
+      input.PARTNER_LEEFTIJD:
+        article: "Artikel8"
+        paragraph: 1
+        description: "Leeftijd partner voor toeslag"
+      properties.parameters.BSN:
+        article: "Artikel17"
+        paragraph: 1
+        description: "BSN vereist voor aanvraag"
+    "law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml":
+      actions.0:
+        article: "Artikel7a"
+        paragraph: 1
+        description: "Bepaling pensioengerechtigde leeftijd"
+
+  # Vanuit wettekst naar YAML
+  law_to_yaml:
+    "Artikel7":
+      paragraph_1:
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "legal_basis.article"
+      paragraph_2:
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "requirements"
+    "Artikel9":
+      paragraph_1:
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "definitions.BASISBEDRAG_ALLEENSTAAND"
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "definitions.BASISBEDRAG_GEDEELD"
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "actions.1"
+    "Artikel13":
+      paragraph_1:
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "definitions.OPBOUW_PER_JAAR"
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "actions.1"
+    "Artikel8":
+      paragraph_1:
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "input.PARTNER_LEEFTIJD"
+        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
+          section: "actions.2"
+
+# Metadata voor UI
+ui_metadata:
+  featured_articles:
+    - "Artikel7"
+    - "Artikel7a"
+    - "Artikel8"
+    - "Artikel9"
+    - "Artikel13"
+    - "Artikel17"
+  complexity_level: "high"
+  citizen_relevance: "high"
+  calculation_articles:
+    - "Artikel9"  # Basisbedragen
+    - "Artikel13" # Opbouwpercentage
+    - "Artikel8"  # Toeslag

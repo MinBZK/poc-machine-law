@@ -1,0 +1,352 @@
+# Wet op de huurtoeslag (BWBR0008659) - machine-law format
+# Volledige tekst van de Wet op de huurtoeslag zoals gepubliceerd op wetten.overheid.nl
+
+bwb_id: "BWBR0008659"
+title: "Wet op de huurtoeslag"
+url: "https://wetten.overheid.nl/BWBR0008659"
+valid_from: "2025-01-01"
+last_updated: "2025-07-13"
+
+# Mapping naar onze YAML files
+yaml_files:
+  - path: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+    description: "Hoofdimplementatie van de huurtoeslag berekening"
+
+# Hoofdstructuur van de wet
+structure:
+  chapters:
+    - id: "Hoofdstuk1"
+      title: "Algemene bepalingen"
+      sections:
+        - id: "Paragraaf1"
+          title: "Definities"
+          articles:
+            - id: "Artikel1"
+              title: "Begripsbepalingen"
+              content: |
+                In deze wet en de bepalingen die daarop berusten wordt verstaan onder:
+                a. burgemeester en wethouders: burgemeester en wethouders van de gemeente waar de woning is gelegen waarop de huurtoeslag betrekking heeft;
+                b. huurcommissie: de huurcommissie, bedoeld in artikel 3a, eerste lid, van de Uitvoeringswet huurprijzen woonruimte;
+                c. huurder: persoon die zijn hoofdverblijf heeft in een door hem gehuurde woning, daaronder begrepen een woonwagen, tenzij:
+                   1°. de overeenkomst van huur en verhuur een gebruik van de woning betreft dat naar zijn aard slechts van korte duur is, of
+                   2°. de woning onderdeel uitmaakt van een hotel-, pension-, kamp- of vakantiebestedingsbedrijf, ongeacht de duur van de huurovereenkomst;
+                d. huurprijs: de prijs die bij huur en verhuur is verschuldigd voor het enkele gebruik van een woning;
+                e. huurtoeslag: een tegemoetkoming van het Rijk als bedoeld in artikel 2, eerste lid, onderdeel h, van de Algemene wet inkomensafhankelijke regelingen in de kosten van het huren van een woning;
+                f. onderhuurder: persoon als bedoeld in artikel 2, eerste lid, onderdeel e, onder 2°, van de Algemene wet inkomensafhankelijke regelingen;
+                g. Onze Minister: Onze Minister van Volkshuisvesting en Ruimtelijke Ordening;
+                h. rekenhuur: de rekenhuur, bedoeld in artikel 5;
+                i. rekeninkomen: de gezamenlijke toetsingsinkomens, bedoeld in artikel 8 van de Algemene wet inkomensafhankelijke regelingen, die in aanmerking worden genomen voor het bepalen van de draagkracht, bedoeld in artikel 7 van die wet;
+                j. standplaats: kavel, bestemd voor het plaatsen van een woonwagen, waarop voorzieningen aanwezig zijn die op het leidingnet van de openbare nutsbedrijven, andere instellingen of van gemeenten kunnen worden aangesloten;
+                k. woning: een gebouwde onroerende zaak voor zover deze als zelfstandige woonruimte, onvrije etage dan wel andere onzelfstandige woonruimte is verhuurd, alsmede de onroerende aanhorigheden;
+                l. woonwagen: voor bewoning bestemd gebouw dat is geplaatst op een standplaats en dat in zijn geheel of in delen kan worden verplaatst.
+              paragraphs:
+                - number: 1
+                  content: "Begripsbepalingen zoals hierboven omschreven"
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "legal_basis"
+                      description: "Definities gebruikt in huurtoeslag berekening"
+                      line_reference: "legal_basis.bwb_id"
+
+            - id: "Artikel1a"
+              title: "Toepassing Algemene wet inkomensafhankelijke regelingen"
+              content: |
+                1. Op deze wet is de Algemene wet inkomensafhankelijke regelingen, met uitzondering van artikel 6, eerste en tweede lid, van toepassing.
+                2. De uitvoering van het toekennen, uitbetalen en terugvorderen van een huurtoeslag is opgedragen aan de Dienst Toeslagen.
+                3. In afwijking van artikel 3 van de Algemene wet inkomensafhankelijke regelingen wordt in deze wet en de daarop berustende bepalingen de partner uitsluitend als partner aangemerkt indien deze in de basisregistratie personen op het adres van de huurder staat ingeschreven.
+              paragraphs:
+                - number: 1
+                  content: "Op deze wet is de Algemene wet inkomensafhankelijke regelingen, met uitzondering van artikel 6, eerste en tweede lid, van toepassing."
+                - number: 2
+                  content: "De uitvoering van het toekennen, uitbetalen en terugvorderen van een huurtoeslag is opgedragen aan de Dienst Toeslagen."
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "service"
+                      description: "Implementatie door Dienst Toeslagen"
+                      line_reference: "service"
+                - number: 3
+                  content: "In afwijking van artikel 3 van de Algemene wet inkomensafhankelijke regelingen wordt in deze wet en de daarop berustende bepalingen de partner uitsluitend als partner aangemerkt indien deze in de basisregistratie personen op het adres van de huurder staat ingeschreven."
+
+        - id: "Paragraaf2"
+          title: "In aanmerking te nemen bewoningssituatie en huur"
+          articles:
+            - id: "Artikel2"
+              title: "Huishoudentypes"
+              content: |
+                In deze wet en de bepalingen die daarop berusten wordt verstaan onder:
+                a. eenpersoonshuishouden: het huishouden van een huurder die, afgezien van een eventuele onderhuurder en de tot het huishouden van de onderhuurder behorende personen, als enige een woning bewoont;
+                b. meerpersoonshuishouden: het huishouden van een huurder die samen met diens partner of een of meer medebewoners een woning bewoont.
+              paragraphs:
+                - number: 1
+                  content: "Definitie eenpersoonshuishouden en meerpersoonshuishouden"
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "definitions.HUISHOUDEN_TYPE"
+                      description: "Type huishouden bepaalt hoogte toeslag"
+                      line_reference: "definitions.HUISHOUDEN_TYPE"
+
+            - id: "Artikel5"
+              title: "Rekenhuur"
+              content: |
+                1. In deze wet en de bepalingen die daarop berusten wordt verstaan onder rekenhuur: de huurprijs die de huurder per maand is verschuldigd, of, als dat lager is dan de huurprijs, een bedrag dat gelijk is aan de maximale huurprijsgrens, bedoeld in de krachtens de artikelen 10, eerste lid, en 12, tweede lid, van de Uitvoeringswet huurprijzen woonruimte daarover gestelde regels, vermeerderd met:
+                   a. een bedrag voor door de huurder verschuldigde servicekosten, en
+                   b. in geval van huur van een woonwagen zonder eigen aandrijving het bedrag dat verschuldigd is voor de huur van de standplaats.
+                2. Bij de toepassing van het eerste lid kan het in de aanhef van dat lid laatstbedoelde bedrag slechts in plaats van de verschuldigde huurprijs in aanmerking worden genomen nadat, op verzoek van de Dienst Toeslagen, de huurcommissie, dan wel de voorzitter van de huurcommissie, aan de Dienst Toeslagen en aan de huurder advies heeft uitgebracht, dan wel een verklaring heeft verstrekt, over de redelijk te achten huurprijs.
+                3. Als servicekosten als bedoeld in het eerste lid, onderdeel a, worden uitsluitend in aanmerking genomen:
+                   a. kosten voor het in bedrijf zijn van lift-, ventilatie-, hydrofoor- en alarminstallaties, en van verlichting van door de huurder met anderen gemeenschappelijk gebruikte ruimten, met een maximum van € 12 per maand;
+                   b. schoonmaakkosten van de lift en andere gemeenschappelijke ruimten, met een maximum van € 12 per maand;
+                   c. de kosten voor de diensten van een huismeester, met een maximum van € 12 per maand;
+                   d. kapitaals- en onderhoudskosten van dienstruimten en gemeenschappelijke recreatieruimten, met een maximum van € 12 per maand.
+              paragraphs:
+                - number: 1
+                  content: "Definitie rekenhuur inclusief huurprijs en servicekosten"
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "properties.sources.HUURPRIJS"
+                      description: "Rekenhuur als basis voor berekening"
+                      line_reference: "properties.sources.HUURPRIJS"
+                - number: 2
+                  content: "Procedure voor vaststelling redelijke huurprijs door huurcommissie"
+                - number: 3
+                  content: "Limitatieve opsomming toegestane servicekosten met maxima"
+
+    - id: "Hoofdstuk2"
+      title: "Het recht op huurtoeslag"
+      sections:
+        - id: "Paragraaf1"
+          title: "Algemeen"
+          articles:
+            - id: "Artikel7"
+              title: "Draagkracht en voorwaarden"
+              content: |
+                1. Het recht op en de hoogte van de huurtoeslag is afhankelijk van de draagkracht, waaronder begrepen het vermogen, van de huurder, diens partner en de medebewoners.
+                2. Ten aanzien van een bepaalde woning kan slechts aan één huurder een huurtoeslag worden toegekend.
+              paragraphs:
+                - number: 1
+                  content: "Het recht op en de hoogte van de huurtoeslag is afhankelijk van de draagkracht, waaronder begrepen het vermogen, van de huurder, diens partner en de medebewoners."
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "properties.sources.REKENINKOMEN"
+                      description: "Draagkracht bepaald door rekeninkomen"
+                      line_reference: "properties.sources.REKENINKOMEN"
+                - number: 2
+                  content: "Ten aanzien van een bepaalde woning kan slechts aan één huurder een huurtoeslag worden toegekend."
+
+        - id: "Paragraaf2"
+          title: "Eisen aan de huurder, diens partner en de medebewoners"
+          articles:
+            - id: "Artikel8"
+              title: "Leeftijdseis"
+              content: |
+                Een huurtoeslag wordt slechts toegekend aan een huurder die meerderjarig is.
+              paragraphs:
+                - number: 1
+                  content: "Een huurtoeslag wordt slechts toegekend aan een huurder die meerderjarig is."
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "definitions.MINIMUM_LEEFTIJD"
+                      description: "Minimum leeftijd van 18 jaar"
+                      line_reference: "definitions.MINIMUM_LEEFTIJD"
+
+            - id: "Artikel9"
+              title: "Inschrijving BRP"
+              content: |
+                1. Een huurtoeslag wordt slechts toegekend:
+                   a. als de huurder, diens partner alsmede degenen die medebewoner van de woning zijn, als ingezetene op het adres van die woning zijn ingeschreven in de basisregistratie personen;
+                   b. als geen andere personen met dat adres in de basisregistratie personen zijn ingeschreven, behoudens eventueel een onderhuurder en personen die behoren tot diens huishouden.
+                2. In afwijking van het eerste lid kan een huurtoeslag worden toegekend, als de onjuiste inschrijving in de basisregistratie personen niet aan de huurder kan worden toegerekend.
+              paragraphs:
+                - number: 1
+                  content: "Eisen aan inschrijving in basisregistratie personen"
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "properties.parameters.BSN"
+                      description: "BSN voor identificatie en inschrijving controle"
+                      line_reference: "properties.parameters.BSN"
+                - number: 2
+                  content: "Uitzondering bij onjuiste inschrijving buiten schuld huurder"
+
+    - id: "Hoofdstuk3"
+      title: "De hoogte van de huurtoeslag"
+      sections:
+        - id: "Paragraaf1"
+          title: "Basishuur en normhuur"
+          articles:
+            - id: "Artikel16"
+              title: "Basishuur"
+              content: |
+                Voor de toepassing van deze wet wordt verstaan onder basishuur: het bedrag dat bij ministeriële regeling wordt vastgesteld.
+              paragraphs:
+                - number: 1
+                  content: "Voor de toepassing van deze wet wordt verstaan onder basishuur: het bedrag dat bij ministeriële regeling wordt vastgesteld."
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "definitions.BASISHUUR"
+                      description: "Basishuur als startpunt berekening"
+                      line_reference: "definitions.BASISHUUR"
+
+        - id: "Paragraaf2"
+          title: "Kwaliteitskortings- en aftoppingsgrens"
+          articles:
+            - id: "Artikel20"
+              title: "Grenzen voor berekening"
+              content: |
+                1. Voor de toepassing van deze wet wordt verstaan onder:
+                   a. kwaliteitskortingsgrens: het bedrag dat bij ministeriële regeling wordt vastgesteld;
+                   b. aftoppingsgrens: het bedrag dat bij ministeriële regeling wordt vastgesteld.
+                2. De bedragen, bedoeld in het eerste lid, kunnen verschillend worden vastgesteld voor verschillende categorieën van huishoudens.
+              paragraphs:
+                - number: 1
+                  content: "Definitie kwaliteitskortingsgrens en aftoppingsgrens"
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "definitions.KWALITEITSKORTINGSGRENS"
+                      description: "Grens voor volledig gesubsidieerde huur"
+                      line_reference: "definitions.KWALITEITSKORTINGSGRENS"
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "definitions.AFTOPPINGSGRENS"
+                      description: "Maximale huur voor subsidie"
+                      line_reference: "definitions.AFTOPPINGSGRENS"
+                - number: 2
+                  content: "De bedragen kunnen verschillend worden vastgesteld voor verschillende categorieën van huishoudens."
+
+        - id: "Paragraaf3"
+          title: "Berekening van de huurtoeslag"
+          articles:
+            - id: "Artikel21"
+              title: "Berekeningsformule"
+              content: |
+                1. De huurtoeslag wordt berekend overeenkomstig de formule:
+                   huurtoeslag = (rekenhuur - (basishuur + normhuur)) x factor A + kwaliteitskorting x factor B - aftoppingskorting.
+                2. Bij de toepassing van het eerste lid gelden de volgende regels:
+                   a. de factor A is gelijk aan 1, tenzij de rekenhuur hoger is dan de kwaliteitskortingsgrens;
+                   b. de factor B is lager dan 1 en wordt bij ministeriële regeling vastgesteld;
+                   c. de kwaliteitskorting is het bedrag waarmee de rekenhuur de kwaliteitskortingsgrens te boven gaat, met dien verstande dat de kwaliteitskorting maximaal gelijk is aan het verschil tussen de aftoppingsgrens en de kwaliteitskortingsgrens;
+                   d. de aftoppingskorting wordt berekend volgens een bij ministeriële regeling vast te stellen formule.
+              paragraphs:
+                - number: 1
+                  content: "De huurtoeslag wordt berekend overeenkomstig de formule: huurtoeslag = (rekenhuur - (basishuur + normhuur)) x factor A + kwaliteitskorting x factor B - aftoppingskorting."
+                  yaml_references:
+                    - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+                      section: "actions"
+                      description: "Hoofdberekening van de huurtoeslag"
+                      line_reference: "actions.0"
+                - number: 2
+                  content: "Uitwerking van de factoren en componenten in de berekeningsformule"
+
+# Cross-referentie index voor snelle lookup
+cross_references:
+  # Vanuit YAML naar wettekst
+  yaml_to_law:
+    "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml":
+      legal_basis.bwb_id:
+        article: "Artikel1"
+        paragraph: 1
+        description: "Verwijzing naar deze wet"
+      service:
+        article: "Artikel1a"
+        paragraph: 2
+        description: "Uitvoering door Dienst Toeslagen"
+      definitions.HUISHOUDEN_TYPE:
+        article: "Artikel2"
+        paragraph: 1
+        description: "Onderscheid een- en meerpersoonshuishouden"
+      definitions.MINIMUM_LEEFTIJD:
+        article: "Artikel8"
+        paragraph: 1
+        description: "Meerderjarigheidseis voor huurder"
+      properties.parameters.BSN:
+        article: "Artikel9"
+        paragraph: 1
+        description: "BSN voor identificatie en registratie-eisen"
+      properties.sources.HUURPRIJS:
+        article: "Artikel5"
+        paragraph: 1
+        description: "Rekenhuur als basis voor berekening"
+      properties.sources.REKENINKOMEN:
+        article: "Artikel7"
+        paragraph: 1
+        description: "Draagkracht bepaald door inkomen en vermogen"
+      definitions.BASISHUUR:
+        article: "Artikel16"
+        paragraph: 1
+        description: "Basishuur bij ministeriële regeling"
+      definitions.KWALITEITSKORTINGSGRENS:
+        article: "Artikel20"
+        paragraph: 1
+        description: "Grens voor kwaliteitskorting"
+      definitions.AFTOPPINGSGRENS:
+        article: "Artikel20"
+        paragraph: 1
+        description: "Aftoppingsgrens per huishoudtype"
+      actions.0:
+        article: "Artikel21"
+        paragraph: 1
+        description: "Berekeningsformule huurtoeslag"
+
+  # Vanuit wettekst naar YAML
+  law_to_yaml:
+    "Artikel1":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "legal_basis.bwb_id"
+    "Artikel1a":
+      paragraph_2:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "service"
+    "Artikel2":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "definitions.HUISHOUDEN_TYPE"
+    "Artikel5":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "properties.sources.HUURPRIJS"
+    "Artikel7":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "properties.sources.REKENINKOMEN"
+    "Artikel8":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "definitions.MINIMUM_LEEFTIJD"
+    "Artikel9":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "properties.parameters.BSN"
+    "Artikel16":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "definitions.BASISHUUR"
+    "Artikel20":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "definitions.KWALITEITSKORTINGSGRENS"
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "definitions.AFTOPPINGSGRENS"
+    "Artikel21":
+      paragraph_1:
+        - file: "law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml"
+          section: "actions.0"
+
+# Metadata voor UI
+ui_metadata:
+  featured_articles:
+    - "Artikel1"   # Begripsbepalingen
+    - "Artikel5"   # Rekenhuur
+    - "Artikel7"   # Draagkracht
+    - "Artikel8"   # Leeftijdseis
+    - "Artikel9"   # Inschrijving BRP
+    - "Artikel20"  # Grenzen
+    - "Artikel21"  # Berekeningsformule
+  complexity_level: "high"
+  citizen_relevance: "high"
+  calculation_relevant_articles:
+    - "Artikel5"   # Rekenhuur definitie
+    - "Artikel16"  # Basishuur
+    - "Artikel20"  # Kwaliteitskortings- en aftoppingsgrens
+    - "Artikel21"  # Berekeningsformule
+  eligibility_articles:
+    - "Artikel7"   # Draagkracht
+    - "Artikel8"   # Leeftijdseis
+    - "Artikel9"   # Inschrijving eisen

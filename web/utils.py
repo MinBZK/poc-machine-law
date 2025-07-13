@@ -7,6 +7,50 @@ import re
 import markdown
 from markupsafe import Markup
 
+# Mapping from law names (as used in YAML) to BWB IDs
+LAW_NAME_TO_BWB = {
+    # Toeslagen
+    "wet_op_de_zorgtoeslag": "BWBR0018451",
+    "zorgtoeslagwet": "BWBR0018451",
+    "wet_op_de_huurtoeslag": "BWBR0008659",
+    "wet_kinderopvang": "BWBR0017017",
+    # Sociale zekerheid
+    "algemene_ouderdomswet": "BWBR0002221",
+    "participatiewet": "BWBR0015703",
+    "participatiewet/bijstand": "BWBR0015703",
+    # Belastingen
+    "wet_inkomstenbelasting": "BWBR0011353",
+    # Kieswet
+    "kieswet": "BWBR0004627",
+    # Algemeen bestuursrecht
+    "awb": "BWBR0005537",
+    "awb/bezwaar": "BWBR0005537",
+    "awb/beroep": "BWBR0005537",
+}
+
+
+def get_bwb_id(law_name: str) -> str | None:
+    """Get BWB ID for a law name."""
+    # Direct lookup
+    if law_name in LAW_NAME_TO_BWB:
+        return LAW_NAME_TO_BWB[law_name]
+
+    # Try without service prefix (e.g., "participatiewet/bijstand" -> "participatiewet")
+    base_law = law_name.split("/")[0]
+    if base_law in LAW_NAME_TO_BWB:
+        return LAW_NAME_TO_BWB[base_law]
+
+    return None
+
+
+def get_law_url(law_name: str, service: str = None) -> str | None:
+    """Get the /wetten URL for a law."""
+    bwb_id = get_bwb_id(law_name)
+    if bwb_id:
+        return f"/wetten/{bwb_id}"
+
+    return None
+
 
 def format_message(text: str, is_user_message: bool = False) -> Markup:
     """

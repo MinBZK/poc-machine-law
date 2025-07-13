@@ -1,0 +1,519 @@
+# Participatiewet (BWBR0015703) - machine-law format
+# Volledige tekst van de Participatiewet zoals gepubliceerd op wetten.overheid.nl
+
+bwb_id: "BWBR0015703"
+title: "Participatiewet"
+url: "https://wetten.overheid.nl/BWBR0015703"
+valid_from: "2025-01-01"
+last_updated: "2025-07-13"
+
+# Mapping naar onze YAML files
+yaml_files:
+  - path: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+    description: "Landelijke regels voor het bepalen van het recht op bijstand"
+  - path: "law/participatiewet/bijstand/gemeenten/GEMEENTE_AMSTERDAM-2023-01-01.yaml"
+    description: "Gemeente-specifieke implementatie Amsterdam"
+
+# Hoofdstructuur van de wet
+structure:
+  preface:
+    title: "Wet van 9 oktober 2003, houdende nieuwe regels betreffende de bijstand voor zelfstandigen en de participatie en ondersteuning met betrekking tot de arbeidsmarkt"
+    description: "Participatiewet"
+
+  chapters:
+    - id: "HoofdstukI"
+      title: "Algemene bepalingen"
+      articles:
+        - id: "Artikel1"
+          title: "Begripsbepalingen"
+          content: |
+            In deze wet en de daarop berustende bepalingen wordt verstaan onder:
+            a. Onze Minister: Onze Minister van Sociale Zaken en Werkgelegenheid;
+            b. algemene bijstand: bijstand als bedoeld in hoofdstuk 3;
+            c. bijzondere bijstand: bijstand als bedoeld in hoofdstuk 4;
+            d. bijstand: algemene bijstand en bijzondere bijstand;
+            e. belanghebbende: degene die bijstand ontvangt of heeft aangevraagd;
+            f. college: college van burgemeester en wethouders;
+            g. gezin: een persoon en zijn echtgenoot, alsmede degenen die tot hun last komen;
+            h. alleenstaande: een persoon die geen echtgenoot heeft;
+            i. pensioengerechtigde leeftijd: de leeftijd, bedoeld in artikel 7a, eerste lid, van de Algemene Ouderdomswet.
+          paragraphs:
+            - number: 1
+              content: "Begripsbepalingen voor de Participatiewet"
+              yaml_references:
+                - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                  section: "legal_basis"
+                  description: "Definities gebruikt in bijstandsberekening"
+                  line_reference: "legal_basis.bwb_id"
+
+        - id: "Artikel3"
+          title: "Gezin"
+          content: |
+            1. Voor de toepassing van deze wet wordt onder gezin verstaan een persoon en zijn echtgenoot, alsmede degenen die tot hun last komen.
+            2. Voor de toepassing van deze wet worden als gezin aangemerkt personen die gezamenlijk hun huishouding voeren, tenzij het betreft:
+            a. personen die elkaar bestaan in de eerste graad;
+            b. een persoon die een ander als kamergenoot heeft opgenomen;
+            c. een persoon die als kamergenoot is opgenomen.
+          paragraphs:
+            - number: 1
+              content: "Definitie van gezin: persoon, echtgenoot en tot last komenden"
+            - number: 2
+              content: "Gezamenlijke huishouding geldt als gezin met uitzonderingen"
+              yaml_references:
+                - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                  section: "input.HEEFT_PARTNER"
+                  description: "Partnerstatus voor bijstandsberekening"
+                  line_reference: "input.HEEFT_PARTNER.legal_basis"
+
+    - id: "HoofdstukII"
+      title: "Rechten en plichten"
+      sections:
+        - id: "Paragraaf1"
+          title: "Verplichtingen"
+          articles:
+            - id: "Artikel9"
+              title: "Verplichtingen"
+              content: |
+                1. Een persoon van achttien jaar of ouder doch jonger dan de pensioengerechtigde leeftijd is verplicht om, vanaf de dag van inschrijving:
+                a. algemeen geaccepteerde arbeid te verkrijgen, te aanvaarden en te behouden, waaronder begrepen het zich inschrijven als werkzoekende bij het Uitvoeringsinstituut werknemersverzekeringen;
+                b. gebruik te maken van een hem aangeboden voorziening gericht op arbeidsinschakeling en mee te werken aan onderzoek naar zijn mogelijkheden tot het verrichten van arbeid of arbeidsinschakeling;
+                c. onbeloonde maatschappelijk nuttige activiteiten te verrichten.
+                2. Het college kan, zolang daar dringende redenen voor zijn, tijdelijk geheel of gedeeltelijk ontheffing verlenen van de verplichtingen.
+                3. De verplichtingen gelden voor gehuwden ieder afzonderlijk.
+                4. Voor zover een alleenstaande ouder de zorg heeft voor een tot zijn last komend kind dat de leeftijd van twaalf jaar nog niet heeft bereikt, gelden de verplichtingen slechts indien toereikende kinderopvang beschikbaar is.
+                5. De verplichtingen gelden niet voor personen die volledig en duurzaam arbeidsongeschikt zijn.
+              paragraphs:
+                - number: 1
+                  content: "Verplichtingen voor 18+ tot AOW-leeftijd: werk zoeken, voorzieningen gebruiken, maatschappelijke activiteiten"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.LEEFTIJD"
+                      description: "Leeftijdseis voor bijstand"
+                      line_reference: "input.LEEFTIJD.legal_basis"
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.PENSIOENLEEFTIJD"
+                      description: "Bovengrens leeftijd voor bijstand"
+                      line_reference: "input.PENSIOENLEEFTIJD.legal_basis"
+                - number: 2
+                  content: "College kan tijdelijke ontheffing verlenen bij dringende redenen"
+                - number: 3
+                  content: "Verplichtingen gelden voor gehuwden individueel"
+                - number: 4
+                  content: "Alleenstaande ouders met kind <12 jaar alleen bij beschikbare kinderopvang"
+                - number: 5
+                  content: "Uitzondering voor volledig en duurzaam arbeidsongeschikten"
+
+        - id: "Paragraaf2"
+          title: "Recht op bijstand"
+          articles:
+            - id: "Artikel11"
+              title: "Recht op algemene bijstand"
+              content: |
+                1. Recht op algemene bijstand heeft degene die:
+                a. Nederlander is of vreemdeling is die rechtmatig in Nederland verblijft;
+                b. in Nederland woonachtig is;
+                c. de leeftijd van achttien jaar heeft bereikt en jonger is dan de pensioengerechtigde leeftijd;
+                d. niet over voldoende middelen beschikt of niet in staat is deze te verwerven.
+                2. Een vreemdeling heeft slechts recht op algemene bijstand indien hij beschikt over een verblijfsvergunning voor bepaalde tijd als bedoeld in artikel 14 van de Vreemdelingenwet 2000 of een verblijfsvergunning voor onbepaalde tijd als bedoeld in artikel 20 van die wet.
+              paragraphs:
+                - number: 1
+                  content: "Recht op bijstand: Nederlander/rechtmatig verblijf, woonachtig Nederland, 18+ tot AOW, onvoldoende middelen"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "legal_basis"
+                      description: "Hoofdartikel voor recht op bijstand"
+                      line_reference: "legal_basis.article"
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.HEEFT_NEDERLANDSE_NATIONALITEIT"
+                      description: "Nederlandse nationaliteit"
+                      line_reference: "input.HEEFT_NEDERLANDSE_NATIONALITEIT.legal_basis"
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.VERBLIJFSADRES"
+                      description: "Woonplaats Nederland"
+                      line_reference: "input.VERBLIJFSADRES.legal_basis"
+                - number: 2
+                  content: "Vreemdelingen: verblijfsvergunning bepaalde of onbepaalde tijd vereist"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.VERBLIJFSVERGUNNING_TYPE"
+                      description: "Type verblijfsvergunning voor vreemdelingen"
+                      line_reference: "input.VERBLIJFSVERGUNNING_TYPE.legal_basis"
+
+            - id: "Artikel13"
+              title: "Uitsluitingen"
+              content: |
+                1. Geen recht op algemene bijstand hebben:
+                a. personen die in een penitentiaire inrichting verblijven;
+                b. personen die aanspraak hebben op uitkering op grond van de Werkloosheidswet;
+                c. personen die aanspraak hebben op uitkering op grond van de Ziektewet.
+                2. Geen recht op algemene bijstand hebben tevens:
+                h. degenen die, al dan niet tezamen met hun echtgenoot, onderwijs volgen en die terzake aanspraak kunnen maken op studiefinanciering.
+              paragraphs:
+                - number: 1
+                  content: "Uitsluiting: gedetineerden, WW-uitkering, ziektewet-uitkering"
+                  subsections:
+                    - letter: "a"
+                      content: "Gedetineerden uitgesloten van bijstand"
+                      yaml_references:
+                        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                          section: "input.IS_GEDETINEERDE"
+                          description: "Uitsluiting gedetineerden"
+                          line_reference: "input.IS_GEDETINEERDE.legal_basis"
+                - number: 2
+                  content: "Verdere uitsluitingen"
+                  subsections:
+                    - letter: "h"
+                      content: "Studenten met studiefinanciering uitgesloten"
+                      yaml_references:
+                        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                          section: "input.IS_STUDENT"
+                          description: "Studentenstatus"
+                          line_reference: "input.IS_STUDENT.legal_basis"
+                        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                          section: "input.ONTVANGT_STUDIEFINANCIERING"
+                          description: "Ontvangst studiefinanciering"
+                          line_reference: "input.ONTVANGT_STUDIEFINANCIERING.legal_basis"
+
+    - id: "HoofdstukIII"
+      title: "Algemene bijstand"
+      sections:
+        - id: "Paragraaf1"
+          title: "Hoogte van de algemene bijstand"
+          articles:
+            - id: "Artikel20"
+              title: "Hoogte bijstandsnorm"
+              content: |
+                1. De algemene bijstand bedraagt:
+                a. voor een alleenstaande van eenentwintig jaar of ouder: zeventig procent van het referentieminimumloon per maand;
+                b. voor een alleenstaande jongere van eenentwintig jaar: vijftig procent van het referentieminimumloon per maand;
+                c. voor gehuwden tezamen van eenentwintig jaar of ouder: honderd procent van het referentieminimumloon per maand;
+                d. voor een gehuwde van eenentwintig jaar of ouder van wie de echtgenoot de pensioengerechtigde leeftijd nog niet heeft bereikt en die geen recht heeft op algemene bijstand: honderd procent van het referentieminimumloon per maand.
+              paragraphs:
+                - number: 1
+                  content: "Bijstandsnormen: alleenstaand 21+ 70%, alleenstaand <21 50%, gehuwden 21+ 100%"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "definitions.BASISBEDRAG_ALLEENSTAAND_21_PLUS"
+                      description: "Norm alleenstaanden 21+"
+                      line_reference: "definitions.BASISBEDRAG_ALLEENSTAAND_21_PLUS"
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "definitions.BASISBEDRAG_PARTNERS_21_PLUS"
+                      description: "Norm gehuwden 21+"
+                      line_reference: "definitions.BASISBEDRAG_PARTNERS_21_PLUS"
+
+            - id: "Artikel22a"
+              title: "Kostendelersnorm"
+              content: |
+                1. Indien een alleenstaande zijn woning deelt met een of meer meerderjarigen, wordt de norm, bedoeld in artikel 20, eerste lid, onder a, verminderd.
+                2. De vermindering bedraagt:
+                a. bij twee personen: vijftig procent van de norm;
+                b. bij drie personen: zevenenveertig procent van de norm;
+                c. bij vier personen: veertig procent van de norm;
+                d. bij vijf of meer personen: achtendertig procent van de norm.
+              paragraphs:
+                - number: 1
+                  content: "Kostendelersnorm: vermindering norm bij gedeelde woning"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.HUISHOUDLEDEN"
+                      description: "Aantal personen in huishouden"
+                      line_reference: "input.HUISHOUDLEDEN.legal_basis"
+                - number: 2
+                  content: "Verminderingspercentages: 2p=50%, 3p=47%, 4p=40%, 5+p=38%"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "definitions.KOSTENDELERSNORM_FACTOREN"
+                      description: "Kostendelersnorm percentages"
+                      line_reference: "definitions.KOSTENDELERSNORM_FACTOREN"
+
+        - id: "Paragraaf2"
+          title: "Middelen"
+          articles:
+            - id: "Artikel31"
+              title: "Middelen"
+              content: |
+                1. Onder middelen wordt verstaan het totaal van alle inkomsten en het vermogen.
+                2. Tot de inkomsten worden alle goederen gerekend die als inkomen uit werk en woning in de zin van de Wet inkomstenbelasting 2001 worden aangemerkt, dan wel zouden worden aangemerkt indien de belanghebbende binnenlands belastingplichtige was.
+              paragraphs:
+                - number: 1
+                  content: "Middelen = inkomsten + vermogen"
+                - number: 2
+                  content: "Inkomsten volgens Wet inkomstenbelasting 2001"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.INKOMEN"
+                      description: "Maandelijks inkomen"
+                      line_reference: "input.INKOMEN.legal_basis"
+
+            - id: "Artikel32"
+              title: "Middelen bij gezin"
+              content: |
+                1. Voor de vaststelling van de middelen van een gezin worden de middelen van alle gezinsleden samengeteld.
+                2. Een uitzondering geldt voor middelen van kinderen die tot de last van het gezin komen.
+              paragraphs:
+                - number: 1
+                  content: "Gezinsmiddelen: alle middelen van gezinsleden samen"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.PARTNER_INKOMEN"
+                      description: "Inkomen partner"
+                      line_reference: "input.PARTNER_INKOMEN.legal_basis"
+                - number: 2
+                  content: "Uitzondering voor kindermiddelen"
+
+            - id: "Artikel34"
+              title: "Vermogen"
+              content: |
+                1. Onder vermogen wordt verstaan het vermogen, bedoeld in hoofdstuk 5 van de Wet inkomstenbelasting 2001.
+                2. Voor de vaststelling van het vermogen van gehuwden wordt het vermogen van beide echtgenoten samengeteld.
+                3. Het vermogen, bedoeld in het eerste lid, blijft buiten beschouwing voorzover het een bedrag van zevenentwintighonderdvijftig euro niet te boven gaat. Voor gehuwden gezamenlijk geldt een bedrag van vijftienduizend euro.
+              paragraphs:
+                - number: 1
+                  content: "Vermogen volgens hoofdstuk 5 Wet inkomstenbelasting 2001"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.BEZITTINGEN"
+                      description: "Vermogen alleenstaande"
+                      line_reference: "input.BEZITTINGEN.legal_basis"
+                - number: 2
+                  content: "Vermogen gehuwden samen opgeteld"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "input.PARTNER_BEZITTINGEN"
+                      description: "Vermogen partner"
+                      line_reference: "input.PARTNER_BEZITTINGEN.legal_basis"
+                - number: 3
+                  content: "Vermogensvrije voet: €7.500 alleenstaand, €15.000 gehuwden"
+                  yaml_references:
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "definitions.VERMOGENSGRENS_ALLEENSTAAND"
+                      description: "Vermogensgrens alleenstaanden"
+                      line_reference: "definitions.VERMOGENSGRENS_ALLEENSTAAND"
+                    - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+                      section: "definitions.VERMOGENSGRENS_PARTNER"
+                      description: "Vermogensgrens partners"
+                      line_reference: "definitions.VERMOGENSGRENS_PARTNER"
+
+    - id: "HoofdstukIV"
+      title: "Bijzondere bijstand"
+      articles:
+        - id: "Artikel35"
+          title: "Bijzondere bijstand"
+          content: |
+            Het college kan bijzondere bijstand verlenen aan personen die vanwege bijzondere omstandigheden bijstand behoeven die naar aard, duur of hoogte de algemene bijstand overstijgt.
+          paragraphs:
+            - number: 1
+              content: "College kan bijzondere bijstand verlenen bij bijzondere omstandigheden"
+
+    - id: "HoofdstukV"
+      title: "Uitvoering"
+      articles:
+        - id: "Artikel40"
+          title: "Uitvoeringsorgaan"
+          content: |
+            Het college is belast met de uitvoering van deze wet.
+          paragraphs:
+            - number: 1
+              content: "College van B&W voert Participatiewet uit"
+
+# Cross-referentie index voor snelle lookup
+cross_references:
+  # Vanuit YAML naar wettekst
+  yaml_to_law:
+    "law/participatiewet/bijstand/SZW-2023-01-01.yaml":
+      legal_basis.article:
+        article: "Artikel11"
+        paragraph: 1
+        description: "Hoofdartikel voor recht op bijstand"
+      input.LEEFTIJD:
+        article: "Artikel9"
+        paragraph: 1
+        description: "Leeftijdseis 18 jaar tot AOW-leeftijd"
+      input.PENSIOENLEEFTIJD:
+        article: "Artikel9"
+        paragraph: 1
+        description: "Bovengrens leeftijd voor bijstand"
+      input.HEEFT_NEDERLANDSE_NATIONALITEIT:
+        article: "Artikel11"
+        paragraph: 1
+        description: "Nederlandse nationaliteit als voorwaarde"
+      input.VERBLIJFSVERGUNNING_TYPE:
+        article: "Artikel11"
+        paragraph: 2
+        description: "Verblijfsvergunning voor vreemdelingen"
+      input.VERBLIJFSADRES:
+        article: "Artikel11"
+        paragraph: 1
+        description: "Woonplaats Nederland vereist"
+      input.INKOMEN:
+        article: "Artikel31"
+        paragraph: 2
+        description: "Inkomsten voor middelen"
+      input.BEZITTINGEN:
+        article: "Artikel34"
+        paragraph: 1
+        description: "Vermogen voor middelen"
+      input.HEEFT_PARTNER:
+        article: "Artikel3"
+        paragraph: 2
+        description: "Partnerstatus voor gezinssamenstelling"
+      input.PARTNER_INKOMEN:
+        article: "Artikel32"
+        paragraph: 1
+        description: "Partnerinkomen voor gezinsmiddelen"
+      input.PARTNER_BEZITTINGEN:
+        article: "Artikel34"
+        paragraph: 2
+        description: "Partnervermogen voor gezinsmiddelen"
+      input.HUISHOUDLEDEN:
+        article: "Artikel22a"
+        paragraph: 1
+        description: "Aantal huishoudleden voor kostendelersnorm"
+      input.IS_STUDENT:
+        article: "Artikel13"
+        paragraph: 2
+        description: "Studentenstatus voor uitsluiting"
+      input.ONTVANGT_STUDIEFINANCIERING:
+        article: "Artikel13"
+        paragraph: 2
+        description: "Studiefinanciering voor uitsluiting"
+      input.IS_GEDETINEERDE:
+        article: "Artikel13"
+        paragraph: 1
+        description: "Detentiestatus voor uitsluiting"
+      definitions.BASISBEDRAG_ALLEENSTAAND_21_PLUS:
+        article: "Artikel20"
+        paragraph: 1
+        description: "70% referentieminimumloon alleenstaanden 21+"
+      definitions.BASISBEDRAG_PARTNERS_21_PLUS:
+        article: "Artikel20"
+        paragraph: 1
+        description: "100% referentieminimumloon gehuwden 21+"
+      definitions.VERMOGENSGRENS_ALLEENSTAAND:
+        article: "Artikel34"
+        paragraph: 3
+        description: "€7.500 vermogensvrije voet alleenstaanden"
+      definitions.VERMOGENSGRENS_PARTNER:
+        article: "Artikel34"
+        paragraph: 3
+        description: "€15.000 vermogensvrije voet gehuwden"
+      definitions.KOSTENDELERSNORM_FACTOREN:
+        article: "Artikel22a"
+        paragraph: 2
+        description: "Percentages kostendelersnorm per aantal bewoners"
+
+  # Vanuit wettekst naar YAML
+  law_to_yaml:
+    "Artikel9":
+      paragraph_1:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.LEEFTIJD"
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.PENSIOENLEEFTIJD"
+    "Artikel11":
+      paragraph_1:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "legal_basis.article"
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.HEEFT_NEDERLANDSE_NATIONALITEIT"
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.VERBLIJFSADRES"
+      paragraph_2:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.VERBLIJFSVERGUNNING_TYPE"
+    "Artikel13":
+      paragraph_1_a:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.IS_GEDETINEERDE"
+      paragraph_2_h:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.IS_STUDENT"
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.ONTVANGT_STUDIEFINANCIERING"
+    "Artikel20":
+      paragraph_1:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "definitions.BASISBEDRAG_ALLEENSTAAND_21_PLUS"
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "definitions.BASISBEDRAG_PARTNERS_21_PLUS"
+    "Artikel22a":
+      paragraph_1:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.HUISHOUDLEDEN"
+      paragraph_2:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "definitions.KOSTENDELERSNORM_FACTOREN"
+    "Artikel31":
+      paragraph_2:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.INKOMEN"
+    "Artikel32":
+      paragraph_1:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.PARTNER_INKOMEN"
+    "Artikel34":
+      paragraph_1:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.BEZITTINGEN"
+      paragraph_2:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "input.PARTNER_BEZITTINGEN"
+      paragraph_3:
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "definitions.VERMOGENSGRENS_ALLEENSTAAND"
+        - file: "law/participatiewet/bijstand/SZW-2023-01-01.yaml"
+          section: "definitions.VERMOGENSGRENS_PARTNER"
+
+# Metadata voor UI
+ui_metadata:
+  featured_articles:
+    - "Artikel9"   # Verplichtingen
+    - "Artikel11"  # Recht op bijstand
+    - "Artikel13"  # Uitsluitingen
+    - "Artikel20"  # Hoogte bijstand
+    - "Artikel22a" # Kostendelersnorm
+    - "Artikel31"  # Middelen
+    - "Artikel34"  # Vermogen
+  complexity_level: "high"
+  citizen_relevance: "high"
+  calculation_articles:
+    - "Artikel20"  # Bijstandsnormen
+    - "Artikel22a" # Kostendelersnorm
+    - "Artikel31"  # Middelen
+    - "Artikel34"  # Vermogenstoets
+
+  # Artikelen meest relevant voor implementaties
+  implementation_priority:
+    high:
+      - "Artikel9"   # Leeftijdseisen en verplichtingen
+      - "Artikel11"  # Rechthebbenden op bijstand
+      - "Artikel20"  # Uitkeringsberekening
+      - "Artikel34"  # Vermogenstoets
+    medium:
+      - "Artikel13"  # Uitsluitingsgronden
+      - "Artikel22a" # Kostendelersnorm
+      - "Artikel31"  # Middelen definitie
+      - "Artikel32"  # Gezinsmiddelen
+    low:
+      - "Artikel1"   # Begripsbepalingen
+      - "Artikel3"   # Gezin definitie
+      - "Artikel35"  # Bijzondere bijstand
+      - "Artikel40"  # Uitvoering
+
+  # Thematische groeperingen
+  themes:
+    eligibility:
+      - "Artikel9"   # Leeftijd en verplichtingen
+      - "Artikel11"  # Basisrecht op bijstand
+      - "Artikel13"  # Uitsluitingen
+    calculation:
+      - "Artikel20"  # Bijstandsnormen
+      - "Artikel22a" # Kostendelersnorm
+      - "Artikel31"  # Middelen
+      - "Artikel32"  # Gezinsmiddelen
+      - "Artikel34"  # Vermogenstoets
+    implementation:
+      - "Artikel1"   # Begrippen
+      - "Artikel3"   # Gezin
+      - "Artikel35"  # Bijzondere bijstand
+      - "Artikel40"  # Uitvoering

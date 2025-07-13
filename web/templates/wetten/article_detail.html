@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ page_title }}</title>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
+        /* Base styling similar to wetten.overheid.nl */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: RO Sans, Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: #01689b;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-dropdown {
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Navigation */
+        .nav {
+            background: #01689b;
+            padding: 0;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Main layout */
+        .main {
+            background: white;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            padding: 30px 0;
+        }
+
+        /* Content area */
+        .content {
+            padding: 0 20px;
+        }
+
+        .article-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #154273;
+        }
+
+        .article-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 10px;
+        }
+
+        .context-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .context-info a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .context-info a:hover {
+            text-decoration: underline;
+        }
+
+        .article-content {
+            background: #fafafa;
+            padding: 25px;
+            border-left: 4px solid #154273;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 30px;
+        }
+
+        .article-text {
+            color: #333;
+            white-space: pre-line;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .paragraphs-section {
+            margin-top: 30px;
+        }
+
+        .paragraphs-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #154273;
+            margin-bottom: 20px;
+        }
+
+        .paragraph {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .paragraph-number {
+            font-weight: 600;
+            color: #154273;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .paragraph-content {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .yaml-references {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .yaml-refs-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #154273;
+            margin-bottom: 10px;
+        }
+
+        .yaml-ref {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border-left: 3px solid #0066cc;
+        }
+
+        .yaml-ref:last-child {
+            margin-bottom: 0;
+        }
+
+        .yaml-ref-type {
+            font-size: 12px;
+            background: #0066cc;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .yaml-ref-description {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .yaml-ref-link {
+            font-size: 12px;
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .yaml-ref-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Implementations panel */
+        .implementations-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .implementations-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #154273;
+            margin-bottom: 20px;
+        }
+
+        .yaml-references-panel {
+            margin-bottom: 30px;
+        }
+
+        .references-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #154273;
+            margin-bottom: 15px;
+        }
+
+        .yaml-ref-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.3s;
+        }
+
+        .yaml-ref-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .implementation-name {
+            font-weight: 600;
+            color: #154273;
+            margin-bottom: 5px;
+        }
+
+        .implementation-service {
+            font-size: 12px;
+            color: #666;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .ref-section {
+            font-size: 13px;
+            color: #666;
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }
+
+        .ref-description {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .implementation-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .implementation-link:hover {
+            text-decoration: underline;
+        }
+
+        .all-implementations {
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .implementation-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.3s;
+        }
+
+        .implementation-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .no-references {
+            color: #666;
+            font-style: italic;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            border: 1px dashed #ddd;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .main {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .implementations-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-direction: column;
+            }
+
+            .nav-link {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.2);
+            }
+        }
+
+        /* Ensure Alpine.js cloak works */
+        [x-cloak] {
+            display: none !important;
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Header -->
+        {% set header_title = article.title or article_id %}
+        {% set breadcrumb_extra %}
+            <a href="/wetten/{{ bwb_id }}">{{ law.title }}</a> /
+            {{ article.title or article_id }}
+        {% endset %}
+        {% include "wetten/partials/header.html" %}
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="/wetten/{{ bwb_id }}" class="nav-link">← Terug naar {{ law.title }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/wetten" class="nav-link">Alle wetten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Burger.nl</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Content Area -->
+                <div class="content">
+                    <!-- Article Header -->
+                    <div class="article-header">
+                        <h1 class="article-title">{{ article.title or article_id }}</h1>
+                        <div class="context-info">
+                            {% if chapter_context %}
+                                <p>
+                                    <strong>{{ chapter_context.chapter.title }}</strong>
+                                    {% if chapter_context.section %}→ {{ chapter_context.section.title }}{% endif %}
+                                    {% if chapter_context.subsection %}→ {{ chapter_context.subsection.title }}{% endif %}
+                                </p>
+                            {% endif %}
+                            <p>
+                                Onderdeel van: <a href="/wetten/{{ bwb_id }}">{{ law.title }}</a> ({{ law.bwb_id }})
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Article Content -->
+                    <div class="article-content">
+                        <div class="article-text">{{ article.content }}</div>
+                    </div>
+                    <!-- Paragraphs -->
+                    {% if article.paragraphs %}
+                        <div class="paragraphs-section">
+                            <h2 class="paragraphs-title">Paragrafen</h2>
+                            {% for paragraph in article.paragraphs %}
+                                <div class="paragraph">
+                                    <div class="paragraph-number">Paragraaf {{ paragraph.number }}</div>
+                                    <div class="paragraph-content">{{ paragraph.content }}</div>
+                                    {% if paragraph.yaml_references %}
+                                        <div class="yaml-references">
+                                            <div class="yaml-refs-title">Machine-uitvoerbare implementaties:</div>
+                                            {% for ref in paragraph.yaml_references %}
+                                                <div class="yaml-ref">
+                                                    <div class="yaml-ref-type">{{ ref.section }}</div>
+                                                    <div class="yaml-ref-description">{{ ref.description }}</div>
+                                                    <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.section|replace('.', '-') }}"
+                                                       class="yaml-ref-link">Bekijk in YAML → {{ ref.line_reference }}</a>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <!-- Implementations Panel -->
+                <aside class="implementations-panel">
+                    <h3 class="implementations-title">Machine-uitvoerbare Code</h3>
+                    {% if yaml_references %}
+                        <div class="yaml-references-panel">
+                            <h4 class="references-title">Dit artikel wordt geïmplementeerd door:</h4>
+                            {% for ref in yaml_references %}
+                                <div class="yaml-ref-card">
+                                    <div class="implementation-name">{{ ref.implementation.name }}</div>
+                                    <div class="implementation-service">{{ ref.implementation.service }}</div>
+                                    <div class="ref-section">{{ ref.yaml_section }}</div>
+                                    <div class="ref-description">{{ ref.description }}</div>
+                                    <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.implementation.path }}#{{ ref.yaml_section|replace('.', '-') }}"
+                                       class="implementation-link">Bekijk YAML implementatie →</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="yaml-references-panel">
+                            <h4 class="references-title">YAML Implementaties</h4>
+                            <div class="no-references">Dit artikel heeft nog geen directe machine-uitvoerbare implementaties.</div>
+                        </div>
+                    {% endif %}
+                    {% if implementations %}
+                        <div class="all-implementations">
+                            <h4 class="references-title">Alle implementaties voor deze wet:</h4>
+                            {% for impl in implementations %}
+                                <div class="implementation-card">
+                                    <div class="implementation-name">{{ impl.name }}</div>
+                                    <div class="implementation-service">{{ impl.service }}</div>
+                                    <div style="font-size: 13px; color: #555; margin-bottom: 10px;">{{ impl.description }}</div>
+                                    <a href="/wetten/{{ bwb_id }}/yaml/{{ impl.path }}"
+                                       class="implementation-link">Bekijk YAML implementatie →</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </aside>
+            </div>
+        </main>
+    </body>
+</html>

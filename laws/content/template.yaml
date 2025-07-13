@@ -1,0 +1,72 @@
+# Template voor wetteksten in machine-law format
+# Dit is het format waarin we wetteksten opslaan voor onze wetten.overheid.nl clone
+
+bwb_id: "BWBR0000000"
+title: "Voorbeeldwet"
+url: "https://wetten.overheid.nl/BWBR0000000"
+valid_from: "2024-01-01"
+last_updated: "2024-01-01"
+
+# Mapping naar onze YAML files
+yaml_files:
+  - path: "law/example/SERVICE-2024-01-01.yaml"
+    description: "Hoofdimplementatie van de wet"
+
+# Hoofdstructuur van de wet
+structure:
+  chapters:
+    - id: "HoofdstukI"
+      title: "Algemene bepalingen"
+      sections:
+        - id: "Paragraaf1"
+          title: "Begripsbepalingen"
+          articles:
+            - id: "Artikel1"
+              title: "Begripsbepalingen"
+              content: |
+                In deze wet en de daarop berustende bepalingen wordt verstaan onder:
+                a. definitie 1: omschrijving;
+                b. definitie 2: omschrijving.
+              paragraphs:
+                - number: 1
+                  content: "Eerste lid van het artikel"
+                  yaml_references:
+                    - file: "law/example/SERVICE-2024-01-01.yaml"
+                      section: "definitions.VOORBEELD_DEFINITIE"
+                      description: "Deze definitie wordt gebruikt in artikel 1"
+                      line_reference: "definitions.VOORBEELD_DEFINITIE"
+                - number: 2
+                  content: "Tweede lid van het artikel"
+
+# Cross-referentie index voor snelle lookup
+cross_references:
+  # Vanuit YAML naar wettekst
+  yaml_to_law:
+    "law/example/SERVICE-2024-01-01.yaml":
+      definitions.VOORBEELD_DEFINITIE:
+        article: "Artikel1"
+        paragraph: 1
+        description: "Definitie zoals gebruikt in de wet"
+      actions.0:
+        article: "Artikel5"
+        paragraph: 2
+        description: "Implementatie van uitkeringsberekening"
+
+  # Vanuit wettekst naar YAML
+  law_to_yaml:
+    "Artikel1":
+      paragraph_1:
+        - file: "law/example/SERVICE-2024-01-01.yaml"
+          section: "definitions.VOORBEELD_DEFINITIE"
+    "Artikel5":
+      paragraph_2:
+        - file: "law/example/SERVICE-2024-01-01.yaml"
+          section: "actions.0"
+
+# Metadata voor UI
+ui_metadata:
+  featured_articles:
+    - "Artikel1"
+    - "Artikel5"
+  complexity_level: "medium"
+  citizen_relevance: "high"

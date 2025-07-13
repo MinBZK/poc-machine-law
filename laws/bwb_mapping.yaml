@@ -1,0 +1,133 @@
+# Mapping van BWB IDs naar wetnamen voor onze machine-law implementatie
+# Deze lijst is gebaseerd op de legal_basis velden in onze YAML files
+
+laws:
+  BWBR0001830:
+    title: "Grondwet voor het Koninkrijk der Nederlanden"
+    short_name: "Grondwet"
+    category: "staatsrecht"
+
+  BWBR0001854:
+    title: "Wetboek van Strafrecht"
+    short_name: "Sr"
+    category: "strafrecht"
+
+  BWBR0002144:
+    title: "Burgerlijk Wetboek Boek 1"
+    short_name: "BW1"
+    category: "burgerlijk_recht"
+
+  BWBR0002170:
+    title: "Burgerlijk Wetboek Boek 2"
+    short_name: "BW2"
+    category: "burgerlijk_recht"
+
+  BWBR0002221:
+    title: "Algemene Ouderdomswet"
+    short_name: "AOW"
+    category: "sociale_zekerheid"
+
+  BWBR0002320:
+    title: "Burgerlijk Wetboek Boek 3"
+    short_name: "BW3"
+    category: "burgerlijk_recht"
+
+  BWBR0004627:
+    title: "Kieswet"
+    short_name: "Kieswet"
+    category: "staatsrecht"
+
+  BWBR0005537:
+    title: "Algemene wet bestuursrecht"
+    short_name: "Awb"
+    category: "bestuursrecht"
+
+  BWBR0008659:
+    title: "Wet op de huurtoeslag"
+    short_name: "Wet huurtoeslag"
+    category: "sociale_zekerheid"
+
+  BWBR0009709:
+    title: "Penitentiaire beginselenwet"
+    short_name: "Pbw"
+    category: "strafrecht"
+
+  BWBR0011353:
+    title: "Wet inkomstenbelasting 2001"
+    short_name: "Wet IB 2001"
+    category: "belastingrecht"
+
+  BWBR0011453:
+    title: "Wet studiefinanciering 2000"
+    short_name: "WSF 2000"
+    category: "onderwijs"
+
+  BWBR0011823:
+    title: "Vreemdelingenwet 2000"
+    short_name: "Vw 2000"
+    category: "migratierecht"
+
+  BWBR0013060:
+    title: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+    short_name: "Wet SUWI"
+    category: "sociale_zekerheid"
+
+  BWBR0014194:
+    title: "Wet op de loonbelasting 1964"
+    short_name: "Wet LB 1964"
+    category: "belastingrecht"
+
+  BWBR0015703:
+    title: "Participatiewet"
+    short_name: "Participatiewet"
+    category: "sociale_zekerheid"
+
+  BWBR0015926:
+    title: "Wet op het Centraal Bureau voor de Statistiek"
+    short_name: "Wet CBS"
+    category: "overheid"
+
+  BWBR0017017:
+    title: "Wet kinderopvang"
+    short_name: "Wko"
+    category: "sociale_zekerheid"
+
+  BWBR0018450:
+    title: "Zorgverzekeringswet"
+    short_name: "Zvw"
+    category: "zorg"
+
+  BWBR0018451:
+    title: "Zorgtoeslagwet"
+    short_name: "Ztw"
+    category: "sociale_zekerheid"
+
+  BWBR0018472:
+    title: "Wet marktordening gezondheidszorg"
+    short_name: "Wmg"
+    category: "zorg"
+
+  BWBR0021777:
+    title: "Handelsregisterwet 2007"
+    short_name: "Hrw 2007"
+    category: "ondernemingsrecht"
+
+  BWBR0033715:
+    title: "Wet basisregistratie personen"
+    short_name: "Wet BRP"
+    category: "overheid"
+
+  BWBR0040635:
+    title: "Wet forensische zorg"
+    short_name: "Wfz"
+    category: "zorg"
+
+  BWBR0049005:
+    title: "Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2024"
+    short_name: "Regeling standaardpremie 2024"
+    category: "uitvoeringsregeling"
+
+  BWBR0050536:
+    title: "Regeling vaststelling standaardpremie en bestuursrechtelijke premies 2025"
+    short_name: "Regeling standaardpremie 2025"
+    category: "uitvoeringsregeling"

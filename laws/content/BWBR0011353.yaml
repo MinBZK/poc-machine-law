@@ -1,0 +1,261 @@
+# Wet inkomstenbelasting 2001 (BWBR0011353) - machine-law format
+# Volledige tekst van de Wet inkomstenbelasting 2001 zoals gepubliceerd op wetten.overheid.nl
+
+bwb_id: "BWBR0011353"
+title: "Wet inkomstenbelasting 2001"
+url: "https://wetten.overheid.nl/BWBR0011353"
+valid_from: "2001-01-01"
+last_updated: "2025-01-13"
+
+# Mapping naar onze YAML files
+yaml_files:
+  - path: "law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml"
+    description: "Hoofdimplementatie van de inkomstenbelastingberekening"
+
+# Hoofdstructuur van de wet
+structure:
+  chapters:
+    - id: "Hoofdstuk1"
+      title: "Algemene bepalingen"
+      articles:
+        - id: "Artikel1.1"
+          title: "Belastingplicht"
+          content: |
+            Inkomstenbelasting wordt geheven van natuurlijke personen.
+          paragraphs:
+            - number: 1
+              content: "Inkomstenbelasting wordt geheven van natuurlijke personen"
+
+    - id: "Hoofdstuk2"
+      title: "Kader van de heffing"
+      sections:
+        - id: "Afdeling2.1"
+          title: "Belastingplichtigen"
+          articles:
+            - id: "Artikel2.1"
+              title: "Belastingplichtigen"
+              content: |
+                1. Inkomstenbelasting wordt geheven van:
+                a. natuurlijke personen die in Nederland wonen;
+                b. natuurlijke personen die niet in Nederland wonen, maar wel Nederlands inkomen genieten.
+                2. Voor de toepassing van deze wet wordt onder Nederlands inkomen verstaan:
+                a. inkomen uit werk en woning als bedoeld in artikel 3.1;
+                b. inkomen uit aanmerkelijk belang als bedoeld in artikel 4.1;
+                c. inkomen uit sparen en beleggen als bedoeld in artikel 5.1.
+              paragraphs:
+                - number: 1
+                  content: "Inkomstenbelasting geheven van Nederlandse inwoners en niet-inwoners met Nederlands inkomen"
+                - number: 2
+                  content: "Nederlands inkomen bestaat uit drie categorieën: werk en woning, aanmerkelijk belang, sparen en beleggen"
+
+            - id: "Artikel2.3"
+              title: "Grondslag van de heffing"
+              content: |
+                1. Inkomstenbelasting wordt geheven over:
+                a. het belastbare inkomen uit werk en woning;
+                b. het belastbare inkomen uit aanmerkelijk belang;
+                c. het belastbare inkomen uit sparen en beleggen.
+                2. Het belastbare inkomen uit werk en woning is het inkomen uit werk en woning verminderd met de persoonsgebonden aftrek.
+              paragraphs:
+                - number: 1
+                  content: "Belasting geheven over drie boxen: werk en woning, aanmerkelijk belang, sparen en beleggen"
+                - number: 2
+                  content: "Box 1 inkomen verminderd met persoonsgebonden aftrek"
+
+        - id: "Afdeling2.3"
+          title: "Belastingjaar en woonplaats"
+          articles:
+            - id: "Artikel2.10"
+              title: "Belastingjaar"
+              content: |
+                Het belastingjaar is het kalenderjaar.
+              paragraphs:
+                - number: 1
+                  content: "Belastingjaar is het kalenderjaar"
+
+            - id: "Artikel2.12"
+              title: "Woonplaats"
+              content: |
+                Voor de toepassing van deze wet wordt als woonplaats beschouwd de plaats waar de belastingplichtige duurzaam verblijf houdt.
+              paragraphs:
+                - number: 1
+                  content: "Woonplaats is waar belastingplichtige duurzaam verblijf houdt"
+
+            - id: "Artikel2.13"
+              title: "Partner"
+              content: |
+                1. Als partners worden aangemerkt:
+                a. echtgenoten die niet duurzaam gescheiden leven;
+                b. personen die een notarieel samenlevingscontract hebben gesloten en op grond daarvan met elkaar samenleven.
+                2. Partners worden voor de heffing van inkomstenbelasting als één eenheid beschouwd.
+              paragraphs:
+                - number: 1
+                  content: "Partners: echtgenoten niet gescheiden of notarieel samenlevingscontract"
+                - number: 2
+                  content: "Partners vormen één fiscale eenheid"
+
+            - id: "Artikel2.14"
+              title: "Identificatie belastingplichtigen"
+              content: |
+                1. Belastingplichtigen worden geïdentificeerd door middel van het burgerservicenummer.
+                2. Voor buitenlandse belastingplichtigen wordt een vervangend identificatienummer gebruikt.
+              paragraphs:
+                - number: 1
+                  content: "Identificatie via burgerservicenummer (BSN)"
+                - number: 2
+                  content: "Buitenlanders krijgen vervangend identificatienummer"
+
+    - id: "Hoofdstuk3"
+      title: "Belastbaar inkomen uit werk en woning"
+      articles:
+        - id: "Artikel3.1"
+          title: "Inhoud van het inkomen uit werk en woning"
+          content: |
+            Het inkomen uit werk en woning bestaat uit:
+            a. resultaat uit werk en woning behaald met of door middel van een onderneming;
+            b. loon zoals bedoeld in de Wet op de loonbelasting 1964;
+            c. resultaat uit overige werkzaamheden;
+            d. resultaat uit eigen woning;
+            e. periodieke uitkeringen en verstrekkingen.
+          paragraphs:
+            - number: 1
+              content: "Box 1 inkomen: onderneming, loon, overige werkzaamheden, eigen woning, uitkeringen"
+
+    - id: "Hoofdstuk4"
+      title: "Belastbaar inkomen uit aanmerkelijk belang"
+      articles:
+        - id: "Artikel4.1"
+          title: "Inhoud van het inkomen uit aanmerkelijk belang"
+          content: |
+            Het inkomen uit aanmerkelijk belang bestaat uit:
+            a. voordelen uit aanmerkelijk belang;
+            b. resultaat uit vervreemding van aanmerkelijk belang.
+          paragraphs:
+            - number: 1
+              content: "Box 2 inkomen: voordelen en vervreemding aanmerkelijk belang"
+
+    - id: "Hoofdstuk5"
+      title: "Belastbaar inkomen uit sparen en beleggen"
+      articles:
+        - id: "Artikel5.1"
+          title: "Inhoud van het inkomen uit sparen en beleggen"
+          content: |
+            1. Het inkomen uit sparen en beleggen is een forfaitair bepaald rendement over de rendementsgrondslag.
+            2. De rendementsgrondslag is de waarde van de bezittingen verminderd met de schulden en de heffingsvrije som.
+            3. Het forfaitaire rendement bedraagt een bij ministeriële regeling vast te stellen percentage van de rendementsgrondslag.
+          paragraphs:
+            - number: 1
+              content: "Box 3 inkomen: forfaitair rendement over rendementsgrondslag"
+            - number: 2
+              content: "Rendementsgrondslag: bezittingen minus schulden minus heffingsvrije som"
+            - number: 3
+              content: "Forfaitair rendementpercentage bij ministeriële regeling"
+
+    - id: "Hoofdstuk6"
+      title: "Persoonsgebonden aftrek"
+      articles:
+        - id: "Artikel6.1"
+          title: "Persoonsgebonden aftrek"
+          content: |
+            1. De persoonsgebonden aftrek bestaat uit aftrekbare kosten en aftrekbare giften.
+            2. Persoonsgebonden aftrek wordt in mindering gebracht op het inkomen uit werk en woning.
+          paragraphs:
+            - number: 1
+              content: "Persoonsgebonden aftrek: aftrekbare kosten en giften"
+            - number: 2
+              content: "Aftrek in mindering op box 1 inkomen"
+
+    - id: "Hoofdstuk8"
+      title: "Heffingskortingen"
+      articles:
+        - id: "Artikel8.10"
+          title: "Algemene heffingskorting"
+          content: |
+            1. Een belastingplichtige heeft recht op een algemene heffingskorting.
+            2. De algemene heffingskorting bedraagt het bij ministeriële regeling vastgestelde bedrag.
+            3. De algemene heffingskorting wordt verminderd indien het inkomen uit werk en woning een bepaalde grens overschrijdt.
+          paragraphs:
+            - number: 1
+              content: "Recht op algemene heffingskorting"
+            - number: 2
+              content: "Bedrag vastgesteld bij ministeriële regeling"
+            - number: 3
+              content: "Vermindering bij overschrijding inkomensgrens"
+
+        - id: "Artikel8.11"
+          title: "Arbeidskorting"
+          content: |
+            1. Een belastingplichtige heeft recht op arbeidskorting over loon en winst uit onderneming.
+            2. De arbeidskorting bedraagt het bij ministeriële regeling vastgestelde bedrag en percentage.
+            3. De arbeidskorting wordt verminderd indien het arbeidsinkomen een bepaalde grens overschrijdt.
+          paragraphs:
+            - number: 1
+              content: "Recht op arbeidskorting over loon en winst"
+            - number: 2
+              content: "Bedrag en percentage bij ministeriële regeling"
+            - number: 3
+              content: "Vermindering bij overschrijding arbeidsinkomen"
+
+        - id: "Artikel8.14a"
+          title: "Inkomensafhankelijke combinatiekorting"
+          content: |
+            1. Een belastingplichtige met kinderen jonger dan 12 jaar heeft recht op inkomensafhankelijke combinatiekorting.
+            2. De combinatiekorting is afhankelijk van de hoogte van het arbeidsinkomen.
+            3. Het maximum bedrag wordt vastgesteld bij ministeriële regeling.
+          paragraphs:
+            - number: 1
+              content: "Recht bij kinderen onder 12 jaar"
+            - number: 2
+              content: "Afhankelijk van arbeidsinkomen"
+            - number: 3
+              content: "Maximum bij ministeriële regeling"
+
+    - id: "Hoofdstuk9"
+      title: "Wijze van heffing"
+      articles:
+        - id: "Artikel9.1"
+          title: "Tarief"
+          content: |
+            1. De inkomstenbelasting wordt geheven naar een tarief dat bestaat uit schijven met oplopende percentages.
+            2. Voor elke box gelden verschillende tarieven.
+            3. De tarieven worden jaarlijks vastgesteld bij wet.
+          paragraphs:
+            - number: 1
+              content: "Progressief tarief met schijven"
+            - number: 2
+              content: "Verschillende tarieven per box"
+            - number: 3
+              content: "Jaarlijke vaststelling bij wet"
+
+
+# Metadata voor UI
+ui_metadata:
+  featured_articles:
+    - "Artikel1.1"   # Belastingplicht
+    - "Artikel2.1"   # Belastingplichtigen
+    - "Artikel2.3"   # Grondslag heffing
+    - "Artikel2.13"  # Partner definitie
+    - "Artikel2.14"  # Identificatie via BSN
+    - "Artikel3.1"   # Box 1 inkomen
+    - "Artikel4.1"   # Box 2 inkomen
+    - "Artikel5.1"   # Box 3 inkomen
+    - "Artikel6.1"   # Persoonsgebonden aftrek
+    - "Artikel8.10"  # Algemene heffingskorting
+    - "Artikel8.11"  # Arbeidskorting
+    - "Artikel8.14a" # Combinatiekorting
+    - "Artikel9.1"   # Tarieven
+  complexity_level: "high"
+  citizen_relevance: "high"
+  tax_calculation_articles:
+    - "Artikel9.1"   # Tariefberekening
+    - "Artikel3.1"   # Box 1 berekening
+    - "Artikel4.1"   # Box 2 berekening
+    - "Artikel5.1"   # Box 3 berekening
+  tax_credit_articles:
+    - "Artikel8.10"  # Algemene heffingskorting
+    - "Artikel8.11"  # Arbeidskorting
+    - "Artikel8.14a" # Combinatiekorting
+  eligibility_articles:
+    - "Artikel2.1"   # Belastingplicht
+    - "Artikel2.13"  # Partner criteria
+    - "Artikel8.14a" # Kinderen criteria combinatiekorting
