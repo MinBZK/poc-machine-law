@@ -318,7 +318,7 @@ func FromContext(ctx context.Context) Logger {
 	}
 
 	// Return a default logger if none is found in context
-	return New("default", os.Stdout, logrus.InfoLevel)
+	return New("default", os.Stdout, logrus.DebugLevel)
 }
 
 type TreeChar string

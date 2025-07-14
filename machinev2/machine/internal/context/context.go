@@ -10,7 +10,6 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
@@ -31,6 +30,8 @@ type ServiceProvider interface {
 	HasOrganizationName() bool
 	GetOrganizationName() string
 	InStandAloneMode() bool
+	HasExternalClaimResolverEndpoint() bool
+	GetExternalClaimResolverEndpoint() string
 }
 
 // CaseManagerAccessor interface for accessing case manager events
@@ -104,7 +105,6 @@ func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProv
 		NewPropertySpecOverwriteResolver(propertySpecs, overwriteInput),
 		NewPropertySpecSourceResolver(rc, propertySpecs),
 		NewPropertySpecServiceResolver(rc, propertySpecs),
-		NewExternalClaimResolver("http://belastingdienst-backend-svc/box1/1", parameters["BSN"].(string), propertySpecs),
 	}
 
 	return rc
@@ -339,141 +339,4 @@ func resolveDate(path string, date string) (any, error) {
 	}
 
 	return nil, fmt.Errorf("not a date path")
-}
-
-// resolveFromSource resolves a value from a data source
-func (rc *RuleContext) resolveFromSource(
-	ctx context.Context,
-	sourceRef ruleresolver.SourceReference) (any, error) {
-
-	var df model.DataFrame
-	tableName := ""
-
-	// Determine the DataFrame to use
-	if sourceRef.SourceType == "laws" {
-		tableName = "laws"
-
-		df = dataframe.New(rc.ServiceProvider.GetRuleResolver().RulesDataFrame())
-	} else if sourceRef.SourceType == "events" {
-		tableName = "events"
-
-		caseManager := rc.ServiceProvider.GetCaseManager()
-
-		// Get events from case manager
-		events := caseManager.GetEvents(nil)
-
-		data := make([]map[string]any, 0, len(events))
-		for idx := range events {
-			data = append(data, events[idx].ToMap())
-		}
-
-		// Create a dataframe from events
-		df = dataframe.New(data)
-	} else {
-		tableName = sourceRef.Table
-
-		var exists bool
-		df, exists = rc.Sources.Get(tableName)
-		if !exists {
-			return nil, fmt.Errorf("table %s not found in sources", tableName)
-		}
-	}
-
-	if df == nil {
-		return nil, fmt.Errorf("no dataframe found for source")
-	}
-
-	// Apply filters
-	for _, selectCond := range sourceRef.SelectOn {
-		var value any
-		var err error
-		operation := "="
-
-		if selectCond.Value.Action != nil {
-			action, err := rc.ResolveAction(ctx, *selectCond.Value.Action)
-			if err != nil {
-				return nil, err
-			}
-
-			value, err = rc.ResolveValue(ctx, action)
-			if err != nil {
-				return nil, err
-			}
-
-			if *selectCond.Value.Action.Operation == "IN" {
-				operation = "in"
-			}
-
-		} else if selectCond.Value.Value != nil {
-			value, err = rc.ResolveValue(ctx, *selectCond.Value.Value)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		// Standard equality filter
-		df, err = df.Filter(selectCond.Name, operation, value)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Get results according to requested fields
-	var result any
-
-	if sourceRef.Fields != nil {
-		// Check if all requested fields exist
-		missingFields := []string{}
-		for _, field := range *sourceRef.Fields {
-			if !df.HasColumn(field) {
-				missingFields = append(missingFields, field)
-			}
-		}
-
-		if len(missingFields) > 0 {
-			rc.logger.WithIndent().Warningf(ctx, "Fields %v not found in source for table %s", missingFields, tableName)
-		}
-
-		// Get existing fields
-		existingFields := []string{}
-		for _, field := range *sourceRef.Fields {
-			if df.HasColumn(field) {
-				existingFields = append(existingFields, field)
-			}
-		}
-
-		result = df.Select(existingFields).ToRecords()
-	} else if sourceRef.Field != nil {
-		if !df.HasColumn(*sourceRef.Field) {
-			rc.logger.WithIndent().Warningf(ctx, "Field %s not found in source for table %s", *sourceRef.Field, tableName)
-			return nil, nil
-		}
-		result = df.GetColumnValues(*sourceRef.Field)
-	} else {
-		result = df.ToRecords()
-	}
-
-	if result == nil {
-		return nil, nil
-	}
-
-	// Handle array results
-	switch r := result.(type) {
-	case []any:
-		if len(r) == 0 {
-			return nil, nil
-		}
-		if len(r) == 1 {
-			return r[0], nil
-		}
-	case []map[string]any:
-		if len(r) == 0 {
-			return nil, nil
-		}
-		if len(r) == 1 {
-			return r[0], nil
-		}
-	}
-
-	return result, nil
 }

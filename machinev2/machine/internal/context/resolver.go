@@ -2,12 +2,8 @@ package context
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"maps"
-	"net/http"
-	"net/url"
 	"strings"
 	"sync"
 
@@ -82,121 +78,6 @@ func (c *ClaimResolver) Resolve(ctx context.Context, key string) (*Resolved, boo
 
 func (c *ClaimResolver) ResolveType() string {
 	return "CLAIM"
-}
-
-var _ Resolver = &ExternalClaimResolver{}
-
-type ExternalClaimResolver struct {
-	endpoint     string
-	bsn          string
-	client       *http.Client
-	propertySpec map[string]ruleresolver.Field
-}
-
-func NewExternalClaimResolver(endpoint string, bsn string, propertySpec map[string]ruleresolver.Field) *ExternalClaimResolver {
-	return &ExternalClaimResolver{
-		propertySpec: propertySpec,
-		endpoint:     endpoint,
-		bsn:          bsn,
-		client:       http.DefaultClient,
-	}
-}
-
-// Resolve implements Resolver.
-func (c *ExternalClaimResolver) Resolve(ctx context.Context, key string) (*Resolved, bool) {
-	logger := logging.FromContext(ctx)
-	logger = logger.WithField("resolver", "external_claim")
-
-	value, err := c.do(ctx, c.bsn, key)
-	if err != nil {
-		logger.Errorf(ctx, "could not execute external claim: %w", err)
-		return nil, false
-	}
-
-	resolved := &Resolved{
-		Value:   value,
-		Details: make(map[string]any),
-	}
-
-	// Add type information for claims
-	if spec, ok := c.propertySpec[key]; ok {
-		if spec.GetBase().Type != "" {
-			resolved.Details["type"] = spec.GetBase().Type
-		}
-
-		if spec.GetBase().TypeSpec != nil {
-			resolved.Details["type_spec"] = map[string]any{
-				"type":      spec.GetBase().TypeSpec.Type,
-				"unit":      spec.GetBase().TypeSpec.Unit,
-				"precision": spec.GetBase().TypeSpec.Precision,
-				"min":       spec.GetBase().TypeSpec.Min,
-				"max":       spec.GetBase().TypeSpec.Max,
-			}
-		}
-
-		required := false
-		if spec.GetBase().Required != nil {
-			required = *spec.GetBase().Required
-		}
-		resolved.Required = required
-	}
-
-	return resolved, true
-}
-
-// Resolve implements Resolver.
-func (c *ExternalClaimResolver) do(ctx context.Context, bsn, key string) (any, error) {
-	logger := logging.FromContext(ctx)
-	logger = logger.WithField("resolver", "external_claim").WithField("bns", bsn).WithField("key", key)
-
-	endpoint, err := url.Parse(c.endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("url parse")
-	}
-
-	values := url.Values{}
-	values.Add("key", key)
-	values.Add("bsn", bsn)
-
-	endpoint.RawQuery = values.Encode()
-
-	logger.Debug(ctx, "url parse", logging.NewField("endpoint", endpoint))
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("new request with context: %w", err)
-	}
-	logger.Debug(ctx, "do request")
-
-	response, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
-
-	logger.Debug(ctx, "request done")
-
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("invalid http status: %d", response.StatusCode)
-	}
-
-	var body struct {
-		Value any `json:"value"`
-	}
-
-	if err := json.NewDecoder(response.Body).Decode(&body); err != nil {
-		return nil, fmt.Errorf("json decode: %w", err)
-	}
-
-	body2, _ := io.ReadAll(response.Body)
-	logger.Debug(ctx, "request body", logging.NewField("body", body2))
-
-	return body.Value, nil
-}
-
-func (c *ExternalClaimResolver) ResolveType() string {
-	return "EXTERNAL_CLAIM"
 }
 
 var _ Resolver = &MapResolver{}
@@ -376,78 +257,6 @@ func (l *PropertySpecOverwriteResolver) Resolve(ctx context.Context, key string)
 // ResolveType implements Resolver.
 func (l *PropertySpecOverwriteResolver) ResolveType() string {
 	return "OVERWRITE"
-}
-
-var _ Resolver = &PropertySpecSourceResolver{}
-
-type PropertySpecSourceResolver struct {
-	rc           *RuleContext
-	propertySpec map[string]ruleresolver.Field
-}
-
-func NewPropertySpecSourceResolver(rc *RuleContext, propertySpec map[string]ruleresolver.Field) *PropertySpecSourceResolver {
-	return &PropertySpecSourceResolver{
-		rc:           rc,
-		propertySpec: propertySpec,
-	}
-}
-
-// Resolve implements Resolver.
-func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*Resolved, bool) {
-	spec, ok := l.propertySpec[key]
-	if !ok {
-		return nil, false
-	}
-
-	var sourceRef *ruleresolver.SourceReference
-	if spec.Source != nil {
-		sourceRef = spec.Source.SourceReference
-	}
-
-	// Check sources
-	if sourceRef == nil {
-		return nil, false
-	}
-
-	value, err := l.rc.resolveFromSource(ctx, *sourceRef)
-	if err != nil {
-		// logger.Debugf(ctx, "resolving from source: %s", err)
-		return nil, false
-	}
-
-	if value == nil {
-		return nil, false
-	}
-
-	required := false
-	if spec.GetBase().Required != nil {
-		required = *spec.GetBase().Required
-	}
-
-	resolved := &Resolved{
-		Value:    value,
-		Required: required,
-		Details:  make(map[string]any),
-	}
-
-	// Add type information to the node
-	if spec.GetBase().Type != "" {
-		resolved.Details["type"] = spec.GetBase().Type
-	}
-
-	if spec.GetBase().TypeSpec != nil {
-		resolved.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
-	}
-
-	logging.FromContext(ctx).Debugf(ctx, "Resolving from SOURCE %v: %v", sourceRef.Table, value)
-
-	return resolved, true
-
-}
-
-// ResolveType implements Resolver.
-func (l *PropertySpecSourceResolver) ResolveType() string {
-	return "SOURCE"
 }
 
 var _ Resolver = &PropertySpecServiceResolver{}

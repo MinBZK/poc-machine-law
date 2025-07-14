@@ -22,6 +22,7 @@ type ServeCmd struct {
 		Enabled  bool   `env:"APP_LDV_ENABLED" name:"enabled"`
 		Endpoint string `env:"APP_LDV_ENDPOINT" name:"endpoint"`
 	} `embed:"" prefix:"ldv-"`
+	ExternalClaimResolverEndpoint string `env:"APP_EXTERNAL_CLAIM_RESOLVER_ENDPOINT" name:"external-claim-resolver-endpoint" help:"Will setup an external resolver for claims"`
 }
 
 func (opt *ServeCmd) Run(ctx *Context) error {
@@ -37,6 +38,7 @@ func (opt *ServeCmd) Run(ctx *Context) error {
 			Enabled:  opt.LDV.Enabled,
 			Endpoint: opt.LDV.Endpoint,
 		},
+		ExternalClaimResolverEndpoint: opt.ExternalClaimResolverEndpoint,
 	}
 
 	logger := ctx.Logger.With("application", "http_server")

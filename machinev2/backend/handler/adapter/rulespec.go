@@ -14,7 +14,7 @@ func FromRuleSpec(rulespec ruleresolver.RuleSpec) api.RuleSpec {
 
 	var references *[]api.Reference
 	// Convert References
-	if rulespec.References != nil && len(rulespec.References) > 0 {
+	if len(rulespec.References) > 0 {
 		refs := make([]api.Reference, 0, len(rulespec.References))
 		for _, ref := range rulespec.References {
 			refs = append(refs, FromReference(ref))
@@ -25,7 +25,7 @@ func FromRuleSpec(rulespec ruleresolver.RuleSpec) api.RuleSpec {
 
 	// Convert Requirements
 	var requirements *[]api.Requirement
-	if rulespec.Requirements != nil && len(rulespec.Requirements) > 0 {
+	if len(rulespec.Requirements) > 0 {
 		reqs := make([]api.Requirement, 0, len(rulespec.Requirements))
 		for _, req := range rulespec.Requirements {
 			reqs = append(reqs, FromRequirements(req))
@@ -35,7 +35,7 @@ func FromRuleSpec(rulespec ruleresolver.RuleSpec) api.RuleSpec {
 
 	// Convert Actions
 	var actions *[]api.Action
-	if rulespec.Actions != nil && len(rulespec.Actions) > 0 {
+	if len(rulespec.Actions) > 0 {
 		acts := make([]api.Action, 0, len(rulespec.Actions))
 		for _, action := range rulespec.Actions {
 			acts = append(acts, *FromAction(action))
@@ -64,7 +64,7 @@ func FromRuleSpec(rulespec ruleresolver.RuleSpec) api.RuleSpec {
 // FromProperties converts ruleresolver.Properties to api.Properties
 func FromProperties(src ruleresolver.Properties) api.Properties {
 	var applies *[]api.Apply
-	if src.Applies != nil && len(src.Applies) > 0 {
+	if len(src.Applies) > 0 {
 		appls := make([]api.Apply, 0, len(src.Applies))
 		for _, apply := range src.Applies {
 			appls = append(appls, FromApply(apply))
@@ -75,7 +75,7 @@ func FromProperties(src ruleresolver.Properties) api.Properties {
 
 	var inputs *[]api.InputField
 	// Convert Input
-	if src.Input != nil && len(src.Input) > 0 {
+	if len(src.Input) > 0 {
 		inpts := make([]api.InputField, 0, len(src.Input))
 		for _, input := range src.Input {
 			inpts = append(inpts, FromInputField(input))
@@ -86,7 +86,7 @@ func FromProperties(src ruleresolver.Properties) api.Properties {
 
 	var outputs *[]api.OutputField
 	// Convert Output
-	if src.Output != nil && len(src.Output) > 0 {
+	if len(src.Output) > 0 {
 		outpts := make([]api.OutputField, 0, len(src.Output))
 		for _, output := range src.Output {
 			outpts = append(outpts, FromOutputField(output))
@@ -97,7 +97,7 @@ func FromProperties(src ruleresolver.Properties) api.Properties {
 
 	var parameters *[]api.ParameterField
 	// Convert Parameters
-	if src.Parameters != nil && len(src.Parameters) > 0 {
+	if len(src.Parameters) > 0 {
 		params := make([]api.ParameterField, 0, len(src.Parameters))
 		for _, param := range src.Parameters {
 			params = append(params, api.ParameterField(FromBaseField(param.BaseField)))
@@ -108,7 +108,7 @@ func FromProperties(src ruleresolver.Properties) api.Properties {
 
 	var sources *[]api.SourceField
 	// Convert Sources
-	if src.Sources != nil && len(src.Sources) > 0 {
+	if len(src.Sources) > 0 {
 		srcs := make([]api.SourceField, 0, len(src.Sources))
 		for _, source := range src.Sources {
 			srcs = append(srcs, FromSourceField(source))
@@ -237,7 +237,7 @@ func FromInputField(src ruleresolver.InputField) api.InputField {
 // FromSourceReference converts ruleresolver.SourceReference to api.SourceReference
 func FromSourceReference(src ruleresolver.SourceReference) *api.SourceReference {
 	var selectsOn *[]api.SelectField
-	if src.SelectOn != nil && len(src.SelectOn) > 0 {
+	if len(src.SelectOn) > 0 {
 		selectOn := make([]api.SelectField, 0, len(src.SelectOn))
 		for _, sel := range src.SelectOn {
 			selectOn = append(selectOn, FromSelectField(sel))
@@ -267,7 +267,7 @@ func FromServiceReference(src ruleresolver.ServiceReference) api.ServiceReferenc
 
 // FromParameter converts ruleresolver.Parameter to api.Parameter
 func FromParameters(parameters []ruleresolver.Parameter) *[]api.Parameter {
-	if parameters != nil && len(parameters) > 0 {
+	if len(parameters) > 0 {
 		params := make([]api.Parameter, 0, len(parameters))
 		for _, param := range parameters {
 			params = append(params, FromParameter(param))
@@ -424,7 +424,7 @@ func FromAction(action ruleresolver.Action) *api.Action {
 	}
 
 	var conditions *[]api.Condition
-	if action.Conditions != nil && len(action.Conditions) > 0 {
+	if len(action.Conditions) > 0 {
 		conds := make([]api.Condition, 0, len(action.Conditions))
 		for _, cond := range action.Conditions {
 			conds = append(conds, ConditionToAPI(cond))

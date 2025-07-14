@@ -38,11 +38,12 @@ type Services struct {
 
 	shutdownFns []func(context.Context) error
 
-	ruleServiceInMemory bool
-	organization        *string
-	standAloneMode      bool
-	ldvEnabled          bool
-	rvaIDs              map[string]uuid.UUID
+	ruleServiceInMemory           bool
+	organization                  *string
+	standAloneMode                bool
+	ldvEnabled                    bool
+	rvaIDs                        map[string]uuid.UUID
+	externalClaimResolverEndpoint *string
 }
 
 type Option func(*Services)
@@ -80,6 +81,13 @@ func SetStandaloneMode() Option {
 	return func(s *Services) {
 		s.logger.Warningf(context.Background(), "setup in standalone mode")
 		s.standAloneMode = true
+	}
+}
+
+func WithExternalClaimResolverEndpoint(endpoint string) Option {
+	return func(s *Services) {
+		s.logger.Warning(context.Background(), "external claim resolver setup", logging.NewField("endpoint", endpoint))
+		s.externalClaimResolverEndpoint = &endpoint
 	}
 }
 
@@ -563,11 +571,11 @@ func (s *Services) HasOrganizationName() bool {
 }
 
 func (s *Services) GetOrganizationName() string {
-	if s.organization == nil {
-		return ""
+	if s.HasOrganizationName() {
+		return *s.organization
 	}
 
-	return *s.organization
+	return ""
 }
 
 func (s *Services) RuleServicesInMemory() bool {
@@ -576,4 +584,16 @@ func (s *Services) RuleServicesInMemory() bool {
 
 func (s *Services) InStandAloneMode() bool {
 	return s.standAloneMode
+}
+
+func (s *Services) HasExternalClaimResolverEndpoint() bool {
+	return s.externalClaimResolverEndpoint != nil
+}
+
+func (s *Services) GetExternalClaimResolverEndpoint() string {
+	if s.HasExternalClaimResolverEndpoint() {
+		return *s.externalClaimResolverEndpoint
+	}
+
+	return ""
 }

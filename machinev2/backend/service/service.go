@@ -41,6 +41,10 @@ func New(logger *slog.Logger, cfg *config.Config) (*Service, error) {
 		options = append(options, machine.WithLogboekDataVerwerking(cfg.LDV.Endpoint, cfg.Organization))
 	}
 
+	if cfg.ExternalClaimResolverEndpoint != "" {
+		options = append(options, machine.WithExternalClaimResolverEndpoint(cfg.ExternalClaimResolverEndpoint))
+	}
+
 	services, err := machine.NewServices(time.Now(), options...)
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
