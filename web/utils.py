@@ -47,6 +47,8 @@ def get_law_url(law_name: str, service: str = None) -> str | None:
     """Get the /wetten URL for a law."""
     bwb_id = get_bwb_id(law_name)
     if bwb_id:
+        # If we have a service, we can potentially link to the specific YAML
+        # For now, just return the main law page which lists all implementations
         return f"/wetten/{bwb_id}"
 
     return None
