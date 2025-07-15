@@ -1,0 +1,524 @@
+{% extends "wetten/base_dark.html" %}
+{% block title %}{{ yaml_content.name }} - Regelspraak - wetten.overheid.nl{% endblock %}
+{% block navigation %}
+    <li class="nav-item">
+        <a href="/" class="nav-link">← Terug naar Burger.nl</a>
+    </li>
+    <li class="nav-item">
+        <a href="/wetten/{{ bwb_id }}" class="nav-link">← Terug naar Wettekst</a>
+    </li>
+    <li class="nav-item">
+        <a href="/wetten" class="nav-link">Alle wetten</a>
+    </li>
+{% endblock %}
+{% block extra_styles %}
+    <style>
+    /* Regelspraak specifieke styling */
+    .rule-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+    }
+
+    .rule-actions {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+        color: #e2e8f0;
+    }
+
+    .action-assign, .action-if {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #1e293b;
+        border-radius: 6px;
+        border: 1px solid #334155;
+    }
+
+    .var-output {
+        color: #86efac;
+        font-weight: 600;
+        font-family: monospace;
+        background: #064e3b;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .var-input {
+        color: #86efac;
+        font-weight: 600;
+        font-family: monospace;
+    }
+
+    .var-param {
+        color: #60a5fa;
+        font-weight: 600;
+        font-family: monospace;
+    }
+
+    .value-number {
+        color: #fb923c;
+        font-weight: 600;
+    }
+
+    .value-bool {
+        color: #c084fc;
+        font-weight: 600;
+    }
+
+    .test {
+        font-style: italic;
+        color: #94a3b8;
+    }
+
+    .legal-basis-inline {
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+
+    .legal-basis-link {
+        display: inline-block;
+        background: #0891b2;
+        color: white !important;
+        text-decoration: none;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+
+    .legal-basis-link:hover {
+        opacity: 0.8;
+        text-decoration: none;
+    }
+
+    .condition {
+        margin: 0.75rem 0;
+        padding-left: 1.5rem;
+        border-left: 3px solid #1e40af;
+    }
+
+    .condition-else {
+        margin: 0.75rem 0;
+        padding-left: 1.5rem;
+        border-left: 3px solid #be123c;
+    }
+
+    .requirement-item {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #1e293b;
+        border-radius: 6px;
+        border: 1px solid #334155;
+    }
+
+    .definition-name {
+        color: #60a5fa;
+        font-family: monospace;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .definition-value {
+        color: #fb923c;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    .field-item {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #1e293b;
+        border-radius: 6px;
+        border: 1px solid #334155;
+        transition: all 0.3s ease;
+    }
+
+    .field-item:target {
+        border-color: #0891b2;
+        box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.3);
+        background: #1e293b;
+    }
+
+    /* Animate the highlight effect */
+    @keyframes highlight-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(8, 145, 178, 0.5); }
+        50% { box-shadow: 0 0 0 10px rgba(8, 145, 178, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(8, 145, 178, 0); }
+    }
+
+    .field-item.highlight-active {
+        animation: highlight-pulse 2s ease-out;
+    }
+
+    .field-name {
+        color: #86efac;
+        font-family: monospace;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .field-meta {
+        color: #94a3b8;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .meta-tag {
+        display: inline-block;
+        background: #334155;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-right: 8px;
+        font-size: 12px;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumbs %}
+    <nav class="breadcrumbs">
+        <a href="/">Burger.nl</a>
+        <span class="separator">›</span>
+        <a href="/wetten">Wetten</a>
+        <span class="separator">›</span>
+        <a href="/wetten/{{ bwb_id }}">{{ law.title }}</a>
+        <span class="separator">›</span>
+        <span>Regelspraak</span>
+    </nav>
+{% endblock %}
+{% block content %}
+    <!-- Header -->
+    <div style="margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #334155">
+        <h1 style="font-size: 32px;
+                   font-weight: 700;
+                   color: #67e8f9;
+                   margin-bottom: 10px">{{ yaml_content.name }}</h1>
+        <div style="color: #94a3b8; font-size: 14px;">
+            <span class="meta-tag"
+                  style="background: #0c4a6e;
+                         color: #67e8f9;
+                         border: 1px solid #0891b2">{{ yaml_content.service }}</span>
+            <span class="meta-tag">{{ yaml_content.law }}</span>
+            <span class="meta-tag">Geldig vanaf: {{ yaml_content.valid_from }}</span>
+            {% if yaml_content.law_type %}<span class="meta-tag">Type: {{ yaml_content.law_type }}</span>{% endif %}
+            {% if yaml_content.legal_character %}
+                <span class="meta-tag">Karakter: {{ yaml_content.legal_character }}</span>
+            {% endif %}
+        </div>
+        {% if yaml_content.description %}
+            <p style="margin-top: 15px; color: #94a3b8; font-style: italic;">{{ yaml_content.description }}</p>
+        {% endif %}
+    </div>
+    <!-- Top-level Legal Basis -->
+    {% if yaml_content.legal_basis %}
+        <span id="legal_basis"></span>
+        <span id="legal_basis.bwb_id"></span>
+        <span id="legal_basis.article"></span>
+        <span id="legal_basis.law"></span>
+        <div class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Wettelijke Basis</h2>
+            {{ renderer.render_legal_basis(yaml_content.legal_basis) | safe }}
+        </div>
+    {% endif %}
+    <!-- Definitions -->
+    {% if yaml_content.properties and yaml_content.properties.definitions %}
+        <div id="definitions" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Definities</h2>
+            <div style="display: grid;
+                        grid-template-columns: auto 1fr;
+                        gap: 8px 20px;
+                        align-items: baseline">
+                {% for name, value in yaml_content.properties.definitions.items() %}
+                    <span id="definitions.{{ name }}"></span>
+                    <span id="properties.definitions.{{ name }}"></span>
+                    <span class="definition-name" style="text-align: right;">{{ name }}:</span>
+                    <span>
+                        {% if value is number %}
+                            <span class="definition-value">{{ value }}</span>
+                        {% elif value is string and value.startswith('$') %}
+                            <span class="definition-value" style="color: #60a5fa;">{{ value }}</span>
+                        {% else %}
+                            <span class="definition-value">{{ value }}</span>
+                        {% endif %}
+                        {% if value is mapping and 'legal_basis' in value %}
+                            {{ renderer.render_legal_basis(value.legal_basis) | safe }}
+                        {% endif %}
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    <!-- Parameters -->
+    {% if yaml_content.properties and yaml_content.properties.parameters %}
+        <div id="parameters" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Parameters</h2>
+            {% for param in yaml_content.properties.parameters %}
+                <span id="parameters.{{ param.name }}"></span>
+                <span id="properties.parameters.{{ param.name }}"></span>
+                <span id="properties.parameters.{{ param.name }}.legal_basis"></span>
+                <div class="field-item">
+                    <div class="field-name">{{ param.name }}</div>
+                    <div style="color: #94a3b8;">{{ param.description }}</div>
+                    <div class="field-meta">
+                        <span class="meta-tag">Type: {{ param.type }}</span>
+                        {% if param.required %}<span class="meta-tag" style="background: #dc2626;">Verplicht</span>{% endif %}
+                    </div>
+                    {% if param.legal_basis %}
+                        <div style="margin-top: 8px;">
+                            <span style="color: #94a3b8; font-size: 0.875rem;">Wettelijke basis:</span>
+                            {{ renderer.render_legal_basis(param.legal_basis) | safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Sources -->
+    {% if yaml_content.properties and yaml_content.properties.sources %}
+        <div id="sources" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Bronnen</h2>
+            {% for source_item in yaml_content.properties.sources %}
+                <span id="sources.{{ source_item.name }}"></span>
+                <span id="properties.sources.{{ source_item.name }}"></span>
+                <span id="sources.{{ source_item.name }}.legal_basis"></span>
+                <div class="field-item">
+                    <div class="field-name">{{ source_item.name }}</div>
+                    <div style="color: #94a3b8;">{{ source_item.description }}</div>
+                    <div class="field-meta">
+                        <span class="meta-tag">Type: {{ source_item.type }}</span>
+                        {% if source_item.source_reference %}
+                            <span class="meta-tag" style="background: #0891b2;">Tabel: {{ source_item.source_reference.table }}</span>
+                        {% endif %}
+                    </div>
+                    {% if source_item.legal_basis %}
+                        <div style="margin-top: 8px;">
+                            <span style="color: #94a3b8; font-size: 0.875rem;">Wettelijke basis:</span>
+                            {{ renderer.render_legal_basis(source_item.legal_basis) | safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Input -->
+    {% if yaml_content.properties and yaml_content.properties.input %}
+        <div id="input" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Input Velden</h2>
+            {% for input_item in yaml_content.properties.input %}
+                <span id="input.{{ input_item.name }}"></span>
+                <span id="properties.input.{{ input_item.name }}"></span>
+                <span id="input.{{ input_item.name }}.legal_basis"></span>
+                <span id="properties.input.{{ input_item.name }}.legal_basis"></span>
+                <div class="field-item">
+                    <div class="field-name">{{ input_item.name }}</div>
+                    <div style="color: #94a3b8;">{{ input_item.description }}</div>
+                    <div class="field-meta">
+                        <span class="meta-tag">Type: {{ input_item.type }}</span>
+                        {% if input_item.type_spec %}
+                            {% if input_item.type_spec.unit %}<span class="meta-tag">Eenheid: {{ input_item.type_spec.unit }}</span>{% endif %}
+                            {% if input_item.type_spec.min is defined %}
+                                <span class="meta-tag">Min: {{ input_item.type_spec.min }}</span>
+                            {% endif %}
+                            {% if input_item.type_spec.max is defined %}
+                                <span class="meta-tag">Max: {{ input_item.type_spec.max }}</span>
+                            {% endif %}
+                        {% endif %}
+                        {% if input_item.service_reference %}
+                            {% if input_item.name in service_reference_urls %}
+                                {% set ref_info = service_reference_urls[input_item.name] %}
+                                <a href="{{ ref_info.url }}"
+                                   class="meta-tag"
+                                   style="background: #0891b2;
+                                          color: white;
+                                          text-decoration: none;
+                                          transition: opacity 0.2s"
+                                   onmouseover="this.style.opacity='0.8'"
+                                   onmouseout="this.style.opacity='1'"
+                                   title="Klik om naar {{ input_item.service_reference.service }}.{{ input_item.service_reference.field }} te gaan">
+                                    Bron: {{ input_item.service_reference.service }}.{{ input_item.service_reference.field }} →
+                                </a>
+                            {% else %}
+                                <span class="meta-tag" style="background: #0891b2;">Bron: {{ input_item.service_reference.service }}.{{ input_item.service_reference.field }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    {% if input_item.legal_basis %}
+                        <div style="margin-top: 8px;">
+                            <span style="color: #94a3b8; font-size: 0.875rem;">Wettelijke basis:</span>
+                            {{ renderer.render_legal_basis(input_item.legal_basis) | safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Requirements -->
+    {% if yaml_content.requirements %}
+        <div id="requirements" class="rule-section" style="margin-bottom: 40px;">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Vereisten</h2>
+            {{ renderer.render_requirements(yaml_content.requirements) | safe }}
+        </div>
+    {% endif %}
+    <!-- Actions (Regelspraak) -->
+    {% if yaml_content.actions %}
+        <div id="actions" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Berekeningen en Acties</h2>
+            <div class="rule-actions">
+                {% for i, action in enumerate(yaml_content.actions) %}
+                    <span id="actions.{{ i }}"></span>
+                    <span id="actions.{{ i }}.operation"></span>
+                    <div>{{ renderer.render_action(action) | safe }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    <!-- Output -->
+    {% if yaml_content.properties and yaml_content.properties.output %}
+        <div id="output" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Output Velden</h2>
+            {% for output_item in yaml_content.properties.output %}
+                <span id="output.{{ output_item.name }}"></span>
+                <span id="properties.output.{{ output_item.name }}"></span>
+                <div class="field-item" id="output-{{ output_item.name }}">
+                    <div class="field-name">{{ output_item.name }}</div>
+                    <div style="color: #94a3b8;">{{ output_item.description }}</div>
+                    <div class="field-meta">
+                        <span class="meta-tag">Type: {{ output_item.type }}</span>
+                        {% if output_item.type_spec %}
+                            {% if output_item.type_spec.unit %}<span class="meta-tag">Eenheid: {{ output_item.type_spec.unit }}</span>{% endif %}
+                        {% endif %}
+                        {% if output_item.citizen_relevance %}
+                            <span class="meta-tag" style="background: #10b981;">Relevantie: {{ output_item.citizen_relevance }}</span>
+                        {% endif %}
+                    </div>
+                    {% if output_item.legal_basis %}
+                        <div style="margin-top: 8px;">
+                            <span style="color: #94a3b8; font-size: 0.875rem;">Wettelijke basis:</span>
+                            {{ renderer.render_legal_basis(output_item.legal_basis) | safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- References -->
+    {% if yaml_content.references %}
+        <div id="references" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Referenties</h2>
+            {% for ref in yaml_content.references %}
+                <div style="margin-bottom: 10px;">
+                    <a href="{{ ref.url }}" target="_blank" style="color: #38bdf8;">
+                        {{ ref.law }} - Artikel {{ ref.article }}
+                        {% if ref.description %}: {{ ref.description }}{% endif %}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Raw YAML (collapsed by default) -->
+    <div class="rule-section">
+        <details>
+            <summary style="cursor: pointer; color: #67e8f9; font-weight: 600;">Bekijk ruwe YAML data</summary>
+            <pre style="margin-top: 15px;
+                        padding: 15px;
+                        background: #0f172a;
+                        border: 1px solid #334155;
+                        border-radius: 6px;
+                        overflow-x: auto;
+                        color: #e2e8f0;
+                        font-size: 12px">{{ yaml_content_string }}</pre>
+        </details>
+    </div>
+    <!-- JavaScript for smooth scrolling and highlighting -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there's a hash in the URL
+        if (window.location.hash) {
+            const targetId = window.location.hash.substring(1);
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                // Add highlight animation
+                targetElement.classList.add('highlight-active');
+
+                // Smooth scroll to the element with some offset
+                setTimeout(function() {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
+
+                // Remove the animation class after it completes
+                setTimeout(function() {
+                    targetElement.classList.remove('highlight-active');
+                }, 2100);
+            }
+        }
+
+        // Handle clicks on service reference links for smooth scrolling
+        document.querySelectorAll('a[href*="#output-"]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                const hashIndex = href.indexOf('#');
+
+                if (hashIndex !== -1) {
+                    const targetId = href.substring(hashIndex + 1);
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        e.preventDefault();
+
+                        // Navigate to the URL (for proper history)
+                        window.location.href = href;
+
+                        // Add highlight animation
+                        targetElement.classList.add('highlight-active');
+
+                        // Smooth scroll
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        // Remove animation class after completion
+                        setTimeout(function() {
+                            targetElement.classList.remove('highlight-active');
+                        }, 2100);
+                    }
+                }
+            });
+        });
+    });
+    </script>
+{% endblock %}

@@ -27,3 +27,8 @@ machinev2/backend/backend
 __debug_bin*
 
 .claude
+
+# Fetched law data (large files)
+laws/fetched/*.yaml
+laws/fetched/*.html
+laws/fetched/*.json

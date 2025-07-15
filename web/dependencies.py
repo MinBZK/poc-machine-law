@@ -115,6 +115,40 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
 
     templates.env.filters["format_currency"] = format_currency
 
+    def get_yaml_explanation(yaml_explanations: dict, file_path: str, section_path: str) -> str:
+        """Get explanation from loaded YAML content"""
+        if not yaml_explanations or file_path not in yaml_explanations:
+            return ""
+
+        yaml_content = yaml_explanations[file_path]
+        parts = section_path.split(".")
+        current = yaml_content
+
+        try:
+            for part in parts:
+                if isinstance(current, dict) and part in current:
+                    current = current[part]
+                elif isinstance(current, list):
+                    idx = int(part)
+                    if 0 <= idx < len(current):
+                        current = current[idx]
+                    else:
+                        return ""
+                else:
+                    return ""
+
+            # Extract explanation from legal_basis
+            if isinstance(current, dict) and "legal_basis" in current:
+                return current["legal_basis"].get("explanation", "")
+            elif isinstance(current, dict) and "explanation" in current:
+                return current.get("explanation", "")
+
+            return ""
+        except Exception:
+            return ""
+
+    templates.env.filters["get_yaml_explanation"] = get_yaml_explanation
+
     return templates
 
 
