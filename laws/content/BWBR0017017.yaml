@@ -1,445 +1,292 @@
-# Wet kinderopvang (BWBR0017017) - machine-law format
-# Volledige tekst van de Wet kinderopvang zoals gepubliceerd op wetten.overheid.nl
-
-bwb_id: "BWBR0017017"
-title: "Wet kinderopvang"
-url: "https://wetten.overheid.nl/BWBR0017017"
-valid_from: "2024-12-11"
-last_updated: "2025-01-13"
-
-# Mapping naar onze YAML files
+bwb_id: BWBR0017017
+title: Wet kinderopvang
+url: https://wetten.overheid.nl/BWBR0017017
+valid_from: '2024-12-11'
+last_updated: '2025-07-14T17:58:51.251147'
 yaml_files:
-  - path: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-    description: "Hoofdimplementatie van de kinderopvangtoeslag berekening"
-
-# Hoofdstructuur van de wet
+- path: law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml
+  description: Hoofdimplementatie van de kinderopvangtoeslag berekening
 structure:
   chapters:
-    - id: "Hoofdstuk1"
-      title: "Kinderopvang"
-      sections:
-        - id: "Afdeling1"
-          title: "Algemene bepalingen"
-          articles:
-            - id: "Artikel1.1"
-              title: "Begripsbepalingen"
-              content: |
-                In deze wet en de daarop berustende bepalingen wordt verstaan onder:
-                a. kinderopvang: het bieden van opvang voor kinderen in de leeftijd vanaf zes weken tot en met drie jaar en buitenschoolse opvang voor kinderen in de leeftijd vanaf vier jaar tot en met het jaar waarin zij de leeftijd van dertien jaar bereiken;
-                b. gastouder: een natuurlijk persoon van achttien jaar of ouder die, al dan niet tegen betaling, regelmatig kinderopvang biedt;
-                c. kindercentrum: een voorziening voor kinderopvang, niet zijnde kinderopvang door een gastouder;
-                d. kinderopvangtoeslag: een tegemoetkoming in de kosten van kinderopvang als bedoeld in artikel 1.5;
-                e. Onze Minister: de Minister van Sociale Zaken en Werkgelegenheid;
-                f. houder: de natuurlijke persoon of rechtspersoon die een kindercentrum in stand houdt;
-                g. voorschoolse educatie: educatieve activiteiten gericht op de bevordering van de ontwikkeling van kinderen;
-                h. buitenschoolse opvang: kinderopvang voor kinderen die het basisonderwijs of speciaal onderwijs volgen;
-                i. peuteropvang: kinderopvang voor kinderen van twee en drie jaar;
-                j. dagopvang: kinderopvang, niet zijnde buitenschoolse opvang of peuteropvang;
-                k. gastouderbureau: de rechtspersoon die bemiddelt bij het tot stand brengen van overeenkomsten voor kinderopvang door gastouders;
-                l. ouder: de ouder, voogd of verzorger van een kind;
-                m. toezichthouder: een ambtenaar als bedoeld in artikel 1.61;
-              paragraphs:
-                - number: 1
-                  content: "Begripsbepalingen zoals hierboven omschreven"
-                  yaml_references:
-                    - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                      section: "legal_basis"
-                      description: "Definities gebruikt in kinderopvangtoeslag"
-                      line_reference: "legal_basis.bwb_id"
+  - id: Hoofdstuk1
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel1
+      paragraphs:
+      - number: 1
+        content: 'In deze wet en de op deze wet berustende bepalingen wordt verstaan onder:
 
-        - id: "Afdeling2"
-          title: "Kinderopvangtoeslag"
-          sections:
-            - id: "Paragraaf2"
-              title: "Aanspraak op kinderopvangtoeslag"
-              articles:
-                - id: "Artikel1.5"
-                  title: "Recht op kinderopvangtoeslag"
-                  content: |
-                    1. Recht op kinderopvangtoeslag hebben ouders die gebruik maken van kinderopvang die wordt aangeboden door:
-                    a. een kindercentrum dat is geregistreerd overeenkomstig artikel 1.45, eerste lid;
-                    b. een gastouder die is geregistreerd overeenkomstig artikel 1.50, eerste lid, bij een gastouderbureau dat is geregistreerd overeenkomstig artikel 1.48, eerste lid.
-                    2. Recht op kinderopvangtoeslag hebben ouders gezamenlijk. In afwijking daarvan heeft de ouder die alleen met het kind een huishouding voert, alleen recht op kinderopvangtoeslag.
-                    3. Voor kinderen van vier jaar en ouder wordt kinderopvangtoeslag uitsluitend verstrekt voor buitenschoolse opvang.
-                  paragraphs:
-                    - number: 1
-                      content: "Recht op toeslag bij gebruik geregistreerde kinderopvang"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "legal_basis"
-                          description: "Hoofdartikel voor recht op kinderopvangtoeslag"
-                          line_reference: "legal_basis.article"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "sources.KINDEROPVANG_KVK"
-                          description: "Registratie kinderopvangorganisatie"
-                          line_reference: "sources.KINDEROPVANG_KVK.legal_basis"
-                    - number: 2
-                      content: "Ouders hebben gezamenlijk recht, alleenstaande ouder alleen"
-                    - number: 3
-                      content: "Voor kinderen 4+ alleen buitenschoolse opvang"
 
-                - id: "Artikel1.6"
-                  title: "Voorwaarden kinderopvangtoeslag"
-                  content: |
-                    1. Recht op kinderopvangtoeslag bestaat indien de ouder of de ouders:
-                    a. in Nederland wonen;
-                    b. rechtmatig verblijf hebben in de zin van artikel 8 van de Vreemdelingenwet 2000;
-                    c. ten minste één van de activiteiten, bedoeld in het tweede lid, verrichten.
-                    2. De activiteiten, bedoeld in het eerste lid, onderdeel c, zijn:
-                    a. het verrichten van arbeid uit dienstbetrekking of als zelfstandige;
-                    b. het genieten van een uitkering op grond van de Werkloosheidswet, de Ziektewet, de Wet werk en inkomen naar arbeidsvermogen, de Wet op de arbeidsongeschiktheidsverzekering, de Wet arbeidsongeschiktheidsverzekering zelfstandigen of de Wet arbeidsongeschiktheidsvoorziening jonggehandicapten;
-                    c. het volgen van onderwijs;
-                    d. het deelnemen aan een voorziening gericht op arbeidsinschakeling.
-                    3. Geen recht op kinderopvangtoeslag bestaat indien de kinderopvang wordt gebruikt in verband met het volgen van onderwijs dat uitsluitend in de avonduren, het weekend of tijdens vakanties plaatsvindt.
-                  paragraphs:
-                    - number: 1
-                      content: "Voorwaarden: wonen in Nederland, rechtmatig verblijf, activiteiten verrichten"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "requirements"
-                          description: "Werkvoorwaarden voor recht op toeslag"
-                          line_reference: "requirements"
-                    - number: 2
-                      content: "Activiteiten: werken, uitkering, onderwijs, reïntegratie"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "input.GEWERKTE_UREN"
-                          description: "Werkuren als voorwaarde"
-                          line_reference: "input.GEWERKTE_UREN.legal_basis"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "input.PARTNER_GEWERKTE_UREN"
-                          description: "Werkuren partner als voorwaarde"
-                          line_reference: "input.PARTNER_GEWERKTE_UREN.legal_basis"
-                    - number: 3
-                      content: "Geen recht bij onderwijs alleen in avond/weekend/vakantie"
+          beroepskracht: a. de persoon van 18 jaar of ouder die werkzaam is bij een kindercentrum, bezoldigd is en belast
+          is met de verzorging, de opvoeding en het bijdragen aan de ontwikkeling van kinderen; b. de persoon van 18 jaar
+          of ouder die werkzaam is bij een gastouderbureau, bezoldigd is en belast is met het tot stand brengen en begeleiden
+          van gastouderopvang;
 
-                - id: "Artikel1.7"
-                  title: "Hoogte kinderopvangtoeslag"
-                  content: |
-                    1. De kinderopvangtoeslag wordt per kind over een kalenderjaar verstrekt.
-                    2. Bij de vaststelling van de kinderopvangtoeslag worden in acht genomen:
-                    a. het draagkrachtbeginsel;
-                    b. de kosten van kinderopvang per kind;
-                    c. het aantal uren kinderopvang per kind;
-                    d. de soort kinderopvang.
-                    3. Bij ministeriële regeling worden regels gesteld over de wijze van berekening van de kinderopvangtoeslag, waarbij kan worden bepaald dat de hoogte van de kinderopvangtoeslag wordt vastgesteld aan de hand van tabellen.
-                  paragraphs:
-                    - number: 1
-                      content: "Toeslag per kind per kalenderjaar"
-                    - number: 2
-                      content: "Factoren: draagkracht, kosten, uren, soort opvang"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "input.INKOMEN"
-                          description: "Inkomen bepaalt draagkracht"
-                          line_reference: "input.INKOMEN.legal_basis"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "sources.AANGEGEVEN_UREN"
-                          description: "Uren en kosten kinderopvang"
-                          line_reference: "sources.AANGEGEVEN_UREN.legal_basis"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.MAX_UURTARIEF_DAGOPVANG"
-                          description: "Maximum uurtarief dagopvang"
-                          line_reference: "definitions.MAX_UURTARIEF_DAGOPVANG"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.MAX_UURTARIEF_BSO"
-                          description: "Maximum uurtarief BSO"
-                          line_reference: "definitions.MAX_UURTARIEF_BSO"
-                    - number: 3
-                      content: "Ministeriële regeling stelt berekeningsregels en tabellen vast"
 
-                - id: "Artikel1.8"
-                  title: "Berekening kinderopvangtoeslag"
-                  content: |
-                    1. De kinderopvangtoeslag bedraagt een door Onze Minister vast te stellen percentage van de kosten van kinderopvang, verminderd met de door Onze Minister vast te stellen eigen bijdrage van de ouders.
-                    2. Het percentage en de eigen bijdrage kunnen per inkomensklasse verschillend worden vastgesteld.
-                    3. Bij ministeriële regeling kunnen nadere regels worden gesteld over de vaststelling van de eigen bijdrage.
-                  paragraphs:
-                    - number: 1
-                      content: "Toeslag = percentage kosten minus eigen bijdrage"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.PERCENTAGE_1"
-                          description: "Vergoedingspercentage laagste inkomens"
-                          line_reference: "definitions.PERCENTAGE_1"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.PERCENTAGE_2"
-                          description: "Vergoedingspercentage middeninkomens"
-                          line_reference: "definitions.PERCENTAGE_2"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.PERCENTAGE_3"
-                          description: "Vergoedingspercentage hoogste inkomens"
-                          line_reference: "definitions.PERCENTAGE_3"
-                    - number: 2
-                      content: "Percentage en eigen bijdrage verschillend per inkomensklasse"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.INKOMENSDREMPEL_1"
-                          description: "Eerste inkomensdrempel"
-                          line_reference: "definitions.INKOMENSDREMPEL_1"
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.INKOMENSDREMPEL_2"
-                          description: "Tweede inkomensdrempel"
-                          line_reference: "definitions.INKOMENSDREMPEL_2"
-                    - number: 3
-                      content: "Nadere regels eigen bijdrage bij ministeriële regeling"
+          a. de persoon van 18 jaar of ouder die werkzaam is bij een kindercentrum, bezoldigd is en belast is met de verzorging,
+          de opvoeding en het bijdragen aan de ontwikkeling van kinderen;
 
-                - id: "Artikel1.9"
-                  title: "Maximum aantal uren"
-                  content: |
-                    1. Het aantal uren kinderopvang waarvoor kinderopvangtoeslag wordt verstrekt, bedraagt ten hoogste het aantal uren dat noodzakelijk is in verband met de activiteiten, bedoeld in artikel 1.6, tweede lid.
-                    2. Bij ministeriële regeling wordt het maximum aantal uren kinderopvang per kalenderjaar vastgesteld waarvoor kinderopvangtoeslag wordt verstrekt.
-                  paragraphs:
-                    - number: 1
-                      content: "Maximum uren afhankelijk van noodzaak voor activiteiten"
-                    - number: 2
-                      content: "Maximum uren per jaar vastgesteld bij ministeriële regeling"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "definitions.MAX_HOURS_PER_YEAR"
-                          description: "Maximum vergoede uren per jaar"
-                          line_reference: "definitions.MAX_HOURS_PER_YEAR"
 
-        - id: "Afdeling3"
-          title: "Kwaliteit kinderopvang"
-          sections:
-            - id: "Paragraaf1"
-              title: "Registratie en kwaliteitseisen"
-              articles:
-                - id: "Artikel1.45"
-                  title: "Registratie kindercentra"
-                  content: |
-                    1. Een kindercentrum wordt in het handelsregister ingeschreven.
-                    2. De houder van een kindercentrum meldt de exploitatie van het kindercentrum bij de gemeente waar het kindercentrum is gevestigd.
-                  paragraphs:
-                    - number: 1
-                      content: "Kindercentrum moet in handelsregister"
-                      yaml_references:
-                        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-                          section: "sources.KINDEROPVANG_KVK"
-                          description: "KVK registratie kinderopvangorganisatie"
-                          line_reference: "sources.KINDEROPVANG_KVK.legal_basis"
-                    - number: 2
-                      content: "Melding exploitatie bij gemeente"
+          b. de persoon van 18 jaar of ouder die werkzaam is bij een gastouderbureau, bezoldigd is en belast is met het tot
+          stand brengen en begeleiden van gastouderopvang;
 
-                - id: "Artikel1.48"
-                  title: "Registratie gastouderbureaus"
-                  content: |
-                    1. Een gastouderbureau wordt in het handelsregister ingeschreven.
-                    2. Het gastouderbureau meldt de exploitatie bij de gemeente waar het bureau is gevestigd.
-                  paragraphs:
-                    - number: 1
-                      content: "Gastouderbureau moet in handelsregister"
-                    - number: 2
-                      content: "Melding exploitatie bij gemeente"
 
-                - id: "Artikel1.50"
-                  title: "Registratie gastouders"
-                  content: |
-                    1. Een gastouder wordt geregistreerd bij een gastouderbureau.
-                    2. Het gastouderbureau houdt een register bij van de bij haar geregistreerde gastouders.
-                  paragraphs:
-                    - number: 1
-                      content: "Gastouder geregistreerd bij gastouderbureau"
-                    - number: 2
-                      content: "Gastouderbureau houdt register bij"
+          beroepskracht in opleiding: degene die beschikt over een arbeidsovereenkomst met de houder van een kindercentrum
+          of van een gastouderbureau en ten behoeve van het praktijkdeel van de opleiding belast is met de verzorging, de
+          opvoeding en het bijdragen aan de ontwikkeling van kinderen bij een kindercentrum of met het tot stand brengen en
+          begeleiden van gastouderopvang bij een gastouderbureau;
 
-        - id: "Afdeling4"
-          title: "Handhaving"
-          articles:
-            - id: "Artikel1.61"
-              title: "Toezichthouders"
-              content: |
-                1. Met het toezicht op de naleving van het bepaalde bij of krachtens deze wet zijn belast de bij besluit van Onze Minister aangewezen ambtenaren.
-                2. Van een besluit als bedoeld in het eerste lid wordt mededeling gedaan door plaatsing in de Staatscourant.
-              paragraphs:
-                - number: 1
-                  content: "Minister wijst toezichthouders aan"
-                - number: 2
-                  content: "Besluit bekendgemaakt via Staatscourant"
 
-    - id: "Hoofdstuk2"
-      title: "Kwaliteitseisen peuterspeelzalen"
-      articles:
-        - id: "Artikel2.1"
-          title: "Begripsbepalingen peuterspeelzalen"
-          content: |
-            In dit hoofdstuk wordt verstaan onder:
-            a. peuterspeelzaal: een voorziening voor opvang van kinderen in de leeftijd van twee en drie jaar die gericht is op de ontwikkeling van de kinderen;
-            b. houder: de natuurlijke persoon of rechtspersoon die een peuterspeelzaal in stand houdt.
-          paragraphs:
-            - number: 1
-              content: "Definities specifiek voor peuterspeelzalen"
+          beroepskracht meertalige kinderopvang: degene die als beroepskracht werkzaam is en belast is met meertalige kinderopvang
+          en die voldoet aan de opleidingseisen en scholingseisen, bedoeld in artikel 1.50, tweede lid, onderdeel b;
 
-    - id: "Hoofdstuk3"
-      title: "Overgangs- en slotbepalingen"
-      articles:
-        - id: "Artikel3.1"
-          title: "Citeertitel"
-          content: |
-            Deze wet wordt aangehaald als: Wet kinderopvang.
-          paragraphs:
-            - number: 1
-              content: "Officiële naam: Wet kinderopvang"
 
-        - id: "Artikel3.2"
-          title: "Inwerkingtreding"
-          content: |
-            Deze wet treedt in werking op een bij koninklijk besluit te bepalen tijdstip, dat voor de verschillende artikelen of onderdelen daarvan verschillend kan worden vastgesteld.
-          paragraphs:
-            - number: 1
-              content: "Inwerkingtreding bij koninklijk besluit"
+          beroepskracht voorschoolse educatie: degene die als beroepskracht werkzaam is en belast is met voorschoolse educatie
+          en die voldoet aan de opleidingseisen en scholingseisen, bedoeld in artikel 1.50b, onderdeel a;
 
-# Cross-referentie index voor snelle lookup
-cross_references:
-  # Vanuit YAML naar wettekst
-  yaml_to_law:
-    "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml":
-      legal_basis.article:
-        article: "Artikel1.5"
-        paragraph: 1
-        description: "Hoofdartikel voor recht op kinderopvangtoeslag"
-      sources.KINDEROPVANG_KVK:
-        article: "Artikel1.45"
-        paragraph: 1
-        description: "KVK registratie kinderopvangorganisatie"
-      sources.AANGEGEVEN_UREN:
-        article: "Artikel1.7"
-        paragraph: 2
-        description: "Uren en kosten kinderopvang voor berekening"
-      input.INKOMEN:
-        article: "Artikel1.7"
-        paragraph: 2
-        description: "Inkomen voor draagkrachtbeginsel"
-      input.GEWERKTE_UREN:
-        article: "Artikel1.6"
-        paragraph: 2
-        description: "Werkuren als activiteitsvoorwaarde"
-      input.PARTNER_GEWERKTE_UREN:
-        article: "Artikel1.6"
-        paragraph: 2
-        description: "Werkuren partner als activiteitsvoorwaarde"
-      definitions.MAX_UURTARIEF_DAGOPVANG:
-        article: "Artikel1.7"
-        paragraph: 2
-        description: "Maximum uurtarief dagopvang"
-      definitions.MAX_UURTARIEF_BSO:
-        article: "Artikel1.7"
-        paragraph: 2
-        description: "Maximum uurtarief buitenschoolse opvang"
-      definitions.PERCENTAGE_1:
-        article: "Artikel1.8"
-        paragraph: 1
-        description: "Vergoedingspercentage laagste inkomens"
-      definitions.PERCENTAGE_2:
-        article: "Artikel1.8"
-        paragraph: 1
-        description: "Vergoedingspercentage middeninkomens"
-      definitions.PERCENTAGE_3:
-        article: "Artikel1.8"
-        paragraph: 1
-        description: "Vergoedingspercentage hoogste inkomens"
-      definitions.INKOMENSDREMPEL_1:
-        article: "Artikel1.8"
-        paragraph: 2
-        description: "Eerste inkomensdrempel"
-      definitions.INKOMENSDREMPEL_2:
-        article: "Artikel1.8"
-        paragraph: 2
-        description: "Tweede inkomensdrempel"
-      definitions.MAX_HOURS_PER_YEAR:
-        article: "Artikel1.9"
-        paragraph: 2
-        description: "Maximum vergoede uren per jaar"
-      requirements:
-        article: "Artikel1.6"
-        paragraph: 1
-        description: "Voorwaarden voor recht op kinderopvangtoeslag"
-      output.is_gerechtigd:
-        article: "Artikel1.5"
-        paragraph: 1
-        description: "Bepaling van recht op kinderopvangtoeslag"
-      output.jaarbedrag:
-        article: "Artikel1.7"
-        paragraph: 1
-        description: "Hoogte kinderopvangtoeslag per jaar"
 
-  # Vanuit wettekst naar YAML
-  law_to_yaml:
-    "Artikel1.5":
-      paragraph_1:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "legal_basis.article"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "output.is_gerechtigd"
-      paragraph_2:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "input.PARTNER_BSN"
-    "Artikel1.6":
-      paragraph_1:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "requirements"
-      paragraph_2:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "input.GEWERKTE_UREN"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "input.PARTNER_GEWERKTE_UREN"
-    "Artikel1.7":
-      paragraph_1:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "output.jaarbedrag"
-      paragraph_2:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "input.INKOMEN"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "sources.AANGEGEVEN_UREN"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.MAX_UURTARIEF_DAGOPVANG"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.MAX_UURTARIEF_BSO"
-    "Artikel1.8":
-      paragraph_1:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.PERCENTAGE_1"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.PERCENTAGE_2"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.PERCENTAGE_3"
-      paragraph_2:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.INKOMENSDREMPEL_1"
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.INKOMENSDREMPEL_2"
-    "Artikel1.9":
-      paragraph_2:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "definitions.MAX_HOURS_PER_YEAR"
-    "Artikel1.45":
-      paragraph_1:
-        - file: "law/wet_kinderopvang/TOESLAGEN-2024-01-01.yaml"
-          section: "sources.KINDEROPVANG_KVK"
+          buitenschoolse opvang: kinderopvang verzorgd door een kindercentrum voor kinderen in de leeftijd dat ze naar het
+          basisonderwijs kunnen gaan, waarbij opvang wordt geboden voor of na de dagelijkse schooltijd evenals gedurende vrije
+          dagen of middagen en in schoolvakanties;
 
-# Metadata voor UI
-ui_metadata:
-  featured_articles:
-    - "Artikel1.1"   # Begripsbepalingen
-    - "Artikel1.5"   # Recht op kinderopvangtoeslag
-    - "Artikel1.6"   # Voorwaarden kinderopvangtoeslag
-    - "Artikel1.7"   # Hoogte kinderopvangtoeslag
-    - "Artikel1.8"   # Berekening kinderopvangtoeslag
-    - "Artikel1.9"   # Maximum aantal uren
-    - "Artikel1.45"  # Registratie kindercentra
-    - "Artikel1.48"  # Registratie gastouderbureaus
-  complexity_level: "high"
-  citizen_relevance: "high"
-  calculation_articles:
-    - "Artikel1.7"   # Hoogte berekening
-    - "Artikel1.8"   # Berekeningsregels
-    - "Artikel1.9"   # Maximum uren
-  eligibility_articles:
-    - "Artikel1.5"   # Recht op toeslag
-    - "Artikel1.6"   # Voorwaarden
-  quality_articles:
-    - "Artikel1.45"  # Registratie kindercentra
-    - "Artikel1.48"  # Registratie gastouderbureaus
-    - "Artikel1.50"  # Registratie gastouders
+
+          college: college van burgemeester en wethouders van de gemeente waar een kindercentrum, gastouderbureau of voorziening
+          voor gastouderopvang is gevestigd of zal worden gevestigd;
+
+
+          continentaal plat: de exclusieve economische zone van het Koninkrijk, bedoeld in artikel 1 van de Rijkswet instelling
+          exclusieve economische zone, voor zover deze grenst aan de territoriale zee van Nederland;
+
+
+          continue screening kinderopvang: de voortdurende uitwisseling van gegevens over ingeschrevenen in het personenregister
+          kinderopvang door Onze Minister en Onze Minister van Veiligheid en Justitie voor de controle op nieuwe gegevens
+          in de justitiële documentatie van de ingeschrevene op basis waarvan wordt beoordeeld of de ingeschrevene nog steeds
+          voldoet aan de eisen zoals deze gelden bij de afgifte van een verklaring omtrent het gedrag;
+
+
+          gastouder: degene van 18 jaar of ouder die gastouderopvang biedt, met uitzondering van degene: a. van wie een of
+          meer kinderen onderworpen zijn aan ondertoezichtstelling of voorlopige ondertoezichtstelling als bedoeld in artikel
+          255, onderscheidenlijk artikel 257, van Boek 1 van het Burgerlijk Wetboek, die met betrekking tot een of meer van
+          zijn kinderen is ontheven uit het ouderlijk gezag als bedoeld in artikel 266 van Boek 1 van het Burgerlijk Wetboek
+          of die met betrekking tot een of meer van zijn kinderen is ontzet van het gezag als bedoeld in artikel 269 van Boek
+          1 van het Burgerlijk Wetboek, b. die op hetzelfde woonadres staat ingeschreven in de basisregistratie personen als
+          de ouder of diens partner van het kind aan wie opvang wordt geboden, of c. die ten behoeve van de opvang van kinderen
+          in enigerlei vorm personeel in dienst heeft;
+
+
+          a. van wie een of meer kinderen onderworpen zijn aan ondertoezichtstelling of voorlopige ondertoezichtstelling als
+          bedoeld in artikel 255, onderscheidenlijk artikel 257, van Boek 1 van het Burgerlijk Wetboek, die met betrekking
+          tot een of meer van zijn kinderen is ontheven uit het ouderlijk gezag als bedoeld in artikel 266 van Boek 1 van
+          het Burgerlijk Wetboek of die met betrekking tot een of meer van zijn kinderen is ontzet van het gezag als bedoeld
+          in artikel 269 van Boek 1 van het Burgerlijk Wetboek,
+
+
+          b. die op hetzelfde woonadres staat ingeschreven in de basisregistratie personen als de ouder of diens partner van
+          het kind aan wie opvang wordt geboden, of
+
+
+          c. die ten behoeve van de opvang van kinderen in enigerlei vorm personeel in dienst heeft;
+
+
+          gastouderbureau: een organisatie die gastouderopvang tot stand brengt en begeleidt en door tussenkomst van wie de
+          betaling van ouders aan gastouders geschiedt;
+
+
+          gastouderopvang: kinderopvang: a. die plaatsvindt door tussenkomst van een geregistreerd gastouderbureau; b. die
+          plaatsvindt in een gezinssituatie door een ander dan degene die als ouder op grond van artikel 1.5, eerste lid,
+          aanspraak kan maken op een kinderopvangtoeslag of diens partner; c. waarbij de opvang plaatsvindt: 1°. op het woonadres
+          van de gastouder, 2°. op het woonadres van een van de ouders van de kinderen voor wie de gastouder opvang biedt,
+          dan wel 3°. op twee of meer van deze woonadressen; en d. bestaande uit de gelijktijdige opvang van ten hoogste zes
+          kinderen, waaronder begrepen de bloedverwant of aanverwant in de neergaande lijn van de gastouder of zijn partner,
+          die in belangrijke mate wordt onderhouden door de gastouder of zijn partner en op hetzelfde woonadres als de gastouder
+          staat ingeschreven in de basisregistratie personen en de leeftijd van tien jaar nog niet heeft bereikt. Met een
+          bloedverwant of aanverwant in de neergaande lijn wordt gelijkgesteld een pleegkind dat de leeftijd van tien jaar
+          nog niet heeft bereikt;
+
+
+          a. die plaatsvindt door tussenkomst van een geregistreerd gastouderbureau;
+
+
+          b. die plaatsvindt in een gezinssituatie door een ander dan degene die als ouder op grond van artikel 1.5, eerste
+          lid, aanspraak kan maken op een kinderopvangtoeslag of diens partner;
+
+
+          c. waarbij de opvang plaatsvindt: 1°. op het woonadres van de gastouder, 2°. op het woonadres van een van de ouders
+          van de kinderen voor wie de gastouder opvang biedt, dan wel 3°. op twee of meer van deze woonadressen; en
+
+
+          1°. op het woonadres van de gastouder,
+
+
+          2°. op het woonadres van een van de ouders van de kinderen voor wie de gastouder opvang biedt, dan wel
+
+
+          3°. op twee of meer van deze woonadressen; en
+
+
+          d. bestaande uit de gelijktijdige opvang van ten hoogste zes kinderen, waaronder begrepen de bloedverwant of aanverwant
+          in de neergaande lijn van de gastouder of zijn partner, die in belangrijke mate wordt onderhouden door de gastouder
+          of zijn partner en op hetzelfde woonadres als de gastouder staat ingeschreven in de basisregistratie personen en
+          de leeftijd van tien jaar nog niet heeft bereikt. Met een bloedverwant of aanverwant in de neergaande lijn wordt
+          gelijkgesteld een pleegkind dat de leeftijd van tien jaar nog niet heeft bereikt;
+
+
+          geregistreerd gastouderbureau: een in het landelijk register kinderopvang ingeschreven gastouderbureau als bedoeld
+          in artikel 1.46, tweede lid;
+
+
+          geregistreerd kindercentrum: een in het landelijk register kinderopvang ingeschreven kindercentrum als bedoeld in
+          artikel 1.46, tweede lid;
+
+
+          geregistreerde voorziening voor gastouderopvang: een in het landelijk register kinderopvang ingeschreven voorziening
+          voor gastouderopvang als bedoeld in artikel 1.46, tweede lid;
+
+
+          geschillencommissie: de commissie, bedoeld in artikel 1.57c, eerste lid;
+
+
+          GGD: een gemeentelijke gezondheidsdienst als bedoeld in artikel 14 van de Wet publieke gezondheid;
+
+
+          houder: a. degene aan wie een onderneming als bedoeld in de Handelsregisterwet 2007 toebehoort en die met die onderneming
+          een kindercentrum of een gastouderbureau exploiteert; b. de gastouder die een voorziening voor gastouderopvang exploiteert.
+
+
+          a. degene aan wie een onderneming als bedoeld in de Handelsregisterwet 2007 toebehoort en die met die onderneming
+          een kindercentrum of een gastouderbureau exploiteert;
+
+
+          b. de gastouder die een voorziening voor gastouderopvang exploiteert.
+
+
+          ingeschrevene: een persoon als bedoeld in artikel 1.48d, tweede lid, die in het personenregister kinderopvang is
+          ingeschreven;
+
+
+          justitiële documentatie: de documentatie, bedoeld in artikel 1, aanhef en onder e, van de Wet justitiële en strafvorderlijke
+          gegevens;
+
+
+          kindercentrum: een voorziening waar kinderopvang plaatsvindt, anders dan gastouderopvang;
+
+
+          kinderopvang: het bedrijfsmatig of anders dan om niet verzorgen, opvoeden en bijdragen aan de ontwikkeling van kinderen
+          tot de eerste dag van de maand waarop het voortgezet onderwijs voor die kinderen begint;
+
+
+          kinderopvangtoeslag: een tegemoetkoming van het Rijk als bedoeld in artikel 2, eerste lid, onder h, van de Algemene
+          wet inkomensafhankelijke regelingen in de kosten van kinderopvang;
+
+
+          landelijk register kinderopvang: het register, bedoeld in artikel 1.47b, eerste lid;
+
+
+          meertalige kinderopvang: kinderopvang als bedoeld in artikel 1.55, derde lid;
+
+
+          Onze Minister: Onze Minister van Sociale Zaken en Werkgelegenheid;
+
+
+          ouder: de bloed- of aanverwant in opgaande lijn of de pleegouder van een kind op wie de kinderopvang betrekking
+          heeft, met dien verstande dat bij de beoordeling of sprake is van pleegouderschap een vergoeding op grond van de
+          Jeugdwet buiten beschouwing blijft;
+
+
+          oudercommissie: de commissie, bedoeld in artikel 1.58;
+
+
+          ouderparticipatiecrèche: een kindercentrum waar ouderparticipatieopvang plaatsvindt;
+
+
+          ouderparticipatieopvang: kinderopvang als bedoeld in artikel 1.60a;
+
+
+          overheidswerkgever: de werkgever, bedoeld in artikel 1, onderdeel r, van de Wet financiering sociale verzekeringen;
+
+
+          participerende ouder: ouder die ouderparticipatieopvang verzorgt en belast is met de verzorging, de opvoeding en
+          het bijdragen aan de ontwikkeling van kinderen;
+
+
+          pedagogisch beleidsmedewerker: de persoon van 18 jaar of ouder die werkzaam is bij een kindercentrum, bezoldigd
+          is en belast is met de totstandkoming en implementatie van pedagogische beleidsvoornemens of het coachen van beroepskrachten
+          bij de uitvoering van hun werkzaamheden;
+
+
+          personenregister kinderopvang: de verzameling van gegevens die verwerkt worden ten behoeve van het doel, beschreven
+          in artikel 1.48d, eerste lid;
+
+
+          register buitenlandse kinderopvang: het register, bedoeld in artikel 1.48b, eerste lid;
+
+
+          stagiair: degene die een opleiding volgt, waarvan het praktijkdeel een beperkt deel van de totale studieduur is,
+          belast is met werkzaamheden bij de houder ten behoeve van het praktijkdeel van de opleiding en geen beroepskracht
+          in opleiding is;
+
+
+          Uitvoeringsinstituut werknemersverzekeringen: het Uitvoeringsinstituut werknemersverzekeringen, genoemd in hoofdstuk
+          5 van de Wet structuur uitvoeringsorganisatie werk en inkomen;
+
+
+          uitvoeringskosten: de kosten die door een gastouderbureau in rekening worden gebracht bij de ouder of de gastouder,
+          niet zijnde de kosten van gastouderopvang;
+
+
+          uitzendkracht: degene van 18 jaar of ouder die werkzaam is voor een uitzendbureau en is uitgezonden voor werkzaamheden
+          bij een kindercentrum of een gastouderbureau;
+
+
+          verklaring omtrent het gedrag: een verklaring omtrent het gedrag natuurlijke personen of een verklaring omtrent
+          het gedrag rechtspersonen;
+
+
+          verklaring omtrent het gedrag natuurlijke personen: een verklaring omtrent het gedrag, afgegeven volgens de Wet
+          justitiële en strafvorderlijke gegevens, ten behoeve van een natuurlijk persoon;
+
+
+          verklaring omtrent het gedrag rechtspersonen: een verklaring omtrent het gedrag, afgegeven volgens de Wet justitiële
+          en strafvorderlijke gegevens, ten behoeve van een rechtspersoon;
+
+
+          voorschoolse educatie: uitvoering van een door het college gesubsidieerd programma dat gericht is op het verbeteren
+          van de voorwaarden voor het met succes instromen in het basisonderwijs voor kinderen die nog niet tot een school
+          kunnen worden toegelaten;
+
+
+          voorziening voor gastouderopvang: gastouderopvang door een specifieke gastouder op een specifiek woonadres.'
+      - number: 2
+        content: 'Tot kinderopvang worden niet gerekend:
+
+
+          a. het toezichthouden op schoolgaande kinderen dat zich beperkt tot het toezicht tijdens de middagpauze;
+
+
+          b. verzorging en opvoeding die plaatsvindt in het kader van de Jeugdwet;
+
+
+          c. de verzorging, de opvoeding en het bijdragen aan de ontwikkeling van kinderen, anders dan gastouderopvang, die
+          geschiedt op een plaats waar het kind zijn hoofdverblijf heeft.'
+      - number: 3
+        content: Waar in het bepaalde bij of krachtens dit hoofdstuk en hoofdstuk 3 wordt gesproken over verklaring omtrent
+          het gedrag wordt een verklaring omtrent het gedrag natuurlijke personen bedoeld, indien de betrokkene een natuurlijk
+          persoon is en een verklaring omtrent het gedrag rechtspersonen, indien de betrokkene een rechtspersoon is.
+  - id: Hoofdstuk2
+    title: Algemene bepalingen
+    articles: []
+  - id: Hoofdstuk3
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel3
+      paragraphs:
+      - number: 1
+        content: Onze Minister verwerkt de gegevens van de personen die op basis van de artikelen 9a en 9b van het Besluit
+          landelijk register kinderopvang en register buitenlandse kinderopvang onder de continue screening vallen vanaf de
+          datum van inwerkingtreding van artikel 1.48d tot een bij ministeriële regeling te bepalen tijdstip in het personenregister
+          kinderopvang. Deze personen kunnen bij hun inschrijving gebruik maken van hun bestaande verklaring omtrent het gedrag.
+      - number: 2
+        content: Bij de personen, bedoeld in het eerste lid, en bij de overige personen die op grond van de artikelen 1.50,
+          derde lid, 1.56, derde lid en 1.56b, derde lid, in het bezit dienen te zijn van een verklaring omtrent het gedrag,
+          worden in verband met de verwerking van hun gegevens in het personenregister kinderopvang tot een bij ministeriële
+          regeling te bepalen tijdstip geen kosten in rekening gebracht.

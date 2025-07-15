@@ -1,322 +1,1315 @@
-# Algemene Ouderdomswet (BWBR0002221) - machine-law format
-# Volledige tekst van de AOW zoals gepubliceerd op wetten.overheid.nl
-
-bwb_id: "BWBR0002221"
-title: "Algemene Ouderdomswet"
-url: "https://wetten.overheid.nl/BWBR0002221"
-valid_from: "2025-01-01"
-last_updated: "2025-01-01"
-
-# Mapping naar onze YAML files
+bwb_id: BWBR0002221
+title: Algemene Ouderdomswet
+url: https://wetten.overheid.nl/BWBR0002221
+valid_from: '2025-01-01'
+last_updated: '2025-07-14T17:58:49.436980'
 yaml_files:
-  - path: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-    description: "Hoofdimplementatie van de AOW-berekening"
-  - path: "law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml"
-    description: "Bepaling van de AOW-leeftijd"
-
-# Hoofdstructuur van de wet
+- path: law/algemene_ouderdomswet/SVB-2024-01-01.yaml
+  description: Hoofdimplementatie van de AOW-berekening
+- path: law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml
+  description: Bepaling van de AOW-leeftijd
 structure:
   chapters:
-    - id: "HoofdstukI"
-      title: "Algemene bepalingen"
-      articles:
-        - id: "Artikel1"
-          title: "Begripsbepalingen"
-          content: |
-            In deze wet en de daarop berustende bepalingen wordt verstaan onder:
-            a. Onze Minister: de Minister van Sociale Zaken en Werkgelegenheid;
-            b. lichamen: rechtspersonen, vennootschappen onder firma, commanditaire vennootschappen en alle andere niet in deze wet als natuurlijk persoon aangemerkte samenwerkingsvormen;
-            c. vreemdeling: hetgeen daaronder wordt verstaan in de Vreemdelingenwet 2000;
-            d. brutominimumloon: het bedrag, bedoeld in artikel 8, eerste lid, onderdeel a, van de Wet minimumloon en minimumvakantiebijslag;
-            e. vrijheidsbeneming: het op grond van een wettelijk voorschrift of een rechterlijke uitspraak zijn opgenomen in een justitiële inrichting;
-            f. justitiële inrichting: een penitentiaire inrichting als bedoeld in artikel 1, onderdeel b, van de Penitentiaire beginselenwet, of een inrichting voor de opvang van vreemdelingen als bedoeld in artikel 1, onderdeel h, van de Vreemdelingenwet 2000;
-            g. continentaal plat: het continentaal plat, bedoeld in artikel 1 van de Wet op het continentaal plat, en de exclusieve economische zone van het Koninkrijk;
-            h. gevangenisstraf of hechtenis: een bij onherroepelijke rechterlijke uitspraak opgelegde vrijheidsstraf onderscheidenlijk vrijheidsbenemende maatregel;
-            i. pensioengerechtigde leeftijd: de leeftijd, bedoeld in artikel 7a, eerste lid;
-            j. aanvangsleeftijd: de leeftijd van 15 jaar;
-            k. CBS: het Centraal Bureau voor de Statistiek;
-            l. vertrekker: degene die Nederland heeft verlaten en van wie redelijkerwijs kan worden aangenomen dat hij zich heeft begeven naar het grondgebied van een organisatie die bij of krachtens de Sanctiewet 1977 is aangewezen of een persoon die daaraan leiding geeft, daarvan deel uitmaakt, daarvoor werkt of die anderszins steun verleent aan de activiteiten van een dergelijke organisatie;
-          paragraphs:
-            - number: 1
-              content: "Begripsbepalingen zoals hierboven omschreven"
-              yaml_references:
-                - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                  section: "legal_basis"
-                  description: "Definities gebruikt in AOW-berekening"
-                  line_reference: "legal_basis.bwb_id"
-            - number: 2
-              content: "Voor de toepassing van deze wet wordt onder gehuwde mede verstaan een ongehuwde die met een andere ongehuwde een gezamenlijke huishouding voert, tenzij het betreft een bloedverwant in de eerste graad."
-            - number: 3
-              content: "Voor de toepassing van deze wet wordt onder gehuwde niet verstaan degene die duurzaam gescheiden leeft van zijn echtgenoot."
-            - number: 4
-              content: "Voor de toepassing van deze wet wordt gelijkgesteld met een echtgenoot de geregistreerde partner."
-            - number: 5
-              content: "Voor de toepassing van deze wet wordt onder alleenstaande verstaan degene die niet gehuwd is."
+  - id: HoofdstukI
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel1
+      paragraphs:
+      - number: 1
+        content: 'Voor de toepassing van deze wet en van de tot haar uitvoering genomen besluiten wordt verstaan onder:
 
-        - id: "Artikel2"
-          title: "Ingezetene"
-          content: |
-            Ingezetene in de zin van deze wet is hij die in Nederland woont.
-          paragraphs:
-            - number: 1
-              content: "Definitie van ingezetene als basis voor verzekering"
 
-        - id: "Artikel3"
-          title: "Woonplaats en verblijf"
-          content: |
-            1. Het hebben van woonplaats en het hebben van werkelijke verblijfplaats in Nederland wordt naar de omstandigheden beoordeeld.
-            2. Als woonplaats in Nederland wordt mede aangemerkt het zich bevinden aan boord van een zeeschip dat zijn thuishaven heeft in Nederland, indien en voor zover de opvarende behoort tot de bemanning van dat schip.
-            3. Degene die Nederland heeft verlaten en binnen een jaar na zijn vertrek naar Nederland terugkeert, wordt geacht gedurende zijn afwezigheid ingezetene te zijn gebleven.
-          paragraphs:
-            - number: 1
-              content: "Beoordeling woonplaats naar omstandigheden"
-            - number: 2
-              content: "Zeeschip met Nederlandse thuishaven geldt als Nederlandse woonplaats"
-            - number: 3
-              content: "Terugkeer binnen een jaar behoudt ingezetenenschap"
+          a. Onze Minister: Onze Minister van Sociale Zaken en Werkgelegenheid;
 
-    - id: "HoofdstukII"
-      title: "Kring der verzekerden"
-      articles:
-        - id: "Artikel6"
-          title: "Verplichte verzekering"
-          content: |
-            1. Verzekerd krachtens deze wet zijn zij die:
-            a. ingezetene zijn;
-            b. niet ingezetene zijn, doch ter zake van in Nederland in dienstbetrekking verrichte arbeid, ter zake van in Nederland uitgeoefend beroep of bedrijf dan wel ter zake van het in Nederland gevestigd zijn van de werkgever onderworpen zijn aan de loonbelasting krachtens de Wet inkomstenbelasting 2001.
-            2. Niet verzekerd zijn zij die in verband met hun werkzaamheden ten behoeve van een volkenrechtelijke organisatie zijn vrijgesteld van de in het eerste lid, onderdeel b, bedoelde belastingplicht.
-          paragraphs:
-            - number: 1
-              content: "Verplichte verzekering voor ingezetenen en werkenden in Nederland"
-              yaml_references:
-                - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                  section: "sources.WOONACHTIGE_VERZEKERDE_JAREN"
-                  description: "Verzekerde jaren op basis van ingezetenschap"
-                  line_reference: "sources.WOONACHTIGE_VERZEKERDE_JAREN.legal_basis"
-            - number: 2
-              content: "Uitzondering voor werknemers volkenrechtelijke organisaties"
 
-        - id: "Artikel6a"
-          title: "Einde verzekering bij vertrek"
-          content: |
-            1. De verzekering op grond van artikel 6, eerste lid, onderdeel a, eindigt, behoudens bij ministeriële regeling te bepalen uitzonderingen, met ingang van de dag waarop betrokkene ophoudt ingezetene te zijn.
-            2. De verzekering op grond van artikel 6, eerste lid, onderdeel b, eindigt met ingang van de dag waarop betrokkene niet langer voldoet aan de in dat onderdeel gestelde voorwaarden.
-          paragraphs:
-            - number: 1
-              content: "Einde verzekering bij ophouden ingezetene te zijn"
-            - number: 2
-              content: "Einde verzekering bij wegvallen werkvoorwaarden"
+          b. lichamen: rechtspersonen, maat- en vennootschappen, samenwerkingsvormen zonder rechtspersoonlijkheid die met
+          verenigingen maatschappelijk gelijk kunnen worden gesteld, ondernemingen van publiekrechtelijke rechtspersonen en
+          doelvermogens;
 
-    - id: "HoofdstukIII"
-      title: "Het ouderdomspensioen en de toeslag"
-      sections:
-        - id: "Paragraaf1"
-          title: "Het recht op ouderdomspensioen en toeslag"
-          articles:
-            - id: "Artikel7"
-              title: "Recht op ouderdomspensioen"
-              content: |
-                1. Recht op ouderdomspensioen heeft de verzekerde die de pensioengerechtigde leeftijd heeft bereikt en die onmiddellijk voorafgaande aan het bereiken van die leeftijd gedurende ten minste een kalenderjaar verzekerd is geweest.
-                2. Eveneens recht op ouderdomspensioen heeft degene die de pensioengerechtigde leeftijd heeft bereikt en die tussen de aanvangsleeftijd en de pensioengerechtigde leeftijd gedurende ten minste een kalenderjaar verzekerd is geweest.
-              paragraphs:
-                - number: 1
-                  content: "Recht op ouderdomspensioen bij bereiken pensioenleeftijd en minimaal één jaar verzekerd"
-                  yaml_references:
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "legal_basis"
-                      description: "Hoofdartikel voor AOW-recht"
-                      line_reference: "legal_basis.article"
-                - number: 2
-                  content: "Alternatieve route: minimaal één jaar verzekerd tussen 15 jaar en pensioenleeftijd"
 
-            - id: "Artikel7a"
-              title: "Pensioengerechtigde leeftijd"
-              content: |
-                1. De pensioengerechtigde leeftijd bedraagt 67 jaar.
-                2. Voor personen geboren voor 1 januari 1960 gelden overgangsregelingen zoals vastgesteld in artikel 59a.
-              paragraphs:
-                - number: 1
-                  content: "Pensioengerechtigde leeftijd is 67 jaar"
-                  yaml_references:
-                    - file: "law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml"
-                      section: "actions"
-                      description: "Bepaling van individuele pensioenleeftijd"
-                      line_reference: "actions.0"
-                - number: 2
-                  content: "Overgangsregelingen voor personen geboren voor 1960"
+          c. vreemdeling: hetgeen daaronder wordt verstaan in de Vreemdelingenwet 2000;
 
-            - id: "Artikel8"
-              title: "Toeslag"
-              content: |
-                1. Aan de gehuwde verzekerde die recht heeft op ouderdomspensioen wordt een toeslag toegekend, indien zijn echtgenoot de pensioengerechtigde leeftijd nog niet heeft bereikt.
-                2. De toeslag wordt verminderd met het bedrag waarmee het inkomen van de echtgenoot een bij ministeriële regeling vast te stellen grens overschrijdt.
-                3. De toeslag bedraagt ten hoogste het verschil tussen het bedrag van het ouderdomspensioen waarop de ongehuwde en dat waarop de gehuwde verzekerde aanspraak heeft.
-              paragraphs:
-                - number: 1
-                  content: "Toeslag voor gehuwde met partner jonger dan AOW-leeftijd"
-                  yaml_references:
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "input.PARTNER_LEEFTIJD"
-                      description: "Leeftijd partner voor toeslagberekening"
-                      line_reference: "input.PARTNER_LEEFTIJD.legal_basis"
-                - number: 2
-                  content: "Vermindering toeslag bij inkomen partner"
-                - number: 3
-                  content: "Maximum toeslag is verschil tussen alleenstaand en gehuwd tarief"
 
-            - id: "Artikel9"
-              title: "Hoogte van het ouderdomspensioen"
-              content: |
-                1. Het bruto-ouderdomspensioen bedraagt per maand:
-                a. voor de ongehuwde verzekerde: 70 percent van het netto-minimumloon per maand;
-                b. voor de gehuwde verzekerde: 50 percent van het netto-minimumloon per maand.
-                2. Bij de vaststelling van het netto-minimumloon wordt uitgegaan van het brutominimumloon en de daarover verschuldigde belasting en premies.
-              paragraphs:
-                - number: 1
-                  content: "Bruto-ouderdomspensioen: ongehuwd 70%, gehuwd 50% van netto-minimumloon"
-                  yaml_references:
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "definitions.BASISBEDRAG_ALLEENSTAAND"
-                      description: "Basisbedrag voor alleenstaanden (70%)"
-                      line_reference: "definitions.BASISBEDRAG_ALLEENSTAAND"
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "definitions.BASISBEDRAG_GEDEELD"
-                      description: "Basisbedrag voor gehuwden (50%)"
-                      line_reference: "definitions.BASISBEDRAG_GEDEELD"
-                - number: 2
-                  content: "Netto-minimumloon is bruto minus belasting en premies"
+          d. bruto-minimumloon: het in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag
+          bedoelde bedrag;
 
-            - id: "Artikel13"
-              title: "Korting wegens niet-verzekerde tijdvakken"
-              content: |
-                1. Het ouderdomspensioen wordt verminderd met 2 percent voor elk kalenderjaar, gelegen tussen de aanvangsleeftijd en de pensioengerechtigde leeftijd, waarover de verzekerde niet verzekerd is geweest.
-                2. Voor de vrouw die is geboren vóór 1 januari 1950 en die tussen 1 januari 1957 en 1 januari 1985 niet verzekerd is geweest uitsluitend op grond van het feit dat zij gehuwd was, geldt de korting niet over die periode.
-              paragraphs:
-                - number: 1
-                  content: "Korting van 2% per niet-verzekerd kalenderjaar"
-                  yaml_references:
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "definitions.OPBOUW_PER_JAAR"
-                      description: "2% opbouw per verzekerd jaar"
-                      line_reference: "definitions.OPBOUW_PER_JAAR"
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "actions.1.operation"
-                      description: "Berekening opbouwpercentage"
-                      line_reference: "actions.1"
-                - number: 2
-                  content: "Uitzondering voor gehuwde vrouwen 1957-1985"
 
-        - id: "Paragraaf2"
-          title: "Toekenning, ingang, intrekking, herziening en betaling van het ouderdomspensioen"
-          articles:
-            - id: "Artikel14"
-              title: "Aanvraag"
-              content: |
-                1. Het ouderdomspensioen wordt op aanvraag toegekend.
-                2. Een aanvraag wordt ingediend bij de Sociale verzekeringsbank.
-              paragraphs:
-                - number: 1
-                  content: "Ouderdomspensioen wordt toegekend op aanvraag"
-                - number: 2
-                  content: "Aanvraag bij Sociale verzekeringsbank (SVB)"
+          e. rechtens zijn vrijheid is ontnomen: rechtens zijn vrijheid is ontnomen, behoudens de gevallen, bedoeld in de
+          Wet verplichte geestelijke gezondheidszorg en in de Wet zorg en dwang psychogeriatrische en verstandelijk gehandicapte
+          cliënten;
 
-            - id: "Artikel17"
-              title: "Indiening aanvraag"
-              content: |
-                1. De aanvraag om ouderdomspensioen wordt ingediend door de verzekerde.
-                2. Een aanvraag kan worden ingediend vanaf 4 maanden voor het bereiken van de pensioengerechtigde leeftijd.
-              paragraphs:
-                - number: 1
-                  content: "Aanvraag door verzekerde zelf"
-                  yaml_references:
-                    - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-                      section: "properties.parameters.BSN"
-                      description: "BSN vereist voor aanvraag"
-                      line_reference: "properties.parameters.BSN.legal_basis"
-                - number: 2
-                  content: "Aanvraag mogelijk vanaf 4 maanden voor pensioenleeftijd"
 
-# Cross-referentie index voor snelle lookup
-cross_references:
-  # Vanuit YAML naar wettekst
-  yaml_to_law:
-    "law/algemene_ouderdomswet/SVB-2024-01-01.yaml":
-      legal_basis.article:
-        article: "Artikel7"
-        paragraph: 1
-        description: "Hoofdartikel voor recht op AOW"
-      definitions.BASISBEDRAG_ALLEENSTAAND:
-        article: "Artikel9"
-        paragraph: 1
-        description: "70% van netto-minimumloon voor alleenstaanden"
-      definitions.BASISBEDRAG_GEDEELD:
-        article: "Artikel9"
-        paragraph: 1
-        description: "50% van netto-minimumloon voor gehuwden"
-      definitions.OPBOUW_PER_JAAR:
-        article: "Artikel13"
-        paragraph: 1
-        description: "2% opbouw per verzekerd kalenderjaar"
-      sources.WOONACHTIGE_VERZEKERDE_JAREN:
-        article: "Artikel6"
-        paragraph: 1
-        description: "Verzekering op basis van ingezetenschap"
-      input.PARTNER_LEEFTIJD:
-        article: "Artikel8"
-        paragraph: 1
-        description: "Leeftijd partner voor toeslag"
-      properties.parameters.BSN:
-        article: "Artikel17"
-        paragraph: 1
-        description: "BSN vereist voor aanvraag"
-    "law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml":
-      actions.0:
-        article: "Artikel7a"
-        paragraph: 1
-        description: "Bepaling pensioengerechtigde leeftijd"
+          f. justitiële inrichting: een penitentiaire inrichting of een instelling voor de verpleging van ter beschikking
+          gestelden;
 
-  # Vanuit wettekst naar YAML
-  law_to_yaml:
-    "Artikel7":
-      paragraph_1:
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "legal_basis.article"
-      paragraph_2:
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "requirements"
-    "Artikel9":
-      paragraph_1:
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "definitions.BASISBEDRAG_ALLEENSTAAND"
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "definitions.BASISBEDRAG_GEDEELD"
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "actions.1"
-    "Artikel13":
-      paragraph_1:
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "definitions.OPBOUW_PER_JAAR"
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "actions.1"
-    "Artikel8":
-      paragraph_1:
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "input.PARTNER_LEEFTIJD"
-        - file: "law/algemene_ouderdomswet/SVB-2024-01-01.yaml"
-          section: "actions.2"
 
-# Metadata voor UI
-ui_metadata:
-  featured_articles:
-    - "Artikel7"
-    - "Artikel7a"
-    - "Artikel8"
-    - "Artikel9"
-    - "Artikel13"
-    - "Artikel17"
-  complexity_level: "high"
-  citizen_relevance: "high"
-  calculation_articles:
-    - "Artikel9"  # Basisbedragen
-    - "Artikel13" # Opbouwpercentage
-    - "Artikel8"  # Toeslag
+          g. continentaal plat: de exclusieve economische zone van het Koninkrijk, bedoeld in artikel 1 van de Rijkswet instelling
+          exclusieve economische zone, voor zover deze grenst aan de territoriale zee van Nederland;
+
+
+          h. vrijheidsstraf of vrijheidsbenemende maatregel: een bij onherroepelijk geworden vonnis opgelegde vrijheidsstraf
+          of vrijheidsbenemende maatregel als bedoeld in het Wetboek van Strafrecht;
+
+
+          i. pensioengerechtigde leeftijd: leeftijd, bedoeld in artikel 7a, waarop recht op ouderdomspensioen ontstaat;
+
+
+          j. aanvangsleeftijd: leeftijd, bedoeld in artikel 7a, met ingang waarvan een niet verzekerd tijdvak leidt tot een
+          korting op het ouderdomspensioen;
+
+
+          k. CBS: Centraal bureau voor de statistiek, bedoeld in artikel 2, eerste lid, van de Wet op het Centraal bureau
+          voor de statistiek;
+
+
+          l. uitreiziger: persoon ten aanzien van wie op grond van een melding van de opsporingsdiensten of inlichtingen-
+          en veiligheidsdiensten, gericht aan de Sociale verzekeringsbank, is gebleken dat het gegronde vermoeden bestaat
+          dat deze persoon zich buiten Nederland bevindt met het doel om zich aan te sluiten bij een organisatie die is geplaatst
+          op de lijst van organisaties, bedoeld in artikel 14, vierde lid, van de Rijkswet op het Nederlanderschap.'
+      - number: 2
+        content: 'In deze wet en de daarop berustende bepalingen wordt gelijkgesteld met:
+
+
+          a. echtgenoot: geregistreerde partner;
+
+
+          b. echtgenoten: geregistreerde partners;
+
+
+          c. gehuwd: als partner geregistreerd;
+
+
+          d. gehuwde: als partner geregistreerde.'
+      - number: 3
+        content: 'In deze wet en de daarop berustende bepalingen wordt:
+
+
+          a. als gehuwd of als echtgenoot mede aangemerkt de ongehuwde meerderjarige die met een andere ongehuwde meerderjarige
+          een gezamenlijke huishouding voert, tenzij het betreft een bloedverwant in de eerste graad;
+
+
+          b. als ongehuwd mede aangemerkt degene die duurzaam gescheiden leeft van de persoon met wie hij gehuwd is.'
+      - number: 4
+        content: Van een gezamenlijke huishouding is sprake indien twee personen hun hoofdverblijf in dezelfde woning hebben
+          en zij blijk geven zorg te dragen voor elkaar door middel van het leveren van een bijdrage in de kosten van de huishouding
+          dan wel anderszins.
+      - number: 5
+        content: 'Een gezamenlijke huishouding wordt in ieder geval aanwezig geacht indien de betrokkenen hun hoofdverblijf
+          hebben in dezelfde woning en:
+
+
+          a. zij met elkaar gehuwd zijn geweest of eerder voor de toepassing van deze wet daarmee gelijk zijn gesteld;
+
+
+          b. uit hun relatie een kind is geboren of erkenning heeft plaatsgevonden van een kind van de een door de ander;
+
+
+          c. zij zich wederzijds verplicht hebben tot een bijdrage aan de huishouding krachtens een geldend samenlevingscontract;
+          of
+
+
+          d. zij op grond van een registratie worden aangemerkt als een gezamenlijke huishouding die naar aard en strekking
+          overeenkomt met de gezamenlijke huishouding, bedoeld in het vierde lid.'
+      - number: 6
+        content: Bij algemene maatregel van bestuur wordt vastgesteld welke registraties, en gedurende welk tijdvak, in aanmerking
+          worden genomen voor de toepassing van het vijfde lid, onderdeel d.
+      - number: 7
+        content: Bij algemene maatregel van bestuur kunnen regels worden gesteld ten aanzien van hetgeen wordt verstaan onder
+          het hoofdverblijf in dezelfde woning hebben als bedoeld in het vierde en vijfde lid, aanhef, en het blijk geven
+          zorg te dragen voor een ander als bedoeld in het vierde lid.
+      - number: 8
+        content: Onder bloedverwant in de eerste graad als bedoeld in het derde lid, onderdeel a, wordt mede verstaan een
+          meerderjarig aangehuwd kind of een meerderjarig voormalig pleegkind van de ongehuwde meerderjarige.
+      - number: 9
+        content: Onder voormalig pleegkind als bedoeld in het achtste lid wordt verstaan een pleegkind voor wie de ongehuwde
+          meerderjarige een pleegvergoeding ontving of ontvangt op grond van de Wet op de jeugdzorg of de Jeugdwet, of kinderbijslag
+          ontving op grond van de Algemene Kinderbijslagwet.
+    - id: Artikel3
+      paragraphs:
+      - number: 1
+        content: Waar iemand woont en waar een lichaam gevestigd is, wordt naar de omstandigheden beoordeeld.
+      - number: 2
+        content: Voor de toepassing van het eerste lid worden schepen welke in Nederland hun thuishaven hebben, ten opzichte
+          van de bemanning als deel van Nederland beschouwd.
+      - number: 3
+        content: Hij die Nederland metterwoon heeft verlaten en binnen een jaar nadien metterwoon terugkeert zonder inmiddels
+          in Aruba, Curaçao, Sint Maarten, de openbare lichamen Bonaire, Sint Eustatius en Saba, of op het grondgebied van
+          een andere Mogendheid te hebben gewoond, wordt ook voor de duur van zijn afwezigheid geacht in Nederland te hebben
+          gewoond.
+  - id: HoofdstukII
+    title: Kring der verzekerden
+    articles:
+    - id: Artikel6
+      paragraphs:
+      - number: 1
+        content: 'Verzekerd overeenkomstig de bepalingen van deze wet is degene, die nog niet de pensioengerechtigde leeftijd
+          heeft bereikt, en
+
+
+          a. ingezetene is;
+
+
+          b. geen ingezetene is, doch ter zake van in Nederland of op het continentaal plat in dienstbetrekking verrichte
+          arbeid aan de loonbelasting is onderworpen.'
+      - number: 2
+        content: Niet verzekerd is de vreemdeling die niet rechtmatig in Nederland verblijf houdt in de zin van artikel 8,
+          onder a tot en met e en l, van de Vreemdelingenwet 2000.
+      - number: 3
+        content: Bij of krachtens algemene maatregel van bestuur kan, in afwijking van het eerste en tweede lid, uitbreiding
+          dan wel beperking worden gegeven aan de kring der verzekerden.
+      - number: 4
+        content: 'Bij een maatregel, als bedoeld in het derde lid, kan worden afgeweken van het tweede lid ten aanzien van:
+
+
+          a. vreemdelingen die rechtmatig in Nederland arbeid verrichten, dan wel hebben verricht;
+
+
+          b. vreemdelingen die, na rechtmatig verblijf te hebben gehouden in de zin van artikel 8, onder a tot en met e en
+          l, van de Vreemdelingenwet 2000, rechtmatig in Nederland verblijf hebben als bedoeld in artikel 8, onder g of h,
+          van de Vreemdelingenwet 2000.'
+  - id: HoofdstukIII
+    title: Het ouderdomspensioen en de toeslag
+    articles:
+    - id: Artikel7
+      paragraphs:
+      - number: 1
+        content: 'Recht op ouderdomspensioen overeenkomstig de bepalingen van deze wet heeft degene, die
+
+
+          a. de pensioengerechtigde leeftijd heeft bereikt, en
+
+
+          b. ingevolge deze wet minimaal één kalenderjaar verzekerd is geweest in het tijdvak, aanvangende met de dag waarop
+          de aanvangsleeftijd is bereikt en eindigende met de dag voorafgaande aan de dag waarop de pensioengerechtigde leeftijd
+          is bereikt.'
+      - number: 2
+        content: Bij ministeriële regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren tot
+          gehele kalenderjaren.
+    - id: Artikel7a
+      paragraphs:
+      - number: 1
+        content: 'De pensioengerechtigde leeftijd en de aanvangsleeftijd zijn:
+
+
+          a. vóór 1 januari 2013: 65, respectievelijk 15 jaar;
+
+
+          b. in 2013: 65 jaar en één maand, respectievelijk 15 jaar en één maand;
+
+
+          c. in 2014: 65 jaar en twee maanden, respectievelijk 15 jaar en twee maanden;
+
+
+          d. in 2015: 65 jaar en drie maanden, respectievelijk 15 jaar en drie maanden;
+
+
+          e. in 2016: 65 jaar en zes maanden, respectievelijk 15 jaar en zes maanden;
+
+
+          f. in 2017: 65 jaar en negen maanden, respectievelijk 15 jaar en negen maanden;
+
+
+          g. in 2018: 66 jaar, respectievelijk 16 jaar;
+
+
+          h. in 2019: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
+
+
+          i. in 2020: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
+
+
+          j. in 2021: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
+
+
+          k. in 2022: 66 jaar en zeven maanden, respectievelijk 16 jaar en zeven maanden;
+
+
+          l. in 2023: 66 jaar en tien maanden, respectievelijk 16 jaar en tien maanden;
+
+
+          m. in 2024: 67 jaar, respectievelijk 17 jaar;
+
+
+          n. in 2025: 67 jaar, respectievelijk 17 jaar;
+
+
+          o. in 2026 en de kalenderjaren daarna: de pensioengerechtigde leeftijd en de aanvangsleeftijd, die jaarlijks op
+          basis van de verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd op grond van het tweede lid worden
+          vastgesteld.'
+      - number: 2
+        content: 'De verhoging van de pensioengerechtigde leeftijd en de aanvangsleeftijd in 2026 en de kalenderjaren daarna
+          wordt jaarlijks, voor de eerste maal uiterlijk op 1 januari 2021 voor het jaar 2026, vastgesteld volgens de formule:'
+      - number: 3
+        content: De verhoging, bedoeld in het tweede lid, treedt telkens in werking vijf jaar na de uiterste datum van vaststelling,
+          bedoeld in het tweede lid, voor de eerste maal met ingang van 1 januari 2026.
+      - number: 4
+        content: De ramingen van de macro gemiddelde resterende levensverwachting, bedoeld in het tweede lid, worden uitgevoerd
+          en bekendgemaakt door het CBS.
+    - id: Artikel8
+      paragraphs:
+      - number: 1
+        content: De pensioengerechtigde die voor 1 januari 2015 is gehuwd en voor die datum recht heeft op ouderdomspensioen
+          en van wie de echtgenoot jonger is dan de pensioengerechtigde leeftijd, heeft overeenkomstig de bepalingen van deze
+          wet recht op een toeslag, tenzij, met inachtneming van artikel 11, het inkomen uit arbeid of overig inkomen van
+          die echtgenoot meer bedraagt dan de volledige bruto-toeslag.
+      - number: 2
+        content: 'In afwijking van het eerste lid ontstaat op of na 1 januari 2015, geen recht meer op toeslag als gevolg
+          van:
+
+
+          a. wijziging van het inkomen, bedoeld in het eerste lid;
+
+
+          b. wijziging van de leefvorm, waardoor niet langer sprake is van een ongehuwde als bedoeld in artikel 1, tweede
+          en derde lid;
+
+
+          c. het gaan wonen in Nederland of in een land waarmee een verdrag in werking is getreden dan wel een besluit van
+          een volkenrechtelijke organisatie van kracht is geworden, op grond waarvan recht op toeslag kan bestaan;
+
+
+          d. een invrijheidstelling als bedoeld in artikel 8b, derde lid; of
+
+
+          e. het zich niet langer onttrekken aan de tenuitvoerlegging van een vrijheidsstraf of vrijheidsbenemende maatregel
+          als bedoeld in artikel 8c, derde lid;
+
+
+          f. het niet langer bestaan van het gegronde vermoeden dat de pensioengerechtigde dan wel diens partner zich buiten
+          Nederland bevindt met het doel zich aan te sluiten bij een organisatie als bedoeld in artikel 1, eerste lid, onderdeel
+          l.'
+      - number: 3
+        content: Indien het recht op toeslag is geëindigd uitsluitend als gevolg van een incidentele stijging van het inkomen,
+          bedoeld in het eerste lid, kan, in afwijking van het tweede lid, het recht op toeslag herleven.
+      - number: 4
+        content: Waar in deze wet en in de tot haar uitvoering genomen besluiten wordt gesproken van ouderdomspensioen wordt
+          daaronder mede verstaan de in het eerste lid bedoelde toeslag, voor zover niet anders is bepaald.
+    - id: Artikel8a
+      paragraphs:
+      - number: 1
+        content: Geen recht op toeslag heeft de pensioengerechtigde, bedoeld in artikel 8, eerste lid, die niet in Nederland
+          woont.
+      - number: 2
+        content: Het eerste lid is niet van toepassing indien de pensioengerechtigde woont in een land waarin op grond van
+          een verdrag of een besluit van een volkenrechtelijke organisatie recht op toeslag kan bestaan.
+      - number: 3
+        content: 'Bij of krachtens algemene maatregel van bestuur kan worden bepaald dat recht heeft op toeslag:
+
+
+          a. de pensioengerechtigde, bedoeld in artikel 8, eerste lid, die werkzaamheden verricht in het algemeen belang en
+          niet in Nederland woont;
+
+
+          b. de pensioengerechtigde, bedoeld in artikel 8, eerste lid, die in Aruba, Curaçao, Sint Maarten of in de openbare
+          lichamen Bonaire, Sint Eustatius en Saba woont; of
+
+
+          c. de gezinsleden van de in de onderdelen a of b bedoelde pensioengerechtigde.'
+    - id: Artikel8b
+      paragraphs:
+      - number: 1
+        content: Geen recht op ouderdomspensioen ontstaat voor de pensioengerechtigde, aan wie rechtens zijn vrijheid is ontnomen
+          indien de dag waarop het ouderdomspensioen zou ingaan dan wel de dag na afloop van de toepassing van artikel 8c,
+          eerste lid, met betrekking tot dat recht op ouderdomspensioen, is gelegen in de periode dat hem rechtens zijn vrijheid
+          is ontnomen.
+      - number: 2
+        content: Het recht op ouderdomspensioen eindigt, indien de pensioengerechtigde rechtens zijn vrijheid is ontnomen
+          gedurende ten minste een maand.
+      - number: 3
+        content: De persoon die op grond van het eerste of tweede lid geen recht op ouderdomspensioen heeft, heeft met ingang
+          van de dag waarop hij in vrijheid is gesteld met inachtneming van de bepalingen van deze wet recht op ouderdomspensioen.
+      - number: 4
+        content: Voor de toepassing van het tweede lid worden perioden van vrijheidsontneming samengeteld, indien zij elkaar
+          met een onderbreking van minder dan vier weken opvolgen.
+      - number: 5
+        content: Het eerste en tweede lid zijn niet van toepassing en het derde lid is van overeenkomstige toepassing op bij
+          algemene maatregel van bestuur aan te wijzen categorieën personen waarbij tenuitvoerlegging van een vrijheidsstraf
+          of vrijheidsbenemende maatregel buiten een justitiële inrichting plaatsvindt.
+      - number: 6
+        content: Voor de pensioengerechtigde die op de dag voorafgaande aan de vrijheidsontneming geen recht heeft op ouderdomspensioen
+          op grond van artikel 8c, tweede lid, eindigt het recht op ouderdomspensioen, in afwijking van het tweede lid, vanaf
+          de dag dat de vrijheidsontneming ingaat.
+    - id: Artikel8c
+      paragraphs:
+      - number: 1
+        content: Voor de pensioengerechtigde ontstaat geen recht op ouderdomspensioen indien en voor zolang hij zich op de
+          dag waarop het ouderdomspensioen zou ingaan en daarna onttrekt aan de tenuitvoerlegging van een vrijheidsstraf of
+          vrijheidsbenemende maatregel.
+      - number: 2
+        content: Het recht op ouderdomspensioen eindigt, indien de pensioengerechtigde zich, nadat het recht op ouderdomspensioen
+          is ingegaan, onttrekt aan de tenuitvoerlegging van een vrijheidsstraf of vrijheidsbenemende maatregel.
+      - number: 3
+        content: De persoon die op grond van het eerste of tweede lid geen recht op ouderdomspensioen heeft, heeft met ingang
+          van de dag dat hij zich niet langer onttrekt aan de tenuitvoerlegging van een vrijheidsstraf of vrijheidsbenemende
+          maatregel met inachtneming van de bepalingen van deze wet recht op ouderdomspensioen.
+    - id: Artikel8d
+      paragraphs:
+      - number: 1
+        content: Voor de pensioengerechtigde ontstaat geen recht op ouderdomspensioen indien en voor zolang hij een uitreiziger
+          is.
+      - number: 2
+        content: Het recht op ouderdomspensioen eindigt, indien de pensioengerechtigde, nadat het recht op ouderdomspensioen
+          is ingegaan, een uitreiziger is.
+      - number: 3
+        content: De persoon die op grond van het eerste of tweede lid geen recht op ouderdomspensioen heeft, heeft met ingang
+          van de dag dat niet langer het gegronde vermoeden bestaat dat hij zich buiten Nederland bevindt met het doel zich
+          aan te sluiten bij een organisatie als bedoeld in artikel 1, eerste lid, onderdeel l, met inachtneming van de bepalingen
+          van deze wet recht op ouderdomspensioen.
+      - number: 4
+        content: Geen recht op toeslag heeft de pensioengerechtigde, bedoeld in artikel 8, eerste lid, van wie de partner
+          een uitreiziger is.
+      - number: 5
+        content: Voor het derde lid is artikel 14, eerste lid, van overeenkomstige toepassing.
+    - id: Artikel9
+      paragraphs:
+      - number: 1
+        content: 'Deze wet kent een bruto-ouderdomspensioen voor:
+
+
+          a. de ongehuwde pensioengerechtigde;
+
+
+          b. de gehuwde pensioengerechtigde.'
+      - number: 2
+        content: De in het eerste lid bedoelde ouderdomspensioenen worden afgeleid van het netto-minimumloon per maand.
+      - number: 3
+        content: Onder het netto-minimumloon wordt verstaan het bruto-minimumloon, na aftrek van premies op grond van de Wet
+          financiering sociale verzekeringen en loonbelasting.
+      - number: 4
+        content: De loonbelasting en premie voor de volksverzekeringen, bedoeld in artikel 2 van de Wet financiering sociale
+          verzekeringen, worden berekend voor een werknemer, jonger dan de pensioengerechtigde leeftijd, rekening houdend
+          met uitsluitend tweemaal de algemene heffingskorting, bedoeld in artikel 22 van de Wet op de loonbelasting 1964,
+          over het bruto-minimumloon.
+      - number: 5
+        content: 'De bruto-ouderdomspensioenen worden zodanig vastgesteld, dat na aftrek van de in te houden loonbelasting
+          en premie voor de volksverzekeringen, rekening houdend met de toepasselijke heffingskortingen voor een persoon van
+          de pensioengerechtigde leeftijd en ouder, en van de inkomensafhankelijke bijdrage, bedoeld in artikel 41 van de
+          Zorgverzekeringswet:
+
+
+          a. het netto-ouderdomspensioen per maand van een pensioengerechtigde als bedoeld in het eerste lid, onderdeel a,
+          gelijk is aan 70% van het netto-minimumloon per maand;
+
+
+          b. het netto-ouderdomspensioen per maand van een pensioengerechtigde als bedoeld in het eerste lid, onderdeel b,
+          gelijk is aan 50% van het netto-minimumloon per maand.'
+      - number: 6
+        content: De volledige bruto-toeslag, bedoeld in artikel 8, is gelijk aan het bruto-ouderdomspensioen voor de pensioengerechtigde,
+          bedoeld in het eerste lid, onderdeel b.
+      - number: 7
+        content: Een wijziging van het bruto-ouderdomspensioen in verband met een wijziging van het netto-minimumloon wordt
+          samen met de dag waarop deze wijziging ingaat, door of namens Onze Minister medegedeeld in de Staatscourant.
+      - number: 8
+        content: Een wijziging van het bruto-ouderdomspensioen in verband met een wijziging van het netto-minimumloon vindt
+          plaats zonder dat dit bij beschikking is vastgesteld.
+      - number: 9
+        content: De Sociale verzekeringsbank betaalt het gewijzigde ouderdomspensioen, bedoeld in het achtste lid, bij de
+          eerstvolgende betaling van het ouderdomspensioen nadat de wijziging, bedoeld in het achtste lid, heeft plaatsgevonden.
+    - id: Artikel9a
+      paragraphs:
+      - number: 1
+        content: In afwijking van artikel 9 is voor de pensioengerechtigde, die niet in Nederland woont, het bruto-ouderdomspensioen
+          gelijk aan het bruto-ouderdomspensioen voor de pensioengerechtigde, bedoeld in artikel 9, eerste lid, onderdeel
+          b, onverminderd artikel 13, eerste lid.
+      - number: 2
+        content: Artikel 8a, tweede lid, is van overeenkomstige toepassing.
+      - number: 3
+        content: 'Bij of krachtens algemene maatregel van bestuur kan worden bepaald dat recht heeft op ouderdomspensioen
+          alsof hij in Nederland woont:
+
+
+          a. de pensioengerechtigde, bedoeld in artikel 9, eerste lid, onderdeel a, die werkzaamheden verricht in het algemeen
+          belang en niet in Nederland woont;
+
+
+          b. de pensioengerechtigde, bedoeld in artikel 9, eerste lid, onderdeel a, die in Aruba, Curaçao, Sint Maarten of
+          in de openbare lichamen Bonaire, Sint Eustatius en Saba woont; of
+
+
+          c. de gezinsleden van de in de onderdelen a of b bedoelde pensioengerechtigde.'
+      - number: 4
+        content: 'Recht op ouderdomspensioen alsof hij in Nederland woont, heeft de pensioengerechtigde die niet in Nederland
+          woont en recht heeft op:
+
+
+          a. een buitengewoon pensioen, garantietoeslag, uitkering, periodieke uitkering, garantie-uitkering, vergoeding of
+          tegemoetkoming als bedoeld in de Wet buitengewoon pensioen 1940–1945, de Wet buitengewoon pensioen zeelieden-oorlogsslachtoffers,
+          de Wet buitengewoon pensioen Indisch verzet, de Wet uitkeringen vervolgingsslachtoffers 1940–1945, de Wet uitkeringen
+          burger-oorlogsslachtoffers 1940–1945 of de Algemene Oorlogsongevallenregeling Indonesië met inbegrip van het besluit
+          van de Luitenant-Gouverneur-Generaal van Nederlands-Indië van 5 november 1946 (Indisch Staatsblad, 1946, 118); of
+
+
+          b. een pensioen, toeslag, uitkering, vergoeding of tegemoetkoming, vergelijkbaar met een pensioen, toeslag, uitkering,
+          vergoeding of tegemoetkoming als bedoeld in onderdeel a, op grond van een buitenlandse wettelijke regeling die vergelijkbaar
+          is met de wettelijke regelingen, genoemd in onderdeel a.'
+    - id: Artikel10
+      paragraphs:
+      - number: 1
+        content: De volledige bruto-toeslag wordt toegekend voorzolang, met inachtneming van het bepaalde in artikel 11, het
+          inkomen uit arbeid of overig inkomen van de echtgenoot van de pensioengerechtigde nihil bedraagt.
+      - number: 2
+        content: Op de volledige bruto-toeslag wordt in mindering gebracht het inkomen van de echtgenoot van de pensioengerechtigde
+          uit arbeid of overig inkomen, vastgesteld met inachtneming van het bepaalde in artikel 11.
+    - id: Artikel11
+      paragraphs:
+      - number: 1
+        content: 'Voor de toepassing van de artikelen 8 en 10 wordt van het inkomen uit arbeid buiten aanmerking gelaten:
+
+
+          1°. een bedrag, gelijk aan 15% van het bruto-minimumloon; alsmede
+
+
+          2°. voor zover het inkomen uit arbeid meer bedraagt dan het onder 1° bedoelde bedrag, een derde gedeelte van dat
+          meerdere.'
+      - number: 2
+        content: 'In afwijking van het eerste lid wordt in de maand waarin de pensioengerechtigde of de echtgenoot van de
+          pensioengerechtigde de pensioengerechtigde leeftijd heeft bereikt, het bruto-minimumloon, bedoeld in het eerste
+          lid, onder 1°, vermenigvuldigd met de factor X/Y, waarbij:
+
+
+          – X staat voor: a. het aantal dagen gelegen in de maand waarin de pensioengerechtigde de pensioengerechtigde leeftijd
+          bereikt, vanaf de dag dat de pensioengerechtigde deze leeftijd heeft bereikt, of b. het aantal dagen gelegen in
+          de maand waarin de echtgenoot van de pensioengerechtigde de pensioengerechtigde leeftijd bereikt, voordat de echtgenoot
+          deze leeftijd heeft bereikt, en
+
+
+          a. het aantal dagen gelegen in de maand waarin de pensioengerechtigde de pensioengerechtigde leeftijd bereikt, vanaf
+          de dag dat de pensioengerechtigde deze leeftijd heeft bereikt, of
+
+
+          b. het aantal dagen gelegen in de maand waarin de echtgenoot van de pensioengerechtigde de pensioengerechtigde leeftijd
+          bereikt, voordat de echtgenoot deze leeftijd heeft bereikt, en
+
+
+          – Y staat voor het aantal dagen van de maand waarin de pensioengerechtigde of de echtgenoot van de pensioengerechtigde
+          de pensioengerechtigde leeftijd heeft bereikt.'
+    - id: Artikel12
+      paragraphs:
+      - number: 1
+        content: Op de bruto-toeslag, vastgesteld op grond van artikel 10 en, indien van toepassing, na toepassing van artikel
+          13, tweede lid, wordt een korting toegepast tot 10% voor zover de toeslag samen met het gezamenlijke inkomen uit
+          arbeid of overig inkomen van de gehuwde pensioengerechtigde en diens echtgenoot vermeerderd met het op grond van
+          de artikelen 9, zesde lid, onderdeel b en 13, eerste lid, vastgestelde bruto-ouderdomspensioen door de toepassing
+          van de korting niet minder bedraagt dan 162% van het bruto-minimumloon met inbegrip van de bruto-minimumvakantiebijslag,
+          bedoeld in artikel 15, eerste lid, van de Wet minimumloon en minimumvakantiebijslag.
+      - number: 2
+        content: De met toepassing van artikel 10, tweede lid, of artikel 13, tweede lid, of het eerste lid berekende niet-volledige
+          bruto-toeslag wordt voor toepassing van artikel 29, tweede lid, aanhef en onderdeel b, uitgedrukt in een percentage
+          van de volledige bruto-toeslag. Dit percentage wordt rekenkundig afgerond op een veelvoud van éénhonderdste.
+      - number: 3
+        content: 'Dit artikel is van overeenkomstige toepassing op de pensioengerechtigde, bedoeld in artikel II van de Wet
+          van 23 oktober 1993 tot wijziging van de Algemene Ouderdomswet (wijziging in de verhouding van ouderdomspensioen
+          en toeslag) (Stb. 592). Ten aanzien van die pensioengerechtigden dient:
+
+
+          a. artikel 10, vierde lid, zoals dat luidde voor de datum van inwerkingtreding van die wet, te worden gelezen alsof
+          «en 11» is vervangen door «11 en 12»; en
+
+
+          b. artikel 29, tweede lid, zoals dat luidde voor de datum van inwerkingtreding van die wet, te worden gelezen alsof
+          «met toepassing van artikel 10, tweede lid,» is vervangen door «met toepassing van artikel 10, tweede lid, of artikel
+          13, tweede lid, of artikel 12, eerste lid,» en «de in artikel 10, derde lid, bedoelde percenten» is vervangen door
+          «de in artikel 12, tweede lid, bedoelde percenten».'
+      - number: 4
+        content: Artikel 11, tweede lid, is van overeenkomstige toepassing op de inkomensgrens, bedoeld in het eerste lid.
+    - id: Artikel13
+      paragraphs:
+      - number: 1
+        content: Op het bruto-ouderdomspensioen, vastgesteld op grond van artikel 9, wordt een korting toegepast van 2% voor
+          elk kalenderjaar, dat de pensioengerechtigde na het bereiken van de aanvangsleeftijd, doch vóór het bereiken van
+          de pensioengerechtigde leeftijd niet verzekerd is geweest.
+      - number: 2
+        content: Op de bruto-toeslag wordt, na toepassing van artikel 10, een korting toegepast van 2% voor elk kalenderjaar,
+          dat de echtgenoot van de pensioengerechtigde na het bereiken van de aanvangsleeftijd, doch vóór het bereiken van
+          de pensioengerechtigde leeftijd van de pensioengerechtigde niet verzekerd is geweest.
+      - number: 3
+        content: Bij ministeriële regeling worden regels gesteld omtrent de herleiding van gedeelten van kalenderjaren tot
+          gehele kalenderjaren.
+    - id: Artikel13a
+      paragraphs:
+      - number: 1
+        content: Artikel 13, eerste lid, is niet van toepassing op de vrouwelijke pensioengerechtigde voor elk kalenderjaar
+          dat zij in de periode van 1 januari 1957 tot 1 april 1985 niet verzekerd was, doordat zij in Nederland woonde en
+          gehuwd dan wel gehuwd geweest was met een persoon, die in die periode niet verzekerd was.
+      - number: 2
+        content: Artikel 13, tweede lid, is niet van toepassing op de pensioengerechtigde voor elk kalenderjaar dat zijn echtgenoot
+          in de periode van 1 januari 1957 tot 1 april 1985 niet verzekerd was, doordat die echtgenoot in Nederland woonde
+          en gehuwd dan wel gehuwd geweest was met een persoon, die in die periode niet verzekerd was.
+    - id: Artikel14
+      paragraphs:
+      - number: 1
+        content: Het ouderdomspensioen alsmede een verhoging van het ouderdomspensioen wordt op aanvraag toegekend door de
+          Sociale verzekeringsbank.
+      - number: 2
+        content: In afwijking van het bepaalde in het vorige lid is de Sociale verzekeringsbank bevoegd het ouderdomspensioen
+          of een verhoging van het ouderdomspensioen ambtshalve toe te kennen.
+    - id: Artikel15
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank is bevoegd controlevoorschriften vast te stellen. Deze voorschriften mogen niet
+          verder gaan dan strikt noodzakelijk is voor een juiste uitvoering van deze wet.
+      - number: 2
+        content: De pensioengerechtigde, zijn echtgenoot dan wel zijn wettelijke vertegenwoordiger of de instelling waaraan
+          op grond van artikel 20 ouderdomspensioen wordt uitbetaald, is verplicht de voorschriften op te volgen en anderszins
+          aan de Sociale verzekeringsbank desgevraagd de medewerking te verlenen die redelijkerwijs nodig is voor de uitvoering
+          van deze wet.
+      - number: 3
+        content: De pensioengerechtigde, zijn echtgenoot, dan wel zijn wettelijk vertegenwoordiger, onthouden zich van zeer
+          ernstige misdragingen jegens de met de uitvoering van deze wet belaste personen en instanties tijdens het verrichten
+          van hun werkzaamheden.
+    - id: Artikel16
+      paragraphs:
+      - number: 1
+        content: Het ouderdomspensioen gaat in op de dag waarop de belanghebbende aan de voorwaarden voor het recht op ouderdomspensioen
+          voldoet.
+      - number: 2
+        content: In afwijking van het bepaalde in het eerste lid kan een ouderdomspensioen niet vroeger ingaan dan de eerste
+          dag van de twaalfde maand vóór de dag waarop de aanvraag werd ingediend of vóór de dag waarop ambtshalve toekenning
+          plaatsvond. De Sociale verzekeringsbank kan voor bijzondere gevallen van het bepaalde in de vorige volzin afwijken.
+    - id: Artikel17
+      paragraphs:
+      - number: 1
+        content: Het ouderdomspensioen wordt door de Sociale verzekeringsbank ingetrokken of herzien, wanneer degene, aan
+          wie het is toegekend, ingevolge het bij of krachtens deze wet bepaalde daarvoor niet of niet meer in aanmerking
+          komt, onderscheidenlijk voor een hoger of lager ouderdomspensioen in aanmerking komt.
+      - number: 2
+        content: '[Red: Vervallen.]'
+      - number: 3
+        content: De herziening van het ouderdomspensioen, welke voortvloeit uit een wijziging der omstandigheden en welke
+          een verhoging van dit ouderdomspensioen tot gevolg heeft, gaat in op de eerste dag der maand, waarin de wijziging
+          dier omstandigheden heeft plaatsgevonden. Het bepaalde in artikel 16, tweede lid, is van overeenkomstige toepassing.
+      - number: 4
+        content: De Sociale verzekeringsbank kent, indien de pensioengerechtigde of zijn wettelijke vertegenwoordiger niet
+          op grond van artikel 50 desgevraagd aantoont, dat hij een pensioengerechtigde is als bedoeld in artikel 9, eerste
+          lid, onderdeel a, of dat zijn feitelijke woonsituatie in overeenstemming is met het door hem dan wel zijn wettelijke
+          vertegenwoordiger verstrekte adres, een ouderdomspensioen toe gelijk aan dat van een pensioengerechtigde als bedoeld
+          in artikel 9, eerste lid, onderdeel b, dan wel herziet het ouderdomspensioen tot het bedrag van dat ouderdomspensioen.
+      - number: 5
+        content: De intrekking van het ouderdomspensioen of de herziening daarvan, welke voortvloeit uit een wijziging der
+          omstandigheden en welke een verlaging van dit ouderdomspensioen tot gevolg heeft, gaat, behoudens in de bij ministeriële
+          regeling aan te wijzen gevallen, in op de eerste dag der maand, volgende op die, waarin de dag is gelegen met ingang
+          waarvan degene, aan wie ouderdomspensioen is toegekend, daarvoor niet meer in aanmerking komt, onderscheidenlijk
+          voor een lager ouderdomspensioen in aanmerking komt. Indien het ouderdomspensioen ten onrechte of tot een te hoog
+          bedrag is toegekend, wordt het ingetrokken onderscheidenlijk herzien met ingang van de dag, waarop het is ingegaan.
+      - number: 6
+        content: De herziening van het ouderdomspensioen als gevolg van een wijziging van het netto-minimumloon gaat, in afwijking
+          van het bepaalde in het derde en vierde lid, in op de dag waarop het netto-minimumloon is herzien.
+      - number: 7
+        content: De beëindiging van het ouderdomspensioen op grond van artikel 8b, tweede lid, gaat in op de eerste dag van
+          de maand volgend op de maand waarin de vrijheidsontneming een maand heeft geduurd.
+      - number: 8
+        content: Ter uitvoering van dit artikel kunnen bij ministeriële regeling nadere voorschriften worden gegeven.
+    - id: Artikel17a
+      paragraphs:
+      - number: 1
+        content: 'Onverminderd het elders in deze wet bepaalde terzake van herziening of intrekking van een besluit tot toekenning
+          van ouderdomspensioen en terzake van weigering van ouderdomspensioen, herziet de Sociale verzekeringsbank een dergelijk
+          besluit of trekt zij dat in:
+
+
+          a. indien het niet of niet behoorlijk nakomen van een verplichting op grond van artikel 15, tweede lid, of 49, heeft
+          geleid tot het ten onrechte of tot een te hoog bedrag verlenen van ouderdomspensioen;
+
+
+          b. indien anderszins het ouderdomspensioen ten onrechte of tot een te hoog bedrag is verleend;
+
+
+          c. indien het niet of niet behoorlijk nakomen van de verplichting bedoeld in artikel 15, tweede lid, of 49, ertoe
+          leidt dat niet kan worden vastgesteld of nog recht op ouderdomspensioen bestaat.'
+      - number: 2
+        content: Indien daarvoor dringende redenen aanwezig zijn kan de Sociale verzekeringsbank besluiten geheel of gedeeltelijk
+          van herziening of intrekking af te zien.
+    - id: Artikel17b
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank weigert het ouderdomspensioen geheel of gedeeltelijk, tijdelijk of blijvend,
+          indien de pensioengerechtigde, zijn echtgenoot, of zijn wettelijke vertegenwoordiger een verplichting, hem op grond
+          van artikel 15, tweede of derde lid, opgelegd, of de verplichtingen, bedoeld in artikel 55, tweede lid, van de Wet
+          structuur uitvoeringsorganisatie werk en inkomen niet of niet behoorlijk is nagekomen, dan wel de verplichting,
+          bedoeld in artikel 49 niet binnen de door de Sociale verzekeringsbank daarvoor vastgestelde termijn is nagekomen.
+      - number: 2
+        content: Een maatregel als bedoeld in het eerste lid wordt afgestemd op de ernst van de gedraging en de mate waarin
+          de belanghebbende de gedraging verweten kan worden. Van het opleggen van een maatregel wordt in elk geval afgezien,
+          indien elke vorm van verwijtbaarheid ontbreekt.
+      - number: 3
+        content: De Sociale verzekeringsbank kan afzien van het opleggen van een maatregel als bedoeld in het eerste lid en
+          volstaan met het geven van een schriftelijke waarschuwing ter zake het niet tijdig nakomen van de verplichting,
+          bedoeld in artikel 49, indien het niet tijdig nakomen van de verplichting niet heeft geleid tot het ten onrechte
+          of tot een te hoog bedrag verlenen van ouderdomspensioen, tenzij het niet tijdig nakomen van de verplichting plaatsvindt
+          binnen een periode van twee jaar te rekenen vanaf de datum waarop eerder aan de belanghebbende een zodanige waarschuwing
+          is gegeven.
+      - number: 4
+        content: De Sociale verzekeringsbank kan afzien van het opleggen van een maatregel indien daarvoor dringende redenen
+          aanwezig zijn.
+      - number: 5
+        content: Het opleggen van een maatregel blijft achterwege indien voor dezelfde gedraging een bestuurlijke boete als
+          bedoeld in artikel 17c wordt opgelegd.
+      - number: 6
+        content: Bij of krachtens algemene maatregel van bestuur worden nadere regels gesteld met betrekking tot het eerste
+          en tweede lid.
+    - id: Artikel17c
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank legt een bestuurlijke boete op van ten hoogste het benadelingsbedrag wegens het
+          niet of niet behoorlijk nakomen door de pensioengerechtigde, zijn echtgenoot, of zijn wettelijke vertegenwoordiger
+          van de verplichting, bedoeld in artikel 49. Indien de feiten en omstandigheden, bedoeld in artikel 49, niet of niet
+          behoorlijk zijn medegedeeld en deze overtreding opzettelijk is begaan, bedraagt de bestuurlijke boete ten hoogste
+          het bedrag van de vijfde categorie, bedoeld in artikel 23, vierde lid, van het Wetboek van Strafrecht. Indien de
+          feiten en omstandigheden, bedoeld in artikel 49, niet of niet behoorlijk zijn medegedeeld en deze overtreding niet
+          opzettelijk is begaan, bedraagt de bestuurlijke boete ten hoogste het bedrag van de derde categorie, bedoeld in
+          artikel 23, vierde lid, van het Wetboek van Strafrecht.
+      - number: 2
+        content: In dit artikel wordt onder benadelingsbedrag verstaan het brutobedrag dat als gevolg van het niet of niet
+          behoorlijk nakomen van de verplichting, bedoeld in artikel 49, ten onrechte of tot een te hoog bedrag aan ouderdomspensioen
+          is verleend.
+      - number: 3
+        content: Indien het niet of niet behoorlijk nakomen door de pensioengerechtigde, zijn echtgenoot, of zijn wettelijke
+          vertegenwoordiger van de verplichting, bedoeld in artikel 49, niet heeft geleid tot een benadelingsbedrag, legt
+          de Sociale verzekeringsbank een bestuurlijke boete op van ten hoogste het bedrag van de tweede categorie, bedoeld
+          in artikel 23, vierde lid, van het Wetboek van Strafrecht.
+      - number: 4
+        content: De Sociale verzekeringsbank kan afzien van het opleggen van een bestuurlijke boete en volstaan met het geven
+          van een schriftelijke waarschuwing wegens het niet of niet behoorlijk nakomen van de verplichting, bedoeld in artikel
+          49, in situaties die bij algemene maatregel van bestuur worden bepaald, tenzij het niet of niet behoorlijk nakomen
+          van de verplichting plaats vindt binnen een periode van twee jaar te rekenen vanaf de datum waarop eerder aan de
+          pensioengerechtigde, zijn echtgenoot, of zijn wettelijke vertegenwoordiger, een zodanige waarschuwing is gegeven.
+      - number: 5
+        content: De Sociale verzekeringsbank legt een bestuurlijke boete op wegens het niet of niet behoorlijk nakomen door
+          de pensioengerechtigde, zijn echtgenoot, of zijn wettelijke vertegenwoordiger van de verplichting, bedoeld in artikel
+          49, als gevolg waarvan ten onrechte of tot een te hoog bedrag aan ouderdomspensioen is ontvangen, van ten hoogste
+          150 procent van het benadelingsbedrag, met overeenkomstige toepassing van het eerste lid, indien binnen een tijdvak
+          van vijf jaar voorafgaand aan de dag van het begaan van de overtreding een eerdere bestuurlijke boete of strafrechtelijke
+          sanctie is opgelegd wegens een eerdere overtreding, bestaande uit eenzelfde gedraging, die onherroepelijk is geworden.
+      - number: 6
+        content: Onder eenzelfde gedraging als bedoeld in het vijfde lid wordt verstaan het niet of niet behoorlijk nakomen
+          van de verplichting, bedoeld in de artikelen 49 van deze wet of 35 van de Algemene nabestaandenwet als gevolg waarvan
+          ten onrechte of tot een te hoog bedrag aan ouderdomspensioen, nabestaandenuitkering of wezenuitkering is verleend.
+      - number: 7
+        content: In afwijking van het vijfde lid is het in dat lid genoemde tijdvak van vijf jaar tien jaar indien wegens
+          de eerdere overtreding, bedoeld in het vijfde lid, de pensioengerechtigde, zijn echtgenoot, of zijn wettelijke vertegenwoordiger
+          is gestraft met een onvoorwaardelijke gevangenisstraf.
+      - number: 8
+        content: De Sociale verzekeringsbank kan afzien van het opleggen van een bestuurlijke boete indien daarvoor dringende
+          redenen aanwezig zijn.
+      - number: 9
+        content: Degene aan wie een bestuurlijke boete is opgelegd, is verplicht desgevraagd aan de Sociale verzekeringsbank
+          de inlichtingen te verstrekken die voor de tenuitvoerlegging van de bestuurlijke boete van belang zijn.
+      - number: 10
+        content: Bij algemene maatregel van bestuur worden nadere regels gesteld over de hoogte van de bestuurlijke boete.
+      - number: 11
+        content: In afwijking van artikel 8:69 van de Algemene wet bestuursrecht kan de rechter in beroep of hoger beroep
+          het bedrag waarop de bestuurlijke boete is vastgesteld ook ten nadele van de pensioengerechtigde, zijn echtgenoot,
+          of zijn wettelijke vertegenwoordiger wijzigen.
+      - number: 12
+        content: Indien ten aanzien van een overtreding waarvoor een bestuurlijke boete is opgelegd geen sprake is geweest
+          van opzet of grove schuld, en voorts is gebleken dat binnen een jaar nadat de bestuurlijke boete is opgelegd niet
+          nogmaals een overtreding wegens eenzelfde gedraging is begaan, is de Sociale verzekeringsbank bevoegd op verzoek
+          van degene aan wie de bestuurlijke boete is opgelegd, de bestuurlijke boete geheel of gedeeltelijk kwijt te schelden
+          bij medewerking aan een schuldregeling. Artikel 25, eerste, derde en vierde lid, is van overeenkomstige toepassing.
+      - number: 13
+        content: Het besluit tot kwijtschelding, bedoeld in het twaalfde lid, wordt ingetrokken of ten nadele van degene aan
+          wie de bestuurlijke boete is opgelegd herzien indien binnen vijf jaar na het besluit tot kwijtschelding wederom
+          een overtreding wegens eenzelfde gedraging is begaan.
+    - id: Artikel17i
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank verrekent de bestuurlijke boete en een eerdere bestuurlijke boete wegens eenzelfde
+          gedraging als bedoeld in artikel 17c, vijfde lid, met het ouderdomspensioen dat degene aan wie een bestuurlijke
+          boete is opgelegd op grond van deze wet ontvangt.
+      - number: 2
+        content: Onverminderd het eerste lid kan de Sociale verzekeringsbank de bestuurlijke boete verrekenen met een vordering
+          die degene aan wie de bestuurlijke boete is opgelegd op hem heeft.
+      - number: 3
+        content: Het college van burgemeester en wethouders van de betrokken gemeente, onderscheidenlijk het Uitvoeringsinstituut
+          werknemersverzekeringen, betaalt het bedrag van de bestuurlijke boete, zonder dat daarvoor een machtiging nodig
+          is, op haar verzoek aan de Sociale verzekeringsbank indien degene aan wie een bestuurlijke boete is opgelegd een
+          uitkering ontvangt op grond van de Participatiewet, de Wet inkomensvoorziening oudere en gedeeltelijk arbeidsongeschikte
+          werkloze werknemers, de Wet inkomensvoorziening oudere en gedeeltelijk arbeidsongeschikte gewezen zelfstandigen,
+          de Wet inkomensvoorziening oudere werklozen, de Werkloosheidswet, de Ziektewet, de Wet arbeidsongeschiktheidsverzekering
+          zelfstandigen, de Wet arbeidsongeschiktheidsvoorziening jonggehandicapten, de Wet werk en inkomen naar arbeidsvermogen,
+          de Wet op de arbeidsongeschiktheidsverzekering of de Wet arbeid en zorg of een toeslag op grond van de Toeslagenwet.
+      - number: 4
+        content: De in artikel 479g van het Wetboek van Burgerlijke Rechtsvordering aan de raad voor de kinderbescherming
+          toegekende bevoegdheid komt gelijkelijk toe aan de Sociale verzekeringsbank. Indien de Sociale verzekeringsbank
+          gebruik maakt van deze bevoegdheid, geschiedt de bekendmaking van het dwangbevel, in afwijking van artikel 4:123,
+          eerste lid, van de Algemene wet bestuursrecht, door middel van toezending per post aan degene aan wie de boete is
+          opgelegd.
+      - number: 5
+        content: 'Zolang de belanghebbende zijn verplichting, bedoeld in artikel 17c, negende lid, niet of niet behoorlijk
+          nakomt:
+
+
+          a. is de Sociale verzekeringsbank, in afwijking van artikel 4:93, vierde lid, van de Algemene wet bestuursrecht,
+          bevoegd tot verrekening voor zover beslag op de vordering van de schuldeiser nietig zou zijn;
+
+
+          b. geldt de beslagvrije voet, bedoeld in de artikelen 475c tot en met 475e van het Wetboek van Burgerlijke Rechtsvordering,
+          in afwijking van artikel 4:116 van de Algemene wet bestuursrecht, niet bij de invordering van een bestuurlijke boete
+          bij dwangbevel.'
+    - id: Artikel18
+      paragraphs:
+      - number: 1
+        content: 'Na het overlijden van degene, aan wie ouderdomspensioen is toegekend, wordt met ingang van de dag na het
+          overlijden, ouderdomspensioen in de vorm van een overlijdensuitkering uitbetaald:
+
+
+          a. aan de langstlevende van de echtgenoten;
+
+
+          b. bij ontstentenis van de in onderdeel a bedoelde persoon, aan de minderjarige kinderen tot wie de overledene in
+          familierechtelijke betrekking stond;
+
+
+          c. bij ontstentenis van de in de onderdelen a en b bedoelde personen, aan degenen met wie de overledene in gezinsverband
+          leefde.'
+      - number: 2
+        content: De overlijdensuitkering is gelijk aan het bedrag van het ouderdomspensioen over één maand, met uitzondering
+          van de toeslag, berekend naar de hoogte van het ouderdomspensioen in de maand van overlijden van degene aan wie
+          ouderdomspensioen is toegekend.
+      - number: 3
+        content: De overlijdensuitkering wordt ambtshalve of op verzoek aan de rechthebbende of rechthebbenden door de Sociale
+          verzekeringsbank uitbetaald.
+      - number: 4
+        content: De overlijdensuitkering wordt in een bedrag ineens aan de rechthebbende of rechthebbenden uitbetaald.
+      - number: 5
+        content: Het bedrag van de overlijdensuitkering wordt verminderd met het bedrag aan ouderdomspensioen dat, over na
+          het overlijden gelegen dagen, reeds is uitbetaald.
+      - number: 6
+        content: De overlijdensuitkering is niet vatbaar voor beslag.
+    - id: Artikel19
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank betaalt het ouderdomspensioen waarop op grond van deze wet recht bestaat. De
+          betaling geschiedt als regel maandelijks.
+      - number: 2
+        content: De Sociale verzekeringsbank kan de aan een gehuwde pensioengerechtigde toegekende toeslag betaalbaar stellen
+          aan de echtgenoot.
+      - number: 3
+        content: Indien het ouderdomspensioen in het buitenland wordt uitbetaald, geschiedt de betaling in afwijking van artikel
+          4:89, derde lid, van de Algemene wet bestuursrecht op het tijdstip waarop de rekening van de daartoe door de schuldeiser
+          aangewezen bank wordt gecrediteerd.
+      - number: 4
+        content: Wanneer een pensioengerechtigde een ander machtigt om het ouderdomspensioen in ontvangst te nemen, onderscheidenlijk
+          een verleende machtiging intrekt, wordt daaraan gevolg gegeven met ingang van een betalingstermijn, aanvangende
+          na de dag, waarop de machtiging wordt ingediend, onderscheidenlijk waarop van haar intrekking mededeling wordt gedaan,
+          doch niet later dan de eerste dag van de tweede maand na de dag van indiening, onderscheidenlijk intrekking der
+          machtiging.
+      - number: 5
+        content: 'De Sociale verzekeringsbank schort de betaling van het ouderdomspensioen op of schorst de betaling indien
+          zij op grond van duidelijke aanwijzingen van oordeel is of het gegronde vermoeden heeft, dat:
+
+
+          a. het recht op ouderdomspensioen niet of niet meer bestaat;
+
+
+          b. recht op een lager ouderdomspensioen bestaat; of
+
+
+          c. de pensioengerechtigde, zijn echtgenoot dan wel zijn wettelijke vertegenwoordiger of de instelling waaraan op
+          grond van artikel 20 ouderdomspensioen wordt uitbetaald, een verplichting als bedoeld in artikel 15, tweede lid,
+          artikel 49 of artikel 50 niet is nagekomen.'
+      - number: 6
+        content: De Sociale verzekeringsbank stelt de betrokken persoon of instelling onverwijld schriftelijk in kennis van
+          de beslissing, bedoeld in het vijfde lid.
+    - id: Artikel19a
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank schort de betaling van het ouderdomspensioen op indien degene aan wie een ouderdomspensioen
+          is toegekend een vreemdeling is die niet rechtmatig in Nederland verblijf houdt als bedoeld in artikel 8 van de
+          Vreemdelingenwet 2000.
+      - number: 2
+        content: De betaling van het ouderdomspensioen wordt hervat indien betrokkene daartoe een aanvraag indient en het
+          de Sociale verzekeringsbank is gebleken dat hij feitelijk buiten Nederland woont of verblijf houdt.
+    - id: Artikel19b
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank schort de betaling van de uitkering op, indien blijkt dat het door de pensioengerechtigde
+          verstrekte adres van hemzelf of van zijn echtgenoot afwijkt van het adres waaronder de pensioengerechtigde of zijn
+          echtgenoot in de basisregistratie personen staat ingeschreven.
+      - number: 2
+        content: 'Geen opschorting vindt plaats:
+
+
+          a. indien de afwijking redelijkerwijs geen gevolgen kan hebben voor het recht op of de hoogte van de uitkering;
+
+
+          b. indien de pensioengerechtigde van de afwijking redelijkerwijs geen verwijt kan worden gemaakt.'
+      - number: 3
+        content: De Sociale verzekeringsbank doet schriftelijk mededeling van de opschorting aan de belanghebbende.
+      - number: 4
+        content: De opschorting wordt beëindigd zodra het aan de Sociale verzekeringsbank gebleken is dat de afwijking niet
+          meer bestaat.
+    - id: Artikel20
+      paragraphs:
+      - number: 1
+        content: Indien degene aan wie een ouderdomspensioen is toegekend, aanspraak heeft op verstrekking of vergoeding van
+          zorg als bedoeld in de Wet langdurige zorg en op grond van die wet een bijdrage voor die zorg verschuldigd is, is
+          de Sociale verzekeringsbank bevoegd het ouderdomspensioen tot het bedrag van die bijdrage in plaats van aan degene,
+          aan wie ouderdomspensioen is toegekend, zonder diens machtiging uit te betalen aan het Zorginstituut Nederland,
+          genoemd in artikel 58, eerste lid, van de Zorgverzekeringswet.
+      - number: 2
+        content: Indien aan degene aan wie een ouderdomspensioen is toegekend, een maatwerkvoorziening of persoonsgebonden
+          budget wordt verstrekt voor beschermd wonen als bedoeld in artikel 1.1.1 van de Wet maatschappelijke ondersteuning
+          2015, en hij op grond van die wet hiervoor een bijdrage is verschuldigd, is de Sociale verzekeringsbank bevoegd
+          het ouderdomspensioen tot het bedrag van die bijdrage in plaats van aan degene, aan wie het ouderdomspensioen is
+          toegekend, zonder diens machtiging uit te betalen aan het CAK, genoemd in artikel 6.1.1, eerste lid, van de Wet
+          langdurige zorg, dat voor de gemeente de bijdrage int.
+      - number: 3
+        content: Indien degene, aan wie een ouderdomspensioen is toegekend, in een inrichting ter verpleging van geesteszieken
+          of van zwakzinnigen is opgenomen en de Sociale verzekeringsbank, van de desbetreffende inrichting of van het college
+          van burgemeester en wethouders van de gemeente die de opnamekosten betaalt, het verzoek ontvangt om het ouderdomspensioen
+          aan die inrichting of die gemeente uit te betalen, is de Sociale verzekeringsbank bevoegd dat verzoek zonder het
+          stellen van andere voorwaarden in te willigen.
+      - number: 4
+        content: Indien het eerste of tweede lid toepassing vindt, heeft de in het derde lid bedoelde bevoegdheid betrekking
+          op het gedeelte van het ouderdomspensioen dat niet aan de in het eerste of tweede lid genoemde instantie wordt uitbetaald.
+      - number: 5
+        content: Een herziening van het ouderdomspensioen op grond van het eerste of tweede lid als gevolg van een wijziging
+          van de verschuldigde bijdrage vindt plaats zonder dat dit bij beschikking wordt vastgesteld.
+    - id: Artikel24
+      paragraphs:
+      - number: 1
+        content: Het ouderdomspensioen dat als gevolg van een besluit als bedoeld in artikel 17 onverschuldigd is betaald,
+          alsmede hetgeen anderszins onverschuldigd is betaald, wordt door de Sociale verzekeringsbank teruggevorderd van
+          de pensioengerechtigde of zijn wettelijke vertegenwoordiger, dan wel van de erfgenaam van de pensioengerechtigde
+          voor zover het onverschuldigd betaalde in het vermogen van die erfgenaam is gevallen.
+      - number: 2
+        content: 'In afwijking van het eerste lid kan de Sociale verzekeringsbank besluiten van terugvordering of van verdere
+          terugvordering af te zien, indien de pensioengerechtigde, of zijn wettelijke vertegenwoordiger:
+
+
+          a. gedurende vijf jaar volledig aan zijn betalingsverplichtingen heeft voldaan;
+
+
+          b. gedurende vijf jaar niet volledig aan zijn betalingsverplichtingen heeft voldaan, maar het achterstallige bedrag
+          over die periode, vermeerderd met de daarover verschuldigde wettelijke rente en de op de invordering betrekking
+          hebbende kosten, alsnog heeft betaald;
+
+
+          c. gedurende vijf jaar geen betalingen heeft verricht en niet aannemelijk is dat hij deze op enig moment zal gaan
+          verrichten; of
+
+
+          d. een bedrag, overeenkomend met ten minste 50% van de restsom in één keer aflost.'
+      - number: 3
+        content: De in het tweede lid, onderdelen a, b en c, genoemde termijn is tien jaar indien de terugvordering het gevolg
+          is van het niet of niet behoorlijk nakomen van de verplichting, bedoeld in artikel 49.
+      - number: 4
+        content: 'De in het tweede lid, onder a en b, genoemde termijn is drie jaar indien:
+
+
+          a. het gemiddeld inkomen van de belanghebbende in die periode de beslagvrije voet bedoeld in de artikelen 475c tot
+          en met 475e van het Wetboek van Burgerlijke Rechtsvordering niet te boven is gegaan; en
+
+
+          b. de terugvordering niet het gevolg is van het niet of niet behoorlijk nakomen van de verplichting, bedoeld in
+          artikel 49.'
+      - number: 5
+        content: Indien daarvoor dringende redenen aanwezig zijn kan de Sociale verzekeringsbank besluiten geheel of gedeeltelijk
+          van terugvordering af te zien.
+      - number: 6
+        content: Degene van wie wordt teruggevorderd is verplicht desgevraagd aan de Sociale verzekeringsbank de inlichtingen
+          te verstrekken die voor de terugvordering van belang zijn.
+      - number: 7
+        content: In afwijking van het eerste lid kan de Sociale verzekeringsbank, onder voorwaarden die Onze Minister kan
+          stellen, besluiten van terugvordering af te zien indien het terug te vorderen bedrag een door Onze Minister vast
+          te stellen bedrag niet te boven gaat.
+    - id: Artikel24a
+      paragraphs:
+      - number: 1
+        content: De Sociale verzekeringsbank kan hetgeen is teruggevorderd op grond van artikel 24, eerste lid, invorderen
+          bij dwangbevel.
+      - number: 2
+        content: Artikel 17i is van overeenkomstige toepassing, met dien verstande dat indien het gemiddeld inkomen van de
+          pensioengerechtigde of zijn wettelijke vertegenwoordiger gedurende drie jaar de beslagvrije voet bedoeld in de artikelen
+          475c tot en met 475e van het Wetboek van Burgerlijke Rechtsvordering niet te boven is gegaan, de Sociale verzekeringsbank
+          de aflossingsbedragen lager vaststelt.
+    - id: Artikel25
+      paragraphs:
+      - number: 1
+        content: 'In afwijking van artikel 24, eerste lid, kan de Sociale verzekeringsbank, op verzoek van de pensioengerechtigde,
+          of zijn wettelijke vertegenwoordiger, besluiten gedeeltelijk van terugvordering of gedeeltelijk van verdere terugvordering
+          af te zien door medewerking aan een schuldregeling, indien:
+
+
+          a. redelijkerwijs te voorzien is dat de pensioengerechtigde niet zal kunnen voortgaan met het betalen van zijn schulden
+          of indien hij in de toestand verkeert dat hij heeft opgehouden te betalen;
+
+
+          b. redelijkerwijs te voorzien is dat een schuldregeling met betrekking tot alle vorderingen, behoudens de in het
+          tweede lid bedoelde vorderingen, van de overige schuldeisers zonder een zodanig besluit niet tot stand zal komen;
+
+
+          c. een naar het oordeel van de Sociale verzekeringsbank betrouwbaar voorstel voor een schuldregeling tot stand is
+          gekomen door tussenkomst van een schuldhulpverlener als bedoeld in artikel 48 van de Wet op het consumentenkrediet;
+
+
+          d. aannemelijk is dat medewerking aan een schuldregeling niet concurrentieverstorend werkt; en
+
+
+          e. uitdeling in het kader van de schuldregeling plaatsvindt overeenkomstig artikel 349 van de Faillissementswet.'
+      - number: 2
+        content: Het eerste lid is niet van toepassing indien een vordering is ontstaan door het opzettelijk of door grove
+          schuld niet nakomen door de pensioengerechtigde van de verplichting, bedoeld in artikel 49, en met betrekking tot
+          het niet naleven van die verplichting een boete als bedoeld in artikel 17c is opgelegd, dan wel indien hiervoor
+          aangifte is gedaan op grond van het Wetboek van Strafrecht.
+      - number: 3
+        content: 'Het besluit tot het afzien van terugvordering of van verdere terugvordering wordt ingetrokken of ten nadele
+          van de belanghebbende gewijzigd indien:
+
+
+          a. niet binnen twaalf maanden nadat dat besluit is bekendgemaakt, een schuldregeling tot stand is gekomen die voldoet
+          aan de eisen, bedoeld in het eerste lid;
+
+
+          b. de pensioengerechtigde, of zijn wettelijke vertegenwoordiger, zijn schuld aan de Sociale verzekeringsbank niet
+          overeenkomstig de schuldregeling voldoet; of
+
+
+          c. onjuiste of onvolledige gegevens zijn verstrekt en de verstrekking van juiste of volledige gegevens tot een ander
+          besluit zou hebben geleid.'
+      - number: 4
+        content: Bij ministeriële regeling kunnen met betrekking tot dit artikel nadere regels worden gesteld ten aanzien
+          van de bevoegdheid om mee te werken aan schuldregelingen.
+    - id: Artikel26
+      paragraphs:
+      - number: 1
+        content: 'Het ouderdomspensioen is:
+
+
+          a. onvervreemdbaar;
+
+
+          b. niet vatbaar voor verpanding of belening.'
+      - number: 2
+        content: Volmacht tot ontvangst van ouderdomspensioen, onder welke vorm of welke benaming ook door de gepensioneerde
+          verleend, is steeds herroepelijk.
+      - number: 3
+        content: Elk beding, strijdig met enige bepaling van dit artikel, is nietig.
+    - id: Artikel29
+      paragraphs:
+      - number: 1
+        content: 'De bruto-vakantie-uitkering wordt zodanig vastgesteld, dat:
+
+
+          a. de netto-vakantie-uitkering per maand van een ongehuwde pensioengerechtigde gelijk is aan 70% van de netto-minimumvakantiebijslag
+          per maand;
+
+
+          b. de netto-vakantie-uitkering per maand van de gehuwde pensioengerechtigde, bedoeld in artikel 9, eerste lid onderdeel
+          b, van wie de echtgenoot de pensioengerechtigde leeftijd heeft bereikt dan wel de pensioengerechtigde leeftijd nog
+          niet heeft bereikt. maar voor wie geen recht op toeslag bestaat als bedoeld in artikel 8, eerste lid, gelijk is
+          aan 50% van de netto-minimumvakantiebijslag per maand.'
+      - number: 2
+        content: 'De bruto-vakantie-uitkering per maand van een gehuwde pensioengerechtigde:
+
+
+          a. aan wie een volledige toeslag is toegekend is gelijk aan tweemaal de bruto-vakantie-uitkering als bedoeld in
+          het eerste lid, onderdeel b;
+
+
+          b. aan wie een niet-volledige toeslag is toegekend met toepassing van artikel 10, tweede lid, artikel 13, tweede
+          lid, of artikel 12, eerste lid, is gelijk aan de bruto-vakantie-uitkering, bedoeld in het eerste lid, onderdeel
+          b, vermeerderd met de met behulp van de in artikel 12, tweede lid, bedoelde percenten over het verschil tussen de
+          vastgestelde bruto-vakantie-uitkering, bedoeld in onderdeel a en de vastgestelde bruto-vakantie-uitkering, bedoeld
+          in het eerste lid, onderdeel b.'
+      - number: 3
+        content: De in het eerste lid bedoelde netto minimumvakantiebijslag bedraagt het verschil tussen het bedrag, dat voor
+          een werknemer jonger dan de pensioengerechtigde leeftijd ontstaat door toepassing van artikel 9, derde lid, op het
+          in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag bedoelde bedrag vermeerderd
+          met de aanspraak op vakantiebijslag op grond van artikel 15 van die wet van degene die aanspraak heeft op laatstgenoemd
+          bedrag, en het netto-minimumloon, bedoeld in artikel 9, derde lid.
+      - number: 4
+        content: In de gevallen, dat op het ouderdomspensioen, vastgesteld op grond van artikel 9, met toepassing van artikel
+          13, eerste lid, een korting wordt toegepast, wordt op de, op grond van het eerste en derde lid, vastgestelde bruto-vakantie-uitkering,
+          een evenredige korting toegepast.
+    - id: Artikel31
+      paragraphs:
+      - number: 1
+        content: Eenmaal per jaar vindt ambtshalve uitbetaling van de vakantie-uitkering plaats.
+      - number: 2
+        content: De in het vorige lid bedoelde uitbetaling vindt plaats in de maand mei en omvat de vakantie-uitkering, waarop
+          recht bestond over de periode van twaalf maanden, voorafgaande aan de maand mei.
+      - number: 3
+        content: De vakantie-uitkering wordt betaald zonder dat dit bij beschikking is vastgesteld.
+  - id: HoofdstukIV
+    title: De vrijwillige verzekering
+    articles:
+    - id: Artikel35
+      paragraphs:
+      - number: 1
+        content: De gewezen verzekerde die de aanvangsleeftijd heeft bereikt kan zich, zolang hij de pensioengerechtigde leeftijd
+          nog niet heeft bereikt, vrijwillig verzekeren over een periode van maximaal tien jaar, met ingang van de dag na
+          de dag waarop de verplichte verzekering is geëindigd. De eerste zin is alleen van toepassing indien de gewezen verzekerde
+          direct voorafgaande aan de periode van vrijwillige verzekering ten minste een jaar verplicht verzekerd is geweest.
+      - number: 2
+        content: Indien de periode van vrijwillige verzekering is onderbroken door een periode van verplichte verzekering
+          korter dan een jaar, kan de gewezen verzekerde zich opnieuw vrijwillig verzekeren voor de resterende periode van
+          de tien jaar.
+      - number: 3
+        content: 'De periode van maximaal tien jaar, bedoeld in het eerste lid, is niet van toepassing op:
+
+
+          a. de gewezen verzekerde die in dienstbetrekking staat tot een Nederlandse publiekrechtelijke rechtspersoon dan
+          wel uit anderen hoofde loon geniet van een zodanige rechtspersoon;
+
+
+          b. de gewezen verzekerde die is uitgezonden om werkzaamheden te verrichten voor door Onze Minister in overeenstemming
+          met Onze Minister van Buitenlandse Zaken aan te wijzen organisaties voor ontwikkelingssamenwerking;
+
+
+          c. de gewezen verzekerde die werkzaam is bij een door Onze Minister, Onze Minister van Volksgezondheid, Welzijn
+          en Sport en Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties aan te wijzen volkenrechtelijke organisatie;
+
+
+          d. de gewezen verzekerde die werkzaamheden verricht die worden bekostigd door het Rijk en die tevens in opdracht
+          van het Rijk worden verricht in het kader van een wettelijke taakomschrijving of ter uitvoering van een internationaal
+          verdrag dan wel een daarmee gelijk te stellen overeenkomst of een besluit van een volkenrechtelijke organisatie;
+          of
+
+
+          e. de gewezen verzekerde, die op de dag waarop de verplichte verzekering is geëindigd de leeftijd van 50 jaar heeft
+          bereikt, niet in Nederland woont en recht heeft op een: 1°. uitkering op grond van de Wet werk en inkomen naar arbeidsvermogen;
+          2°. uitkering op grond van de Wet op de arbeidsongeschiktheidsverzekering; 3°. uitkering op grond van de Wet arbeidsongeschiktheidsverzekering
+          zelfstandigen; 4°. uitkering of op recht op arbeidsondersteuning op grond van de Wet arbeidsongeschiktheidsvoorziening
+          jonggehandicapten; 5°. uitkering op grond van de Wet arbeidsongeschiktheidsvoorziening militairen; 6°. pensioen
+          op basis van arbeidsongeschiktheid op grond van de Wet privatisering Spoorwegpensioenfonds; 7°. pensioen op basis
+          van arbeidsongeschiktheid op grond van de Algemene militaire pensioenwet, zoals die luidde voor 1 januari 1998;
+          of 8°. nabestaandenuitkering op grond van de Algemene nabestaandenwet, mits die uitkering of dat pensioen ten minste
+          gelijk is aan 35% van het bruto-minimumloon;
+
+
+          1°. uitkering op grond van de Wet werk en inkomen naar arbeidsvermogen;
+
+
+          2°. uitkering op grond van de Wet op de arbeidsongeschiktheidsverzekering;
+
+
+          3°. uitkering op grond van de Wet arbeidsongeschiktheidsverzekering zelfstandigen;
+
+
+          4°. uitkering of op recht op arbeidsondersteuning op grond van de Wet arbeidsongeschiktheidsvoorziening jonggehandicapten;
+
+
+          5°. uitkering op grond van de Wet arbeidsongeschiktheidsvoorziening militairen;
+
+
+          6°. pensioen op basis van arbeidsongeschiktheid op grond van de Wet privatisering Spoorwegpensioenfonds;
+
+
+          7°. pensioen op basis van arbeidsongeschiktheid op grond van de Algemene militaire pensioenwet, zoals die luidde
+          voor 1 januari 1998; of
+
+
+          8°. nabestaandenuitkering op grond van de Algemene nabestaandenwet, mits die uitkering of dat pensioen ten minste
+          gelijk is aan 35% van het bruto-minimumloon;
+
+
+          f. de gewezen verzekerde, bedoeld in artikel 40.'
+      - number: 4
+        content: De periode van maximaal tien jaar, bedoeld in het eerste lid, is niet van toepassing op de echtgenoot van
+          de in het derde lid genoemde gewezen verzekerde en de inwonende minderjarige kinderen met wie die gewezen verzekerde
+          of die echtgenoot in familierechtelijke betrekking staat. Voor de toepassing van dit lid wordt onder de in het derde
+          lid genoemde gewezen verzekerde mede verstaan de gewezen verzekerde, bedoeld in onderdeel e van dat lid, wiens recht
+          op een uitkering als bedoeld in dat onderdeel uitsluitend als gevolg van het bereiken van de pensioengerechtigde
+          leeftijd is geëindigd.
+      - number: 5
+        content: Bij of krachtens algemene maatregel van bestuur kunnen ten aanzien van dit artikel nadere regels worden gesteld.
+    - id: Artikel36
+      paragraphs:
+      - number: 1
+        content: De gewezen verzekerde die van de vrijwillige verzekering, bedoeld in artikel 35, eerste lid, gebruik wil
+          maken, is verplicht uiterlijk een jaar na de dag, waarop de verplichte verzekering is geëindigd, een aanvraag daartoe
+          in te dienen bij de Sociale verzekeringsbank.
+      - number: 2
+        content: De aanvraag wordt afgewezen indien de gewezen verzekerde niet voldoet aan de bij of krachtens dit hoofdstuk
+          gestelde voorwaarden.
+    - id: Artikel38
+      paragraphs:
+      - number: 1
+        content: De verzekerde, die voorafgaand aan de verplichte verzekering niet eerder verplicht verzekerd is geweest,
+          kan zich, zolang hij de pensioengerechtigde leeftijd nog niet heeft bereikt, vrijwillig verzekeren vanaf de aanvangsleeftijd,
+          over de achterliggende periode, waarin hij niet verplicht verzekerd is geweest, indien hij ten minste vijf jaar
+          verplicht verzekerd is geweest ingevolge de artikelen 6 of 6a, en voor zover hij in die achterliggende periode niet
+          onderworpen is geweest aan een buitenlandse wettelijk verplichte ouderdomsverzekering, die bij het bereiken van
+          de daarin aangegeven leeftijd recht geeft op ouderdomspensioen.
+      - number: 2
+        content: Voor de toepassing van het eerste lid wordt degene wiens verplichte verzekering voor het bereiken van de
+          aanvangsleeftijd is beëindigd, geacht niet verplicht verzekerd te zijn geweest gedurende de periode voorafgaand
+          aan het bereiken van de aanvangsleeftijd.
+      - number: 3
+        content: Bij of krachtens algemene maatregel van bestuur kunnen ten aanzien van het eerste lid nadere regels worden
+          gesteld.
+    - id: Artikel39
+      paragraphs:
+      - number: 1
+        content: De verzekerde die van de vrijwillige verzekering, bedoeld in artikel 38, eerste lid, gebruik wil maken, is
+          verplicht uiterlijk tien jaar na de dag, waarop de verplichte verzekering is ontstaan, een aanvraag daartoe in te
+          dienen bij de Sociale verzekeringsbank.
+      - number: 2
+        content: De artikelen 36, tweede lid, en 37, onderdelen e en f, zijn van overeenkomstige toepassing.
+  - id: HoofdstukIVA
+    title: Vrijwillige verzekering voor in de Europese Unie wonende postactieven
+    articles: []
+  - id: HoofdstukV
+    title: Gemoedsbezwaren
+    articles:
+    - id: Artikel48
+      paragraphs:
+      - number: 1
+        content: Degene, van wie ingevolge artikel 65, eerste lid, van de Wet financiering sociale verzekeringen belasting
+          is geheven of in door Onze Minister en Onze Minister van Financiën bij ministeriële regeling aan te wijzen gevallen
+          geacht wordt te zijn geheven, heeft recht op een uitkering, indien en zolang hij recht heeft op ouderdomspensioen
+          krachtens deze wet en hij wegens gemoedsbezwaren geen aanspraak maakt op dit ouderdomspensioen.
+      - number: 2
+        content: Degene, die ingevolge het eerste lid recht op een uitkering heeft, dient de Sociale verzekeringsbank schriftelijk
+          in kennis te stellen, zodra naar zijn oordeel het totaal aan uitkering betaalde bedragen heeft overschreden het
+          totaal van de bedragen, die van hem op grond van de in de aanhef van het eerste lid bedoelde bepalingen aan belasting
+          zijn geheven of geacht worden te zijn geheven. De uitbetaling van deze uitkering wordt dan beëindigd met ingang
+          van een betalingstermijn, aanvangende na de dag, waarop de kennisgeving door de Sociale verzekeringsbank is ontvangen,
+          doch niet later dan de eerste dag van de tweede maand na de dag van ontvangst van die kennisgeving.
+      - number: 3
+        content: 'Voor de toepassing van het bepaalde in het vorige lid wordt het totaal van de aan belasting geheven bedragen:
+
+
+          a. verminderd met de bedragen die niet zijn ingevorderd, dan wel die de verzekerde nalatig is gebleven te betalen;
+
+
+          b. vermeerderd met een door de in het eerste lid bedoelde uitkeringsgerechtigde te bepalen opslag.'
+      - number: 4
+        content: Het bedrag van de uitkering is gelijk aan het bedrag aan ouderdomspensioen en vakantie-uitkering, waarop
+          de belanghebbende krachtens deze wet recht heeft.
+      - number: 5
+        content: Het bepaalde bij of krachtens de artikelen 14 tot en met 26, 31 en 33 is, voor zover daarvan ten aanzien
+          van de artikelen 17, derde lid, 18, en 24, eerste lid, bij ministeriële regeling niet wordt afgeweken, van overeenkomstige
+          toepassing.
+      - number: 6
+        content: Het bepaalde bij artikel 49 is van overeenkomstige toepassing.
+      - number: 7
+        content: Onze Minister en Onze Minister van Financiën kunnen bij ministeriële regeling ter zake van het bepaalde in
+          het eerste tot en met het zesde lid nadere regels en uitvoeringsvoorschriften geven.
+  - id: HoofdstukVI
+    title: Informatieverplichtingen
+    articles: []
+  - id: HoofdstukVII
+    title: Bepalingen in verband met de Algemene wet bestuursrecht en het beroep in cassatie
+    articles:
+    - id: Artikel51
+      paragraphs:
+      - number: 1
+        content: Een beschikking op grond van deze wet en de daarop berustende bepalingen wordt gegeven binnen een redelijke
+          termijn na ontvangst van de aanvraag.
+      - number: 2
+        content: De redelijke termijn is in ieder geval verstreken wanneer binnen acht weken na ontvangst van de aanvraag
+          geen beschikking is gegeven, noch een kennisgeving als bedoeld in het derde lid is gedaan.
+      - number: 3
+        content: Indien een beschikking niet binnen de termijn van acht weken kan worden gegeven, wordt die termijn met een
+          redelijke termijn verlengd en wordt de aanvrager daarvan schriftelijk in kennis gesteld.
+    - id: Artikel53
+      paragraphs:
+      - number: 1
+        content: Tegen uitspraken van de Centrale Raad van Beroep kan ieder der partijen beroep in cassatie instellen ter
+          zake van schending of verkeerde toepassing van de artikelen 1, derde tot en met zevende lid, 2, 3 en 6 en de op
+          die artikelen berustende bepalingen.
+      - number: 2
+        content: Op dit beroep zijn de voorschriften betreffende het beroep in cassatie tegen uitspraken van de gerechtshoven
+          inzake beroepen in belastingzaken van overeenkomstige toepassing, waarbij de Centrale Raad van Beroep de plaats
+          inneemt van een gerechtshof.
+  - id: HoofdstukVIII
+    title: Overgangsbepalingen
+    articles:
+    - id: Artikel55
+      paragraphs:
+      - number: 1
+        content: Degene, die vóór het in werking treden van artikel 6 de leeftijd van 15, doch nog niet die van 65 jaar heeft
+          bereikt, en die - al dan niet onafgebroken - gedurende zes jaren na de voleindiging van zijn 59ste levensjaar in
+          Nederland, Aruba, Curaçao, Sint Maarten of in de openbare lichamen Bonaire, Sint Eustatius en Saba heeft gewoond,
+          wordt voor de toepassing van het bepaalde in artikel 13, eerste lid, gedurende het tijdvak, gelegen tussen de voleindiging
+          van zijn 15de levensjaar en het in werking treden van artikel 6, geacht verzekerd te zijn geweest. Voor de toepassing
+          van het bepaalde in de vorige volzin wordt, uitsluitend voor de vaststelling van de toeslag, bedoeld in artikel
+          8 met toepassing van het bepaalde in artikel 13, tweede lid, de jongere echtgenoot van de pensioengerechtigde geacht
+          het 59ste levensjaar te hebben voleindigd op dezelfde dag als de pensioengerechtigde.
+      - number: 2
+        content: Degene, die voldoet aan het bepaalde in de eerste volzin van het eerste lid, doch nimmer ingevolge deze wet
+          verzekerd is geweest, wordt nochtans voor de toepassing van artikel 7 geacht verzekerd te zijn geweest.
+    - id: Artikel62
+      paragraphs:
+      - number: 1
+        content: 'De artikelen 8a en 9a zijn niet van toepassing op de pensioengerechtigde, die:
+
+
+          a. op 31 december 1999 recht heeft op een ouderdomspensioen en op die dag niet in Nederland woont, en
+
+
+          b. op 19 december 2005 dit recht op een ouderdomspensioen uitsluitend nog heeft op grond van artikel 2 van de wet
+          van 9 december 2004, houdende goedkeuring van het voornemen tot opzegging van het op 28 juni 1962 te Genève tot
+          stand gekomen Verdrag betreffende de gelijkheid van behandeling van eigen onderdanen en vreemdelingen met betrekking
+          tot de sociale zekerheid (Verdrag nr. 118 aangenomen door de Internationale Arbeidsconferentie in haar zesenveertigste
+          zitting; Trb. 1962, 122 en Trb. 1964, 23) (Stb. 2004, 715).'
+      - number: 2
+        content: Het eerste lid blijft van toepassing zolang de pensioengerechtigde blijft wonen in hetzelfde land als het
+          land waar hij op 19 december 2005 woonde en blijft voldoen aan de voorwaarden voor het recht op ouderdomspensioen.
+    - id: Artikel62a
+      paragraphs:
+      - number: 1
+        content: De artikelen 8a, eerste lid, en 9a, eerste lid, zijn niet van toepassing op de pensioengerechtigde, op wie
+          die artikelen als gevolg van de opzegging van een verdrag, de beëindiging van de voorlopige toepassing van een verdrag
+          dan wel de beëindiging van een daarmee gelijk te stellen situatie van toepassing zouden worden, zolang de pensioengerechtigde
+          blijft wonen in hetzelfde land of gebied als het land of gebied waar hij op de dag voor buitenwerkingtreding als
+          gevolg van die opzegging respectievelijk op de dag voor de beëindiging woonde en blijft voldoen aan de voorwaarden
+          voor het recht op ouderdomspensioen.
+      - number: 2
+        content: Onze Minister deelt mede ten aanzien van welk land of gebied, met inbegrip van de dag waarop, een verdrag
+          als bedoeld in het eerste lid buitenwerking is getreden dan wel de voorlopige toepassing van een verdrag of een
+          daarmee gelijk te stellen situatie als bedoeld in het eerste lid is beëindigd.
+    - id: Artikel64b
+      paragraphs:
+      - number: 1
+        content: Pensioengerechtigden die voor 1 januari 2015 zijn gehuwd en die in november of december 2014 de leeftijd
+          van 65 jaar bereiken en van wie de echtgenoot jonger is dan de pensioengerechtigde leeftijd hebben, in afwijking
+          van artikel 8, eerste lid, overeenkomstig de bepalingen van deze wet recht op een toeslag, tenzij, met inachtneming
+          van artikel 11, het inkomen uit arbeid of overig inkomen van die echtgenoot meer bedraagt dan de volledige bruto-toeslag.
+      - number: 2
+        content: Artikel 8, tweede tot en met vierde lid, is van overeenkomstige toepassing.
+    - id: Artikel64e
+      paragraphs:
+      - number: 1
+        content: Op aanvragen om gebruik te maken van de vrijwillige verzekering, bedoeld in artikel 38, eerste lid, die zijn
+          ingediend voor de datum van inwerkingtreding van de Wet van 26 november 2014 tot wijziging van de Algemene Ouderdomswet
+          in verband met wijziging van de voorwaarden voor de vrijwillige verzekering over een achterliggende periode en wijziging
+          van de Participatiewet in verband met wijziging van de berekening en de periodieke aanpassing van de bijstandsnormen
+          voor pensioengerechtigden (Stb. 2014, 502) blijft artikel 38, eerste lid, van de Algemene Ouderdomswet, zoals dat
+          luidde op de dag voorafgaand aan die datum van inwerkingtreding van toepassing.
+      - number: 2
+        content: Op aanvragen om gebruik te maken van de vrijwillige verzekering, bedoeld in artikel 38, eerste lid, die zijn
+          ingediend op of na de datum van inwerkingtreding van de Wet van 26 november 2014 tot wijziging van de Algemene Ouderdomswet
+          in verband met wijziging van de voorwaarden voor de vrijwillige verzekering over een achterliggende periode en wijziging
+          van de Participatiewet in verband met wijziging van de berekening en de periodieke aanpassing van de bijstandsnormen
+          voor pensioengerechtigden (Stb. 2014, 502) is artikel 38, eerste lid, van de Algemene Ouderdomswet, zoals dat door
+          die wet is komen te luiden van toepassing.
+  - id: HoofdstukIX
+    title: Strafbepalingen
+    articles: []
+  - id: HoofdstukX
+    title: Slotbepalingen
+    articles:
+    - id: Artikel71
+      paragraphs:
+      - number: 1
+        content: Indien in een pensioenregeling van een pensioenfonds of van een werkgever bepalingen zijn of worden opgenomen
+          krachtens welke op enigerlei wijze geheel of gedeeltelijk met het ouderdomspensioen ingevolge deze wet rekening
+          wordt gehouden, dient bij de toepassing van deze bepalingen in acht te worden genomen, dat een verhoging van het
+          ouderdomspensioen, welke plaatsvindt na de datum van beëindiging van de actieve deelneming aan de pensioenregeling,
+          buiten beschouwing blijft.
+      - number: 2
+        content: Het eerste lid is niet van toepassing op pensioenregelingen waarin bepalingen zijn opgenomen volgens welke
+          het ouderdomspensioen ingevolge deze wet en de premievrije aanspraken of het pensioen van die regeling tezamen na
+          beëindiging van de actieve deelneming jaarlijks ten minste worden verhoogd met het percentage van de in het eerste
+          lid bedoelde verhoging van het ouderdomspensioen of het percentage van de loon- of prijsontwikkeling.
+    - id: Artikel75
+      paragraphs:
+      - number: 1
+        content: Deze wet kan worden aangehaald onder de titel "Algemene Ouderdomswet".
+      - number: 2
+        content: De artikelen van deze wet treden in werking met ingang van een bij koninklijk besluit te bepalen tijdstip,
+          dat voor de verschillende artikelen of onderdelen daarvan verschillend kan worden gesteld.

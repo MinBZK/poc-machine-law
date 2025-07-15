@@ -1,261 +1,724 @@
-# Wet inkomstenbelasting 2001 (BWBR0011353) - machine-law format
-# Volledige tekst van de Wet inkomstenbelasting 2001 zoals gepubliceerd op wetten.overheid.nl
-
-bwb_id: "BWBR0011353"
-title: "Wet inkomstenbelasting 2001"
-url: "https://wetten.overheid.nl/BWBR0011353"
-valid_from: "2001-01-01"
-last_updated: "2025-01-13"
-
-# Mapping naar onze YAML files
+bwb_id: BWBR0011353
+title: Wet inkomstenbelasting 2001
+url: https://wetten.overheid.nl/BWBR0011353
+valid_from: '2001-01-01'
+last_updated: '2025-07-14T21:24:30.986431'
 yaml_files:
-  - path: "law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml"
-    description: "Hoofdimplementatie van de inkomstenbelastingberekening"
+- path: law/wet_inkomstenbelasting/BELASTINGDIENST-2001-01-01.yaml
+  description: 'Regels voor het berekenen van de inkomstenbelasting volgens de Wet inkomstenbelasting. De inkomstenbelasting
+    wordt opgelegd op inkomen dat natuurlijke personen ontvangen, onderverdeeld in drie ''boxen'': box 1 (werk en woning),
+    box 2 (aanmerkelijk belang), en box 3 (sparen en beleggen). De wet regelt ook de berekening van heffingskortingen die
+    de te betalen belasting verminderen.
 
-# Hoofdstructuur van de wet
+    '
+- path: law/wet_inkomstenbelasting/UWV-2020-01-01.yaml
+  description: 'Regels voor het bepalen van het toetsingsinkomen volgens de Wet inkomstenbelasting 2001, artikel 2.11 en 2.12.
+    Het toetsingsinkomen is een samentelling van inkomen uit verschillende boxen en eventuele niet in Nederland belastbare
+    inkomsten.
+
+    '
 structure:
   chapters:
-    - id: "Hoofdstuk1"
-      title: "Algemene bepalingen"
-      articles:
-        - id: "Artikel1.1"
-          title: "Belastingplicht"
-          content: |
-            Inkomstenbelasting wordt geheven van natuurlijke personen.
-          paragraphs:
-            - number: 1
-              content: "Inkomstenbelasting wordt geheven van natuurlijke personen"
-
-    - id: "Hoofdstuk2"
-      title: "Kader van de heffing"
-      sections:
-        - id: "Afdeling2.1"
-          title: "Belastingplichtigen"
-          articles:
-            - id: "Artikel2.1"
-              title: "Belastingplichtigen"
-              content: |
-                1. Inkomstenbelasting wordt geheven van:
-                a. natuurlijke personen die in Nederland wonen;
-                b. natuurlijke personen die niet in Nederland wonen, maar wel Nederlands inkomen genieten.
-                2. Voor de toepassing van deze wet wordt onder Nederlands inkomen verstaan:
-                a. inkomen uit werk en woning als bedoeld in artikel 3.1;
-                b. inkomen uit aanmerkelijk belang als bedoeld in artikel 4.1;
-                c. inkomen uit sparen en beleggen als bedoeld in artikel 5.1.
-              paragraphs:
-                - number: 1
-                  content: "Inkomstenbelasting geheven van Nederlandse inwoners en niet-inwoners met Nederlands inkomen"
-                - number: 2
-                  content: "Nederlands inkomen bestaat uit drie categorieën: werk en woning, aanmerkelijk belang, sparen en beleggen"
-
-            - id: "Artikel2.3"
-              title: "Grondslag van de heffing"
-              content: |
-                1. Inkomstenbelasting wordt geheven over:
-                a. het belastbare inkomen uit werk en woning;
-                b. het belastbare inkomen uit aanmerkelijk belang;
-                c. het belastbare inkomen uit sparen en beleggen.
-                2. Het belastbare inkomen uit werk en woning is het inkomen uit werk en woning verminderd met de persoonsgebonden aftrek.
-              paragraphs:
-                - number: 1
-                  content: "Belasting geheven over drie boxen: werk en woning, aanmerkelijk belang, sparen en beleggen"
-                - number: 2
-                  content: "Box 1 inkomen verminderd met persoonsgebonden aftrek"
-
-        - id: "Afdeling2.3"
-          title: "Belastingjaar en woonplaats"
-          articles:
-            - id: "Artikel2.10"
-              title: "Belastingjaar"
-              content: |
-                Het belastingjaar is het kalenderjaar.
-              paragraphs:
-                - number: 1
-                  content: "Belastingjaar is het kalenderjaar"
-
-            - id: "Artikel2.12"
-              title: "Woonplaats"
-              content: |
-                Voor de toepassing van deze wet wordt als woonplaats beschouwd de plaats waar de belastingplichtige duurzaam verblijf houdt.
-              paragraphs:
-                - number: 1
-                  content: "Woonplaats is waar belastingplichtige duurzaam verblijf houdt"
-
-            - id: "Artikel2.13"
-              title: "Partner"
-              content: |
-                1. Als partners worden aangemerkt:
-                a. echtgenoten die niet duurzaam gescheiden leven;
-                b. personen die een notarieel samenlevingscontract hebben gesloten en op grond daarvan met elkaar samenleven.
-                2. Partners worden voor de heffing van inkomstenbelasting als één eenheid beschouwd.
-              paragraphs:
-                - number: 1
-                  content: "Partners: echtgenoten niet gescheiden of notarieel samenlevingscontract"
-                - number: 2
-                  content: "Partners vormen één fiscale eenheid"
-
-            - id: "Artikel2.14"
-              title: "Identificatie belastingplichtigen"
-              content: |
-                1. Belastingplichtigen worden geïdentificeerd door middel van het burgerservicenummer.
-                2. Voor buitenlandse belastingplichtigen wordt een vervangend identificatienummer gebruikt.
-              paragraphs:
-                - number: 1
-                  content: "Identificatie via burgerservicenummer (BSN)"
-                - number: 2
-                  content: "Buitenlanders krijgen vervangend identificatienummer"
-
-    - id: "Hoofdstuk3"
-      title: "Belastbaar inkomen uit werk en woning"
-      articles:
-        - id: "Artikel3.1"
-          title: "Inhoud van het inkomen uit werk en woning"
-          content: |
-            Het inkomen uit werk en woning bestaat uit:
-            a. resultaat uit werk en woning behaald met of door middel van een onderneming;
-            b. loon zoals bedoeld in de Wet op de loonbelasting 1964;
-            c. resultaat uit overige werkzaamheden;
-            d. resultaat uit eigen woning;
-            e. periodieke uitkeringen en verstrekkingen.
-          paragraphs:
-            - number: 1
-              content: "Box 1 inkomen: onderneming, loon, overige werkzaamheden, eigen woning, uitkeringen"
-
-    - id: "Hoofdstuk4"
-      title: "Belastbaar inkomen uit aanmerkelijk belang"
-      articles:
-        - id: "Artikel4.1"
-          title: "Inhoud van het inkomen uit aanmerkelijk belang"
-          content: |
-            Het inkomen uit aanmerkelijk belang bestaat uit:
-            a. voordelen uit aanmerkelijk belang;
-            b. resultaat uit vervreemding van aanmerkelijk belang.
-          paragraphs:
-            - number: 1
-              content: "Box 2 inkomen: voordelen en vervreemding aanmerkelijk belang"
-
-    - id: "Hoofdstuk5"
-      title: "Belastbaar inkomen uit sparen en beleggen"
-      articles:
-        - id: "Artikel5.1"
-          title: "Inhoud van het inkomen uit sparen en beleggen"
-          content: |
-            1. Het inkomen uit sparen en beleggen is een forfaitair bepaald rendement over de rendementsgrondslag.
-            2. De rendementsgrondslag is de waarde van de bezittingen verminderd met de schulden en de heffingsvrije som.
-            3. Het forfaitaire rendement bedraagt een bij ministeriële regeling vast te stellen percentage van de rendementsgrondslag.
-          paragraphs:
-            - number: 1
-              content: "Box 3 inkomen: forfaitair rendement over rendementsgrondslag"
-            - number: 2
-              content: "Rendementsgrondslag: bezittingen minus schulden minus heffingsvrije som"
-            - number: 3
-              content: "Forfaitair rendementpercentage bij ministeriële regeling"
-
-    - id: "Hoofdstuk6"
-      title: "Persoonsgebonden aftrek"
-      articles:
-        - id: "Artikel6.1"
-          title: "Persoonsgebonden aftrek"
-          content: |
-            1. De persoonsgebonden aftrek bestaat uit aftrekbare kosten en aftrekbare giften.
-            2. Persoonsgebonden aftrek wordt in mindering gebracht op het inkomen uit werk en woning.
-          paragraphs:
-            - number: 1
-              content: "Persoonsgebonden aftrek: aftrekbare kosten en giften"
-            - number: 2
-              content: "Aftrek in mindering op box 1 inkomen"
-
-    - id: "Hoofdstuk8"
-      title: "Heffingskortingen"
-      articles:
-        - id: "Artikel8.10"
-          title: "Algemene heffingskorting"
-          content: |
-            1. Een belastingplichtige heeft recht op een algemene heffingskorting.
-            2. De algemene heffingskorting bedraagt het bij ministeriële regeling vastgestelde bedrag.
-            3. De algemene heffingskorting wordt verminderd indien het inkomen uit werk en woning een bepaalde grens overschrijdt.
-          paragraphs:
-            - number: 1
-              content: "Recht op algemene heffingskorting"
-            - number: 2
-              content: "Bedrag vastgesteld bij ministeriële regeling"
-            - number: 3
-              content: "Vermindering bij overschrijding inkomensgrens"
-
-        - id: "Artikel8.11"
-          title: "Arbeidskorting"
-          content: |
-            1. Een belastingplichtige heeft recht op arbeidskorting over loon en winst uit onderneming.
-            2. De arbeidskorting bedraagt het bij ministeriële regeling vastgestelde bedrag en percentage.
-            3. De arbeidskorting wordt verminderd indien het arbeidsinkomen een bepaalde grens overschrijdt.
-          paragraphs:
-            - number: 1
-              content: "Recht op arbeidskorting over loon en winst"
-            - number: 2
-              content: "Bedrag en percentage bij ministeriële regeling"
-            - number: 3
-              content: "Vermindering bij overschrijding arbeidsinkomen"
-
-        - id: "Artikel8.14a"
-          title: "Inkomensafhankelijke combinatiekorting"
-          content: |
-            1. Een belastingplichtige met kinderen jonger dan 12 jaar heeft recht op inkomensafhankelijke combinatiekorting.
-            2. De combinatiekorting is afhankelijk van de hoogte van het arbeidsinkomen.
-            3. Het maximum bedrag wordt vastgesteld bij ministeriële regeling.
-          paragraphs:
-            - number: 1
-              content: "Recht bij kinderen onder 12 jaar"
-            - number: 2
-              content: "Afhankelijk van arbeidsinkomen"
-            - number: 3
-              content: "Maximum bij ministeriële regeling"
-
-    - id: "Hoofdstuk9"
-      title: "Wijze van heffing"
-      articles:
-        - id: "Artikel9.1"
-          title: "Tarief"
-          content: |
-            1. De inkomstenbelasting wordt geheven naar een tarief dat bestaat uit schijven met oplopende percentages.
-            2. Voor elke box gelden verschillende tarieven.
-            3. De tarieven worden jaarlijks vastgesteld bij wet.
-          paragraphs:
-            - number: 1
-              content: "Progressief tarief met schijven"
-            - number: 2
-              content: "Verschillende tarieven per box"
-            - number: 3
-              content: "Jaarlijke vaststelling bij wet"
+  - id: Hoofdstuk1
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel1
+      paragraphs:
+      - number: 1
+        content: 'In aanvulling op artikel 5a van de Algemene wet inzake rijksbelastingen wordt voor de toepassing van deze
+          wet en de daarop berustende bepalingen onder partner mede verstaan degene die op hetzelfde woonadres als de belastingplichtige
+          staat ingeschreven in de basisregistratie personen en:
 
 
-# Metadata voor UI
-ui_metadata:
-  featured_articles:
-    - "Artikel1.1"   # Belastingplicht
-    - "Artikel2.1"   # Belastingplichtigen
-    - "Artikel2.3"   # Grondslag heffing
-    - "Artikel2.13"  # Partner definitie
-    - "Artikel2.14"  # Identificatie via BSN
-    - "Artikel3.1"   # Box 1 inkomen
-    - "Artikel4.1"   # Box 2 inkomen
-    - "Artikel5.1"   # Box 3 inkomen
-    - "Artikel6.1"   # Persoonsgebonden aftrek
-    - "Artikel8.10"  # Algemene heffingskorting
-    - "Artikel8.11"  # Arbeidskorting
-    - "Artikel8.14a" # Combinatiekorting
-    - "Artikel9.1"   # Tarieven
-  complexity_level: "high"
-  citizen_relevance: "high"
-  tax_calculation_articles:
-    - "Artikel9.1"   # Tariefberekening
-    - "Artikel3.1"   # Box 1 berekening
-    - "Artikel4.1"   # Box 2 berekening
-    - "Artikel5.1"   # Box 3 berekening
-  tax_credit_articles:
-    - "Artikel8.10"  # Algemene heffingskorting
-    - "Artikel8.11"  # Arbeidskorting
-    - "Artikel8.14a" # Combinatiekorting
-  eligibility_articles:
-    - "Artikel2.1"   # Belastingplicht
-    - "Artikel2.13"  # Partner criteria
-    - "Artikel8.14a" # Kinderen criteria combinatiekorting
+          a. uit wiens relatie met de belastingplichtige een kind is geboren;
+
+
+          b. die een kind van de belastingplichtige heeft erkend dan wel van wie een kind door de belastingplichtige is erkend;
+
+
+          c. die voor de toepassing van een pensioenregeling als partner van de belastingplichtige is aangemeld;
+
+
+          d. die samen met de belastingplichtige een woning heeft, die hun anders dan tijdelijk als hoofdverblijf ter beschikking
+          staat op grond van eigendom, waaronder begrepen economisch eigendom, of op grond van een recht van lidmaatschap
+          van een coöperatie;
+
+
+          e. die evenals de belastingplichtige meerderjarig is, waarbij op dat woonadres tevens een minderjarig kind van ten
+          minste een van beiden staat ingeschreven, behoudens ingeval de belastingplichtige een verzoek indient om niet als
+          partner te worden aangemerkt van degene, bedoeld in de aanhef van dit lid, bij welk verzoek de belastingplichtige
+          door middel van een schriftelijke huurovereenkomst, waaraan bij ministeriële regeling nadere voorwaarden kunnen
+          worden gesteld, doet blijken dat een van beiden op zakelijke gronden een gedeelte van de woning huurt van de ander
+          of dat beiden op zakelijke gronden een eigen gedeelte van de woning huren van een derde, of
+
+
+          f. die in het aan het kalenderjaar voorafgaande kalenderjaar reeds partner van de belastingplichtige was.'
+      - number: 2
+        content: Degene die ingevolge het eerste lid voor een deel van het kalenderjaar als partner wordt aangemerkt, wordt
+          ook als partner aangemerkt in de andere perioden van het kalenderjaar, voor zover hij in die perioden op hetzelfde
+          woonadres als de belastingplichtige staat ingeschreven in de basisregistratie personen.
+      - number: 3
+        content: Een persoon kan op enig moment slechts één partner hebben. Indien de belastingplichtige op grond van het
+          eerste lid op dat moment meer dan één partner zou hebben, geldt als partner van de belastingplichtige degene die
+          ingevolge artikel 5a van de Algemene wet inzake rijksbelastingen op dat moment als partner wordt aangemerkt; mocht
+          op grond van artikel 5a van de Algemene wet inzake rijksbelastingen op dat moment geen persoon als partner zijn
+          aangemerkt, geldt als partner degene die op grond van de in het eerste lid eerstgenoemde categorie als partner wordt
+          aangemerkt.
+      - number: 4
+        content: 'In afwijking van artikel 5a van de Algemene wet inzake rijksbelastingen en het eerste lid wordt niet als
+          partner aangemerkt:
+
+
+          a. een bloed- of aanverwant in de eerste graad van de belastingplichtige, tenzij beiden bij de aanvang van het kalenderjaar
+          de leeftijd van 27 jaar hebben bereikt;
+
+
+          b. een persoon die geen inwoner is van Nederland en geen kwalificerende buitenlandse belastingplichtige als bedoeld
+          in artikel 7.8 is;
+
+
+          c. een persoon die de leeftijd van 27 jaar nog niet heeft bereikt en voor wie de belastingplichtige in enig jaar
+          een pleegvergoeding heeft ontvangen op grond van de Wet op de jeugdzorg of de Jeugdwet, dan wel voor wie de belastingplichtige
+          in enig jaar kinderbijslag heeft ontvangen op grond van de Algemene Kinderbijslagwet, indien de belastingplichtige
+          en deze persoon in enig jaar een gezamenlijk verzoek hebben ingediend bij de inspecteur om niet als partners te
+          worden aangemerkt.'
+      - number: 5
+        content: Personen die partners waren op grond van het eerste lid, blijven als partners aangemerkt nadat de in dat
+          onderdeel bedoelde inschrijving op hetzelfde woonadres niet langer mogelijk is als gevolg van opname in een verpleeghuis
+          of verzorgingshuis vanwege medische redenen of ouderdom van een van hen, zolang na het einde van die inschrijving
+          op hetzelfde woonadres ten aanzien van geen van beiden een derde persoon als partner wordt aangemerkt. De eerste
+          volzin vindt geen toepassing meer indien één van beiden door middel van een schriftelijke kennisgeving aan de inspecteur
+          laat weten dat zij niet langer als partners willen worden aangemerkt. Bij ministeriële regeling kunnen nadere regels
+          worden gesteld ten behoeve van de uitvoering van dit lid.
+      - number: 6
+        content: Voor de toepassing van deze wet en de daarop berustende bepalingen worden twee ongehuwde personen die met
+          toepassing van de vorige leden en artikel 5a van de Algemene wet inzake rijksbelastingen als elkaars partners worden
+          aangemerkt of aangemerkt zijn geweest, voor de bepaling van aanverwantschap gelijkgesteld met gehuwden, onderscheidenlijk
+          voormalige gehuwden.
+      - number: 7
+        content: Onder partner wordt niet verstaan degene die uitsluitend ingevolge het eerste lid, onderdeel e, als partner
+          wordt aangemerkt en woont in een accommodatie van een instelling die opvang als bedoeld in artikel 1.1.1 van de
+          Wet maatschappelijke ondersteuning 2015 biedt, mits de belastingplichtige een afschrift van de beschikkingen, bedoeld
+          in artikel 2.3.5, tweede lid, van die wet, tot het treffen van een maatwerkvoorziening voor hem en voor de persoon,
+          bedoeld in het eerste lid, onderdeel e, ten behoeve van opvang overlegt.
+      - number: 8
+        content: Een aanverwant van de belastingplichtige wordt uitsluitend als aanverwant als bedoeld in het vierde lid,
+          onderdeel a, aangemerkt ingeval de belastingplichtige en de aanverwant in enig jaar een gezamenlijk verzoek bij
+          de inspecteur hebben ingediend om niet als partners te worden aangemerkt.
+      - number: 9
+        content: Een persoon die op basis van een verzoek als bedoeld in het eerste lid, onderdeel e, het vierde lid, onderdeel
+          c, of het achtste lid niet als partner van de belastingplichtige wordt aangemerkt, wordt eveneens niet als partner
+          van de belastingplichtige aangemerkt voor de toepassing van de Algemene wet inkomensafhankelijke regelingen.
+      - number: 10
+        content: Op een verzoek als bedoeld in het eerste lid, onderdeel e, het vierde lid, onderdeel c, of het achtste lid
+          beslist de inspecteur bij voor bezwaar vatbare beschikking.
+  - id: Hoofdstuk2
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel2
+      paragraphs:
+      - number: 1
+        content: 'Belastingplichtigen voor de inkomstenbelasting zijn de natuurlijke personen die:
+
+
+          a. in Nederland wonen (binnenlandse belastingplichtigen) of
+
+
+          b. niet in Nederland wonen maar wel Nederlands inkomen genieten (buitenlandse belastingplichtigen).'
+      - number: 2
+        content: Nederlands inkomen is inkomen bedoeld in hoofdstuk 7.
+  - id: Hoofdstuk3
+    title: van de Wet waardering onroerende zaken voor die woning vastgestelde waarde of waarden voor het kalenderjaar van
+      de onttrekking.
+    articles:
+    - id: Artikel3
+      paragraphs:
+      - number: 1
+        content: Belastbaar inkomen uit werk en woning is het inkomen uit werk en woning verminderd met de te verrekenen verliezen
+          uit werk en woning (afdeling 3.13).
+      - number: 2
+        content: 'Inkomen uit werk en woning is het gezamenlijke bedrag van:
+
+
+          a. de belastbare winst uit onderneming (afdeling 3.2);
+
+
+          b. het belastbare loon (afdeling 3.3);
+
+
+          c. het belastbare resultaat uit overige werkzaamheden (afdeling 3.4);
+
+
+          d. de belastbare periodieke uitkeringen en verstrekkingen (afdeling 3.5);
+
+
+          e. de belastbare inkomsten uit eigen woning (afdeling 3.6);
+
+
+          f. de negatieve uitgaven voor inkomensvoorzieningen (afdeling 3.8) en
+
+
+          g. de negatieve persoonsgebonden aftrekposten (afdeling 3.9);
+
+
+          verminderd met:
+
+
+          h. de aftrek wegens geen of geringe eigenwoningschuld (afdeling 3.6a);
+
+
+          i. de uitgaven voor inkomensvoorzieningen (afdeling 3.7) en
+
+
+          j. de persoonsgebonden aftrek (hoofdstuk 6).'
+  - id: Hoofdstuk4
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel4
+      paragraphs:
+      - number: 1
+        content: Voor de toepassing van dit hoofdstuk en de daarop berustende bepalingen worden bewijzen van deelgerechtigdheid
+          in fondsen voor gemene rekening gelijkgesteld met aandelen in vennootschappen met een in aandelen verdeeld kapitaal
+          en worden de fondsen gelijkgesteld met vennootschappen.
+      - number: 2
+        content: Voor de beoordeling van de vraag of een belastingplichtige een aanmerkelijk belang heeft in een fonds voor
+          gemene rekening wordt zijn bezit aan bewijzen van deelgerechtigdheid in het fonds uitgedrukt als een percentage
+          van de in omloop zijnde bewijzen van deelgerechtigdheid, waarbij andere dan enkelvoudige bewijzen van deelgerechtigdheid
+          worden herleid tot een daarmee overeenstemmend aantal enkelvoudige bewijzen.
+  - id: Hoofdstuk5
+    title: van de Algemene wet inzake rijksbelastingen, of de invorderingsrente, bedoeld in hoofdstuk V van de Invorderingswet
+      1990. De derde volzin is van overeenkomstige toepassing op bezittingen die voortvloeien
+    articles:
+    - id: Artikel5
+      paragraphs:
+      - number: 1
+        content: Het voordeel uit sparen en beleggen wordt gesteld op het product van het effectieve rendementspercentage,
+          bedoeld in het tweede lid, en de grondslag sparen en beleggen. De grondslag sparen en beleggen is de rendementsgrondslag
+          aan het begin van het kalenderjaar (peildatum) voor zover die rendementsgrondslag meer bedraagt dan het heffingvrije
+          vermogen.
+      - number: 2
+        content: Het effectieve rendementspercentage wordt gesteld op het rendement gedeeld door de rendementsgrondslag. Het
+          rendement is de som van 1,44% van de waarde van de banktegoeden op de peildatum en 5,88% van de waarde van de overige
+          bezittingen op de peildatum, verminderd met 2,61% van de waarde van de schulden op de peildatum. Indien het ingevolge
+          de tweede zin berekende rendement negatief is, wordt het rendement op nihil gesteld.
+      - number: 3
+        content: 'Voor de toepassing van het tweede lid wordt onder banktegoeden verstaan:
+
+
+          a. deposito’s als bedoeld in artikel 1:1 van de Wet op het financieel toezicht en daarmee naar aard en strekking
+          overeenkomende buitenlandse deposito’s;
+
+
+          b. een recht van vruchtgebruik dat rust op een banktegoed als bedoeld in onderdeel a;
+
+
+          c. contant geld;
+
+
+          d. een lidmaatschapsrecht in een vereniging van eigenaars als bedoeld in artikel 125, tweede lid, van Boek 5 van
+          het Burgerlijk Wetboek;
+
+
+          e. een vorderingsrecht voortvloeiende uit de bijzondere rekening van de notaris, bedoeld in artikel 25 van de Wet
+          op het notarisambt;
+
+
+          f. een vorderingsrecht voortvloeiende uit de bijzondere rekening van de gerechtsdeurwaarder, bedoeld in artikel
+          19 van de Gerechtsdeurwaarderswet.'
+      - number: 4
+        content: Voor de toepassing van het tweede lid wordt onder schulden mede verstaan een genotsrecht van een schuld waarvan
+          de genotsgerechtigde de rente moet voldoen.
+      - number: 5
+        content: Indien de belastingplichtige het gehele kalenderjaar dezelfde partner heeft of voor de toepassing van artikel
+          2.17 geacht wordt te hebben gehad, wordt bij de toepassing van het eerste lid uitgegaan van het op grond van artikel
+          2.17 aan hem toegerekende gedeelte van de gezamenlijke grondslag sparen en beleggen. De gezamenlijke grondslag sparen
+          en beleggen is de gezamenlijke rendementsgrondslag aan het begin van het kalenderjaar (peildatum) van de belastingplichtige
+          en zijn partner voor zover die gezamenlijke rendementsgrondslag meer bedraagt dan het heffingvrije vermogen van
+          de belastingplichtige en zijn partner. Bij de berekening van het effectieve rendementspercentage wordt hierbij uitgegaan
+          van de gezamenlijke rendementsgrondslag en wordt bij de berekening van het rendement uitgegaan van de waarde van
+          de banktegoeden, de waarde van de overige bezittingen en de waarde van de schulden van de belastingplichtige en
+          zijn partner tezamen.
+      - number: 6
+        content: Indien de belastingplichtige bij het begin van het kalenderjaar nog niet binnenlands belastingplichtig is,
+          of indien de binnenlandse belastingplicht gedurende het kalenderjaar anders dan door overlijden eindigt, wordt eveneens
+          uitgegaan van de rendementsgrondslag aan het begin van het kalenderjaar maar wordt het voordeel uit sparen en beleggen
+          naar tijdsgelang herleid, waarbij gedeelten van kalendermaanden worden verwaarloosd.
+  - id: Hoofdstuk6
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel6
+      paragraphs:
+      - number: 1
+        content: 'Persoonsgebonden aftrek is het gezamenlijke bedrag van:
+
+
+          a. de in het kalenderjaar op de belastingplichtige drukkende persoonsgebonden aftrekposten en
+
+
+          b. het gedeelte van de persoonsgebonden aftrek van voorafgaande jaren dat niet eerder in aanmerking is genomen.'
+      - number: 2
+        content: 'Persoonsgebonden aftrekposten zijn de:
+
+
+          a. uitgaven voor onderhoudsverplichtingen (afdeling 6.2);
+
+
+          b. [Red: vervallen;]
+
+
+          c. [Red: vervallen;]
+
+
+          d. uitgaven voor specifieke zorgkosten (afdeling 6.5);
+
+
+          e. weekenduitgaven voor gehandicapten (afdeling 6.6);
+
+
+          f. [Red: vervallen;]
+
+
+          g. [Red: vervallen;]
+
+
+          h. aftrekbare giften (afdeling 6.9).'
+      - number: 3
+        content: Uitgaven als bedoeld in het tweede lid, onderdeel d, worden in aanmerking genomen voorzover de belastingplichtige
+          zich redelijkerwijs gedrongen heeft kunnen voelen tot het doen van die uitgaven.
+      - number: 4
+        content: Bij algemene maatregel van bestuur kunnen aanspraken op vergoedingen of tegemoetkomingen alsmede genoten
+          of te genieten vergoedingen of tegemoetkomingen worden aangewezen die buiten beschouwing blijven bij de bepaling
+          van de omvang van hetgeen op de belastingplichtige aan uitgaven drukt.
+  - id: Hoofdstuk7
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel7
+      paragraphs:
+      - number: 1
+        content: Het belastbare inkomen uit werk en woning in Nederland is het inkomen uit werk en woning in Nederland verminderd
+          met de verliezen uit werk en woning, berekend overeenkomstig de regels van hoofdstuk 3.
+      - number: 2
+        content: 'Het inkomen uit werk en woning in Nederland is het gezamenlijke bedrag van:
+
+
+          a. de belastbare winst uit Nederlandse onderneming, dat is de belastbare winst, bedoeld in de artikelen 3.2 en 3.3
+          uit een onderneming die, of het gedeelte van een onderneming dat wordt gedreven met behulp van een vaste inrichting
+          in Nederland of een vaste vertegenwoordiger in Nederland (Nederlandse onderneming);
+
+
+          b. het belastbaar loon ter zake van het in Nederland verrichten of hebben verricht van arbeid;
+
+
+          c. het belastbaar resultaat uit overige werkzaamheden in Nederland;
+
+
+          d. de belastbare periodieke uitkeringen en verstrekkingen voorzover de daarvoor betaalde premies als uitgaven voor
+          inkomensvoorzieningen in aanmerking zijn genomen of voortkomen uit pensioenregelingen voorzover de daarvoor betaalde
+          premies ten laste van de belastbare winst van een Nederlandse onderneming zijn gebracht, waarbij met het in aanmerking
+          nemen van negatieve uitgaven voor inkomensvoorzieningen op grond van artikel 3.133, tweede lid, onderdelen h of
+          j, of artikel 3.136, dan wel in de periode van buitenlandse belastingplicht, geen rekening wordt gehouden;
+
+
+          e. de rechten op periodieke uitkeringen en verstrekkingen van publiekrechtelijke aard van of namens een Nederlandse
+          publiekrechtelijke rechtspersoon;
+
+
+          f. de belastbare inkomsten uit eigen woning in Nederland, verminderd met de aftrek wegens geen of geringe eigenwoningschuld;
+
+
+          g. de negatieve uitgaven voor inkomensvoorzieningen, en
+
+
+          h. de negatieve persoonsgebonden aftrek.'
+      - number: 3
+        content: Voor de toepassing van het tweede lid, onderdeel a, worden de werkzaamheden in Nederland verricht in de uitoefening
+          van een bedrijf of in de zelfstandige uitoefening van een beroep door een inwoner van een niet-verdragsland die
+          ingevolge een overeenkomst van korte duur als musicus of anderszins als artiest optreedt dan wel als beroep een
+          tak van sport beoefent, steeds aangemerkt als een vaste inrichting in Nederland. Voor de toepassing van het tweede
+          lid, onderdeel c, is artikel 1.2, vierde lid, onderdeel b, niet van toepassing en wordt onder werkzaamheid in Nederland
+          mede verstaan het ter beschikking stellen van vermogensbestanddelen als bedoeld in de artikelen 3.91 en 3.92 aan
+          het in Nederland gevestigde deel van een onderneming, werkzaamheid of vennootschap alsmede het houden van aandelen,
+          vorderingen of rechten als bedoeld in artikel 3.92b of het hebben van schulden als bedoeld in artikel 3.92b indien
+          de voordelen die daarmee worden behaald naar moet worden aangenomen mede een beloning beogen te zijn voor werkzaamheden
+          verricht in Nederland.
+      - number: 4
+        content: Indien de berekening van het inkomen uit werk en woning in Nederland leidt tot een negatief bedrag wordt
+          dit aangemerkt als een verlies uit werk en woning in Nederland. De verrekening van dit verlies vindt plaats overeenkomstig
+          de regels van afdeling 3.13.
+      - number: 5
+        content: Verliezen uit werk en woning zijn de verliezen uit werk en woning die betrekking hebben op jaren waarin de
+          buitenlandse belastingplichtige binnenlands belastingplichtig was en de verliezen uit werk en woning in Nederland.
+      - number: 6
+        content: In Nederland gelegen onroerende zaken, daaronder begrepen rechten die samenhangen met de exploratie en exploitatie
+          van in Nederland aanwezige natuurlijke rijkdommen waaronder ook wordt gerekend de opwekking van energie uit het
+          water, de stromen en de winden, of rechten waaraan deze zijn onderworpen, die tot het vermogen van een onderneming
+          behoren, behoren tot het vermogen van een Nederlandse onderneming.
+      - number: 7
+        content: De gedeeltelijk buiten Nederland vervulde dienstbetrekking voor een inhoudingsplichtige in de zin van de
+          Wet op de loonbelasting 1964, wordt geacht geheel in Nederland te zijn vervuld. De eerste volzin vindt geen toepassing
+          voorzover het loon uit die dienstbetrekking met inachtneming van de Belastingregeling voor het Koninkrijk, de Belastingregeling
+          voor het land Nederland of verdragen waarbij de Staat der Nederlanden partij is, feitelijk is onderworpen aan een
+          belasting naar het inkomen die door of vanwege een andere mogendheid of door de rijksoverheid op de BES eilanden
+          wordt geheven. De eerste volzin vindt evenmin toepassing indien de dienstbetrekking nagenoeg geheel buiten Nederland
+          wordt vervuld en het loon is onderworpen aan een belasting naar het inkomen die door een andere mogendheid wordt
+          geheven en het loon niet op grond van een verdrag ter voorkoming van dubbele belasting of op grond van enige andere
+          regel van interregionaal of internationaal recht in feite slechts in Nederland aan een belasting naar het inkomen
+          is onderworpen. De dienstbetrekking bij een Nederlandse publiekrechtelijke rechtspersoon dan wel de dienstbetrekking
+          waarbij in het kader van een uitzending op het grondgebied van een andere mogendheid werkzaamheden zijn of worden
+          verricht op grond van een verdrag waarbij de Staat der Nederlanden partij is, wordt steeds geacht in Nederland te
+          zijn vervuld. Tenzij de eerste zin toepassing vindt, wordt een geheel of gedeeltelijk buiten Nederland vervulde
+          dienstbetrekking geacht in Nederland te zijn vervuld voor zover het heffingsrecht over het loon ter zake van die
+          dienstbetrekking op grond van een verdrag ter voorkoming van dubbele belasting of op grond van enige andere regel
+          van interregionaal of internationaal recht aan Nederland is toegewezen.
+      - number: 8
+        content: '
+
+
+          a. Tot belastbaar loon wordt gerekend de waarde in het economisch verkeer van opgebouwde aanspraken uit een pensioenregeling
+          indien de verplichtingen volgens de pensioenregeling waarop die aanspraken berusten geheel of gedeeltelijk zijn
+          ondergebracht bij een ander lichaam dan bedoeld in artikel 19a, eerste lid, onderdelen a, b en d van de Wet op de
+          loonbelasting 1964. Tot de waarde in het economische verkeer wordt niet gerekend het met pensioenpremies behaalde
+          rendement over een periode waarin de belastingplichtige geen binnenlands belastingplichtige is geweest.
+
+
+          b. Indien onderdeel a toepassing vindt met betrekking tot de waarde van aanspraken die eerder op grond van: 1°.
+          onderdeel a in het Nederlandse inkomen uit werk en woning is begrepen, wordt, onder bij ministeriële regeling te
+          stellen voorwaarden, dat inkomen met die waarde van de aanspraken verlaagd. De inspecteur vermindert dienovereenkomstig
+          de conserverende aanslag bij voor bezwaar vatbare beschikking. Rechtsmiddelen tegen deze beschikking kunnen uitsluitend
+          betrekking hebben op de grootte van de vermindering; 2°. artikel 3.83 in het belastbare inkomen uit werk en woning
+          is begrepen, wordt, voorzover de belasting ter zake van die aanspraken is voldaan, dat inkomen met die waarde van
+          de aanspraken verlaagd en de eerder opgelegde conserverende aanslag door de inspecteur verminderd bij voor bezwaar
+          vatbare beschikking. Rechtsmiddelen tegen deze beschikking kunnen uitsluitend betrekking hebben op de grootte van
+          de vermindering.
+
+
+          1°. onderdeel a in het Nederlandse inkomen uit werk en woning is begrepen, wordt, onder bij ministeriële regeling
+          te stellen voorwaarden, dat inkomen met die waarde van de aanspraken verlaagd. De inspecteur vermindert dienovereenkomstig
+          de conserverende aanslag bij voor bezwaar vatbare beschikking. Rechtsmiddelen tegen deze beschikking kunnen uitsluitend
+          betrekking hebben op de grootte van de vermindering;
+
+
+          2°. artikel 3.83 in het belastbare inkomen uit werk en woning is begrepen, wordt, voorzover de belasting ter zake
+          van die aanspraken is voldaan, dat inkomen met die waarde van de aanspraken verlaagd en de eerder opgelegde conserverende
+          aanslag door de inspecteur verminderd bij voor bezwaar vatbare beschikking. Rechtsmiddelen tegen deze beschikking
+          kunnen uitsluitend betrekking hebben op de grootte van de vermindering.
+
+
+          c. Indien artikel 19b van de Wet op de loonbelasting 1964 toepassing heeft gevonden wordt het belastbaar loon verminderd
+          met de waarde van de aanspraken die zijn gerekend tot het loon met toepassing van artikel 3.83 dan wel met toepassing
+          van onderdeel a, voorzover de belasting ter zake van de waarde van die aanspraken is voldaan.
+
+
+          d. Op verzoek van de belastingplichtige wordt, indien de waarde van aanspraken op grond van onderdeel a is begrepen
+          in het Nederlandse inkomen uit werk en woning van een vorig kalenderjaar, en 1°. wordt voldaan aan de voorwaarden
+          voor uitstel van betaling als bedoeld in artikel 25, vijfde lid, van de Invorderingswet 1990, en 2°. de verplichtingen
+          waarop de aanspraken berusten geheel zijn ondergebracht bij een verzekeraar als bedoeld in artikel 19a, eerste lid,
+          onderdelen a, b of d, van de Wet op de loonbelasting 1964, het Nederlandse inkomen uit werk en woning van dat vorige
+          kalenderjaar met die waarde van de aanspraken verlaagd. De inspecteur vermindert dienovereenkomstig de conserverende
+          aanslag over dat jaar bij voor bezwaar vatbare beschikking. Rechtsmiddelen tegen deze beschikking kunnen uitsluitend
+          betrekking hebben op de grootte van de vermindering.
+
+
+          1°. wordt voldaan aan de voorwaarden voor uitstel van betaling als bedoeld in artikel 25, vijfde lid, van de Invorderingswet
+          1990, en
+
+
+          2°. de verplichtingen waarop de aanspraken berusten geheel zijn ondergebracht bij een verzekeraar als bedoeld in
+          artikel 19a, eerste lid, onderdelen a, b of d, van de Wet op de loonbelasting 1964, het Nederlandse inkomen uit
+          werk en woning van dat vorige kalenderjaar met die waarde van de aanspraken verlaagd. De inspecteur vermindert dienovereenkomstig
+          de conserverende aanslag over dat jaar bij voor bezwaar vatbare beschikking. Rechtsmiddelen tegen deze beschikking
+          kunnen uitsluitend betrekking hebben op de grootte van de vermindering.
+
+
+          e. De waarde van de opgebouwde aanspraken wordt verminderd met de waarde van de aanspraken die niet ten laste zijn
+          gekomen van Nederlands belastbaar inkomen uit werk en woning.'
+      - number: 9
+        content: Het bedrag van de belastbare periodieke uitkeringen uit een aanspraak wordt verminderd met de ter zake van
+          die aanspraak in aanmerking genomen negatieve uitgaven voor inkomensvoorzieningen voorzover de belasting die is
+          verschuldigd over die negatieve uitgaven is voldaan.
+      - number: 10
+        content: Bij een aanspraak op periodieke uitkeringen vindt artikel 3.133, tweede lid, onderdelen h en j, alleen toepassing
+          indien door de buitenlandse belastingplichtige in het kalenderjaar ter zake van de aanspraak premie is voldaan die
+          als uitgaven voor inkomensvoorzieningen in aanmerking is genomen. De vorige volzin geldt bij onderdeel h niet voor
+          het jaar van de in dat onderdeel bedoelde overgang van de lijfrenteverplichtingen.
+      - number: 11
+        content: Het bij een buitenlandse belastingplichtige op grond van artikel 3.133, tweede lid, onderdelen h of j, in
+          aanmerking te nemen bedrag aan negatieve uitgaven wordt in de bij ministeriële regeling te bepalen gevallen en onder
+          de in die regeling te stellen voorwaarden, verminderd met de negatieve uitgaven die bij hem ter zake van dezelfde
+          aanspraken op grond van artikel 3.136 in aanmerking zijn genomen.
+      - number: 12
+        content: Voorzover bij een buitenlandse belastingplichtige de negatieve uitgaven voor inkomensvoorzieningen die op
+          grond van artikel 3.133, tweede lid, onderdelen h of j, in aanmerking worden genomen, eveneens zijn begrepen in
+          het belastbaar inkomen uit werk en woning in Nederland van een vorig kalenderjaar, wordt, onder bij ministeriële
+          regeling te stellen voorwaarden, het belastbaar inkomen uit werk en woning in Nederland van dat vorig kalenderjaar
+          met die daarin begrepen negatieve uitgaven verlaagd. De verlaging vindt plaats door vermindering van de aanslag
+          over dat jaar bij voor bezwaar vatbare beschikking van de inspecteur. Rechtsmiddelen tegen deze beschikking kunnen
+          uitsluitend betrekking hebben op de grootte van de vermindering.
+      - number: 13
+        content: Voor de toepassing van het tweede lid wordt een niet in Nederland wonende natuurlijke persoon die deel uitmaakt
+          van een buitenlands gezelschap als bedoeld in artikel 5b van de Wet op de loonbelasting 1964, geacht een evenredig
+          deel, gerelateerd aan het aantal leden van het gezelschap, te hebben genoten van de door het gezelschap voor het
+          optreden of de sportbeoefening ontvangen gage, bedoeld in artikel 35g van de Wet op de loonbelasting 1964, behoudens
+          voorzover hij aannemelijk maakt dat hij een ander deel van de gage heeft genoten.
+      - number: 14
+        content: 'Tot het belastbaar loon ter zake van het in Nederland verrichten of hebben verricht van arbeid worden gerekend:
+
+
+          1°. uitkeringen op grond van artikel 14 of 15 van het Besluit van het Europees Parlement nr. 2005/684/EG, Euratom,
+          van 28 september 2005 houdende aanneming van het Statuut van de leden van het Europees Parlement (PbEU L 262/I),
+          aan een in Nederland gekozen lid of voormalig lid van het Europees Parlement;
+
+
+          2°. uitkeringen op grond van artikel 17 van het onder 1° bedoelde Besluit aan de echtgenoot of partner van een in
+          Nederland gekozen lid of voormalig lid van het Europees Parlement;
+
+
+          3°. uitkeringen op grond van artikel 17 van het onder 1° bedoelde Besluit aan de ten laste van een in Nederland
+          gekozen lid of voormalig lid van het Europees Parlement komende kinderen.'
+      - number: 15
+        content: Tot het belastbaar resultaat uit overige werkzaamheden in Nederland worden gerekend uitkeringen op grond
+          van de artikelen 9 en 13 van het in het veertiende lid bedoelde Besluit aan een in Nederland gekozen lid of voormalig
+          lid van het Europees Parlement.
+      - number: 16
+        content: De in het achtste lid, onderdelen b, c en e, bedoelde verlaging vindt mede plaats met de aanspraken en bijdragen,
+          bedoeld in artikel 3.136, derde en vierde lid.
+      - number: 17
+        content: 'De functie van bestuurder of commissaris van een in Nederland gevestigd lichaam wordt:
+
+
+          a. voor de toepassing van het tweede lid, onderdeel a, steeds geacht te zijn vervuld met behulp van een vaste inrichting
+          in Nederland;
+
+
+          b. voor de toepassing van het tweede lid, onderdelen b en c, steeds geacht te zijn vervuld in Nederland.'
+      - number: 18
+        content: Indien bij een buitenlandse belastingplichtige als bedoeld in artikel 2.7, eerste lid, derde zin, een heffingskorting
+          afhankelijk is van zijn arbeidsinkomen of van dat van zijn partner, wordt voor de bepaling hiervan uitgegaan van
+          het volgens de regels voor binnenlandse belastingplichtigen berekende arbeidsinkomen.
+      - number: 19
+        content: Tot een Nederlandse onderneming worden gerekend stemrechten, kapitaalbelangen of winstrechten in een lichaam
+          als bedoeld in artikel 2, elfde lid, van de Wet op de vennootschapsbelasting 1969 die worden gehouden door een natuurlijk
+          persoon die woonachtig is in een staat die dat lichaam niet als een belastingplichtige voor een naar de winst geheven
+          belasting beschouwt, indien die natuurlijk persoon ten aanzien van deze stemrechten, kapitaalbelangen of winstrechten
+          zonder toepassing van artikel 2, derde lid, van die wet en artikel 2.14bis, derde lid, belastbare winst uit Nederlandse
+          onderneming als bedoeld in het tweede lid, onderdeel a, zou hebben genoten.
+  - id: Hoofdstuk8
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel8
+      paragraphs:
+      - number: 1
+        content: 'In dit hoofdstuk en de daarop berustende bepalingen wordt verstaan onder:
+
+
+          a. belastingtarief eerste schijf: het in de eerste regel van de vierde kolom van de tabel in artikel 2.10, eerste
+          lid, opgenomen percentage;
+
+
+          b. gecombineerde inkomensheffing: het gezamenlijke bedrag, na toepassing van regelingen ter voorkoming van dubbele
+          belasting, van de belasting op het belastbare inkomen uit werk en woning, de belasting op het belastbare inkomen
+          uit aanmerkelijk belang, de belasting op het belastbare inkomen uit sparen en beleggen en de volgens artikel 10
+          van de Wet financiering sociale verzekeringen berekende premie voor de volksverzekeringen;
+
+
+          c. gecombineerd heffingspercentage: de som van het belastingtarief eerste schijf en de op grond van artikel 11 van
+          de Wet financiering sociale verzekeringen vastgestelde premiepercentages voor de algemene ouderdomsverzekering,
+          de nabestaandenverzekering en de verzekering langdurige zorg;
+
+
+          d. gecombineerde heffingskorting: het gezamenlijke bedrag van de heffingskorting voor de inkomstenbelasting, de
+          heffingskorting voor de algemene ouderdomsverzekering, de heffingskorting voor de nabestaandenverzekering en de
+          heffingskorting voor de verzekering langdurige zorg;
+
+
+          e. arbeidsinkomen: het gezamenlijke bedrag van hetgeen door de belastingplichtige met tegenwoordige arbeid is genoten
+          als winst uit een of meer ondernemingen, loon en resultaat uit een of meer werkzaamheden.'
+      - number: 2
+        content: 'Tot het arbeidsinkomen wordt tevens gerekend:
+
+
+          a. loon genoten wegens tijdelijke inactiviteit als bedoeld in artikel 628 van Boek 7 van het Burgerlijk Wetboek,
+          alsmede hetgeen door de werknemer met een publiekrechtelijke dienstbetrekking wordt genoten op grond van naar aard
+          en strekking overeenkomstige regelingen, voor een tijdvak van maximaal 104 weken;
+
+
+          b. loon genoten als garantieloon als bedoeld in artikel 628a, eerste, derde en achtste lid, van Boek 7 van het Burgerlijk
+          Wetboek;
+
+
+          c. loon genoten wegens tijdelijke arbeidsongeschiktheid als bedoeld in artikel 629 van Boek 7 van het Burgerlijk
+          Wetboek, alsmede hetgeen door de werknemer met een publiekrechtelijke dienstbetrekking wordt genoten op grond van
+          naar aard en strekking overeenkomstige regelingen en uitkeringen ingevolge de Ziektewet, voor zover die betrekking
+          hebben op de periode waarin de dienstbetrekking in de zin van die wet nog niet is beëindigd of voor zover die voortvloeien
+          uit een vrijwillige verzekering als bedoeld in artikel 64 van die wet;
+
+
+          d. uitkeringen op grond van de Wet arbeid en zorg en aanvullingen daarop door degene tot wie de belastingplichtige
+          in dienstbetrekking staat.'
+  - id: Hoofdstuk9
+    title: van de Algemene wet inzake rijksbelastingen, geacht worden onderdeel uit te maken van de voorlopige aanslag. De
+      termijn, bedoeld
+    articles:
+    - id: Artikel9
+      paragraphs:
+      - number: 1
+        content: De belasting, bedoeld in de artikelen 2.7 en 2.8, wordt geheven bij wege van aanslag.
+      - number: 2
+        content: De belasting, bedoeld in artikel 2.9, wordt geheven bij wege van conserverende aanslag.
+      - number: 3
+        content: Indien de belastingplichtige ook premieplichtig is voor de volksverzekeringen geschiedt de heffing van de
+          belasting en de premie voor de volksverzekeringen door middel van één belastingaanslag en voorzover de heffing plaatsvindt
+          bij wege van conserverende aanslag, door middel van één conserverende belastingaanslag. Hierbij zijn de regels die
+          gelden voor de heffing en de invordering van de inkomstenbelasting van overeenkomstige toepassing. In dat geval
+          wordt, indien artikel 67a van de Algemene wet inzake rijksbelastingen toepassing vindt, die bepaling eenmaal toegepast.
+  - id: Hoofdstuk10
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel10
+      paragraphs:
+      - number: 1
+        content: Bij het begin van het kalenderjaar worden de in de artikelen 2.10, 2.10a, 2.12, 3.15, eerste lid, 3.41, 3.42,
+          3.47, 3.77, 3.87, 3.125, 3.126a, 3.127, tweede lid, 3.129, 3.133, 5.3, 5.5, 5.10,5.13, 6.17, vierde lid, 6.20, 8.11,
+          tweede lid, eerste volzin, onderdeel a, 8.14a, 8.16a, 8.17, 8.18, 9.4, 9.4a en 10.7 vermelde bedragen, het in artikel
+          8.10, tweede lid, eerstvermelde bedrag, het in artikel 8.11, tweede lid, eerste volzin, onderdeel b, als tweede
+          vermelde bedrag en het in artikel 8.11, tweede lid, eerste volzin, onderdeel c, als tweede vermelde bedrag bij ministeriële
+          regeling vervangen door andere. Deze bedragen worden berekend door de te vervangen bedragen te vermenigvuldigen
+          met de tabelcorrectiefactor en vervolgens de nodig geachte afronding aan te brengen. Indien in het voorafgaande
+          jaar een dergelijke afronding is toegepast, kan bij vervanging worden uitgegaan van het niet-afgeronde bedrag.
+      - number: 2
+        content: 'In afwijking in zoverre van het eerste lid, tweede volzin, wordt het bedrag dat is vermeld in de eerste
+          regel van de tweede kolom en in de tweede regel van de eerste kolom van de tabel in artikel 2.10, eerste lid, berekend
+          door het te vervangen bedrag te vermenigvuldigen met de uitkomst van de formule: 1 + (75% x (tabelcorrectiefactor
+          – 1)).'
+  - id: Hoofdstuk10bis
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel10b
+      paragraphs:
+      - number: 1
+        content: 'Onder bestaande eigenwoningschuld van de belastingplichtige wordt verstaan: de eigenwoningschuld, bedoeld
+          in artikel 3.119a, eerste lid, zoals dat luidde op 31 december 2012, van de belastingplichtige op 31 december 2012.'
+      - number: 2
+        content: 'Onder de bestaande eigenwoningschuld, bedoeld in het eerste lid, wordt mede verstaan de tot de eigenwoningschuld,
+          bedoeld in artikel 3.119a, eerste lid, zoals dat luidde op 31 december 2012, behorende schuld die:
+
+
+          a. de belastingplichtige, die op 31 december 2012 niet een zodanige eigenwoningschuld had, in 2012 had op het moment
+          direct voorafgaand aan de vervreemding van een eigen woning, voor zover de belastingplichtige in 2013 weer een zodanige
+          eigenwoningschuld heeft;
+
+
+          b. in 2013 ontstaat ten gevolge van een op 31 december 2012 bestaande onherroepelijke, schriftelijke overeenkomst
+          van de belastingplichtige tot verwerving van een eigen woning;
+
+
+          c. in 2013 ontstaat ten gevolge van een op 31 december 2012 bestaande onherroepelijke, schriftelijke overeenkomst
+          van de belastingplichtige tot het verrichten van onderhoud aan of tot verbetering van de woning, voor zover het
+          onderhoud of de verbetering in 2013 voltooid is;
+
+
+          d. de belastingplichtige, die op 31 december 2012 niet een zodanige eigenwoningschuld had, op enig moment vóór 31
+          december 2012 direct voorafgaand aan de vervreemding van een eigen woning had, indien die vervreemding het gevolg
+          is van verhuur van de voormalige eigen woning, voor zover de belastingplichtige vóór 1 januari 2021 ter zake van
+          diezelfde woning weer een zodanige eigenwoningschuld heeft;
+
+
+          e. de belastingplichtige na 31 december 2012 heeft in verband met een woning die op 31 december 2012 een woning
+          was als bedoeld in artikel 3.19, eerste lid, tot ten hoogste de omvang van de schuld die op 31 december 2012 in
+          verband met die woning bestond, of
+
+
+          f. de belastingplichtige in 2013, 2014, 2015 of 2016 als starterslening aangaat bij de Stichting Stimuleringsfonds
+          Volkshuisvesting Nederlandse gemeenten.'
+      - number: 3
+        content: Indien na 31 december 2012 op de bestaande eigenwoningschuld, bedoeld in het eerste lid, van de belastingplichtige
+          wordt afgelost, wordt het bedrag van die bestaande eigenwoningschuld verminderd met die aflossing. Onder aflossing
+          wordt voor de toepassing van dit lid niet verstaan het in een kalenderjaar geheel of gedeeltelijk aflossen van een
+          tot de bestaande eigenwoningschuld behorende schuld voor zover tot ten hoogste het afgeloste bedrag uiterlijk in
+          het daaropvolgende kalenderjaar opnieuw een schuld in verband met een eigen woning bestaat (oversluiten). Indien
+          vanwege oversluiten van een schuld van de belastingplichtige gezamenlijk bij de belastingplichtige en zijn partner
+          opnieuw een schuld bestaat in verband met een eigen woning, kan deze schuld, in afwijking in zoverre van de tweede
+          zin, tot ten hoogste het afgeloste bedrag naar rato van het schuldaandeel in de gezamenlijke schuld en tot uiterlijk
+          het tijdstip waarop de termijn van 30 jaar, bedoeld in artikel 10bis.10, bij de belastingplichtige zou verstrijken,
+          bij de belastingplichtige en zijn partner worden aangemerkt als bestaande eigenwoningschuld.
+      - number: 4
+        content: Indien na een verrekening op grond van artikel 3:265d van de Wet op het financieel toezicht van een spaarrekening
+          eigen woning met een eigenwoningschuld, uiterlijk het kalenderjaar volgend op het jaar waarin de verrekening heeft
+          plaatsgevonden opnieuw een schuld wordt aangegaan, wordt deze opnieuw aangegane schuld tot het beloop van die verrekening
+          geacht te zijn aangegaan in verband met een eigen woning. De eerste zin vindt alleen toepassing voor zover in samenhang
+          met de opnieuw aangegane schuld weer een spaarrekening eigen woning wordt geopend als bedoeld in artikel 10bis.2,
+          zesde lid.
+      - number: 5
+        content: Indien ten aanzien van de belastingplichtige op enig moment na 31 december 2012 twee woningen gelijktijdig
+          als eigen woning worden aangemerkt, wordt de schuld in verband met de tweede eigen woning mede aangemerkt als bestaande
+          eigenwoningschuld als bedoeld in het eerste lid, voor zover de schuld ten behoeve van die tweede eigen woning de
+          bestaande eigenwoningschuld in verband met de eerste eigen woning niet overtreft.
+      - number: 6
+        content: Indien ten aanzien van de belastingplichtige op of na 31 december 2012 twee woningen gelijktijdig als eigen
+          woning worden aangemerkt en vervolgens een van die woningen niet langer als eigen woning wordt aangemerkt, wordt
+          de bestaande eigenwoningschuld, bedoeld in het eerste lid, van de belastingplichtige verminderd met de tot de eigenwoningschuld
+          behorende schuld die de belastingplichtige had in verband met de woning die niet langer als eigen woning wordt aangemerkt.
+      - number: 7
+        content: Voor zover krachtens boedelmenging door voltrekking van een huwelijk, krachtens wijziging van huwelijkse
+          voorwaarden of krachtens erfrecht een bestaande eigenwoningschuld als bedoeld in het eerste lid van een van de partners
+          overgaat op de andere partner, is deze schuld tot uiterlijk het tijdstip waarop de termijn van 30 jaar, bedoeld
+          in artikel 10bis.10, bij de eerstgenoemde partner zou verstrijken, bij die andere partner een bestaande eigenwoningschuld.
+          Indien, op een bestaande eigenwoningschuld als bedoeld in het eerste lid is afgelost, en een van de partners overlijdt,
+          kan, voor zover de langstlevende partner binnen de termijn, bedoeld in het derde lid, tweede volzin, opnieuw een
+          schuld aangaat in verband met een eigen woning, deze schuld, in afwijking in zoverre van het derde lid, tot ten
+          hoogste het afgeloste bedrag worden aangemerkt als bestaande eigenwoningschuld.
+      - number: 8
+        content: Indien de belastingplichtige de partner van de erflater was, wordt als een bestaande eigenwoningschuld als
+          bedoeld in het eerste lid van de belastingplichtige tot uiterlijk het tijdstip waarop de termijn van 30 jaar, bedoeld
+          in artikel 10bis.10, bij de erflater zou zijn verstreken mede aangemerkt een schuld voor een eigen woning waarvan
+          de belastingplichtige op grond van een krachtens erfrecht verkregen recht van vruchtgebruik, recht van bewoning
+          of recht van gebruik gehouden is de kosten en lasten te dragen en die bij de erflater een bestaande eigenwoningschuld
+          was.
+      - number: 9
+        content: Voor de toepassing van dit hoofdstuk zijn de artikelen 3.111, 3.119a, tweede lid, en 3.119aa, vierde lid,
+          van overeenkomstige toepassing.
+      - number: 10
+        content: Het derde lid, tweede en derde zin, is niet van toepassing op een starterslening als bedoeld in het tweede
+          lid, onderdeel f. Bij ministeriële regeling wordt bepaald wat wordt verstaan onder een starterslening als bedoeld
+          in het tweede lid, onderdeel f.
+  - id: Hoofdstuk10A
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel10a
+      paragraphs:
+      - number: 1
+        content: Op aanspraken die uitsluitend dan wel mede betrekking hebben op lijfrenten als bedoeld in artikel 3.125,
+          eerste lid, onderdeel c, zoals dit onderdeel luidde op 31 december 2005, blijven de op die datum geldende bepalingen
+          die verband houden met de aanspraken op dergelijke lijfrenten van toepassing, voor zover de aanspraken voortvloeien
+          uit premies die vóór 1 januari 2006 in aanmerking zijn genomen als uitgaven voor inkomensvoorzieningen.
+      - number: 2
+        content: Indien ter zake van een overeenkomst waarin een aanspraak is opgenomen die mede betrekking heeft op lijfrenten
+          als bedoeld in artikel 3.125, eerste lid, onderdeel c, zoals dit onderdeel luidde op 31 december 2005, ook na 31
+          december 2005 nog premies worden voldaan, worden die premies geacht geen betrekking te hebben op lijfrenten als
+          bedoeld in genoemd onderdeel c.
+      - number: 3
+        content: Indien ter zake van een overeenkomst waarin een aanspraak is opgenomen die uitsluitend of mede betrekking
+          heeft op lijfrenten als bedoeld in artikel 3.125, eerste lid, onderdeel c, zoals dit onderdeel luidde op 31 december
+          2005, ook na 31 december 2005 nog premies worden voldaan, is aanwending van opgebouwde aanspraken voor lijfrenten
+          als bedoeld in genoemd onderdeel c slechts mogelijk tot ten hoogste een bedrag gelijk aan de waarde in het economische
+          verkeer van die aanspraak op 31 december 2005. Voor zover de in de eerste volzin bedoelde aanspraken tot een hoger
+          bedrag dan de aldaar bedoelde waarde worden aangewend voor lijfrenten als bedoeld in genoemd onderdeel c, is artikel
+          3.133, eerste lid, van overeenkomstige toepassing.
+  - id: Hoofdstuk10b
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel10b
+      paragraphs:
+      - number: 1
+        content: De artikelen 3.31, 3.42 en 3.42a vervallen met ingang van 1 januari 2029.
+      - number: 2
+        content: Artikel 3.20, tweede lid, vervalt met ingang van 1 januari 2026.
+  - id: Hoofdstuk11
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel11
+      paragraphs:
+      - number: 1
+        content: De Wet op de inkomstenbelasting 1964 wordt ingetrokken.
+      - number: 2
+        content: De Wet op de vermogensbelasting 1964 wordt ingetrokken.

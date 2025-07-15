@@ -1,0 +1,13 @@
+bwb_id: BWBR0001854
+title: Wetboek van Strafrecht
+url: https://wetten.overheid.nl/BWBR0001854
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:31.021934'
+yaml_files:
+- path: law/wetboek_van_strafrecht/JUSTID-2023-01-01.yaml
+  description: 'Regels voor het bepalen of iemand is uitgesloten van het kiesrecht op basis van een rechterlijke uitspraak
+    volgens art. 28 Wetboek van Strafrecht.
+
+    '
+structure:
+  chapters: []

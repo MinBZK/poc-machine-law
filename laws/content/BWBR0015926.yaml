@@ -1,0 +1,14 @@
+bwb_id: BWBR0015926
+title: Wet op het Centraal Bureau voor de Statistiek
+url: https://wetten.overheid.nl/BWBR0015926
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:30.947953'
+yaml_files:
+- path: law/wet_op_het_centraal_bureau_voor_de_statistiek/CBS-2024-01-01.yaml
+  description: 'Regels voor het bepalen van de levensverwachting volgens de Wet op het Centraal Bureau voor de Statistiek.
+    Het CBS is verantwoordelijk voor het berekenen en publiceren van statistieken over de Nederlandse samenleving, waaronder
+    de levensverwachting.
+
+    '
+structure:
+  chapters: []

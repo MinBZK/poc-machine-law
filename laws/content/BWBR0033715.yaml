@@ -1,0 +1,13 @@
+bwb_id: BWBR0033715
+title: Wet basisregistratie personen
+url: https://wetten.overheid.nl/BWBR0033715
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:31.022752'
+yaml_files:
+- path: law/wet_brp/RvIG-2020-01-01.yaml
+  description: 'Regels voor het bepalen van persoonsgegevens volgens de Wet Basisregistratie Personen (RvIG). Dit omvat basisgegevens
+    (artikel 1.6 en 1.7), woonsituatie (artikel 2.4) en verblijfsgegevens (artikel 2.7).
+
+    '
+structure:
+  chapters: []

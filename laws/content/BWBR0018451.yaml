@@ -1,435 +1,144 @@
-# Zorgtoeslagwet (BWBR0018451) - machine-law format
-# Volledige tekst van de Wet op de zorgtoeslag zoals gepubliceerd op wetten.overheid.nl
-
-bwb_id: "BWBR0018451"
-title: "Wet op de zorgtoeslag"
-url: "https://wetten.overheid.nl/BWBR0018451"
-valid_from: "2025-01-01"
-last_updated: "2025-07-13"
-
-# Mapping naar onze YAML files
+bwb_id: BWBR0018451
+title: Wet op de zorgtoeslag
+url: https://wetten.overheid.nl/BWBR0018451
+valid_from: '2025-01-01'
+last_updated: '2025-07-14T17:58:47.741566'
 yaml_files:
-  - path: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-    description: "Hoofdimplementatie van de zorgtoeslagberekening 2025"
-  - path: "law/zorgtoeslagwet/TOESLAGEN-2024-01-01.yaml"
-    description: "Implementatie van de zorgtoeslagberekening 2024"
-  - path: "law/zorgtoeslagwet/regelingen/vaststelling_standaardpremie_2025_01_01.yaml"
-    description: "Vaststelling standaardpremie 2025"
-  - path: "law/zorgtoeslagwet/regelingen/vaststelling_standaardpremie_2024_01_01.yaml"
-    description: "Vaststelling standaardpremie 2024"
-
-# Hoofdstructuur van de wet
+- path: law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml
+  description: Hoofdimplementatie van de zorgtoeslagberekening 2025
+- path: law/zorgtoeslagwet/TOESLAGEN-2024-01-01.yaml
+  description: Implementatie van de zorgtoeslagberekening 2024
+- path: law/zorgtoeslagwet/regelingen/vaststelling_standaardpremie_2025_01_01.yaml
+  description: Vaststelling standaardpremie 2025
+- path: law/zorgtoeslagwet/regelingen/vaststelling_standaardpremie_2024_01_01.yaml
+  description: Vaststelling standaardpremie 2024
 structure:
-  preface:
-    title: "Wet van 16 juni 2005, houdende regels inzake de aanspraak op een financiële tegemoetkoming in de premie van een zorgverzekering vanwege een laag inkomen"
-    description: "Wet op de zorgtoeslag"
-
-  articles:
-    - id: "Artikel1"
-      title: "Begripsbepalingen"
-      content: |
-        1. In deze wet en de daarop berustende bepalingen wordt, tenzij anders is geregeld, verstaan onder:
-        a. Onze Minister: Onze Minister van Volksgezondheid, Welzijn en Sport;
-        b. zorgverzekering: de schadeverzekering, bedoeld in artikel 1, onder d, van de Zorgverzekeringswet;
-        c. verzekerde: de persoon, bedoeld in artikel 1, onder f, van de Zorgverzekeringswet, de persoon die een bijdrage als bedoeld in artikel 68b, vijfde lid, van de Zorgverzekeringswet verschuldigd is, of de persoon, bedoeld in artikel 69 van de Zorgverzekeringswet, steeds vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij achttien jaar wordt, met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of derde lid, van die wet;
-        d. premie: een premie als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet;
-        e. zorgtoeslag: een tegemoetkoming in een premie dan wel in een bestuursrechtelijke premie als bedoeld in artikel 18d of 18e van de Zorgverzekeringswet en in het verplicht eigen risico, bedoeld in artikel 19 van de Zorgverzekeringswet;
-        f. drempelinkomen: 108% van het twaalfvoud van het voor de maand januari van het berekeningsjaar geldende in artikel 8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag bedoelde bedrag per maand;
-        g. de standaardpremie: het op grond van artikel 4 vastgestelde bedrag;
-        h. de normpremie: de aan de hand van het drempelinkomen en het toetsingsinkomen van de verzekerde berekende premie voor een zorgverzekering in het berekeningsjaar.
-
-        2. De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en het vermogen.
+  chapters:
+  - id: HoofdstukI
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel1
       paragraphs:
-        - number: 1
-          content: "Begripsbepalingen"
-          subsections:
-            - letter: "a"
-              content: "Onze Minister: Onze Minister van Volksgezondheid, Welzijn en Sport"
-            - letter: "b"
-              content: "zorgverzekering: de schadeverzekering, bedoeld in artikel 1, onder d, van de Zorgverzekeringswet"
-            - letter: "c"
-              content: "verzekerde: persoon vanaf 18 jaar verzekerd onder de Zorgverzekeringswet"
-              yaml_references:
-                - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-                  section: "input.IS_VERZEKERDE"
-                  description: "Definitie van verzekerde voor zorgtoeslag"
-                  line_reference: "input.IS_VERZEKERDE.legal_basis"
-            - letter: "d"
-              content: "premie: een premie als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet"
-            - letter: "e"
-              content: "zorgtoeslag: tegemoetkoming in premie en verplicht eigen risico"
-              yaml_references:
-                - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-                  section: "properties.output.hoogte_toeslag"
-                  description: "Definitie van zorgtoeslag als output"
-                  line_reference: "properties.output.hoogte_toeslag"
-            - letter: "f"
-              content: "drempelinkomen: 108% van het twaalfvoud van het minimumloon januari"
-              yaml_references:
-                - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-                  section: "definitions.DREMPELINKOMEN_ALLEENSTAANDE"
-                  description: "Drempelinkomen voor alleenstaanden"
-                  line_reference: "definitions.DREMPELINKOMEN_ALLEENSTAANDE"
-                - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-                  section: "definitions.DREMPELINKOMEN_TOESLAGPARTNER"
-                  description: "Drempelinkomen voor partners"
-                  line_reference: "definitions.DREMPELINKOMEN_TOESLAGPARTNER"
-            - letter: "g"
-              content: "standaardpremie: het op grond van artikel 4 vastgestelde bedrag"
-              yaml_references:
-                - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-                  section: "input.STANDAARDPREMIE"
-                  description: "Standaardpremie als input voor berekening"
-                  line_reference: "input.STANDAARDPREMIE"
-            - letter: "h"
-              content: "normpremie: berekende premie op basis van drempel- en toetsingsinkomen"
-        - number: 2
-          content: "De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en het vermogen"
-          yaml_references:
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.INKOMEN"
-              description: "Inkomen als basis voor draagkracht"
-              line_reference: "input.INKOMEN.legal_basis"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.VERMOGEN"
-              description: "Vermogen als basis voor draagkracht"
-              line_reference: "input.VERMOGEN.legal_basis"
+      - number: 1
+        content: 'In deze wet en de daarop berustende bepalingen wordt, tenzij anders is geregeld, verstaan onder:
 
-    - id: "Artikel2"
-      title: "Hoogte zorgtoeslag"
-      content: |
-        1. Indien de normpremie voor een verzekerde in het berekeningsjaar minder bedraagt dan de standaardpremie in dat jaar, heeft de verzekerde aanspraak op een zorgtoeslag ter grootte van dat verschil. Voor een verzekerde met een partner wordt daarbij tweemaal de standaardpremie in aanmerking genomen; in dat geval worden de verzekerde en zijn partner voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.
 
-        2. De normpremie bedraagt een percentage van het drempelinkomen in het berekeningsjaar, vermeerderd met een percentage van het toetsingsinkomen van de verzekerde in dat jaar voorzover dat toetsingsinkomen het drempelinkomen te boven gaat. Voor een verzekerde met een partner wordt daarbij het gezamenlijke toetsingsinkomen in aanmerking genomen.
+          a. Onze Minister: Onze Minister van Volksgezondheid, Welzijn en Sport;
 
-        3. De percentages worden voor verzekerden met een partner vastgesteld op 4,273% van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen voor zover dat boven het drempelinkomen uitgaat en voor een verzekerde zonder partner op 1,896% van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen voor zover dat boven het drempelinkomen uitgaat. Deze percentages kunnen bij algemene maatregel van bestuur worden gewijzigd.
 
-        4. Indien de verzekerde een partner heeft die niet verzekerd is in de zin van deze wet, bedraagt de zorgtoeslag de helft van de zorgtoeslag die zou worden berekend indien zijn partner wel verzekerd zou zijn.
+          b. zorgverzekering: de schadeverzekering, bedoeld in artikel 1, onder d, van de Zorgverzekeringswet;
 
-        5. De zorgtoeslag wordt per maand berekend.
 
-        6. Bij ministeriële regeling kunnen nadere regels worden gesteld ter uitvoering van dit artikel.
+          c. verzekerde: de persoon, bedoeld in artikel 1, onder f, van de Zorgverzekeringswet, de persoon die een bijdrage
+          als bedoeld in artikel 68b, vijfde lid, van de Zorgverzekeringswet verschuldigd is, of de persoon, bedoeld in artikel
+          69 van de Zorgverzekeringswet, steeds vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij achttien
+          jaar wordt, met uitzondering van de verzekerde, bedoeld in artikel 24, eerste of derde lid,van die wet;
 
-        7. Een ontwerpregeling als bedoeld in het zesde lid wordt overgelegd aan de beide kamers der Staten-Generaal. De regeling wordt vastgesteld nadat twee weken zijn verstreken na de overlegging van het ontwerp aan de beide kamers en door geen van beide kamers een motie van afkeuring is aangenomen.
+
+          d. premie: een premie als bedoeld in afdeling 3.3.1 van de Zorgverzekeringswet;
+
+
+          e. zorgtoeslag: een tegemoetkoming in een premie dan wel in een bestuursrechtelijke premie als bedoeld in artikel
+          18d of 18e van de Zorgverzekeringswet en in het verplicht eigen risico, bedoeld in artikel 19 van de Zorgverzekeringswet;
+
+
+          f. drempelinkomen: 108% van het twaalfvoud van het voor de maand januari van het berekeningsjaar geldende in artikel
+          8, eerste lid, onderdeel b, van de Wet minimumloon en minimumvakantiebijslag bedoelde bedrag per maand;
+
+
+          g. de standaardpremie: het op grond van artikel 4 vastgestelde bedrag;
+
+
+          h. de normpremie: de aan de hand van het drempelinkomen en het toetsingsinkomen van de verzekerde berekende premie
+          voor een zorgverzekering in het berekeningsjaar.'
+      - number: 2
+        content: De hoogte van de zorgtoeslag is afhankelijk van de draagkracht op basis van het inkomen en het vermogen.
+    - id: Artikel2
       paragraphs:
-        - number: 1
-          content: "Recht op zorgtoeslag bij normpremie lager dan standaardpremie; tweemaal standaardpremie voor partners"
-          yaml_references:
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "legal_basis"
-              description: "Hoofdartikel voor zorgtoeslagrecht"
-              line_reference: "legal_basis.article"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.HEEFT_PARTNER"
-              description: "Partner status voor berekening"
-              line_reference: "input.HEEFT_PARTNER.legal_basis"
-        - number: 2
-          content: "Normpremie berekening: percentage drempelinkomen plus percentage boven drempel"
-          yaml_references:
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.INKOMEN"
-              description: "Toetsingsinkomen voor normpremie"
-              line_reference: "input.INKOMEN.legal_basis"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.PARTNER_INKOMEN"
-              description: "Partnerinkomen voor gezamenlijk toetsingsinkomen"
-              line_reference: "input.PARTNER_INKOMEN.legal_basis"
-        - number: 3
-          content: "Percentages: partners 4,273% + 13,700%; alleenstaanden 1,896% + 13,700%"
-          yaml_references:
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "definitions.PERCENTAGE_DREMPELINKOMEN_MET_PARTNER"
-              description: "4,273% voor partners"
-              line_reference: "definitions.PERCENTAGE_DREMPELINKOMEN_MET_PARTNER"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "definitions.PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
-              description: "1,896% voor alleenstaanden"
-              line_reference: "definitions.PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "definitions.AFBOUWPERCENTAGE_MINIMUM"
-              description: "13,700% afbouwpercentage"
-              line_reference: "definitions.AFBOUWPERCENTAGE_MINIMUM"
-        - number: 4
-          content: "Helft van zorgtoeslag indien partner niet verzekerd"
-        - number: 5
-          content: "Zorgtoeslag wordt per maand berekend"
-        - number: 6
-          content: "Nadere regels bij ministeriële regeling"
-        - number: 7
-          content: "Parlementaire goedkeuring van ontwerpregeling"
-
-    - id: "Artikel3"
-      title: "Vermogensgrenzen"
-      content: |
-        1. Geen aanspraak op zorgtoeslag bestaat indien de rendementsgrondslag van de verzekerde, bedoeld in artikel 5.2 van de Wet inkomstenbelasting 2001, meer bedraagt dan € 141.896. Voor een verzekerde met een partner geldt een bedrag van € 179.429.
-
-        2. De in het eerste lid genoemde bedragen worden bij het begin van het kalenderjaar bij ministeriële regeling herzien aan de hand van de ontwikkeling van de in artikel 10.1 van de Wet inkomstenbelasting 2001 bedoelde tabelcorrectiefactor over het aan het kalenderjaar voorafgaande kalenderjaar. Indien die ontwikkeling daartoe aanleiding geeft, kunnen de bedragen eveneens tussentijds worden herzien.
-
-        3. Indien aanpassing van de bedragen, bedoeld in het eerste lid, ingevolge het tweede lid zou leiden tot een verlaging daarvan, blijven de bedragen ongewijzigd.
-
-        4. Bij algemene maatregel van bestuur kunnen de bedragen, bedoeld in het eerste lid, worden verhoogd. Een zodanige verhoging vindt slechts plaats nadat het ontwerp van de algemene maatregel van bestuur gedurende vier weken ter inzage heeft gelegen voor eenieder en belanghebbenden in de gelegenheid zijn gesteld hun zienswijze naar voren te brengen.
-
-        5. De ingevolge het tweede of vierde lid gewijzigde bedragen treden in de plaats van de in het eerste lid genoemde bedragen. Verhoging van de bedragen ingevolge het vierde lid geschiedt na toepassing van het tweede lid.
+      - number: 1
+        content: Indien de normpremie voor een verzekerde in het berekeningsjaar minder bedraagt dan de standaardpremie in
+          dat jaar, heeft de verzekerde aanspraak op een zorgtoeslag ter grootte van dat verschil. Voor een verzekerde met
+          een partner wordt daarbij tweemaal de standaardpremie in aanmerking genomen; in dat geval worden de verzekerde en
+          zijn partner voor de toepassing van deze wet geacht gezamenlijk één aanspraak te hebben.
+      - number: 2
+        content: De normpremie bedraagt een percentage van het drempelinkomen in het berekeningsjaar, vermeerderd met een
+          percentage van het toetsingsinkomen van de verzekerde in dat jaar voorzover dat toetsingsinkomen het drempelinkomen
+          te boven gaat. Voor een verzekerde met een partner wordt daarbij het gezamenlijke toetsingsinkomen in aanmerking
+          genomen.
+      - number: 3
+        content: De percentages worden voor verzekerden met een partner vastgesteld op 4,273% van het drempelinkomen, vermeerderd
+          met 13,700% van het toetsingsinkomen voor zover dat boven het drempelinkomen uitgaat en voor een verzekerde zonder
+          partner op 1,896% van het drempelinkomen, vermeerderd met 13,700% van het toetsingsinkomen voor zover dat boven
+          het drempelinkomen uitgaat. Deze percentages kunnen bij algemene maatregel van bestuur worden gewijzigd.
+      - number: 4
+        content: In afwijking van het eerste lid bedraagt de aanspraak op een zorgtoeslag voor een verzekerde met een partner
+          die geen verzekerde is, vijftig procent van het op grond van het eerste lid berekende bedrag.
+      - number: 5
+        content: De aanspraak op een zorgtoeslag wordt voor iedere kalendermaand afzonderlijk bepaald.
+      - number: 6
+        content: Bij regeling van Onze Minister kunnen omtrent het bepaalde in het vijfde lid nadere regels worden gesteld.
+      - number: 7
+        content: De voordracht voor een krachtens het derde lid vast te stellen algemene maatregel van bestuur wordt niet
+          eerder gedaan dan twee weken nadat het ontwerp aan beide kamers der Staten-Generaal is overgelegd.
+    - id: Artikel3
       paragraphs:
-        - number: 1
-          content: "Vermogensgrenzen: €141.896 alleenstaand, €179.429 met partner"
-          yaml_references:
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "definitions.VERMOGENSGRENS_ALLEENSTAANDE"
-              description: "Vermogensgrens voor alleenstaanden"
-              line_reference: "definitions.VERMOGENSGRENS_ALLEENSTAANDE"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "definitions.VERMOGENSGRENS_TOESLAGPARTNER"
-              description: "Vermogensgrens voor partners"
-              line_reference: "definitions.VERMOGENSGRENS_TOESLAGPARTNER"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.VERMOGEN"
-              description: "Vermogen van alleenstaande"
-              line_reference: "input.VERMOGEN.legal_basis"
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.GEZAMENLIJK_VERMOGEN"
-              description: "Gezamenlijk vermogen van partners"
-              line_reference: "input.GEZAMENLIJK_VERMOGEN.legal_basis"
-        - number: 2
-          content: "Jaarlijkse herziening op basis van tabelcorrectiefactor"
-        - number: 3
-          content: "Bedragen blijven ongewijzigd bij verlaging"
-        - number: 4
-          content: "Verhoging mogelijk bij algemene maatregel van bestuur"
-        - number: 5
-          content: "Gewijzigde bedragen vervangen oorspronkelijke bedragen"
-
-    - id: "Artikel4"
-      title: "Standaardpremie"
-      content: |
-        1. Onze Minister stelt jaarlijks, uiterlijk 22 dagen voor de aanvang van het berekeningsjaar, de standaardpremie voor dat jaar vast. Deze standaardpremie wordt gesteld op een door Onze Minister geraamde landelijk gewogen gemiddelde premie voor een zorgverzekering vermeerderd met een door Onze Minister geraamd landelijk gewogen gemiddeld verplicht eigen risico voor dat jaar.
-
-        2. Bij de vaststelling van de in het eerste lid bedoelde standaardpremie baseert Onze Minister zich op de beschikbare gegevens betreffende de premies en het verplichte eigen risico.
+      - number: 1
+        content: In afwijking van artikel 7, derde lid, van de Algemene wet inkomensafhankelijke regelingen, bestaat geen
+          aanspraak op een zorgtoeslag indien de rendementsgrondslag, bedoeld in artikel 5.3 van de Wet inkomstenbelasting
+          2001, van de verzekerde aan het begin van het berekeningsjaar meer bedraagt dan € 141.896 of, indien de verzekerde
+          het gehele berekeningsjaar dezelfde partner heeft, de gezamenlijke rendementsgrondslag, bedoeld in artikel 5.3,
+          van de Wet inkomstenbelasting 2001, van de verzekerde en zijn partner aan het begin van het berekeningsjaar meer
+          bedraagt dan € 179.429. Bij de bepaling van de rendementsgrondslag, bedoeld in de vorige zin, wordt geen rekening
+          gehouden met de vrijstelling, bedoeld in artikel 5.13 van de Wet inkomstenbelasting 2001.
+      - number: 2
+        content: Bij het begin van het kalenderjaar worden de bedragen, bedoeld in het eerste lid, bij ministeriële regeling
+          gewijzigd overeenkomstig de tabelcorrectiefactor, bedoeld in artikel 10.2 van de Wet inkomstenbelasting 2001.
+      - number: 3
+        content: Indien er aanleiding is om de bedragen, bedoeld in het eerste lid, te verhogen op een andere wijze dan op
+          grond van het tweede lid, worden de bedragen vastgesteld bij algemene maatregel van bestuur.
+      - number: 4
+        content: De overeenkomstig het tweede en derde lid aangepaste bedragen treden in de plaats van de bedragen, genoemd
+          in het eerste lid.
+      - number: 5
+        content: Indien een verhoging als bedoeld in het derde lid wordt toegepast, vindt deze verhoging plaats nadat het
+          tweede lid toepassing heeft gevonden.
+    - id: Artikel4a
       paragraphs:
-        - number: 1
-          content: "Jaarlijkse vaststelling standaardpremie: gemiddelde premie plus eigen risico"
-          yaml_references:
-            - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-              section: "input.STANDAARDPREMIE"
-              description: "Standaardpremie voor berekening zorgtoeslag"
-              line_reference: "input.STANDAARDPREMIE.legal_basis"
-        - number: 2
-          content: "Vaststelling op basis van beschikbare gegevens premies en eigen risico"
-
-    - id: "Artikel4a"
-      title: "Bijzondere bepaling standaardpremie"
-      content: |
-        Voor een persoon als bedoeld in artikel 69 van de Zorgverzekeringswet wordt de standaardpremie, bedoeld in artikel 4, gesteld op het bedrag dat voor hem geldt ingevolge artikel 4a, eerste lid, van die wet, vermeerderd met een door Onze Minister geraamd landelijk gewogen gemiddeld verplicht eigen risico voor dat jaar.
+      - number: 1
+        content: De standaardpremie voor een persoon als bedoeld in artikel 69 van de Zorgverzekeringswet is, in afwijking
+          van artikel 4, gelijk aan het met toepassing van dat artikel bepaalde bedrag, vermenigvuldigd met het getal dat
+          wordt berekend uit de verhouding tussen de gemiddelde uitgaven voor zorg voor een persoon ten laste van de sociale
+          zorgverzekeringen in het woonland van deze persoon, en de gemiddelde uitgaven voor zorg voor een persoon ten laste
+          van de sociale zorgverzekeringen in Nederland.
+      - number: 2
+        content: Bij ministeriële regeling wordt jaarlijks uiterlijk in november per land het in het eerste lid bedoelde verhoudingsgetal
+          vastgesteld.
+      - number: 3
+        content: De aanspraak op een zorgtoeslag van een verzekerde met een partner die een persoon is als bedoeld in artikel
+          69 van de Zorgverzekeringswet, wordt berekend met toepassing van artikel 2, eerste lid, tweede zin, waarbij de standaardpremie,
+          bedoeld in het eerste lid, in acht wordt genomen.
+      - number: 4
+        content: De standaardpremie voor een partner van een persoon als bedoeld in artikel 69 van de Zorgverzekeringswet
+          wordt overeenkomstig het eerste lid vastgesteld, tenzij deze partner een persoon is als bedoeld in artikel 1, onderdeel
+          f, van de Zorgverzekeringswet.
+    - id: Artikel5
       paragraphs:
-        - number: 1
-          content: "Bijzondere standaardpremie voor personen onder artikel 69 ZVW"
-
-    - id: "Artikel5"
-      title: "Uitvoering"
-      content: |
-        1. Met de uitvoering van deze wet is belast de Dienst Toeslagen, genoemd in artikel 2 van de Wet op de Dienst Toeslagen.
-
-        2. De zorgtoeslag wordt door de Dienst Toeslagen uit 's Rijks kas betaald.
-
-        3. Voor de persoon, bedoeld in artikel 69 van de Zorgverzekeringswet die in Nederland woont of op wie artikel 2 van de Zorgverzekeringswet van toepassing is, wordt de zorgtoeslag overgemaakt aan het Zorginstituut Nederland, genoemd in artikel 58, eerste lid, van de Zorgverzekeringswet.
-      paragraphs:
-        - number: 1
-          content: "Uitvoering door Dienst Toeslagen"
-        - number: 2
-          content: "Betaling uit 's Rijks kas"
-        - number: 3
-          content: "Overmaken aan Zorginstituut voor bepaalde personen"
-
-    - id: "Artikel6"
-      title: "Inwerkingtreding"
-      content: |
-        Deze wet treedt in werking op een bij koninklijk besluit te bepalen tijdstip.
-      paragraphs:
-        - number: 1
-          content: "Inwerkingtreding bij koninklijk besluit"
-
-    - id: "Artikel7"
-      title: "Evaluatie"
-      content: |
-        Onze Minister zendt binnen drie jaar na de inwerkingtreding van deze wet aan de Staten-Generaal een verslag over de doeltreffendheid en de effecten van deze wet in de praktijk.
-      paragraphs:
-        - number: 1
-          content: "Evaluatieverslag binnen drie jaar na inwerkingtreding"
-
-    - id: "Artikel8"
-      title: "Citeertitel"
-      content: |
-        Deze wet wordt aangehaald als: Wet op de zorgtoeslag.
-      paragraphs:
-        - number: 1
-          content: "Citeertitel: Wet op de zorgtoeslag"
-
-# Cross-referentie index voor snelle lookup
-cross_references:
-  # Vanuit YAML naar wettekst
-  yaml_to_law:
-    "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml":
-      legal_basis.article:
-        article: "Artikel2"
-        paragraph: 1
-        description: "Hoofdartikel voor recht op zorgtoeslag"
-      input.IS_VERZEKERDE:
-        article: "Artikel1"
-        paragraph: 1
-        subsection: "c"
-        description: "Definitie verzekerde vanaf 18 jaar"
-      input.LEEFTIJD:
-        article: "Artikel1"
-        paragraph: 1
-        subsection: "c"
-        description: "Leeftijdsgrens 18 jaar voor zorgtoeslag"
-      input.INKOMEN:
-        article: "Artikel2"
-        paragraph: 2
-        description: "Toetsingsinkomen voor normpremie"
-      input.PARTNER_INKOMEN:
-        article: "Artikel2"
-        paragraph: 2
-        description: "Gezamenlijk toetsingsinkomen voor partners"
-      input.VERMOGEN:
-        article: "Artikel3"
-        paragraph: 1
-        description: "Vermogensgrens alleenstaanden"
-      input.GEZAMENLIJK_VERMOGEN:
-        article: "Artikel3"
-        paragraph: 1
-        description: "Vermogensgrens partners"
-      input.HEEFT_PARTNER:
-        article: "Artikel2"
-        paragraph: 1
-        description: "Partner status voor berekening"
-      input.STANDAARDPREMIE:
-        article: "Artikel4"
-        paragraph: 1
-        description: "Jaarlijkse vaststelling standaardpremie"
-      definitions.DREMPELINKOMEN_ALLEENSTAANDE:
-        article: "Artikel1"
-        paragraph: 1
-        subsection: "f"
-        description: "108% van twaalfvoud minimumloon"
-      definitions.DREMPELINKOMEN_TOESLAGPARTNER:
-        article: "Artikel1"
-        paragraph: 1
-        subsection: "f"
-        description: "108% van twaalfvoud minimumloon"
-      definitions.PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND:
-        article: "Artikel2"
-        paragraph: 3
-        description: "1,896% voor alleenstaanden"
-      definitions.PERCENTAGE_DREMPELINKOMEN_MET_PARTNER:
-        article: "Artikel2"
-        paragraph: 3
-        description: "4,273% voor partners"
-      definitions.AFBOUWPERCENTAGE_MINIMUM:
-        article: "Artikel2"
-        paragraph: 3
-        description: "13,700% afbouwpercentage"
-      definitions.VERMOGENSGRENS_ALLEENSTAANDE:
-        article: "Artikel3"
-        paragraph: 1
-        description: "€141.896 voor alleenstaanden"
-      definitions.VERMOGENSGRENS_TOESLAGPARTNER:
-        article: "Artikel3"
-        paragraph: 1
-        description: "€179.429 voor partners"
-      properties.output.hoogte_toeslag:
-        article: "Artikel2"
-        paragraph: 1
-        description: "Zorgtoeslag is verschil standaardpremie minus normpremie"
-      properties.output.is_verzekerde_zorgtoeslag:
-        article: "Artikel2"
-        paragraph: 1
-        description: "Recht op zorgtoeslag"
-
-  # Vanuit wettekst naar YAML
-  law_to_yaml:
-    "Artikel1":
-      paragraph_1_c:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.IS_VERZEKERDE"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.LEEFTIJD"
-      paragraph_1_e:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "properties.output.hoogte_toeslag"
-      paragraph_1_f:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.DREMPELINKOMEN_ALLEENSTAANDE"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.DREMPELINKOMEN_TOESLAGPARTNER"
-      paragraph_1_g:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.STANDAARDPREMIE"
-      paragraph_2:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.INKOMEN"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.VERMOGEN"
-    "Artikel2":
-      paragraph_1:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "legal_basis.article"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.HEEFT_PARTNER"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "properties.output.hoogte_toeslag"
-      paragraph_2:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.INKOMEN"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.PARTNER_INKOMEN"
-      paragraph_3:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.PERCENTAGE_DREMPELINKOMEN_MET_PARTNER"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.AFBOUWPERCENTAGE_MINIMUM"
-    "Artikel3":
-      paragraph_1:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.VERMOGENSGRENS_ALLEENSTAANDE"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "definitions.VERMOGENSGRENS_TOESLAGPARTNER"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.VERMOGEN"
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.GEZAMENLIJK_VERMOGEN"
-    "Artikel4":
-      paragraph_1:
-        - file: "law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml"
-          section: "input.STANDAARDPREMIE"
-
-# Metadata voor UI
-ui_metadata:
-  featured_articles:
-    - "Artikel1"
-    - "Artikel2"
-    - "Artikel3"
-    - "Artikel4"
-  complexity_level: "high"
-  citizen_relevance: "high"
-  calculation_articles:
-    - "Artikel2"  # Hoofdberekening zorgtoeslag
-    - "Artikel3"  # Vermogensgrenzen
-    - "Artikel4"  # Standaardpremie
-
-  # Artikelen meest relevant voor implementaties
-  implementation_priority:
-    high:
-      - "Artikel1"  # Definities
-      - "Artikel2"  # Berekeningsregels
-      - "Artikel3"  # Vermogensgrenzen
-    medium:
-      - "Artikel4"  # Standaardpremie
-      - "Artikel4a" # Bijzondere standaardpremie
-      - "Artikel5"  # Uitvoering
-    low:
-      - "Artikel6"  # Inwerkingtreding
-      - "Artikel7"  # Evaluatie
-      - "Artikel8"  # Citeertitel
+      - number: 1
+        content: De Dienst Toeslagen is belast met de uitvoering van deze wet.
+      - number: 2
+        content: In afwijking van artikel 25, eerste lid, van de Algemene wet inkomensafhankelijke regelingen betaalt de Dienst
+          Toeslagen in opdracht van het CAK, genoemd in artikel 6.1.1, eerste lid, van de Wet langdurige zorg, de zorgtoeslag
+          of het voorschot op de zorgtoeslag als tegemoetkoming in de bestuursrechtelijke premie, bedoeld in artikel 18d of
+          18e van de Zorgverzekeringswet, aan het CAK uit.
+      - number: 3
+        content: De persoon, bedoeld in artikel 68b, vijfde lid, van de Zorgverzekeringswet, wordt geacht, zo nodig in afwijking
+          van artikel 15, eerste lid, van de Algemene wet inkomensafhankelijke regelingen, tijdig een aanvraag als bedoeld
+          in laatstgenoemd artikel te hebben gedaan voor de berekeningsjaren in de periode gelegen tussen de ingangsdatum
+          van de verzekeringsplicht voor de Zorgverzekeringswet en het moment waarop hij van het CAK een kennisgeving heeft
+          ontvangen van de verplichting om een zorgverzekering af te sluiten.
+      - number: 4
+        content: Voor de toepassing van artikel 16, eerste lid, van de Algemene wet inkomensafhankelijke regelingen wordt
+          in het geval, bedoeld in het derde lid, de aanvraag geacht te zijn gedaan op het moment waarop de Belastingdienst/Toeslagen
+          van het CAK een afschrift heeft ontvangen van de beschikking, bedoeld in artikel 68b, zesde lid, van de Zorgverzekeringswet.
+      - number: 5
+        content: De zorgtoeslag komt ten laste van het Rijk.

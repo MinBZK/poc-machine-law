@@ -1,0 +1,2691 @@
+bwb_id: BWBR0018450
+title: Zorgverzekeringswet
+url: https://wetten.overheid.nl/BWBR0018450
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:31.126381'
+yaml_files:
+- path: law/zvw/RVZ-2024-01-01.yaml
+  description: 'Regels voor het bepalen van de verzekeringsstatus volgens de Zorgverzekeringswet (Zvw), artikel 2 (verzekeringsplicht),
+    artikel 9 (verdragsverzekering) en artikel 24 (opschorting).
+
+    '
+structure:
+  chapters:
+  - id: Hoofdstuk1
+    title: Algemene bepalingen
+    articles: []
+  - id: Hoofdstuk2
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel2
+      paragraphs:
+      - number: 1
+        content: Degene die ingevolge de Wet langdurige zorg en de daarop gebaseerde regelgeving van rechtswege verzekerd
+          is, is verplicht zich krachtens een zorgverzekering te verzekeren of te laten verzekeren tegen het in artikel 10
+          bedoelde risico.
+      - number: 2
+        content: 'In afwijking van het eerste lid is niet verzekeringsplichtig:
+
+
+          a. de militaire ambtenaar in werkelijke dienst als bedoeld in artikel 1, eerste lid, onderdeel a juncto onderdeel
+          b, van de Wet ambtenaren defensie, alsmede de militair aan wie buitengewoon verlof met behoud van militaire inkomsten
+          is verleend;
+
+
+          b. de natuurlijke persoon die op grond van artikel 64, eerste lid, van de Wet financiering sociale verzekeringen
+          is ontheven van de verplichtingen, opgelegd op grond van de Wet langdurige zorg.'
+      - number: 3
+        content: Degene die het gezag over een minderjarige, jonger dan achttien jaar, uitoefent, een curator, een bewindvoerder
+          of een mentor als bedoeld in de titels 16, 19 of 20 van Boek 1 van het Burgerlijk Wetboek, zorgt ervoor dat de minderjarige
+          verzekeringsplichtige, dan wel de onder curatele, bewind of mentorschap gestelde verzekeringsplichtige krachtens
+          een zorgverzekering verzekerd is.
+    - id: Artikel3
+      paragraphs:
+      - number: 1
+        content: Een zorgverzekeraar is verplicht met of ten behoeve van iedere verzekeringsplichtige die in zijn werkgebied
+          woont alsmede met of ten behoeve van iedere verzekeringsplichtige die in het buitenland woont, desgevraagd een zorgverzekering
+          te sluiten.
+      - number: 2
+        content: Indien een zorgverzekeraar in een provincie verschillende varianten van de zorgverzekering aanbiedt, kan
+          voor iedere in die provincie wonende verzekeringsplichtige uit alle varianten worden gekozen.
+      - number: 3
+        content: De zorgverzekeraar stelt alle varianten van de zorgverzekering die hij in een provincie aanbiedt, in de vorm
+          van modelovereenkomsten ter beschikking aan personen die overwegen ten behoeve van een in die provincie wonende
+          verzekeringsplichtige een zorgverzekering met die verzekeraar te sluiten, alsmede, indien de zorgverzekeraar varianten
+          toevoegt of wijzigt, aan de verzekeringnemers die ten behoeve van een in die provincie wonende verzekeringsplichtige
+          een zorgverzekering met hem hebben gesloten.
+      - number: 4
+        content: 'In afwijking van het eerste lid is een zorgverzekeraar niet verplicht een zorgverzekering te sluiten met
+          of ten behoeve van een verzekeringsplichtige:
+
+
+          a. die reeds krachtens een zorgverzekering verzekerd is, of
+
+
+          b. wiens eerdere zorgverzekering hij of de verzekeringnemer binnen een periode van vijf jaar, gelegen onmiddellijk
+          voorafgaande aan het verzoek tot het sluiten van de verzekering, heeft opgezegd of ontbonden wegens: 1°. opzettelijke
+          misleiding door de verzekeringnemer of de verzekerde, of 2°. het niet betalen van de premie, bedoeld in artikel
+          17, vijfde lid.
+
+
+          1°. opzettelijke misleiding door de verzekeringnemer of de verzekerde, of
+
+
+          2°. het niet betalen van de premie, bedoeld in artikel 17, vijfde lid.'
+      - number: 5
+        content: In afwijking van het tweede lid kan ten behoeve van een in het buitenland wonende verzekeringsplichtige worden
+          gekozen tussen alle varianten van de zorgverzekering die een zorgverzekeraar in Nederland aanbiedt.
+      - number: 6
+        content: In afwijking van het derde lid worden degene die ten behoeve van een in het buitenland wonende verzekeringsplichtige
+          een zorgverzekering wenst te sluiten alle modelovereenkomsten die de zorgverzekeraar in Nederland hanteert ter beschikking
+          gesteld, en worden, indien eenmaal een zorgverzekering is gesloten, de verzekeringnemer alle toegevoegde of gewijzigde
+          varianten die die zorgverzekeraar aanbiedt ter beschikking gesteld.
+    - id: Artikel4
+      paragraphs:
+      - number: 1
+        content: Degene die een zorgverzekering wenst te sluiten, vermeldt bij het verzoek daartoe het burgerservicenummer
+          van de te verzekeren persoon, indien deze persoon daarover beschikt.
+      - number: 2
+        content: De zorgverzekeraar stelt, voor zover dat redelijkerwijs nodig is voor de uitvoering van de zorgverzekering
+          en van deze wet, de identiteit van de te verzekeren persoon vast.
+      - number: 3
+        content: De in het tweede lid bedoelde vaststelling geschiedt aan de hand van documenten als bedoeld in artikel 1
+          van de Wet op de identificatieplicht, die de verzekeringnemer of de te verzekeren persoon hem desgevraagd ter inzage
+          geeft.
+      - number: 4
+        content: De zorgverzekeraar neemt aard en nummer van de in het derde lid bedoelde documenten in zijn administratie
+          op.
+      - number: 5
+        content: De zorgverzekeraar verlangt van de vreemdeling, bedoeld in de Vreemdelingenwet 2000, voor wie hem wordt verzocht
+          een zorgverzekering te sluiten, een kopie van het document of de schriftelijke verklaring, bedoeld in artikel 9,
+          eerste lid, van die wet, dat wordt aangemerkt als een bescheid als bedoeld in artikel 4:3, tweede lid, van de Algemene
+          wet bestuursrecht.
+    - id: Artikel4a
+      paragraphs:
+      - number: 1
+        content: Degene die een zorgverzekering wenst te sluiten, vermeldt bij het verzoek daartoe zijn adres, en indien hij
+          niet de te verzekeren persoon is, het adres van de te verzekeren persoon.
+      - number: 2
+        content: De zorgverzekeraar sluit de verzekering niet zolang het verstrekte adres van de persoon of personen, bedoeld
+          in het eerste lid, niet in de basisregistratie personen voorkomt of afwijkt van het adres waaronder deze persoon
+          of personen in die administratie als ingezetene staat of staan ingeschreven.
+      - number: 3
+        content: 'In afwijking van het tweede lid wordt de te verzekeren persoon ingeschreven:
+
+
+          a. indien degene die de zorgverzekering wenst te sluiten een verklaring van de werkgever of een salarisafschrift
+          heeft overgelegd, waaruit blijkt dat de te verzekeren persoon, onder vermelding van de ingangsdatum van de dienstbetrekking,
+          ter zake van in Nederland of op het continentaal plat als bedoeld in artikel 1.1.1 van de Wet langdurige zorg, in
+          dienstbetrekking verrichte arbeid aan de loonbelasting is onderworpen, mits die verklaring of het salarisafschrift
+          niet ouder zijn dan één maand;
+
+
+          b. indien degene die de zorgverzekering wenst te sluiten een verklaring van de Sociale verzekeringsbank heeft overgelegd
+          waaruit blijkt dat de te verzekeren persoon verzekerd is ingevolge de Wet langdurige zorg; of
+
+
+          c. indien de persoon of de personen, bedoeld in het tweede lid, van de afwijking redelijkerwijs geen verwijt kan
+          worden gemaakt.'
+      - number: 4
+        content: Bij ministeriële regeling kunnen regels worden gesteld met betrekking tot het derde lid.
+    - id: Artikel5
+      paragraphs:
+      - number: 1
+        content: De zorgverzekering gaat in op de dag waarop de zorgverzekeraar het verzoek, bedoeld in artikel 3, eerste
+          lid, en, indien het tweede of vijfde lid van dat artikel van toepassing is, de aanduiding van de variant waar de
+          verzekeringnemer voor kiest, heeft ontvangen.
+      - number: 2
+        content: Indien de zorgverzekeraar op basis van het in het eerste lid bedoelde verzoek niet vast kan stellen of hij
+          verplicht is voor de te verzekeren persoon een zorgverzekering te sluiten, en hij de persoon die de verzekering
+          wenst te sluiten in verband daarmee uitnodigt de voor deze vaststelling noodzakelijke gegevens te verschaffen, gaat
+          de zorgverzekering, in afwijking van het eerste lid, in op de dag waarop laatstbedoelde persoon aan dit verzoek
+          heeft voldaan.
+      - number: 3
+        content: 'De zorgverzekeraar verstrekt degene die het verzoek, bedoeld in het eerste lid, doet en, indien dit een
+          ander is dan degene ten behoeve van wiens verzekering het verzoek is gedaan, laatstbedoelde persoon onverwijld:
+
+
+          a. een bewijs van het verzoek, bedoeld in het eerste lid, waarop de datum van ontvangst is vermeld;
+
+
+          b. een bewijs van de ontvangst van gegevens, bedoeld in het tweede lid, waarop de datum van de ontvangst is vermeld.'
+      - number: 4
+        content: Indien degene ten behoeve van wie de zorgverzekering wordt gesloten op de dag waarop de zorgverzekeraar het
+          verzoek, bedoeld in het eerste lid, ontvangt reeds op grond van een zorgverzekering verzekerd is, en de verzekeringnemer
+          aangeeft de zorgverzekering te willen laten ingaan op een door hem aangegeven, latere dag dan de dag, bedoeld in
+          het eerste of tweede lid, gaat de verzekering op die latere dag in.
+      - number: 5
+        content: 'De zorgverzekering werkt, zonodig in afwijking van artikel 925, eerste lid, van Boek 7 van het Burgerlijk
+          Wetboek, terug:
+
+
+          a. indien zij ingaat binnen vier maanden nadat de verzekeringsplicht is ontstaan, tot en met de dag waarop die plicht
+          ontstond;
+
+
+          b. indien zij ingaat binnen een maand nadat een eerdere zorgverzekering met ingang van 1 januari van een kalenderjaar
+          of wegens wijziging van de voorwaarden met toepassing van artikel 940, vierde lid, van Boek 7 van het Burgerlijk
+          Wetboek is geëindigd door opzegging, tot en met de dag na die waarop de eerdere zorgverzekering is geëindigd.'
+      - number: 6
+        content: Bij ministeriële regeling kunnen nadere regels worden gesteld over de vaststelling, bedoeld in het tweede
+          lid, en over het verkrijgen van de gegevens die noodzakelijk zijn voor deze vaststelling.
+    - id: Artikel6
+      paragraphs:
+      - number: 1
+        content: 'De zorgverzekering eindigt van rechtswege met ingang van de dag volgende op de dag waarop:
+
+
+          a. de verzekeraar ten gevolge van wijziging of intrekking van zijn vergunning tot uitoefening van het schadeverzekeringsbedrijf,
+          geen zorgverzekeringen meer mag aanbieden;
+
+
+          b. de verzekerde ten gevolge van wijziging van het werkgebied buiten het werkgebied van de zorgverzekeraar komt
+          te wonen;
+
+
+          c. de verzekerde overlijdt;
+
+
+          d. de verzekeringsplicht van de verzekerde eindigt.'
+      - number: 2
+        content: De zorgverzekering eindigt van rechtswege met ingang van de eerste dag van de tweede maand volgende op de
+          dag waarop de verzekerde, zonder dat zijn verzekeringsplicht eindigt, ten gevolge van verhuizing komt te wonen buiten
+          een provincie waarin zijn zorgverzekeraar de ten behoeve van hem gesloten variant van de zorgverzekering aanbiedt
+          of uitvoert.
+      - number: 3
+        content: De zorgverzekeraar stelt de verzekeringnemer uiterlijk twee maanden voordat een zorgverzekering op grond
+          van het eerste lid, onderdeel a of b, eindigt, van dit einde op de hoogte, onder vermelding van de reden daarvan
+          en de datum waarop de verzekering eindigt.
+      - number: 4
+        content: De verzekeringnemer stelt de zorgverzekeraar uit eigen beweging of op diens verzoek onverwijld op de hoogte
+          van alle feiten en omstandigheden over de verzekerde die op grond van het eerste lid, onderdeel c of d, dan wel
+          het tweede lid tot het einde van de zorgverzekering hebben geleid of kunnen leiden.
+      - number: 5
+        content: De Sociale verzekeringsbank gaat op basis van vergelijking van bij ministeriële regeling aan te wijzen bestanden
+          na voor welke personen in weerwil van het ontbreken van hun verzekeringsplicht een zorgverzekering wordt uitgevoerd
+          en informeert hun zorgverzekeraar daarover.
+      - number: 6
+        content: Indien de zorgverzekeraar op grond van de in het vierde of vijfde lid bedoelde gegevens tot de conclusie
+          komt dat de zorgverzekering zal eindigen of geëindigd is, deelt hij dit, onder vermelding van de reden daarvan en
+          de datum waarop de verzekering eindigt of geëindigd is, onverwijld aan de verzekeringnemer mede.
+      - number: 7
+        content: Bij ministeriële regeling kunnen nadere regels worden gesteld over de feiten en omstandigheden, bedoeld in
+          het vierde lid, over de wijze waarop de zorgverzekeraar van die feiten en omstandigheden kennisneemt alsmede over
+          de wijze waarop de zorgverzekeraar tot de conclusie, bedoeld in het zesde lid komt.
+    - id: Artikel7
+      paragraphs:
+      - number: 1
+        content: De verzekeringnemer kan de zorgverzekering uiterlijk 31 december van ieder jaar met ingang van 1 januari
+          van het volgende kalenderjaar opzeggen.
+      - number: 2
+        content: De verzekeringnemer die een ander dan zichzelf heeft verzekerd, kan de zorgverzekering opzeggen indien de
+          verzekerde krachtens een andere zorgverzekering verzekerd wordt.
+      - number: 3
+        content: In afwijking van artikel 940, vierde lid, van Boek 7 van het Burgerlijk Wetboek kan de verzekeringnemer niet
+          opzeggen indien een wijziging in de verzekerde prestaties ten nadele van de verzekeringnemer of de verzekerde rechtstreeks
+          voortvloeit uit een wijziging van de bij of krachtens de artikelen 11 tot en met 14a gestelde regels.
+      - number: 4
+        content: Een verzekeringnemer kan zijn zorgverzekering opzeggen binnen zes weken nadat hij een mededeling als bedoeld
+          in artikel 78c, tweede lid, of artikel 92, eerste lid, van de Wet marktordening gezondheidszorg over zijn zorgverzekeraar
+          heeft ontvangen.
+      - number: 5
+        content: De opzegging, bedoeld in het tweede of vierde lid, gaat in op de eerste dag van de tweede kalendermaand volgende
+          op de dag waarop de verzekeringnemer heeft opgezegd.
+      - number: 6
+        content: In afwijking van het vierde of vijfde lid gaat een opzegging, bedoeld in het tweede lid, in met ingang van
+          de dag waarop de verzekerde krachtens de andere zorgverzekering verzekerd wordt, indien die opzegging voorafgaande
+          aan laatstbedoelde dag door de zorgverzekeraar is ontvangen.
+    - id: Artikel8
+      paragraphs:
+      - number: 1
+        content: Aan een opzegging of ontbinding van de zorgverzekering wegens het niet betalen van de verschuldigde premie,
+          wordt geen terugwerkende kracht verleend, noch wordt daaraan een verplichting verbonden tot ongedaanmaking of vergoeding
+          van hetgeen partijen reeds ter nakoming van de zorgverzekering jegens elkaar hebben verricht.
+      - number: 2
+        content: Een zorgverzekeraar mag de zorgverzekering gedurende de periode, bedoeld in artikel 24, eerste lid, niet
+          opzeggen of ontbinden.
+      - number: 3
+        content: Artikel 934 van Boek 7 van het Burgerlijk Wetboek is tevens van toepassing met betrekking tot de eerste premie
+          die een verzekeringnemer voor een zorgverzekering verschuldigd is.
+    - id: Artikel8a
+      paragraphs:
+      - number: 1
+        content: Nadat de zorgverzekeraar de verzekeringnemer heeft aangemaand tot betaling van een of meer vervallen termijnen
+          van de verschuldigde premie, kan de verzekeringnemer gedurende de tijd dat de verschuldigde premie, rente en incassokosten
+          niet zijn voldaan, de zorgverzekering niet opzeggen, tenzij de zorgverzekeraar de zorgverzekering of de dekking
+          daarvan heeft geschorst of opgeschort.
+      - number: 2
+        content: Het eerste lid lijdt uitzondering indien de zorgverzekeraar de verzekeringnemer binnen twee weken te kennen
+          geeft de opzegging te bevestigen.
+    - id: Artikel9
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar verstrekt de verzekeringnemer en, indien deze een ander is dan de verzekeringnemer, de
+          verzekerde zo spoedig mogelijk na het sluiten van de zorgverzekering en vervolgens voorafgaande aan ieder kalenderjaar
+          een zorgpolis.
+      - number: 2
+        content: 'Indien de zorgverzekering eindigt, verstrekt de zorgverzekeraar de verzekeringnemer en, indien deze een
+          ander is dan de verzekeringnemer, de verzekerde een bewijs van het einde van de zorgverzekering, waarop worden aangetekend:
+
+
+          a. naam, adres, woonplaats en burgerservicenummer van de verzekerde;
+
+
+          b. naam, adres en woonplaats van de verzekeringnemer;
+
+
+          c. naam, adres en woonplaats van de zorgverzekeraar;
+
+
+          d. de dag waarop de zorgverzekering eindigt;
+
+
+          e. of voor de verzekerde op die dag een vrijwillig eigen risico gold en zo ja, met welke ingangsdatum, voor welk
+          bedrag en met welke in verband daarmee verleende korting.'
+      - number: 3
+        content: Indien de zorgverzekering eindigt om de in artikel 6, eerste lid, onderdeel d, genoemde reden, wordt dat
+          op het in het tweede lid bedoelde bewijs aangetekend.
+    - id: Artikel9a
+      paragraphs:
+      - number: 1
+        content: Het CAK gaat op basis van vergelijking van bij ministeriële regeling aan te wijzen bestanden na welke verzekeringsplichtigen
+          in weerwil van hun verzekeringsplicht niet krachtens een zorgverzekering verzekerd zijn.
+      - number: 2
+        content: Het CAK zendt een verzekeringsplichtige als bedoeld in het eerste lid een schriftelijke aanmaning om zich
+          binnen een termijn van drie maanden, te rekenen vanaf de datum van verzending van de aanmaning, alsnog op grond
+          van zo'n verzekering te verzekeren of te laten verzekeren.
+      - number: 3
+        content: De aanmaning bevat een overzicht van de gevolgen indien betrokkene niet binnen de in het tweede lid genoemde
+          termijn verzekerd zal zijn.
+      - number: 4
+        content: Het CAK is bevoegd tot het verwerken van persoonsgegevens van de verzekeringsplichtige, bedoeld in het eerste
+          lid, die noodzakelijk zijn voor de uitvoering van deze paragraaf.
+      - number: 5
+        content: Het CAK is de verwerkingsverantwoordelijke, voor de verwerking, bedoeld in het vierde lid.
+    - id: Artikel9b
+      paragraphs:
+      - number: 1
+        content: Indien een verzekeringsplichtige aan wie een aanmaning als bedoeld in artikel 9a is verzonden, niet binnen
+          drie maanden na verzending daarvan verzekerd is, legt het CAK hem dan wel, indien de verzekeringsplichtige minderjarig
+          is, degene die het gezag over hem uitoefent, een bestuurlijke boete op.
+      - number: 2
+        content: De hoogte van de boete is gelijk aan driemaal de tot een maandbedrag herleide standaardpremie, bedoeld in
+          de Wet op de zorgtoeslag.
+      - number: 3
+        content: Artikel 5:53, tweede en derde lid, van de Algemene wet bestuursrecht geldt niet voor de oplegging van de
+          boete, bedoeld in het eerste lid.
+      - number: 4
+        content: Het CAK kan de boete bij dwangbevel invorderen.
+      - number: 5
+        content: Tegelijk met de oplegging van de boete deelt het CAK mee wat de gevolgen zullen zijn indien de verzekeringsplichtige
+          niet binnen een termijn van drie maanden, te rekenen vanaf de dag van verzending van de beschikking tot oplegging
+          van de boete, alsnog verzekerd zal zijn.
+    - id: Artikel9c
+      paragraphs:
+      - number: 1
+        content: Indien een verzekeringsplichtige aan wie de boete, bedoeld in artikel 9b, is opgelegd, niet binnen de termijn,
+          bedoeld in artikel 9b, vijfde lid, alsnog verzekerd is, legt het CAK hem dan wel, indien hij minderjarig is, degene
+          die het gezag over hem uitoefent nogmaals een bestuurlijke boete op.
+      - number: 2
+        content: Artikel 9b, tweede tot en met vierde lid, zijn van toepassing.
+      - number: 3
+        content: De boetebeschikking, bedoeld in het eerste lid, gaat vergezeld van een last, inhoudende dat de verzekeringsplichtige
+          binnen drie maanden na de verzending van de last alsnog krachtens een zorgverzekering verzekerd dient te zijn, bij
+          gebreke waarvan het CAK artikel 9d zal toepassen.
+      - number: 4
+        content: De in dit artikel en in artikel 9b bedoelde boeten worden in ’s Rijks kas gestort.
+    - id: Artikel9d
+      paragraphs:
+      - number: 1
+        content: Indien een verzekeringsplichtige aan wie de bestuurlijke boete en de last, bedoeld in artikel 9c, is opgelegd,
+          niet binnen drie maanden na verzending van de beschikking tot oplegging daarvan alsnog verzekerd is, sluit het CAK
+          namens hem een zorgverzekering waarin hij hem verzekert.
+      - number: 2
+        content: Het CAK kiest de zorgverzekeraar waarmee een zorgverzekering als bedoeld in het eerste lid wordt gesloten,
+          met dien verstande dat het zorgt voor een spreiding van zorgverzekeringen als bedoeld in dat lid over alle zorgverzekeraars,
+          naar evenredigheid van het aantal verzekerden bij iedere zorgverzekeraar.
+      - number: 3
+        content: Indien een zorgverzekeraar verschillende varianten van de zorgverzekering aanbiedt, sluit het CAK een zorgverzekering
+          overeenkomstig de variant met de laagste premie, maar zonder vrijwillig eigen risico.
+      - number: 4
+        content: Op de last, bedoeld in artikel 9c, derde lid, en op het uitvoeren van de last als bedoeld in het eerste lid,
+          is afdeling 5.3.1 van de Algemene wet bestuursrecht, met uitzondering van de artikelen 5:25 en 5:27 tot en met 5:30
+          van die wet, van overeenkomstige toepassing.
+      - number: 5
+        content: Degene die op grond van het eerste lid door het CAK verzekerd is, kan de desbetreffende verzekering gedurende
+          een periode van twee weken, te rekenen vanaf de datum waarop het CAK hem daarvan mededeling heeft gedaan, vernietigen,
+          indien hij jegens het CAK alsmede jegens de zorgverzekeraar bij wie die zorgverzekering is gesloten, aantoont in
+          de periode, bedoeld in dat lid, reeds krachtens een andere zorgverzekering verzekerd te zijn geraakt.
+      - number: 6
+        content: In afwijking van artikel 931 van Boek 7 van het Burgerlijk Wetboek is een zorgverzekeraar bevoegd een met
+          hem gesloten verzekeringsovereenkomst wegens dwaling te vernietigen, indien achteraf blijkt dat degene die het CAK
+          bij hem verzekerde op dat moment niet verzekeringsplichtig was.
+      - number: 7
+        content: Zonodig in afwijking van artikel 7, kan, tenzij het derde lid van dat artikel van toepassing is, een verzekeringnemer
+          een zorgverzekering als bedoeld in het eerste lid niet opzeggen gedurende de eerste twaalf maanden waarover deze
+          loopt.
+  - id: Hoofdstuk3
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel11
+      paragraphs:
+      - number: 1
+        content: 'De zorgverzekeraar heeft jegens zijn verzekerden een zorgplicht die zodanig wordt vormgegeven, dat de verzekerde
+          bij wie het verzekerde risico zich voordoet, krachtens de zorgverzekering recht heeft op prestaties bestaande uit:
+
+
+          a. de zorg of de overige diensten waaraan hij behoefte heeft, of
+
+
+          b. vergoeding van de kosten van deze zorg of overige diensten alsmede, desgevraagd, activiteiten gericht op het
+          verkrijgen van deze zorg of diensten.'
+      - number: 2
+        content: In de zorgverzekering kunnen combinaties van verzekerde prestaties als bedoeld in het eerste lid, onderdeel
+          a of b, worden opgenomen.
+      - number: 3
+        content: Bij algemene maatregel van bestuur worden de inhoud en omvang van de in het eerste lid bedoelde prestaties
+          nader geregeld en kan voor bij die maatregel aan te wijzen vormen van zorg of overige diensten worden bepaald dat
+          een deel van de kosten voor rekening van de verzekerde komt.
+      - number: 4
+        content: 'In de algemene maatregel van bestuur kan worden bepaald dat bij ministeriële regeling:
+
+
+          a. vormen van zorg of overige diensten kunnen worden uitgezonderd van de in het eerste lid bedoelde of in de maatregel
+          nader omschreven prestaties;
+
+
+          b. de inhoud en omvang van de prestaties bestaande uit zorg als bedoeld in artikel 10, onderdelen a, c en d, nader
+          wordt geregeld;
+
+
+          c. nadere regels kunnen worden gesteld over het deel van de kosten dat voor rekening van de verzekerde komt.'
+      - number: 5
+        content: Een zorgverzekeraar kan modelovereenkomsten aanbieden waarin, in geringe afwijking van het bepaalde bij of
+          krachtens het eerste en derde lid, bepaalde om ethische of levensbeschouwelijke redenen controversiële prestaties
+          buiten de dekking van de zorgverzekering blijven.
+    - id: Artikel12
+      paragraphs:
+      - number: 1
+        content: Bij algemene maatregel van bestuur kunnen ter bescherming van het algemeen belang vormen van zorg of overige
+          diensten worden aangewezen die de zorgverzekeraar slechts verstrekt of vergoedt indien tussen hem en de aanbieder
+          van de desbetreffende zorg of dienst een overeenkomst over de te leveren zorg of dienst en de daarvoor in rekening
+          te brengen prijs is gesloten, dan wel indien de aanbieder bij hem in dienst is.
+      - number: 2
+        content: Bij deze algemene maatregel van bestuur kunnen tevens vormen van zorg of overige diensten worden aangewezen
+          waarvoor de zorgverzekeraar met iedere instelling die binnen zijn werkgebied is gelegen of waarvan zijn verzekerden
+          naar verwachting regelmatig gebruik zullen maken, op haar verzoek een overeenkomst als bedoeld in het eerste lid
+          sluit.
+      - number: 3
+        content: Een instelling als bedoeld in artikel 1, onderdeel m, onder 1°, die voor een in het tweede lid bedoelde vorm
+          van zorg of dienst een overeenkomst met een zorgverzekeraar heeft gesloten, is verplicht desgevraagd met een andere
+          zorgverzekeraar een gelijke overeenkomst te sluiten.
+      - number: 4
+        content: Het tweede en het derde lid gelden niet indien de zorgverzekeraar respectievelijk instelling ernstige bezwaren
+          heeft tegen het sluiten van een overeenkomst met de instelling respectievelijk zorgverzekeraar die om die overeenkomst
+          vraagt.
+    - id: Artikel13
+      paragraphs:
+      - number: 1
+        content: Indien een verzekerde krachtens zijn zorgverzekering een bepaalde vorm van zorg of een andere dienst dient
+          te betrekken van een aanbieder met wie zijn zorgverzekeraar een overeenkomst over deze zorg of dienst en de daarvoor
+          in rekening te brengen prijs heeft gesloten of van een aanbieder die bij zijn zorgverzekeraar in dienst is, en hij
+          deze zorg of andere dienst desalniettemin betrekt van een andere aanbieder, heeft hij recht op een door de zorgverzekeraar
+          te bepalen vergoeding van de voor deze zorg of dienst gemaakte kosten.
+      - number: 2
+        content: De zorgverzekeraar neemt de wijze waarop hij de vergoeding berekent in de modelovereenkomst op.
+      - number: 3
+        content: Indien bij of krachtens de algemene maatregel van bestuur, bedoeld in artikel 11, is bepaald dat een deel
+          van de kosten van een bepaalde vorm van zorg of van een bepaalde andere dienst voor rekening van de verzekerde komt,
+          verwerkt de zorgverzekeraar dit in de wijze waarop hij de vergoeding voor de desbetreffende vorm van zorg of dienst
+          berekent.
+      - number: 4
+        content: De wijze waarop de vergoeding wordt berekend is voor alle verzekerden, bedoeld in het eerste lid, die in
+          een zelfde situatie een zelfde vorm van zorg of dienst behoeven, gelijk.
+      - number: 5
+        content: Indien een overeenkomst tussen een zorgverzekeraar en een aanbieder als bedoeld in het eerste lid wordt beëindigd,
+          houdt een verzekerde die op het moment van beëindiging van de overeenkomst zorg ontvangt van deze aanbieder, recht
+          op zorgverlening door die aanbieder voor rekening van deze zorgverzekeraar.
+    - id: Artikel13a
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar neemt in zijn modelovereenkomst op dat de verzekerde die behoefte heeft aan verpleging
+          en verzorging die niet gepaard gaat met verblijf in verband met geneeskundige zorg, desgevraagd altijd in aanmerking
+          komt voor een passende vergoeding in de vorm van een Zvw-pgb. De zorgverzekeraar stelt de verzekerde met deze vergoeding
+          in staat in de praktijk zorg of een andere dienst te betrekken, die is afgestemd op zijn behoeften, persoonskenmerken
+          en mogelijkheden.
+      - number: 2
+        content: De zorgverzekeraar treedt, na de in het eerste lid bedoelde aanvraag en voorafgaand aan het verstrekken van
+          het Zvw-pgb, in contact met de verzekerde. De zorgverzekeraar informeert de verzekerde over de in het derde lid
+          en andere bij of krachtens deze wet gestelde voorwaarden of beperkingen en beoordeelt de geschiktheid van verzekerde
+          om in aanmerking te komen voor een Zvw-pgb.
+      - number: 3
+        content: De zorgverzekeraar neemt in zijn modelovereenkomst de voorwaarden op waaronder de verzekerde in aanmerking
+          komt voor een Zvw-pgb.
+      - number: 4
+        content: De zorgverzekeraar neemt in zijn modelovereenkomst op dat de verzekerde ook in aanmerking kan komen voor
+          een Zvw-pgb indien de kosten die de verzekerde maakt voor het betrekken van de desbetreffende zorg of andere dienst
+          hoger zijn dan de vergoeding in de vorm van het Zvw-pgb, mits het verschil voor rekening van de verzekerde komt.
+      - number: 5
+        content: Bij of krachtens algemene maatregel van bestuur worden regels gesteld over de voorwaarden die aan de verzekerde
+          of diens vertegenwoordiger worden gesteld om in aanmerking te komen voor een Zvw-pgb.
+      - number: 6
+        content: 'Bij of krachtens algemene maatregel van bestuur kunnen regels worden gesteld met betrekking tot:
+
+
+          a. de inhoud van de zorg waarvoor een Zvw-pgb wordt verstrekt;
+
+
+          b. het uitzonderen van vormen van zorg of overige diensten van het Zvw-pgb;
+
+
+          c. het met een Zvw-pgb vergoeden van andere vormen van zorg of overige diensten die onmiddellijk samenhangen met
+          verpleging en verzorging die niet gepaard gaat met verblijf in verband met geneeskundige zorg;
+
+
+          d. de mate van vergoeding die de zorgverzekeraar de verzekerde ten minste moet of ten hoogste mag bieden.'
+      - number: 7
+        content: De zorgverzekeraar wijst de verzekerde bij de aanvraag op het recht op cliëntondersteuning, bedoeld in artikel
+          2.2.4, eerste lid, onder a, van de Wet maatschappelijke ondersteuning 2015.
+      - number: 8
+        content: Bij ministeriële regeling kan een publiekrechtelijke rechtspersoon worden aangewezen die de verzekerde met
+          een Zvw-pgb op diens verzoek ondersteunt bij het verkrijgen van de vergoeding van zijn zorgverzekeraar voor en zijn
+          werkgeverstaken of opdrachtgeverschap in verband met de door verzekerde betrokken zorg of diensten.
+      - number: 9
+        content: In de ministeriële regeling, bedoeld in het achtste lid, kunnen regels worden gesteld over de uitvoering
+          van de ondersteuning en over de verstrekking van een jaarlijkse rijksbijdrage voor de uitvoering van de ondersteuning.
+    - id: Artikel14
+      paragraphs:
+      - number: 1
+        content: De vraag of een verzekerde behoefte heeft aan een bepaalde vorm van zorg of een bepaalde andere dienst, wordt
+          slechts op basis van zorginhoudelijke criteria beantwoord.
+      - number: 2
+        content: De zorgverzekeraar neemt in zijn modelovereenkomst op dat geneeskundige zorg zoals medisch-specialisten die
+          plegen te bieden, met uitzondering van acute zorg, slechts toegankelijk is na verwijzing door in die overeenkomst
+          aangewezen categorieën zorgaanbieders, waaronder in ieder geval de huisarts.
+      - number: 3
+        content: De zorgverzekeraar draagt er zorg voor dat zijn modelovereenkomst aansluit bij de afspraken, bedoeld in artikel
+          2.7, vierde lid, van de Jeugdwet.
+      - number: 4
+        content: De zorgverzekeraar stemt de wijze waarop hij zijn verantwoordelijkheden op grond van deze wet uitvoert, af
+          met de colleges van burgemeester en wethouders met het oog op de wettelijke verantwoordelijkheden van die laatsten.
+      - number: 5
+        content: Voor zover een verzekerde ingevolge zijn zorgverzekering toestemming behoeft van de zorgverzekeraar dan wel
+          een verwijzing of een recept van een deskundige is vereist voor het verkrijgen van de verzekerde prestaties, en
+          de verzekerde in het bezit is van deze toestemming, deze verwijzing of dit recept, geldt die toestemming, die verwijzing
+          of dat recept als titel voor het verkrijgen van de verzekerde prestaties gedurende de periode waarvoor de toestemming
+          is verleend of de verwijzing of het recept geldig is, en verlangt een nieuwe verzekeraar niet dat nogmaals toestemming
+          wordt gevraagd of dat een verwijzing of recept wordt overgelegd.
+    - id: Artikel14a
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar zorgt dat zijn modelovereenkomst aansluit bij de gemaakte afspraken, bedoeld in artikel
+          5.4.1, van de Wet maatschappelijke ondersteuning.
+      - number: 2
+        content: De zorgverzekeraar stemt de wijze waarop hij zijn taken op grond van deze wet uitvoert af met de colleges
+          van burgemeester en wethouders, met het oog op de wettelijke taken van die laatsten op grond van de Wet maatschappelijke
+          ondersteuning.
+    - id: Artikel15
+      paragraphs:
+      - number: 1
+        content: De artikelen 941, eerste lid, en 957 van Boek 7 van het Burgerlijk Wetboek zijn niet van toepassing.
+      - number: 2
+        content: Zonodig in afwijking van artikel 952 van Boek 7 van het Burgerlijk Wetboek is de zorgverzekeraar niet bevoegd
+          een verzekerde prestatie geheel of gedeeltelijk te weigeren indien het intreden van het verzekerde risico aan de
+          verzekerde is te wijten.
+    - id: Artikel16
+      paragraphs:
+      - number: 1
+        content: Krachtens de zorgverzekering is de verzekeringnemer premie verschuldigd.
+      - number: 2
+        content: 'In afwijking van artikel 925 van Boek 7 van het Burgerlijk Wetboek en van het eerste lid:
+
+
+          a. is geen premie verschuldigd tot de eerste dag van de kalendermaand volgende op de kalendermaand waarin een verzekerde
+          de leeftijd van achttien jaren heeft bereikt;
+
+
+          b. is geen premie verschuldigd over de periode, bedoeld in artikel 18d of 18e.'
+    - id: Artikel17
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar stelt voor iedere variant van de zorgverzekering die hij aanbiedt, de grondslag van de
+          premie en de bij die variant behorende premiekorting of premiekortingen vast en neemt deze in de modelovereenkomst
+          op.
+      - number: 2
+        content: De grondslag van de premie is gelijk voor varianten die wat betreft de te verzekeren prestaties als bedoeld
+          in artikel 11, eerste lid, of de keuzemogelijkheden tussen aanbieders van zorg of van overige diensten als bedoeld
+          in dat lid, niet van elkaar verschillen.
+      - number: 3
+        content: Indien de zorgverzekeraar gebruik maakt van zijn bevoegdheid, bedoeld in artikel 11, vijfde lid, is de grondslag
+          van de premie gelijk aan de grondslag die hij heeft of zou hebben vastgesteld voor een modelovereenkomst met volledige
+          dekking.
+      - number: 4
+        content: De grondslag van de premie is de premie indien geen premiekorting als bedoeld in artikel 20 geldt of zou
+          gelden.
+      - number: 5
+        content: De verschuldigde premie is gelijk aan de grondslag van de premie behorende bij de variant van de zorgverzekering
+          die de verzekeringnemer gekozen heeft, verminderd met de premiekorting, bedoeld in artikel 20, indien deze van toepassing
+          is.
+      - number: 6
+        content: De zorgverzekeraar geeft de wijze waarop de verschuldigde premie van de grondslag van de premie wordt afgeleid
+          in de modelovereenkomst weer, en neemt de wijze waarop de door de verzekeringnemer verschuldigde premie van de grondslag
+          van de premie is afgeleid in de zorgpolis op.
+      - number: 7
+        content: Een wijziging in de grondslag van de premie treedt niet eerder in werking dan zeven weken na de dag waarop
+          deze aan de verzekeringnemer is medegedeeld.
+    - id: Artikel18a
+      paragraphs:
+      - number: 1
+        content: Uiterlijk tien werkdagen nadat ten aanzien van een zorgverzekering een achterstand in de betaling van de
+          verschuldigde premie ter hoogte van twee maandpremies is geconstateerd, doet de zorgverzekeraar de verzekeringnemer
+          een aanbod tot het treffen van een betalingsregeling.
+      - number: 2
+        content: 'De betalingsregeling bestaat ten minste uit de volgende elementen:
+
+
+          a. afspraken over de betaling van nieuw vervallende termijnen van de premie,
+
+
+          b. afspraken inzake de afwikkeling van de uit de zorgverzekering voortvloeiende schulden van de verzekeringnemer
+          aan de zorgverzekeraar, inclusief rente en incassokosten, en de termijnen waarbinnen betaling zal plaatsvinden,
+          en
+
+
+          c. een toezegging van de zorgverzekeraar, inhoudende dat hij de zorgverzekering of de dekking daarvan gedurende
+          de looptijd van de betalingsregeling niet om reden van het bestaan van de schulden, bedoeld in onderdeel b, zal
+          beëindigen, schorsen of opschorten, zolang de verzekeringnemer de afspraken, bedoeld in de onderdelen a en b, nakomt.'
+      - number: 3
+        content: 'Indien de verzekeringnemer een ander heeft verzekerd en ten aan zien van diens verzekering een premie-achterstand
+          als bedoeld in het eerste lid is ontstaan, omvat het aanbod, bedoeld in het eerste lid, tevens een bereidverklaring
+          opzegging van deze verzekering met ingang van de dag waarop de betalingsregeling van kracht wordt, te aanvaarden,
+          mits:
+
+
+          a. de verzekerde zichzelf uiterlijk met ingang van dezelfde dag krachtens een andere zorgverzekering verzekerd heeft,
+          en
+
+
+          b. deze, indien deze zorgverzekering bij dezelfde zorgverzekeraar is gesloten, terzake van de premie voor deze verzekering
+          een volmacht of opdracht als bedoeld in het tweede lid, onderdeel a, heeft gegeven.'
+      - number: 4
+        content: Tegelijk met het aanbod deelt de zorgverzekeraar de verzekeringnemer schriftelijk mee dat deze een termijn
+          van vier weken heeft om het te aanvaarden, waarbij de verzekeraar bovendien aangeeft wat de gevolgen zullen zijn
+          indien het aanbod niet wordt aanvaard en de premieschuld, rente en incassokosten buiten beschouwing gelaten, tot
+          zes of meer maandpremies zal zijn opgelopen, en wijst hij de verzekeringnemer op de mogelijkheid van schuldhulpverlening,
+          waarbij hij tevens informatie verstrekt over de vormen hiervan en wijze waarop deze kan worden verzocht.
+      - number: 5
+        content: Indien het derde lid van toepassing is, zendt de zorgverzekeraar de verzekerde tegelijk met de verzending
+          van de in het eerste tot en met vierde lid bedoelde stukken aan de verzekeringnemer, afschriften van deze stukken.
+    - id: Artikel18b
+      paragraphs:
+      - number: 1
+        content: Zo spoedig mogelijk nadat ten aanzien van een zorgverzekering, rente en incassokosten buiten beschouwing
+          latend, een achterstand in de betaling van de verschuldigde premie ter hoogte van vier maandpremies is geconstateerd,
+          deelt de zorgverzekeraar de verzekeringnemer en, indien deze een ander is dan de verzekeringnemer, de verzekerde
+          mee dat hij voornemens is over te gaan tot de melding, bedoeld in artikel 18c, zodra de premieschuld de daar bedoelde
+          hoogte zal hebben bereikt, tenzij de verzekeringnemer of de verzekerde hem uiterlijk vier weken na ontvangst van
+          de mededeling heeft laten weten, het bestaan van de schuld of de hoogte ervan te betwisten.
+      - number: 2
+        content: Ingeval van tijdige betwisting als bedoeld in het eerste lid deelt de zorgverzekeraar, indien deze na onderzoek
+          zijn standpunt handhaaft, de verzekeringnemer en, indien deze een ander is dan de verzekeringnemer, de verzekerde
+          mee dat hij het voornemen tot melding tot uitvoering zal brengen zodra de premieschuld de in artikel 18c, eerste
+          lid, bedoelde hoogte zal hebben bereikt, tenzij de verzekeringnemer of de verzekerde binnen een termijn van vier
+          weken na ontvangst van de in dit lid bedoelde mededeling een geschil hierover heeft voorgelegd aan een onafhankelijke
+          instantie als bedoeld in artikel 114 of aan de burgerlijke rechter.
+      - number: 3
+        content: Indien een betalingsregeling als bedoeld in artikel 18a ingaat nadat ten aanzien van de zorgverzekering,
+          rente en incassokosten buiten beschouwing latend, een achterstand in de betaling van de verschuldigde premie ter
+          hoogte van vier maandpremies is ontstaan, laat de zorgverzekeraar de in het eerste lid bedoelde melding achterwege
+          zolang de nieuw vervallende termijnen van de premie worden voldaan.
+    - id: Artikel18c
+      paragraphs:
+      - number: 1
+        content: Indien ten aanzien van een zorgverzekering, rente en incassokosten buiten beschouwing latend, een premieschuld
+          ter hoogte van zes of meer maandpremies is ontstaan, meldt de zorgverzekeraar dit, onder vermelding van de voor
+          de heffing van de bestuursrechtelijke premie alsmede voor de uitvoering van artikel 34a noodzakelijke persoonsgegevens
+          van de verzekeringnemer en de verzekerde, aan het CAK, de verzekeringnemer en, indien deze een ander is dan de verzekeringnemer,
+          aan de verzekerde.
+      - number: 2
+        content: 'De melding geschiedt niet:
+
+
+          a. in geval van tijdige betwisting als bedoeld in artikel 18b, eerste lid, zolang de zorgverzekeraar zijn standpunt
+          dienaangaande niet aan de verzekeringnemer en, indien dit een ander dan de verzekeringnemer is, aan de verzekerde
+          heeft kenbaar gemaakt;
+
+
+          b. gedurende de termijn, genoemd in artikel 18b, tweede lid;
+
+
+          c. ingeval van tijdige voorlegging van het geschil aan een onafhankelijke instantie of aan de burgerlijke rechter
+          als bedoeld in artikel 18b, tweede lid, zolang op het geschil niet onherroepelijk is beslist;
+
+
+          d. ingeval de verzekeringnemer zich heeft aangemeld bij een schuldhulpverlener als bedoeld in artikel 48 van de
+          Wet op het consumentenkrediet en aantoont dat hij in het kader daarvan een schriftelijke overeenkomst tot stabilisatie
+          van zijn schulden heeft gesloten;
+
+
+          e. ingeval het adres van de verzekeringnemer en, indien dit een ander is dan de verzekeringnemer, de verzekerde,
+          niet in de basisregistratie personen voorkomt of het adres zoals dat is opgenomen in de administratie van de zorgverzekeraar
+          afwijkt van het adres waaronder deze persoon of personen in de basisregistratie personen als ingezetene staat of
+          staan ingeschreven, tenzij deze afwijking het gevolg is van een omstandigheid als bedoeld in artikel 4a, derde lid,
+          onderdeel a tot en met c.'
+      - number: 3
+        content: Onderdeel van de melding vormt een verklaring van de zorgverzekeraar, inhoudende dat hij artikel 18b en het
+          tweede lid in acht heeft genomen.
+      - number: 4
+        content: Na de melding verleent de zorgverzekeraar aantoonbaar voldoende medewerking aan activiteiten van de verzekeringnemer
+          of derden, gericht op aflossing van de jegens de zorgverzekeraar bestaande, uit de zorgverzekering voortvloeiende
+          schuld.
+      - number: 5
+        content: Bij ministeriële regeling wordt bepaald wanneer sprake is van het verrichten van aantoonbaar voldoende medewerking
+          als bedoeld in het vierde lid.
+    - id: Artikel18d
+      paragraphs:
+      - number: 1
+        content: De verzekeringnemer is vanaf de eerste dag van de maand volgende op de maand waarin het CAK de melding, bedoeld
+          in artikel 18c, heeft ontvangen aan het CAK een bij ministeriële regeling te bepalen, bestuursrechtelijke premie
+          van ten minste 110% en ten hoogste 130% van de gemiddelde premie verschuldigd.
+      - number: 2
+        content: 'De premie, bedoeld in het eerste lid, is niet meer verschuldigd met ingang van de eerste dag van de maand
+          volgende op de maand waarin:
+
+
+          a. de uit de zorgverzekering voortvloeiende schulden zijn of zullen zijn afgelost of tenietgaan,
+
+
+          b. de schuldsaneringsregeling natuurlijke personen, bedoeld in de Faillissementswet, op de verzekeringnemer van
+          toepassing wordt,
+
+
+          c. door tussenkomst van een schuldhulpverlener als bedoeld in artikel 48 van de Wet op het consumentenkrediet een
+          overeenkomst als bedoeld in artikel 18c, tweede lid, onderdeel d, is gesloten, door diens tussenkomst een buitengerechtelijke
+          schuldregeling tot stand is gekomen waarin, naast de verzekeringnemer, ten minste zijn zorgverzekeraar deelneemt,
+          of de zorgverzekeraar met de verzekeringnemer een betalingsregeling is overeengekomen, of
+
+
+          d. de verzekeringnemer aan bij ministeriële regeling te bepalen voorwaarden voldoet.'
+      - number: 3
+        content: Ten behoeve van de toepassing van het tweede lid stelt de zorgverzekeraar het CAK, de verzekeringnemer en,
+          indien deze een ander is dan de verzekeringnemer, de verzekerde, onverwijld op de hoogte van de datum waarop een
+          situatie als bedoeld in onderdeel a, b of c van dat lid van toepassing wordt.
+      - number: 4
+        content: 'In afwijking van het eerste en tweede lid is de verzekeringnemer wederom aan het CAK bestuursrechtelijke
+          premie verschuldigd vanaf de eerste dag van de maand volgende op de maand:
+
+
+          a. waarin de toepassing van de schuldsaneringsregeling natuurlijke personen op grond van artikel 350, derde lid,
+          onderdeel c, d, e, f, of g, van de Faillissementwet, is beëindigd,
+
+
+          b. waarin hij zich, blijkens een melding van zijn zorgverzekeraar, aan deelname aan een op hem van toepassing zijnde
+          overeenkomst of regeling als bedoeld in het tweede lid, onderdeel c, heeft onttrokken voordat hij de in de desbetreffende
+          overeenkomst of regeling neergelegde afspraken jegens zijn zorgverzekeraar volledig is nagekomen of
+
+
+          c. waarin hij niet meer voldoet aan bij de ministeriële regeling, bedoeld in het tweede lid, te bepalen voorwaarden.'
+      - number: 5
+        content: Indien in het in het vierde lid, onderdeel b, bedoeld geval een door tussenkomst van een schuldhulpverlener
+          als bedoeld in het tweede lid, onderdeel c, tot stand gekomen overeenkomst of regeling betreft, dient de melding,
+          bedoeld in dat onderdeel mede door een schuldhulpverlener te zijn ondertekend.
+      - number: 6
+        content: Bij ministeriële regeling wordt bepaald hoe de gemiddelde premie, bedoeld in het eerste lid, wordt berekend.
+    - id: Artikel18e
+      paragraphs:
+      - number: 1
+        content: Gedurende de eerste twaalf maanden waarover een verzekering als bedoeld in artikel 9d loopt, is de verzekeringnemer
+          vanaf de eerste dag van de kalendermaand volgende op de maand waarin hij de leeftijd van achttien jaren heeft bereikt
+          aan het CAK een bestuursrechtelijke premie verschuldigd.
+      - number: 2
+        content: De hoogte van de bestuursrechtelijke premie wordt bij ministeriële regeling vastgesteld op een percentage
+          van de gemiddelde premie.
+      - number: 3
+        content: Artikel 18d, zesde lid, is van toepassing.
+    - id: Artikel18f
+      paragraphs:
+      - number: 1
+        content: Het CAK heft en int de bestuursrechtelijke premie.
+      - number: 2
+        content: In opdracht van het CAK houdt de inhoudingsplichtige de bestuursrechtelijke premie geheel of voor een door
+          het CAK te bepalen gedeelte in op door hem aan de verzekeringnemer verschuldigd loon als bedoeld in de Wet op de
+          loonbelasting 1964, waarna hij het ingehouden bedrag aan het CAK afdraagt.
+      - number: 3
+        content: De inhouding geschiedt onmiddellijk nadat de krachtens een ander wettelijk voorschrift of krachtens een arbeidsovereenkomst
+          verplicht in te houden belastingen, premies of andere bijdragen zijn ingehouden, met dien verstande dat bij ministeriële
+          regeling op socialezekerheidsuitkeringen te verrichten inhoudingen of verrekeningen kunnen worden aangewezen waarvoor
+          een andere volgorde geldt.
+      - number: 4
+        content: Een inhoudingsplichtige die het door het CAK aan te geven bedrag niet of niet geheel heeft ingehouden, is
+          gehouden het gehele bedrag aan het CAK af te dragen, zonder dat het niet ingehouden bedrag alsnog op de verzekeringnemer
+          kan worden verhaald.
+      - number: 5
+        content: Indien op loon waarop bestuursrechtelijke premie is ingehouden tevens derdenbeslag ligt, is het bedrag dat
+          de inhoudingsplichtige ten minste aan de verzekeringnemer uitbetaalt gelijk aan de beslagvrije voet, bedoeld in
+          de artikelen 475c tot en met 475e van het Wetboek van Burgerlijke Rechtsvordering, verminderd met het in opdracht
+          van het CAK ingehouden bedrag.
+      - number: 6
+        content: In opdracht van het CAK wordt een aan de verzekeringnemer of zijn partner uit te betalen zorgtoeslag als
+          bedoeld in de Wet op de zorgtoeslag of een voorschot daarop, in afwijking van artikel 25, eerste lid, van de Algemene
+          wet inkomensafhankelijke regelingen, als tegemoetkoming in de bestuursrechtelijke premie aan het CAK uitbetaald.
+      - number: 7
+        content: Het CAK kan de bestuursrechtelijke premie of het door de werkgever af te dragen bedrag, bedoeld in het vierde
+          lid, bij dwangbevel invorderen.
+      - number: 8
+        content: Het CAK heeft terzake van de bestuursrechtelijke premie die op andere wijze dan bij wege van inhouding wordt
+          geïnd, een voorrecht op alle goederen van de verzekeringnemer, welk voorrecht onmiddellijk na het voorrecht, bedoeld
+          in artikel 21 van de Invorderingswet 1990, kan worden uitgeoefend.
+      - number: 9
+        content: Indien het CAK ter zake van de inning van de bestuursrechtelijke premie beslag laat leggen onder een derde
+          die de verzekeringnemer periodieke betalingen, niet zijnde periodieke betalingen ter zake van het levensonderhoud
+          van diens kinderen, verschuldigd is, is de derde-beslagene vanaf de dag van het beslag verplicht om, zolang het
+          CAK dit verlangt, het door het CAK aangegeven achterstallige bedrag en telkens de nieuw vervallende termijnen van
+          de bestuursrechtelijke premie of door het CAK te bepalen gedeelten daarvan, tot welker verhaal het beslag is gelegd,
+          met inachtneming van het bepaalde in artikel 478, eerste en tweede lid, van het Wetboek van Burgerlijke Rechtsvordering,
+          aan het CAK uit te betalen, tenzij onder hem beslag gelegd mocht worden wegens vorderingen van hogere of gelijke
+          rang.
+      - number: 10
+        content: Indien een beslag als bedoeld in het negende lid is gelegd op een vordering tot een periodieke betaling als
+          bedoeld in artikel 475c van het Wetboek van Burgerlijke Rechtsvordering, wordt de beslagvrije voet, berekend overeenkomstig
+          de artikelen 475d tot en met 475e van die wet, louter ten aanzien van de vordering van het CAK ter zake waarvan
+          het beslag is gelegd en enkel voor zover het beslag dient tot inning van een nieuw vervallende termijn als bedoeld
+          in het negende lid, verlaagd met de bestuursrechtelijke premie.
+      - number: 11
+        content: De derde die meer aan het CAK heeft betaald dan waarop deze recht heeft, is jegens de verzekeringnemer bevrijd,
+          voor zover dat voortvloeit uit artikel 34 van Boek 6 van het Burgerlijk Wetboek.
+    - id: Artikel18g
+      paragraphs:
+      - number: 1
+        content: Het CAK gebruikt het burgerservicenummer van de in de artikelen 18c, eerste lid, en 18e bedoelde personen,
+          met het doel te waarborgen dat de in het kader van de uitvoering van deze afdeling en artikel 34a te verwerken persoonsgegevens
+          op die personen betrekking hebben.
+      - number: 2
+        content: Bij gegevensuitwisseling tussen het CAK en de in de artikelen 18f, 88 en 89 bedoelde personen en instanties
+          wordt, voor de uitvoering van deze afdeling en voor zover die personen en instanties tot gebruik van dat nummer
+          bevoegd zijn, het burgerservicenummer gebruikt.
+      - number: 3
+        content: Het CAK is bevoegd tot het verwerken van persoonsgegevens van de in de artikelen 18c, eerste lid, en 18e
+          bedoelde personen, die noodzakelijk zijn voor de uitvoering van deze afdeling en artikel 34a.
+      - number: 4
+        content: Het CAK is de verwerkingsverantwoordelijke, voor de verwerking, bedoeld in het derde lid.
+      - number: 5
+        content: Het CAK is bevoegd schulden ter zake van de bestuursrechtelijke premie die hem nog niet zijn voldaan nadat
+          artikel 18d of 18e niet meer op de verzekeringnemer van toepassing is, kwijt te schelden.
+      - number: 6
+        content: Bij ministeriële regeling worden nadere regels gesteld over de wijze waarop het CAK de bestuursrechtelijke
+          premie int en wordt bepaald welk gedeelte van de geïnde bestuursrechtelijke premie door het CAK in ’s Rijks kas
+          wordt gestort.
+    - id: Artikel19
+      paragraphs:
+      - number: 1
+        content: Iedere verzekerde van achttien jaar of ouder heeft een verplicht eigen risico van € 385 per kalenderjaar.
+      - number: 2
+        content: Het bedrag, genoemd in het eerste lid, wordt jaarlijks geïndexeerd overeenkomstig het verschil in geraamde
+          uitgaven voor de zorg en overige diensten, bedoeld in artikel 11, tussen het kalenderjaar waarop het verplicht eigen
+          risico betrekking zal hebben en vergelijkbare uitgaven voor het jaar voorafgaand aan dat kalenderjaar.
+      - number: 3
+        content: Indien het geïndexeerde bedrag naar beneden afgerond € 5 of een veelvoud daarvan verschilt van het in het
+          eerste lid genoemde bedrag, wordt dit bedrag bij ministeriële regeling gewijzigd, waarna het in die regeling genoemde
+          bedrag in de plaats treedt van het in het eerste lid genoemde bedrag.
+      - number: 4
+        content: Rekeningen voor kosten van zorg of overige diensten worden slechts op het verplicht eigen risico in mindering
+          gebracht, indien deze door de zorgverzekeraar zijn ontvangen voor een bij algemene maatregel van bestuur te bepalen
+          dag van het kalenderjaar volgend op het kalenderjaar waarop het verplicht eigen risico betrekking heeft, tenzij
+          het aan de verzekerde te wijten is dat de rekening niet voor die dag is ingediend.
+      - number: 5
+        content: In afwijking van het vierde lid is de zorgverzekeraar gerechtigd het verplicht eigen risico in rekening te
+          brengen indien het aan de verzekerde te wijten is dat de rekening niet voor de bij algemene maatregel van bestuur
+          bepaalde dag is ingediend.
+      - number: 6
+        content: Bij algemene maatregel van bestuur wordt bepaald op welke wijze het verplicht eigen risico in mindering wordt
+          gebracht.
+      - number: 7
+        content: Het tweede en derde lid blijven buiten toepassing voor de jaren 2019 tot en met 2025.
+    - id: Artikel20
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar biedt van iedere zorgverzekering met een bepaalde combinatie van te verzekeren prestaties
+          als bedoeld in artikel 11, eerste lid, een variant zonder vrijwillig eigen risico aan.
+      - number: 2
+        content: De zorgverzekeraar kan voor de verzekering van een persoon van achttien jaar of ouder varianten van de zorgverzekering
+          aanbieden met een vrijwillig eigen risico van € 100, € 200, € 300, € 400 of € 500 per kalenderjaar, waartegenover
+          hij een korting op de grondslag van de premie verleent.
+      - number: 3
+        content: 'De korting mag afhangen van:
+
+
+          a. de omvang van het voor de verzekerde gekozen vrijwillig eigen risico;
+
+
+          b. het aantal kalenderjaren waarvoor een vrijwillig eigen risico voor de verzekerde gegolden heeft.'
+      - number: 4
+        content: De zorgverzekeraar neemt in zijn modelovereenkomst op welke premiekorting bij welk vrijwillig eigen risico
+          voor welk aantal kalenderjaren geldt.
+      - number: 5
+        content: Indien de zorgverzekeraar een of meer van de door hem aangeboden vrijwillige eigen risico’s laat vervallen,
+          geeft de zorgverzekeraar de verzekeringnemers die een zorgverzekering met zo’n vrijwillig eigen risico hebben afgesloten,
+          de mogelijkheid om te kiezen voor een zorgverzekering met een lager of zonder vrijwillig eigen risico.
+    - id: Artikel21
+      paragraphs:
+      - number: 1
+        content: Het percentage van de kosten van zorg of overige diensten dat ten laste gaat van het verplicht eigen risico,
+          wordt bij algemene maatregel van bestuur vastgesteld.
+      - number: 2
+        content: In afwijking van het eerste lid kunnen bij algemene maatregel van bestuur vormen van zorg of overige diensten
+          worden aangewezen waarvoor de kosten geheel, gedeeltelijk of in het geheel niet onder het verplicht eigen risico
+          vallen.
+      - number: 3
+        content: In afwijking van het eerste lid kunnen bij algemene maatregel van bestuur vormen van zorg of overige diensten
+          worden aangewezen waarvan de zorgverzekeraar, onder bij die maatregel te bepalen voorwaarden, kan bepalen dat de
+          kosten geheel of gedeeltelijk buiten het verplicht eigen risico vallen.
+      - number: 4
+        content: De zorgverzekeraar kan vormen van zorg of overige diensten aanwijzen waarvan de kosten niet onder het vrijwillig
+          eigen risico vallen, met dien verstande dat bij algemene maatregel van bestuur vormen van zorg of overige diensten
+          kunnen worden aangewezen waarvan de kosten geheel of gedeeltelijk buiten het vrijwillig eigen risico vallen.
+    - id: Artikel22
+      paragraphs:
+      - number: 1
+        content: Indien een zorgverzekering niet op 1 januari van een kalenderjaar ingaat of eindigt, is het in dat kalenderjaar
+          voor die overeenkomst geldende bedrag van het verplicht eigen risico en indien dat van toepassing is, vrijwillig
+          eigen risico gelijk aan het voor het gehele kalenderjaar geldende bedrag, vermenigvuldigd met een breuk waarvan
+          de teller gelijk is aan het aantal dagen in dat kalenderjaar waarover de zorgverzekering zal lopen of heeft gelopen,
+          en de noemer aan het aantal dagen in het desbetreffende kalenderjaar.
+      - number: 2
+        content: 'In afwijking van het eerste lid wordt het in het kalenderjaar geldende bedrag van het vrijwillig eigen risico
+          indien dat gedurende het kalenderjaar wijzigt en de verzekeringnemer onmiddellijk voorafgaande aan die wijziging
+          reeds een zorgverzekering met de zorgverzekeraar had gesloten, als volgt berekend:
+
+
+          a. ieder bedrag aan vrijwillig eigen risico dat in het desbetreffende kalenderjaar heeft gegolden of zal gelden,
+          wordt vermenigvuldigd met het aantal in dat jaar gelegen dagen waarvoor dat risico gold of zal gelden;
+
+
+          b. de op grond van onderdeel a berekende bedragen worden bij elkaar opgeteld;
+
+
+          c. het op grond van onderdeel b berekende bedrag wordt gedeeld door het aantal dagen in het kalenderjaar.'
+      - number: 3
+        content: Het op grond van het eerste of tweede lid berekende bedrag wordt afgerond op hele euro’s.
+    - id: Artikel23
+      paragraphs:
+      - number: 1
+        content: Kosten van zorg of een andere dienst worden toegerekend aan het kalenderjaar waarin de zorg of dienst is
+          genoten, met dien verstande dat de kosten van zorg of een andere dienst die in twee achtereenvolgende kalenderjaren
+          is genoten en door de zorgaanbieder of andere dienstverlener in één bedrag in rekening zijn gebracht, worden toegerekend
+          aan het kalenderjaar waarin de zorg of dienst is aangevangen.
+      - number: 2
+        content: Bedragen als bedoeld in artikel 11, derde of vierde lid, die voor rekening van de verzekerde komen, of kosten
+          als bedoeld in artikel 13, eerste lid, voor zover zij voor rekening van de verzekerde blijven, worden bij de beantwoording
+          van de vraag of een voor zijn verzekering geldend verplicht of vrijwillig eigen risico wordt overschreden, buiten
+          aanmerking gelaten.
+      - number: 3
+        content: Een zorgverzekeraar brengt kosten van zorg of overige diensten die zowel ten laste van het verplicht als
+          het vrijwillig eigen risico kunnen komen, eerst ten laste van het verplicht eigen risico.
+    - id: Artikel24
+      paragraphs:
+      - number: 1
+        content: De rechten en plichten uit de zorgverzekering zijn van rechtswege opgeschort gedurende de periode waarover
+          Onze Minister van Justitie in het kader van de uitvoering van een rechterlijke uitspraak verantwoordelijk is voor
+          de verstrekking van geneeskundige zorg aan een verzekerde.
+      - number: 2
+        content: Het eerste lid is niet van toepassing gedurende de periode waarover iemand die geen gedetineerde is in de
+          zin van de Wet forensische zorg, forensische zorg als bedoeld in die wet geniet.
+      - number: 3
+        content: De rechten en plichten uit de zorgverzekering zijn eveneens van rechtswege opgeschort gedurende de periode
+          dat een verzekerde blijkens een verklaring van de Minister van Buitenlandse Zaken of een verklaring van Reclassering
+          Nederland buiten Nederland in detentie is genomen.
+      - number: 4
+        content: De verzekeringnemer, de verzekerde, of de gemachtigde van de verzekeringnemer of verzekerde meldt de zorgverzekeraar
+          de dag waarop de periode, bedoeld in het eerste of derde lid, aanvangt, waarbij hij indien het derde lid van toepassing
+          is, tevens de daar bedoelde verklaring aan de zorgverzekeraar overlegt.
+  - id: Hoofdstuk4
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel25
+      paragraphs:
+      - number: 1
+        content: Een verzekeraar meldt het voornemen zorgverzekeringen aan te bieden en uit te voeren schriftelijk aan de
+          zorgautoriteit, onder vermelding van de dag met ingang waarvan hij zorgverzekeringen zal aanbieden.
+      - number: 2
+        content: De verzekeraar voegt bij de melding alle modelovereenkomsten volgens welke hij zorgverzekeringen wenst aan
+          te bieden.
+      - number: 3
+        content: Een zorgverzekeraar legt wijzigingen in zijn modelovereenkomsten of nieuwe modelovereenkomsten voordat deze
+          ingaan aan de zorgautoriteit over.
+    - id: Artikel26
+      paragraphs:
+      - number: 1
+        content: De zorgautoriteit tekent de datum van ontvangst aan op het geschrift waarmee de melding, bedoeld in artikel
+          25, eerste lid, is gedaan, alsmede op de modelovereenkomsten of wijzigingen daarvan, bedoeld in artikel 25, tweede
+          en derde lid.
+      - number: 2
+        content: De zorgautoriteit zendt de verzekeraar onverwijld een bewijs van ontvangst, waarin die datum is vermeld.
+      - number: 3
+        content: De zorgautoriteit zendt het Zorginstituut onverwijld een afschrift van de melding, de modelovereenkomsten
+          of de wijzigingen in de modelovereenkomsten, onder vermelding van de datum van ontvangst ervan.
+      - number: 4
+        content: De zorgautoriteit zendt de beheerder van het register van zorgverzekeraars, bedoeld in artikel 14 van de
+          Wet aanvullende bepalingen verwerking persoonsgegevens in de zorg, onverwijld een afschrift van de melding onder
+          vermelding van de datum van ontvangst ervan.
+    - id: Artikel28
+      paragraphs:
+      - number: 1
+        content: 'De statuten van een zorgverzekeraar:
+
+
+          a. voorzien in toezicht op het beleid van het bestuur en op de algemene gang van zaken in de rechtspersoon en de
+          daarmee verbonden onderneming,
+
+
+          b. bieden waarborgen voor een redelijke mate van invloed van de verzekerden op het beleid, en
+
+
+          c. sluiten iedere verplichting van de verzekeringnemers, verzekerden, gewezen verzekeringnemers of gewezen verzekerden
+          tot het doen van een bijdrage in tekorten van de rechtspersoon uit.'
+      - number: 2
+        content: Een waarborg als bedoeld in het eerste lid, onderdeel b, bestaat in ieder geval uit het aan een permanente
+          vertegenwoordiging van verzekerden toekennen van het recht om in te stemmen met de in artikel 28a, eerste lid, bedoelde
+          regeling en het recht om advies uit te brengen over de bij of krachtens artikel 28c aangewezen onderwerpen.
+    - id: Artikel28a
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar stelt een schriftelijke regeling vast waarin wordt bepaald op welke onderdelen van het
+          beleid hij zijn verzekerden in de gelegenheid stelt inspraak uit te oefenen. In die regeling wordt tevens bepaald
+          op welke wijze de inspraak kan worden verkregen en op welke wijze de verzekerden worden geïnformeerd over de resultaten
+          van de inspraak alsmede over hetgeen daarmee is gedaan.
+      - number: 2
+        content: 'In de regeling worden in elk geval onderdelen aangewezen van het beleid betreffende:
+
+
+          a. het met zorgaanbieders sluiten van overeenkomsten met betrekking tot de zorg of overige diensten;
+
+
+          b. de wijze waarop de zorgverzekeraar met zijn verzekerden communiceert.'
+      - number: 3
+        content: Bij algemene maatregel van bestuur kunnen in aanvulling op het bepaalde in het tweede lid beleidsterreinen
+          worden aangewezen waarvan onderdelen in de regeling moeten worden aangewezen.
+      - number: 4
+        content: De zorgverzekeraar stelt zijn verzekerden in de gelegenheid inspraak uit te oefenen overeenkomstig het bepaalde
+          in de regeling, bedoeld in het eerste lid.
+      - number: 5
+        content: De zorgverzekeraar behoeft de instemming van de vertegenwoordiging, bedoeld in artikel 28, tweede lid, voor
+          de vaststelling, wijziging of intrekking van de regeling. De zorgverzekeraar mag de regeling uitsluitend vaststellen
+          zonder instemming van de vertegenwoordiging, indien het onthouden van de instemming door de vertegenwoordiging onredelijk
+          is.
+      - number: 6
+        content: De zorgverzekeraar maakt de regeling openbaar.
+    - id: Artikel28b
+      paragraphs:
+      - number: 1
+        content: De vertegenwoordiging, bedoeld in artikel 28, tweede lid, bestaat uitsluitend uit verzekerden van de zorgverzekeraar
+          of, indien de zorgverzekeraar deel uitmaakt van een groep als bedoeld in artikel 24b van Boek 2 van het Burgerlijk
+          Wetboek, uit vertegenwoordigers van de verzekerden van alle betrokken zorgverzekeraars van de groep.
+      - number: 2
+        content: 'De zorgverzekeraar kent de rechten, genoemd in artikel 28, tweede lid, uitsluitend toe aan een vertegenwoordiging
+          waarvoor statutair is geregeld dat zij voor zover mogelijk zodanig is samengesteld dat:
+
+
+          a. zij wat betreft in ieder geval leeftijd, woonplaats en opleiding een goede afspiegeling is van de verzekerden
+          en dat de samenstelling aansluit bij de verscheidenheid van de verzekerden;
+
+
+          b. zij redelijkerwijs de diverse belangen van de verzekerden kan behartigen, en
+
+
+          c. indien de vertegenwoordiging verzekerden vertegenwoordigt van zorgverzekeraars die tot eenzelfde groep als bedoeld
+          in artikel 24b, van Boek 2 van het Burgerlijk Wetboek behoren, sprake is van een evenwichtige verdeling van het
+          aantal vertegenwoordigers van de verzekerden van elk van de betrokken zorgverzekeraars.'
+      - number: 3
+        content: De zorgverzekeraar bepaalt in zijn statuten het aantal leden waaruit de vertegenwoordiging ten minste moet
+          bestaan alsmede de wijze van benoeming van die leden, waarbij wordt bepaald dat elke verzekerde van 18 jaar of ouder
+          in de gelegenheid wordt gesteld zich kandidaat te stellen.
+      - number: 4
+        content: 'De vertegenwoordiging zorgt voor:
+
+
+          a. het regelmatig inventariseren van de wensen en meningen van de betrokken verzekerden; en
+
+
+          b. het informeren van de betrokken verzekerden over zijn werkzaamheden en de resultaten daarvan.'
+      - number: 5
+        content: 'De zorgverzekeraar draagt er zorg voor dat:
+
+
+          a. een vacature voor de vertegenwoordiging openbaar wordt gemaakt;
+
+
+          b. de vertegenwoordiging gebruik kan maken van de voorzieningen die zij redelijkerwijs nodig heeft voor de vervulling
+          van haar werkzaamheden, en
+
+
+          c. wordt voorzien in de kosten die redelijkerwijs noodzakelijk zijn voor de vervulling van de werkzaamheden van
+          de vertegenwoordiging, waaronder de kosten die verband houden met scholing, onafhankelijke ondersteuning en het
+          voeren van rechtsgedingen.'
+      - number: 6
+        content: De zorgverzekeraar verstrekt de vertegenwoordiging tijdig en desgevraagd schriftelijk alle inlichtingen en
+          gegevens die zij voor de vervulling van haar werkzaamheden redelijkerwijs nodig heeft.
+      - number: 7
+        content: De zorgverzekeraar verleent de vertegenwoordiging desgevraagd hulp bij de uitvoering van het vierde lid.
+    - id: Artikel28c
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar stelt de vertegenwoordiging, bedoeld in artikel 28, tweede lid, in de gelegenheid advies
+          uit te brengen over de vaststelling, wijziging of intrekking van het jaarlijkse zorginkoopbeleid.
+      - number: 2
+        content: Het advies wordt op een zodanig tijdstip gevraagd, dat de vertegenwoordiging redelijkerwijs genoeg tijd heeft
+          zich een goed oordeel ter zake te vormen en dat het advies van wezenlijke invloed kan zijn op het jaarlijkse zorginkoopbeleid.
+      - number: 3
+        content: De vertegenwoordiging brengt binnen een redelijke termijn schriftelijk advies uit en betrekt daarin hetgeen
+          is gedaan met de resultaten van de inspraak als bedoeld in artikel 28a, tweede lid, onderdeel a.
+      - number: 4
+        content: De vertegenwoordiging is bevoegd de zorgverzekeraar ongevraagd te adviseren over het jaarlijkse zorginkoopbeleid.
+      - number: 5
+        content: De zorgverzekeraar doet van de vaststelling, wijziging of intrekking van het jaarlijkse zorginkoopbeleid
+          schriftelijk, en voor zover van het advies wordt afgeweken onder opgave van redenen, mededeling aan de vertegenwoordiging.
+      - number: 6
+        content: Bij algemene maatregel van bestuur kunnen onderdelen van beleidsterreinen worden aangewezen waarop het bepaalde
+          in het eerste tot en met vijfde lid van overeenkomstige toepassing is.
+      - number: 7
+        content: Indien de zorgverzekeraar in zijn statuten bepaalt dat de vertegenwoordiging ook over andere onderdelen van
+          het beleid advies uit kan brengen, is het bepaalde in het eerste tot en met vijfde lid van overeenkomstige toepassing.
+    - id: Artikel29
+      paragraphs:
+      - number: 1
+        content: Het werkgebied van een zorgverzekeraar is Nederland.
+      - number: 2
+        content: In afwijking van het eerste lid kan een zorgverzekeraar zijn werkgebied tot een of meer gehele provincies
+          van Nederland beperken zolang bij hem minder dan 850 000 verzekerden op basis van een zorgverzekering verzekerd
+          zijn.
+      - number: 3
+        content: Voor de bepaling van het aantal verzekerden, bedoeld in het tweede lid, wordt uitgegaan van het gemiddelde
+          aantal verzekerden in het tweede jaar voorafgaande aan het jaar waarvoor de bepaling geschiedt.
+      - number: 4
+        content: Bij ministeriële regeling kunnen regels worden gesteld over de wijze waarop het aantal verzekerden wordt
+          bepaald indien de zorgverzekeraar in het tweede of eerste jaar voorafgaande aan het jaar waarvoor de bepaling geschiedt,
+          rechtsopvolger is geweest van, gefuseerd is met, of afgesplitst is van een andere zorgverzekeraar dan wel indien
+          deze verzekeraar zorgverzekeringen van een andere zorgverzekeraar heeft overgenomen.
+    - id: Artikel30
+      paragraphs:
+      - number: 1
+        content: Een zorgverzekeraar die geen zorgverzekeringen meer wenst aan te bieden of uit te voeren, meldt het voornemen
+          hiertoe schriftelijk aan de zorgautoriteit, onder vermelding van de dag met ingang waarvan hij geen zorgverzekeringen
+          meer zal uitvoeren.
+      - number: 2
+        content: Artikel 26 is van overeenkomstige toepassing.
+    - id: Artikel31
+      paragraphs:
+      - number: 1
+        content: Indien een voormalige zorgverzekeraar failliet is verklaard, voldoet het Zorginstituut aan de verzekerden
+          jegens die zorgverzekeraar of voormalige zorgverzekeraar bestaande vorderingen ter zake van een recht op vergoeding
+          als bedoeld in artikel 11, eerste lid, onderdeel b, of artikel 13.
+      - number: 2
+        content: De vorderingen, bedoeld in het eerste lid, gaan bij wijze van subrogatie op het Zorginstituut over voor zover
+          dat instituut deze heeft voldaan.
+      - number: 3
+        content: Het Rijk is tegenover het Zorginstituut aansprakelijk voor de betalingen, bedoeld in het eerste lid.
+    - id: Artikel32
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut kent een zorgverzekeraar die voldaan heeft aan zijn verplichtingen, bedoeld in artikel
+          25, voor ieder kalenderjaar waarin hij zorgverzekeringen aanbiedt en uitvoert een vereveningsbijdrage toe.
+      - number: 2
+        content: Bij algemene maatregel van bestuur worden regels omtrent de berekening van de vereveningsbijdragen gesteld.
+      - number: 3
+        content: De regels, bedoeld in het tweede lid, bepalen ten minste dat de hoogte van de vereveningsbijdrage wordt berekend
+          op basis van bij die maatregel te bepalen, voor alle zorgverzekeraars gelijke criteria, waaronder in ieder geval
+          het aantal verzekerden bij een zorgverzekeraar en een aantal verzekerdenkenmerken.
+      - number: 4
+        content: 'Bij ministeriële regeling:
+
+
+          a. wordt voor 1 oktober van ieder jaar bepaald welk bedrag in totaal voor het daaropvolgende kalenderjaar aan de
+          zorgverzekeraars kan worden toegekend;
+
+
+          b. kan worden bepaald dat in aanvulling op de criteria, bedoeld in het derde lid, voor de berekening van de hoogte
+          van de vereveningsbijdragen eenmalig rekening wordt gehouden met een bij die regeling te bepalen, voor alle zorgverzekeraars
+          gelijk criterium;
+
+
+          c. wordt statistisch onderbouwd aan elk criterium als bedoeld in het derde lid of aan een criterium als bedoeld
+          in onderdeel b een bijdrage gekoppeld;
+
+
+          d. worden nadere regels omtrent de berekening van de vereveningsbijdragen gesteld en wordt geregeld hoe de op grond
+          van het eerste lid toegekende vereveningsbijdragen door het Zorginstituut worden betaald.'
+      - number: 5
+        content: Het Zorginstituut stelt jaarlijks voor 15 oktober beleidsregels vast waarin wordt aangegeven op welke wijze
+          toepassing wordt gegeven aan de in het vierde lid bedoelde regels.
+      - number: 6
+        content: De toekenning, bedoeld in het eerste lid, geschiedt voor 1 november van het jaar voorafgaande aan het jaar
+          waarvoor de vereveningsbijdrage wordt gegeven.
+      - number: 7
+        content: De beleidsregels, bedoeld in het vijfde lid, behoeven de goedkeuring van Onze Minister.
+      - number: 8
+        content: 'Onze Minister verwerkt de persoonsgegevens waaronder gegevens over gezondheid als bedoeld in artikel 4,
+          onderdeel 15, van de Algemene verordening gegevensbescherming, die noodzakelijk zijn voor:
+
+
+          a. de bepaling van de criteria, bedoeld in het derde lid of het criterium, bedoeld in het vierde lid, onderdeel
+          b, of
+
+
+          b. de statistische onderbouwing van de aan de criteria krachtens het vierde lid, onderdeel c, gekoppelde bijdragen.'
+      - number: 9
+        content: Onze Minister verwerkt op grond van het achtste lid slechts persoonsgegevens indien daarop pseudonimisering
+          als bedoeld in artikel 4, onderdeel 5 van de Algemene verordening gegevensbescherming is toegepast en vervolgens
+          onafgebroken is gecontinueerd.
+      - number: 10
+        content: Artikel 21, eerste lid, tweede volzin, van de Algemene verordening gegevensbescherming, is bij de verwerking
+          door Onze Minister niet van toepassing.
+    - id: Artikel33
+      paragraphs:
+      - number: 1
+        content: 'In dit artikel wordt verstaan onder:
+
+
+          a. catastrofe: een natuurramp, een pandemie, een kernexplosie of een bij ministeriële regeling aan te wijzen andere
+          buitengewone gebeurtenis;
+
+
+          b. catastrofejaar: het kalenderjaar waarin een catastrofe optreedt;
+
+
+          c. gemiddelde vereveningsbijdrage: de toegekende vereveningsbijdrage per verzekerde, die wordt berekend door de
+          som van de op grond van artikel 32 met betrekking tot het catastrofejaar aan alle zorgverzekeraars toegekende vereveningsbijdragen
+          te delen door het op het moment van toekenning van die bijdragen verwachte totaalaantal verzekerden in dat jaar.'
+      - number: 2
+        content: Indien de kosten voor de op grond van de zorgverzekeringen verzekerde zorg of andere diensten ten gevolge
+          van een catastrofe naar verwachting van het Zorginstituut in het catastrofejaar en het daaropvolgende kalenderjaar
+          tezamen, voor een zorgverzekeraar hoger zullen zijn dan 4% van het product van de gemiddelde vereveningsbijdrage
+          en het op het moment van de toekenning van de vereveningsbijdrage over het catastrofejaar verwachte aantal verzekerden
+          bij die verzekeraar, kent het Zorginstituut de verzekeraar die daar om verzoekt naast de hem voor het catastrofejaar
+          toegekende vereveningsbijdrage een extra bijdrage toe.
+      - number: 3
+        content: Een zorgverzekeraar aan wie een extra bijdrage als bedoeld in het tweede lid is toegekend, houdt een afzonderlijke
+          administratie bij van de in het catastrofejaar en het daaropvolgende kalenderjaar ten gevolge van de catastrofe
+          optredende kosten van verzekerde zorg en andere diensten.
+      - number: 4
+        content: Bij ministeriële regeling worden regels gesteld omtrent de berekening van de bijdragen en kunnen regels worden
+          gesteld over de administratie, bedoeld in het derde lid, en de wijze waarop de toegekende bijdragen door het Zorginstituut
+          worden betaald.
+      - number: 5
+        content: Artikel 32, vijfde en zevende lid, zijn, met uitzondering van de in dat vijfde lid opgenomen verplichting
+          de beleidsregels jaarlijks voor 15 oktober vast te stellen, van overeenkomstige toepassing.
+    - id: Artikel34
+      paragraphs:
+      - number: 1
+        content: Uiterlijk op 1 april van het vierde jaar volgende op het kalenderjaar waarvoor de bijdragen, bedoeld in artikel
+          32 en 33, zijn toegekend, stelt het Zorginstituut de bijdragen vast.
+      - number: 2
+        content: De vaststelling van een vereveningsbijdrage als bedoeld in artikel 32, houdt in ieder geval in een herberekening
+          van de vereveningsbijdrage op basis van het werkelijke aantal verzekerden dat de zorgverzekeraar in het desbetreffende
+          jaar had en de werkelijke verdeling van de verzekerdenkenmerken als bedoeld in artikel 32, derde lid, over die verzekerden,
+          voor zover de daartoe benodigde gegevens tijdig bij het Zorginstituut zijn aangeleverd.
+      - number: 3
+        content: Bij of krachtens algemene maatregel van bestuur worden nadere regels omtrent de berekening van de bijdragen
+          gesteld.
+      - number: 4
+        content: Het Zorginstituut stelt beleidsregels op waarin wordt aangegeven op welke wijze toepassing wordt gegeven
+          aan de in het derde lid bedoelde regels en op welke wijze een vergoeding voor rentekosten wordt verleend respectievelijk
+          in rekening wordt gebracht.
+      - number: 5
+        content: Indien de vastgestelde bijdrage hoger is dan de toegekende bijdrage betaalt het Zorginstituut de zorgverzekeraar
+          of diens rechtsopvolger het verschil, vermeerderd met de rentekosten, en indien de vastgestelde bijdrage lager is
+          dan de toegekende bijdrage vordert het Zorginstituut het verschil, vermeerderd met de rentekosten, van de zorgverzekeraar
+          of diens rechtsopvolger terug.
+      - number: 6
+        content: Het Zorginstituut is bevoegd het bedrag dat na toepassing van het eerste en vijfde lid aan de zorgverzekeraar
+          dient te worden betaald respectievelijk van de zorgverzekeraar dient te worden teruggevorderd, te verrekenen met
+          een toekenning van een bijdrage als bedoeld in artikel 32 of 33 over een later jaar.
+    - id: Artikel34a
+      paragraphs:
+      - number: 1
+        content: Het CAK verstrekt een zorgverzekeraar een bijdrage indien hij verzekerden voor wier zorgverzekering de bestuursrechtelijke
+          premie verschuldigd is, onverminderd onder de dekking van de zorgverzekering heeft gehouden.
+      - number: 2
+        content: Bij ministeriële regeling worden regels gesteld over de periode waarvoor de bijdrage wordt verstrekt, de
+          hoogte van de bijdrage, de wijze waarop de bijdrage wordt verstrekt, waaronder de door de zorgverzekeraar over te
+          leggen gegevens en verantwoording, en de door de zorgverzekeraar te voeren administratie.
+    - id: Artikel35a
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut verwerkt de persoonsgegevens waaronder gegevens over gezondheid als bedoeld in artikel
+          4, onderdeel 15 van de Algemene verordening gegevensbescherming, die noodzakelijk zijn voor de berekening van aan
+          een zorgverzekeraar toekomende bijdragen als bedoeld in de artikelen 32 tot en met 34.
+      - number: 2
+        content: Het Zorginstituut verwerkt op grond van het eerste lid slechts persoonsgegevens indien daarop pseudonimisering
+          als bedoeld in artikel 4, onderdeel 5 van de Algemene verordening gegevensbescherming is toegepast en vervolgens
+          onafgebroken is gecontinueerd.
+      - number: 3
+        content: Artikel 21, eerste lid, tweede volzin van de Algemene verordening gegevensbescherming, is bij de verwerking
+          door het Zorginstituut niet van toepassing.
+    - id: Artikel37
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar zendt binnen zes maanden na afloop van het boekjaar twee exemplaren van zijn jaarrekening
+          en van zijn jaarverslag aan de zorgautoriteit.
+      - number: 2
+        content: Een zorgverzekeraar die artikel 403 van Boek 2 van het Burgerlijk Wetboek toepast, zendt de jaarrekening,
+          het jaarverslag en de geconsolideerde jaarrekening onverwijld na de neerlegging van het jaarverslag en de geconsolideerde
+          jaarrekening ten kantore van het handelsregister, in tweevoud aan de zorgautoriteit.
+      - number: 3
+        content: De zorgverzekeraar voegt bij de stukken, bedoeld in het eerste of tweede lid, twee afschriften van de accountantsverklaring
+          die hij op grond van het Burgerlijk Wetboek of de Wet op het financieel toezicht over deze stukken dient te laten
+          opstellen.
+      - number: 4
+        content: De zorgautoriteit zendt het CAK en het Zorginstituut onverwijld één exemplaar van de in het eerste tot en
+          met derde lid bedoelde stukken.
+    - id: Artikel38
+      paragraphs:
+      - number: 1
+        content: 'De zorgverzekeraar zendt voor 1 juli aan de zorgautoriteit in tweevoud een uitvoeringsverslag waarin hij:
+
+
+          a. rapporteert over de uitvoering van deze wet in het voorafgaande kalenderjaar, en
+
+
+          b. een overzicht geeft van zijn voornemens met betrekking tot de uitvoering van deze wet in het lopende kalenderjaar
+          en het daaropvolgende kalenderjaar.'
+      - number: 2
+        content: Bij ministeriële regeling kunnen nadere voorschriften worden gesteld omtrent de inhoud van het uitvoeringsverslag.
+      - number: 3
+        content: De voorschriften, bedoeld in het tweede lid, kunnen in het bijzonder betrekking hebben op naleving van een
+          in de regeling aan te wijzen gedragscode.
+      - number: 4
+        content: 'De zorgverzekeraar voegt bij het uitvoeringsverslag twee exemplaren van een verslag met bevindingen van
+          een accountant als bedoeld in artikel 393 van Boek 2 van het Burgerlijk Wetboek over de vraag of:
+
+
+          a. het uitvoeringsverslag overeenkomstig de daarvoor geldende regels is opgesteld;
+
+
+          b. de uitvoering is geschied overeenkomstig de verplichtingen die bij of krachtens deze wet in het voorafgaande
+          kalenderjaar op de zorgverzekeraar rustten.'
+      - number: 5
+        content: Artikel 37, vierde lid, is van overeenkomstige toepassing.
+  - id: Hoofdstuk5
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel39
+      paragraphs:
+      - number: 1
+        content: Er is een Zorgverzekeringsfonds.
+      - number: 2
+        content: 'Ten gunste van het Zorgverzekeringsfonds komen:
+
+
+          a. de inkomensafhankelijke bijdragen, bedoeld in paragraaf 5.2 en de bijdragevervangende belasting, bedoeld in artikel
+          57, tweede lid;
+
+
+          b. de rijksbijdrage, bedoeld in artikel 54;
+
+
+          c. een rijksbijdrage als bedoeld in de artikelen 55 of 56;
+
+
+          d. een bedrag van iedere rekening, bedoeld in artikel 70, gelijk aan: 1°. voor iedere tot een huishouding als bedoeld
+          in artikel 70, tweede lid, behorende gemoedsbezwaarde, die zich na bereiken van de leeftijd van 18 jaar heeft laten
+          registreren als gemoedsbezwaarde en die daarna alsnog verzekeringsplichtig wordt: het saldo van de rekening gedeeld
+          door het aantal tot de huishouding behorende gemoedsbezwaarden; 2°. indien de rekening met toepassing van artikel
+          70, zevende lid, wordt opgeheven: het saldo van de rekening;
+
+
+          1°. voor iedere tot een huishouding als bedoeld in artikel 70, tweede lid, behorende gemoedsbezwaarde, die zich
+          na bereiken van de leeftijd van 18 jaar heeft laten registreren als gemoedsbezwaarde en die daarna alsnog verzekeringsplichtig
+          wordt: het saldo van de rekening gedeeld door het aantal tot de huishouding behorende gemoedsbezwaarden;
+
+
+          2°. indien de rekening met toepassing van artikel 70, zevende lid, wordt opgeheven: het saldo van de rekening;
+
+
+          e. aan het Zorginstituut betaalde bedragen ter gehele of gedeeltelijke voldoening van vorderingen als bedoeld in
+          artikel 31, tweede lid;
+
+
+          f. de bijdragen en bestuurlijke boeten, bedoeld in artikel 69;
+
+
+          g. met uitzondering van het gedeelte, bedoeld in artikel 18g, zesde lid, de bestuursrechtelijke premies, bedoeld
+          in de artikelen 18d en 18e;
+
+
+          h. de inkomsten die in verband met deze wet voortvloeien uit internationale overeenkomsten;
+
+
+          i. de door de zorgautoriteit van verzekeraars op grond van artikel 83 van de Wet marktordening gezondheidszorg geïnde
+          dwangsommen en de ingevorderde bestuurlijke boeten, bedoeld in de artikelen 86 tot en met 89 van die wet;
+
+
+          j. de bijdrage, bedoeld in artikel 87a van de Wet financiering sociale verzekeringen;
+
+
+          k. door zorgaanbieders ingevolge een regel van de zorgautoriteit op grond van artikel 37, eerste lid, aanhef en
+          onder d, van de Wet marktordening gezondheidszorg dan wel op aanwijzing van de zorgautoriteit op grond van artikel
+          76, tweede lid, van die wet afgedragen bedragen en door de zorgautoriteit van zorgaanbieders op grond van artikel
+          81, eerste lid, onder c, van die wet ingevorderde bedragen, voor zover die bedragen niet worden afgedragen aan het
+          Fonds langdurige zorg of aan derden;
+
+
+          l. de bijdragen, bedoeld in artikel 68b, vijfde lid.'
+      - number: 3
+        content: 'Ten laste van het Zorgverzekeringsfonds komen:
+
+
+          a. de bijdragen, bedoeld in de artikelen 32, 33, 34 en 34a;
+
+
+          b. [Red: vervallen;]
+
+
+          c. door het Zorginstituut voldane vorderingen als bedoeld in artikel 31, eerste lid;
+
+
+          d. uitgaven in verband met molest als bedoeld in artikel 55, inclusief vergoedingen als bedoeld in het derde lid
+          van dat artikel;
+
+
+          e. de uitgaven die in verband met deze wet voortvloeien uit internationale overeenkomsten;
+
+
+          f. bedragen als bedoeld in artikel 56a van de Wet marktordening gezondheidszorg;
+
+
+          g. de door het Zorginstituut op grond van een ministeriële regeling vastgestelde verdeelbedragen, zijnde aan de
+          relevante zorgverzekeraars toegekende delen van de bedragen bedoeld in onderdeel k van het tweede lid;
+
+
+          h. bijdragen als bedoeld in de artikelen 70a en 70b;
+
+
+          i. de vergoedingen, bedoeld in artikel 123, zesde en achtste lid, voor zover het zorg en andere diensten uit hoofde
+          van deze wet betreft;
+
+
+          j. de vergoedingen, bedoeld in artikel 68b, eerste lid.'
+      - number: 4
+        content: Uit het Zorgverzekeringsfonds kunnen, volgens bij ministeriële regeling te stellen regels, middelen worden
+          gebruikt voor het vormen en in stand houden van een voor de doelstelling van het fonds noodzakelijke reserve.
+    - id: Artikel40
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut beheert en administreert afzonderlijk het Zorgverzekeringsfonds.
+      - number: 2
+        content: Het Zorginstituut houdt de financiële middelen die deel uitmaken van het Zorgverzekeringsfonds, in rekening-courant
+          bij Onze Minister van Financiën.
+      - number: 3
+        content: Het Zorginstituut kan, voor de uitvoering van zijn wettelijke taken, beschikken over de financiële middelen
+          die hij in rekening-courant bij Onze Minister van Financiën aanhoudt.
+      - number: 4
+        content: In afwijking van het tweede lid kan het Zorginstituut een deel van de in dat lid bedoelde financiële middelen
+          buiten de in dat lid bedoelde rekening-courant houden.
+      - number: 5
+        content: Onze Minister stelt in overeenstemming met Onze Minister van Financiën, na overleg met het Zorginstituut,
+          de omvang van het in het vierde lid bedoelde deel van de financiële middelen vast.
+      - number: 6
+        content: Bij een tekort aan financiële middelen maakt het Zorginstituut uitsluitend gebruik van de kredietfaciliteiten
+          die door Onze Minister van Financiën worden verleend.
+      - number: 7
+        content: 'Onze Minister van Financiën informeert dagelijks het Zorginstituut ten aanzien van de rekening-courant,
+          in elk geval met betrekking tot:
+
+
+          a. de slotstanden per dag;
+
+
+          b. alle dagelijks geboekte mutaties of transacties in de rekening-courant.'
+      - number: 8
+        content: Het Zorginstituut informeert Onze Minister van Financiën ten aanzien van de rekening-courant in elk geval
+          met betrekking tot de prognoses van de saldi van de rekening-courant.
+      - number: 9
+        content: Onze Minister van Financiën brengt voor het beheer van de rekening-courant geen kosten in rekening.
+      - number: 10
+        content: Onze Minister stelt in overeenstemming met Onze Minister van Financiën, na overleg met het Zorginstituut,
+          regels omtrent de rente die over de saldi van de in het tweede lid bedoelde rekening-courant wordt vergoed onderscheidenlijk
+          in rekening wordt gebracht.
+      - number: 11
+        content: Onze Minister kan in overeenstemming met Onze Minister van Financiën, na overleg met het Zorginstituut, regels
+          stellen omtrent het tweede, zevende en achtste lid.
+    - id: Artikel42
+      paragraphs:
+      - number: 1
+        content: 'De inhoudingsplichtige is een inkomensafhankelijke bijdrage verschuldigd over het door hem verstrekte loon
+          overeenkomstig de Wet op de loonbelasting 1964 uit:
+
+
+          a. tegenwoordige dienstbetrekking als bedoeld in de Wet op de loonbelasting 1964 van de verzekeringsplichtige of
+          van degene, bedoeld in artikel 2, tweede lid, onderdeel b, van deze wet, met uitzondering van: 1°. de eindheffingsbestanddelen,
+          bedoeld in artikel 31, eerste lid, onderdelen b tot en met h, van de Wet op de loonbelasting 1964; 2°. het in artikel
+          13bis van de Wet op de loonbelasting 1964 bedoelde voordeel, voor zover dit voordeel door middel van een aan de
+          werknemer opgelegde naheffingsaanslag in aanmerking is genomen; 3°. het loon van degene, bedoeld in artikel 4, onderdeel
+          f, van de Wet op de loonbelasting 1964; 4°. het loon van de directeur-grootaandeelhouder, bedoeld in artikel 6,
+          eerste lid, onderdeel d, van de Ziektewet;
+
+
+          1°. de eindheffingsbestanddelen, bedoeld in artikel 31, eerste lid, onderdelen b tot en met h, van de Wet op de
+          loonbelasting 1964;
+
+
+          2°. het in artikel 13bis van de Wet op de loonbelasting 1964 bedoelde voordeel, voor zover dit voordeel door middel
+          van een aan de werknemer opgelegde naheffingsaanslag in aanmerking is genomen;
+
+
+          3°. het loon van degene, bedoeld in artikel 4, onderdeel f, van de Wet op de loonbelasting 1964;
+
+
+          4°. het loon van de directeur-grootaandeelhouder, bedoeld in artikel 6, eerste lid, onderdeel d, van de Ziektewet;
+
+
+          b. vroegere arbeid als bedoeld in de Wet op de loonbelasting 1964 van de verzekeringsplichtige of van degene, bedoeld
+          in artikel 2, tweede lid, onderdeel b, tot een bij ministeriële regeling te bepalen tijdstip, met uitzondering van
+          bij ministeriële regeling aan te wijzen bestanddelen van het loon.'
+      - number: 2
+        content: Het loon waarover de inkomensafhankelijke bijdrage ingevolge het eerste lid wordt geheven, wordt ten minste
+          gesteld op nihil en wordt bij dezelfde inhoudingsplichtige tot geen hoger bedrag in aanmerking genomen dan het door
+          Onze Minister, in overeenstemming met Onze Ministers van Sociale Zaken en Werkgelegenheid en van Financiën, met
+          betrekking tot een kalenderjaar vastgestelde bedrag.
+      - number: 3
+        content: Het bedrag, bedoeld in het tweede lid, wordt herleid en vastgesteld voor andere loontijdvakken waarin loon
+          als bedoeld in het eerste lid wordt genoten.
+      - number: 4
+        content: Voor de herleiding naar een ander loontijdvak van het bedrag, bedoeld in het derde lid, is artikel 25, eerste
+          en vierde lid, van de Wet op de loonbelasting 1964 van overeenkomstige toepassing.
+      - number: 5
+        content: De inkomensafhankelijke bijdrage wordt per loontijdvak berekend over het verschil tussen het loon dat de
+          werknemer in het kalenderjaar heeft genoten tot en met dat loontijdvak en het loon dat de werknemer in dat kalenderjaar
+          heeft genoten tot en met het aan dat loontijdvak voorafgaande loontijdvak, met dien verstande dat van het bij eenzelfde
+          inhoudingsplichtige genoten loon buiten aanmerking blijft het gedeelte dat meer bedraagt dan het met toepassing
+          van het derde of vierde lid vastgestelde bedrag per loontijdvak, vermenigvuldigd met het aantal loontijdvakken van
+          het kalenderjaar. Artikel 17, derde lid, tweede en derde zin, van de Wet financiering sociale verzekeringen is van
+          overeenkomstige toepassing op de berekening van de inkomensafhankelijke bijdrage, met dien verstande dat wijze van
+          berekenen van de in dat lid bedoelde premies over het deel van het bij een werkgever genoten loon, dat betrekking
+          heeft op de betaling van uitkeringen als bedoeld in artikel 40, eerste lid, onderdeel a of b, van die wet door een
+          eigenrisicodrager tevens bepalend is voor de wijze van berekenen van de inkomensafhankelijk bijdrage over die uitkeringen.
+      - number: 6
+        content: Het tweede, derde en vierde lid zijn niet van toepassing in de gevallen, bedoeld in artikel 26b, eerste volzin,
+          van de Wet op de loonbelasting 1964.
+      - number: 7
+        content: De inhoudingsplichtige mag de door hem verschuldigde inkomensafhankelijke bijdrage niet verhalen op de verzekeringsplichtige
+          of op degene, bedoeld in artikel 2, tweede lid, onderdeel b. Elk beding waarbij van de eerste volzin wordt afgeweken,
+          is nietig.
+      - number: 8
+        content: De rijksbelastingdienst stort de inkomensafhankelijke bijdrage die is geheven over het loon van degene, bedoeld
+          in artikel 2, tweede lid, onderdeel b, van deze wet op de rekening, bedoeld in artikel 70, eerste dan wel tweede
+          lid.
+    - id: Artikel43
+      paragraphs:
+      - number: 1
+        content: De verzekeringsplichtige is een inkomensafhankelijke bijdrage verschuldigd over het in een kalenderjaar genoten
+          bijdrage-inkomen.
+      - number: 2
+        content: 'Het bijdrage-inkomen is het gezamenlijke bedrag van hetgeen door de verzekeringsplichtige is genoten aan:
+
+
+          a. loon overeenkomstig de Wet op de loonbelasting 1964, verminderd met: 1°. het loon waarop artikel 42 van toepassing
+          is; 2°. de eindheffingsbestanddelen, bedoeld in artikel 31, eerste lid, onderdelen b tot en met h, van de Wet op
+          de loonbelasting 1964; en vermeerderd met loon, bepaald volgens de regels van artikel 3.82 van de Wet inkomstenbelasting
+          2001;
+
+
+          1°. het loon waarop artikel 42 van toepassing is;
+
+
+          2°. de eindheffingsbestanddelen, bedoeld in artikel 31, eerste lid, onderdelen b tot en met h, van de Wet op de
+          loonbelasting 1964;
+
+
+          b. belastbare winst uit onderneming, bepaald volgens de regels van afdeling 3.2 van de Wet inkomstenbelasting 2001
+          met uitzondering van het bedrag dat ingevolge artikel 3.70, tweede lid, van die wet, zoals dat luidde op 31 december
+          2022 in de winst wordt opgenomen ter zake van een afname van de oudedagsreserve als bedoeld in artikel 3.70, eerste
+          lid, aanhef en onderdeel a, van die wet, zoals dat luidde op 31 december 2022;
+
+
+          c. belastbaar resultaat uit overige werkzaamheden, bepaald volgens de regels van afdeling 3.4 van de Wet inkomstenbelasting
+          2001, met uitzondering van de in artikel 3.91, eerste lid, onderdelen a en b, en artikel 3.92 van de Wet inkomstenbelasting
+          2001 bedoelde werkzaamheden;
+
+
+          d. belastbare periodieke uitkeringen en verstrekkingen, bepaald volgens de regels van afdeling 3.5 van de Wet inkomstenbelasting
+          2001.'
+      - number: 3
+        content: Het bijdrage-inkomen wordt ten minste op nihil gesteld en wordt tot geen hoger bedrag in aanmerking genomen
+          dan het bij regeling van Onze Minister, in overeenstemming met Onze Ministers van Sociale Zaken en Werkgelegenheid
+          en van Financiën, met betrekking tot een kalenderjaar vastgestelde bedrag.
+      - number: 4
+        content: Ingeval de inkomensafhankelijke bijdrage ingevolge artikel 49, tweede lid, bij wijze van inhouding wordt
+          geheven, is artikel 42, tweede tot en met zesde lid, van overeenkomstige toepassing.
+      - number: 5
+        content: Ingeval de inkomensafhankelijke bijdrage ingevolge artikel 49, derde lid, bij wege van aanslag wordt geheven,
+          wordt daarbij als bijdrage-inkomen ten hoogste in aanmerking genomen een bedrag gelijk aan het in het derde lid
+          bedoelde bedrag, verminderd met het loon, bedoeld in artikel 42, van de verzekeringsplichtige en met het door de
+          verzekeringsplichtige van een inhoudingsplichtige genoten loon, bedoeld in het tweede lid, onderdeel a.
+    - id: Artikel45
+      paragraphs:
+      - number: 1
+        content: De door de inhoudingsplichtige verschuldigde inkomensafhankelijke bijdrage bedraagt een percentage van het
+          loon, bedoeld in artikel 42, eerste lid.
+      - number: 2
+        content: De door de verzekeringsplichtige verschuldigde inkomensafhankelijke bijdrage bedraagt een percentage van
+          het bijdrage-inkomen.
+      - number: 3
+        content: De in het eerste en tweede lid bedoelde bijdragepercentages worden vastgesteld bij regeling van Onze Minister,
+          in overeenstemming met Onze Ministers van Sociale Zaken en Werkgelegenheid en van Financiën, waarbij voor daarbij
+          aan te geven bestanddelen van het loon of het bijdrage-inkomen een afwijkend percentage kan worden vastgesteld.
+      - number: 4
+        content: De bijdragepercentages worden zodanig vastgesteld, dat de som van de inkomensafhankelijke bijdragen gelijk
+          is aan 50% van de som van bij ministeriële regeling te bepalen, ten gunste van het Zorgverzekeringsfonds of van
+          de zorgverzekeraars komende inkomsten.
+      - number: 5
+        content: Na afloop van het kalenderjaar vastgestelde verschillen tussen de bedragen van de inkomsten die in de ministeriële
+          regeling, bedoeld in het vierde lid, in aanmerking waren genomen en de werkelijke bedragen van die inkomsten, worden
+          verrekend bij de vaststelling van het bijdragepercentage in een volgend jaar.
+      - number: 6
+        content: Indien een wijziging van het bijdragepercentage ingaat op een ander tijdstip dan 1 januari, vindt de vaststelling
+          plaats in overeenstemming met Onze Minister van Financiën en kunnen daarbij regels worden gesteld omtrent de wijze
+          van berekening van de bijdrage over het gehele kalenderjaar.
+    - id: Artikel49
+      paragraphs:
+      - number: 1
+        content: De door de inhoudingsplichtige verschuldigde inkomensafhankelijke bijdrage wordt geheven met overeenkomstige
+          toepassing van de voor de heffing van loonbelasting geldende regels.
+      - number: 2
+        content: Voor zover het bijdrage-inkomen bestaat uit loon als bedoeld in artikel 43, tweede lid, onderdeel a, dat
+          van een inhoudingsplichtige wordt genoten, wordt de inkomensafhankelijke bijdrage bij wijze van inhouding geheven
+          met overeenkomstige toepassing van de voor de heffing van loonbelasting geldende regels.
+      - number: 3
+        content: Voor zover het bijdrage-inkomen bestaat uit andere dan de in het tweede lid bedoelde bestanddelen, wordt
+          de inkomensafhankelijke bijdrage bij wege van aanslag geheven met overeenkomstige toepassing van de voor de heffing
+          van de inkomstenbelasting geldende regels, met uitzondering van artikel 10a.28 van de Wet inkomstenbelasting 2001.
+      - number: 4
+        content: Artikel 13bis, elfde en vijftiende lid, van de Wet op de loonbelasting 1964 is van overeenkomstige toepassing.
+    - id: Artikel50
+      paragraphs:
+      - number: 1
+        content: De inspecteur verleent bij voor bezwaar vatbare beschikking aan de verzekeringsplichtige een teruggaaf van
+          de op het loon ingehouden inkomensafhankelijke bijdrage voor zover het loon van de verzekeringsplichtige waarover
+          inkomensafhankelijke bijdrage is geheven hoger is dan het in artikel 43, derde lid, bedoelde bedrag.
+      - number: 2
+        content: Een teruggaaf wordt niet verleend indien het met toepassing van het eerste lid berekende bedrag niet meer
+          bedraagt dan het in artikel 9.4, vijfde lid, van de Wet inkomstenbelasting 2001 genoemde bedrag.
+      - number: 3
+        content: Bij ministeriële regeling worden regels gesteld ter zake van het verlenen van een voorschot op het bij de
+          beschikking, bedoeld in het eerste lid, vast te stellen bedrag.
+      - number: 4
+        content: Ingeval een teruggaaf of een voorschot ten onrechte of tot een te hoog bedrag is verleend, kan de inspecteur
+          het te veel betaalde bedrag bij voor bezwaar vatbare beschikking terugvorderen. De bevoegdheid tot terugvordering
+          vervalt door verloop van vijf jaren na afloop van het kalenderjaar waarop de teruggaaf of het voorschot, bedoeld
+          in de eerste volzin, betrekking heeft. Bij de invordering van het ingevolge de eerste volzin terug te vorderen bedrag
+          zijn de regels die gelden voor de invordering van inkomstenbelasting van overeenkomstige toepassing.
+      - number: 5
+        content: In afwijking van de artikelen 30h en 30ha van de Algemene wet inzake rijksbelastingen wordt bij de voor bezwaar
+          vatbare beschikking, bedoeld in het eerste lid, en de voor bezwaar vatbare beschikking, bedoeld in het vierde lid,
+          uitsluitend belastingrente vergoed, onderscheidenlijk in rekening gebracht, indien de dagtekening van de beschikking
+          ligt na het verstrijken van een periode van zes maanden na afloop van het kalenderjaar waarop de bijdrage betrekking
+          heeft. De belastingrente wordt enkelvoudig berekend over het tijdvak dat aanvangt op de dag na het verstrijken van
+          een periode van zes maanden na het einde van het kalenderjaar waarop de bijdrage betrekking heeft en eindigt 14
+          dagen na de dagtekening van de beschikking.
+    - id: Artikel51
+      paragraphs:
+      - number: 1
+        content: De rijksbelastingdienst vordert de inkomensafhankelijke bijdrage in.
+      - number: 2
+        content: Bij de invordering van de bijdrage zijn, naar gelang artikel 49, eerste of tweede, dan wel derde lid, van
+          toepassing is, de regels geldende voor de invordering van loonbelasting, onderscheidenlijk de inkomstenbelasting
+          van overeenkomstige toepassing.
+    - id: Artikel54
+      paragraphs:
+      - number: 1
+        content: Onze Minister verleent jaarlijks aan het Zorgverzekeringsfonds een bijdrage in de financiering van de zorgverzekering
+          voor verzekerden jonger dan achttien jaar.
+      - number: 2
+        content: De bijdrage is gelijk aan het bedrag dat daarvoor in de wet tot vaststelling van de begroting van zijn ministerie
+          voor dat jaar is toegestaan.
+      - number: 3
+        content: De bijdrage wordt betaald in gelijke maandelijkse delen.
+    - id: Artikel55
+      paragraphs:
+      - number: 1
+        content: Onze Minister kan, in overeenstemming met Onze Minister van Financiën, een bijdrage aan het Zorgverzekeringsfonds
+          verlenen ter gehele of gedeeltelijke betaling van zorg of overige diensten als bedoeld in artikel 10, in geval de
+          behoefte aan die zorg of diensten is veroorzaakt door of ontstaan uit gewapend conflict, burgeroorlog, opstand,
+          binnenlandse onlusten, oproer, muiterij of terrorisme.
+      - number: 2
+        content: 'Bij ministeriële regeling wordt bepaald:
+
+
+          a. welke vormen van zorg of overige diensten voor welk gedeelte met de bijdrage worden betaald;
+
+
+          b. ten behoeve van welke personen de bijdrage wordt betaald;
+
+
+          c. onder welke voorwaarden en op welke wijze deze zorg of overige diensten door het Zorginstituut worden betaald.'
+      - number: 3
+        content: In een regeling als bedoeld in het tweede lid kan worden bepaald dat zorgverzekeraars het Zorginstituut bijstand
+          verlenen bij het uitvoeren van de ministeriële regeling, bedoeld in het tweede lid, en welke vergoeding daar voor
+          de zorgverzekeraars tegenover staat.
+    - id: Artikel57
+      paragraphs:
+      - number: 1
+        content: Van de persoon die op grond van artikel 2, tweede lid, onderdeel b, niet verzekeringsplichtig is, wordt bijdragevervangende
+          belasting geheven, tot het bedrag van de in artikel 43, eerste lid, bedoelde inkomensafhankelijke bijdrage dat deze
+          persoon verschuldigd zou zijn als hij verzekeringsplichtig zou zijn.
+      - number: 2
+        content: In afwijking in zoverre van artikel 43 wordt van de persoon aan wie met toepassing van artikel 64 van de
+          Wet financiering sociale verzekeringen een ontheffing is verleend in het kader van één of meer volksverzekeringen
+          anders dan die volgens de Wet langdurige zorg, geen inkomensafhankelijke bijdrage geheven maar een bijdragevervangende
+          belasting, tot het bedrag van de inkomensafhankelijke bijdrage, bedoeld in artikel 43, tweede lid.
+      - number: 3
+        content: De heffing van de bijdragevervangende belasting vindt plaats met overeenkomstige toepassing van artikel 49,
+          tweede, derde en vierde lid.
+      - number: 4
+        content: De rijksbelastingdienst stort de belasting, bedoeld in het eerste lid, op de rekening, bedoeld in artikel
+          70, eerste dan wel tweede lid.
+  - id: Hoofdstuk6
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel58
+      paragraphs:
+      - number: 1
+        content: Er is een Zorginstituut Nederland, dat rechtspersoonlijkheid bezit.
+      - number: 2
+        content: Het Zorginstituut is gevestigd in een door Onze Minister te bepalen plaats.
+      - number: 3
+        content: Het Zorginstituut is belast met de taken die hem bij of krachtens wet of internationale overeenkomst zijn
+          opgedragen.
+      - number: 4
+        content: Het Zorginstituut wordt in en buiten rechte vertegenwoordigd door de voorzitter.
+      - number: 5
+        content: De Kaderwet zelfstandige bestuursorganen is op het Zorginstituut van toepassing.
+    - id: Artikel58a
+      paragraphs:
+      - number: 1
+        content: Een besluit van het Zorginstituut om andere werkzaamheden te verrichten dan de uitvoering van taken die hem
+          bij of krachtens de wet zijn opgedragen, behoeft de goedkeuring van Onze Minister.
+      - number: 2
+        content: De goedkeuring kan worden onthouden indien de beslissing in strijd is met het recht of met het algemeen belang,
+          of indien de uitvoering van de andere werkzaamheden een goede taakuitoefening door het Zorginstituut kan belemmeren.
+      - number: 3
+        content: Onze Minister kan bij de goedkeuring verplichtingen opleggen in verband met de uitvoering van andere werkzaamheden
+          als bedoeld in het eerste lid.
+      - number: 4
+        content: Onze Minister kan bepalen dat de uitvoering van andere werkzaamheden als bedoeld in het eerste lid door het
+          Zorginstituut wordt beëindigd.
+    - id: Artikel59
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut bestaat uit ten hoogste drie leden, onder wie de voorzitter.
+      - number: 2
+        content: Benoeming vindt plaats op grond van de deskundigheid die nodig is voor de uitoefening van de taken van het
+          Zorginstituut alsmede op grond van maatschappelijke kennis en ervaring.
+      - number: 3
+        content: De leden worden benoemd voor ten hoogste vier jaar. Herbenoeming kan twee maal en telkens voor ten hoogste
+          vier jaar plaatsvinden.
+    - id: Artikel59a
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut heeft een commissie die rapporten of signalen als bedoeld in artikel 66 voorbereidt.
+      - number: 2
+        content: De commissie bestaat uit een oneven aantal van ten hoogste negen leden die worden benoemd, geschorst en ontslagen
+          door het Zorginstituut.
+      - number: 3
+        content: De leden maken op persoonlijke titel deel uit van de commissie.
+      - number: 4
+        content: De benoeming van de leden van de commissie vindt plaats op grond van de deskundigheid die nodig is voor de
+          uitoefening van de taken van de commissie en op grond van maatschappelijke kennis en ervaring.
+      - number: 5
+        content: De leden worden benoemd voor ten hoogste vier jaar. Herbenoeming kan eenmaal en voor ten hoogste vier jaar
+          plaatsvinden.
+      - number: 6
+        content: Het lidmaatschap eindigt tussentijds door overlijden, ontslag op eigen verzoek of ontslag om zwaarwichtige
+          redenen door het Zorginstituut.
+      - number: 7
+        content: Bij ministeriële regeling worden de vergoeding van reis- en verblijfkosten en verdere vergoedingen aan de
+          leden van de commissie vastgesteld.
+      - number: 8
+        content: Het lidmaatschap van de commissie, bedoeld in het eerste lid, is onverenigbaar met het lidmaatschap van het
+          Zorginstituut en van de commissie, bedoeld in artikel 59b.
+    - id: Artikel59b
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut kent een Adviescommissie Kwaliteit.
+      - number: 2
+        content: De Adviescommissie Kwaliteit bestaat uit een oneven aantal van ten hoogste vijftien leden die worden benoemd,
+          geschorst en ontslagen door het Zorginstituut.
+      - number: 3
+        content: Artikel 59a, derde tot en met achtste lid, zijn van overeenkomstige toepassing.
+    - id: Artikel60
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut stelt een bestuursreglement vast.
+      - number: 2
+        content: Vergaderingen van het Zorginstituut zijn niet openbaar, behoudens voor zover in het bestuursreglement anders
+          is bepaald.
+      - number: 3
+        content: In het bestuursreglement legt het Zorginstituut in ieder geval vast hoe hij voldoet aan de verplichting ingevolge
+          artikel 3:2 van de Algemene wet bestuursrecht.
+    - id: Artikel64
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut bevordert de eenduidige uitleg van de aard, inhoud en omvang van de prestaties, bedoeld
+          in artikel 11.
+      - number: 2
+        content: Het Zorginstituut kan de zorgverzekeraars met het oog hierop richtlijnen geven.
+    - id: Artikel66
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut rapporteert Onze Minister desgevraagd over voorgenomen beleid inzake aard, inhoud en omvang
+          van de prestaties, bedoeld in artikel 11.
+      - number: 2
+        content: Het Zorginstituut signaleert gevraagd en ongevraagd aan Onze Minister feitelijke ontwikkelingen die aanleiding
+          kunnen geven tot wijzigingen van de aard, inhoud en omvang van de prestaties, bedoeld in artikel 11.
+      - number: 3
+        content: Het Zorginstituut signaleert gevraagd en ongevraagd aan Onze Minister feitelijke ontwikkelingen op het gebied
+          van kosten van zorg die behoort tot de te verzekeren prestaties voor de zorgverzekering.
+    - id: Artikel66f
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut rapporteert desgevraagd aan Onze Minister omtrent de uitvoerbaarheid, doeltreffendheid
+          en doelmatigheid van voorgenomen beleid in verband met vernieuwingen en verbeteringen in de structuur van beroepen
+          en opleidingen in de gezondheidszorg.
+      - number: 2
+        content: Het Zorginstituut signaleert gevraagd en ongevraagd aan Onze Minister feitelijke ontwikkelingen inzake vernieuwingen
+          en verbeteringen in de structuur van beroepen en opleidingen in de gezondheidzorg.
+    - id: Artikel68a
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut verwerkt de persoonsgegevens waaronder gegevens over gezondheid als bedoeld in artikel
+          4, onderdeel 15 van de Algemene verordening gegevensbescherming, die noodzakelijk zijn voor de uitvoering van zijn
+          in de artikelen 64 of 66 opgedragen taken.
+      - number: 2
+        content: Het Zorginstituut verwerkt op grond van het eerste lid slechts persoonsgegevens indien daarop pseudonimisering
+          als bedoeld in artikel 4, onderdeel 5 van de Algemene verordening gegevensbescherming, is toegepast en vervolgens
+          onafgebroken is gecontinueerd.
+      - number: 3
+        content: Artikel 21, eerste lid, tweede volzin van de Algemene verordening gegevensbescherming, is bij de verwerking
+          door het Zorginstituut niet van toepassing.
+    - id: Artikel68b
+      paragraphs:
+      - number: 1
+        content: Een persoon die met toepassing van een verordening van het Europees Parlement en de Raad van de Europese
+          Unie, toepassing van zodanige verordening krachtens de overeenkomst betreffende de Europese Economische Ruimte dan
+          wel toepassing van een verdrag met het Verenigd Koninkrijk met terugwerkende kracht van langer dan vier maanden
+          verzekeringsplichtig wordt ingevolge deze wet, kan bij het CAK een vergoeding aanvragen voor kosten van zorg.
+      - number: 2
+        content: Voor vergoeding komen uitsluitend in aanmerking de kosten van zorg die een persoon als bedoeld in het eerste
+          lid heeft ontvangen in de periode gelegen tussen de ingangsdatum van de verzekeringsplicht voor deze wet en het
+          moment waarop hij van het CAK een kennisgeving heeft ontvangen van de verplichting om een zorgverzekering af te
+          sluiten of, als dat eerder is, het moment waarop hij krachtens een zorgverzekering verzekerd is.
+      - number: 3
+        content: Kosten van zorg die is aangevangen in en ontvangen na de periode, bedoeld in het tweede lid, worden toegerekend
+          aan de periode waarin de zorg is aangevangen, indien de kosten door de zorgaanbieder in één bedrag in rekening zijn
+          gebracht.
+      - number: 4
+        content: Het CAK beslist op de aanvraag van de vergoeding.
+      - number: 5
+        content: Een persoon waaraan de vergoeding is verleend, is voor zover deze in de periode, bedoeld in het tweede lid,
+          achttien jaar of ouder was, een bijdrage verschuldigd, die voor de toepassing van de Wet op de zorgtoeslag geheel
+          of gedeeltelijk als premie voor een zorgverzekering wordt beschouwd.
+      - number: 6
+        content: Het CAK stelt de bijdrage ambtshalve vast en zendt een afschrift van de beschikking aan de Belastingdienst/Toeslagen.
+      - number: 7
+        content: 'Het CAK:
+
+
+          a. is bevoegd de vergoeding te verrekenen met de bijdrage;
+
+
+          b. kan de bijdrage bij dwangbevel invorderen.'
+      - number: 8
+        content: 'Het CAK:
+
+
+          a. gebruikt voor de uitvoering van dit artikel het burgerservicenummer van personen als bedoeld in het eerste lid;
+
+
+          b. is bevoegd tot het verwerken van persoonsgegevens, waaronder persoonsgegevens betreffende de gezondheid als bedoeld
+          in artikel 9 van de Algemene verordening gegevensbescherming, van de personen, bedoeld in het eerste lid, die noodzakelijk
+          zijn voor de uitvoering van dit artikel.'
+      - number: 9
+        content: 'Bij ministeriële regeling kunnen regels worden gesteld over:
+
+
+          a. de aanvraag van de vergoeding en de besluitvorming daarover, met inbegrip van beslistermijnen;
+
+
+          b. de kosten van zorg die voor vergoeding in aanmerking komen;
+
+
+          c. de voorwaarden waaronder de vergoeding kan worden verleend;
+
+
+          d. de verplichtingen die aan de vergoeding kunnen worden verbonden;
+
+
+          e. de hoogte van de vergoeding en de wijze van betaling daarvan;
+
+
+          f. de hoogte van de bijdrage en de besluitvorming daarover;
+
+
+          g. het deel van de bijdrage dat als premie voor de zorgverzekering wordt beschouwd;
+
+
+          h. de verwerking van de persoonsgegevens, bedoeld in het achtste lid.'
+      - number: 10
+        content: De zorgverzekering, afgesloten door een persoon als bedoeld in het eerste lid, werkt, zo nodig in afwijking
+          van artikel 925, eerste lid, van Boek 7 van het Burgerlijk Wetboek, terug indien zij ingaat binnen vier maanden
+          na ontvangst van de kennisgeving, bedoeld in het eerste lid, tot en met de dag waarop die kennisgeving is ontvangen.
+    - id: Artikel69
+      paragraphs:
+      - number: 1
+        content: In het buitenland wonende personen die met toepassing van een verordening van het Europees Parlement en de
+          Raad van de Europese Unie dan wel toepassing van zodanige verordening krachtens de overeenkomst betreffende de Europese
+          Economische Ruimte of een verdrag inzake sociale zekerheid in geval van behoefte aan zorg recht hebben op zorg of
+          vergoeding van de kosten daarvan, zoals voorzien in de wetgeving over de verzekering voor zorg van hun woonland,
+          melden zich, tenzij zij op grond van deze wet verzekeringsplichtig zijn, bij het CAK aan.
+      - number: 2
+        content: De personen, bedoeld in het eerste, vijftiende en zestiende lid, zijn een bij ministeriële regeling te bepalen
+          bijdrage verschuldigd.
+      - number: 3
+        content: Bij de vaststelling van de bijdrage, bedoeld in het tweede lid, wordt rekening gehouden met een bij ministeriële
+          regeling te bepalen verhouding tussen de gemiddelde uitgaven voor zorg voor een persoon in het woonland van de rechthebbende
+          ten laste van de sociale zorgverzekeringen in dat land en de gemiddelde uitgaven voor zorg voor een persoon in Nederland
+          uit hoofde van deze wet en de Wet langdurige zorg.
+      - number: 4
+        content: 'Bij ministeriële regeling kan worden bepaald:
+
+
+          a. over welk jaar het inkomen bij wijze van grondslag voor de bijdrage, bedoeld in het tweede lid, wordt berekend
+          en onder welke omstandigheden van dat jaar kan worden afgeweken;
+
+
+          b. welk deel van de bijdrage, bedoeld in het tweede lid, voor de toepassing van de Wet op de zorgtoeslag als premie
+          voor een zorgverzekering wordt beschouwd.'
+      - number: 5
+        content: De bijdrage van een persoon, bedoeld in het eerste lid, van 18 jaar of ouder die ingevolge de verordening,
+          de overeenkomst of het verdrag, bedoeld in het eerste lid, als gezinslid wordt aangemerkt is verschuldigd door degene
+          van wie het recht op zorg van dat gezinslid ingevolge die verordening, die overeenkomst of dat verdrag is afgeleid.
+      - number: 6
+        content: Voor zover een pensioen- of renteverstrekkend orgaan aan een in het eerste lid bedoelde persoon loon als
+          bedoeld in artikel 42 verstrekt, is dat orgaan een bij ministeriële regeling te bepalen bijdrage verschuldigd.
+      - number: 7
+        content: Het CAK is belast met de administratie voortvloeiend uit het eerste, vijftiende en zestiende lid en de daar
+          genoemde internationale regels, alsmede met het nemen van beschikkingen over de heffing en de inning van de bijdragen,
+          bedoeld in het tweede en zesde lid.
+      - number: 8
+        content: Indien tegen een door het CAK op grond van dit artikel genomen beschikking bezwaar wordt gemaakt, beslist
+          het CAK, in afwijking van artikel 7:10, eerste lid, van de Algemene wet bestuursrecht, binnen dertien weken gerekend
+          vanaf de dag na die waarop de termijn voor het indienen van het bezwaarschrift is verstreken.
+      - number: 9
+        content: Het CAK gebruikt voor de uitvoering van dit artikel het burgerservicenummer van de in het eerste lid bedoelde
+          personen.
+      - number: 10
+        content: Het CAK is bevoegd tot het verwerken van persoonsgegevens van de personen, bedoeld in het eerste en veertiende
+          lid die noodzakelijk zijn voor de uitvoering van dit artikel.
+      - number: 11
+        content: Het CAK is de verwerkingsverantwoordelijke, voor de verwerking, bedoeld in het zevende lid.
+      - number: 12
+        content: 'Bij ministeriële regeling:
+
+
+          a. kan worden bepaald dat organen die pensioen of rente verschuldigd zijn of werkgevers in opdracht van het CAK
+          werkzaamheden verrichten ter voorbereiding of uitvoering van beschikkingen als bedoeld in het zevende lid, waarbij
+          kan worden bepaald dat die organen of werkgevers de bijdragen die de personen, bedoeld in het eerste lid, verschuldigd
+          zijn, inhouden op een pensioen of een rente dan wel, indien het eerste lid van toepassing is op gezinsleden van
+          een verzekeringsplichtige, op het loon, het pensioen of de rente van die verzekeringsplichtige;
+
+
+          b. kunnen regels worden gesteld over de wijze waarop het CAK zijn taak, bedoeld in het zevende lid, uitoefent of
+          de organen of werkgevers, bedoeld in onderdeel a, de in dat onderdeel bedoelde werkzaamheden uitvoeren;
+
+
+          c. kan, voor gevallen waarin een persoon als bedoeld in het eerste lid van meer dan één orgaan pensioen of rente
+          ontvangt, worden bepaald dat het CAK één orgaan aanwijst dat de bijdrage van die persoon en de bijdragen van de
+          gezinsleden van die persoon inhoudt op door dat orgaan aan die persoon verschuldigde pensioen of rente, of indien
+          het in te houden bedrag groter is dan dat pensioen of die rente, twee of meer organen aanwijst die elk een deel
+          van dat bedrag inhouden. Daarbij kan worden bepaald dat een deel van het pensioen of de rente wordt vrijgesteld
+          van inhouding door het aangewezen orgaan.'
+      - number: 13
+        content: Artikel 18f, derde lid, is van overeenkomstige toepassing.
+      - number: 14
+        content: Het CAK kan de bijdrage, bedoeld in het tweede of zesde lid, bij dwangbevel invorderen.
+      - number: 15
+        content: Voor de toepassing van Verordening (EG) Nr. 883/2004 van het Europees Parlement en de Raad van 29 april 2004,
+          betreffende de coördinatie van socialezekerheidsstelsels (Pb EU 2004, L 166) wordt de in het eerste lid bedoelde
+          persoon die op de laatste dag van de maand voorafgaande aan die waarin hij de 65-jarige leeftijd bereikt een pensioen
+          of uitkering ontvangt dat op grond van bijlage XI bij die verordening is gelijkgesteld met op grond van de Nederlandse
+          wetgeving verschuldigde pensioenen, tot aan de pensioengerechtigde leeftijd als bedoeld in artikel 7a van de Algemene
+          Ouderdomswet aangemerkt als een aanvrager van een pensioen.
+      - number: 16
+        content: Voor de toepassing van een in het eerste lid bedoeld verdrag wordt de in het eerste lid bedoelde persoon
+          die op de laatste dag van de maand voorafgaande aan die waarin hij de 65-jarige leeftijd bereikt een pensioen of
+          uitkering ontvangt dat op grond van het verdrag is gelijkgesteld met op grond van de Nederlandse wetgeving verschuldigde
+          pensioenen, tot aan de pensioengerechtigde leeftijd als bedoeld in artikel 7a van de Algemene Ouderdomswet aangemerkt
+          als een rechthebbende op een pensioen.
+      - number: 17
+        content: Bij ministeriële regeling kunnen regels worden gesteld over de uitvoering van de taken, bedoeld in artikel
+          6.1.2, onderdelen k en l, van de Wet langdurige zorg, van het CAK.
+    - id: Artikel69a
+      paragraphs:
+      - number: 1
+        content: Het CAK bevordert de rechtmatige en doelmatige uitvoering van de verordeningen, de overeenkomsten en de verdragen,
+          bedoeld in artikel 69, eerste lid.
+      - number: 2
+        content: Het CAK kan met het oog hierop richtlijnen geven.
+    - id: Artikel69b
+      paragraphs:
+      - number: 1
+        content: Het CAK is het nationale contactpunt, bedoeld in artikel 6, eerste lid, van Richtlijn 2011/24/EU van het
+          Europees Parlement en de Raad van 9 maart 2011 betreffende de toepassing van de rechten van patiënten bij grensoverschrijdende
+          gezondheidszorg (PbEU 2011, L 88).
+      - number: 2
+        content: Het CAK draagt zorg voor de uitvoering van de taken die bij de richtlijn, bedoeld in het eerste lid, zijn
+          toebedeeld aan het nationale contactpunt.
+      - number: 3
+        content: Bij ministeriële regeling kunnen regels worden gesteld over de uitvoering van de taken, bedoeld in het tweede
+          lid.
+    - id: Artikel70
+      paragraphs:
+      - number: 1
+        content: Het CAK opent voor iedere gemoedsbezwaarde, bedoeld in artikel 2, tweede lid, onderdeel b, een rekening,
+          waarop de geheven inkomensafhankelijke bijdrage, bedoeld in artikel 42, achtste lid, en de bijdragevervangende belasting,
+          bedoeld in artikel 57, eerste lid, worden gestort.
+      - number: 2
+        content: In afwijking van het eerste lid opent of houdt het CAK één rekening in stand indien twee of meer gemoedsbezwaarden
+          als bedoeld in artikel 2, tweede lid, onderdeel b, een gezamenlijke huishouding voeren, en worden op die rekening
+          de bijdragen en belastingen van ieder van deze gemoedsbezwaarden gestort.
+      - number: 3
+        content: Tot de rekening is geen ander begunstigd dan het CAK.
+      - number: 4
+        content: 'Het saldo wordt door het CAK gebruikt voor het doen van:
+
+
+          a. uitkeringen ter vergoeding van kosten van zorg of overige diensten als bedoeld in artikel 11, voor zover deze
+          zijn verleend aan een gemoedsbezwaarde voor wie de rekening in stand wordt gehouden, of aan een tot zijn huishouding
+          behorend kind, jonger dan achttien jaar;
+
+
+          b. uitkeringen als bedoeld in artikel 39, tweede lid, onderdeel d.'
+      - number: 5
+        content: Uitkeringen als bedoeld in het vierde lid, onderdeel a, worden slechts op verzoek van een gemoedsbezwaarde
+          voor wie de rekening in stand wordt gehouden, gedaan.
+      - number: 6
+        content: De kosten van zorg of overige diensten worden niet vergoed voor zover deze voor een verzekerde op grond van
+          de regels, gesteld bij of krachtens de algemene maatregel van bestuur, bedoeld in artikel 11, derde of vierde lid,
+          voor eigen rekening blijven.
+      - number: 7
+        content: Het CAK heft een rekening op indien alle gemoedsbezwaarden voor wie de rekening in stand werd gehouden, verzekeringsplichtig
+          zijn geworden dan wel zijn overleden.
+      - number: 8
+        content: Indien een gemoedsbezwaarde een gezamenlijke huishouding is gaan vormen met een andere gemoedsbezwaarde,
+          heft het CAK een van de twee rekeningen op, onder overmaking van het saldo naar de overblijvende rekening.
+      - number: 9
+        content: Het CAK zorgt per gemoedsbezwaarde of huishouding, bedoeld in het tweede lid, voor een ordentelijke administratie
+          van de stortingen op en de uitkeringen ten laste van de rekening.
+      - number: 10
+        content: Bij ministeriële regeling kunnen ter zake van het bepaalde in het eerste tot en met negende lid nadere regels
+          en uitvoeringsregels worden gegeven.
+      - number: 11
+        content: Het CAK is bevoegd de werkzaamheden, bedoeld bij of krachtens het eerste tot en met tiende lid, onder vergoeding
+          van de daarmee gepaard gaande kosten, uit te besteden aan een of meer zorgverzekeraars.
+      - number: 12
+        content: Het CAK gebruikt voor de uitvoering van dit artikel het burgerservicenummer van de gemoedsbezwaarde.
+      - number: 13
+        content: Het CAK is bevoegd tot het verwerken van persoonsgegevens van de gemoedsbezwaarde, waaronder gegevens over
+          gezondheid, die noodzakelijk zijn voor de uitvoering van dit artikel.
+      - number: 14
+        content: Het CAK is de verwerkingsverantwoordelijke, voor de verwerking, bedoeld in het dertiende lid.
+    - id: Artikel70a
+      paragraphs:
+      - number: 1
+        content: Bij ministeriële regeling kan worden bepaald dat het Zorginstituut een subsidie verstrekt aan zorgaanbieders
+          ten behoeve van kosten van geneeskundige zorg zoals huisartsen en klinisch-psychologen die plegen te bieden voor
+          zover het gaat om kortdurende generalistische behandeling van een persoon met lichte tot matig ernstige psychische
+          problematiek, inclusief de daarbij behorende diagnostiek of toegeleiding naar die zorg, die niet in rekening te
+          brengen zijn bij de zorgverzekeraar of de individuele verzekerde, omdat de identiteit van de verzekerde niet kan
+          worden vastgesteld.
+      - number: 2
+        content: In de regeling, bedoeld in het eerste lid, kunnen voorwaarden opgenomen worden ten aanzien van de subsidie
+          en kan jaarlijks een subsidieplafond worden vastgesteld.
+    - id: Artikel70b
+      paragraphs:
+      - number: 1
+        content: Bij ministeriële regeling kan worden bepaald dat het Zorginstituut uitkeringen verstrekt ter vergoeding van
+          kosten van zorg en andere diensten, bedoeld bij en krachtens artikel 11, verleend door zorgaanbieders aan personen
+          die zijn opgenomen in het stelsel van Bewaken & Beveiligen van het Openbaar Ministerie.
+      - number: 2
+        content: In de regeling, bedoeld in het eerste lid, kunnen voorwaarden opgenomen worden ten aanzien van de in dat
+          lid bedoelde uitkeringen en ten aanzien van de uitvoering van de in dat lid bedoelde taak van het Zorginstituut.
+    - id: Artikel71
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut zendt jaarlijks voor 1 oktober tegelijk met de begroting een werkprogramma voor het volgende
+          kalenderjaar aan Onze Minister met een beschrijving van de activiteiten die het Zorginstituut voornemens is ter
+          uitvoering van zijn taken te verrichten.
+      - number: 2
+        content: Tegelijk met de begroting, bedoeld in het eerste lid, zendt het Zorginstituut voor de uitvoering van de taken
+          op het gebied van de kwaliteit van de zorg eveneens een meerjarenagenda voor de volgende vier kalenderjaren aan
+          Onze Minister.
+      - number: 3
+        content: Onverminderd artikel 27 van de Kaderwet zelfstandige bestuursorganen bevat de begroting een meerjarenraming
+          van de beheerskosten voor de vier kalenderjaren, volgend op het begrotingsjaar.
+      - number: 4
+        content: In het werkprogramma, bedoeld in het eerste lid, wordt onderscheid gemaakt naar gelang het gaat om de uitvoering
+          van taken op het gebied van de kwaliteit van de zorg en van de taken, bedoeld in artikel 66f, dan wel om andere
+          taken van het Zorginstituut.
+    - id: Artikel72
+      paragraphs:
+      - number: 1
+        content: Onze Minister stelt jaarlijks voor 1 december het budget voor de beheerskosten van het Zorginstituut voor
+          het volgende kalenderjaar vast.
+      - number: 2
+        content: Onze Minister kan besluiten het budget voor de beheerskosten van het Zorginstituut te wijzigen.
+      - number: 3
+        content: Het Zorginstituut gaat met betrekking tot de beheerskosten geen verplichtingen aan en doet geen uitgaven
+          die leiden tot overschrijding van het vastgestelde budget voor de beheerskosten.
+      - number: 4
+        content: Indien het budget voor de beheerskosten niet is vastgesteld voor 1 januari van het kalenderjaar waarop de
+          begroting betrekking heeft, is het Zorginstituut bevoegd, teneinde zijn activiteiten gaande te houden, te beschikken
+          over ten hoogste een derde gedeelte van het budget dat laatstelijk voor hem voor een geheel jaar is vastgesteld.
+      - number: 5
+        content: Onze Minister kan besluiten dat het Zorginstituut in een geval als bedoeld in het vierde lid, kan beschikken
+          over meer dan een derde gedeelte van het budget dat laatstelijk voor hem voor een geheel jaar is vastgesteld.
+      - number: 6
+        content: Het door Onze Minister vastgestelde budget voor de beheerskosten van het Zorginstituut wordt gedekt uit ’s
+          Rijks kas.
+    - id: Artikel73
+      paragraphs:
+      - number: 1
+        content: De in artikel 26 van de Kaderwet zelfstandige bestuursorganen bedoelde begroting heeft betrekking op de beheerskosten
+          van het Zorginstituut.
+      - number: 2
+        content: De in artikel 34 van de Kaderwet zelfstandige bestuursorganen bedoelde jaarrekening van het Zorginstituut
+          heeft betrekking op de beheerskosten van het Zorginstituut.
+      - number: 3
+        content: De accountant doet verslag van zijn bevindingen over de vraag of het beheer en de organisatie van het Zorginstituut
+          voldoen aan de eisen van rechtmatigheid, ordelijkheid en controleerbaarheid.
+    - id: Artikel73a
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut zendt jaarlijks voor 15 april aan Onze Minister een verantwoording over de vaststelling
+          van de bijdragen, bedoeld in artikel 34, verstrekt ten behoeve van het vierde kalenderjaar, voorafgaande aan het
+          jaar waarin verantwoording wordt afgelegd, alsmede een assurance report.
+      - number: 2
+        content: Het assurance report geeft aan of het beheer en de organisatie voldoen aan eisen van rechtmatigheid, ordelijkheid,
+          controleerbaarheid en doelmatigheid.
+      - number: 3
+        content: Het assurance report wordt opgesteld door een accountant als bedoeld in artikel 393 van Boek 2 van het Burgerlijk
+          Wetboek, die bereid is Onze Minister desgevraagd inzicht te geven in zijn controlewerkzaamheden.
+    - id: Artikel74
+      paragraphs:
+      - number: 1
+        content: Het Zorginstituut zendt jaarlijks voor 31 december aan Onze Minister met betrekking tot het Zorgverzekeringsfonds
+          een jaarrekening over het afgelopen kalenderjaar, alsmede het verslag van bevindingen, bedoeld in het vijfde lid.
+      - number: 2
+        content: 'Het Zorginstituut legt in de jaarrekening, die zoveel mogelijk met overeenkomstige toepassing van titel
+          9 van Boek 2 van het Burgerlijk Wetboek wordt ingericht, rekening en verantwoording af over:
+
+
+          a. de baten en lasten van het Zorgverzekeringsfonds,
+
+
+          b. de rechtmatigheid en doelmatigheid van het beheer van het Zorgverzekeringsfonds,
+
+
+          c. de toestand van het Zorgverzekeringsfonds per 31 december van het voorafgaande kalenderjaar.'
+      - number: 3
+        content: De jaarrekening gaat vergezeld van een verklaring omtrent de getrouwheid, afgegeven door een accountant als
+          bedoeld in artikel 393 van Boek 2 van het Burgerlijk Wetboek, die bereid is Onze Minister desgevraagd inzicht te
+          geven in zijn controlewerkzaamheden.
+      - number: 4
+        content: De verklaring heeft mede betrekking op de rechtmatige verkrijging en besteding van de middelen van het Zorgverzekeringsfonds.
+      - number: 5
+        content: De accountant voegt bij de verklaring een verslag van zijn bevindingen over de vraag of het beheer en de
+          organisatie voldoen aan eisen van rechtmatigheid, ordelijkheid, controleerbaarheid en doelmatigheid.
+    - id: Artikel75
+      paragraphs:
+      - number: 1
+        content: Het werkprogramma, bedoeld in artikel 71, de verantwoording, bedoeld in artikel 73a, eerste lid, en de jaarrekening,
+          bedoeld in artikel 74, behoeven de goedkeuring van Onze Minister.
+      - number: 2
+        content: 'In afwijking van het eerste lid en van artikel 29, eerste lid, van de Kaderwet zelfstandige bestuursorganen,
+          behoeven wijzigingen in een goedgekeurde begroting geen goedkeuring van Onze Minister, mits:
+
+
+          a. de totale omvang van de begroting geen wijziging ondergaat, en
+
+
+          b. de wijziging per groep van kostensoorten en baten, gerekend over het desbetreffende begrotingsjaar, een bedrag
+          van 5 procent van het in artikel 72 bedoelde budget niet te boven gaat.'
+      - number: 3
+        content: 'Bij ministeriële regeling kunnen regels worden gesteld over:
+
+
+          a. de inhoud en de inrichting van het werkprogramma, bedoeld in artikel 71, eerste lid, en de meerjarenagenda, bedoeld
+          in artikel 71, tweede lid;
+
+
+          b. de inhoud en de inrichting van de begroting, bedoeld in artikel 26 van de Kaderwet zelfstandige bestuursorganen;
+
+
+          c. de inhoud en inrichting van de verantwoording, bedoeld in artikel 73a, eerste lid, en van het in dat lid bedoelde
+          assurance report;
+
+
+          d. de inhoud en inrichting van de jaarrekening, bedoeld in artikel 74, alsmede in artikel 34 van de Kaderwet zelfstandige
+          bestuursorganen;
+
+
+          e. de accountantscontrole van de jaarrekeningen, bedoeld in artikel 74 en artikel 34 van de Kaderwet zelfstandige
+          bestuursorganen;
+
+
+          f. de bij de jaarrekeningen, bedoeld in artikel 74 en artikel 34 van de Kaderwet zelfstandige bestuursorganen behorende
+          verslagen van bevindingen alsmede het assurance report, bedoeld in artikel 73a, eerste lid;
+
+
+          g. de inhoud en de inrichting van het jaarverslag, bedoeld in artikel 18 van de Kaderwet zelfstandige bestuursorganen;
+
+
+          h. de omvang van de egalisatiereserve, bedoeld in artikel 33 van de Kaderwet zelfstandige bestuursorganen.'
+      - number: 4
+        content: Bij ministeriële regeling worden regels gesteld over de wijze waarop en de voorwaarden waaronder het budget,
+          bedoeld in artikel 72, wordt vastgesteld.
+  - id: Hoofdstuk7
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel86
+      paragraphs:
+      - number: 1
+        content: Tenzij de verzekerde daarover niet beschikt, neemt de zorgverzekeraar met het oog op de uitvoering van de
+          zorgverzekering en van deze wet het burgerservicenummer van zijn verzekerde en, gedurende zeven jaren na het einde
+          van de verzekering, van zijn gewezen verzekerde in zijn administratie op.
+      - number: 2
+        content: De zorgverzekeraar stelt bij de eerste opname in zijn administratie en vervolgens indien daartoe aanleiding
+          is het burgerservicenummer van de verzekerde vast met overeenkomstige toepassing van artikel 7 van de Wet aanvullende
+          bepalingen verwerking persoonsgegevens in de zorg.
+      - number: 3
+        content: De zorgverzekeraar gebruikt het burgerservicenummer van de verzekerde met het doel te waarborgen dat de in
+          het kader van de verzekering van zorg te verwerken persoonsgegevens op die verzekerde betrekking hebben.
+      - number: 4
+        content: Bij gegevensuitwisseling tussen de zorgverzekeraars en de in de artikelen 88 en 89 genoemde personen en instanties
+          wordt, voor zover die personen en instanties tot gebruik van dat nummer bevoegd zijn, het burgerservicenummer of,
+          bij het ontbreken daarvan, het sociaal-fiscaalnummer gebruikt.
+      - number: 5
+        content: Het vierde lid is van overeenkomstige toepassing op de gegevensuitwisseling tussen de zorgverzekeraars en
+          de zorgaanbieders, indicatieorganen en zorgverzekeraars in de zin van de Wet aanvullende bepalingen verwerking persoonsgegevens
+          in de zorg die niet in de artikelen 88 en 89 zijn genoemd.
+      - number: 6
+        content: Bij algemene maatregel van bestuur kunnen nadere regels worden gesteld met betrekking tot het eerste en tweede
+          lid.
+      - number: 7
+        content: Bij ministeriële regeling kan worden bepaald aan welke beveiligingseisen de gegevensverwerking, bedoeld in
+          het eerste, vierde en vijfde lid, voldoet.
+      - number: 8
+        content: Bij of krachtens algemene maatregel van bestuur kunnen regels gesteld worden over de bij de gegevensuitwisseling,
+          bedoeld in het vierde en vijfde lid, te verwerken feiten of gegevens met betrekking tot verzekerden van wie het
+          vaststellen van het burgerservicenummer onmogelijk blijkt of een onevenredige inspanning kost. Bij of krachtens
+          die maatregel kan worden bepaald aan welke beveiligingseisen de verwerking van die feiten of gegevens voldoet.
+      - number: 9
+        content: Bij algemene maatregel van bestuur kunnen vormen van zorg of andere diensten als bedoeld in artikel 11, alsmede
+          categorieën van zorgverzekeraars en van in de artikelen 88 en 89 genoemde personen en instanties worden uitgezonderd
+          van de toepassing van het bepaalde bij of krachtens het eerste tot en met het achtste lid.
+    - id: Artikel87
+      paragraphs:
+      - number: 1
+        content: Een zorgaanbieder die aan een verzekerde zorg of andere diensten, bedoeld in artikel 11, heeft verleend,
+          en die de kosten daarvan krachtens een door hem met de zorgverzekeraar gesloten overeenkomst rechtstreeks bij die
+          zorgverzekeraar in rekening brengt, verstrekt die zorgverzekeraar of een door die zorgverzekeraar aangewezen persoon
+          de persoonsgegevens van de verzekerde, waaronder gegevens over gezondheid als bedoeld in artikel 4, onderdeel 15
+          van de Algemene verordening gegevensbescherming, die noodzakelijk zijn voor de uitvoering van de zorgverzekering
+          of van deze wet, dan wel stelt hem deze gegevens voor dit doel voor inzage of het nemen van afschrift ter beschikking.
+      - number: 2
+        content: Een zorgaanbieder die aan een verzekerde zorg of andere diensten, bedoeld in artikel 11, heeft verleend en
+          die de kosten daarvan bij de verzekerde in rekening brengt, verstrekt hem de persoonsgegevens, waaronder gegevens
+          over gezondheid als bedoeld in artikel 4, onderdeel 15 van de Algemene verordening gegevensbescherming, die voor
+          zijn zorgverzekeraar noodzakelijk zijn voor de uitvoering van de zorgverzekering of van deze wet.
+      - number: 3
+        content: De zorgaanbieder, bedoeld in het eerste of tweede lid, verstrekt een door Onze Minister aangewezen persoon
+          kosteloos bij ministeriële regeling omschreven, voor de uitvoering van deze wet noodzakelijke persoonsgegevens,
+          waaronder gegevens over gezondheid als bedoeld in artikel 4, onderdeel 15 van de Algemene verordening gegevensbescherming.
+      - number: 4
+        content: Personen werkzaam ten behoeve van een zorgaanbieder als bedoeld in het eerste of tweede lid, verstrekken
+          die zorgaanbieder de persoonsgegevens die hij nodig heeft om te kunnen voldoen aan zijn verplichtingen bedoeld in
+          het eerste, tweede en derde lid.
+      - number: 5
+        content: Personen werkzaam bij de zorgverzekeraar, bij een door de zorgverzekeraar aangewezen persoon als bedoeld
+          in het eerste lid, of bij de door Onze Minister aangewezen persoon als bedoeld in het derde lid, voor wie niet reeds
+          uit hoofde van ambt of beroep een geheimhoudingplicht geldt, zijn verplicht tot geheimhouding van de gegevens als
+          bedoeld in het eerste, tweede of derde lid, behoudens voor zover enig wettelijk voorschrift hen mededeling toestaat.
+      - number: 6
+        content: 'Bij ministeriële regeling kan worden bepaald:
+
+
+          a. tot welke gegevens de verplichting, bedoeld in het eerste of tweede lid, zich in ieder geval uitstrekt;
+
+
+          b. op welke wijze gegevens, bedoeld in het eerste of tweede lid, worden verwerkt;
+
+
+          c. volgens welke technische standaarden gegevensverwerking plaatsvindt;
+
+
+          d. aan welke beveiligingseisen gegevensverwerking voldoet;
+
+
+          e. in welke gevallen gegevens, bedoeld in het eerste of tweede lid, verder worden verwerkt met het oog op de uitvoering
+          van de zorgverzekering of een aanvullende ziektekostenverzekering, voor zover deze gegevens niet worden gebruikt
+          voor het beoordelen en accepteren van een aspirant-verzekerde voor een aanvullende verzekering en bovendien noodzakelijk
+          zijn voor: 1°. de betaling aan een zorgaanbieder of de vergoeding van zorgkosten aan een verzekerde; 2°. de vaststelling
+          van eigen bijdragen of nog openstaand verplicht of vrijwillig eigen risico; 3°. het uitoefenen van het verhaalsrecht;
+          of 4°. het verrichten van controle of fraudeonderzoek.
+
+
+          1°. de betaling aan een zorgaanbieder of de vergoeding van zorgkosten aan een verzekerde;
+
+
+          2°. de vaststelling van eigen bijdragen of nog openstaand verplicht of vrijwillig eigen risico;
+
+
+          3°. het uitoefenen van het verhaalsrecht; of
+
+
+          4°. het verrichten van controle of fraudeonderzoek.'
+    - id: Artikel88
+      paragraphs:
+      - number: 1
+        content: Een ieder verstrekt op verzoek aan de zorgverzekeraars, het Zorginstituut, de zorgautoriteit, Onze Minister,
+          de rijksbelastingdienst, het Uitvoeringsinstituut werknemersverzekeringen, de Sociale verzekeringsbank, het college
+          van burgemeester en wethouders, het CAK, of aan een daartoe door of vanwege een van deze zorgverzekeraars of instanties
+          aangewezen persoon kosteloos alle inlichtingen en gegevens, waaronder persoonsgegevens als bedoeld in de Algemene
+          verordening gegevensbescherming, die noodzakelijk zijn voor de uitvoering van de zorgverzekeringen of van deze wet
+          of van artikel 11g van de Wet kwaliteit, klachten en geschillen zorg.
+      - number: 2
+        content: De in het eerste lid bedoelde gegevens en inlichtingen worden op verzoek verstrekt in schriftelijke vorm
+          of in een andere vorm die redelijkerwijs kan worden verlangd, binnen een termijn die schriftelijk wordt gesteld
+          bij het in het eerste lid bedoelde verzoek.
+      - number: 3
+        content: Een ieder geeft op verzoek van een rechtspersoon als bedoeld in het eerste lid, inzage in alle bescheiden
+          en andere gegevensdragers, stelt deze op verzoek ter beschikking voor het nemen van afschrift en verleent de terzake
+          verlangde medewerking, voor zover dit noodzakelijk is voor de uitvoering van deze wet door de desbetreffende zorgverzekeraars
+          of instanties.
+      - number: 4
+        content: Bij ministeriële regeling kunnen nadere regels worden gesteld met betrekking tot het eerste, tweede of derde
+          lid.
+    - id: Artikel89
+      paragraphs:
+      - number: 1
+        content: De in artikel 88, eerste lid, bedoelde zorgverzekeraars en instanties, alsmede de Wlz-uitvoerders en de in
+          artikel 24, eerste en derde lid, bedoelde ministers, zijn bevoegd uit eigen beweging en verplicht op verzoek binnen
+          een bij dat verzoek genoemde termijn, uit de onder hun verantwoordelijkheid gevoerde administratie, aan elkaar,
+          aan een daartoe door of vanwege hen aangewezen persoon of aan een door Onze Minister aangewezen persoon, kosteloos,
+          de gegevens, waaronder persoonsgegevens als bedoeld in de Algemene verordening gegevensbescherming, te verstrekken
+          die noodzakelijk zijn voor de uitvoering van de zorgverzekeringen of van deze wet, van artikel 11g van de Wet kwaliteit,
+          klachten en geschillen zorg, of voor de onderlinge afstemming van op grond van de zorgverzekering verzekerde zorg
+          en zorg die is verzekerd op grond van de Wet langdurige zorg.
+      - number: 2
+        content: Een zorgverzekeraar verleent op verzoek van het Zorginstituut, het CAK dan wel van de zorgautoriteit aan
+          door het desbetreffende bestuursorgaan aangewezen personen inzage in alle bescheiden en andere gegevensdragers,
+          stelt deze op verzoek ter beschikking voor het nemen van afschrift en verleent de terzake verlangde medewerking,
+          voor zover het desbetreffende bestuursorgaan dit nodig acht voor de uitoefening van zijn taak.
+      - number: 3
+        content: Alle ambtenaren tot afgifte van uittreksels uit registers van burgerlijke stand bevoegd, zijn verplicht aan
+          een in artikel 88, eerste lid, bedoelde zorgverzekeraar of instantie de door deze gevraagde uittreksels uit de registers
+          kosteloos toe te zenden.
+      - number: 4
+        content: Griffiers van colleges, geheel of ten dele met rechtspraak belast, verstrekken op verzoek, kosteloos, aan
+          een zorgverzekeraar, aan het CAK, aan het Zorginstituut of aan de zorgautoriteit alle gegevens, inlichtingen en
+          uittreksels uit of afschriften van uitspraken, registers en andere stukken, die noodzakelijk zijn voor de uitvoering
+          van deze wet door de zorgverzekeraar of het desbetreffende bestuursorgaan.
+      - number: 5
+        content: De verstrekking aan Onze Minister op grond van artikel 88, eerste lid, of het eerste lid betreft, voor zover
+          het gaat om persoonsgegevens als bedoeld in de Algemene verordening gegevensbescherming, waaronder gegevens over
+          gezondheid als bedoeld in artikel 4, onderdeel 15 van die verordening, gegevens die noodzakelijk zijn voor de bepaling
+          van de criteria, bedoeld in artikel 32, derde lid, of van het criterium, bedoeld in artikel 32, vierde lid, onderdeel
+          b, of de statistische onderbouwing van de aan de criteria krachtens artikel 32, vierde lid, onderdeel c, gekoppelde
+          bijdragen.
+      - number: 6
+        content: 'De verstrekking aan het Zorginstituut op grond van artikel 88, eerste lid of het eerste lid, betreft gegevens
+          waaronder gegevens over gezondheid als bedoeld in artikel 4, onderdeel 15 van de Algemene verordening gegevensbescherming,
+          die noodzakelijk zijn voor:
+
+
+          a. de berekening van de aan een zorgverzekeraar toekomende bijdragen als bedoeld in artikelen 32 tot en met 34;
+
+
+          b. de uitvoering van de aan het Zorginstituut in de artikelen 64 of 66 opgedragen taken; of
+
+
+          c. de uitvoering van de aan het Zorginstituut in artikel 11g van de Wet kwaliteit, klachten en geschillen zorg opgedragen
+          taken.'
+      - number: 7
+        content: Op de aan Onze Minister of het Zorginstituut te verstrekken persoonsgegevens is pseudonimisering als bedoeld
+          in artikel 4, onderdeel 5 van de Algemene verordening gegevensbescherming, toegepast die vervolgens onafgebroken
+          is gecontinueerd.
+      - number: 8
+        content: Bij algemene maatregel van bestuur worden nadere regels gesteld over de verstrekking van gegevens door de
+          rijksbelastingdienst aan de zorgverzekeraars.
+      - number: 9
+        content: Bij ministeriële regeling kunnen nadere regels worden gesteld met betrekking tot het eerste of tweede lid.
+    - id: Artikel89a
+      paragraphs:
+      - number: 1
+        content: Een zorgverzekeraar verstrekt aan Onze Minister de door hem verzochte informatie ten behoeve van het te voeren
+          beleid op het gebied van de volksgezondheid.
+      - number: 2
+        content: De door een Wlz-uitvoerder op grond van artikel 89, eerste lid, aan een zorgverzekeraar voor de uitvoering
+          van dit artikel te verstrekken informatie kan ook gegevens over gezondheid als bedoeld in artikel 4, onderdeel 15,
+          van de Algemene verordening gegevensbescherming, betreffen.
+      - number: 3
+        content: Een zorgverzekeraar verwerkt ten behoeve van de verstrekking op grond van het eerste lid geen andere persoonsgegevens
+          dan hij op grond van de artikelen 86, 87, 88 of 89 heeft verwerkt, waaronder verwerkte gegevens over gezondheid
+          als bedoeld in artikel 4, onderdeel 15, van de Algemene verordening gegevensbescherming.
+      - number: 4
+        content: De aan Onze Minister op grond van het eerste lid te verstrekken informatie bevat geen gegevens waarmee hij
+          een natuurlijk persoon direct of indirect kan identificeren.
+      - number: 5
+        content: Onze Minister verwerkt geen andere gegevens waarmee hij op basis van de op grond van het eerste lid te verstrekken
+          informatie een natuurlijk persoon direct dan wel indirect kan identificeren.
+    - id: Artikel90
+      paragraphs:
+      - number: 1
+        content: De zorgautoriteit, onderscheidenlijk het Zorginstituut kan na overleg met het Zorginstituut, onderscheidenlijk
+          de zorgautoriteit bij regeling bepalen welke gegevens en inlichtingen regelmatig door de zorgverzekeraars moeten
+          worden verstrekt.
+      - number: 2
+        content: De regels kunnen mede omvatten het tijdstip en de wijze waarop de gegevens en inlichtingen moeten worden
+          verstrekt, alsmede dat een accountant als bedoeld in artikel 393 van Boek 2 van het Burgerlijk Wetboek de juistheid
+          van de verstrekte gegevens en inlichtingen bevestigt.
+      - number: 3
+        content: Bij ministeriële regeling kan worden bepaald welke statistische gegevens de zorgverzekeraars verzamelen betreffende
+          vormen van zorg en andere diensten.
+    - id: Artikel91
+      paragraphs:
+      - number: 1
+        content: Het CAK, het Zorginstituut en de zorgautoriteit verstrekken Onze Minister uit eigen beweging inlichtingen
+          over ontwikkelingen die ertoe leiden of kunnen leiden dat ten behoeve van verzekerden niet vrij kan worden gekozen
+          tussen zorgverzekeraars en de door hen aangeboden varianten van de zorgverzekering of die een rechtmatige en volledige
+          uitvoering van zorgverzekeringen jegens de verzekeringnemers of verzekerden in gevaar kunnen brengen.
+      - number: 2
+        content: Het Zorginstituut en de zorgautoriteit verstrekken desgevraagd aan het het College sanering, bedoeld in de
+          Wet toelating zorginstellingen, de voor de uitoefening van hun taak benodigde inlichtingen en gegevens.
+      - number: 3
+        content: Het Zorginstituut en de zorgautoriteit verlenen aan door een bestuursorgaan, bedoeld in het tweede lid, aangewezen
+          personen toegang tot en inzage in zakelijke gegevens en bescheiden, voor zover dat voor de vervulling van hun taak
+          redelijkerwijs nodig is.
+    - id: Artikel92
+      paragraphs:
+      - number: 1
+        content: Een zorgverzekeraar maakt voor de verstrekking of ontvangst van gegevens aan of van personen, aan te wijzen
+          door het CAK, gebruik van een elektronische infrastructuur.
+      - number: 2
+        content: 'Het CAK kan met betrekking tot het eerste lid regels stellen over:
+
+
+          a. de aard en omvang van de gegevens en de voorschriften waaraan de verstrekking of ontvangst ten minste moet voldoen;
+
+
+          b. de wijze waarop de verstrekking of ontvangst van gegevens plaatsvindt, waaronder begrepen de aansluiting van
+          zorgverzekeraars op de infrastructuur;
+
+
+          c. de wijze waarop het gebruik van de infrastructuur wordt georganiseerd en beheerd, waaronder begrepen de inrichting
+          en instandhouding van een gemeenschappelijke database;
+
+
+          d. de financiering van het gebruik van de infrastructuur en de wijze waarop de kosten ervan worden verdeeld.'
+    - id: Artikel93
+      paragraphs:
+      - number: 1
+        content: Het is een ieder die uit hoofde van de toepassing van deze wet of van krachtens deze wet genomen besluiten
+          enige taak vervult of heeft vervuld, verboden van vertrouwelijke gegevens of inlichtingen die ingevolge deze wet
+          dan wel ingevolge titel 5.2 van de Algemene wet bestuursrecht zijn verstrekt of verkregen of van De Nederlandsche
+          Bank N.V. of de Stichting Autoriteit Financiële Markten zijn ontvangen, verder of anders gebruik te maken of daaraan
+          verder of anders bekendheid te geven dan voor de uitvoering van zijn taak of bij of krachtens deze wet wordt geëist.
+      - number: 2
+        content: In afwijking van het eerste lid kunnen de zorgautoriteit, het CAK en het Zorginstituut met gebruikmaking
+          van vertrouwelijke gegevens of inlichtingen verkregen bij de uitvoering van hun taken op grond van deze wet, mededelingen
+          doen, indien deze niet kunnen worden herleid tot afzonderlijke personen of ondernemingen.
+      - number: 3
+        content: In afwijking van het eerste lid en in overeenstemming met artikel 1:89 van de Wet op het financieel toezicht
+          zijn de zorgautoriteit, het CAK, het Zorginstituut, De Nederlandsche Bank N.V. en de Stichting Autoriteit Financiële
+          Markten, voor zover dat voor hun taakuitoefening noodzakelijk is, bevoegd aan elkaar en aan Onze Minister vertrouwelijke
+          gegevens of inlichtingen omtrent afzonderlijke verzekeraars te verschaffen.
+      - number: 4
+        content: 'Het eerste lid laat, ten aanzien van degene op wie dat lid van toepassing is, onverlet:
+
+
+          a. de toepasselijkheid van de bepalingen van het Wetboek van Strafvordering welke betrekking hebben op het als getuige
+          of deskundige in strafzaken afleggen van een verklaring omtrent gegevens of inlichtingen verkregen bij de vervulling
+          van de ingevolge deze wet opgedragen taak;
+
+
+          b. de toepasselijkheid van de bepalingen van het Wetboek van Burgerlijke Rechtsvordering en van artikel 66 van de
+          Faillissementswet welke betrekking hebben op het als getuige of als partij in een comparitie van partijen dan wel
+          als deskundige in burgerlijke zaken afleggen van een verklaring omtrent gegevens of inlichtingen verkregen bij de
+          vervulling van zijn ingevolge deze wet opgedragen taak, voor zover het gaat om gegevens of inlichtingen omtrent
+          een verzekeraar die in staat van faillissement is verklaard of op grond van een rechterlijke uitspraak is ontbonden;
+
+
+          c. de bevoegdheden van de Algemene Rekenkamer ingevolge artikel 7.34 van de Comptabiliteitswet 2016, voor zover
+          deze niet bij artikel 121 zijn beperkt.'
+      - number: 5
+        content: Het vierde lid, onderdeel b, geldt niet voor gegevens of inlichtingen die betrekking hebben op verzekeraars
+          die betrokken zijn of zijn geweest bij een poging de desbetreffende verzekeraar in staat te stellen zijn bedrijf
+          voort te zetten.
+      - number: 6
+        content: De Algemene Rekenkamer is bij het doen van mededelingen als bedoeld in artikelen 7.30, 7.34, negende lid
+          en 7.39 van de Comptabiliteitswet 2016, verplicht tot geheimhouding, voor zover het betreft gegevens en inlichtingen
+          die haar ingevolge het vierde lid, onderdeel c, bekend zijn geworden.
+  - id: Hoofdstuk8
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel114
+      paragraphs:
+      - number: 1
+        content: De zorgverzekeraar zorgt ervoor dat zijn verzekeringnemers en verzekerden geschillen over de uitvoering van
+          de zorgverzekering kunnen voorleggen aan een onafhankelijke instantie.
+      - number: 2
+        content: De onafhankelijke instantie neemt een geschil slechts in behandeling nadat de verzekeringnemer of de verzekerde
+          de zorgverzekeraar heeft verzocht zijn beslissing te heroverwegen, en deze niet binnen redelijke termijn of niet
+          naar tevredenheid van de verzekeringnemer of verzekerde heeft gereageerd.
+      - number: 3
+        content: De onafhankelijke instantie vraagt advies aan het Zorginstituut indien het geschil betrekking heeft op de
+          zorg of de overige diensten, bedoeld in artikel 11, dan wel de vergoeding van die zorg of diensten.
+      - number: 4
+        content: Het Zorginstituut zendt zijn advies binnen vier weken na ontvangst van de adviesaanvraag aan de onafhankelijke
+          instantie.
+  - id: Hoofdstuk9
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel118
+      paragraphs:
+      - number: 1
+        content: Een verzekerde die voor rekening van zijn zorgverzekering bij ministeriële regeling aan te wijzen zorg of
+          andere diensten als bedoeld in artikel 11 wenst te genieten, verstrekt aan de persoon of instelling die die zorg
+          of dienst verleent ter inzage een identiteitsbewijs als bedoeld in artikel 1, eerste lid, van de Wet op de identificatieplicht,
+          of een ander bij ministeriële regeling aan te wijzen document waarmee zijn identiteit kan worden vastgesteld.
+      - number: 2
+        content: Indien het identiteitsbewijs niet onmiddellijk ter inzage kan worden verstrekt, kan de persoon of instelling
+          toestaan dat uiterlijk binnen een termijn van veertien dagen aan deze verplichting wordt voldaan.
+      - number: 3
+        content: De persoon of instelling stelt aan de hand van het ter inzage verstrekte document de identiteit vast van
+          degene aan wie de in het eerste lid bedoelde zorg of dienst wordt verleend, en neemt het met inachtneming van artikel
+          7 van de Wet aanvullende bepalingen verwerking persoonsgegevens in de zorg vastgestelde burgerservicenummer van
+          de verzekerde in zijn administratie op.
+    - id: Artikel119
+      paragraphs:
+      - number: 1
+        content: Een overeenkomst met betrekking tot de verzekering van geneeskundige zorg of de kosten daarvan, gesloten
+          voor een verzekerde met of ten behoeve van wie tevens een zorgverzekering is gesloten, vervalt met ingang van de
+          dag waarop de bij en krachtens artikel 11 te verzekeren prestaties worden uitgebreid, voor zover aan de overeenkomst
+          rechten kunnen worden ontleend, gelijkwaardig aan die, welke vanaf dat moment uit de zorgverzekering voortvloeien.
+      - number: 2
+        content: De premie die voor de op grond van het eerste lid geheel of gedeeltelijk vervallen overeenkomst is vooruitbetaald,
+          wordt door de verzekeraar al naar gelang van het vervallen gedeelte der overeenkomst terugbetaald, onder aftrek
+          van ten hoogste 25% van het terug te betalen bedrag.
+    - id: Artikel122a
+      paragraphs:
+      - number: 1
+        content: 'Het CAK verstrekt bijdragen aan zorgaanbieders die inkomsten derven ten gevolge van het verlenen van medisch
+          noodzakelijke zorg aan:
+
+
+          a. vreemdelingen als bedoeld in artikel 8, onderdelen f of h, van de Vreemdelingenwet 2000, voor zover het betreft
+          vreemdelingen die in afwachting zijn van een beslissing op een aanvraag tot het verlenen van een verblijfsvergunning
+          als bedoeld in artikel 14 van die wet, dan wel vreemdelingen die in afwachting zijn van een beslissing op een bezwaarschrift
+          of een beroepschrift naar aanleiding van een beslissing als hiervoor bedoeld en deze procedure krachtens de Vreemdelingenwet
+          2000 of op grond van een rechterlijke beslissing in Nederland mogen afwachten, en
+
+
+          b. vreemdelingen als bedoeld in artikel 10 van de Vreemdelingenwet 2000.'
+      - number: 2
+        content: Onder medisch noodzakelijke zorg wordt verstaan zorg of overige diensten als bedoeld in artikel 11 van deze
+          wet of in artikel 3.1.1 van de Wet langdurige zorg, met uitzondering van bij of krachtens algemene maatregel van
+          bestuur aan te wijzen vormen van zorg of diensten, en slechts voor zover de zorgaanbieder verstrekking ervan, gezien
+          de aard van de prestaties en de verwachte duur van het verblijf van de vreemdeling, medisch noodzakelijk acht.
+      - number: 3
+        content: 'Geen bijdrage wordt verstrekt voor zover de kosten voor de verleende zorg:
+
+
+          a. op de vreemdeling of een verzekeraar van de vreemdeling kunnen worden verhaald,
+
+
+          b. op grond van een andere wettelijke bepaling kunnen worden vergoed, of
+
+
+          c. hoger zijn dan de kosten die voor vergoeding in aanmerking komen bij overeenkomstige toepassing van artikel 11,
+          met dien verstande dat geen aftrek plaatsvindt van het deel van de kosten dat voor rekening van de verzekerde zou
+          komen.'
+      - number: 4
+        content: 'Indien zorg is verleend die aan verzekerden doorgaans zonder verwijzing of recept wordt verleend, bedraagt
+          de bijdrage:
+
+
+          a. 100% van de kosten die verband houden met zwangerschap en bevalling, en
+
+
+          b. 80% van de kosten in de overige gevallen, voor zover deze kosten niet op grond van het derde lid zijn of kunnen
+          worden betaald of buiten beschouwing dienen te blijven.'
+      - number: 5
+        content: In bijdragen als bedoeld in het eerste lid voor andere zorg dan de zorg, bedoeld in het vierde lid, wordt
+          voorzien door middel van met het oog op verlening van die zorg tussen het CAK en zorgaanbieders gesloten overeenkomsten.
+      - number: 6
+        content: Indien een zorgaanbieder zowel in zorg als bedoeld in het vierde lid als in zorg als bedoeld in het vijfde
+          lid kan voorzien, kan een overeenkomst als bedoeld in het vijfde lid zich tevens uitstrekken over de in het vierde
+          lid bedoelde zorg en kunnen in die overeenkomst van het vierde lid afwijkende afspraken worden gemaakt.
+      - number: 7
+        content: Het CAK zendt jaarlijks voor 1 oktober aan Onze Minister een begroting van de kosten van de bijdragen, bedoeld
+          in het eerste lid, voor het volgende kalenderjaar. Indien gedurende het jaar aanmerkelijke verschillen ontstaan
+          of dreigen te ontstaan tussen de werkelijke en de begrote baten en lasten, doet het CAK daarvan onverwijld mededeling
+          aan Onze Minister, onder vermelding van de oorzaak van de verschillen.
+      - number: 8
+        content: Het voor de bijdragen in een kalenderjaar beschikbare bedrag wordt voor 1 december van het daaraan voorafgaande
+          jaar door Onze Minister vastgesteld.
+      - number: 9
+        content: Het bedrag, bedoeld in het achtste lid, wordt gedekt uit ’s Rijks kas en wordt door het CAK afzonderlijk
+          beheerd en geadministreerd.
+      - number: 10
+        content: De zorgaanbieder die in aanmerking wenst te komen voor een bijdrage als bedoeld in dit artikel, verstrekt
+          het CAK of door het CAK aangewezen, bij de uitvoering van dit artikel betrokken personen, bij ministeriële regeling
+          te bepalen gegevens die noodzakelijk zijn om het recht op en de omvang van een bijdrage te kunnen vaststellen, dan
+          wel stelt hem deze gegevens voor dit doel voor inzage of het nemen van afschrift ter beschikking.
+    - id: Artikel123
+      paragraphs:
+      - number: 1
+        content: 'In dit artikel wordt verstaan onder:
+
+
+          a. orgaan van de woonplaats: rechtspersoon die door Onze Minister is aangewezen als orgaan van de woonplaats in
+          de zin van de Verordening (EG) nr. 883/2004 van het Europees Parlement en de Raad van 29 april 2004, betreffende
+          de coördinatie van socialezekerheidsstelsels (PbEU 2004, L 166), of, voor zover het zorg betreft, een verdrag inzake
+          sociale zekerheid;
+
+
+          b. orgaan van de verblijfplaats: rechtspersoon die door Onze Minister is aangewezen als orgaan van de verblijfplaats
+          in de zin van de Verordening (EG) nr. 883/2004 van het Europees Parlement en de Raad van 29 april 2004, betreffende
+          de coördinatie van socialezekerheidsstelsels (PbEU 2004, L 166), of, voor zover het zorg betreft, een verdrag inzake
+          sociale zekerheid;
+
+
+          c. verdragsrecht: recht van een in Nederland wonende of tijdelijk verblijvende persoon op zorg of andere diensten
+          in de zin van deze wet of de Wet langdurige zorg uit hoofde van een verordening van het Europees Parlement en de
+          Raad van de Europese Unie dan wel toepassing van zodanige verordening krachtens een overeenkomst betreffende de
+          Europese Economische Ruimte of een verdrag inzake sociale zekerheid;
+
+
+          d. verdragsgerechtigde: persoon met een verdragsrecht.'
+      - number: 2
+        content: Onze Minister wijst de organen van de woonplaats en de organen van de verblijfplaats aan.
+      - number: 3
+        content: 'Voor een juiste en volledige registratie van verdragsgerechtigden ter beoordeling van het voortbestaan van
+          het verdragsrecht:
+
+
+          a. doet het orgaan van de woonplaats periodiek opgave van de bij hem geregistreerde verdragsgerechtigden aan de
+          Sociale verzekeringsbank, waarbij het orgaan gebruik kan maken van het burgerservicenummer;
+
+
+          b. stelt de Sociale verzekeringsbank het orgaan van de woonplaats in kennis van de verschillen tussen de opgave,
+          bedoeld onder a, en de vermelding van deze personen in het bestand van personen die verzekerd zijn op grond van
+          de Wet langdurige zorg.'
+      - number: 4
+        content: Het orgaan van de woonplaats rapporteert aan het CAK over de uitvoering van het derde lid.
+      - number: 5
+        content: Het CAK kan nadere regels stellen met betrekking tot de wijze waarop het derde en vierde lid worden uitgevoerd.
+      - number: 6
+        content: 'Het CAK verstrekt aan het orgaan van de woonplaats een vergoeding voor:
+
+
+          a. de kosten die het orgaan van de woonplaats heeft betaald voor het doen verlenen van zorg of andere diensten in
+          de zin van deze wet of de Wet langdurige zorg ten behoeve van een persoon die geen verdragsrecht meer heeft en het
+          orgaan van de woonplaats daar niet tijdig over heeft geïnformeerd;
+
+
+          b. de incassokosten voor het verhalen van de kosten, bedoeld onder a, op de persoon, bedoeld onder a.'
+      - number: 7
+        content: 'Geen vergoeding als bedoeld in het zesde lid wordt verstrekt voor zover:
+
+
+          a. de kosten op de persoon, bedoeld in het zesde lid, kunnen worden verhaald;
+
+
+          b. het orgaan van de woonplaats, onder meer uit hoofde van de uitvoering van het derde lid, wist of behoorde te
+          weten dat de persoon, bedoeld in het zesde lid, behoorde te zijn uitgeschreven.'
+      - number: 8
+        content: 'Het CAK verstrekt aan het orgaan van de verblijfplaats een vergoeding voor:
+
+
+          a. de kosten die het orgaan van de verblijfplaats heeft betaald voor het doen verlenen van zorg of andere diensten
+          in de zin van deze wet of de Wet langdurige zorg ten behoeve van een persoon zonder verdragsrecht;
+
+
+          b. de incassokosten voor het verhalen van de kosten, bedoeld onder a.'
+      - number: 9
+        content: 'Geen vergoeding als bedoeld in het achtste lid wordt verstrekt voor zover:
+
+
+          a. de kosten, bedoeld in het achtste lid, kunnen worden verhaald;
+
+
+          b. de zorgaanbieder of het orgaan van de verblijfplaats er niet op mocht vertrouwen dat de persoon, bedoeld in het
+          achtste lid, beschikte over het verdragsrecht.'
+      - number: 10
+        content: De vergoedingen wordt op aanvraag verstrekt.
+      - number: 11
+        content: Bij ministeriële regeling kunnen nadere regels worden gesteld over het verstrekken van de vergoedingen.
+  - id: Hoofdstuk10
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel124
+      paragraphs:
+      - number: 1
+        content: De voordracht voor een krachtens de artikelen 11, derde of vierde lid, 13a, vijfde lid of zesde lid, 18aa,
+          eerste lid, 19, vierde en zesde lid, 21 en 32, tweede lid, vast te stellen algemene maatregel van bestuur wordt
+          niet eerder gedaan dan vier weken nadat het ontwerp aan beide kamers der Staten-Generaal is overgelegd.
+      - number: 2
+        content: Het ontwerp voor een krachtens artikel 18aa, eerste of tweede lid, of artikel 18d, tweede lid, onderdeel
+          d, vast te stellen ministeriële regeling wordt aan beide kamers der Staten-Generaal voorgelegd. De ministeriële
+          regeling wordt niet eerder vastgesteld dan vier weken na de overlegging van het ontwerp.
