@@ -2,7 +2,7 @@
 {% from "macros/render_path.html" import render_path, render_missing_required_form %}
 <div id="application-panel">
     <div class="fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 flex flex-col"
-         x-data="{ show: true, showTechnical: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }}, showUsedData: true }"
+         x-data="{ show: true, showTechnical: false, showLawInfo: false, showExplanation: {{ 'true' if request.query_params.get("default_tab") == 'explanation' else 'false' }}, showUsedData: true }"
          x-show="show"
          x-init="$nextTick(() => { show = true })"
          @click.away="$dispatch('close-panel')"
@@ -81,6 +81,62 @@
                              hx-swap="innerHTML"
                              hx-target="#explanation-content">
                             <div id="explanation-content">{% include "partials/loading.html" %}</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Wet en Regelspraak Section -->
+                <div class="border-t pt-4">
+                    <button @click="showLawInfo = !showLawInfo"
+                            class="flex items-center justify-between w-full text-left">
+                        <span class="text-sm font-medium text-gray-900">Wet en regelspraak</span>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
+                             :class="{ 'rotate-180': showLawInfo }"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="showLawInfo"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform -translate-y-2"
+                         x-transition:enter-end="opacity-100 transform translate-y-0"
+                         x-transition:leave="transition ease-in duration-200"
+                         x-transition:leave-start="opacity-100 transform translate-y-0"
+                         x-transition:leave-end="opacity-0 transform -translate-y-2"
+                         class="mt-4 space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg space-y-3">
+                            <h5 class="font-medium text-gray-900">Wat is dit?</h5>
+                            <p class="text-sm text-gray-600">
+                                Deze berekening is gebaseerd op de officiële wettekst en regelspraak (de computerleesbare vertaling van de wet).
+                            </p>
+                            <div class="space-y-2">
+                                <h6 class="font-medium text-gray-700 text-sm">Wettekst</h6>
+                                <p class="text-sm text-gray-600">
+                                    De officiële wet zoals gepubliceerd door de overheid. Dit is de juridisch bindende tekst die door mensen wordt gelezen en geïnterpreteerd.
+                                </p>
+                            </div>
+                            <div class="space-y-2">
+                                <h6 class="font-medium text-gray-700 text-sm">Regelspraak</h6>
+                                <p class="text-sm text-gray-600">
+                                    Een computerleesbare vertaling van de wet. Dit maakt het mogelijk om automatisch te berekenen waar u recht op heeft, gebaseerd op uw persoonlijke situatie.
+                                </p>
+                            </div>
+                            {% if law_url %}
+                                <div class="mt-4 pt-3 border-t border-gray-200">
+                                    <a href="{{ law_url }}"
+                                       target="_blank"
+                                       class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">
+                                        <svg class="w-4 h-4 mr-2"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
+                                        Bekijk de wettekst en regelspraak
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

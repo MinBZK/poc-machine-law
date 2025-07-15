@@ -343,12 +343,16 @@ async def application_panel(
 
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
 
+        # Get the specific law URL
+        law_url = get_law_url(law, service)
+
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
             {
                 "request": request,
                 "service": service,
                 "law": law,
+                "law_url": law_url,
                 "rule_spec": rule_spec,
                 "input": result.input,
                 "result": result.output,
