@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% block title %}wetten.overheid.nl{% endblock %}
+        </title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
+        /* Using system font stack until RO Sans fonts are available */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 1.125rem; /* 18px base */
+            line-height: 1.7;
+            {% block body_colors %}
+            color: #333;
+            background-color: #f8f9fa;
+            {% endblock %}
+            min-height: 100vh;
+        }
+
+        /* Container voor consistente breedte */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Header - altijd hetzelfde, alleen kleuren verschillen */
+        .header {
+            {% block header_colors %}
+            background: #01689b;
+            color: white;
+            {% endblock %}
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .header .breadcrumb {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header .breadcrumb a {
+            {% block breadcrumb_link_color %}
+            color: white;
+            {% endblock %}
+            text-decoration: none;
+        }
+
+        .header .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-dropdown {
+            position: relative;
+        }
+
+        /* Navigatie balk */
+        .nav {
+            {% block nav_colors %}
+            background: #01689b;
+            {% endblock %}
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding: 0;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 16px 24px;
+            {% block nav_link_color %}
+            color: white;
+            {% endblock %}
+            text-decoration: none;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Main content area */
+        .main {
+            {% block main_colors %}
+            background: #f8f9fa;
+            {% endblock %}
+            padding: 40px 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .content {
+            {% block content_colors %}
+            background: white;
+            {% endblock %}
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            {% block content_border %}{% endblock %}
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            {% block btn_colors %}
+            background: #01689b;
+            color: white;
+            {% endblock %}
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            {% block btn_hover %}
+            background: #014569;
+            {% endblock %}
+        }
+
+        .btn-secondary {
+            {% block btn_secondary_colors %}
+            background: #f8f9fa;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            {% endblock %}
+        }
+
+        .btn-secondary:hover {
+            {% block btn_secondary_hover %}
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            {% endblock %}
+        }
+
+        /* Links */
+        a {
+            {% block link_color %}
+            color: #01689b;
+            {% endblock %}
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            padding: 16px 24px;
+            font-size: 14px;
+            {% block breadcrumb_bg %}
+            background: #f8f9fa;
+            {% endblock %}
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .breadcrumbs a {
+            {% block breadcrumb_link_style %}
+            color: #01689b;
+            {% endblock %}
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .breadcrumbs a:hover {
+            {% block breadcrumb_link_hover %}
+            color: #014569;
+            {% endblock %}
+            text-decoration: underline;
+        }
+
+        .breadcrumbs .separator {
+            margin: 0 10px;
+            {% block breadcrumb_separator_color %}
+            color: #9ca3af;
+            {% endblock %}
+            font-size: 16px;
+        }
+
+        /* Alpine.js cloak */
+        [x-cloak] {
+            display: none !important;
+        }
+
+        /* Menu button styles for wetten pages - match burger.nl exactly */
+        .homepage-dropdown-override button {
+            background-color: transparent;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .homepage-dropdown-override button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .homepage-dropdown-override button svg {
+            stroke: white !important;
+            color: white !important;
+        }
+
+        /* Logo styling for light mode */
+        .logo-img {
+            {% block logo_filter %}{% endblock %}
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-direction: column;
+            }
+
+            .nav-link {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.2);
+            }
+        }
+
+        /* Pill dropdown styles */
+        .pill-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            background: #01689b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            text-decoration: none;
+            margin: 2px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            gap: 4px;
+        }
+
+        .pill::after {
+            content: '▼';
+            font-size: 8px;
+            opacity: 0.7;
+        }
+
+        .pill:hover {
+            background: #004469;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .pill-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px;
+            min-width: 300px;
+            max-width: 500px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .pill-wrapper:hover .pill-dropdown {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .pill-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid white;
+        }
+
+        .pill-dropdown-dark {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        .pill-dropdown-dark::before {
+            border-bottom-color: #1e293b;
+        }
+
+        .pill-preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #154273;
+        }
+
+        .pill-preview-dark .pill-preview-title {
+            color: #67e8f9;
+        }
+
+        .pill-preview-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .pill-preview-code {
+            font-family: monospace;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .pill-preview-dark .pill-preview-code {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        {% block extra_styles %}{% endblock %}
+        </style>
+    </head>
+    <body>
+        <!-- Header -->
+        {% include "wetten/partials/header.html" %}
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    {% block navigation %}
+                        <li class="nav-item">
+                            <a href="/" class="nav-link">← Terug naar Burger.nl</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/wetten" class="nav-link">Alle wetten</a>
+                        </li>
+                    {% endblock %}
+                </ul>
+            </div>
+        </nav>
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                {% block breadcrumbs %}{% endblock %}
+                <div class="content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

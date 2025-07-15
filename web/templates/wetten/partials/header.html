@@ -2,25 +2,33 @@
 <header class="header">
     <div class="container">
         <div class="header-content">
-            <div style="display: flex; align-items: center; gap: 20px; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 20px; flex: 1;">
                 <img src="/static/images/overheid-logo-official.svg"
                      alt="Logo overheid.nl"
-                     height="50">
+                     height="50"
+                     class="logo-img">
                 <div style="flex: 1;">
-                    <div class="breadcrumb">
-                        <a href="/wetten">Wetten.overheid.nl</a>
-                        {% if breadcrumb_extra %}/ {{ breadcrumb_extra }}{% endif %}
-                    </div>
-                    <h1>{{ header_title|default("Wetten.overheid.nl") }}</h1>
+                    {% if breadcrumb_extra %}<div class="breadcrumb">{{ breadcrumb_extra }}</div>{% endif %}
+                    <h1>{{ header_title|default("wetten.overheid.nl") }}</h1>
                 </div>
             </div>
             <!-- Burger.nl dropdown menu -->
-            <div class="header-dropdown">
-                <div x-data="{ menuOpen: false }" class="relative">
+            <div class="header-dropdown" style="position: relative;">
+                <div x-data="{ menuOpen: false }">
                     <button @click="menuOpen = !menuOpen"
-                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 focus:outline-none">
+                            style="width: 32px;
+                                   height: 32px;
+                                   display: flex;
+                                   align-items: center;
+                                   justify-content: center;
+                                   border-radius: 50%;
+                                   background: transparent;
+                                   border: none;
+                                   cursor: pointer">
                         <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-5 w-5 text-white"
+                             style="width: 20px;
+                                    height: 20px;
+                                    color: white"
                              fill="none"
                              viewBox="0 0 24 24"
                              stroke="currentColor">
@@ -30,22 +38,46 @@
                     <div x-show="menuOpen"
                          x-cloak
                          @click.away="menuOpen = false"
-                         class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                         style="position: absolute;
+                                right: 0;
+                                margin-top: 8px;
+                                width: 12rem;
+                                background: white;
+                                border-radius: 6px;
+                                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                                padding: 0.25rem 0;
+                                z-index: 50">
                         <a href="/"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                           style="display: flex;
+                                  align-items: center;
+                                  padding: 0.5rem 1rem;
+                                  color: #374151;
+                                  text-decoration: none;
+                                  font-size: 0.875rem">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
+                                 style="width: 16px;
+                                        height: 16px;
+                                        margin-right: 0.5rem;
+                                        color: #6b7280"
                                  fill="none"
                                  viewBox="0 0 24 24"
                                  stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
-                            Burger.nl
+                            Homepage
                         </a>
                         <a href="/wetten"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                           style="display: flex;
+                                  align-items: center;
+                                  padding: 0.5rem 1rem;
+                                  color: #374151;
+                                  text-decoration: none;
+                                  font-size: 0.875rem">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
+                                 style="width: 16px;
+                                        height: 16px;
+                                        margin-right: 0.5rem;
+                                        color: #6b7280"
                                  fill="none"
                                  viewBox="0 0 24 24"
                                  stroke="currentColor">
@@ -54,9 +86,17 @@
                             Wetten
                         </a>
                         <a href="/admin"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                           style="display: flex;
+                                  align-items: center;
+                                  padding: 0.5rem 1rem;
+                                  color: #374151;
+                                  text-decoration: none;
+                                  font-size: 0.875rem">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
+                                 style="width: 16px;
+                                        height: 16px;
+                                        margin-right: 0.5rem;
+                                        color: #6b7280"
                                  fill="none"
                                  viewBox="0 0 24 24"
                                  stroke="currentColor">
@@ -65,9 +105,17 @@
                             Zaaksysteem
                         </a>
                         <a href="/admin/control"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                           style="display: flex;
+                                  align-items: center;
+                                  padding: 0.5rem 1rem;
+                                  color: #374151;
+                                  text-decoration: none;
+                                  font-size: 0.875rem">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
+                                 style="width: 16px;
+                                        height: 16px;
+                                        margin-right: 0.5rem;
+                                        color: #6b7280"
                                  fill="none"
                                  viewBox="0 0 24 24"
                                  stroke="currentColor">
@@ -77,9 +125,17 @@
                             Admin beheer
                         </a>
                         <a href="/analysis/graph"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                           style="display: flex;
+                                  align-items: center;
+                                  padding: 0.5rem 1rem;
+                                  color: #374151;
+                                  text-decoration: none;
+                                  font-size: 0.875rem">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
+                                 style="width: 16px;
+                                        height: 16px;
+                                        margin-right: 0.5rem;
+                                        color: #6b7280"
                                  fill="none"
                                  viewBox="0 0 24 24"
                                  stroke="currentColor">
@@ -88,9 +144,17 @@
                             Graaf analyse
                         </a>
                         <a href="/importer"
-                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                           style="display: flex;
+                                  align-items: center;
+                                  padding: 0.5rem 1rem;
+                                  color: #374151;
+                                  text-decoration: none;
+                                  font-size: 0.875rem">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 mr-2 text-gray-500"
+                                 style="width: 16px;
+                                        height: 16px;
+                                        margin-right: 0.5rem;
+                                        color: #6b7280"
                                  viewBox="0 0 24 24">
                                 <path fill="currentColor" fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v.756a49 49 0 0 1 9.152 1a.75.75 0 0 1-.152 1.485h-1.918l2.474 10.124a.75.75 0 0 1-.375.84A6.7 6.7 0 0 1 18.75 18a6.7 6.7 0 0 1-3.181-.795a.75.75 0 0 1-.375-.84l2.474-10.124H12.75v13.28c1.293.076 2.534.343 3.697.776a.75.75 0 0 1-.262 1.453h-8.37a.75.75 0 0 1-.262-1.453c1.162-.433 2.404-.7 3.697-.775V6.24H6.332l2.474 10.124a.75.75 0 0 1-.375.84A6.7 6.7 0 0 1 5.25 18a6.7 6.7 0 0 1-3.181-.795a.75.75 0 0 1-.375-.84L4.168 6.241H2.25a.75.75 0 0 1-.152-1.485a49 49 0 0 1 9.152-1V3a.75.75 0 0 1 .75-.75m4.878 13.543l1.872-7.662l1.872 7.662zm-9.756 0L5.25 8.131l-1.872 7.662z" clip-rule="evenodd" />
                             </svg>
@@ -102,18 +166,3 @@
         </div>
     </div>
 </header>
-<style>
-    .header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header-dropdown {
-        position: relative;
-    }
-
-    [x-cloak] {
-        display: none !important;
-    }
-</style>
