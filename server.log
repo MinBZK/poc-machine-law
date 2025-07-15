@@ -1,0 +1,676 @@
+USER_AGENT environment variable not set, consider setting it to identify your requests.
+WARNING:  "workers" flag is ignored when reloading is enabled.
+INFO:     Started server process [40138]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+Task exception was never retrieved
+future: <Task finished name='Task-1' coro=<Server.serve() done, defined at /Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/uvicorn/server.py:68> exception=SystemExit(1)>
+Traceback (most recent call last):
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 163, in startup
+    server = await loop.create_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/anneschuth/.pyenv/versions/3.12.0/lib/python3.12/asyncio/base_events.py", line 1539, in create_server
+    raise OSError(err.errno, 'error while attempting '
+OSError: [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/anneschuth/poc-machine-law/web/main.py", line 99, in <module>
+    server.run()
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/nest_asyncio.py", line 30, in run
+    return loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/nest_asyncio.py", line 92, in run_until_complete
+    self._run_once()
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/nest_asyncio.py", line 133, in _run_once
+    handle._run()
+  File "/Users/anneschuth/.pyenv/versions/3.12.0/lib/python3.12/asyncio/events.py", line 84, in _run
+    self._context.run(self._callback, *self._args)
+  File "/Users/anneschuth/.pyenv/versions/3.12.0/lib/python3.12/asyncio/tasks.py", line 386, in __wakeup
+    self.__step()
+  File "/Users/anneschuth/.pyenv/versions/3.12.0/lib/python3.12/asyncio/tasks.py", line 293, in __step
+    self.__step_run_and_handle_result(exc)
+  File "/Users/anneschuth/.pyenv/versions/3.12.0/lib/python3.12/asyncio/tasks.py", line 304, in __step_run_and_handle_result
+    result = coro.send(None)
+             ^^^^^^^^^^^^^^^
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+    await self._serve(sockets)
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 85, in _serve
+    await self.startup(sockets=sockets)
+  File "/Users/anneschuth/poc-machine-law/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 173, in startup
+    sys.exit(1)
+SystemExit: 1
+USER_AGENT environment variable not set, consider setting it to identify your requests.
+WARNING:  "workers" flag is ignored when reloading is enabled.
+INFO:     Started server process [42953]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61486 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61553 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61553 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61557 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61557 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61557 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61559 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61559 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61559 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61557 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61557 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61557 - "GET /wetten/BWBR0008659/artikel/Artikel7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61562 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61564 - "GET /wetten HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:61564 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61591 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61588 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61564 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61564 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61564 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61588 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61602 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61639 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61656 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61656 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+USER_AGENT environment variable not set, consider setting it to identify your requests.
+WARNING:  "workers" flag is ignored when reloading is enabled.
+INFO:     Started server process [43436]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61718 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61761 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61782 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+USER_AGENT environment variable not set, consider setting it to identify your requests.
+WARNING:  "workers" flag is ignored when reloading is enabled.
+INFO:     Started server process [43906]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61919 - "GET /wetten/BWBR0018451/artikel/Artikel16 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61919 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61919 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61919 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61920 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61920 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61920 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61941 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61941 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61948 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61979 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61979 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61979 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61979 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61979 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61980 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61980 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61980 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61980 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62021 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61980 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62021 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62021 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62021 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61980 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62033 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62033 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62033 - "GET /wetten HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62033 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62033 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61980 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62056 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62056 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62057 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+USER_AGENT environment variable not set, consider setting it to identify your requests.
+WARNING:  "workers" flag is ignored when reloading is enabled.
+INFO:     Started server process [44343]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:62085 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62088 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62086 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62104 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62115 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62117 - "GET /wetten/BWBR0018451/artikel/Artikel2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62137 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62137 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62157 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62169 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62171 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62169 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62169 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62169 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62173 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62171 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62169 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62180 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62182 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62182 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62182 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62182 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62180 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62182 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62184 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62180 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62184 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62180 - "GET /wetten/BWBR0002221/yaml/law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62180 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62180 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62184 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62184 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+║──Required parameter {'name': 'GEBOORTEDATUM', 'description': 'Geboortedatum van de persoon', 'type': 'date', 'required': True, 'legal_basis': {'law': 'Algemene Ouderdomswet', 'bwb_id': 'BWBR0002221', 'article': '7a', 'paragraph': '1', 'url': 'https://wetten.overheid.nl/BWBR0002221/2024-01-01#HoofdstukIII_Artikel7a', 'juriconnect': 'jci1.3:c:BWBR0002221&artikel=7a&lid=1&z=2024-01-01&g=2024-01-01', 'explanation': 'Artikel 7a lid 1 AOW koppelt de pensioengerechtigde leeftijd aan het geboortejaar'}} not found in {'BSN': '100000001'}
+║   │   │   ├──Could not resolve value for GEBOORTEDATUM
+║──No output values computed for 2025-07-13 None
+INFO:     127.0.0.1:62184 - "GET /laws/execute?service=SVB&law=algemene_ouderdomswet/leeftijdsbepaling&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ├──Could not resolve value for STEMRECHT_UITSLUITINGEN
+║   │   │   │   ║   │   ├──Could not resolve value for DIENSTVERBANDPERIODES
+║   │   │   │   ║   ├──No data found to run FOREACH on
+║   │   │   │   ║   ├──No values found (or they where None), returning 0 for ADD([])
+║──No output values computed for 2025-07-13 None
+║   │   │   │   ║   │   │   ├──Could not resolve value for VERDRAGSINSCHRIJVING
+║   │   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   │   │   │   │   ║   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   │   │   │   ║   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for PARTNER_BUITENLANDS_INKOMEN
+║   │   │   │   ║   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ├──Could not resolve value for HUISHOUDEN
+║   │   │   │   │   │   ├──Could not resolve value for leeftijd
+║   │   │   │   │   ├──Error computing GREATER_OR_EQUAL(None, 21): '>=' not supported between instances of 'NoneType' and 'int'
+║   │   │   │   │   │   ├──Could not resolve value for inkomen
+║   │   │   │   │   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ├──Could not resolve value for HUISHOUDEN
+║   │   │   │   │   │   ├──Could not resolve value for leeftijd
+║   │   │   │   │   ├──Error computing LESS_THAN(None, 23): '<' not supported between instances of 'NoneType' and 'int'
+║   │   │   │   │   │   ├──Could not resolve value for inkomen
+║   │   │   ├──No values found (or they where None), returning 0 for ADD([None])
+║   │   │   ├──Could not resolve value for HUURPRIJS
+║   │   │   ├──This is a missing required value: HUURPRIJS
+║   │   │   ├──Could not resolve value for SUBSIDIABELE_SERVICEKOSTEN
+║   │   │   ├──This is a missing required value: SUBSIDIABELE_SERVICEKOSTEN
+║   │   ├──Dropped 1 values because they where None
+║   │   ├──Dropped 1 values because they where None
+║──Missing required values, breaking
+║──Missing required values, requirements not met, setting outputs to empty.
+║──No output values computed for 2025-07-13 None
+║   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   │   │   ║   │   │   ├──Field kinderen not found in source for table relaties
+║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   ├──Dropped 1 values because they where None
+║   │   ├──Could not resolve value for PARTNER_BUITENLANDS_INKOMEN
+║   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║──No output values computed for 2025-07-13 None
+║   │   │   │   ║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   │   ║   │   │   │   │   ║   │   ├──Field onderwijstype not found in source for table inschrijvingen
+║   │   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   │   │   │   ├──Fields ['ontheffing_reden', 'ontheffing_einddatum'] not found in source for table werk_en_re_integratie
+║   │   │   │   │   ├──Fields ['ontheffing_reden', 'ontheffing_einddatum'] not found in source for table werk_en_re_integratie
+║   │   │   ║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   ║   │   │   │   │   ║   │   ├──Field onderwijstype not found in source for table inschrijvingen
+║   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   ║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   ║   │   │   │   │   ║   │   ├──Field onderwijstype not found in source for table inschrijvingen
+║   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   ║   │   │   │   │   ║   │   │   ├──Could not resolve value for HUISHOUDEN
+║   │   │   │   │   ║   │   │   │   │   │   ├──Fields ['kvk_nummer'] not found in source for table inschrijvingen
+║   │   │   │   │   ║   │   │   │   │   │   ├──Fields ['kvk_nummer'] not found in source for table inschrijvingen
+INFO:     127.0.0.1:62191 - "GET / HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   │   ║   │   │   │   │   ║   │   ├──Field onderwijstype not found in source for table inschrijvingen
+║   │   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   │   │   │   ├──Fields ['ontheffing_reden', 'ontheffing_einddatum'] not found in source for table werk_en_re_integratie
+║   │   │   │   │   ├──Fields ['ontheffing_reden', 'ontheffing_einddatum'] not found in source for table werk_en_re_integratie
+║   │   │   ║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   ║   │   │   │   │   ║   │   ├──Field onderwijstype not found in source for table inschrijvingen
+║   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   ║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   ║   │   │   │   │   ║   │   ├──Field onderwijstype not found in source for table inschrijvingen
+║   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   ║   │   │   │   │   ║   │   │   ├──Could not resolve value for HUISHOUDEN
+║   │   │   │   │   ║   │   │   │   │   │   ├──Fields ['kvk_nummer'] not found in source for table inschrijvingen
+║   │   │   │   │   ║   │   │   │   │   │   ├──Fields ['kvk_nummer'] not found in source for table inschrijvingen
+INFO:     127.0.0.1:62191 - "GET /laws/execute?service=GEMEENTE_AMSTERDAM&law=participatiewet/bijstand&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ├──Could not resolve value for VERDRAGSINSCHRIJVING
+║   │   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   │   │   │   │   ║   ├──Dropped 1 values because they where None
+INFO:     127.0.0.1:62192 - "GET /laws/execute?service=TOESLAGEN&law=zorgtoeslagwet&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   │   │   │   ║   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for PARTNER_BUITENLANDS_INKOMEN
+║   │   │   │   ║   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ├──Could not resolve value for HUISHOUDEN
+║   │   │   │   │   │   ├──Could not resolve value for leeftijd
+║   │   │   │   │   ├──Error computing GREATER_OR_EQUAL(None, 21): '>=' not supported between instances of 'NoneType' and 'int'
+║   │   │   │   │   │   ├──Could not resolve value for inkomen
+║   │   │   │   │   ├──Dropped 1 values because they where None
+║   │   │   │   ║   │   │   ├──Could not resolve value for HUISHOUDEN
+║   │   │   │   │   │   ├──Could not resolve value for leeftijd
+║   │   │   │   │   ├──Error computing LESS_THAN(None, 23): '<' not supported between instances of 'NoneType' and 'int'
+║   │   │   │   │   │   ├──Could not resolve value for inkomen
+║   │   │   ├──No values found (or they where None), returning 0 for ADD([None])
+║   │   │   ├──Could not resolve value for HUURPRIJS
+║   │   │   ├──This is a missing required value: HUURPRIJS
+║   │   │   ├──Could not resolve value for SUBSIDIABELE_SERVICEKOSTEN
+║   │   │   ├──This is a missing required value: SUBSIDIABELE_SERVICEKOSTEN
+║   │   ├──Dropped 1 values because they where None
+║   │   ├──Dropped 1 values because they where None
+║──Missing required values, breaking
+║──Missing required values, requirements not met, setting outputs to empty.
+║──No output values computed for 2025-07-13 None
+INFO:     127.0.0.1:62196 - "GET /laws/execute?service=TOESLAGEN&law=wet_op_de_huurtoeslag&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ├──Could not resolve value for STEMRECHT_UITSLUITINGEN
+INFO:     127.0.0.1:62197 - "GET /laws/execute?service=KIESRAAD&law=kieswet&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║──No output values computed for 2025-07-13 None
+INFO:     127.0.0.1:62199 - "GET /laws/execute?service=SVB&law=algemene_ouderdomswet&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   ║   │   │   ├──Error computing GREATER_THAN(None, 20.0): '>' not supported between instances of 'NoneType' and 'float'
+║   │   │   │   │   ║   │   │   ├──Field kinderen not found in source for table relaties
+║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   ├──Dropped 1 values because they where None
+║   │   ├──Could not resolve value for PARTNER_BUITENLANDS_INKOMEN
+║   ├──Dropped 1 values because they where None
+INFO:     127.0.0.1:62200 - "GET /laws/execute?service=BELASTINGDIENST&law=wet_inkomstenbelasting&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   ├──Could not resolve value for DIENSTVERBANDPERIODES
+║   │   │   │   ║   ├──No data found to run FOREACH on
+║   │   │   │   ║   ├──No values found (or they where None), returning 0 for ADD([])
+║──No output values computed for 2025-07-13 None
+INFO:     127.0.0.1:62191 - "GET /laws/execute?service=TOESLAGEN&law=wet_kinderopvang&bsn=100000001 HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ├──Could not resolve value for VERDRAGSINSCHRIJVING
+║   │   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   │   │   │   │   ║   ├──Dropped 1 values because they where None
+INFO:     127.0.0.1:62191 - "GET /laws/application-panel?service=TOESLAGEN&law=zorgtoeslagwet&bsn=100000001&default_tab=application HTTP/1.1" 200 OK
+║   │   │   │   ║   │   │   ├──Could not resolve value for VERDRAGSINSCHRIJVING
+║   │   │   │   ║   │   │   │   ║   │   │   │   ├──Field inrichting_type not found in source for table detenties
+║   │   │   │   │   ║   │   │   ║   │   ├──Could not resolve value for BUITENLANDS_INKOMEN
+║   │   │   │   │   ║   ├──Dropped 1 values because they where None
+Explanation requested for TOESLAGEN, zorgtoeslagwet, with provider: None
+Using default provider: claude
+Generated explanation using provider: claude
+INFO:     127.0.0.1:62191 - "GET /laws/explanation?service=TOESLAGEN&law=zorgtoeslagwet&bsn=100000001&approved=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62191 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62191 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62206 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62216 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62216 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62217 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62220 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62220 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62221 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62223 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62220 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62345 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62345 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62346 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62346 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62345 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62346 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62346 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62346 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62345 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62345 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62345 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62346 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62348 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62345 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62350 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62350 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62352 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62354 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62350 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62350 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62350 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62352 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62354 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62350 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62363 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62364 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62363 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62363 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62364 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62363 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62366 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62363 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62375 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62376 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62375 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62378 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62378 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62378 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62378 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62376 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62375 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62378 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62378 - "GET /wetten/BWBR0018451/artikel/Artikel2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62378 - "GET /wetten/BWBR0018451/artikel/Artikel2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62380 - "GET /wetten/BWBR0018451/artikel/Artikel2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62380 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62380 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62393 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62380 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62402 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62402 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62404 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62404 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62404 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62402 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62406 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62404 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62408 - "GET /wetten/BWBR0018451/artikel/Artikel2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62408 - "GET /wetten/BWBR0018451/artikel/Artikel2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62408 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62408 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62410 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62410 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62410 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62410 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62408 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62408 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62451 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62451 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62452 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62452 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62452 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62451 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62496 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62496 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62497 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62502 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62502 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62504 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62561 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62561 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62563 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62563 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62563 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62561 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62561 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62561 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62563 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62566 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62561 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62594 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62595 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62594 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62598 - "GET /wetten/BWBR0018451/artikel/Artikel3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62599 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62599 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62607 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62654 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62654 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62656 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62656 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62656 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62654 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62666 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62666 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62687 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62686 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62687 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62689 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62689 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62686 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /wetten HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62689 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62686 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62689 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62691 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62686 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62689 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62689 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62699 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62699 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62689 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62699 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62709 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62711 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62724 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62724 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62726 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62724 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62735 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62735 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62738 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62736 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62735 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62738 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62738 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62738 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62738 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62738 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62735 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62736 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62735 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62736 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62735 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62738 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62736 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62769 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62769 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62768 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62769 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62768 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62795 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62796 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62795 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62795 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62795 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62796 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62796 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62796 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62796 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62795 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62795 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62848 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62849 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62851 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62848 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62851 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62860 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62861 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62860 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62860 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62860 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62861 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62864 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62865 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62864 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62890 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62892 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62894 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62892 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62892 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62890 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62890 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62890 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62894 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62890 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62902 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62902 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62890 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62894 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62894 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62910 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62910 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62913 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62915 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62910 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62910 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62915 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62910 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62910 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62910 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62915 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62913 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62910 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62963 - "GET /wetten/BWBR0008659 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62964 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62963 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62966 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62966 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62966 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62963 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62966 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62966 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62966 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62963 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62964 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62964 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62964 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62964 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62966 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62963 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62964 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62979 - "GET /wetten/BWBR0008659/artikel/Artikel7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62981 - "GET /wetten HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62981 - "GET /wetten/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62981 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62994 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62994 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62981 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62994 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63007 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63009 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63007 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63017 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63017 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63018 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63020 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63017 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63028 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63029 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63028 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63031 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63028 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63098 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63099 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63098 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63101 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63098 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63098 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63099 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63098 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63101 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63098 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63109 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63110 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63109 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63112 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63109 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63114 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63114 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63114 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63116 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63116 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63123 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63123 - "GET /wetten/BWBR0018451/yaml/law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63123 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63116 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63125 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63123 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63133 - "GET /wetten/BWBR0018451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63133 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63135 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63137 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63137 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63152 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63152 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63152 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63152 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63153 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63155 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63152 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63152 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63152 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63152 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63153 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63155 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63152 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63157 - "GET /wetten/BWBR0008659/artikel/Artikel7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63157 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63157 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63159 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63167 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63157 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /wetten/BWBR0008659/yaml/law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63176 - "GET /static/images/overheid-logo-official.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63177 - "GET /static/fonts/ROsanswebtextregular.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63179 - "GET /static/fonts/ROsanswebtextbold.woff HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63179 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [44343]

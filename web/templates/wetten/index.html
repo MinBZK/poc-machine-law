@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>wetten.nl - Eenvoudig zoeken - Overheid.nl</title>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
+        @font-face {
+            font-family: "RO Sans";
+            src: url("/static/fonts/ROsanswebtextregular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: "RO Sans";
+            src: url("/static/fonts/ROsanswebtextbold.woff") format("woff");
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "RO Sans", Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: #01689b;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-dropdown {
+            position: relative;
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            background: #01689b;
+        }
+
+        .nav-tabs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            padding: 0 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .nav-tab:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .nav-tab.active {
+            background-color: white;
+            color: #01689b;
+            font-weight: 700;
+        }
+
+        /* Breadcrumb section (below header) */
+        .breadcrumb-section {
+            background: #f3f3f3;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .breadcrumb-section a {
+            color: #01689b;
+            text-decoration: none;
+        }
+
+        .breadcrumb-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Search form */
+        .search-form {
+            background: white;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            text-align: right;
+        }
+
+        .form-input {
+            padding: 0.375rem 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-input:focus {
+            outline: 2px solid #007bc7;
+            outline-offset: -2px;
+        }
+
+        .date-input {
+            width: 120px;
+        }
+
+        .form-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 2px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: #154273;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0e3054;
+        }
+
+        /* Info section */
+        .info-box {
+            background: #e5f1f9;
+            border: 1px solid #b2d7ee;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Laws section with implementations */
+        .laws-section {
+            margin-top: 3rem;
+            border-top: 2px solid #154273;
+            padding-top: 2rem;
+        }
+
+        .laws-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 1rem;
+        }
+
+        .law-item {
+            border: 1px solid #e5e5e5;
+            margin-bottom: 1rem;
+            background: white;
+        }
+
+        .law-header {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .law-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .law-title a {
+            color: #01689b;
+            text-decoration: none;
+        }
+
+        .law-title a:hover {
+            text-decoration: underline;
+        }
+
+        .law-meta {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .law-category {
+            display: inline-block;
+            background: #e5f1f9;
+            color: #154273;
+            padding: 0.125rem 0.5rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+        }
+
+        .implementations {
+            padding: 1rem;
+            background: #fafafa;
+            font-size: 0.875rem;
+        }
+
+        .implementations-title {
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .implementation-item {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-left: 3px solid #007bc7;
+        }
+
+        .implementation-name {
+            font-weight: 600;
+            color: #154273;
+            font-size: 0.875rem;
+        }
+
+        .implementation-link {
+            color: #01689b;
+            text-decoration: none;
+            font-size: 0.813rem;
+        }
+
+        .implementation-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background: #e5f1f9;
+            border-top: 3px solid #01689b;
+            margin-top: 4rem;
+            padding: 2rem 0;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #154273;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #01689b;
+            text-decoration: none;
+            font-size: 0.813rem;
+        }
+
+        .footer-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Ensure Alpine.js cloak works */
+        [x-cloak] {
+            display: none !important;
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Header -->
+        {% include "wetten/partials/header.html" %}
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb-section">
+            <div class="breadcrumb-container">
+                <a href="/">U bent hier:</a> Zoeken
+            </div>
+        </nav>
+        <!-- Main Content -->
+        <main class="main">
+            <h1 class="page-title">Wetten met regelspraak</h1>
+            <div class="info-box">
+                De informatie in dit onderdeel wordt geen bekendmaking in de zin van de Grondwet. Alleen publicatie in het Tractatenblad, het Staatsblad, de Staatscourant en andere vanwege de overheid verkrijgbaar gestelde publicatiebladen heeft een officieel karakter.
+            </div>
+            <!-- Regelspraak Section -->
+            <section class="laws-section">
+                <h2 class="laws-title">Wetten met regelspraak ({{ laws|length }} wetten)</h2>
+                {% for law in laws %}
+                    <div class="law-item">
+                        <div class="law-header">
+                            <h3 class="law-title">
+                                <a href="/wetten/{{ law.bwb_id }}">{{ law.title }}</a>
+                            </h3>
+                            <div class="law-meta">
+                                <span class="law-category">{{ law.category or 'Wet' }}</span>
+                                <span>{{ law.bwb_id }}</span>
+                            </div>
+                        </div>
+                        {% if law.implementations %}
+                            <div class="implementations">
+                                <div class="implementations-title">Regelspraak implementaties ({{ law.implementations|length }})</div>
+                                {% for impl in law.implementations[:2] %}
+                                    <div class="implementation-item">
+                                        <div class="implementation-name">{{ impl.name }}</div>
+                                        <a href="/wetten/{{ law.bwb_id }}/yaml/{{ impl.path|urlencode }}"
+                                           class="implementation-link">Bekijk regelspraak →</a>
+                                    </div>
+                                {% endfor %}
+                                {% if law.implementations|length > 2 %}
+                                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #666;">
+                                        + {{ law.implementations|length - 2 }} meer implementaties
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </section>
+        </main>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>Over deze website</h3>
+                    <ul>
+                        <li>
+                            <a href="#">Contact</a>
+                        </li>
+                        <li>
+                            <a href="#">Copyright</a>
+                        </li>
+                        <li>
+                            <a href="#">Privacy en cookies</a>
+                        </li>
+                        <li>
+                            <a href="#">Toegankelijkheid</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Informatie hergebruiken</h3>
+                    <ul>
+                        <li>
+                            <a href="#">Open data</a>
+                        </li>
+                        <li>
+                            <a href="#">Ontwikkelaarsportaal</a>
+                        </li>
+                        <li>
+                            <a href="#">Webrichtlijnen</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Machine Law Project</h3>
+                    <ul>
+                        <li>
+                            <a href="/">Burger.nl</a>
+                        </li>
+                        <li>
+                            <a href="/laws/list">Regelspraak overzicht</a>
+                        </li>
+                        <li>
+                            <a href="/admin">Beheer</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>

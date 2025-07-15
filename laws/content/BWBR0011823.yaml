@@ -1,0 +1,13 @@
+bwb_id: BWBR0011823
+title: Vreemdelingenwet 2000
+url: https://wetten.overheid.nl/BWBR0011823
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:30.961432'
+yaml_files:
+- path: law/vreemdelingenwet/IND-2024-01-01.yaml
+  description: 'Regels voor het bepalen van de verblijfsstatus volgens de Vreemdelingenwet 2000. Dit omvat reguliere verblijfsvergunningen,
+    verblijfsvergunningen voor EU-burgers en hun familieleden, en permanente verblijfsvergunningen.
+
+    '
+structure:
+  chapters: []

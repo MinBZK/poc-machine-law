@@ -1,0 +1,13 @@
+bwb_id: BWBR0009709
+title: Penitentiaire beginselenwet
+url: https://wetten.overheid.nl/BWBR0009709
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:31.005480'
+yaml_files:
+- path: law/penitentiaire_beginselenwet/DJI-2022-01-01.yaml
+  description: 'Regels voor het bepalen van detentiestatus volgens de Penitentiaire beginselenwet, artikel 2 en 3. Een gedetineerde
+    is iemand die rechtens van zijn vrijheid is beroofd en is opgenomen in een penitentiaire inrichting.
+
+    '
+structure:
+  chapters: []

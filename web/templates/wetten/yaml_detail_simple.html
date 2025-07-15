@@ -1,0 +1,392 @@
+{% extends "wetten/base_dark.html" %}
+{% block title %}{{ yaml_content.name }} - Regelspraak - wetten.overheid.nl{% endblock %}
+{% block navigation %}
+    <li class="nav-item">
+        <a href="/" class="nav-link">← Terug naar Burger.nl</a>
+    </li>
+    <li class="nav-item">
+        <a href="/wetten/{{ bwb_id }}" class="nav-link">← Terug naar Wettekst</a>
+    </li>
+    <li class="nav-item">
+        <a href="/wetten" class="nav-link">Alle wetten</a>
+    </li>
+{% endblock %}
+{% block extra_styles %}
+    <style>
+    /* Regelspraak specifieke styling */
+    .rule-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+    }
+
+    .rule-actions {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+        color: #e2e8f0;
+    }
+
+    .action-assign, .action-if {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #1e293b;
+        border-radius: 6px;
+        border: 1px solid #334155;
+    }
+
+    .var-output {
+        color: #86efac;
+        font-weight: 600;
+        font-family: monospace;
+        background: #064e3b;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .var-input {
+        color: #86efac;
+        font-weight: 600;
+        font-family: monospace;
+    }
+
+    .var-param {
+        color: #60a5fa;
+        font-weight: 600;
+        font-family: monospace;
+    }
+
+    .value-number {
+        color: #fb923c;
+        font-weight: 600;
+    }
+
+    .value-bool {
+        color: #c084fc;
+        font-weight: 600;
+    }
+
+    .test {
+        font-style: italic;
+        color: #94a3b8;
+    }
+
+    .legal-basis-inline {
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+
+    .legal-basis-link {
+        display: inline-block;
+        background: #0891b2;
+        color: white !important;
+        text-decoration: none;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+
+    .legal-basis-link:hover {
+        opacity: 0.8;
+        text-decoration: none;
+    }
+
+    /* Pill dropdown styles */
+    .pill-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .pill-wrapper .legal-basis-link::after {
+        content: ' ▼';
+        font-size: 10px;
+        margin-left: 4px;
+        opacity: 0.7;
+    }
+
+    .pill-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 8px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        min-width: 300px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+    }
+
+    .pill-wrapper:hover .pill-dropdown {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .pill-dropdown::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 20px;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-right: none;
+        border-bottom: none;
+        transform: rotate(45deg);
+    }
+
+    .pill-dropdown-dark {
+        background: #1e293b;
+        border-color: #334155;
+        color: #e2e8f0;
+    }
+
+    .pill-dropdown-dark::before {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .pill-preview-dark {
+        color: #e2e8f0;
+    }
+
+    .pill-preview-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #1f2937;
+    }
+
+    .pill-preview-dark .pill-preview-title {
+        color: #f3f4f6;
+    }
+
+    .pill-preview-content {
+        color: #6b7280;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .pill-preview-dark .pill-preview-content {
+        color: #9ca3af;
+    }
+
+    .pill-preview-code {
+        font-family: monospace;
+        font-size: 13px;
+        background: #f3f4f6;
+        padding: 8px 12px;
+        border-radius: 4px;
+        color: #374151;
+    }
+
+    .pill-preview-dark .pill-preview-code {
+        background: #0f172a;
+        color: #e2e8f0;
+    }
+
+    .condition {
+        margin: 0.75rem 0;
+        padding-left: 1.5rem;
+        border-left: 3px solid #1e40af;
+    }
+
+    .condition-else {
+        margin: 0.75rem 0;
+        padding-left: 1.5rem;
+        border-left: 3px solid #be123c;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumbs %}
+    <nav class="breadcrumbs">
+        <a href="/">Burger.nl</a>
+        <span class="separator">›</span>
+        <a href="/wetten">Wetten</a>
+        <span class="separator">›</span>
+        <a href="/wetten/{{ bwb_id }}">{{ law.title }}</a>
+        <span class="separator">›</span>
+        <span>Regelspraak</span>
+    </nav>
+{% endblock %}
+{% block content %}
+    <!-- Header -->
+    <div style="margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #334155">
+        <h1 style="font-size: 32px;
+                   font-weight: 700;
+                   color: #67e8f9;
+                   margin-bottom: 10px">{{ yaml_content.name }}</h1>
+        <div style="color: #94a3b8; font-size: 14px;">
+            <span style="background: #0c4a6e;
+                         color: #67e8f9;
+                         padding: 4px 8px;
+                         border-radius: 4px;
+                         border: 1px solid #0891b2">{{ yaml_content.service }}</span>
+            <span style="margin-left: 10px;">{{ yaml_content.law }}</span>
+            <span style="margin-left: 10px;">Geldig vanaf: {{ yaml_content.valid_from }}</span>
+        </div>
+        {% if yaml_content.description %}
+            <p style="margin-top: 15px; color: #94a3b8; font-style: italic;">{{ yaml_content.description }}</p>
+        {% endif %}
+    </div>
+    <!-- Parameters -->
+    {% if yaml_content.properties and yaml_content.properties.parameters %}
+        <div id="properties.parameters" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Parameters</h2>
+            {% for param in yaml_content.properties.parameters %}
+                <div id="parameters-{{ param.name }}" style="margin-bottom: 15px;">
+                    <strong style="color: #60a5fa; font-family: monospace;">{{ param.name }}</strong>
+                    <span style="color: #94a3b8;">: {{ param.description }}</span>
+                    {% if param.legal_basis %}
+                        <div style="margin-top: 5px; font-size: 14px;">
+                            <span class="pill-wrapper">
+                                <a href="#" onclick="event.preventDefault();" class="legal-basis-link">
+                                    → Artikel {{ param.legal_basis.article }}
+                                    {% if param.legal_basis.paragraph %}lid {{ param.legal_basis.paragraph }}{% endif %}
+                                    {% if param.legal_basis.subparagraph %}onderdeel {{ param.legal_basis.subparagraph }}{% endif %}
+                                </a>
+                                <div class="pill-dropdown pill-dropdown-dark">
+                                    <div class="pill-preview-dark">
+                                        <div class="pill-preview-title">Wettekst - Artikel {{ param.legal_basis.article }}</div>
+                                        <div class="pill-preview-content">
+                                            {% if param.legal_basis.explanation %}
+                                                {{ param.legal_basis.explanation }}
+                                            {% else %}
+                                                Deze parameter is gebaseerd op:
+                                            {% endif %}
+                                        </div>
+                                        <div class="pill-preview-code">
+                                            Artikel {{ param.legal_basis.article }}
+                                            {% if param.legal_basis.paragraph %}lid {{ param.legal_basis.paragraph }}{% endif %}
+                                            {% if param.legal_basis.subparagraph %}onderdeel {{ param.legal_basis.subparagraph }}{% endif %}
+                                            <br>
+                                            van {{ param.legal_basis.law or law.title }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Input -->
+    {% if yaml_content.input %}
+        <div id="input" class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Input</h2>
+            {% for input_item in yaml_content.input %}
+                <div id="input-{{ input_item.name }}" style="margin-bottom: 15px;">
+                    <strong style="color: #86efac; font-family: monospace;">{{ input_item.name }}</strong>
+                    <span style="color: #94a3b8;">: {{ input_item.description }}</span>
+                    {% if input_item.legal_basis %}
+                        <div style="margin-top: 5px; font-size: 14px;">
+                            <span class="pill-wrapper">
+                                <a href="#" onclick="event.preventDefault();" class="legal-basis-link">
+                                    → Artikel {{ input_item.legal_basis.article }}
+                                    {% if input_item.legal_basis.paragraph %}lid {{ input_item.legal_basis.paragraph }}{% endif %}
+                                    {% if input_item.legal_basis.subparagraph %}onderdeel {{ input_item.legal_basis.subparagraph }}{% endif %}
+                                </a>
+                                <div class="pill-dropdown pill-dropdown-dark">
+                                    <div class="pill-preview-dark">
+                                        <div class="pill-preview-title">Wettekst - Artikel {{ input_item.legal_basis.article }}</div>
+                                        <div class="pill-preview-content">
+                                            {% if input_item.legal_basis.explanation %}
+                                                {{ input_item.legal_basis.explanation }}
+                                            {% else %}
+                                                Deze input is gebaseerd op:
+                                            {% endif %}
+                                        </div>
+                                        <div class="pill-preview-code">
+                                            Artikel {{ input_item.legal_basis.article }}
+                                            {% if input_item.legal_basis.paragraph %}lid {{ input_item.legal_basis.paragraph }}{% endif %}
+                                            {% if input_item.legal_basis.subparagraph %}onderdeel {{ input_item.legal_basis.subparagraph }}{% endif %}
+                                            <br>
+                                            van {{ input_item.legal_basis.law or law.title }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Regelspraak -->
+    {% if yaml_content.actions %}
+        <div class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Regelspraak</h2>
+            <!-- Render requirements -->
+            {% if rendered_requirements %}{{ rendered_requirements | safe }}{% endif %}
+            <!-- Render actions -->
+            <div class="rule-actions">
+                <h3 style="color: #e2e8f0; margin-bottom: 1rem;">Berekening</h3>
+                {% for action_html in rendered_actions %}{{ action_html | safe }}{% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    <!-- Output -->
+    {% if yaml_content.output %}
+        <div class="rule-section">
+            <h2 style="font-size: 20px;
+                       font-weight: 600;
+                       color: #67e8f9;
+                       margin-bottom: 15px">Output</h2>
+            {% for output_item in yaml_content.output %}
+                <div id="output-{{ output_item.name }}" style="margin-bottom: 15px;">
+                    <strong style="color: #86efac; font-family: monospace;">{{ output_item.name }}</strong>
+                    <span style="color: #94a3b8;">: {{ output_item.description }}</span>
+                    {% if output_item.legal_basis %}
+                        <div style="margin-top: 5px; font-size: 14px;">
+                            <span class="pill-wrapper">
+                                <a href="#" onclick="event.preventDefault();" class="legal-basis-link">
+                                    → Artikel {{ output_item.legal_basis.article }}
+                                    {% if output_item.legal_basis.paragraph %}lid {{ output_item.legal_basis.paragraph }}{% endif %}
+                                    {% if output_item.legal_basis.subparagraph %}onderdeel {{ output_item.legal_basis.subparagraph }}{% endif %}
+                                </a>
+                                <div class="pill-dropdown pill-dropdown-dark">
+                                    <div class="pill-preview-dark">
+                                        <div class="pill-preview-title">Wettekst - Artikel {{ output_item.legal_basis.article }}</div>
+                                        <div class="pill-preview-content">
+                                            {% if output_item.legal_basis.explanation %}
+                                                {{ output_item.legal_basis.explanation }}
+                                            {% else %}
+                                                Deze output is gebaseerd op:
+                                            {% endif %}
+                                        </div>
+                                        <div class="pill-preview-code">
+                                            Artikel {{ output_item.legal_basis.article }}
+                                            {% if output_item.legal_basis.paragraph %}lid {{ output_item.legal_basis.paragraph }}{% endif %}
+                                            {% if output_item.legal_basis.subparagraph %}onderdeel {{ output_item.legal_basis.subparagraph }}{% endif %}
+                                            <br>
+                                            van {{ output_item.legal_basis.law or law.title }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

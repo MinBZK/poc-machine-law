@@ -1,0 +1,13 @@
+bwb_id: BWBR0011453
+title: Wet studiefinanciering 2000
+url: https://wetten.overheid.nl/BWBR0011453
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:30.961911'
+yaml_files:
+- path: law/wet_studiefinanciering/DUO-2024-01-01.yaml
+  description: 'Regels voor het bepalen van studiefinanciering volgens de Wet studiefinanciering 2000. Vanaf 2024 is de basisbeurs
+    weer ingevoerd en is studiefinanciering een gift geworden die meetelt als inkomen voor toeslagen.
+
+    '
+structure:
+  chapters: []

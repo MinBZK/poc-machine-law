@@ -1,0 +1,534 @@
+{% extends "wetten/base.html" %}
+{% block title %}{{ law.title }} - wetten.overheid.nl{% endblock %}
+{# Macro for rendering yaml reference explanations #}
+{% macro render_yaml_explanation(yaml_explanations, ref) %}
+    {% if yaml_explanations and ref.file in yaml_explanations %}
+        {% set yaml_content = yaml_explanations[ref.file] %}
+        {% set ref_path = ref.line_reference|default(ref.section) %}
+        {# Handle different types of references #}
+        {% if ref_path.startswith('actions.') %}
+            {# Extract action info #}
+            {% set action_parts = ref_path.split('.') %}
+            {% if action_parts|length >= 2 and yaml_content.actions %}
+                {% set action_idx = action_parts[1]|int %}
+                {% if action_idx < yaml_content.actions|length %}
+                    {% set action = yaml_content.actions[action_idx] %}
+                    <div class="pill-preview-content"
+                         style="margin-bottom: 10px;
+                                padding: 12px;
+                                background: #f3f4f6;
+                                border-radius: 4px">
+                        <strong>Actie in regelspraak:</strong>
+                        <br>
+                        {% if action.output %}
+                            Output: {{ action.output }}
+                            <br>
+                        {% endif %}
+                        {% if action.operation %}
+                            Operatie: {{ action.operation }}
+                            <br>
+                        {% endif %}
+                        {% if action.legal_basis and action.legal_basis.explanation %}
+                            <br>
+                            <strong>Uitleg:</strong>
+                            <br>
+                            {{ action.legal_basis.explanation|replace('\n\n', '<br><br>') |replace('\n', '<br>')|safe }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {# First show the explanation from the reference itself #}
+            {% if ref.explanation %}
+                <div class="pill-preview-content"
+                     style="margin-bottom: 10px;
+                            padding: 12px;
+                            background: #f3f4f6;
+                            border-radius: 4px">
+                    <strong>Uitleg:</strong>
+                    <br>
+                    {{ ref.explanation|replace('\n\n', '<br><br>') |replace('\n', '<br>')|safe }}
+                </div>
+            {% endif %}
+            {# Then use existing get_yaml_explanation for other references #}
+            {% set explanation = yaml_explanations|get_yaml_explanation(ref.file, ref_path) %}
+            {% if explanation %}
+                <div class="pill-preview-content"
+                     style="margin-bottom: 10px;
+                            padding: 12px;
+                            background: #f3f4f6;
+                            border-radius: 4px">
+                    <strong>Extra uitleg uit regelspraak:</strong>
+                    <br>
+                    {{ explanation|replace('\n\n', '<br><br>') |replace('\n', '<br>')|safe }}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+{% block navigation %}
+    <li class="nav-item">
+        <a href="/" class="nav-link">← Terug naar Burger.nl</a>
+    </li>
+    <li class="nav-item">
+        <a href="/wetten" class="nav-link">Alle wetten</a>
+    </li>
+    {% if implementations %}
+        <li class="nav-item">
+            <a href="/wetten/{{ bwb_id }}/yaml/{{ implementations[0].path|urlencode }}"
+               class="nav-link">Bekijk Regelspraak →</a>
+        </li>
+    {% endif %}
+{% endblock %}
+{% block breadcrumbs %}
+    <nav class="breadcrumbs">
+        <a href="/">Burger.nl</a>
+        <span class="separator">›</span>
+        <a href="/wetten">Wetten</a>
+        <span class="separator">›</span>
+        <a href="/wetten/{{ bwb_id }}">{{ law.title }}</a>
+        <span class="separator">›</span>
+        <span>Wettekst</span>
+    </nav>
+{% endblock %}
+{% block content %}
+    <!-- Law Header -->
+    <div style="margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #ddd">
+        <h1 style="font-size: 32px;
+                   font-weight: 700;
+                   color: #154273;
+                   margin-bottom: 10px">{{ law.title }}</h1>
+        <div style="color: #666; font-size: 14px;">
+            <span>{{ bwb_id }}</span> |
+            <span>Geldig van {{ law.valid_from }} t/m heden</span>
+            {% if law.url %}| <a href="{{ law.url }}" target="_blank" style="color: #01689b;">Officiële publicatie</a>{% endif %}
+        </div>
+    </div>
+    <!-- Articles -->
+    {% if law.structure.chapters %}
+        {% for chapter in law.structure.chapters %}
+            <div style="margin-bottom: 40px;">
+                <h2 style="font-size: 24px;
+                           font-weight: 700;
+                           color: #154273;
+                           margin-bottom: 20px">{{ chapter.title }}</h2>
+                {% if chapter.sections %}
+                    {% for section in chapter.sections %}
+                        {% if section.title and section.title != "Geen titel" %}
+                            <h3 style="font-size: 20px;
+                                       font-weight: 600;
+                                       color: #154273;
+                                       margin-bottom: 15px">{{ section.title }}</h3>
+                        {% endif %}
+                        {% for article in section.articles %}
+                            <div id="{{ article.id }}"
+                                 style="margin-bottom: 25px;
+                                        padding: 20px;
+                                        background: #f8f9fa;
+                                        border-radius: 6px">
+                                <h4 style="font-size: 18px;
+                                           font-weight: 600;
+                                           color: #154273;
+                                           margin-bottom: 10px">{{ article.id }}. {{ article.title }}</h4>
+                                {% if article.paragraphs %}
+                                    <!-- Display law text with inline pills -->
+                                    <div style="line-height: 1.7;">
+                                        {% for para in article.paragraphs %}
+                                            <div id="{{ article.id }}-para-{{ para.number }}"
+                                                 style="margin-bottom: 15px">
+                                                <strong>{{ para.number }}.</strong>
+                                                <span>{{ para.content }}</span>
+                                                {% set para_key = article.id + "-para-" + para.number|string %}
+                                                {% if para_key in article_yaml_mapping %}
+                                                    {% for ref in article_yaml_mapping[para_key] %}
+                                                        <span class="pill-wrapper">
+                                                            <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                                               class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                                            <div class="pill-dropdown">
+                                                                <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                                <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                                    <strong>Wettekst §{{ para.number }}:</strong>
+                                                                    <br>
+                                                                    <em>"{{ para.content }}"</em>
+                                                                </div>
+                                                                {{ render_yaml_explanation(yaml_explanations, ref) }}
+                                                                <div class="pill-preview-content">Deze paragraaf wordt in de regelspraak gebruikt voor:</div>
+                                                                <div class="pill-preview-code">
+                                                                    <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                                    {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                                        <br>
+                                                                        Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                                    {% endif %}
+                                                                    <br>
+                                                                    <small>In bestand: {{ ref.file }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if para.subsections %}
+                                                    <div style="margin-left: 20px; margin-top: 5px;">
+                                                        {% for sub in para.subsections %}
+                                                            <div id="{{ article.id }}-para-{{ para.number }}-{{ sub.letter }}"
+                                                                 style="margin-bottom: 5px">
+                                                                <strong>{{ sub.letter }}.</strong>
+                                                                <span>{{ sub.content }}</span>
+                                                                {% set sub_key = article.id + "-para-" + para.number|string + "-" + sub.letter %}
+                                                                {% if sub_key in article_yaml_mapping %}
+                                                                    {% for ref in article_yaml_mapping[sub_key] %}
+                                                                        <span class="pill-wrapper">
+                                                                            <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                                                               class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                                                            <div class="pill-dropdown">
+                                                                                <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                                                <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                                                    <strong>Wettekst §{{ para.number }}{{ sub.letter }}:</strong>
+                                                                                    <br>
+                                                                                    <em>"{{ sub.content }}"</em>
+                                                                                </div>
+                                                                                {{ render_yaml_explanation(yaml_explanations, ref) }}
+                                                                                <div class="pill-preview-content">Dit onderdeel wordt in de regelspraak gebruikt voor:</div>
+                                                                                <div class="pill-preview-code">
+                                                                                    <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                                                    {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                                                        <br>
+                                                                                        Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                                                    {% endif %}
+                                                                                    <br>
+                                                                                    <small>In bestand: {{ ref.file }}</small>
+                                                                                </div>
+                                                                            </div>
+                                                                        </span>
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% elif article.content %}
+                                    <!-- Fallback: Display the full law text if no structured paragraphs -->
+                                    <div style="white-space: pre-wrap; line-height: 1.7;">{{ article.content }}</div>
+                                    <!-- Check for article-level references -->
+                                    {% if article.id in article_yaml_mapping %}
+                                        {% for ref in article_yaml_mapping[article.id] %}
+                                            <span class="pill-wrapper">
+                                                <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                                   class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                                <div class="pill-dropdown">
+                                                    <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                    <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                        <strong>Wettekst {{ article.id }}:</strong>
+                                                        <br>
+                                                        <em>"{{ article.content[:300] }}
+                                                            {% if article.content|length > 300 %}...{% endif %}
+                                                        "</em>
+                                                    </div>
+                                                    {{ render_yaml_explanation(yaml_explanations, ref) }}
+                                                    <div class="pill-preview-content">Dit artikel wordt in de regelspraak gebruikt voor:</div>
+                                                    <div class="pill-preview-code">
+                                                        <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                        {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                            <br>
+                                                            Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                        {% endif %}
+                                                        <br>
+                                                        <small>In bestand: {{ ref.file }}</small>
+                                                    </div>
+                                                </div>
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endif %}
+                                <!-- Link naar regelspraak als die er is -->
+                                {% if implementations %}
+                                    <div style="margin-top: 15px;
+                                                padding-top: 15px;
+                                                border-top: 1px solid #ddd">
+                                        <a href="/wetten/{{ bwb_id }}/yaml/{{ implementations[0].path|urlencode }}#{{ article.id }}"
+                                           class="btn btn-secondary"
+                                           style="font-size: 14px">Bekijk in Regelspraak →</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% elif chapter.articles %}
+                    <!-- Direct articles under chapter without sections -->
+                    {% for article in chapter.articles %}
+                        <div id="{{ article.id }}"
+                             style="margin-bottom: 25px;
+                                    padding: 20px;
+                                    background: #f8f9fa;
+                                    border-radius: 6px">
+                            <h4 style="font-size: 18px;
+                                       font-weight: 600;
+                                       color: #154273;
+                                       margin-bottom: 10px">{{ article.id }}. {{ article.title }}</h4>
+                            {% if article.paragraphs %}
+                                <!-- Display law text with inline pills -->
+                                <div style="line-height: 1.7;">
+                                    {% for para in article.paragraphs %}
+                                        <div id="{{ article.id }}-para-{{ para.number }}"
+                                             style="margin-bottom: 15px">
+                                            <strong>{{ para.number }}.</strong>
+                                            <span>{{ para.content }}</span>
+                                            {% set para_key = article.id + "-para-" + para.number|string %}
+                                            {% if para_key in article_yaml_mapping %}
+                                                {% for ref in article_yaml_mapping[para_key] %}
+                                                    <span class="pill-wrapper">
+                                                        <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                                           class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                                        <div class="pill-dropdown">
+                                                            <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                            <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                                <strong>Wettekst §{{ para.number }}:</strong>
+                                                                <br>
+                                                                <em>"{{ para.content }}"</em>
+                                                            </div>
+                                                            {% if yaml_explanations %}{{ render_yaml_explanation(yaml_explanations, ref) }}{% endif %}
+                                                            <div class="pill-preview-content">Deze paragraaf wordt in de regelspraak gebruikt voor:</div>
+                                                            <div class="pill-preview-code">
+                                                                <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                                {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                                    <br>
+                                                                    Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                                {% endif %}
+                                                                <br>
+                                                                <small>In bestand: {{ ref.file }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </span>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if para.subsections %}
+                                                <div style="margin-left: 20px; margin-top: 5px;">
+                                                    {% for sub in para.subsections %}
+                                                        <div id="{{ article.id }}-para-{{ para.number }}-{{ sub.letter }}"
+                                                             style="margin-bottom: 5px">
+                                                            <strong>{{ sub.letter }}.</strong>
+                                                            <span>{{ sub.content }}</span>
+                                                            {% set sub_key = article.id + "-para-" + para.number|string + "-" + sub.letter %}
+                                                            {% if sub_key in article_yaml_mapping %}
+                                                                {% for ref in article_yaml_mapping[sub_key] %}
+                                                                    <span class="pill-wrapper">
+                                                                        <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                                                           class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                                                        <div class="pill-dropdown">
+                                                                            <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                                            <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                                                <strong>Wettekst §{{ para.number }}{{ sub.letter }}:</strong>
+                                                                                <br>
+                                                                                <em>"{{ sub.content }}"</em>
+                                                                            </div>
+                                                                            {{ render_yaml_explanation(yaml_explanations, ref) }}
+                                                                            <div class="pill-preview-content">Dit onderdeel wordt in de regelspraak gebruikt voor:</div>
+                                                                            <div class="pill-preview-code">
+                                                                                <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                                                {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                                                    <br>
+                                                                                    Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                                                {% endif %}
+                                                                                <br>
+                                                                                <small>In bestand: {{ ref.file }}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </span>
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% elif article.content %}
+                                <!-- Fallback: Display the full law text if no structured paragraphs -->
+                                <div style="white-space: pre-wrap; line-height: 1.7;">{{ article.content }}</div>
+                                <!-- Check for article-level references -->
+                                {% if article.id in article_yaml_mapping %}
+                                    {% for ref in article_yaml_mapping[article.id] %}
+                                        <span class="pill-wrapper">
+                                            <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                               class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                            <div class="pill-dropdown">
+                                                <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                    <strong>Wettekst {{ article.id }}:</strong>
+                                                    <br>
+                                                    <em>"{{ article.content[:300] }}
+                                                        {% if article.content|length > 300 %}...{% endif %}
+                                                    "</em>
+                                                </div>
+                                                {{ render_yaml_explanation(yaml_explanations, ref) }}
+                                                <div class="pill-preview-content">Dit artikel wordt in de regelspraak gebruikt voor:</div>
+                                                <div class="pill-preview-code">
+                                                    <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                    {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                        <br>
+                                                        Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                    {% endif %}
+                                                    <br>
+                                                    <small>In bestand: {{ ref.file }}</small>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                            <!-- Link naar regelspraak als die er is -->
+                            {% if implementations %}
+                                <div style="margin-top: 15px;
+                                            padding-top: 15px;
+                                            border-top: 1px solid #ddd">
+                                    <a href="/wetten/{{ bwb_id }}/yaml/{{ implementations[0].path|urlencode }}#{{ article.id }}"
+                                       class="btn btn-secondary"
+                                       style="font-size: 14px">Bekijk in Regelspraak →</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% elif law.structure.articles %}
+        <!-- Flat structure -->
+        {% for article in law.structure.articles %}
+            <div id="{{ article.id }}"
+                 style="margin-bottom: 25px;
+                        padding: 20px;
+                        background: #f8f9fa;
+                        border-radius: 6px">
+                <h4 style="font-size: 18px;
+                           font-weight: 600;
+                           color: #154273;
+                           margin-bottom: 10px">{{ article.id }}. {{ article.title }}</h4>
+                {% if article.paragraphs %}
+                    <!-- Display law text with inline pills -->
+                    <div style="line-height: 1.7;">
+                        {% for para in article.paragraphs %}
+                            <div id="{{ article.id }}-para-{{ para.number }}"
+                                 style="margin-bottom: 15px">
+                                <strong>{{ para.number }}.</strong>
+                                <span>{{ para.content }}</span>
+                                {% set para_key = article.id + "-para-" + para.number|string %}
+                                {% if para_key in article_yaml_mapping %}
+                                    {% for ref in article_yaml_mapping[para_key] %}
+                                        <span class="pill-wrapper">
+                                            <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                               class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                            <div class="pill-dropdown">
+                                                <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                    <strong>Wettekst §{{ para.number }}:</strong>
+                                                    <br>
+                                                    <em>"{{ para.content }}"</em>
+                                                </div>
+                                                <div class="pill-preview-content">Deze paragraaf wordt in de regelspraak gebruikt voor:</div>
+                                                <div class="pill-preview-code">
+                                                    <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                    {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                        <br>
+                                                        Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                    {% endif %}
+                                                    <br>
+                                                    <small>In bestand: {{ ref.file }}</small>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if para.subsections %}
+                                    <div style="margin-left: 20px; margin-top: 5px;">
+                                        {% for sub in para.subsections %}
+                                            <div id="{{ article.id }}-para-{{ para.number }}-{{ sub.letter }}"
+                                                 style="margin-bottom: 5px">
+                                                <strong>{{ sub.letter }}.</strong>
+                                                <span>{{ sub.content }}</span>
+                                                {% set sub_key = article.id + "-para-" + para.number|string + "-" + sub.letter %}
+                                                {% if sub_key in article_yaml_mapping %}
+                                                    {% for ref in article_yaml_mapping[sub_key] %}
+                                                        <span class="pill-wrapper">
+                                                            <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                                               class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                                            <div class="pill-dropdown">
+                                                                <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                                                <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                                                    <strong>Wettekst §{{ para.number }}{{ sub.letter }}:</strong>
+                                                                    <br>
+                                                                    <em>"{{ sub.content }}"</em>
+                                                                </div>
+                                                                <div class="pill-preview-content">Dit onderdeel wordt in de regelspraak gebruikt voor:</div>
+                                                                <div class="pill-preview-code">
+                                                                    <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                                                    {% if ref.line_reference and ref.line_reference != ref.section %}
+                                                                        <br>
+                                                                        Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                                                    {% endif %}
+                                                                    <br>
+                                                                    <small>In bestand: {{ ref.file }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% elif article.content %}
+                    <!-- Fallback: Display the full law text if no structured paragraphs -->
+                    <div style="white-space: pre-wrap; line-height: 1.7;">{{ article.content }}</div>
+                    <!-- Check for article-level references -->
+                    {% if article.id in article_yaml_mapping %}
+                        {% for ref in article_yaml_mapping[article.id] %}
+                            <span class="pill-wrapper">
+                                <a href="/wetten/{{ bwb_id }}/yaml/{{ ref.file }}#{{ ref.line_reference|default(ref.section) }}"
+                                   class="pill">{{ ref.description|default("Regelspraak") }}</a>
+                                <div class="pill-dropdown">
+                                    <div class="pill-preview-title">Regelspraak: {{ ref.description }}</div>
+                                    <div class="pill-preview-content" style="margin-bottom: 10px;">
+                                        <strong>Wettekst {{ article.id }}:</strong>
+                                        <br>
+                                        <em>"{{ article.content[:300] }}
+                                            {% if article.content|length > 300 %}...{% endif %}
+                                        "</em>
+                                    </div>
+                                    {{ render_yaml_explanation(yaml_explanations, ref) }}
+                                    <div class="pill-preview-content">Dit artikel wordt in de regelspraak gebruikt voor:</div>
+                                    <div class="pill-preview-code">
+                                        <strong>{{ ref.section|replace('.', ' → ') }}</strong>
+                                        {% if ref.line_reference and ref.line_reference != ref.section %}
+                                            <br>
+                                            Specifiek: {{ ref.line_reference|replace('.', ' → ') }}
+                                        {% endif %}
+                                        <br>
+                                        <small>In bestand: {{ ref.file }}</small>
+                                    </div>
+                                </div>
+                            </span>
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+                <!-- Link naar regelspraak als die er is -->
+                {% if implementations %}
+                    <div style="margin-top: 15px;
+                                padding-top: 15px;
+                                border-top: 1px solid #ddd">
+                        <a href="/wetten/{{ bwb_id }}/yaml/{{ implementations[0].path|urlencode }}#{{ article.id }}"
+                           class="btn btn-secondary"
+                           style="font-size: 14px">Bekijk in Regelspraak →</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

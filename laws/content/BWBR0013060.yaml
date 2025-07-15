@@ -1,0 +1,14 @@
+bwb_id: BWBR0013060
+title: Wet structuur uitvoeringsorganisatie werk en inkomen
+url: https://wetten.overheid.nl/BWBR0013060
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:31.005026'
+yaml_files:
+- path: law/wet_structuur_uitvoeringsorganisatie_werk_en_inkomen/UWV-2024-01-01.yaml
+  description: 'Regels voor het bepalen van verzekerde jaren voor de AOW op basis van werk- en uitkeringsperiodes volgens
+    de Wet SUWI. Dit omvat periodes van werk in Nederland, grensarbeid, detachering en periodes van uitkeringen zoals WW,
+    WIA, etc.
+
+    '
+structure:
+  chapters: []

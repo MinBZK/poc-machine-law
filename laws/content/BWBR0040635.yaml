@@ -1,0 +1,14 @@
+bwb_id: BWBR0040635
+title: Wet forensische zorg
+url: https://wetten.overheid.nl/BWBR0040635
+valid_from: '2024-01-01'
+last_updated: '2025-07-14T21:24:31.022328'
+yaml_files:
+- path: law/wet_forensische_zorg/DJI-2022-01-01.yaml
+  description: 'Regels voor het bepalen van forensische zorg status volgens de Wet forensische zorg (Wfz). Forensische zorg
+    is geestelijke gezondheidszorg, verslavingszorg en verstandelijke gehandicaptenzorg die onderdeel is van een (voorwaardelijke)
+    straf of maatregel.
+
+    '
+structure:
+  chapters: []

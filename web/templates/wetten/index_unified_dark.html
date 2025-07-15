@@ -1,0 +1,250 @@
+{% extends "wetten/base_dark.html" %}
+{% block title %}Wetten met regelspraak - wetten.overheid.nl{% endblock %}
+{% block extra_styles %}
+    <style>
+    /* Laws listing specific styles - dark mode */
+    .laws-section {
+        margin-top: 3rem;
+    }
+
+    .laws-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #67e8f9;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #0891b2;
+    }
+
+    .law-item {
+        border: 1px solid #1e3a5f;
+        margin-bottom: 1rem;
+        background: #0f1729;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+
+    .law-item:hover {
+        box-shadow: 0 4px 20px rgba(8, 145, 178, 0.2);
+        border-color: #0891b2;
+    }
+
+    .law-header {
+        padding: 1.25rem;
+        background: #1a2332;
+        border-bottom: 1px solid #1e3a5f;
+    }
+
+    .law-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .law-title a {
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    .law-title a:hover {
+        color: #67e8f9;
+        text-decoration: underline;
+    }
+
+    .law-meta {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .law-category {
+        display: inline-block;
+        background: #0c4a6e;
+        color: #7dd3fc;
+        padding: 0.25rem 0.75rem;
+        border-radius: 3px;
+        font-size: 0.813rem;
+        font-weight: 500;
+        border: 1px solid #0891b2;
+    }
+
+    .law-dates {
+        font-size: 0.813rem;
+        color: #94a3b8;
+    }
+
+    .implementations {
+        padding: 1.25rem;
+        background: #0a1220;
+        border-top: 1px solid #1e3a5f;
+    }
+
+    .implementations-title {
+        font-weight: 700;
+        color: #67e8f9;
+        margin-bottom: 0.75rem;
+        font-size: 0.938rem;
+    }
+
+    .implementation-item {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        background: #0f1729;
+        border: 1px solid #1e3a5f;
+        border-left: 3px solid #0891b2;
+        border-radius: 3px;
+        transition: all 0.2s;
+    }
+
+    .implementation-item:hover {
+        background: #1a2332;
+        border-left-color: #38bdf8;
+    }
+
+    .implementation-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .implementation-name {
+        font-weight: 600;
+        color: #e2e8f0;
+        font-size: 0.938rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .implementation-link {
+        color: #38bdf8;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .implementation-link:hover {
+        color: #67e8f9;
+        text-decoration: underline;
+    }
+
+    .implementation-link::after {
+        content: "→";
+    }
+
+    .no-implementations {
+        padding: 1.25rem;
+        background: #0a1220;
+        font-size: 0.938rem;
+        color: #64748b;
+        font-style: italic;
+        text-align: center;
+        border-top: 1px solid #1e3a5f;
+    }
+
+    .more-implementations {
+        margin-top: 0.75rem;
+        font-size: 0.813rem;
+        color: #64748b;
+        font-style: italic;
+    }
+
+    /* Info box */
+    .info-box {
+        background: #0c4a6e;
+        border: 1px solid #0891b2;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        font-size: 0.938rem;
+        line-height: 1.6;
+        border-radius: 6px;
+        color: #e2e8f0;
+    }
+
+    /* Search section placeholder */
+    .search-section {
+        background: #0f1729;
+        padding: 2rem;
+        border: 1px solid #1e3a5f;
+        border-radius: 6px;
+        margin-bottom: 2rem;
+    }
+
+    .search-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #67e8f9;
+        margin-bottom: 1rem;
+    }
+
+    .search-hint {
+        color: #94a3b8;
+        font-size: 0.938rem;
+    }
+    </style>
+{% endblock %}
+{% block breadcrumb_items %}<li>Wetten overzicht</li>{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 class="page-title">Wetten met regelspraak</h1>
+        <div class="info-box">
+            De informatie in dit onderdeel wordt geen bekendmaking in de zin van de Grondwet.
+            Alleen publicatie in het Tractatenblad, het Staatsblad, de Staatscourant en andere
+            vanwege de overheid verkrijgbaar gestelde publicatiebladen heeft een officieel karakter.
+        </div>
+        <div class="search-section">
+            <h2 class="search-title">Zoeken in wetten</h2>
+            <p class="search-hint">Gebruik de zoekfunctie om specifieke wetten of regelspraak te vinden.</p>
+        </div>
+        <!-- Laws Section -->
+        <section class="laws-section">
+            <h2 class="laws-title">Beschikbare wetten ({{ laws|length }})</h2>
+            {% for law in laws %}
+                <div class="law-item">
+                    <div class="law-header">
+                        <h3 class="law-title">
+                            <a href="/wetten/{{ law.bwb_id }}">{{ law.title }}</a>
+                        </h3>
+                        <div class="law-meta">
+                            <span class="law-category">{{ law.category|replace('_', ' ') |title }}</span>
+                            <span>{{ law.bwb_id }}</span>
+                            {% if law.valid_from or law.last_updated %}
+                                <span class="law-dates">
+                                    {% if law.valid_from %}Geldig vanaf: {{ law.valid_from }}{% endif %}
+                                    {% if law.last_updated %}| Bijgewerkt: {{ law.last_updated[:10] }}{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if law.implementations %}
+                        <div class="implementations">
+                            <div class="implementations-title">Regelspraak implementaties ({{ law.implementations|length }})</div>
+                            {% for impl in law.implementations[:2] %}
+                                <div class="implementation-item">
+                                    <div class="implementation-name">{{ impl.name }}</div>
+                                    <a href="/wetten/{{ law.bwb_id }}/yaml/{{ impl.path|urlencode }}"
+                                       class="implementation-link">Bekijk regelspraak</a>
+                                </div>
+                            {% endfor %}
+                            {% if law.implementations|length > 2 %}
+                                <div class="more-implementations">+ {{ law.implementations|length - 2 }} meer implementaties beschikbaar</div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="no-implementations">Nog geen regelspraak implementaties beschikbaar</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+{% endblock %}
+{% block navigation %}
+    <li class="nav-item">
+        <a href="/" class="nav-link">← Terug naar Burger.nl</a>
+    </li>
+    <li class="nav-item">
+        <a href="/laws/list" class="nav-link">Alle regelspraak</a>
+    </li>
+{% endblock %}

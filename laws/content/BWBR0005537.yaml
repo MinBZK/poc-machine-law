@@ -1,0 +1,254 @@
+bwb_id: BWBR0005537
+title: Algemene wet bestuursrecht
+url: https://wetten.overheid.nl/BWBR0005537
+valid_from: '1994-01-01'
+last_updated: '2025-07-14T17:58:42.326164'
+yaml_files:
+- path: law/awb/bezwaar/JenV-2024-01-01.yaml
+  description: Implementatie van bezwaarmogelijkheid en termijnen
+- path: law/awb/beroep/JenV-2024-01-01.yaml
+  description: Implementatie van beroepmogelijkheid en termijnen
+structure:
+  chapters:
+  - id: Hoofdstuk1
+    title: van toepassing of van overeenkomstige toepassing is.
+    articles:
+    - id: Artikel1
+      paragraphs:
+      - number: 1
+        content: 'Onder bestuursorgaan wordt verstaan:
+
+
+          a. een orgaan van een rechtspersoon die krachtens publiekrecht is ingesteld, of
+
+
+          b. een ander persoon of college, met enig openbaar gezag bekleed.'
+      - number: 2
+        content: 'De volgende organen, personen en colleges worden niet als bestuursorgaan aangemerkt:
+
+
+          a. de wetgevende macht;
+
+
+          b. de kamers en de verenigde vergadering der Staten-Generaal;
+
+
+          c. onafhankelijke, bij de wet ingestelde organen die met rechtspraak zijn belast, alsmede de Raad voor de rechtspraak
+          en het College van afgevaardigden;
+
+
+          d. de Raad van State en zijn afdelingen;
+
+
+          e. de Algemene Rekenkamer;
+
+
+          f. de Nationale ombudsman en de substituut-ombudsmannen als bedoeld in artikel 9, eerste lid, van de Wet Nationale
+          ombudsman, en ombudsmannen en ombudscommissies als bedoeld in artikel 9:17, onderdeel b;
+
+
+          g. de voorzitters, leden, griffiers en secretarissen van de in de onderdelen b tot en met f bedoelde organen, de
+          procureur-generaal, de plaatsvervangend procureur-generaal en de advocaten-generaal bij de Hoge Raad, de besturen
+          van de in onderdeel c bedoelde organen alsmede de voorzitters van die besturen, alsmede de commissies uit het midden
+          van de in de onderdelen b tot en met f bedoelde organen;
+
+
+          h. de commissie van toezicht op de inlichtingen- en veiligheidsdiensten en haar afdelingen, bedoeld in artikel 97
+          van de Wet op de inlichtingen- en veiligheidsdiensten 2017;
+
+
+          i. de toetsingscommissie inzet bevoegdheden, bedoeld in artikel 32 van de Wet op de inlichtingen- en veiligheidsdiensten
+          2017.'
+      - number: 3
+        content: Een ingevolge het tweede lid uitgezonderd orgaan, persoon of college wordt wel als bestuursorgaan aangemerkt
+          voor zover het orgaan, de persoon of het college besluiten neemt of handelingen verricht ten aanzien van een persoon
+          met betrekking tot diens in artikel 3 van de Ambtenarenwet 2017 bedoelde hoedanigheid, zijn nagelaten betrekkingen
+          of zijn rechtverkrijgenden, met uitzondering van een voor het leven benoemde ambtenaar werkzaam bij de Raad van
+          State en zijn afdelingen en de Algemene Rekenkamer.
+      - number: 4
+        content: De vermogensrechtelijke gevolgen van een handeling van een bestuursorgaan treffen de rechtspersoon waartoe
+          het bestuursorgaan behoort.
+  - id: Hoofdstuk2
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel2
+      paragraphs:
+      - number: 1
+        content: Een bestuursorgaan draagt zorg voor passende ondersteuning bij het verkeer met dat bestuursorgaan.
+      - number: 2
+        content: Een ieder kan zich ter behartiging van zijn belangen in het verkeer met bestuursorganen laten bijstaan of
+          door een gemachtigde laten vertegenwoordigen.
+      - number: 3
+        content: Het bestuursorgaan kan van een gemachtigde een schriftelijke machtiging verlangen.
+  - id: Hoofdstuk3
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel3
+      paragraphs:
+      - number: 1
+        content: 'Op besluiten, inhoudende algemeen verbindende voorschriften:
+
+
+          a. is afdeling 3.2 slechts van toepassing, voor zover de aard van de besluiten zich daartegen niet verzet;
+
+
+          b. zijn de afdelingen 3.6 en 3.7 niet van toepassing.'
+      - number: 2
+        content: Op andere handelingen van bestuursorganen dan besluiten zijn de afdelingen 3.2 tot en met 3.4 van overeenkomstige
+          toepassing, voor zover de aard van de handelingen zich daartegen niet verzet.
+  - id: Hoofdstuk4
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel4
+      paragraphs:
+      - number: 1
+        content: 'De aanvraag wordt ondertekend en bevat ten minste:
+
+
+          a. de naam en het adres van de aanvrager;
+
+
+          b. de dagtekening;
+
+
+          c. een aanduiding van de beschikking die wordt gevraagd.'
+      - number: 2
+        content: De aanvrager verschaft voorts de gegevens en bescheiden die voor de beslissing op de aanvraag nodig zijn
+          en waarover hij redelijkerwijs de beschikking kan krijgen.
+  - id: Hoofdstuk5
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel5
+      paragraphs:
+      - number: 1
+        content: 'In deze wet wordt verstaan onder overtreding: een gedraging die in strijd is met het bepaalde bij of krachtens
+          enig wettelijk voorschrift.'
+      - number: 2
+        content: 'Onder overtreder wordt verstaan: degene die de overtreding pleegt of medepleegt.'
+      - number: 3
+        content: Overtredingen kunnen worden begaan door natuurlijke personen en rechtspersonen. Artikel 51, tweede en derde
+          lid, van het Wetboek van Strafrecht is van overeenkomstige toepassing.
+  - id: Hoofdstuk6
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel6
+      paragraphs:
+      - number: 1
+        content: Het maken van bezwaar geschiedt door het indienen van een bezwaarschrift bij het bestuursorgaan dat het besluit
+          heeft genomen.
+      - number: 2
+        content: Het instellen van administratief beroep geschiedt door het indienen van een beroepschrift bij het beroepsorgaan.
+      - number: 3
+        content: Het instellen van beroep bij een bestuursrechter geschiedt door het indienen van een beroepschrift bij die
+          rechter.
+  - id: Hoofdstuk7
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel7
+      paragraphs:
+      - number: 1
+        content: 'Degene aan wie het recht is toegekend beroep bij een bestuursrechter in te stellen, dient alvorens beroep
+          in te stellen bezwaar te maken, tenzij:
+
+
+          a. het besluit in bezwaar of in administratief beroep is genomen,
+
+
+          b. het besluit aan goedkeuring is onderworpen,
+
+
+          c. het besluit een goedkeuring of een weigering daarvan inhoudt,
+
+
+          d. het besluit is voorbereid met toepassing van afdeling 3.4,
+
+
+          e. het besluit is genomen op basis van een uitspraak waarin de bestuursrechter met toepassing van artikel 8:72,
+          vierde lid, onderdeel a, heeft bepaald dat afdeling 3.4 geheel of gedeeltelijk buiten toepassing blijft,
+
+
+          f. het beroep zich richt tegen het niet tijdig nemen van een besluit,
+
+
+          g. het besluit is genomen op grond van een voorschrift als genoemd in de bij deze wet behorende Regeling rechtstreeks
+          beroep dan wel het besluit anderszins in die regeling is omschreven.'
+      - number: 2
+        content: Tegen de beslissing op het bezwaar kan beroep worden ingesteld met toepassing van de voorschriften die gelden
+          voor het instellen van beroep tegen het besluit waartegen bezwaar is gemaakt.
+  - id: Hoofdstuk8
+    title: van de Algemene wet inzake rijksbelastingen van overeenkomstige toepassing is indien de schade is veroorzaakt door
+      een besluit
+    articles:
+    - id: Artikel8
+      paragraphs:
+      - number: 1
+        content: 'Met een besluit wordt gelijkgesteld:
+
+
+          a. een andere handeling van een bestuursorgaan waarbij een persoon met betrekking tot diens in artikel 3 van de
+          Ambtenarenwet 2017 bedoelde hoedanigheid, zijn nagelaten betrekkingen of zijn rechtverkrijgenden belanghebbende
+          zijn,
+
+
+          b. een andere publiekrechtelijke handeling van de Sociaal-Economische Raad.'
+      - number: 2
+        content: 'Met een besluit wordt gelijkgesteld de schriftelijke beslissing, inhoudende de weigering van de goedkeuring
+          van:
+
+
+          a. een besluit, inhoudende een algemeen verbindend voorschrift of een beleidsregel of de intrekking of de vaststelling
+          van de inwerkingtreding van een algemeen verbindend voorschrift of een beleidsregel,
+
+
+          b. een besluit ter voorbereiding van een privaatrechtelijke rechtshandeling.'
+  - id: Hoofdstuk9
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel9
+      paragraphs:
+      - number: 1
+        content: Een ieder heeft het recht om over de wijze waarop een bestuursorgaan zich in een bepaalde aangelegenheid
+          jegens hem of een ander heeft gedragen, een klacht in te dienen bij dat bestuursorgaan.
+      - number: 2
+        content: Een gedraging van een persoon, werkzaam onder de verantwoordelijkheid van een bestuursorgaan, wordt aangemerkt
+          als een gedraging van dat bestuursorgaan.
+  - id: Hoofdstuk10
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel10
+      paragraphs:
+      - number: 1
+        content: Een bestuursorgaan kan mandaat verlenen, tenzij bij wettelijk voorschrift anders is bepaald of de aard van
+          de bevoegdheid zich tegen de mandaatverlening verzet.
+      - number: 2
+        content: 'Mandaat wordt in ieder geval niet verleend indien het betreft een bevoegdheid:
+
+
+          a. tot het vaststellen van algemeen verbindende voorschriften, tenzij bij de verlening van die bevoegdheid in mandaatverlening
+          is voorzien;
+
+
+          b. tot het nemen van een besluit ten aanzien waarvan is bepaald dat het met versterkte meerderheid moet worden genomen
+          of waarvan de aard van de voorgeschreven besluitvormingsprocedure zich anderszins tegen de mandaatverlening verzet;
+
+
+          c. tot het vernietigen van of tot het onthouden van goedkeuring aan een besluit van een ander bestuursorgaan.'
+      - number: 3
+        content: Mandaat tot het beslissen op een bezwaarschrift of op een verzoek als bedoeld in artikel 7:1a, eerste lid,
+          wordt niet verleend aan degene die het besluit waartegen het bezwaar zich richt, krachtens mandaat heeft genomen.
+      - number: 4
+        content: Indien artikel 5:53 van toepassing is, wordt mandaat tot het opleggen van een bestuurlijke boete niet verleend
+          aan degene die van de overtreding een rapport of proces-verbaal heeft opgemaakt.
+  - id: Hoofdstuk11
+    title: Algemene bepalingen
+    articles:
+    - id: Artikel11
+      paragraphs:
+      - number: 1
+        content: De bedragen, vastgesteld krachtens de artikelen 7:15, vierde lid, 7:28, vijfde lid, en 8:75, eerste lid,
+          worden jaarlijks met ingang van 1 januari bij regeling van Onze Minister van Justitie en Veiligheid gewijzigd voor
+          zover de consumentenprijsindex daartoe aanleiding geeft. Daarbij worden de bedragen rekenkundig afgerond op gehele
+          euro’s.
+      - number: 2
+        content: De overige bij of krachtens deze wet vastgestelde bedragen kunnen bij regeling van Onze Minister van Justitie
+          en Veiligheid worden gewijzigd voor zover de consumentenprijsindex daartoe aanleiding geeft.

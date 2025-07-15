@@ -1,0 +1,10 @@
+bwb_id: BWBR0004627
+title: Kieswet
+url: https://wetten.overheid.nl/BWBR0004627
+valid_from: '1998-05-28'
+last_updated: '2025-07-14T17:58:55.718874'
+yaml_files:
+- path: law/kieswet/KIESRAAD-2024-01-01.yaml
+  description: Implementatie van kiesrecht voor Tweede Kamerverkiezingen
+structure:
+  chapters: []

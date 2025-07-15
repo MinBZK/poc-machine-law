@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ page_title }}</title>
+        <style>
+        @font-face {
+            font-family: "RO Sans";
+            src: url("/static/fonts/ROsanswebtextregular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: "RO Sans";
+            src: url("/static/fonts/ROsanswebtextbold.woff") format("woff");
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        /* Base styling similar to wetten.overheid.nl */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "RO Sans", Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+            background-color: #0f172a;
+            /* Underwater dark theme */
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header - Underwater theme */
+        .header {
+            background: #0c4a6e;
+            color: white;
+            padding: 20px 0;
+            border-bottom: 2px solid #0891b2;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Navigation - Underwater theme */
+        .nav {
+            background: #0c4a6e;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding: 0;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* Main layout - Dark underwater */
+        .main {
+            background: #0f172a;
+            padding: 30px 0;
+        }
+
+        .main .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        /* Sidebar - Dark underwater theme */
+        .sidebar {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            border: 1px solid #334155;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #38bdf8;
+            margin-bottom: 20px;
+        }
+
+        .legal-basis-main {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0891b2;
+        }
+
+        .legal-basis-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #67e8f9;
+            margin-bottom: 8px;
+        }
+
+        .legal-basis-law {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 5px;
+        }
+
+        .legal-basis-article {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .legal-basis-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .legal-basis-link:hover {
+            text-decoration: underline;
+        }
+
+        .legal-references {
+            margin-top: 20px;
+        }
+
+        .references-section {
+            margin-bottom: 20px;
+        }
+
+        .references-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #67e8f9;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .reference-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .reference-name {
+            font-weight: 500;
+            color: #e2e8f0;
+            margin-bottom: 3px;
+        }
+
+        .reference-article {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .reference-article a {
+            color: #38bdf8;
+            text-decoration: none;
+        }
+
+        .reference-article a:hover {
+            text-decoration: underline;
+        }
+
+        /* Content area */
+        .content {
+            padding: 0 20px;
+        }
+
+        .yaml-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0891b2;
+        }
+
+        .yaml-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #67e8f9;
+            margin-bottom: 10px;
+        }
+
+        .yaml-meta {
+            color: #94a3b8;
+            font-size: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #cbd5e1;
+        }
+
+        .meta-value {
+            color: #e2e8f0;
+        }
+
+        .service-badge {
+            background: #0c4a6e;
+            color: #67e8f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            width: fit-content;
+            border: 1px solid #0891b2;
+        }
+
+        .discoverable-badge {
+            background: #064e3b;
+            color: #6ee7b7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            width: fit-content;
+            border: 1px solid #10b981;
+        }
+
+        /* YAML sections */
+        .yaml-section {
+            margin-bottom: 30px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .yaml-section-header {
+            background: #0c4a6e;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #0891b2;
+        }
+
+        .yaml-section-content {
+            padding: 20px;
+        }
+
+        .yaml-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .yaml-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .yaml-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #67e8f9;
+            margin-bottom: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .yaml-item-description {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .yaml-item-type {
+            font-size: 12px;
+            background: #334155;
+            color: #cbd5e1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+
+        .legal-basis-ref {
+            background: #1e293b;
+            border: 1px solid #0891b2;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .legal-basis-ref-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #67e8f9;
+            margin-bottom: 5px;
+        }
+
+        .legal-basis-ref-content {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+
+        .legal-basis-ref-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .legal-basis-ref-link:hover {
+            text-decoration: underline;
+        }
+
+        /* YAML Code view */
+        .yaml-code-section {
+            margin-top: 30px;
+        }
+
+        .yaml-code-header {
+            background: #0c4a6e;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0891b2;
+        }
+
+        .yaml-code-content {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .yaml-code-content pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Highlight target section */
+        .yaml-item.highlight {
+            background: #1e3a8a;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .main .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-direction: column;
+            }
+
+            .nav-link {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.2);
+            }
+
+            .yaml-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+        </style>
+        <script>
+            // Highlight targeted section on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.location.hash) {
+                    const targetId = window.location.hash.substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.classList.add('highlight');
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Remove highlight after 3 seconds
+                        setTimeout(() => {
+                            targetElement.classList.remove('highlight');
+                        }, 3000);
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div style="display: flex;
+                            align-items: center;
+                            gap: 20px;
+                            margin-bottom: 10px">
+                    <img src="/static/images/overheid-logo-official.svg"
+                         alt="Logo overheid.nl"
+                         height="50">
+                    <div style="flex: 1;">
+                        <div class="breadcrumb">
+                            <a href="/wetten">Wetten.overheid.nl</a> /
+                            <a href="/wetten/{{ bwb_id }}">{{ law.title }}</a> /
+                            Regelspraak
+                        </div>
+                        <h1>{{ yaml_content.name }}</h1>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="/wetten/{{ bwb_id }}" class="nav-link">← Terug naar {{ law.title }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/wetten" class="nav-link">Alle wetten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/laws/execute?service={{ yaml_content.service }}&law={{ yaml_content.law }}&bsn=100000001"
+                           class="nav-link">Test uitvoering →</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Burger.nl</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Sidebar - Legal References -->
+                <aside class="sidebar">
+                    <h3 class="sidebar-title">Juridische Basis</h3>
+                    <!-- Main Legal Basis -->
+                    {% if yaml_content.legal_basis %}
+                        <div class="legal-basis-main">
+                            <div class="legal-basis-title">Hoofdartikel</div>
+                            <div class="legal-basis-law">{{ yaml_content.legal_basis.law }}</div>
+                            <div class="legal-basis-article">
+                                Artikel {{ yaml_content.legal_basis.article }}
+                                {% if yaml_content.legal_basis.paragraph %}, lid {{ yaml_content.legal_basis.paragraph }}{% endif %}
+                            </div>
+                            <a href="/wetten/{{ bwb_id }}/artikel/{{ yaml_content.legal_basis.article }}"
+                               class="legal-basis-link">Bekijk in wettekst →</a>
+                            {% if yaml_content.legal_basis.explanation %}
+                                <div style="margin-top: 10px;
+                                            font-size: 12px;
+                                            color: #666;
+                                            font-style: italic">{{ yaml_content.legal_basis.explanation }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <!-- All Legal References -->
+                    <div class="legal-references">
+                        {% set sections = ["properties.parameters", "properties.sources", "properties.input", "properties.output", "actions"] %}
+                        {% for section_path in sections %}
+                            {% set section_name = section_path.split('.')[-1] %}
+                            {% set section_data = yaml_content.get('properties', {}).get(section_name) or yaml_content.get(section_name, []) %}
+                            {% if section_data %}
+                                {% set has_legal_basis = section_data | selectattr('legal_basis', 'defined') | list | length > 0 %}
+                                {% if has_legal_basis %}
+                                    <div class="references-section">
+                                        <div class="references-section-title">{{ section_name | title }}</div>
+                                        {% for item in section_data %}
+                                            {% if item.legal_basis %}
+                                                <div class="reference-item">
+                                                    <div class="reference-name">{{ item.name or item.description or 'Onbekend' }}</div>
+                                                    <div class="reference-article">
+                                                        <a href="/wetten/{{ bwb_id }}/artikel/{{ item.legal_basis.article }}">
+                                                            Artikel {{ item.legal_basis.article }}
+                                                            {% if item.legal_basis.paragraph %}, lid {{ item.legal_basis.paragraph }}{% endif %}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </aside>
+                <!-- Content Area -->
+                <div class="content">
+                    <!-- YAML Header -->
+                    <div class="yaml-header">
+                        <h1 class="yaml-title">{{ yaml_content.name }}</h1>
+                        <div class="yaml-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Service:</span>
+                                <span class="meta-value">
+                                    <span class="service-badge">{{ yaml_content.service }}</span>
+                                </span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Wet:</span>
+                                <span class="meta-value">{{ yaml_content.law }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Type:</span>
+                                <span class="meta-value">{{ yaml_content.law_type or 'Onbekend' }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Zichtbaar voor:</span>
+                                <span class="meta-value">
+                                    <span class="discoverable-badge">{{ yaml_content.discoverable or 'NONE' }}</span>
+                                </span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Geldig vanaf:</span>
+                                <span class="meta-value">{{ yaml_content.valid_from }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Schema versie:</span>
+                                <span class="meta-value">{{ yaml_content.schema_version }}</span>
+                            </div>
+                        </div>
+                        {% if yaml_content.description %}
+                            <div style="margin-top: 15px;
+                                        padding: 15px;
+                                        background: #1e293b;
+                                        border-radius: 6px;
+                                        font-style: italic;
+                                        color: #94a3b8;
+                                        border: 1px solid #334155">{{ yaml_content.description }}</div>
+                        {% endif %}
+                    </div>
+                    <!-- Parameters Section -->
+                    {% if yaml_content.properties and yaml_content.properties.parameters %}
+                        <div class="yaml-section">
+                            <div class="yaml-section-header">Parameters</div>
+                            <div class="yaml-section-content">
+                                {% for param in yaml_content.properties.parameters %}
+                                    <div class="yaml-item" id="parameters-{{ param.name }}">
+                                        <div class="yaml-item-name">{{ param.name }}</div>
+                                        <div class="yaml-item-type">
+                                            {{ param.type }}
+                                            {% if param.required %}(verplicht){% endif %}
+                                        </div>
+                                        <div class="yaml-item-description">{{ param.description }}</div>
+                                        {% if param.legal_basis %}
+                                            <div class="legal-basis-ref">
+                                                <div class="legal-basis-ref-title">Juridische basis:</div>
+                                                <div class="legal-basis-ref-content">
+                                                    {{ param.legal_basis.law }},
+                                                    <a href="/wetten/{{ param.legal_basis.bwb_id or bwb_id }}/artikel/{{ param.legal_basis.article }}"
+                                                       class="legal-basis-ref-link">Artikel {{ param.legal_basis.article }}
+                                                        {% if param.legal_basis.paragraph %}lid {{ param.legal_basis.paragraph }}{% endif %}
+                                                    </a>
+                                                </div>
+                                                <a href="/wetten/{{ param.legal_basis.bwb_id or bwb_id }}"
+                                                   class="legal-basis-ref-link">Bekijk volledige wettekst →</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Sources Section -->
+                    {% if yaml_content.properties and yaml_content.properties.sources %}
+                        <div class="yaml-section">
+                            <div class="yaml-section-header">Bronnen</div>
+                            <div class="yaml-section-content">
+                                {% for source in yaml_content.properties.sources %}
+                                    <div class="yaml-item" id="sources-{{ source.name }}">
+                                        <div class="yaml-item-name">{{ source.name }}</div>
+                                        <div class="yaml-item-type">
+                                            {{ source.type }}
+                                            {% if source.required %}(verplicht){% endif %}
+                                        </div>
+                                        <div class="yaml-item-description">{{ source.description }}</div>
+                                        {% if source.legal_basis %}
+                                            <div class="legal-basis-ref">
+                                                <div class="legal-basis-ref-title">Juridische basis:</div>
+                                                <div class="legal-basis-ref-content">
+                                                    {{ source.legal_basis.law }},
+                                                    <a href="/wetten/{{ source.legal_basis.bwb_id or bwb_id }}/artikel/{{ source.legal_basis.article }}"
+                                                       class="legal-basis-ref-link">Artikel {{ source.legal_basis.article }}
+                                                        {% if source.legal_basis.paragraph %}lid {{ source.legal_basis.paragraph }}{% endif %}
+                                                    </a>
+                                                </div>
+                                                <a href="/wetten/{{ source.legal_basis.bwb_id or bwb_id }}"
+                                                   class="legal-basis-ref-link">Bekijk volledige wettekst →</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Input Section -->
+                    {% if yaml_content.input %}
+                        <div class="yaml-section">
+                            <div class="yaml-section-header">Input</div>
+                            <div class="yaml-section-content">
+                                {% for input_item in yaml_content.input %}
+                                    <div class="yaml-item" id="input-{{ input_item.name }}">
+                                        <div class="yaml-item-name">{{ input_item.name }}</div>
+                                        <div class="yaml-item-type">{{ input_item.type }}</div>
+                                        <div class="yaml-item-description">{{ input_item.description }}</div>
+                                        {% if input_item.legal_basis %}
+                                            <div class="legal-basis-ref">
+                                                <div class="legal-basis-ref-title">Juridische basis:</div>
+                                                <div class="legal-basis-ref-content">
+                                                    {{ input_item.legal_basis.law }},
+                                                    <a href="/wetten/{{ input_item.legal_basis.bwb_id or bwb_id }}/artikel/{{ input_item.legal_basis.article }}"
+                                                       class="legal-basis-ref-link">Artikel {{ input_item.legal_basis.article }}
+                                                        {% if input_item.legal_basis.paragraph %}lid {{ input_item.legal_basis.paragraph }}{% endif %}
+                                                    </a>
+                                                </div>
+                                                <a href="/wetten/{{ input_item.legal_basis.bwb_id or bwb_id }}"
+                                                   class="legal-basis-ref-link">Bekijk volledige wettekst →</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Output Section -->
+                    {% if yaml_content.output %}
+                        <div class="yaml-section">
+                            <div class="yaml-section-header">Output</div>
+                            <div class="yaml-section-content">
+                                {% for output_item in yaml_content.output %}
+                                    <div class="yaml-item" id="output-{{ output_item.name }}">
+                                        <div class="yaml-item-name">{{ output_item.name }}</div>
+                                        <div class="yaml-item-type">{{ output_item.type }}</div>
+                                        <div class="yaml-item-description">{{ output_item.description }}</div>
+                                        {% if output_item.legal_basis %}
+                                            <div class="legal-basis-ref">
+                                                <div class="legal-basis-ref-title">Juridische basis:</div>
+                                                <div class="legal-basis-ref-content">
+                                                    {{ output_item.legal_basis.law }},
+                                                    <a href="/wetten/{{ output_item.legal_basis.bwb_id or bwb_id }}/artikel/{{ output_item.legal_basis.article }}"
+                                                       class="legal-basis-ref-link">Artikel {{ output_item.legal_basis.article }}
+                                                        {% if output_item.legal_basis.paragraph %}lid {{ output_item.legal_basis.paragraph }}{% endif %}
+                                                    </a>
+                                                </div>
+                                                <a href="/wetten/{{ output_item.legal_basis.bwb_id or bwb_id }}"
+                                                   class="legal-basis-ref-link">Bekijk volledige wettekst →</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Definitions Section -->
+                    {% if yaml_content.definitions %}
+                        <div class="yaml-section">
+                            <div class="yaml-section-header">Definities</div>
+                            <div class="yaml-section-content">
+                                {% for name, value in yaml_content.definitions.items() %}
+                                    <div class="yaml-item" id="definitions-{{ name }}">
+                                        <div class="yaml-item-name">{{ name }}</div>
+                                        <div class="yaml-item-type">
+                                            {% if value is number %}
+                                                {% if value is integer %}
+                                                    number (integer)
+                                                {% else %}
+                                                    number (float)
+                                                {% endif %}
+                                            {% else %}
+                                                {{ value.__class__.__name__ }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="yaml-item-description">
+                                            {% if value is integer and value > 1000 %}
+                                                {{ "{:,}".format(value).replace(",", ".") }}
+                                                {% if value > 10000 %}
+                                                    (€ {{ "%.2f"|format(value / 100) }})
+                                                {% endif %}
+                                            {% elif value is float %}
+                                                {% if 0 <= value <= 1 %}
+                                                    {{ "%.1f%%"|format(value * 100) }}
+                                                {% else %}
+                                                    {{ "%.3f"|format(value) }}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ value }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Actions Section - Regelspraak Rendering -->
+                    {% if yaml_content.actions %}
+                        <div class="yaml-section">
+                            <div class="yaml-section-header">Regelspraak</div>
+                            <div class="yaml-section-content">
+                                <!-- General link to law text -->
+                                <div style="margin-bottom: 1.5rem;
+                                            padding: 1rem;
+                                            background: #0c4a6e;
+                                            border-radius: 6px;
+                                            border: 1px solid #0891b2">
+                                    <a href="/wetten/{{ bwb_id }}"
+                                       style="color: #38bdf8;
+                                              text-decoration: none;
+                                              font-weight: 500;
+                                              display: flex;
+                                              align-items: center;
+                                              gap: 0.5rem">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             style="width: 20px;
+                                                    height: 20px"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
+                                        Bekijk de volledige wettekst van {{ law.title }} →
+                                    </a>
+                                </div>
+                                <style>
+                                    .rule-actions {
+                                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                                        line-height: 1.6;
+                                        color: #e2e8f0;
+                                    }
+                                    .action-assign, .action-if {
+                                        margin-bottom: 1.5rem;
+                                        padding: 1rem;
+                                        background: #1e293b;
+                                        border-radius: 6px;
+                                        border: 1px solid #334155;
+                                    }
+                                    .condition {
+                                        margin: 0.75rem 0;
+                                        padding-left: 1.5rem;
+                                        border-left: 3px solid #1e40af;
+                                    }
+                                    .condition-else {
+                                        margin: 0.75rem 0;
+                                        padding-left: 1.5rem;
+                                        border-left: 3px solid #be123c;
+                                    }
+                                    .var-output {
+                                        color: #86efac;
+                                        font-weight: 600;
+                                        font-family: monospace;
+                                        background: #064e3b;
+                                        padding: 2px 6px;
+                                        border-radius: 3px;
+                                    }
+                                    .var-input {
+                                        color: #86efac;
+                                        font-weight: 600;
+                                        font-family: monospace;
+                                    }
+                                    .var-param {
+                                        color: #60a5fa;
+                                        font-weight: 600;
+                                        font-family: monospace;
+                                    }
+                                    .value-number {
+                                        color: #fb923c;
+                                        font-weight: 600;
+                                    }
+                                    .value-bool {
+                                        color: #c084fc;
+                                        font-weight: 600;
+                                    }
+                                    .test {
+                                        font-style: italic;
+                                        color: #94a3b8;
+                                    }
+                                    .legal-basis-inline {
+                                        font-size: 0.875rem;
+                                        color: #94a3b8;
+                                        font-style: italic;
+                                        margin-bottom: 0.5rem;
+                                    }
+                                    .legal-basis-inline .legal-basis-link {
+                                        color: #38bdf8;
+                                        text-decoration: none;
+                                        font-style: normal;
+                                        font-weight: 500;
+                                    }
+                                    .legal-basis-inline .legal-basis-link:hover {
+                                        text-decoration: underline;
+                                    }
+                                    .parameters-section, .sources-section, .requirements-section, .definitions-section {
+                                        margin-top: 2rem;
+                                        padding: 1rem;
+                                        background: #1e293b;
+                                        border-radius: 6px;
+                                        border: 1px solid #334155;
+                                    }
+                                    .requirements-list {
+                                        list-style: none;
+                                        padding: 0;
+                                        margin: 0.5rem 0 0 0;
+                                    }
+                                    .requirement-item {
+                                        margin-bottom: 0.5rem;
+                                        padding: 0.5rem;
+                                        background: #0f172a;
+                                        border-radius: 4px;
+                                        border: 1px solid #334155;
+                                    }
+                                    .requirement-group {
+                                        margin-bottom: 1rem;
+                                    }
+                                    .requirement-group p {
+                                        margin-bottom: 0.5rem;
+                                        font-weight: 500;
+                                        color: #e2e8f0;
+                                    }
+                                    .parameters-list, .sources-list, .definitions-list {
+                                        list-style: none;
+                                        padding: 0;
+                                        margin: 0.5rem 0 0 0;
+                                    }
+                                    .parameter-item, .source-item, .definition-item {
+                                        margin-bottom: 0.5rem;
+                                        padding: 0.5rem;
+                                        background: #0f172a;
+                                        border-radius: 4px;
+                                        border: 1px solid #334155;
+                                    }
+                                    .param-name {
+                                        color: #60a5fa;
+                                        font-weight: 600;
+                                        font-family: monospace;
+                                    }
+                                    .param-value {
+                                        color: #fb923c;
+                                        font-weight: 600;
+                                    }
+                                    .param-description {
+                                        color: #94a3b8;
+                                        font-size: 0.875rem;
+                                    }
+                                    .source-name {
+                                        color: #86efac;
+                                        font-weight: 600;
+                                    }
+                                    .source-service {
+                                        color: #fbbf24;
+                                        font-weight: 600;
+                                    }
+                                    .source-law {
+                                        color: #f472b6;
+                                        font-weight: 600;
+                                    }
+                                    .definition-name {
+                                        color: #60a5fa;
+                                        font-weight: 600;
+                                        font-family: monospace;
+                                    }
+                                    .definition-value {
+                                        color: #fb923c;
+                                        font-weight: 600;
+                                    }
+                                    .definition-description {
+                                        color: #94a3b8;
+                                        font-size: 0.875rem;
+                                    }
+                                </style>
+                                <!-- Render definitions first if available -->
+                                {% if rendered_definitions %}
+                                    {{ rendered_definitions | safe }}
+                                {% endif %}
+                                <!-- Render parameters if available -->
+                                {% if yaml_content.properties and yaml_content.properties.parameters %}
+                                    {{ renderer.render_parameters(yaml_content.properties.parameters) | safe }}
+                                {% endif %}
+                                <!-- Render requirements if available -->
+                                {% if rendered_requirements %}
+                                    {{ rendered_requirements | safe }}
+                                {% endif %}
+                                <!-- Render sources if available -->
+                                {% if yaml_content.properties and yaml_content.properties.sources %}
+                                    {{ renderer.render_sources(yaml_content.properties.sources) | safe }}
+                                {% endif %}
+                                <!-- Render actions -->
+                                <div class="rule-actions">
+                                    <h3 style="color: #e2e8f0; margin-bottom: 1rem;">Berekening</h3>
+                                    {% for action_html in rendered_actions %}
+                                        {{ action_html | safe }}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- YAML Code View -->
+                    <div class="yaml-code-section">
+                        <div class="yaml-section">
+                            <div class="yaml-code-header">
+                                <span>YAML Broncode</span>
+                                <span style="font-size: 12px; font-weight: normal;">{{ yaml_path }}</span>
+                            </div>
+                            <div class="yaml-code-content">
+                                <pre>{{ yaml_content_string }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
