@@ -38,6 +38,9 @@
     law: LawNode,
   };
 
+  let laws: Law[] = [];
+  let selectedLaws: string[] = []; // Contains the law UUIDs. This will hold the selected laws from the checkboxes
+
   (async () => {
     try {
       // Fetch the available laws from the backend
@@ -52,7 +55,7 @@
       // Initialize a map of service names to their UUIDs
       const serviceToUUIDsMap = new Map<string, string[]>();
 
-      const laws: Law[] = await Promise.all(
+      laws = await Promise.all(
         filePaths.map(async (filePath) => {
           // Read the file content
           const fileContent = await fetch(`${base}/law/${filePath}`).then((response) =>
@@ -89,6 +92,8 @@
           ).length
         );
       });
+
+      selectedLaws = laws.map((law) => law.uuid); // Initialize selected laws with all laws
 
       for (const data of laws) {
         const lawID = data.uuid;
@@ -252,11 +257,26 @@
   <title>Dependency graph — Digilab</title>
 </svelte:head>
 
-<!--
-👇 By default, the Svelte Flow container has a height of 100%.
-This means that the parent container needs a height to render the flow.
--->
-<div class="h-screen">
+<div class="float-right h-screen w-80 overflow-y-auto px-6 py-4 text-sm">
+  <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
+
+  {#each laws as law}
+    <div class="mb-1.5">
+      <label class="inline-flex items-start">
+        <input
+          bind:group={selectedLaws}
+          class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          type="checkbox"
+          value={law.uuid}
+        />
+        <span>{law.name} <span class="text-xs text-gray-600">({law.service})</span></span>
+      </label>
+    </div>
+  {/each}
+</div>
+
+<!-- By default, the Svelte Flow container has a height of 100%. This means that the parent container needs a height to render the flow. -->
+<div class="mr-80 h-screen">
   <SvelteFlow
     {nodes}
     {edges}
