@@ -262,14 +262,23 @@
 
   {#each laws as law}
     <div class="mb-1.5">
-      <label class="inline-flex items-start">
+      <label class="group inline-flex items-start">
         <input
           bind:group={selectedLaws}
           class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           type="checkbox"
           value={law.uuid}
         />
-        <span>{law.name} <span class="text-xs text-gray-600">({law.service})</span></span>
+        <span
+          >{law.name} <span class="text-xs text-gray-600">({law.service})</span>
+          <button
+            on:click|preventDefault={() => {
+              selectedLaws = [law.uuid];
+            }}
+            class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
+            >alleen</button
+          ></span
+        >
       </label>
     </div>
   {/each}
