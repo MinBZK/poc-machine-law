@@ -456,7 +456,7 @@
                 this.law = null;
                 this.bsn = null;
             }
-        })
+        });
     });
     document.addEventListener('htmx:afterOnLoad', function (evt) {
         if (evt.detail.triggerSpec && evt.detail.triggerSpec.includes('edit-dialog-closed')) {
