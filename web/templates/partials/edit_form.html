@@ -99,7 +99,6 @@
                                                    step="0.01"
                                                    placeholder="0.00"
                                                    :value="displayValue(newValue)"
-                                                   @input="newValue = parseValue($event.target.value)"
                                                    @change="$event.target.value = parseFloat($event.target.value).toFixed(2)"
                                                    required>
                                             <input type="hidden" id="new-value" name="new_value" :value="newValue">
@@ -151,7 +150,6 @@
                                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                                step="0.01"
                                                                placeholder="0.00"
-                                                               @input="newValue = parseValue($event.target.value)"
                                                                @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
                                                                required>
                                                         <input type="hidden" id="new-value" name="new_value" :value="newValue">
@@ -219,7 +217,6 @@
                                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                                step="0.01"
                                                                placeholder="0.00"
-                                                               @input="newValue = Math.round(parseFloat($event.target.value || 0) * 100)"
                                                                @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
                                                                required>
                                                         <input type="hidden" id="new-value" name="new_value" :value="newValue">
