@@ -251,6 +251,33 @@
       $edges = $edges.filter((e) => !e.source.startsWith(node.id) && !e.target.startsWith(node.id));
     }
   }
+
+  // Handle changes to selectedLaws
+  $: ((selectedLaws: string[]) => {
+    // Hide nodes that are not selected and not connected to any selected law
+    $nodes = $nodes.map((node) => ({
+      ...node,
+      hidden:
+        !selectedLaws.includes(node.id.substring(0, 36)) &&
+        !$edges.some(
+          (edge) =>
+            (edge.source.startsWith(node.id.substring(0, 36)) &&
+              selectedLaws.includes(edge.target.substring(0, 36))) ||
+            (edge.target.startsWith(node.id.substring(0, 36)) &&
+              selectedLaws.includes(edge.source.substring(0, 36))),
+        ),
+    }));
+
+    // Hide edges that are not connected to any selected law
+    $edges = $edges.map((edge) => {
+      return {
+        ...edge,
+        hidden:
+          !selectedLaws.includes(edge.source.substring(0, 36)) &&
+          !selectedLaws.includes(edge.target.substring(0, 36)),
+      };
+    });
+  })(selectedLaws);
 </script>
 
 <svelte:head>
@@ -265,7 +292,7 @@
       <label class="group inline-flex items-start">
         <input
           bind:group={selectedLaws}
-          class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           type="checkbox"
           value={law.uuid}
         />
@@ -275,7 +302,7 @@
             on:click|preventDefault={() => {
               selectedLaws = [law.uuid];
             }}
-            class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
+            class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
             >alleen</button
           ></span
         >
