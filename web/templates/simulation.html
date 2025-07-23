@@ -250,10 +250,16 @@
                                    oninput="updateSliderValue('student_percentage_young')"
                                    class="mt-1 w-full">
                         </div>
-                        
-                        <!-- Preset Scenarios -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3 mt-6">Vooraf Ingestelde Scenario's</h3>
-                        <div class="grid grid-cols-1 gap-2">
+                    </div>
+                    </div>
+                </div>
+                </div>
+                
+                <!-- Preset Scenarios - Separate Section -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">Vooraf Ingestelde Scenario's</h2>
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                             <button type="button"
                                     onclick="loadPreset('current')"
                                     class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -277,21 +283,224 @@
                         </div>
                     </div>
                 </div>
-                <!-- Run Simulation -->
-                <div class="flex justify-end">
-                    <button type="button"
-                            onclick="runSimulation()"
-                            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="mr-2 -ml-1 h-5 w-5"
-                             xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 20 20"
-                             fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                
+                <!-- Law Parameters - Collapsible -->
+                <div class="bg-white shadow rounded-lg overflow-hidden">
+                    <button type="button" 
+                            onclick="toggleSection('law-parameters-section')"
+                            class="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                        <h2 class="text-lg font-medium text-gray-900">Parameters van Wetgeving</h2>
+                        <svg id="law-parameters-section-chevron" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
-                        Voeg Simulatie Toe
                     </button>
+                    <div id="law-parameters-section" class="px-6 pb-6 hidden">
+                        <!-- Zorgtoeslag Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3 mt-4">Zorgtoeslag</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4">
+                            <div>
+                                <label for="zorgtoeslag_standaardpremie" class="block text-sm font-medium text-gray-700">Standaardpremie (€/maand)</label>
+                                <input type="number"
+                                       name="zorgtoeslag_standaardpremie"
+                                       id="zorgtoeslag_standaardpremie"
+                                       value="1677"
+                                       min="0"
+                                       max="3000"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <!-- Huurtoeslag Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3">Huurtoeslag</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                            <div>
+                                <label for="huurtoeslag_max_huur" class="block text-sm font-medium text-gray-700">Max huur (€/maand)</label>
+                                <input type="number"
+                                       name="huurtoeslag_max_huur"
+                                       id="huurtoeslag_max_huur"
+                                       value="879"
+                                       min="0"
+                                       max="1500"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="huurtoeslag_basishuur" class="block text-sm font-medium text-gray-700">Basishuur (€/maand)</label>
+                                <input type="number"
+                                       name="huurtoeslag_basishuur"
+                                       id="huurtoeslag_basishuur"
+                                       value="200"
+                                       min="0"
+                                       max="500"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <!-- Kinderopvangtoeslag Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3">Kinderopvangtoeslag</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                            <div>
+                                <label for="kinderopvang_uurprijs" class="block text-sm font-medium text-gray-700">Max uurtarief dagopvang (€)</label>
+                                <input type="number"
+                                       name="kinderopvang_uurprijs"
+                                       id="kinderopvang_uurprijs"
+                                       value="9.27"
+                                       min="0"
+                                       max="20"
+                                       step="0.01"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="kinderopvang_max_uren" class="block text-sm font-medium text-gray-700">Max uren per maand</label>
+                                <input type="number"
+                                       name="kinderopvang_max_uren"
+                                       id="kinderopvang_max_uren"
+                                       value="230"
+                                       min="0"
+                                       max="300"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <!-- AOW Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3">AOW</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                            <div>
+                                <label for="aow_pensioenleeftijd" class="block text-sm font-medium text-gray-700">Pensioenleeftijd</label>
+                                <input type="number"
+                                       name="aow_pensioenleeftijd"
+                                       id="aow_pensioenleeftijd"
+                                       value="67"
+                                       min="65"
+                                       max="70"
+                                       step="0.25"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="aow_basisbedrag" class="block text-sm font-medium text-gray-700">Basisbedrag (€/maand)</label>
+                                <input type="number"
+                                       name="aow_basisbedrag"
+                                       id="aow_basisbedrag"
+                                       value="1461"
+                                       min="1000"
+                                       max="2000"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <!-- Bijstand Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3">Bijstand</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                            <div>
+                                <label for="bijstand_norm_alleenstaand" class="block text-sm font-medium text-gray-700">Norm alleenstaand (€/maand)</label>
+                                <input type="number"
+                                       name="bijstand_norm_alleenstaand"
+                                       id="bijstand_norm_alleenstaand"
+                                       value="1210"
+                                       min="800"
+                                       max="1500"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="bijstand_norm_gehuwd" class="block text-sm font-medium text-gray-700">Norm gehuwd/samenwonend (€/maand)</label>
+                                <input type="number"
+                                       name="bijstand_norm_gehuwd"
+                                       id="bijstand_norm_gehuwd"
+                                       value="1729"
+                                       min="1200"
+                                       max="2200"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <!-- Inkomstenbelasting Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3">Inkomstenbelasting</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                            <div>
+                                <label for="ib_tarief_schijf1" class="block text-sm font-medium text-gray-700">Tarief schijf 1 (%)</label>
+                                <input type="number"
+                                       name="ib_tarief_schijf1"
+                                       id="ib_tarief_schijf1"
+                                       value="36.97"
+                                       min="0"
+                                       max="50"
+                                       step="0.01"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="ib_tarief_schijf2" class="block text-sm font-medium text-gray-700">Tarief schijf 2 (%)</label>
+                                <input type="number"
+                                       name="ib_tarief_schijf2"
+                                       id="ib_tarief_schijf2"
+                                       value="49.5"
+                                       min="0"
+                                       max="60"
+                                       step="0.01"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="ib_grens_schijf1" class="block text-sm font-medium text-gray-700">Grens schijf 1 (€)</label>
+                                <input type="number"
+                                       name="ib_grens_schijf1"
+                                       id="ib_grens_schijf1"
+                                       value="75518"
+                                       min="50000"
+                                       max="100000"
+                                       step="100"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="ib_algemene_heffingskorting" class="block text-sm font-medium text-gray-700">Algemene heffingskorting max (€)</label>
+                                <input type="number"
+                                       name="ib_algemene_heffingskorting"
+                                       id="ib_algemene_heffingskorting"
+                                       value="3362"
+                                       min="2000"
+                                       max="5000"
+                                       step="10"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <!-- Kiesrecht Parameters -->
+                        <h3 class="text-base font-medium text-gray-700 mb-3">Kiesrecht</h3>
+                        <div class="grid grid-cols-1 gap-4 mb-4">
+                            <div>
+                                <label for="kiesrecht_min_leeftijd" class="block text-sm font-medium text-gray-700">Minimale stemleeftijd</label>
+                                <input type="number"
+                                       name="kiesrecht_min_leeftijd"
+                                       id="kiesrecht_min_leeftijd"
+                                       value="18"
+                                       min="16"
+                                       max="21"
+                                       step="1"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
+            
+            <!-- Run Simulation Button - Outside Form -->
+            <div class="mt-6 pb-6">
+                <button type="button"
+                        onclick="runSimulation()"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="mr-2 -ml-1 h-5 w-5"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                    </svg>
+                    Voeg Simulatie Toe
+                </button>
+            </div>
         </div>
         <!-- Right Panel: Tabs and Results -->
         <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden">
@@ -598,6 +807,36 @@ async function runSimulation() {
             zero_income_prob: parseInt(formData.get('zero_income_prob')),
             rent_percentage: parseInt(formData.get('rent_percentage')),
             student_percentage_young: parseInt(formData.get('student_percentage_young'))
+        },
+        law_parameters: {
+            zorgtoeslag: {
+                standaardpremie: parseFloat(formData.get('zorgtoeslag_standaardpremie'))
+            },
+            huurtoeslag: {
+                max_huur: parseFloat(formData.get('huurtoeslag_max_huur')),
+                basishuur: parseFloat(formData.get('huurtoeslag_basishuur'))
+            },
+            kinderopvangtoeslag: {
+                max_uurprijs: parseFloat(formData.get('kinderopvang_uurprijs')),
+                max_uren: parseInt(formData.get('kinderopvang_max_uren'))
+            },
+            aow: {
+                pensioenleeftijd: parseFloat(formData.get('aow_pensioenleeftijd')),
+                basisbedrag: parseFloat(formData.get('aow_basisbedrag'))
+            },
+            bijstand: {
+                norm_alleenstaand: parseFloat(formData.get('bijstand_norm_alleenstaand')),
+                norm_gehuwd: parseFloat(formData.get('bijstand_norm_gehuwd'))
+            },
+            inkomstenbelasting: {
+                tarief_schijf1: parseFloat(formData.get('ib_tarief_schijf1')),
+                tarief_schijf2: parseFloat(formData.get('ib_tarief_schijf2')),
+                grens_schijf1: parseFloat(formData.get('ib_grens_schijf1')),
+                algemene_heffingskorting: parseFloat(formData.get('ib_algemene_heffingskorting'))
+            },
+            kiesrecht: {
+                min_leeftijd: parseInt(formData.get('kiesrecht_min_leeftijd'))
+            }
         }
     };
 
