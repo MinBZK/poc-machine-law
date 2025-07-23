@@ -1,6 +1,7 @@
 import itertools
 import logging
 import random
+import sys
 from datetime import date, datetime
 
 import numpy as np
@@ -46,11 +47,13 @@ class LawSimulator:
         }
 
         # Rent cost distributions (in euros) for rent calculation
-        # Adjusted to match huurtoeslag criteria (max 885.71 euros)
+        # Updated to reflect 2025 Dutch rental market
+        # Social housing: €650-€808 (liberalization threshold 2025)
+        # Private sector: €900-€1500+
         self.rent_distribution = {
-            "low": (477, 600),  # Just above quality discount threshold
-            "medium": (600, 750),  # Medium rent range
-            "high": (750, 800),  # High rent range (below maximum rent limit)
+            "low": (550, 700),  # Social housing range
+            "medium": (700, 850),  # Upper social/lower private
+            "high": (850, 1200),  # Private sector (some eligible for huurtoeslag)
         }
 
     def generate_bsn(self):
@@ -153,20 +156,20 @@ class LawSimulator:
                 else:
                     # Calculate monthly rent
                     rent_amount = int(random.randint(*rent_range) * 100)  # Convert to cents
-                    rent_service_costs = int(random.randint(30, 60) * 100)  # €30-€60 service costs
-                    eligible_service_costs = min(rent_service_costs, 4800)  # Max €48 eligible service costs
+                    rent_service_costs = int(random.randint(80, 120) * 100)  # €80-€120 service costs
+                    eligible_service_costs = min(rent_service_costs, 3000)  # Max €30 eligible for most
             elif annual_income < 4000000:  # Less than €40,000
                 rent_range = self.rent_distribution["medium"]
                 # Calculate monthly rent
                 rent_amount = int(random.randint(*rent_range) * 100)  # Convert to cents
-                rent_service_costs = int(random.randint(40, 80) * 100)  # €40-€80 service costs
-                eligible_service_costs = min(rent_service_costs, 4800)  # Max €48 eligible service costs
+                rent_service_costs = int(random.randint(100, 150) * 100)  # €100-€150 service costs
+                eligible_service_costs = min(rent_service_costs, 3000)  # Max €30 eligible
             else:
                 rent_range = self.rent_distribution["high"]
                 # Calculate monthly rent
                 rent_amount = int(random.randint(*rent_range) * 100)  # Convert to cents
-                rent_service_costs = int(random.randint(50, 100) * 100)  # €50-€100 service costs
-                eligible_service_costs = min(rent_service_costs, 4800)  # Max €48 eligible service costs
+                rent_service_costs = int(random.randint(120, 200) * 100)  # €120-€200 service costs
+                eligible_service_costs = min(rent_service_costs, 3000)  # Max €30 eligible
         else:
             # For homeowners, estimate mortgage payment
             rent_amount = 0
@@ -194,6 +197,7 @@ class LawSimulator:
                     child_birth_year = datetime.now().year - child_age
                     children_data.append(
                         {
+                            "bsn": self.generate_bsn(),  # Generate BSN for child
                             "birth_date": date(child_birth_year, random.randint(1, 12), random.randint(1, 28)),
                             "age": child_age,
                             "zorgbehoefte": random.random() < 0.05,  # 5% chance of special care needs
@@ -293,7 +297,7 @@ class LawSimulator:
                     "partnerschap_type": "HUWELIJK" if p["has_partner"] else "GEEN",
                     "partner_bsn": p["partner_bsn"],
                     # Add children directly in the format expected by features
-                    "children": [{"bsn": self.generate_bsn()} for _ in range(len(p.get("children_data", [])))]
+                    "children": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
                     if p.get("children_data")
                     else [],
                 }
@@ -678,145 +682,8 @@ class LawSimulator:
             if p["housing_type"] == "rent"
         ]
 
-        # Add RENT_AMOUNT source which is explicitly required by huurtoeslag
-        # Alleen voor mensen die huurders zijn, om realisme te behouden
-        sources[("TOESLAGEN", "RENT_AMOUNT")] = [
-            # Add some values exactly as in feature file (72000) to ensure people qualify
-            {
-                "bsn": p["bsn"],
-                "value": 72000 if p["annual_income"] < 2000000 and random.random() < 0.5 else p["rent_amount"],
-            }
-            for p in people
-            if p["housing_type"] == "rent"
-        ]
-
-        # Add SERVICE_COSTS source alleen voor huurders
-        sources[("TOESLAGEN", "SERVICE_COSTS")] = [
-            {
-                "bsn": p["bsn"],
-                "value": 5000 if p["annual_income"] < 2000000 and random.random() < 0.5 else p["rent_service_costs"],
-            }
-            for p in people
-            if p["housing_type"] == "rent"
-        ]
-
-        # Add ELIGIBLE_SERVICE_COSTS source alleen voor huurders
-        sources[("TOESLAGEN", "ELIGIBLE_SERVICE_COSTS")] = [
-            {
-                "bsn": p["bsn"],
-                "value": 4800
-                if p["annual_income"] < 2000000 and random.random() < 0.5
-                else p["eligible_service_costs"],
-            }
-            for p in people
-            if p["housing_type"] == "rent"
-        ]
-
-        # Add a specific huurtoeslag test case that exactly matches feature file
-        if any(p for p in people if p["housing_type"] == "rent" and p["annual_income"] < 2000000):
-            test_person = next(p for p in people if p["housing_type"] == "rent" and p["annual_income"] < 2000000)
-            sources[("TOESLAGEN", "RENT_AMOUNT")] = [
-                {
-                    "bsn": p["bsn"],
-                    "value": 72000
-                    if p["bsn"] == test_person["bsn"]
-                    else (72000 if p["annual_income"] < 2000000 and random.random() < 0.5 else p["rent_amount"]),
-                }
-                for p in people
-                if p["housing_type"] == "rent"
-            ]
-            sources[("TOESLAGEN", "SERVICE_COSTS")] = [
-                {
-                    "bsn": p["bsn"],
-                    "value": 5000
-                    if p["bsn"] == test_person["bsn"]
-                    else (5000 if p["annual_income"] < 2000000 and random.random() < 0.5 else p["rent_service_costs"]),
-                }
-                for p in people
-                if p["housing_type"] == "rent"
-            ]
-            sources[("TOESLAGEN", "ELIGIBLE_SERVICE_COSTS")] = [
-                {
-                    "bsn": p["bsn"],
-                    "value": 4800
-                    if p["bsn"] == test_person["bsn"]
-                    else (
-                        4800 if p["annual_income"] < 2000000 and random.random() < 0.5 else p["eligible_service_costs"]
-                    ),
-                }
-                for p in people
-                if p["housing_type"] == "rent"
-            ]
-            # Add an additional huurtoeslag test case that matches feature file exactly
-            specific_test_bsn = "222222222"  # Exact match to feature file
-            huurtoeslag_test_data = {
-                "bsn": specific_test_bsn,
-                "birth_date": date(1990, 1, 1),
-                "verblijfsadres": "Voorstraat 1, Utrecht",
-                "land_verblijf": "NEDERLAND",
-                "partnerschap_type": "GEEN",
-                "partner_bsn": None,
-                "loon_uit_dienstbetrekking": 1400000,  # €14,000
-                "rent_amount": 72000,  # €720
-                "service_costs": 5000,  # €50
-                "eligible_service_costs": 4800,  # €48
-            }
-
-            # Add to RvIG personen
-            sources[("RvIG", "personen")].append(
-                {
-                    "bsn": specific_test_bsn,
-                    "geboortedatum": huurtoeslag_test_data["birth_date"].isoformat(),
-                    "verblijfsadres": huurtoeslag_test_data["verblijfsadres"],
-                    "land_verblijf": huurtoeslag_test_data["land_verblijf"],
-                    "has_dutch_nationality": True,
-                    "has_partner": False,
-                    "age": 35,
-                }
-            )
-
-            # Add to RvIG relaties
-            sources[("RvIG", "relaties")].append(
-                {
-                    "bsn": specific_test_bsn,
-                    "partnerschap_type": huurtoeslag_test_data["partnerschap_type"],
-                    "partner_bsn": huurtoeslag_test_data["partner_bsn"],
-                    "children": [],
-                }
-            )
-
-            # Add to BELASTINGDIENST box1
-            sources[("BELASTINGDIENST", "box1")].append(
-                {
-                    "bsn": specific_test_bsn,
-                    "loon_uit_dienstbetrekking": huurtoeslag_test_data["loon_uit_dienstbetrekking"],
-                    "uitkeringen_en_pensioenen": 0,
-                    "winst_uit_onderneming": 0,
-                    "resultaat_overige_werkzaamheden": 0,
-                    "eigen_woning": 0,
-                }
-            )
-
-            # Add to TOESLAGEN RENT_AMOUNT
-            sources[("TOESLAGEN", "RENT_AMOUNT")].append(
-                {"bsn": specific_test_bsn, "value": huurtoeslag_test_data["rent_amount"]}
-            )
-
-            # Add to TOESLAGEN SERVICE_COSTS
-            sources[("TOESLAGEN", "SERVICE_COSTS")].append(
-                {"bsn": specific_test_bsn, "value": huurtoeslag_test_data["service_costs"]}
-            )
-
-            # Add to TOESLAGEN ELIGIBLE_SERVICE_COSTS
-            sources[("TOESLAGEN", "ELIGIBLE_SERVICE_COSTS")].append(
-                {"bsn": specific_test_bsn, "value": huurtoeslag_test_data["eligible_service_costs"]}
-            )
-
-            # For original test person, make sure it uses proper feature file values
-            source_df = sources[("BELASTINGDIENST", "box1")]
-            for i, item in enumerate(source_df):
-                if item["bsn"] == test_person["bsn"]:
-                    source_df[i]["loon_uit_dienstbetrekking"] = 1400000  # Exactly €14,000 from feature file
+        # IMPORTANT: Huurtoeslag requires CLAIMS, not regular data sources
+        # We'll submit these as claims after loading all other data
 
         # Add household members and children required by huurtoeslag with the correct format
         # Voorbeeld uit de feature file toont dat deze velden niet als 'value' worden verwacht, maar direct
@@ -1008,6 +875,151 @@ class LawSimulator:
                 insured_years_df = pd.DataFrame(insured_years_data)
                 self.services.set_source_dataframe("UWV", "insured_years", insured_years_df)
 
+        # Submit claims for huurtoeslag (rent subsidy)
+        # These are required as claims, not regular data sources
+        renters_count = 0
+        claims_submitted = 0
+        for person in people:
+            if person["housing_type"] == "rent":
+                renters_count += 1
+                bsn = person["bsn"]
+                try:
+                    # Submit claim for HUURPRIJS (rent price)
+                    claim1 = self.services.claim_manager.submit_claim(
+                        service="TOESLAGEN",
+                        key="HUURPRIJS",
+                        new_value=person["rent_amount"],
+                        reason="Simulated rent claim",
+                        claimant="BURGER",
+                        law="wet_op_de_huurtoeslag",
+                        bsn=bsn,
+                        auto_approve=True,
+                    )
+                    # Submit claim for SERVICEKOSTEN (service costs)
+                    claim2 = self.services.claim_manager.submit_claim(
+                        service="TOESLAGEN",
+                        key="SERVICEKOSTEN",
+                        new_value=person["rent_service_costs"],
+                        reason="Simulated service costs claim",
+                        claimant="BURGER",
+                        law="wet_op_de_huurtoeslag",
+                        bsn=bsn,
+                        auto_approve=True,
+                    )
+                    # Submit claim for SUBSIDIABELE_SERVICEKOSTEN (subsidizable service costs)
+                    claim3 = self.services.claim_manager.submit_claim(
+                        service="TOESLAGEN",
+                        key="SUBSIDIABELE_SERVICEKOSTEN",
+                        new_value=person["eligible_service_costs"],
+                        reason="Simulated subsidizable service costs claim",
+                        claimant="BURGER",
+                        law="wet_op_de_huurtoeslag",
+                        bsn=bsn,
+                        auto_approve=True,
+                    )
+                    claims_submitted += 1
+                    logging.debug(
+                        f"Submitted huurtoeslag claims for BSN {bsn}: rent={person['rent_amount']}, claims={claim1},{claim2},{claim3}"
+                    )
+                except Exception as e:
+                    logging.error(f"Error submitting huurtoeslag claims for BSN {bsn}: {e}")
+                    import traceback
+
+                    logging.error(traceback.format_exc())
+
+        print(f"Submitted huurtoeslag claims for {claims_submitted}/{renters_count} renters", file=sys.stderr)
+
+        # Submit claims for kinderopvangtoeslag (childcare subsidy)
+        parents_count = 0
+        childcare_claims_submitted = 0
+        for person in people:
+            if person.get("has_children") and person.get("children_data"):
+                # Check if any children are under 12
+                young_children = [child for child in person["children_data"] if child["age"] < 12]
+                if young_children:
+                    parents_count += 1
+                    bsn = person["bsn"]
+                    try:
+                        # Submit KvK number claim
+                        self.services.claim_manager.submit_claim(
+                            service="TOESLAGEN",
+                            key="KINDEROPVANG_KVK",
+                            new_value="12345678",  # Simulated childcare provider KvK
+                            reason="Simulated childcare provider",
+                            claimant="BURGER",
+                            law="wet_kinderopvang",
+                            bsn=bsn,
+                            auto_approve=True,
+                        )
+
+                        # Submit childcare hours for each young child
+                        aangegeven_uren = []
+                        for child in young_children:
+                            # Simulate different childcare hours based on child age
+                            if child["age"] < 4:
+                                # Daycare for toddlers (full-time)
+                                hours_per_year = 2000
+                                hourly_rate = 850  # €8.50 per hour
+                                care_type = "DAGOPVANG"
+                            else:
+                                # After school care for school-age children
+                                hours_per_year = 800
+                                hourly_rate = 750  # €7.50 per hour
+                                care_type = "BUITENSCHOOLSE_OPVANG"
+
+                            aangegeven_uren.append(
+                                {
+                                    "kind_bsn": child["bsn"],
+                                    "uren_per_jaar": hours_per_year,
+                                    "uurtarief": hourly_rate,
+                                    "soort_opvang": care_type,
+                                }
+                            )
+
+                        # Submit childcare hours claim
+                        self.services.claim_manager.submit_claim(
+                            service="TOESLAGEN",
+                            key="AANGEGEVEN_UREN",
+                            new_value=aangegeven_uren,
+                            reason="Simulated childcare hours",
+                            claimant="BURGER",
+                            law="wet_kinderopvang",
+                            bsn=bsn,
+                            auto_approve=True,
+                        )
+
+                        # Submit partner hours (0 if no partner, otherwise partner's worked hours)
+                        partner_hours = 0
+                        if person.get("has_partner"):
+                            # Assume partner works full-time
+                            partner_hours = 1920
+
+                        self.services.claim_manager.submit_claim(
+                            service="TOESLAGEN",
+                            key="VERWACHTE_PARTNER_UREN",
+                            new_value=partner_hours,
+                            reason="Simulated partner work hours",
+                            claimant="BURGER",
+                            law="wet_kinderopvang",
+                            bsn=bsn,
+                            auto_approve=True,
+                        )
+
+                        childcare_claims_submitted += 1
+                        logging.debug(
+                            f"Submitted kinderopvangtoeslag claims for BSN {bsn} with {len(young_children)} young children"
+                        )
+                    except Exception as e:
+                        logging.error(f"Error submitting kinderopvangtoeslag claims for BSN {bsn}: {e}")
+                        import traceback
+
+                        logging.error(traceback.format_exc())
+
+        print(
+            f"Submitted kinderopvangtoeslag claims for {childcare_claims_submitted}/{parents_count} parents with young children",
+            file=sys.stderr,
+        )
+
         return people
 
     def simulate_person(self, person) -> None:
@@ -1043,19 +1055,27 @@ class LawSimulator:
                 "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, self.simulation_date
             )
 
+            # Also evaluate 2024 version for comparison if simulating in 2025
+            zorgtoeslag_2024 = None
+            if self.simulation_date.startswith("2025"):
+                try:
+                    zorgtoeslag_2024 = self.services.evaluate(
+                        "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, "2024-12-31"
+                    )
+                except Exception:
+                    pass
+
             # 2. AOW (state pension)
             aow = self.services.evaluate("SVB", "algemene_ouderdomswet", {"BSN": person["bsn"]}, self.simulation_date)
 
             # 3. Huurtoeslag (rent subsidy)
-            # Altijd een poging doen, inclusief niet-huurders (wet zegt wanneer iemand niet in aanmerking komt)
-            # try:
-            #     huurtoeslag = self.services.evaluate(
-            #         "TOESLAGEN", "wet_op_de_huurtoeslag", {"BSN": person["bsn"]}, self.simulation_date
-            #     )
-            #
-            # except Exception as e:
-            #     logging.error(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
-            #     huurtoeslag = None
+            try:
+                huurtoeslag = self.services.evaluate(
+                    "TOESLAGEN", "wet_op_de_huurtoeslag", {"BSN": person["bsn"]}, self.simulation_date
+                )
+            except Exception as e:
+                logging.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
+                huurtoeslag = None
 
             # 4. Bijstand (social assistance)
             try:
@@ -1067,14 +1087,15 @@ class LawSimulator:
 
             # 5. Kinderopvangtoeslag (childcare subsidy)
             # Alleen proberen voor mensen met kinderen onder 12 jaar
-            # kinderopvangtoeslag = None
-            # if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
-            #     try:
-            #         kinderopvangtoeslag = self.services.evaluate(
-            #             "TOESLAGEN", "wet_kinderopvang", {"BSN": person["bsn"]}, self.simulation_date
-            #         )
-            #     except Exception as e:
-            #         kinderopvangtoeslag = None
+            kinderopvangtoeslag = None
+            if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
+                try:
+                    kinderopvangtoeslag = self.services.evaluate(
+                        "TOESLAGEN", "wet_kinderopvang", {"BSN": person["bsn"]}, self.simulation_date
+                    )
+                except Exception as e:
+                    logging.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
+                    kinderopvangtoeslag = None
 
             # 6. Kiesrecht (voting rights)
             kiesrecht = self.services.evaluate("KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date)
@@ -1091,23 +1112,26 @@ class LawSimulator:
                 # Zorgtoeslag
                 "zorgtoeslag_eligible": zorgtoeslag.requirements_met,
                 "zorgtoeslag_amount": zorgtoeslag.output.get("hoogte_toeslag", 0) / 100,
+                # Zorgtoeslag 2024 comparison (if available)
+                "zorgtoeslag_2024_amount": zorgtoeslag_2024.output.get("hoogte_toeslag", 0) / 100
+                if zorgtoeslag_2024
+                else None,
                 # AOW
                 "aow_eligible": aow.requirements_met,
                 "aow_amount": aow.output.get("pensioenbedrag", 0) / 100,
                 "aow_accrual": aow.output.get("opbouwpercentage", 0),
-                # # Huurtoeslag
-                # "huurtoeslag_eligible": huurtoeslag.requirements_met,
-                # "huurtoeslag_amount": huurtoeslag.output.get("subsidy_amount", 0) / 100,
-                # "huurtoeslag_base_rent": huurtoeslag.output.get("base_rent", 0) / 100,
+                # Huurtoeslag
+                "huurtoeslag_eligible": huurtoeslag.requirements_met if huurtoeslag else False,
+                "huurtoeslag_amount": huurtoeslag.output.get("subsidiebedrag", 0) / 100 if huurtoeslag else 0,
+                "huurtoeslag_base_rent": huurtoeslag.output.get("basishuur", 0) / 100 if huurtoeslag else 0,
                 # Bijstand
                 "bijstand_eligible": bijstand.requirements_met if bijstand else False,
                 "bijstand_amount": bijstand.output.get("uitkeringsbedrag", 0) / 100 if bijstand else 0,
                 "bijstand_housing": bijstand.output.get("woonkostentoeslag", 0) / 100 if bijstand else 0,
                 "bijstand_startup": bijstand.output.get("startkapitaal", 0) / 100 if bijstand else 0,
-                # # Kinderopvangtoeslag
-                # "kinderopvangtoeslag_eligible": kinderopvangtoeslag.requirements_met if kinderopvangtoeslag else False,
-                # "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("yearly_amount",
-                #                                                              0) / 100 / 12 if kinderopvangtoeslag else 0,
+                # Kinderopvangtoeslag
+                "kinderopvangtoeslag_eligible": kinderopvangtoeslag.requirements_met if kinderopvangtoeslag else False,
+                "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("jaarbedrag", 0) / 100 / 12 if kinderopvangtoeslag else 0,
                 # Kiesrecht
                 "voting_rights": kiesrecht.output.get("heeft_stemrecht", False),
                 # Belasting
@@ -1127,11 +1151,10 @@ class LawSimulator:
         benefits = (
             result["zorgtoeslag_amount"]
             + result["aow_amount"]
-            +
-            # result["huurtoeslag_amount"] +
-            result["bijstand_amount"]
+            + result["huurtoeslag_amount"]
+            + result["bijstand_amount"]
             + result["bijstand_housing"]
-            # result["kinderopvangtoeslag_amount"]
+            + result["kinderopvangtoeslag_amount"]
         )
 
         # Calculate housing costs (rent or mortgage)
@@ -1146,25 +1169,27 @@ class LawSimulator:
             "monthly_pretax_income": monthly_income,
             "monthly_tax": tax_monthly,
             "zorgtoeslag": result["zorgtoeslag_amount"],
-            # "huurtoeslag": result["huurtoeslag_amount"],
+            "huurtoeslag": result["huurtoeslag_amount"],
             "aow": result["aow_amount"],
             "bijstand": result["bijstand_amount"] + result["bijstand_housing"],
-            # "kinderopvangtoeslag": result["kinderopvangtoeslag_amount"],
+            "kinderopvangtoeslag": result["kinderopvangtoeslag_amount"],
             "housing_costs": housing_costs,
         }
 
         self.results.append(result)
 
     def run_simulation(self, num_people=1000):
-        print(f"Generating {num_people} people with realistic demographics...")
+        import sys
+
+        print(f"Generating {num_people} people with realistic demographics...", file=sys.stderr)
         pairs = self.generate_paired_people(num_people)
 
-        print("Setting up test data sources...")
+        print("Setting up test data sources...", file=sys.stderr)
         people = self.setup_test_data(pairs)
         total_people = len(people)
 
-        print(f"Simulating laws for {total_people} people...")
-        progress_bar = tqdm(total=total_people, desc="Simulating", unit="person")
+        print(f"Simulating laws for {total_people} people...", file=sys.stderr)
+        progress_bar = tqdm(total=total_people, desc="Simulating", unit="person", file=sys.stderr)
         for person in people:
             self.simulate_person(person)
             progress_bar.update(1)
@@ -1178,6 +1203,417 @@ class LawSimulator:
             return results_df
         else:
             raise ValueError("Simulation failed to generate valid results")
+
+    def calculate_law_breakdowns(self, df, law_name, eligible_col, amount_col):
+        """Calculate breakdowns by various demographics for a specific law."""
+        # Handle special case for voting_rights which uses same column for eligible and amount
+        if law_name == "voting_rights":
+            amount_col = eligible_col
+
+        breakdowns = {}
+
+        # By age group
+        age_bins = [0, 30, 45, 67, 85, 150]
+        age_labels = ["18-30", "30-45", "45-67", "67-85", "85+"]
+        df["age_group"] = pd.cut(df["age"], bins=age_bins, labels=age_labels)
+
+        age_breakdown = (
+            df.groupby("age_group", observed=True)
+            .agg({eligible_col: ["sum", "count", "mean"], amount_col: "mean"})
+            .round(2)
+        )
+
+        breakdowns["by_age"] = {}
+        if len(age_breakdown) > 0:
+            for age in age_breakdown.index:
+                row = age_breakdown.loc[age]
+                try:
+                    breakdowns["by_age"][str(age)] = {
+                        "eligible_count": int(row[(eligible_col, "sum")]),
+                        "total_count": int(row[(eligible_col, "count")]),
+                        "eligible_pct": float(row[(eligible_col, "mean")] * 100),
+                        "avg_amount": float(row[(amount_col, "mean")]) if pd.notna(row[(amount_col, "mean")]) else 0,
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_age"][str(age)] = {
+                        "eligible_count": 0,
+                        "total_count": 0,
+                        "eligible_pct": 0,
+                        "avg_amount": 0,
+                    }
+
+        # By income bracket
+        income_bins = [0, 20000, 40000, 60000, 1000000]
+        income_labels = ["€0-20k", "€20-40k", "€40-60k", "€60k+"]
+        df["income_bracket"] = pd.cut(df["income"], bins=income_bins, labels=income_labels)
+
+        income_breakdown = (
+            df.groupby("income_bracket", observed=True)
+            .agg({eligible_col: ["sum", "count", "mean"], amount_col: "mean"})
+            .round(2)
+        )
+
+        breakdowns["by_income"] = {}
+        if len(income_breakdown) > 0:
+            for bracket in income_breakdown.index:
+                row = income_breakdown.loc[bracket]
+                try:
+                    breakdowns["by_income"][str(bracket)] = {
+                        "eligible_count": int(row[(eligible_col, "sum")]),
+                        "total_count": int(row[(eligible_col, "count")]),
+                        "eligible_pct": float(row[(eligible_col, "mean")] * 100),
+                        "avg_amount": float(row[(amount_col, "mean")]) if pd.notna(row[(amount_col, "mean")]) else 0,
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_income"][str(bracket)] = {
+                        "eligible_count": 0,
+                        "total_count": 0,
+                        "eligible_pct": 0,
+                        "avg_amount": 0,
+                    }
+
+        # By housing type (if relevant)
+        if "housing_type" in df.columns and law_name in ["huurtoeslag"]:
+            housing_breakdown = (
+                df.groupby("housing_type", observed=True)
+                .agg({eligible_col: ["sum", "count", "mean"], amount_col: "mean"})
+                .round(2)
+            )
+
+            breakdowns["by_housing"] = {}
+            if len(housing_breakdown) > 0:
+                for housing in housing_breakdown.index:
+                    row = housing_breakdown.loc[housing]
+                    try:
+                        breakdowns["by_housing"][str(housing)] = {
+                            "eligible_count": int(row[(eligible_col, "sum")]),
+                            "total_count": int(row[(eligible_col, "count")]),
+                            "eligible_pct": float(row[(eligible_col, "mean")] * 100),
+                            "avg_amount": float(row[(amount_col, "mean")])
+                            if pd.notna(row[(amount_col, "mean")])
+                            else 0,
+                        }
+                    except (KeyError, TypeError):
+                        breakdowns["by_housing"][str(housing)] = {
+                            "eligible_count": 0,
+                            "total_count": 0,
+                            "eligible_pct": 0,
+                            "avg_amount": 0,
+                        }
+
+        # By partner status
+        partner_breakdown = (
+            df.groupby("has_partner", observed=True)
+            .agg({eligible_col: ["sum", "count", "mean"], amount_col: "mean"})
+            .round(2)
+        )
+
+        breakdowns["by_partner"] = {
+            "with_partner": {"eligible_count": 0, "total_count": 0, "eligible_pct": 0, "avg_amount": 0},
+            "without_partner": {"eligible_count": 0, "total_count": 0, "eligible_pct": 0, "avg_amount": 0},
+        }
+
+        if True in partner_breakdown.index:
+            row = partner_breakdown.loc[True]
+            try:
+                breakdowns["by_partner"]["with_partner"] = {
+                    "eligible_count": int(row[(eligible_col, "sum")]),
+                    "total_count": int(row[(eligible_col, "count")]),
+                    "eligible_pct": float(row[(eligible_col, "mean")] * 100),
+                    "avg_amount": float(row[(amount_col, "mean")]) if pd.notna(row[(amount_col, "mean")]) else 0,
+                }
+            except (KeyError, TypeError):
+                pass
+
+        if False in partner_breakdown.index:
+            row = partner_breakdown.loc[False]
+            try:
+                breakdowns["by_partner"]["without_partner"] = {
+                    "eligible_count": int(row[(eligible_col, "sum")]),
+                    "total_count": int(row[(eligible_col, "count")]),
+                    "eligible_pct": float(row[(eligible_col, "mean")] * 100),
+                    "avg_amount": float(row[(amount_col, "mean")]) if pd.notna(row[(amount_col, "mean")]) else 0,
+                }
+            except (KeyError, TypeError):
+                pass
+
+        return breakdowns
+    
+    def calculate_tax_breakdowns(self, df):
+        """Calculate tax breakdowns by demographics."""
+        breakdowns = {}
+        
+        # By age group
+        age_bins = [0, 30, 45, 67, 85, 150]
+        age_labels = ["18-30", "30-45", "45-67", "67-85", "85+"]
+        df["age_group"] = pd.cut(df["age"], bins=age_bins, labels=age_labels)
+        
+        age_breakdown = df.groupby("age_group", observed=True).agg({
+            "tax_due": "mean",
+            "income": "mean"
+        }).round(2)
+        
+        breakdowns["by_age"] = {}
+        if len(age_breakdown) > 0:
+            for age in age_breakdown.index:
+                row = age_breakdown.loc[age]
+                try:
+                    avg_tax = float(row["tax_due"])
+                    avg_income = float(row["income"])
+                    breakdowns["by_age"][str(age)] = {
+                        "avg_amount": avg_tax,
+                        "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
+                        "eligible_pct": 100.0  # Everyone pays tax
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_age"][str(age)] = {
+                        "avg_amount": 0,
+                        "avg_rate": 0,
+                        "eligible_pct": 100.0
+                    }
+        
+        # By income bracket  
+        income_bins = [0, 20000, 40000, 60000, 1000000]
+        income_labels = ["€0-20k", "€20-40k", "€40-60k", "€60k+"]
+        df["income_bracket"] = pd.cut(df["income"], bins=income_bins, labels=income_labels)
+        
+        income_breakdown = df.groupby("income_bracket", observed=True).agg({
+            "tax_due": "mean",
+            "income": "mean"
+        }).round(2)
+        
+        breakdowns["by_income"] = {}
+        if len(income_breakdown) > 0:
+            for bracket in income_breakdown.index:
+                row = income_breakdown.loc[bracket]
+                try:
+                    avg_tax = float(row["tax_due"])
+                    avg_income = float(row["income"])
+                    breakdowns["by_income"][str(bracket)] = {
+                        "avg_amount": avg_tax,
+                        "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
+                        "eligible_pct": 100.0
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_income"][str(bracket)] = {
+                        "avg_amount": 0,
+                        "avg_rate": 0,
+                        "eligible_pct": 100.0
+                    }
+        
+        # By partner status
+        partner_breakdown = df.groupby("has_partner", observed=True).agg({
+            "tax_due": "mean",
+            "income": "mean"
+        }).round(2)
+        
+        breakdowns["by_partner"] = {
+            "with_partner": {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0},
+            "without_partner": {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0}
+        }
+        
+        if True in partner_breakdown.index:
+            row = partner_breakdown.loc[True]
+            try:
+                avg_tax = float(row["tax_due"])
+                avg_income = float(row["income"])
+                breakdowns["by_partner"]["with_partner"] = {
+                    "avg_amount": avg_tax,
+                    "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
+                    "eligible_pct": 100.0
+                }
+            except (KeyError, TypeError):
+                pass
+        
+        if False in partner_breakdown.index:
+            row = partner_breakdown.loc[False]
+            try:
+                avg_tax = float(row["tax_due"])
+                avg_income = float(row["income"])
+                breakdowns["by_partner"]["without_partner"] = {
+                    "avg_amount": avg_tax,
+                    "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
+                    "eligible_pct": 100.0
+                }
+            except (KeyError, TypeError):
+                pass
+        
+        return breakdowns
+
+    def calculate_disposable_income_breakdowns(self, df):
+        """Calculate disposable income breakdowns by demographics."""
+        breakdowns = {}
+
+        # By age group
+        age_bins = [0, 30, 45, 67, 85, 150]
+        age_labels = ["18-30", "30-45", "45-67", "67-85", "85+"]
+        df["age_group"] = pd.cut(df["age"], bins=age_bins, labels=age_labels)
+
+        age_breakdown = (
+            df.groupby("age_group", observed=True)
+            .agg({"disposable_income": ["mean", "median"], "disposable_income_after_housing": "mean"})
+            .round(2)
+        )
+
+        breakdowns["by_age"] = {}
+        if len(age_breakdown) > 0:
+            for age in age_breakdown.index:
+                row = age_breakdown.loc[age]
+                try:
+                    breakdowns["by_age"][str(age)] = {
+                        "avg_monthly": float(row[("disposable_income", "mean")]),
+                        "median_monthly": float(row[("disposable_income", "median")]),
+                        "after_housing_avg": float(row[("disposable_income_after_housing", "mean")]),
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_age"][str(age)] = {"avg_monthly": 0, "median_monthly": 0, "after_housing_avg": 0}
+
+        # By income bracket
+        income_bins = [0, 20000, 40000, 60000, 1000000]
+        income_labels = ["€0-20k", "€20-40k", "€40-60k", "€60k+"]
+        df["income_bracket"] = pd.cut(df["income"], bins=income_bins, labels=income_labels)
+
+        income_breakdown = (
+            df.groupby("income_bracket", observed=True)
+            .agg({"disposable_income": ["mean", "median"], "disposable_income_after_housing": "mean"})
+            .round(2)
+        )
+
+        breakdowns["by_income"] = {}
+        if len(income_breakdown) > 0:
+            for bracket in income_breakdown.index:
+                row = income_breakdown.loc[bracket]
+                try:
+                    breakdowns["by_income"][str(bracket)] = {
+                        "avg_monthly": float(row[("disposable_income", "mean")]),
+                        "median_monthly": float(row[("disposable_income", "median")]),
+                        "after_housing_avg": float(row[("disposable_income_after_housing", "mean")]),
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_income"][str(bracket)] = {
+                        "avg_monthly": 0,
+                        "median_monthly": 0,
+                        "after_housing_avg": 0,
+                    }
+
+        # By housing type
+        housing_breakdown = (
+            df.groupby("housing_type", observed=True)
+            .agg({"disposable_income": ["mean", "median"], "disposable_income_after_housing": "mean"})
+            .round(2)
+        )
+
+        breakdowns["by_housing"] = {}
+        if len(housing_breakdown) > 0:
+            for housing_type in housing_breakdown.index:
+                row = housing_breakdown.loc[housing_type]
+                try:
+                    breakdowns["by_housing"][str(housing_type)] = {
+                        "avg_monthly": float(row[("disposable_income", "mean")]),
+                        "median_monthly": float(row[("disposable_income", "median")]),
+                        "after_housing_avg": float(row[("disposable_income_after_housing", "mean")]),
+                    }
+                except (KeyError, TypeError):
+                    breakdowns["by_housing"][str(housing_type)] = {
+                        "avg_monthly": 0,
+                        "median_monthly": 0,
+                        "after_housing_avg": 0,
+                    }
+
+        return breakdowns
+
+    def get_summary_with_breakdowns(self, results_df, simulation_date):
+        """Generate summary statistics with demographic breakdowns for web API."""
+        # Calculate summary statistics
+        summary = {
+            "demographics": {
+                "total_people": len(results_df),
+                "avg_age": float(results_df["age"].mean()),
+                "with_partners_pct": float(results_df["has_partner"].mean() * 100),
+                "students_pct": float(results_df["is_student"].mean() * 100),
+                "renters_pct": float((results_df["housing_type"] == "rent").mean() * 100),
+                "with_children_pct": float(results_df["has_children"].mean() * 100),
+            },
+            "income": {
+                "avg_annual": float(results_df["income"].mean()),
+                "median_annual": float(results_df["income"].median()),
+            },
+            "laws": {
+                "zorgtoeslag": {
+                    "eligible_pct": float(results_df["zorgtoeslag_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["zorgtoeslag_eligible"]]["zorgtoeslag_amount"].mean())
+                    if any(results_df["zorgtoeslag_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "zorgtoeslag", "zorgtoeslag_eligible", "zorgtoeslag_amount"
+                    ),
+                },
+                "huurtoeslag": {
+                    "eligible_pct": float(results_df["huurtoeslag_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["huurtoeslag_eligible"]]["huurtoeslag_amount"].mean())
+                    if any(results_df["huurtoeslag_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "huurtoeslag", "huurtoeslag_eligible", "huurtoeslag_amount"
+                    ),
+                },
+                "aow": {
+                    "eligible_pct": float(results_df["aow_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["aow_eligible"]]["aow_amount"].mean())
+                    if any(results_df["aow_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(results_df, "aow", "aow_eligible", "aow_amount"),
+                },
+                "bijstand": {
+                    "eligible_pct": float(results_df["bijstand_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["bijstand_eligible"]]["bijstand_amount"].mean())
+                    if any(results_df["bijstand_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "bijstand", "bijstand_eligible", "bijstand_amount"
+                    ),
+                },
+                "kinderopvangtoeslag": {
+                    "eligible_pct": float(results_df["kinderopvangtoeslag_eligible"].mean() * 100),
+                    "avg_amount": float(
+                        results_df[results_df["kinderopvangtoeslag_eligible"]]["kinderopvangtoeslag_amount"].mean()
+                    )
+                    if any(results_df["kinderopvangtoeslag_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "kinderopvangtoeslag", "kinderopvangtoeslag_eligible", "kinderopvangtoeslag_amount"
+                    ),
+                },
+                "voting_rights": {
+                    "eligible_pct": float(results_df["voting_rights"].mean() * 100),
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "voting_rights", "voting_rights", "voting_rights"
+                    ),
+                },
+                "inkomstenbelasting": {
+                    "avg_tax": float(results_df["tax_due"].mean()),
+                    "avg_tax_rate": float((results_df["tax_due"] / results_df["income"]).mean() * 100),
+                    "avg_tax_credits": float(results_df["tax_credits"].mean()),
+                    "avg_box1": float(results_df["tax_box1"].mean()),
+                    "avg_box2": float(results_df["tax_box2"].mean()),
+                    "avg_box3": float(results_df["tax_box3"].mean()),
+                    "breakdowns": self.calculate_tax_breakdowns(results_df)
+                },
+            },
+            "disposable_income": {
+                "avg_monthly": float(results_df["disposable_income"].mean()),
+                "median_monthly": float(results_df["disposable_income"].median()),
+                "after_housing_avg": float(results_df["disposable_income_after_housing"].mean()),
+                "breakdowns": self.calculate_disposable_income_breakdowns(results_df),
+            },
+        }
+
+        return {
+            "status": "success",
+            "summary": summary,
+            "total_people": len(results_df),
+            "simulation_date": simulation_date,
+        }
 
 
 def format_money(amount):
@@ -1312,12 +1748,9 @@ def main() -> None:
     print(f"🏘️ Renters: {(results['housing_type'] == 'rent').mean() * 100:.1f}%")
     print(f"👶 With children: {(results['has_children']).mean() * 100:.1f}%")
 
-    print("\n💰 === INCOME AND TAX STATISTICS ===")
+    print("\n💰 === INCOME STATISTICS (DEMOGRAPHICS) ===")
     print(f"💼 Average annual income: {format_money(results['income'].mean())}")
     print(f"📊 Median annual income: {format_money(results['income'].median())}")
-    print(f"🧾 Average tax: {format_money(results['tax_due'].mean())}")
-    print(f"📉 Average tax rate: {(results['tax_due'] / results['income']).mean() * 100:.1f}%")
-    print(f"💳 Average tax credits: {format_money(results['tax_credits'].mean())}")
 
     print("\n📊 Income quartiles:")
     income_quantiles = results["income"].quantile([0.25, 0.5, 0.75])
@@ -1359,7 +1792,7 @@ def main() -> None:
     print_law_statistics(results, "🏥 Zorgtoeslag (Healthcare Subsidy)", "zorgtoeslag_eligible", "zorgtoeslag_amount")
 
     # Huurtoeslag
-    # print_law_statistics(results, "🏠 Huurtoeslag (Rent Subsidy)", "huurtoeslag_eligible", "huurtoeslag_amount")
+    print_law_statistics(results, "🏠 Huurtoeslag (Rent Subsidy)", "huurtoeslag_eligible", "huurtoeslag_amount")
 
     # AOW
     print_law_statistics(results, "👴 AOW (State Pension)", "aow_eligible", "aow_amount")
@@ -1368,8 +1801,22 @@ def main() -> None:
     print_law_statistics(results, "🤲 Bijstand (Social Assistance)", "bijstand_eligible", "bijstand_amount")
 
     # Kinderopvangtoeslag
-    # print_law_statistics(results, "👶 Kinderopvangtoeslag (Childcare Subsidy)", "kinderopvangtoeslag_eligible",
-    #                      "kinderopvangtoeslag_amount")
+    print_law_statistics(
+        results,
+        "👶 Kinderopvangtoeslag (Childcare Subsidy)",
+        "kinderopvangtoeslag_eligible",
+        "kinderopvangtoeslag_amount",
+    )
+
+    # Inkomstenbelasting
+    print("\n💸 Inkomstenbelasting (Income Tax) Statistics:")
+    print(f"Average tax due: {format_money(results['tax_due'].mean())}")
+    print(f"Average tax rate: {(results['tax_due'] / results['income']).mean() * 100:.1f}%")
+    print(f"Average tax credits: {format_money(results['tax_credits'].mean())}")
+    print(f"Tax by box:")
+    print(f"  Box 1 (work/home): {format_money(results['tax_box1'].mean())}")
+    print(f"  Box 2 (shares): {format_money(results['tax_box2'].mean())}")
+    print(f"  Box 3 (savings): {format_money(results['tax_box3'].mean())}")
 
     # Kiesrecht
     voting_eligible = results["voting_rights"].mean() * 100
