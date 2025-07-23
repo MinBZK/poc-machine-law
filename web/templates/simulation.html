@@ -281,40 +281,36 @@
                              fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                         </svg>
-                        Start Simulatie
+                        Voeg Simulatie Toe
                     </button>
                 </div>
             </form>
         </div>
-        <!-- Right Panel: Results -->
-        <div class="flex-1 bg-gray-50 p-6 overflow-y-auto"
-             style="max-height: 100%">
-            <div id="initial-message" class="flex items-center justify-center h-full">
-                <div class="text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <p class="mt-4 text-lg text-gray-600">Configureer de parameters en klik op "Start Simulatie" om te beginnen</p>
-                </div>
-            </div>
-            <!-- Progress Section -->
-            <div id="progress-section" class="hidden">
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Voortgang</h2>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div id="progress-bar"
-                             class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                             style="width: 0%"></div>
+        <!-- Right Panel: Tabs and Results -->
+        <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+            <!-- Tab Bar -->
+            <div class="bg-gray-100 border-b border-gray-200">
+                <div class="flex items-center" id="tab-bar">
+                    <!-- Tabs will be dynamically added here -->
+                    <div id="initial-tab" class="py-4 px-4 text-gray-500">
+                        <p class="text-sm">Configureer de parameters en klik op "Voeg Simulatie Toe" om te beginnen</p>
                     </div>
-                    <p id="progress-text" class="mt-2 text-sm text-gray-600">Simulatie wordt voorbereid...</p>
                 </div>
             </div>
-            <!-- Results Section -->
-            <div id="results-section" class="hidden">
-                <!-- Results will be dynamically inserted here -->
+            
+            <!-- Tab Content Area -->
+            <div class="flex-1 overflow-y-auto p-6" id="tab-content">
+                <div id="initial-message" class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <p class="mt-4 text-lg text-gray-600">Klik op "Voeg Simulatie Toe" om een simulatie te starten</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -438,6 +434,114 @@ function loadPreset(presetName) {
     }
 }
 
+// Track active simulations
+let simulations = {};
+let activeTabId = null;
+let simulationCounter = 0;
+
+function switchTab(tabId) {
+    // Hide all tab contents
+    Object.keys(simulations).forEach(id => {
+        const content = document.getElementById(`content-${id}`);
+        if (content) content.classList.add('hidden');
+        const tab = document.getElementById(`tab-${id}`);
+        if (tab) {
+            tab.classList.remove('bg-white', 'text-gray-900', 'border-b-white', 'border-b-2');
+            tab.classList.add('text-gray-500', 'hover:text-gray-700', 'bg-gray-50');
+        }
+    });
+    
+    // Show selected tab content
+    const content = document.getElementById(`content-${tabId}`);
+    if (content) {
+        content.classList.remove('hidden');
+        const tab = document.getElementById(`tab-${tabId}`);
+        if (tab) {
+            tab.classList.remove('text-gray-500', 'hover:text-gray-700', 'bg-gray-50');
+            tab.classList.add('bg-white', 'text-gray-900', 'border-b-white', 'border-b-2');
+        }
+    }
+    
+    activeTabId = tabId;
+}
+
+function closeTab(tabId) {
+    // Remove tab and content
+    const tab = document.getElementById(`tab-${tabId}`);
+    const content = document.getElementById(`content-${tabId}`);
+    if (tab) tab.remove();
+    if (content) content.remove();
+    
+    delete simulations[tabId];
+    
+    // If this was the active tab, switch to another one
+    if (activeTabId === tabId) {
+        const remainingTabs = Object.keys(simulations);
+        if (remainingTabs.length > 0) {
+            switchTab(remainingTabs[0]);
+        } else {
+            activeTabId = null;
+            document.getElementById('initial-message').classList.remove('hidden');
+            document.getElementById('initial-tab').classList.remove('hidden');
+        }
+    }
+}
+
+function createTab(simulationId, params) {
+    // Hide initial message and tab
+    document.getElementById('initial-message').classList.add('hidden');
+    document.getElementById('initial-tab').classList.add('hidden');
+    
+    // Create tab
+    const tabBar = document.getElementById('tab-bar');
+    const tab = document.createElement('div');
+    tab.id = `tab-${simulationId}`;
+    tab.className = 'relative group flex items-center px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer border-r border-gray-200 bg-gray-50 border-b-2 border-b-transparent';
+    tab.innerHTML = `
+        <span onclick="switchTab('${simulationId}')">Simulatie ${simulationId}</span>
+        <button onclick="closeTab('${simulationId}')" class="ml-2 p-0.5 rounded hover:bg-gray-200">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    `;
+    tabBar.appendChild(tab);
+    
+    // Create content area
+    const tabContent = document.getElementById('tab-content');
+    const content = document.createElement('div');
+    content.id = `content-${simulationId}`;
+    content.className = 'hidden';
+    content.innerHTML = `
+        <!-- Progress Section -->
+        <div id="progress-section-${simulationId}">
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Voortgang - Simulatie ${simulationId}</h2>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar-${simulationId}"
+                         class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                         style="width: 0%"></div>
+                </div>
+                <p id="progress-text-${simulationId}" class="mt-2 text-sm text-gray-600">Simulatie wordt voorbereid...</p>
+            </div>
+        </div>
+        <!-- Results Section -->
+        <div id="results-section-${simulationId}" class="hidden">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+    `;
+    tabContent.appendChild(content);
+    
+    // Store simulation info
+    simulations[simulationId] = {
+        params: params,
+        status: 'running'
+    };
+    
+    // Switch to new tab
+    switchTab(simulationId);
+}
+
 async function runSimulation() {
     if (!validateAgeDistribution()) {
         alert('De leeftijdsverdeling moet optellen tot 100%');
@@ -449,10 +553,9 @@ async function runSimulation() {
         return;
     }
 
-    // Hide initial message and show progress section
-    document.getElementById('initial-message').classList.add('hidden');
-    document.getElementById('progress-section').classList.remove('hidden');
-    document.getElementById('results-section').classList.add('hidden');
+    // Create new simulation ID
+    simulationCounter++;
+    const simulationId = simulationCounter;
 
     // Gather form data
     const formData = new FormData(document.getElementById('simulation-form'));
@@ -478,11 +581,14 @@ async function runSimulation() {
         }
     };
 
+    // Create tab for this simulation
+    createTab(simulationId, data);
+
     try {
         // More realistic progress based on estimated time
         let progress = 0;
-        const progressBar = document.getElementById('progress-bar');
-        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById(`progress-bar-${simulationId}`);
+        const progressText = document.getElementById(`progress-text-${simulationId}`);
         const startTime = Date.now();
         // Estimate duration based on number of people (more people = longer simulation)
         const numPeople = parseInt(data.num_people) || 1000;
@@ -537,6 +643,10 @@ async function runSimulation() {
         });
 
         clearInterval(progressInterval);
+        
+        // Set progress to 100% when done
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Simulatie voltooid!';
 
         if (!response.ok) {
             throw new Error('Simulation failed');
@@ -549,20 +659,21 @@ async function runSimulation() {
         progressText.textContent = 'Simulatie voltooid!';
 
         // Show results immediately
-        displayResults(result);
+        displayResults(result, simulationId);
 
     } catch (error) {
         console.error('Error running simulation:', error);
         alert('Er is een fout opgetreden bij het uitvoeren van de simulatie.');
-        document.getElementById('progress-section').classList.add('hidden');
+        document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
+        closeTab(simulationId);
     }
 }
 
-function displayResults(data) {
+function displayResults(data, simulationId) {
     // Hide progress section when showing results
-    document.getElementById('progress-section').classList.add('hidden');
+    document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
     
-    const resultsSection = document.getElementById('results-section');
+    const resultsSection = document.getElementById(`results-section-${simulationId}`);
     resultsSection.innerHTML = `
         <div class="bg-white shadow rounded-lg p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">Simulatie Resultaten</h2>
@@ -807,6 +918,12 @@ function displayResults(data) {
     `;
 
     resultsSection.classList.remove('hidden');
+    
+    // Update simulation status
+    if (simulations[simulationId]) {
+        simulations[simulationId].status = 'completed';
+        simulations[simulationId].results = data;
+    }
 }
 
 function exportResults(format) {
