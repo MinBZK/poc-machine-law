@@ -1131,7 +1131,9 @@ class LawSimulator:
                 "bijstand_startup": bijstand.output.get("startkapitaal", 0) / 100 if bijstand else 0,
                 # Kinderopvangtoeslag
                 "kinderopvangtoeslag_eligible": kinderopvangtoeslag.requirements_met if kinderopvangtoeslag else False,
-                "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("jaarbedrag", 0) / 100 / 12 if kinderopvangtoeslag else 0,
+                "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("jaarbedrag", 0) / 100 / 12
+                if kinderopvangtoeslag
+                else 0,
                 # Kiesrecht
                 "voting_rights": kiesrecht.output.get("heeft_stemrecht", False),
                 # Belasting
@@ -1338,21 +1340,18 @@ class LawSimulator:
                 pass
 
         return breakdowns
-    
+
     def calculate_tax_breakdowns(self, df):
         """Calculate tax breakdowns by demographics."""
         breakdowns = {}
-        
+
         # By age group
         age_bins = [0, 30, 45, 67, 85, 150]
         age_labels = ["18-30", "30-45", "45-67", "67-85", "85+"]
         df["age_group"] = pd.cut(df["age"], bins=age_bins, labels=age_labels)
-        
-        age_breakdown = df.groupby("age_group", observed=True).agg({
-            "tax_due": "mean",
-            "income": "mean"
-        }).round(2)
-        
+
+        age_breakdown = df.groupby("age_group", observed=True).agg({"tax_due": "mean", "income": "mean"}).round(2)
+
         breakdowns["by_age"] = {}
         if len(age_breakdown) > 0:
             for age in age_breakdown.index:
@@ -1363,25 +1362,20 @@ class LawSimulator:
                     breakdowns["by_age"][str(age)] = {
                         "avg_amount": avg_tax,
                         "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
-                        "eligible_pct": 100.0  # Everyone pays tax
+                        "eligible_pct": 100.0,  # Everyone pays tax
                     }
                 except (KeyError, TypeError):
-                    breakdowns["by_age"][str(age)] = {
-                        "avg_amount": 0,
-                        "avg_rate": 0,
-                        "eligible_pct": 100.0
-                    }
-        
-        # By income bracket  
+                    breakdowns["by_age"][str(age)] = {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0}
+
+        # By income bracket
         income_bins = [0, 20000, 40000, 60000, 1000000]
         income_labels = ["€0-20k", "€20-40k", "€40-60k", "€60k+"]
         df["income_bracket"] = pd.cut(df["income"], bins=income_bins, labels=income_labels)
-        
-        income_breakdown = df.groupby("income_bracket", observed=True).agg({
-            "tax_due": "mean",
-            "income": "mean"
-        }).round(2)
-        
+
+        income_breakdown = (
+            df.groupby("income_bracket", observed=True).agg({"tax_due": "mean", "income": "mean"}).round(2)
+        )
+
         breakdowns["by_income"] = {}
         if len(income_breakdown) > 0:
             for bracket in income_breakdown.index:
@@ -1392,26 +1386,19 @@ class LawSimulator:
                     breakdowns["by_income"][str(bracket)] = {
                         "avg_amount": avg_tax,
                         "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
-                        "eligible_pct": 100.0
+                        "eligible_pct": 100.0,
                     }
                 except (KeyError, TypeError):
-                    breakdowns["by_income"][str(bracket)] = {
-                        "avg_amount": 0,
-                        "avg_rate": 0,
-                        "eligible_pct": 100.0
-                    }
-        
+                    breakdowns["by_income"][str(bracket)] = {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0}
+
         # By partner status
-        partner_breakdown = df.groupby("has_partner", observed=True).agg({
-            "tax_due": "mean",
-            "income": "mean"
-        }).round(2)
-        
+        partner_breakdown = df.groupby("has_partner", observed=True).agg({"tax_due": "mean", "income": "mean"}).round(2)
+
         breakdowns["by_partner"] = {
             "with_partner": {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0},
-            "without_partner": {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0}
+            "without_partner": {"avg_amount": 0, "avg_rate": 0, "eligible_pct": 100.0},
         }
-        
+
         if True in partner_breakdown.index:
             row = partner_breakdown.loc[True]
             try:
@@ -1420,11 +1407,11 @@ class LawSimulator:
                 breakdowns["by_partner"]["with_partner"] = {
                     "avg_amount": avg_tax,
                     "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
-                    "eligible_pct": 100.0
+                    "eligible_pct": 100.0,
                 }
             except (KeyError, TypeError):
                 pass
-        
+
         if False in partner_breakdown.index:
             row = partner_breakdown.loc[False]
             try:
@@ -1433,11 +1420,11 @@ class LawSimulator:
                 breakdowns["by_partner"]["without_partner"] = {
                     "avg_amount": avg_tax,
                     "avg_rate": (avg_tax / avg_income * 100) if avg_income > 0 else 0,
-                    "eligible_pct": 100.0
+                    "eligible_pct": 100.0,
                 }
             except (KeyError, TypeError):
                 pass
-        
+
         return breakdowns
 
     def calculate_disposable_income_breakdowns(self, df):
@@ -1597,7 +1584,7 @@ class LawSimulator:
                     "avg_box1": float(results_df["tax_box1"].mean()),
                     "avg_box2": float(results_df["tax_box2"].mean()),
                     "avg_box3": float(results_df["tax_box3"].mean()),
-                    "breakdowns": self.calculate_tax_breakdowns(results_df)
+                    "breakdowns": self.calculate_tax_breakdowns(results_df),
                 },
             },
             "disposable_income": {
