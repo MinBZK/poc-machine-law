@@ -486,14 +486,30 @@ async function runSimulation() {
         const startTime = Date.now();
         // Estimate duration based on number of people (more people = longer simulation)
         const numPeople = parseInt(data.num_people) || 1000;
-        const estimatedDuration = Math.min(5000 + (numPeople * 5), 30000); // 5-30 seconds based on size
+        // More accurate estimation: small simulations are very fast, large ones scale up significantly
+        let estimatedDuration;
+        if (numPeople <= 100) {
+            estimatedDuration = 2000 + (numPeople * 10); // 2-3 seconds for small simulations
+        } else if (numPeople <= 500) {
+            estimatedDuration = 3000 + (numPeople * 15); // 3-10 seconds for medium
+        } else {
+            estimatedDuration = 5000 + (numPeople * 20); // 5-25 seconds for large
+        }
         
-        // Use a logarithmic progression for more realistic appearance
+        // Use a more aggressive progression that reaches 90% faster
         const progressInterval = setInterval(() => {
             const elapsed = Date.now() - startTime;
-            // Logarithmic progression: fast at start, slower as it progresses
-            const rawProgress = (elapsed / estimatedDuration) * 100;
-            progress = Math.min(90 * (1 - Math.exp(-3 * rawProgress / 100)), 90);
+            const timeRatio = Math.min(elapsed / estimatedDuration, 1);
+            
+            // Use square root for faster initial progress, reaching 90% when at 80% of estimated time
+            if (timeRatio < 0.8) {
+                progress = Math.sqrt(timeRatio / 0.8) * 90;
+            } else {
+                // Slow down for the last bit
+                progress = 90 + ((timeRatio - 0.8) / 0.2) * 5;
+            }
+            
+            progress = Math.min(progress, 95); // Never go above 95% until response
             progressBar.style.width = progress + '%';
 
             if (progress < 15) {
