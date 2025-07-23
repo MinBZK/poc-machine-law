@@ -2,12 +2,17 @@ import asyncio
 import json
 from datetime import datetime
 from typing import Dict, Optional
+import uuid
+import time
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.responses import Response
 
 from web.dependencies import templates
+
+# Store simulation progress
+simulation_progress = {}
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
 
@@ -72,10 +77,6 @@ async def run_simulation(request: Request):
 
         if result.returncode != 0:
             raise Exception(f"Simulation failed: {result.stderr}")
-
-        # Debug output if there's stderr but successful completion
-        if result.stderr:
-            print(f"Simulation stderr (warnings/progress): {result.stderr[:500]}...")
 
         # Parse the result
         if not result.stdout.strip():

@@ -479,23 +479,35 @@ async function runSimulation() {
     };
 
     try {
-        // Simulate progress
+        // More realistic progress based on estimated time
         let progress = 0;
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
-
+        const startTime = Date.now();
+        // Estimate duration based on number of people (more people = longer simulation)
+        const numPeople = parseInt(data.num_people) || 1000;
+        const estimatedDuration = Math.min(5000 + (numPeople * 5), 30000); // 5-30 seconds based on size
+        
+        // Use a logarithmic progression for more realistic appearance
         const progressInterval = setInterval(() => {
-            progress = Math.min(progress + 5, 90);
+            const elapsed = Date.now() - startTime;
+            // Logarithmic progression: fast at start, slower as it progresses
+            const rawProgress = (elapsed / estimatedDuration) * 100;
+            progress = Math.min(90 * (1 - Math.exp(-3 * rawProgress / 100)), 90);
             progressBar.style.width = progress + '%';
 
-            if (progress < 30) {
+            if (progress < 15) {
+                progressText.textContent = 'Simulatie wordt gestart...';
+            } else if (progress < 30) {
+                progressText.textContent = 'Parameters worden voorbereid...';
+            } else if (progress < 50) {
                 progressText.textContent = 'Populatie wordt gegenereerd...';
-            } else if (progress < 60) {
+            } else if (progress < 75) {
                 progressText.textContent = 'Wetten worden toegepast...';
             } else {
                 progressText.textContent = 'Resultaten worden berekend...';
             }
-        }, 500);
+        }, 50); // Update frequently for smooth animation
 
         // Run simulation
         const response = await fetch('/simulation/run', {
@@ -518,10 +530,8 @@ async function runSimulation() {
         progressBar.style.width = '100%';
         progressText.textContent = 'Simulatie voltooid!';
 
-        // Show results
-        setTimeout(() => {
-            displayResults(result);
-        }, 1000);
+        // Show results immediately
+        displayResults(result);
 
     } catch (error) {
         console.error('Error running simulation:', error);
@@ -531,6 +541,9 @@ async function runSimulation() {
 }
 
 function displayResults(data) {
+    // Hide progress section when showing results
+    document.getElementById('progress-section').classList.add('hidden');
+    
     const resultsSection = document.getElementById('results-section');
     resultsSection.innerHTML = `
         <div class="bg-white shadow rounded-lg p-6">
