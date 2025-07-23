@@ -491,9 +491,11 @@ async function runSimulation() {
         if (numPeople <= 100) {
             estimatedDuration = 2000 + (numPeople * 10); // 2-3 seconds for small simulations
         } else if (numPeople <= 500) {
-            estimatedDuration = 3000 + (numPeople * 15); // 3-10 seconds for medium
+            estimatedDuration = 3000 + (numPeople * 20); // 3-13 seconds for medium
+        } else if (numPeople <= 1000) {
+            estimatedDuration = 10000 + (numPeople * 40); // ~50 seconds for 1000
         } else {
-            estimatedDuration = 5000 + (numPeople * 20); // 5-25 seconds for large
+            estimatedDuration = 20000 + (numPeople * 50); // Even longer for very large simulations
         }
         
         // Use a more aggressive progression that reaches 90% faster
