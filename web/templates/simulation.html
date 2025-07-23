@@ -505,8 +505,8 @@
         <!-- Right Panel: Tabs and Results -->
         <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden">
             <!-- Tab Bar -->
-            <div class="bg-gray-100 border-b border-gray-200">
-                <div class="flex items-center" id="tab-bar">
+            <div class="bg-gray-100 border-b border-gray-200 min-h-[48px]">
+                <div class="flex items-start" id="tab-bar">
                     <!-- Tabs will be dynamically added here -->
                     <div id="initial-tab" class="py-4 px-4 text-gray-500">
                         <p class="text-sm">Configureer de parameters en klik op "Voeg Simulatie Toe" om te beginnen</p>
@@ -725,7 +725,7 @@ function createTab(simulationId, params) {
     const tabBar = document.getElementById('tab-bar');
     const tab = document.createElement('div');
     tab.id = `tab-${simulationId}`;
-    tab.className = 'relative group flex items-center px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer border-r border-gray-200 bg-gray-50 border-b-2 border-b-transparent';
+    tab.className = 'relative group inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer border-r border-gray-200 bg-gray-50 border-b-2 border-b-transparent';
     tab.innerHTML = `
         <span onclick="switchTab('${simulationId}')">Simulatie ${simulationId}</span>
         <button onclick="closeTab('${simulationId}')" class="ml-2 p-0.5 rounded hover:bg-gray-200">
