@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.responses import Response
 
 from web.dependencies import templates
+from web.law_parameters import get_default_law_parameters
 
 # Store simulation progress
 simulation_progress = {}
@@ -20,6 +21,9 @@ router = APIRouter(prefix="/simulation", tags=["simulation"])
 @router.get("/")
 async def simulation_page(request: Request):
     """Render the simulation configuration page"""
+    # Get law parameters from YAML files
+    law_params = get_default_law_parameters()
+    
     # Default parameters for the simulation
     default_params = {
         "num_people": 1000,
@@ -52,6 +56,7 @@ async def simulation_page(request: Request):
         {
             "request": request,
             "default_params": default_params,
+            "law_params": law_params,
             "all_profiles": {},  # Empty dict for compatibility with base template
         },
     )

@@ -16,9 +16,10 @@ def run_simulation(params: dict):
     """Run simulation with given parameters and return results as JSON."""
     num_people = params.get("num_people", 1000)
     simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
+    law_parameters = params.get("law_parameters", {})
 
-    # Create simulator
-    simulator = LawSimulator(simulation_date)
+    # Create simulator with law parameters
+    simulator = LawSimulator(simulation_date, law_parameters)
 
     # Apply custom parameters if provided
     if "age_distribution" in params:

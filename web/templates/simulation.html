@@ -293,32 +293,45 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="law-parameters-section" class="px-6 pb-6 hidden">
+                    <div id="law-parameters-section" class="px-6 pb-6 hidden space-y-4">
                         <!-- Zorgtoeslag Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3 mt-4">Zorgtoeslag</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Zorgtoeslag
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4">
                             <div>
                                 <label for="zorgtoeslag_standaardpremie" class="block text-sm font-medium text-gray-700">Standaardpremie (€/maand)</label>
                                 <input type="number"
                                        name="zorgtoeslag_standaardpremie"
                                        id="zorgtoeslag_standaardpremie"
-                                       value="1677"
+                                       value="{{ '%.2f'|format(law_params.zorgtoeslag.standaardpremie) }}"
                                        min="0"
-                                       max="3000"
-                                       step="10"
+                                       max="500"
+                                       step="0.01"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                        </div>
                         
                         <!-- Huurtoeslag Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3">Huurtoeslag</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                Huurtoeslag
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="huurtoeslag_max_huur" class="block text-sm font-medium text-gray-700">Max huur (€/maand)</label>
                                 <input type="number"
                                        name="huurtoeslag_max_huur"
                                        id="huurtoeslag_max_huur"
-                                       value="879"
+                                       value="{{ '%.2f'|format(law_params.huurtoeslag.max_huur) }}"
                                        min="0"
                                        max="1500"
                                        step="10"
@@ -329,23 +342,30 @@
                                 <input type="number"
                                        name="huurtoeslag_basishuur"
                                        id="huurtoeslag_basishuur"
-                                       value="200"
+                                       value="{{ '%.2f'|format(law_params.huurtoeslag.basishuur) }}"
                                        min="0"
                                        max="500"
                                        step="10"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                        </div>
                         
                         <!-- Kinderopvangtoeslag Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3">Kinderopvangtoeslag</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                Kinderopvangtoeslag
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="kinderopvang_uurprijs" class="block text-sm font-medium text-gray-700">Max uurtarief dagopvang (€)</label>
                                 <input type="number"
                                        name="kinderopvang_uurprijs"
                                        id="kinderopvang_uurprijs"
-                                       value="9.27"
+                                       value="{{ '%.2f'|format(law_params.kinderopvangtoeslag.uurprijs) }}"
                                        min="0"
                                        max="20"
                                        step="0.01"
@@ -356,23 +376,30 @@
                                 <input type="number"
                                        name="kinderopvang_max_uren"
                                        id="kinderopvang_max_uren"
-                                       value="230"
+                                       value="{{ '%d'|format(law_params.kinderopvangtoeslag.max_uren) }}"
                                        min="0"
                                        max="300"
                                        step="10"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                        </div>
                         
                         <!-- AOW Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3">AOW</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                AOW (Pensioen)
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="aow_pensioenleeftijd" class="block text-sm font-medium text-gray-700">Pensioenleeftijd</label>
                                 <input type="number"
                                        name="aow_pensioenleeftijd"
                                        id="aow_pensioenleeftijd"
-                                       value="67"
+                                       value="{{ '%.2f'|format(law_params.aow.pensioenleeftijd) }}"
                                        min="65"
                                        max="70"
                                        step="0.25"
@@ -383,23 +410,30 @@
                                 <input type="number"
                                        name="aow_basisbedrag"
                                        id="aow_basisbedrag"
-                                       value="1461"
+                                       value="{{ '%.2f'|format(law_params.aow.basisbedrag) }}"
                                        min="1000"
                                        max="2000"
                                        step="10"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                        </div>
                         
                         <!-- Bijstand Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3">Bijstand</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                Bijstand
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="bijstand_norm_alleenstaand" class="block text-sm font-medium text-gray-700">Norm alleenstaand (€/maand)</label>
                                 <input type="number"
                                        name="bijstand_norm_alleenstaand"
                                        id="bijstand_norm_alleenstaand"
-                                       value="1210"
+                                       value="{{ '%.2f'|format(law_params.bijstand.norm_alleenstaand) }}"
                                        min="800"
                                        max="1500"
                                        step="10"
@@ -410,23 +444,30 @@
                                 <input type="number"
                                        name="bijstand_norm_gehuwd"
                                        id="bijstand_norm_gehuwd"
-                                       value="1729"
+                                       value="{{ '%.2f'|format(law_params.bijstand.norm_gehuwd) }}"
                                        min="1200"
                                        max="2200"
                                        step="10"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                        </div>
                         
                         <!-- Inkomstenbelasting Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3">Inkomstenbelasting</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                                Inkomstenbelasting
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="ib_tarief_schijf1" class="block text-sm font-medium text-gray-700">Tarief schijf 1 (%)</label>
                                 <input type="number"
                                        name="ib_tarief_schijf1"
                                        id="ib_tarief_schijf1"
-                                       value="36.97"
+                                       value="{{ '%.2f'|format(law_params.inkomstenbelasting.tarief_schijf1) }}"
                                        min="0"
                                        max="50"
                                        step="0.01"
@@ -437,7 +478,7 @@
                                 <input type="number"
                                        name="ib_tarief_schijf2"
                                        id="ib_tarief_schijf2"
-                                       value="49.5"
+                                       value="{{ '%.2f'|format(law_params.inkomstenbelasting.tarief_schijf2) }}"
                                        min="0"
                                        max="60"
                                        step="0.01"
@@ -448,7 +489,7 @@
                                 <input type="number"
                                        name="ib_grens_schijf1"
                                        id="ib_grens_schijf1"
-                                       value="75518"
+                                       value="{{ '%d'|format(law_params.inkomstenbelasting.grens_schijf1) }}"
                                        min="50000"
                                        max="100000"
                                        step="100"
@@ -459,29 +500,37 @@
                                 <input type="number"
                                        name="ib_algemene_heffingskorting"
                                        id="ib_algemene_heffingskorting"
-                                       value="3362"
+                                       value="{{ '%d'|format(law_params.inkomstenbelasting.algemene_heffingskorting) }}"
                                        min="2000"
                                        max="5000"
                                        step="10"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                        </div>
                         
                         <!-- Kiesrecht Parameters -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3">Kiesrecht</h3>
-                        <div class="grid grid-cols-1 gap-4 mb-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                Kiesrecht
+                            </h3>
+                            <div class="grid grid-cols-1 gap-4">
                             <div>
                                 <label for="kiesrecht_min_leeftijd" class="block text-sm font-medium text-gray-700">Minimale stemleeftijd</label>
                                 <input type="number"
                                        name="kiesrecht_min_leeftijd"
                                        id="kiesrecht_min_leeftijd"
-                                       value="18"
+                                       value="{{ law_params.kiesrecht.min_leeftijd }}"
                                        min="16"
                                        max="21"
                                        step="1"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </form>
