@@ -13,25 +13,6 @@
                     </svg>
                 </button>
             </div>
-            <!-- Introduction -->
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-blue-400"
-                             xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 20 20"
-                             fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-blue-700">
-                            Deze simulatie genereert een populatie met realistische demografische kenmerken en berekent voor elke persoon
-                            de toepassing van alle beschikbare wetten. U kunt de parameters aanpassen om verschillende scenario's te testen.
-                        </p>
-                    </div>
-                </div>
-            </div>
             <form id="simulation-form" class="space-y-4">
                 <!-- Preset Scenarios - At the top for quick access -->
                 <div class="bg-white shadow rounded-lg">
@@ -680,14 +661,22 @@
             <!-- Tab Content Area -->
             <div class="flex-1 overflow-y-auto p-6" id="tab-content">
                 <div id="initial-message" class="flex items-center justify-center h-full">
-                    <div class="text-center">
+                    <div class="max-w-md text-center">
                         <svg class="mx-auto h-12 w-12 text-gray-400"
                              fill="none"
                              stroke="currentColor"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        <p class="mt-4 text-lg text-gray-600">Klik op "Nieuwe Simulatie" om een simulatie te starten</p>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">Machine Law Simulator</h3>
+                        <p class="mt-2 text-sm text-gray-600">
+                            Deze simulator genereert een populatie met realistische demografische kenmerken en berekent voor elke persoon
+                            de toepassing van alle beschikbare wetten.
+                        </p>
+                        <p class="mt-2 text-sm text-gray-600">
+                            U kunt de parameters aanpassen om verschillende scenario's te testen.
+                        </p>
+                        <p class="mt-6 text-base text-gray-700 font-medium">Klik op "Nieuwe Simulatie" om te beginnen</p>
                     </div>
                 </div>
             </div>
