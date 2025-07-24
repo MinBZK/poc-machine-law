@@ -87,7 +87,7 @@
                                    min="0"
                                    max="100"
                                    step="1"
-                                   oninput="updateSliderValue('age_18_30'); validateAgeDistribution()"
+                                   oninput="updateSliderValue('age_18_30'); validateAgeDistribution('age_18_30')"
                                    class="mt-1 w-full">
                         </div>
                         <div>
@@ -102,7 +102,7 @@
                                    min="0"
                                    max="100"
                                    step="1"
-                                   oninput="updateSliderValue('age_30_45'); validateAgeDistribution()"
+                                   oninput="updateSliderValue('age_30_45'); validateAgeDistribution('age_30_45')"
                                    class="mt-1 w-full">
                         </div>
                         <div>
@@ -117,7 +117,7 @@
                                    min="0"
                                    max="100"
                                    step="1"
-                                   oninput="updateSliderValue('age_45_67'); validateAgeDistribution()"
+                                   oninput="updateSliderValue('age_45_67'); validateAgeDistribution('age_45_67')"
                                    class="mt-1 w-full">
                         </div>
                         <div>
@@ -132,7 +132,7 @@
                                    min="0"
                                    max="100"
                                    step="1"
-                                   oninput="updateSliderValue('age_67_85'); validateAgeDistribution()"
+                                   oninput="updateSliderValue('age_67_85'); validateAgeDistribution('age_67_85')"
                                    class="mt-1 w-full">
                         </div>
                         <div>
@@ -147,7 +147,7 @@
                                    min="0"
                                    max="100"
                                    step="1"
-                                   oninput="updateSliderValue('age_85_plus'); validateAgeDistribution()"
+                                   oninput="updateSliderValue('age_85_plus'); validateAgeDistribution('age_85_plus')"
                                    class="mt-1 w-full">
                         </div>
                         <div id="age-total" class="text-sm font-medium">
@@ -171,7 +171,7 @@
                                    min="0"
                                    max="100"
                                    step="5"
-                                   oninput="updateIncomeDistribution()"
+                                   oninput="updateIncomeDistribution('income_low_pct')"
                                    class="mt-1 w-full">
                         </div>
                         <div>
@@ -186,7 +186,7 @@
                                    min="0"
                                    max="100"
                                    step="5"
-                                   oninput="updateIncomeDistribution()"
+                                   oninput="updateIncomeDistribution('income_middle_pct')"
                                    class="mt-1 w-full">
                         </div>
                         <div>
@@ -201,7 +201,7 @@
                                    min="0"
                                    max="100"
                                    step="5"
-                                   oninput="updateIncomeDistribution()"
+                                   oninput="updateIncomeDistribution('income_high_pct')"
                                    class="mt-1 w-full">
                         </div>
                         <div class="mt-2 text-sm">
@@ -693,19 +693,83 @@ function updateSliderValue(sliderId) {
     valueSpan.textContent = slider.value + '%';
 }
 
-function validateAgeDistribution() {
-    const age_18_30 = parseInt(document.getElementById('age_18_30').value);
-    const age_30_45 = parseInt(document.getElementById('age_30_45').value);
-    const age_45_67 = parseInt(document.getElementById('age_45_67').value);
-    const age_67_85 = parseInt(document.getElementById('age_67_85').value);
-    const age_85_plus = parseInt(document.getElementById('age_85_plus').value);
+// Store previous values for auto-adjustment
+let previousAgeValues = {
+    age_18_30: {{ default_params.age_18_30 }},
+    age_30_45: {{ default_params.age_30_45 }},
+    age_45_67: {{ default_params.age_45_67 }},
+    age_67_85: {{ default_params.age_67_85 }},
+    age_85_plus: {{ default_params.age_85_plus }}
+};
 
-    const total = age_18_30 + age_30_45 + age_45_67 + age_67_85 + age_85_plus;
-
-    document.getElementById('age-total-value').textContent = total + '%';
+function validateAgeDistribution(changedField = null) {
+    const ageFields = ['age_18_30', 'age_30_45', 'age_45_67', 'age_67_85', 'age_85_plus'];
+    const currentValues = {};
+    
+    // Get current values
+    ageFields.forEach(field => {
+        currentValues[field] = parseInt(document.getElementById(field).value);
+    });
+    
+    const total = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+    
+    // Auto-adjust if a field was changed
+    if (changedField && total !== 100) {
+        const difference = 100 - total;
+        const otherFields = ageFields.filter(f => f !== changedField);
+        
+        // Calculate sum of other fields for proportional distribution
+        const sumOthers = otherFields.reduce((sum, field) => sum + currentValues[field], 0);
+        
+        if (sumOthers > 0) {
+            // Distribute difference proportionally
+            otherFields.forEach(field => {
+                const proportion = currentValues[field] / sumOthers;
+                let newValue = currentValues[field] + Math.round(difference * proportion);
+                
+                // Ensure value stays within bounds
+                newValue = Math.max(0, Math.min(100, newValue));
+                
+                document.getElementById(field).value = newValue;
+                updateSliderValue(field);
+                currentValues[field] = newValue;
+            });
+        } else {
+            // If all other fields are 0, distribute evenly
+            const perField = Math.floor(difference / otherFields.length);
+            otherFields.forEach(field => {
+                const newValue = Math.max(0, Math.min(100, perField));
+                document.getElementById(field).value = newValue;
+                updateSliderValue(field);
+                currentValues[field] = newValue;
+            });
+        }
+        
+        // Recalculate total after adjustment
+        const newTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+        
+        // Fine-tune if still not exactly 100 due to rounding
+        if (newTotal !== 100) {
+            const finalDiff = 100 - newTotal;
+            // Add the difference to the largest other field
+            const largestOther = otherFields.reduce((max, field) => 
+                currentValues[field] > currentValues[max] ? field : max, otherFields[0]);
+            
+            const adjustedValue = Math.max(0, Math.min(100, currentValues[largestOther] + finalDiff));
+            document.getElementById(largestOther).value = adjustedValue;
+            updateSliderValue(largestOther);
+        }
+    }
+    
+    // Update previous values
+    previousAgeValues = {...currentValues};
+    
+    // Update display
+    const finalTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+    document.getElementById('age-total-value').textContent = finalTotal + '%';
     const warning = document.getElementById('age-warning');
-
-    if (total !== 100) {
+    
+    if (finalTotal !== 100) {
         warning.classList.remove('hidden');
         return false;
     } else {
@@ -714,20 +778,84 @@ function validateAgeDistribution() {
     }
 }
 
-function updateIncomeDistribution() {
-    const low = parseInt(document.getElementById('income_low_pct').value);
-    const middle = parseInt(document.getElementById('income_middle_pct').value);
-    const high = parseInt(document.getElementById('income_high_pct').value);
+// Store previous income values for auto-adjustment
+let previousIncomeValues = {
+    income_low_pct: 30,
+    income_middle_pct: 50,
+    income_high_pct: 20
+};
 
-    document.getElementById('income_low_pct_value').textContent = low + '%';
-    document.getElementById('income_middle_pct_value').textContent = middle + '%';
-    document.getElementById('income_high_pct_value').textContent = high + '%';
-
-    const total = low + middle + high;
-    document.getElementById('income-total-value').textContent = total + '%';
+function updateIncomeDistribution(changedField = null) {
+    const incomeFields = ['income_low_pct', 'income_middle_pct', 'income_high_pct'];
+    const currentValues = {};
+    
+    // Get current values
+    incomeFields.forEach(field => {
+        currentValues[field] = parseInt(document.getElementById(field).value);
+    });
+    
+    const total = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+    
+    // Auto-adjust if a field was changed
+    if (changedField && total !== 100) {
+        const difference = 100 - total;
+        const otherFields = incomeFields.filter(f => f !== changedField);
+        
+        // Calculate sum of other fields for proportional distribution
+        const sumOthers = otherFields.reduce((sum, field) => sum + currentValues[field], 0);
+        
+        if (sumOthers > 0) {
+            // Distribute difference proportionally
+            otherFields.forEach(field => {
+                const proportion = currentValues[field] / sumOthers;
+                let newValue = currentValues[field] + Math.round(difference * proportion);
+                
+                // Ensure value stays within bounds
+                newValue = Math.max(0, Math.min(100, newValue));
+                
+                document.getElementById(field).value = newValue;
+                currentValues[field] = newValue;
+            });
+        } else {
+            // If all other fields are 0, distribute evenly
+            const perField = Math.floor(difference / otherFields.length);
+            otherFields.forEach(field => {
+                const newValue = Math.max(0, Math.min(100, perField));
+                document.getElementById(field).value = newValue;
+                currentValues[field] = newValue;
+            });
+        }
+        
+        // Recalculate total after adjustment
+        const newTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+        
+        // Fine-tune if still not exactly 100 due to rounding
+        if (newTotal !== 100) {
+            const finalDiff = 100 - newTotal;
+            // Add the difference to the largest other field
+            const largestOther = otherFields.reduce((max, field) => 
+                currentValues[field] > currentValues[max] ? field : max, otherFields[0]);
+            
+            const adjustedValue = Math.max(0, Math.min(100, currentValues[largestOther] + finalDiff));
+            document.getElementById(largestOther).value = adjustedValue;
+            currentValues[field] = adjustedValue;
+        }
+    }
+    
+    // Update previous values
+    previousIncomeValues = {...currentValues};
+    
+    // Update display values
+    document.getElementById('income_low_pct_value').textContent = currentValues.income_low_pct + '%';
+    document.getElementById('income_middle_pct_value').textContent = currentValues.income_middle_pct + '%';
+    document.getElementById('income_high_pct_value').textContent = currentValues.income_high_pct + '%';
+    
+    // Update total display
+    const finalTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+    document.getElementById('income-total-value').textContent = finalTotal + '%';
     const warning = document.getElementById('income-warning');
-
-    if (total !== 100) {
+    
+    if (finalTotal !== 100) {
         warning.classList.remove('hidden');
         return false;
     } else {
