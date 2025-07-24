@@ -536,7 +536,7 @@
             </form>
             
             <!-- Run Simulation Button - Outside Form -->
-            <div class="mt-6 pb-6">
+            <div class="mt-6 pb-6 space-y-3">
                 <button type="button"
                         onclick="runSimulation()"
                         class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -547,6 +547,19 @@
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                     </svg>
                     Nieuwe Simulatie
+                </button>
+                <button type="button"
+                        id="compare-button"
+                        onclick="openComparisonView()"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hidden">
+                    <svg class="mr-2 -ml-1 h-5 w-5"
+                         xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Vergelijk Simulaties
                 </button>
             </div>
         </div>
@@ -1242,6 +1255,9 @@ function displayResults(data, simulationId) {
         simulations[simulationId].status = 'completed';
         simulations[simulationId].results = data;
     }
+    
+    // Update compare button visibility
+    updateCompareButtonVisibility();
 }
 
 function exportResults(format) {
@@ -1276,6 +1292,150 @@ function getLawIcon(lawName) {
     return icons[lawName] || '';
 }
 
+function updateCompareButtonVisibility() {
+    const completedSimulations = Object.values(simulations).filter(s => s.status === 'completed').length;
+    const compareButton = document.getElementById('compare-button');
+    
+    if (completedSimulations >= 2) {
+        compareButton.classList.remove('hidden');
+    } else {
+        compareButton.classList.add('hidden');
+    }
+}
+
+function openComparisonView() {
+    const completedSims = Object.entries(simulations)
+        .filter(([id, sim]) => sim.status === 'completed')
+        .map(([id, sim]) => ({id, ...sim}));
+    
+    if (completedSims.length < 2) {
+        alert('Je hebt minstens 2 voltooide simulaties nodig om te vergelijken.');
+        return;
+    }
+    
+    // Create comparison modal
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50';
+    modal.id = 'comparison-modal';
+    
+    const content = document.createElement('div');
+    content.className = 'bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col';
+    
+    // Header
+    content.innerHTML = `
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-900">Vergelijk Simulaties</h2>
+            <button onclick="closeComparisonView()" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="comparison-content">
+                ${renderComparisonContent(completedSims)}
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="exportComparison('csv')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                    </svg>
+                    Export CSV
+                </button>
+            </div>
+        </div>
+    `;
+    
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+}
+
+function closeComparisonView() {
+    const modal = document.getElementById('comparison-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function exportComparison(format) {
+    const completedSims = Object.entries(simulations)
+        .filter(([id, sim]) => sim.status === 'completed')
+        .map(([id, sim]) => ({id, ...sim}));
+    
+    if (completedSims.length < 2) return;
+    
+    const baseline = completedSims[0];
+    const comparisons = completedSims.slice(1);
+    
+    // Create CSV content
+    let csv = 'Metriek,Basis';
+    comparisons.forEach((_, idx) => {
+        csv += `,Simulatie ${idx + 2},Verschil`;
+    });
+    csv += '\n';
+    
+    // Demographics
+    csv += 'DEMOGRAFIE\n';
+    csv += createCSVRow('Aantal personen', baseline.results.summary.demographics.total_people, comparisons.map(c => c.results.summary.demographics.total_people), 'number');
+    csv += createCSVRow('Gemiddelde leeftijd', baseline.results.summary.demographics.avg_age, comparisons.map(c => c.results.summary.demographics.avg_age), 'decimal');
+    csv += createCSVRow('Met partner (%)', baseline.results.summary.demographics.with_partners_pct, comparisons.map(c => c.results.summary.demographics.with_partners_pct), 'percentage');
+    csv += createCSVRow('Studenten (%)', baseline.results.summary.demographics.students_pct, comparisons.map(c => c.results.summary.demographics.students_pct), 'percentage');
+    csv += createCSVRow('Huurders (%)', baseline.results.summary.demographics.renters_pct, comparisons.map(c => c.results.summary.demographics.renters_pct), 'percentage');
+    
+    // Income
+    csv += '\nINKOMEN\n';
+    csv += createCSVRow('Gemiddeld jaarinkomen', baseline.results.summary.income.avg_annual, comparisons.map(c => c.results.summary.income.avg_annual), 'currency');
+    
+    // Laws
+    csv += '\nWETTEN & REGELINGEN\n';
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag', 'voting_rights'];
+    laws.forEach(law => {
+        const lawName = getLawDisplayName(law);
+        csv += createCSVRow(`${lawName} - In aanmerking (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
+        if (baseline.results.summary.laws[law].avg_amount !== undefined) {
+            csv += createCSVRow(`${lawName} - Gem. bedrag`, baseline.results.summary.laws[law].avg_amount, comparisons.map(c => c.results.summary.laws[law].avg_amount), 'currency');
+        }
+    });
+    
+    csv += createCSVRow('Inkomstenbelasting - Gem. belasting', baseline.results.summary.laws.inkomstenbelasting.avg_tax, comparisons.map(c => c.results.summary.laws.inkomstenbelasting.avg_tax), 'currency');
+    
+    // Disposable income
+    csv += '\nBESTEEDBAAR INKOMEN\n';
+    csv += createCSVRow('Gem. besteedbaar inkomen/maand', baseline.results.summary.disposable_income.avg_monthly, comparisons.map(c => c.results.summary.disposable_income.avg_monthly), 'currency');
+    
+    // Download the CSV
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `simulatie_vergelijking_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+function createCSVRow(label, baseValue, compValues, format) {
+    let row = `"${label}","${formatValue(baseValue, format)}"`;
+    
+    compValues.forEach(value => {
+        const diff = value - baseValue;
+        const diffPct = baseValue !== 0 ? (diff / baseValue) * 100 : 0;
+        
+        row += `,"${formatValue(value, format)}"`;
+        
+        if (format === 'percentage') {
+            row += `,"${diff > 0 ? '+' : ''}${diff.toFixed(1)}pp"`;
+        } else if (format === 'currency') {
+            row += `,"${diff > 0 ? '+' : ''}€${Math.abs(diff).toFixed(0)}`;
+            if (Math.abs(diffPct) >= 0.1) {
+                row += ` (${diff > 0 ? '+' : ''}${diffPct.toFixed(1)}%)`;
+            }
+            row += `"`;
+        } else {
+            row += `,"${diff > 0 ? '+' : ''}${diff.toFixed(format === 'decimal' ? 1 : 0)}"`;
+        }
+    });
+    
+    return row + '\n';
+}
+
 function toggleLawDetails(lawName, element) {
     const details = document.getElementById(lawName + '-details');
     const chevron = document.getElementById(lawName + '-chevron');
@@ -1287,6 +1447,264 @@ function toggleLawDetails(lawName, element) {
         details.classList.add('hidden');
         chevron.style.transform = 'rotate(0deg)';
     }
+}
+
+function renderComparisonContent(simulations) {
+    if (simulations.length < 2) return '';
+    
+    // Use first simulation as baseline
+    const baseline = simulations[0];
+    const comparisons = simulations.slice(1);
+    
+    let html = `
+        <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Vergelijking met Basissimulatie</h3>
+            <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                <p class="text-sm text-blue-700">
+                    <strong>Basissimulatie:</strong> ${baseline.params.num_people} personen, 
+                    ${baseline.params.simulation_date}
+                </p>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Metriek
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Basis
+                        </th>
+                        ${comparisons.map((sim, idx) => `
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Simulatie ${idx + 2}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Verschil
+                            </th>
+                        `).join('')}
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    ${renderComparisonRows(baseline, comparisons)}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-6">
+            <h4 class="text-md font-medium text-gray-900 mb-3">Parameter Verschillen</h4>
+            ${renderParameterDifferences(baseline, comparisons)}
+        </div>
+    `;
+    
+    return html;
+}
+
+function renderComparisonRows(baseline, comparisons) {
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag', 'voting_rights'];
+    let html = '';
+    
+    // Demographics
+    html += `
+        <tr class="bg-gray-50">
+            <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
+                Demografie
+            </td>
+        </tr>
+    `;
+    
+    const demoMetrics = [
+        {key: 'total_people', label: 'Aantal personen', format: 'number'},
+        {key: 'avg_age', label: 'Gemiddelde leeftijd', format: 'decimal'},
+        {key: 'with_partners_pct', label: 'Met partner (%)', format: 'percentage'},
+        {key: 'students_pct', label: 'Studenten (%)', format: 'percentage'},
+        {key: 'renters_pct', label: 'Huurders (%)', format: 'percentage'}
+    ];
+    
+    demoMetrics.forEach(metric => {
+        html += renderMetricRow(
+            metric.label,
+            baseline.results.summary.demographics[metric.key],
+            comparisons.map(c => c.results.summary.demographics[metric.key]),
+            metric.format
+        );
+    });
+    
+    // Income
+    html += `
+        <tr class="bg-gray-50">
+            <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
+                Inkomen
+            </td>
+        </tr>
+    `;
+    
+    html += renderMetricRow(
+        'Gemiddeld jaarinkomen',
+        baseline.results.summary.income.avg_annual,
+        comparisons.map(c => c.results.summary.income.avg_annual),
+        'currency'
+    );
+    
+    // Laws
+    html += `
+        <tr class="bg-gray-50">
+            <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
+                Wetten & Regelingen
+            </td>
+        </tr>
+    `;
+    
+    laws.forEach(law => {
+        const lawData = baseline.results.summary.laws[law];
+        const lawName = getLawDisplayName(law);
+        
+        // Eligible percentage
+        html += renderMetricRow(
+            `${lawName} - In aanmerking (%)`,
+            lawData.eligible_pct,
+            comparisons.map(c => c.results.summary.laws[law].eligible_pct),
+            'percentage'
+        );
+        
+        // Average amount (if applicable)
+        if (lawData.avg_amount !== undefined) {
+            html += renderMetricRow(
+                `${lawName} - Gem. bedrag`,
+                lawData.avg_amount,
+                comparisons.map(c => c.results.summary.laws[law].avg_amount),
+                'currency'
+            );
+        }
+    });
+    
+    // Income tax
+    html += renderMetricRow(
+        'Inkomstenbelasting - Gem. belasting',
+        baseline.results.summary.laws.inkomstenbelasting.avg_tax,
+        comparisons.map(c => c.results.summary.laws.inkomstenbelasting.avg_tax),
+        'currency'
+    );
+    
+    // Disposable income
+    html += `
+        <tr class="bg-green-50">
+            <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
+                Besteedbaar Inkomen
+            </td>
+        </tr>
+    `;
+    
+    html += renderMetricRow(
+        'Gem. besteedbaar inkomen/maand',
+        baseline.results.summary.disposable_income.avg_monthly,
+        comparisons.map(c => c.results.summary.disposable_income.avg_monthly),
+        'currency',
+        true
+    );
+    
+    return html;
+}
+
+function renderMetricRow(label, baseValue, compValues, format, highlight = false) {
+    let html = `<tr${highlight ? ' class="font-medium"' : ''}>`;
+    html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">${label}</td>`;
+    html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${formatValue(baseValue, format)}</td>`;
+    
+    compValues.forEach(value => {
+        const diff = value - baseValue;
+        const diffPct = baseValue !== 0 ? (diff / baseValue) * 100 : 0;
+        const diffColor = diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-500';
+        
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${formatValue(value, format)}</td>`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right ${diffColor}">`;
+        
+        if (format === 'percentage') {
+            html += `${diff > 0 ? '+' : ''}${diff.toFixed(1)}pp`;
+        } else if (format === 'currency') {
+            html += `${diff > 0 ? '+' : ''}€${Math.abs(diff).toFixed(0)}`;
+            if (Math.abs(diffPct) >= 0.1) {
+                html += ` (${diff > 0 ? '+' : ''}${diffPct.toFixed(1)}%)`;
+            }
+        } else {
+            html += `${diff > 0 ? '+' : ''}${diff.toFixed(format === 'decimal' ? 1 : 0)}`;
+        }
+        
+        html += `</td>`;
+    });
+    
+    html += `</tr>`;
+    return html;
+}
+
+function formatValue(value, format) {
+    switch (format) {
+        case 'currency':
+            return `€${value.toFixed(0)}`;
+        case 'percentage':
+            return `${value.toFixed(1)}%`;
+        case 'decimal':
+            return value.toFixed(1);
+        default:
+            return value.toFixed(0);
+    }
+}
+
+function getLawDisplayName(law) {
+    const names = {
+        'zorgtoeslag': 'Zorgtoeslag',
+        'huurtoeslag': 'Huurtoeslag',
+        'aow': 'AOW',
+        'bijstand': 'Bijstand',
+        'kinderopvangtoeslag': 'Kinderopvangtoeslag',
+        'voting_rights': 'Kiesrecht',
+        'inkomstenbelasting': 'Inkomstenbelasting'
+    };
+    return names[law] || law;
+}
+
+function renderParameterDifferences(baseline, comparisons) {
+    let html = '<div class="space-y-4">';
+    
+    comparisons.forEach((sim, idx) => {
+        html += `
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h5 class="font-medium text-gray-900 mb-2">Simulatie ${idx + 2} vs Basis</h5>
+                <div class="text-sm text-gray-600 space-y-1">
+        `;
+        
+        // Check demographic parameter differences
+        const baseDemos = baseline.params;
+        const compDemos = sim.params;
+        
+        if (baseDemos.num_people !== compDemos.num_people) {
+            html += `<div>• Aantal personen: ${baseDemos.num_people} → ${compDemos.num_people}</div>`;
+        }
+        
+        // Check law parameter differences
+        if (baseDemos.law_parameters && compDemos.law_parameters) {
+            Object.keys(compDemos.law_parameters).forEach(law => {
+                const baseLaw = baseDemos.law_parameters[law] || {};
+                const compLaw = compDemos.law_parameters[law] || {};
+                
+                Object.keys(compLaw).forEach(param => {
+                    if (baseLaw[param] !== compLaw[param]) {
+                        html += `<div>• ${getLawDisplayName(law)} - ${param}: ${baseLaw[param] || 'default'} → ${compLaw[param]}</div>`;
+                    }
+                });
+            });
+        }
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
 }
 
 function renderLawBreakdowns(breakdowns) {
