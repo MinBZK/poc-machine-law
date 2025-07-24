@@ -16,17 +16,17 @@
             <form id="simulation-form" class="space-y-4">
                 <!-- Preset Scenarios - At the top for quick access -->
                 <div class="bg-white shadow rounded-lg">
-                    <div class="p-6">
-                        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <div class="p-4">
+                        <h2 class="text-base font-medium text-gray-900 mb-3 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                             Snel Starten
                         </h2>
-                        <div class="space-y-3">
+                        <div class="space-y-2">
                             <button type="button"
                                     onclick="loadPreset('current')"
-                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -39,7 +39,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('recession')"
-                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
@@ -52,7 +52,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('housing_crisis')"
-                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-orange-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
@@ -65,7 +65,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('aging')"
-                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-purple-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -78,7 +78,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('healthcare')"
-                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -95,9 +95,9 @@
                 
                 <!-- Basic Settings - Always visible -->
                 <div class="bg-white shadow rounded-lg">
-                    <div class="p-6">
-                        <h2 class="text-lg font-medium text-gray-900 mb-4">Basis Instellingen</h2>
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div class="p-4">
+                        <h2 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h2>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal personen</label>
                                 <input type="number"
@@ -127,16 +127,16 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <button type="button" 
                             onclick="toggleSection('demographics-section')"
-                            class="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                        <h2 class="text-lg font-medium text-gray-900">Demografie</h2>
+                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                        <h2 class="text-base font-medium text-gray-900">Demografie</h2>
                         <svg id="demographics-section-chevron" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="demographics-section" class="px-6 pb-6 hidden">
+                    <div id="demographics-section" class="px-4 pb-4 hidden">
                         <!-- Age Distribution -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3 mt-4">Leeftijdsverdeling</h3>
-                        <div class="space-y-4">
+                        <h3 class="text-sm font-medium text-gray-700 mb-2 mt-3">Leeftijdsverdeling</h3>
+                        <div class="space-y-3">
                         <div>
                             <div class="flex justify-between text-sm">
                                 <label for="age_18_30" class="font-medium text-gray-700">18-30 jaar</label>
@@ -219,8 +219,8 @@
                     </div>
                         
                         <!-- Income Distribution -->
-                        <h3 class="text-base font-medium text-gray-700 mb-3 mt-6">Inkomensverdeling</h3>
-                        <div class="grid grid-cols-1 gap-4">
+                        <h3 class="text-sm font-medium text-gray-700 mb-2 mt-4">Inkomensverdeling</h3>
+                        <div class="grid grid-cols-1 gap-3">
                         <div>
                             <div class="flex justify-between text-sm">
                                 <label for="income_low_pct" class="font-medium text-gray-700">Laag inkomen (€0-30k)</label>
@@ -329,22 +329,22 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <button type="button" 
                             onclick="toggleSection('law-parameters-section')"
-                            class="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                        <h2 class="text-lg font-medium text-gray-900">Parameters van Wetgeving</h2>
+                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                        <h2 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h2>
                         <svg id="law-parameters-section-chevron" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="law-parameters-section" class="px-6 pb-6 hidden space-y-4">
+                    <div id="law-parameters-section" class="px-4 pb-4 hidden space-y-3">
                         <!-- Zorgtoeslag Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 Zorgtoeslag
                             </h3>
-                            <div class="grid grid-cols-1 gap-4">
+                            <div class="grid grid-cols-1 gap-3">
                             <div>
                                 <label for="zorgtoeslag_standaardpremie" class="block text-sm font-medium text-gray-700">Standaardpremie (€/maand)</label>
                                 <input type="number"
@@ -360,8 +360,8 @@
                         </div>
                         
                         <!-- Huurtoeslag Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                                 </svg>
@@ -394,8 +394,8 @@
                         </div>
                         
                         <!-- Kinderopvangtoeslag Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                 </svg>
@@ -428,8 +428,8 @@
                         </div>
                         
                         <!-- AOW Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -462,8 +462,8 @@
                         </div>
                         
                         <!-- Bijstand Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
@@ -496,8 +496,8 @@
                         </div>
                         
                         <!-- Inkomstenbelasting Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                                 </svg>
@@ -552,14 +552,14 @@
                         </div>
                         
                         <!-- Kiesrecht Parameters -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                                 </svg>
                                 Kiesrecht
                             </h3>
-                            <div class="grid grid-cols-1 gap-4">
+                            <div class="grid grid-cols-1 gap-3">
                             <div>
                                 <label for="kiesrecht_min_leeftijd" class="block text-sm font-medium text-gray-700">Minimale stemleeftijd</label>
                                 <input type="number"
@@ -580,14 +580,14 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <button type="button" 
                             onclick="toggleSection('config-section')"
-                            class="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                        <h2 class="text-lg font-medium text-gray-900">Eigen Configuraties</h2>
+                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                        <h2 class="text-base font-medium text-gray-900">Eigen Configuraties</h2>
                         <svg id="config-section-chevron" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="config-section" class="px-6 pb-6 hidden">
-                        <p class="text-sm text-gray-600 mb-4 mt-4">
+                    <div id="config-section" class="px-4 pb-4 hidden">
+                        <p class="text-sm text-gray-600 mb-3 mt-3">
                             Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.
                         </p>
                         <div class="flex items-center space-x-3">
@@ -682,6 +682,9 @@
             </div>
         </div>
     <script>
+// Store default law parameters for comparison
+const defaultLawParams = {{ law_params|tojson|safe }};
+
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
     const chevron = document.getElementById(sectionId + '-chevron');
@@ -1637,7 +1640,16 @@ function displayResults(data, simulationId) {
         const changedParams = [];
         Object.entries(sim.params.law_parameters).forEach(([law, params]) => {
             Object.entries(params).forEach(([param, value]) => {
-                changedParams.push(`${getLawDisplayName(law)} - ${param}: ${value}`);
+                // Only add if it differs from the default value
+                if (defaultLawParams[law] && defaultLawParams[law][param] !== undefined) {
+                    const defaultValue = defaultLawParams[law][param];
+                    if (value !== defaultValue) {
+                        const paramLabel = getParamDisplayName(param);
+                        const formattedValue = formatParamValue(param, value);
+                        const defaultFormatted = formatParamValue(param, defaultValue);
+                        changedParams.push(`${getLawDisplayName(law)} - ${paramLabel}: ${formattedValue} (standaard: ${defaultFormatted})`);
+                    }
+                }
             });
         });
         
@@ -1978,14 +1990,28 @@ function copyResultsAsMarkdown(simulationId) {
     markdown += `**Aantal personen:** ${data.summary.demographics.total_people}\n\n`;
     
     // Changed parameters
-    if (sim.params.law_parameters && Object.keys(sim.params.law_parameters).length > 0) {
-        markdown += `## Aangepaste Parameters\n\n`;
+    const changedParamsForExport = [];
+    if (sim.params.law_parameters) {
         Object.entries(sim.params.law_parameters).forEach(([law, params]) => {
             Object.entries(params).forEach(([param, value]) => {
-                markdown += `- ${getLawDisplayName(law)} - ${param}: ${value}\n`;
+                // Only add if it differs from the default value
+                if (defaultLawParams[law] && defaultLawParams[law][param] !== undefined) {
+                    const defaultValue = defaultLawParams[law][param];
+                    if (value !== defaultValue) {
+                        const paramLabel = getParamDisplayName(param);
+                        const formattedValue = formatParamValue(param, value);
+                        const defaultFormatted = formatParamValue(param, defaultValue);
+                        changedParamsForExport.push(`- ${getLawDisplayName(law)} - ${paramLabel}: ${formattedValue} (standaard: ${defaultFormatted})`);
+                    }
+                }
             });
         });
-        markdown += `\n`;
+    }
+    
+    if (changedParamsForExport.length > 0) {
+        markdown += `## Aangepaste Parameters\n\n`;
+        markdown += changedParamsForExport.join('\n');
+        markdown += `\n\n`;
     }
     
     // Demographics
@@ -2443,6 +2469,43 @@ function getLawDisplayName(law) {
         'inkomstenbelasting': 'Inkomstenbelasting'
     };
     return names[law] || law;
+}
+
+function getParamDisplayName(param) {
+    const names = {
+        'standaardpremie': 'Standaardpremie',
+        'max_huur': 'Maximale huur',
+        'basishuur': 'Basishuur',
+        'uurprijs': 'Max uurtarief',
+        'max_uren': 'Max uren per maand',
+        'pensioenleeftijd': 'Pensioenleeftijd',
+        'basisbedrag': 'Basisbedrag',
+        'norm_alleenstaand': 'Norm alleenstaand',
+        'norm_gehuwd': 'Norm gehuwd/samenwonend',
+        'tarief_schijf1': 'Tarief schijf 1',
+        'tarief_schijf2': 'Tarief schijf 2',
+        'grens_schijf1': 'Grens schijf 1',
+        'algemene_heffingskorting': 'Algemene heffingskorting',
+        'min_leeftijd': 'Minimale leeftijd'
+    };
+    return names[param] || param;
+}
+
+function formatParamValue(param, value) {
+    // Format based on parameter type
+    if (param.includes('tarief')) {
+        return `${value}%`;
+    } else if (param.includes('prijs') || param.includes('huur') || param.includes('bedrag') || 
+               param.includes('norm') || param.includes('premie') || param.includes('korting')) {
+        return `€${value}`;
+    } else if (param.includes('leeftijd')) {
+        return `${value} jaar`;
+    } else if (param.includes('uren')) {
+        return `${value} uur`;
+    } else if (param.includes('grens')) {
+        return `€${value.toLocaleString('nl-NL')}`;
+    }
+    return value.toString();
 }
 
 function renderParameterDifferences(baseline, comparisons) {

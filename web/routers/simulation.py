@@ -27,7 +27,7 @@ async def simulation_page(request: Request):
     
     # Default parameters for the simulation
     default_params = {
-        "num_people": 100,
+        "num_people": 10,
         "simulation_date": datetime.now().strftime("%Y-%m-%d"),
         # Age distribution
         "age_18_30": 18,
