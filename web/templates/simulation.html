@@ -1057,6 +1057,72 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         showKeyboardHelp();
     }
+    
+    // Ctrl/Cmd + W: Close current tab
+    if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
+        e.preventDefault();
+        const activeTab = document.querySelector('#tab-bar .bg-blue-50');
+        if (activeTab) {
+            const tabId = activeTab.id.replace('tab-', '');
+            closeTab(tabId);
+        }
+    }
+    
+    // Ctrl/Cmd + E: Export current simulation (CSV)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        const activeTab = document.querySelector('#tab-bar .bg-blue-50');
+        if (activeTab && simulations[activeTab.id.replace('tab-', '')].results) {
+            exportResults('csv');
+        }
+    }
+    
+    // Ctrl/Cmd + Shift + E: Export current simulation (JSON)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
+        e.preventDefault();
+        const activeTab = document.querySelector('#tab-bar .bg-blue-50');
+        if (activeTab && simulations[activeTab.id.replace('tab-', '')].results) {
+            exportResults('json');
+        }
+    }
+    
+    // Ctrl/Cmd + C: Copy results as markdown
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        const activeTab = document.querySelector('#tab-bar .bg-blue-50');
+        if (activeTab) {
+            const tabId = activeTab.id.replace('tab-', '');
+            if (simulations[tabId] && simulations[tabId].results) {
+                copyResultsAsMarkdown(tabId);
+            }
+        }
+    }
+    
+    // Tab/Shift+Tab: Navigate between tabs
+    if (e.key === 'Tab' && !e.target.matches('input, textarea, select')) {
+        const activeTab = document.querySelector('#tab-bar .bg-blue-50');
+        if (activeTab) {
+            e.preventDefault();
+            const tabs = Array.from(document.querySelectorAll('#tab-bar button[id^="tab-"]'));
+            const currentIndex = tabs.indexOf(activeTab);
+            let nextIndex;
+            
+            if (e.shiftKey) {
+                // Previous tab
+                nextIndex = currentIndex - 1;
+                if (nextIndex < 0) nextIndex = tabs.length - 1;
+            } else {
+                // Next tab
+                nextIndex = currentIndex + 1;
+                if (nextIndex >= tabs.length) nextIndex = 0;
+            }
+            
+            if (tabs[nextIndex]) {
+                const nextTabId = tabs[nextIndex].id.replace('tab-', '');
+                switchTab(nextTabId);
+            }
+        }
+    }
 });
 
 // Show keyboard shortcuts help
@@ -1093,6 +1159,26 @@ function showKeyboardHelp() {
                 <div class="flex justify-between">
                     <span class="text-gray-600">Wissel tab</span>
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + 1-9</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Volgende/Vorige tab</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Tab / Shift+Tab</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Sluit huidige tab</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + W</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Export CSV</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + E</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Export JSON</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + Shift + E</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Kopieer als Markdown</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">Ctrl + C</kbd>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-600">Sluit modal</span>
@@ -1672,6 +1758,12 @@ function displayResults(data, simulationId) {
                     </svg>
                     Export JSON
                 </button>
+                <button onclick="copyResultsAsMarkdown('${simulationId}')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Kopieer
+                </button>
             </div>
         </div>
     `;
@@ -1720,6 +1812,72 @@ function exportResults(format) {
     
     // Download the export file
     window.location.href = `/simulation/export/${simulation.sessionId}?format=${format}`;
+}
+
+function copyResultsAsMarkdown(simulationId) {
+    const sim = simulations[simulationId];
+    if (!sim || !sim.results) return;
+    
+    const data = sim.results;
+    let markdown = `# Simulatie Resultaten\n\n`;
+    markdown += `**Datum:** ${new Date().toLocaleDateString('nl-NL')}\n`;
+    markdown += `**Aantal personen:** ${data.summary.demographics.total_people}\n\n`;
+    
+    // Changed parameters
+    if (sim.params.law_parameters && Object.keys(sim.params.law_parameters).length > 0) {
+        markdown += `## Aangepaste Parameters\n\n`;
+        Object.entries(sim.params.law_parameters).forEach(([law, params]) => {
+            Object.entries(params).forEach(([param, value]) => {
+                markdown += `- ${getLawDisplayName(law)} - ${param}: ${value}\n`;
+            });
+        });
+        markdown += `\n`;
+    }
+    
+    // Demographics
+    markdown += `## Demografie\n\n`;
+    markdown += `| Metriek | Waarde |\n`;
+    markdown += `|---------|--------|\n`;
+    markdown += `| Gemiddelde leeftijd | ${data.summary.demographics.avg_age.toFixed(1)} jaar |\n`;
+    markdown += `| Met partner | ${data.summary.demographics.with_partners_pct.toFixed(1)}% |\n`;
+    markdown += `| Studenten | ${data.summary.demographics.students_pct.toFixed(1)}% |\n`;
+    markdown += `| Huurders | ${data.summary.demographics.renters_pct.toFixed(1)}% |\n`;
+    markdown += `| Gemiddeld inkomen | €${data.summary.income.avg_annual.toFixed(0)}/jaar |\n\n`;
+    
+    // Laws
+    markdown += `## Wetten & Regelingen\n\n`;
+    markdown += `| Wet | In aanmerking | Gem. bedrag |\n`;
+    markdown += `|-----|---------------|-------------|\n`;
+    
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag'];
+    laws.forEach(law => {
+        const lawData = data.summary.laws[law];
+        markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
+    });
+    
+    markdown += `| Kiesrecht | ${data.summary.laws.voting_rights.eligible_pct.toFixed(1)}% | - |\n`;
+    markdown += `| Inkomstenbelasting | - | €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}/maand |\n\n`;
+    
+    // Disposable income
+    markdown += `## Besteedbaar Inkomen\n\n`;
+    markdown += `**Gemiddeld:** €${data.summary.disposable_income.avg_monthly.toFixed(0)}/maand\n`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(markdown).then(() => {
+        // Show notification
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center';
+        notification.innerHTML = `
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            Resultaten gekopieerd als Markdown!
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }).catch(err => {
+        alert('Kopiëren mislukt: ' + err.message);
+    });
 }
 
 function getLawIcon(lawName) {
