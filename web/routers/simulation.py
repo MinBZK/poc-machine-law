@@ -125,6 +125,7 @@ async def export_results(session_id: str, format: str = "csv"):
     import io
 
     import pandas as pd
+
     # Check if we have results for this session
     if session_id not in simulation_results:
         raise HTTPException(status_code=404, detail="Simulation results not found")
