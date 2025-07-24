@@ -786,9 +786,28 @@ function createTab(simulationId, params) {
     const tabBar = document.getElementById('tab-bar');
     const tab = document.createElement('div');
     tab.id = `tab-${simulationId}`;
-    tab.className = 'relative group inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer border-r border-gray-200 bg-gray-50 border-b-2 border-b-transparent';
+    tab.className = 'relative group inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer border-r border-gray-200 bg-yellow-50 border-b-2 border-b-transparent';
+    // Create descriptive tab name
+    const tabNumber = Object.keys(simulations).length + 1;
+    let tabName = `Sim ${tabNumber}: ${params.num_people}p`;
+    
+    // Add key parameter changes if any
+    if (params.law_parameters) {
+        const changedLaws = Object.keys(params.law_parameters).filter(law => 
+            Object.keys(params.law_parameters[law]).length > 0
+        );
+        if (changedLaws.length > 0) {
+            tabName += ` (${changedLaws.map(l => l.substring(0, 3)).join(',')})`;
+        }
+    }
+    
     tab.innerHTML = `
-        <span onclick="switchTab('${simulationId}')">Simulatie ${simulationId}</span>
+        <span class="status-icon mr-1.5">
+            <svg class="w-4 h-4 text-yellow-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+        </span>
+        <span onclick="switchTab('${simulationId}')" title="${params.num_people} personen, ${params.simulation_date}">${tabName}</span>
         <button onclick="closeTab('${simulationId}')" class="ml-2 p-0.5 rounded hover:bg-gray-200">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -999,9 +1018,34 @@ function displayResults(data, simulationId) {
     document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
     
     const resultsSection = document.getElementById(`results-section-${simulationId}`);
+    
+    // Check if any law parameters were changed
+    const sim = simulations[simulationId];
+    let parameterInfo = '';
+    if (sim && sim.params.law_parameters) {
+        const changedParams = [];
+        Object.entries(sim.params.law_parameters).forEach(([law, params]) => {
+            Object.entries(params).forEach(([param, value]) => {
+                changedParams.push(`${getLawDisplayName(law)} - ${param}: ${value}`);
+            });
+        });
+        
+        if (changedParams.length > 0) {
+            parameterInfo = `
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                    <h3 class="text-sm font-medium text-amber-800 mb-1">Aangepaste Parameters:</h3>
+                    <ul class="text-sm text-amber-700 space-y-0.5">
+                        ${changedParams.map(p => `<li>• ${p}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    }
+    
     resultsSection.innerHTML = `
         <div class="bg-white shadow rounded-lg p-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">Simulatie Resultaten</h2>
+            ${parameterInfo}
 
             <!-- Demographics (including income) -->
             <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
@@ -1254,6 +1298,21 @@ function displayResults(data, simulationId) {
     if (simulations[simulationId]) {
         simulations[simulationId].status = 'completed';
         simulations[simulationId].results = data;
+    }
+    
+    // Update tab appearance to show completion
+    const tab = document.getElementById(`tab-${simulationId}`);
+    if (tab) {
+        tab.classList.remove('bg-yellow-50');
+        tab.classList.add('bg-green-50');
+        const statusIcon = tab.querySelector('.status-icon');
+        if (statusIcon) {
+            statusIcon.innerHTML = `
+                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            `;
+        }
     }
     
     // Update compare button visibility
