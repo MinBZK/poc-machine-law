@@ -758,6 +758,7 @@ function validateAgeDistribution(changedField = null) {
             const adjustedValue = Math.max(0, Math.min(100, currentValues[largestOther] + finalDiff));
             document.getElementById(largestOther).value = adjustedValue;
             updateSliderValue(largestOther);
+            currentValues[largestOther] = adjustedValue;
         }
     }
     
@@ -838,7 +839,7 @@ function updateIncomeDistribution(changedField = null) {
             
             const adjustedValue = Math.max(0, Math.min(100, currentValues[largestOther] + finalDiff));
             document.getElementById(largestOther).value = adjustedValue;
-            currentValues[field] = adjustedValue;
+            currentValues[largestOther] = adjustedValue;
         }
     }
     
