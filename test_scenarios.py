@@ -94,7 +94,7 @@ def run_scenario(scenario):
         data = json.loads(result.stdout)
         if "summary" in data:
             summary = data["summary"]
-            print(f"✓ Simulation completed successfully")
+            print("✓ Simulation completed successfully")
             print(f"  Total people: {summary['demographics']['total_people']}")
             print(f"  Average age: {summary['demographics']['avg_age']:.1f}")
             print(f"  Average income: €{summary['income']['avg_annual']:,.0f}/year")

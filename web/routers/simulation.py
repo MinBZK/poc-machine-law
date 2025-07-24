@@ -1,13 +1,9 @@
-import asyncio
 import json
-from datetime import datetime
-from typing import Dict, Optional
 import uuid
-import time
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from starlette.responses import Response
 
 from web.dependencies import templates
 from web.law_parameters import get_default_law_parameters
@@ -126,9 +122,9 @@ async def get_results(request: Request, session_id: str):
 @router.get("/export/{session_id}")
 async def export_results(session_id: str, format: str = "csv"):
     """Export simulation results in various formats"""
-    import pandas as pd
     import io
 
+    import pandas as pd
     # Check if we have results for this session
     if session_id not in simulation_results:
         raise HTTPException(status_code=404, detail="Simulation results not found")
@@ -165,7 +161,7 @@ async def export_results(session_id: str, format: str = "csv"):
         raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
 
 
-def calculate_summary_statistics(df) -> Dict:
+def calculate_summary_statistics(df) -> dict:
     """Calculate summary statistics from simulation results"""
     summary = {
         "demographics": {

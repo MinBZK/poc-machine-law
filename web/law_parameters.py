@@ -1,11 +1,12 @@
 """Utility to extract default law parameters from YAML files."""
 
-import yaml
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
+
+import yaml
 
 
-def get_default_law_parameters() -> Dict[str, Dict[str, Any]]:
+def get_default_law_parameters() -> dict[str, dict[str, Any]]:
     """Extract default parameter values from law YAML files."""
     parameters = {
         "zorgtoeslag": {},

@@ -6,9 +6,7 @@ import os
 import sys
 from datetime import datetime
 
-# Suppress stderr output to avoid progress bar being treated as error
-sys.stderr = open(os.devnull, "w")
-
+# Import simulate before suppressing stderr
 from simulate import LawSimulator
 
 
@@ -69,10 +67,16 @@ if __name__ == "__main__":
     # Read parameters from stdin
     params = json.loads(sys.stdin.read())
 
-    try:
-        result = run_simulation(params)
-        print(json.dumps(result))
-    except Exception as e:
-        error_result = {"status": "error", "message": str(e)}
-        print(json.dumps(error_result))
-        sys.exit(1)
+    # Suppress stderr output to avoid progress bar being treated as error
+    with open(os.devnull, "w") as devnull:
+        old_stderr = sys.stderr
+        sys.stderr = devnull
+        try:
+            result = run_simulation(params)
+            print(json.dumps(result))
+        except Exception as e:
+            error_result = {"status": "error", "message": str(e)}
+            print(json.dumps(error_result))
+            sys.exit(1)
+        finally:
+            sys.stderr = old_stderr

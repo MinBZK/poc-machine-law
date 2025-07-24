@@ -10,7 +10,9 @@ from tqdm.auto import tqdm
 
 from machine.service import Services
 
-logging.basicConfig(level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s")
+# Create a logger for this module
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
 
 class LawSimulator:
@@ -933,14 +935,14 @@ class LawSimulator:
                         auto_approve=True,
                     )
                     claims_submitted += 1
-                    logging.debug(
+                    logger.debug(
                         f"Submitted huurtoeslag claims for BSN {bsn}: rent={person['rent_amount']}, claims={claim1},{claim2},{claim3}"
                     )
                 except Exception as e:
-                    logging.error(f"Error submitting huurtoeslag claims for BSN {bsn}: {e}")
+                    logger.error(f"Error submitting huurtoeslag claims for BSN {bsn}: {e}")
                     import traceback
 
-                    logging.error(traceback.format_exc())
+                    logger.error(traceback.format_exc())
 
         print(f"Submitted huurtoeslag claims for {claims_submitted}/{renters_count} renters", file=sys.stderr)
 
@@ -1021,14 +1023,14 @@ class LawSimulator:
                         )
 
                         childcare_claims_submitted += 1
-                        logging.debug(
+                        logger.debug(
                             f"Submitted kinderopvangtoeslag claims for BSN {bsn} with {len(young_children)} young children"
                         )
                     except Exception as e:
-                        logging.error(f"Error submitting kinderopvangtoeslag claims for BSN {bsn}: {e}")
+                        logger.error(f"Error submitting kinderopvangtoeslag claims for BSN {bsn}: {e}")
                         import traceback
 
-                        logging.error(traceback.format_exc())
+                        logger.error(traceback.format_exc())
 
         print(
             f"Submitted kinderopvangtoeslag claims for {childcare_claims_submitted}/{parents_count} parents with young children",
@@ -1103,7 +1105,7 @@ class LawSimulator:
                     overwrite_input=huurtoeslag_overrides,
                 )
             except Exception as e:
-                logging.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
+                logger.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
                 huurtoeslag = None
 
             # 4. Bijstand (social assistance)
@@ -1133,7 +1135,7 @@ class LawSimulator:
                         overwrite_input=kinderopvang_overrides,
                     )
                 except Exception as e:
-                    logging.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
+                    logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
                     kinderopvangtoeslag = None
 
             # 6. Kiesrecht (voting rights)
@@ -1867,7 +1869,7 @@ def main() -> None:
     print(f"Average tax due: {format_money(results['tax_due'].mean())}")
     print(f"Average tax rate: {(results['tax_due'] / results['income']).mean() * 100:.1f}%")
     print(f"Average tax credits: {format_money(results['tax_credits'].mean())}")
-    print(f"Tax by box:")
+    print("Tax by box:")
     print(f"  Box 1 (work/home): {format_money(results['tax_box1'].mean())}")
     print(f"  Box 2 (shares): {format_money(results['tax_box2'].mean())}")
     print(f"  Box 3 (savings): {format_money(results['tax_box3'].mean())}")
