@@ -325,6 +325,34 @@
                                 </div>
                             </button>
                         </div>
+                        
+                        <!-- Save/Load Custom Configuration -->
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-medium text-gray-700">Eigen Configuraties</h3>
+                                <div class="flex space-x-2">
+                                    <button type="button"
+                                            onclick="saveConfiguration()"
+                                            class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2"></path>
+                                        </svg>
+                                        Opslaan
+                                    </button>
+                                    <button type="button"
+                                            onclick="loadConfiguration()"
+                                            class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                        </svg>
+                                        Laden
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="saved-configs" class="space-y-2 max-h-32 overflow-y-auto">
+                                <!-- Saved configurations will be displayed here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -849,6 +877,125 @@ function loadPreset(presetName) {
 let simulations = {};
 let activeTabId = null;
 let simulationCounter = 0;
+
+// Load saved configurations from localStorage
+function loadSavedConfigs() {
+    const saved = localStorage.getItem('simulationConfigs');
+    return saved ? JSON.parse(saved) : {};
+}
+
+// Save configuration
+function saveConfiguration() {
+    const name = prompt('Naam voor deze configuratie:');
+    if (!name) return;
+    
+    const config = getCurrentConfiguration();
+    const configs = loadSavedConfigs();
+    configs[name] = {
+        ...config,
+        timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('simulationConfigs', JSON.stringify(configs));
+    displaySavedConfigs();
+    
+    // Show notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    notification.textContent = `Configuratie "${name}" opgeslagen`;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Load configuration menu
+function loadConfiguration() {
+    displaySavedConfigs();
+}
+
+// Display saved configurations
+function displaySavedConfigs() {
+    const container = document.getElementById('saved-configs');
+    const configs = loadSavedConfigs();
+    
+    if (Object.keys(configs).length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500 italic">Geen opgeslagen configuraties</p>';
+        return;
+    }
+    
+    container.innerHTML = Object.entries(configs)
+        .sort((a, b) => new Date(b[1].timestamp) - new Date(a[1].timestamp))
+        .map(([name, config]) => `
+            <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                <button onclick="applySavedConfig('${name}')" class="text-sm text-blue-600 hover:text-blue-800 truncate flex-1 text-left">
+                    ${name}
+                </button>
+                <button onclick="deleteSavedConfig('${name}')" class="ml-2 text-red-500 hover:text-red-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            </div>
+        `).join('');
+}
+
+// Apply saved configuration
+function applySavedConfig(name) {
+    const configs = loadSavedConfigs();
+    const config = configs[name];
+    if (!config) return;
+    
+    // Apply all values
+    Object.entries(config).forEach(([key, value]) => {
+        if (key === 'timestamp') return;
+        const element = document.getElementById(key);
+        if (element) {
+            element.value = value;
+            updateSliderValue(key);
+        }
+    });
+    
+    validateAgeDistribution();
+    updateIncomeDistribution();
+    
+    // Show notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    notification.textContent = `Configuratie "${name}" geladen`;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Delete saved configuration
+function deleteSavedConfig(name) {
+    if (!confirm(`Weet je zeker dat je "${name}" wilt verwijderen?`)) return;
+    
+    const configs = loadSavedConfigs();
+    delete configs[name];
+    localStorage.setItem('simulationConfigs', JSON.stringify(configs));
+    displaySavedConfigs();
+}
+
+// Get current configuration
+function getCurrentConfiguration() {
+    const config = {};
+    
+    // Get all demographic inputs
+    document.querySelectorAll('#demographics-section input').forEach(input => {
+        config[input.id] = input.value;
+    });
+    
+    // Get all law parameter inputs
+    document.querySelectorAll('#law-parameters-section input').forEach(input => {
+        config[input.id] = input.value;
+    });
+    
+    return config;
+}
+
+// Initialize saved configs display
+document.addEventListener('DOMContentLoaded', () => {
+    displaySavedConfigs();
+});
 
 function switchTab(tabId) {
     // Hide all tab contents
