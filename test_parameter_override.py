@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Test if zorgtoeslag parameter override is working."""
+
 import json
 import subprocess
 
 print("Testing zorgtoeslag parameter override...")
-print("="*60)
+print("=" * 60)
 
 # Test 1: Default parameters (€176/month)
 print("\nTest 1: Default zorgtoeslag premium (€176/month)")
@@ -23,7 +24,7 @@ result1 = subprocess.run(
 
 if result1.returncode == 0:
     data1 = json.loads(result1.stdout)
-    avg1 = data1['summary']['laws']['zorgtoeslag']['avg_amount']
+    avg1 = data1["summary"]["laws"]["zorgtoeslag"]["avg_amount"]
     print(f"Average zorgtoeslag: €{avg1:.2f}/month")
 else:
     print(f"Error: {result1.stderr}")
@@ -37,7 +38,7 @@ params2 = {
         "zorgtoeslag": {
             "standaardpremie": 250  # €250/month
         }
-    }
+    },
 }
 
 result2 = subprocess.run(
@@ -50,7 +51,7 @@ result2 = subprocess.run(
 
 if result2.returncode == 0:
     data2 = json.loads(result2.stdout)
-    avg2 = data2['summary']['laws']['zorgtoeslag']['avg_amount']
+    avg2 = data2["summary"]["laws"]["zorgtoeslag"]["avg_amount"]
     print(f"Average zorgtoeslag: €{avg2:.2f}/month")
 else:
     print(f"Error: {result2.stderr}")
@@ -64,7 +65,7 @@ params3 = {
         "zorgtoeslag": {
             "standaardpremie": 100  # €100/month
         }
-    }
+    },
 }
 
 result3 = subprocess.run(
@@ -77,19 +78,19 @@ result3 = subprocess.run(
 
 if result3.returncode == 0:
     data3 = json.loads(result3.stdout)
-    avg3 = data3['summary']['laws']['zorgtoeslag']['avg_amount']
+    avg3 = data3["summary"]["laws"]["zorgtoeslag"]["avg_amount"]
     print(f"Average zorgtoeslag: €{avg3:.2f}/month")
 else:
     print(f"Error: {result3.stderr}")
 
 # Compare results
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
-if 'avg1' in locals() and 'avg2' in locals() and 'avg3' in locals():
+if "avg1" in locals() and "avg2" in locals() and "avg3" in locals():
     print(f"Default (€176/month premium): €{avg1:.2f}/month zorgtoeslag")
     print(f"Higher (€250/month premium):  €{avg2:.2f}/month zorgtoeslag")
     print(f"Lower (€100/month premium):   €{avg3:.2f}/month zorgtoeslag")
-    
+
     # With higher premium, people should get MORE zorgtoeslag
     if avg2 > avg1 > avg3:
         print("\n✅ Parameter override is working correctly!")

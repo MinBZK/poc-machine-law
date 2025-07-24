@@ -24,7 +24,7 @@ async def simulation_page(request: Request):
     """Render the simulation configuration page"""
     # Get law parameters from YAML files
     law_params = get_default_law_parameters()
-    
+
     # Default parameters for the simulation
     default_params = {
         "num_people": 10,
@@ -89,16 +89,16 @@ async def run_simulation(request: Request):
             raise Exception("No output from simulation")
 
         simulation_data = json.loads(result.stdout)
-        
+
         # Generate a unique session ID for this simulation
         session_id = str(uuid.uuid4())
-        
+
         # Store the results for export
         simulation_results[session_id] = simulation_data
-        
+
         # Add session_id to response
-        simulation_data['session_id'] = session_id
-        
+        simulation_data["session_id"] = session_id
+
         return JSONResponse(simulation_data)
 
     except Exception as e:
@@ -128,39 +128,39 @@ async def export_results(session_id: str, format: str = "csv"):
     """Export simulation results in various formats"""
     import pandas as pd
     import io
-    
+
     # Check if we have results for this session
     if session_id not in simulation_results:
         raise HTTPException(status_code=404, detail="Simulation results not found")
-    
+
     data = simulation_results[session_id]
-    
+
     if format == "csv":
         # Convert results to CSV
-        if 'results' in data:
-            df = pd.DataFrame(data['results'])
-            
+        if "results" in data:
+            df = pd.DataFrame(data["results"])
+
             # Create CSV content
             csv_buffer = io.StringIO()
             df.to_csv(csv_buffer, index=False)
             csv_content = csv_buffer.getvalue()
-            
+
             return StreamingResponse(
                 iter([csv_content]),
                 media_type="text/csv",
                 headers={"Content-Disposition": f"attachment; filename=simulation_{session_id}.csv"},
             )
-    
+
     elif format == "json":
         # Return full JSON data
         json_content = json.dumps(data, indent=2, ensure_ascii=False)
-        
+
         return StreamingResponse(
             iter([json_content]),
             media_type="application/json",
             headers={"Content-Disposition": f"attachment; filename=simulation_{session_id}.json"},
         )
-    
+
     else:
         raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
 

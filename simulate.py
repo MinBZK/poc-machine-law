@@ -233,7 +233,7 @@ class LawSimulator:
             current_count = len([p for pair in pairs for p in pair if p is not None])
             if current_count >= num_people:
                 break
-                
+
             person = self.generate_person()
 
             # Check if we need only one more person
@@ -1068,8 +1068,11 @@ class LawSimulator:
             # 1. Zorgtoeslag (healthcare subsidy)
             zorgtoeslag_overrides = self._create_law_overrides("zorgtoeslagwet")
             zorgtoeslag = self.services.evaluate(
-                "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, self.simulation_date,
-                overwrite_input=zorgtoeslag_overrides
+                "TOESLAGEN",
+                "zorgtoeslagwet",
+                {"BSN": person["bsn"]},
+                self.simulation_date,
+                overwrite_input=zorgtoeslag_overrides,
             )
 
             # Also evaluate 2024 version for comparison if simulating in 2025
@@ -1077,8 +1080,11 @@ class LawSimulator:
             if self.simulation_date.startswith("2025"):
                 try:
                     zorgtoeslag_2024 = self.services.evaluate(
-                        "TOESLAGEN", "zorgtoeslagwet", {"BSN": person["bsn"]}, "2024-12-31",
-                        overwrite_input=zorgtoeslag_overrides
+                        "TOESLAGEN",
+                        "zorgtoeslagwet",
+                        {"BSN": person["bsn"]},
+                        "2024-12-31",
+                        overwrite_input=zorgtoeslag_overrides,
                     )
                 except Exception:
                     pass
@@ -1090,8 +1096,11 @@ class LawSimulator:
             try:
                 huurtoeslag_overrides = self._create_law_overrides("wet_op_de_huurtoeslag")
                 huurtoeslag = self.services.evaluate(
-                    "TOESLAGEN", "wet_op_de_huurtoeslag", {"BSN": person["bsn"]}, self.simulation_date,
-                    overwrite_input=huurtoeslag_overrides
+                    "TOESLAGEN",
+                    "wet_op_de_huurtoeslag",
+                    {"BSN": person["bsn"]},
+                    self.simulation_date,
+                    overwrite_input=huurtoeslag_overrides,
                 )
             except Exception as e:
                 logging.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
@@ -1101,8 +1110,11 @@ class LawSimulator:
             try:
                 bijstand_overrides = self._create_law_overrides("participatiewet/bijstand")
                 bijstand = self.services.evaluate(
-                    "GEMEENTE_AMSTERDAM", "participatiewet/bijstand", {"BSN": person["bsn"]}, self.simulation_date,
-                    overwrite_input=bijstand_overrides
+                    "GEMEENTE_AMSTERDAM",
+                    "participatiewet/bijstand",
+                    {"BSN": person["bsn"]},
+                    self.simulation_date,
+                    overwrite_input=bijstand_overrides,
                 )
             except Exception:
                 bijstand = None
@@ -1114,8 +1126,11 @@ class LawSimulator:
                 try:
                     kinderopvang_overrides = self._create_law_overrides("wet_kinderopvang")
                     kinderopvangtoeslag = self.services.evaluate(
-                        "TOESLAGEN", "wet_kinderopvang", {"BSN": person["bsn"]}, self.simulation_date,
-                        overwrite_input=kinderopvang_overrides
+                        "TOESLAGEN",
+                        "wet_kinderopvang",
+                        {"BSN": person["bsn"]},
+                        self.simulation_date,
+                        overwrite_input=kinderopvang_overrides,
                     )
                 except Exception as e:
                     logging.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
@@ -1123,14 +1138,18 @@ class LawSimulator:
 
             # 6. Kiesrecht (voting rights)
             kiesrecht_overrides = self._create_law_overrides("kieswet")
-            kiesrecht = self.services.evaluate("KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date,
-                                            overwrite_input=kiesrecht_overrides)
+            kiesrecht = self.services.evaluate(
+                "KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date, overwrite_input=kiesrecht_overrides
+            )
 
             # 7. Inkomstenbelasting (income tax)
             inkomstenbelasting_overrides = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
-                "BELASTINGDIENST", "wet_inkomstenbelasting", {"BSN": person["bsn"]}, self.simulation_date,
-                overwrite_input=inkomstenbelasting_overrides
+                "BELASTINGDIENST",
+                "wet_inkomstenbelasting",
+                {"BSN": person["bsn"]},
+                self.simulation_date,
+                overwrite_input=inkomstenbelasting_overrides,
             )
         except Exception:
             return None
@@ -1211,21 +1230,21 @@ class LawSimulator:
     def _create_law_overrides(self, law_name):
         """Create overwrite_input dict for a specific law based on UI parameters."""
         overrides = {}
-        
+
         if law_name == "zorgtoeslagwet" and "zorgtoeslag" in self.law_parameters:
             params = self.law_parameters["zorgtoeslag"]
             if "standaardpremie" in params and params["standaardpremie"] is not None:
                 # Convert monthly to yearly (in eurocents)
                 yearly_premium = int(params["standaardpremie"] * 12 * 100)
                 overrides["VWS"] = {"standaardpremie": yearly_premium}
-        
+
         # Note: Most other law parameters are in the 'definitions' section of YAML files,
         # which cannot be overridden through the overwrite_input mechanism.
         # These would require extending the system to support definition overrides.
-        
+
         # For now, we can only override input parameters, not definition constants.
         # Future enhancement: Add support for overriding law definitions.
-        
+
         return overrides
 
     def run_simulation(self, num_people=1000):
