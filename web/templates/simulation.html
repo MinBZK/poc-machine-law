@@ -1257,19 +1257,9 @@ function createTab(simulationId, params) {
     const tab = document.createElement('div');
     tab.id = `tab-${simulationId}`;
     tab.className = 'relative group inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer border-r border-gray-200 bg-yellow-50 border-b-2 border-b-transparent';
-    // Create descriptive tab name
+    // Create simple tab name
     const tabNumber = Object.keys(simulations).length + 1;
-    let tabName = `Sim ${tabNumber}: ${params.num_people}p`;
-    
-    // Add key parameter changes if any
-    if (params.law_parameters) {
-        const changedLaws = Object.keys(params.law_parameters).filter(law => 
-            Object.keys(params.law_parameters[law]).length > 0
-        );
-        if (changedLaws.length > 0) {
-            tabName += ` (${changedLaws.map(l => l.substring(0, 3)).join(',')})`;
-        }
-    }
+    let tabName = `Sim ${tabNumber}`;
     
     tab.innerHTML = `
         <span class="status-icon mr-1.5">
@@ -1314,7 +1304,8 @@ function createTab(simulationId, params) {
     // Store simulation info
     simulations[simulationId] = {
         params: params,
-        status: 'running'
+        status: 'running',
+        tabName: tabName
     };
     
     // Switch to new tab
@@ -1970,9 +1961,9 @@ function exportComparison(format) {
     const comparisons = completedSims.slice(1);
     
     // Create CSV content
-    let csv = 'Metriek,Basis';
-    comparisons.forEach((_, idx) => {
-        csv += `,Simulatie ${idx + 2},Verschil`;
+    let csv = 'Metriek,' + baseline.tabName;
+    comparisons.forEach((sim) => {
+        csv += `,${sim.tabName},Verschil`;
     });
     csv += '\n';
     
@@ -2079,10 +2070,10 @@ function renderComparisonContent(simulations) {
     
     let html = `
         <div class="mb-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Vergelijking met Basissimulatie</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Vergelijking Simulaties</h3>
             <div class="bg-blue-50 p-4 rounded-lg mb-4">
                 <p class="text-sm text-blue-700">
-                    <strong>Basissimulatie:</strong> ${baseline.params.num_people} personen, 
+                    <strong>${baseline.tabName}:</strong> ${baseline.params.num_people} personen, 
                     ${baseline.params.simulation_date}
                 </p>
             </div>
@@ -2096,11 +2087,11 @@ function renderComparisonContent(simulations) {
                             Metriek
                         </th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Basis
+                            ${baseline.tabName}
                         </th>
-                        ${comparisons.map((sim, idx) => `
+                        ${comparisons.map((sim) => `
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Simulatie ${idx + 2}
+                                ${sim.tabName}
                             </th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Verschil
@@ -2297,7 +2288,7 @@ function renderParameterDifferences(baseline, comparisons) {
     comparisons.forEach((sim, idx) => {
         html += `
             <div class="bg-gray-50 p-4 rounded-lg">
-                <h5 class="font-medium text-gray-900 mb-2">Simulatie ${idx + 2} vs Basis</h5>
+                <h5 class="font-medium text-gray-900 mb-2">${sim.tabName} vs ${baseline.tabName}</h5>
                 <div class="text-sm text-gray-600 space-y-1">
         `;
         
