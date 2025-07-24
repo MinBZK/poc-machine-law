@@ -258,26 +258,71 @@
                 <div class="bg-white shadow rounded-lg">
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900 mb-4">Vooraf Ingestelde Scenario's</h2>
-                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <div class="space-y-3">
                             <button type="button"
                                     onclick="loadPreset('current')"
-                                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Huidige Realiteit
+                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Huidige Realiteit</div>
+                                        <div class="text-sm text-gray-500">Standaard parameters - huidige Nederlandse situatie</div>
+                                    </div>
+                                </div>
                             </button>
                             <button type="button"
                                     onclick="loadPreset('recession')"
-                                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Economische Recessie
+                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Economische Recessie</div>
+                                        <div class="text-sm text-gray-500">Hogere werkloosheid, lagere inkomens, verhoogde bijstand</div>
+                                    </div>
+                                </div>
                             </button>
                             <button type="button"
                                     onclick="loadPreset('housing_crisis')"
-                                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Wooncrisis
+                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-orange-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Wooncrisis</div>
+                                        <div class="text-sm text-gray-500">Hogere huren, meer huurders, verhoogde huurtoeslag</div>
+                                    </div>
+                                </div>
                             </button>
                             <button type="button"
                                     onclick="loadPreset('aging')"
-                                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Vergrijzing
+                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-purple-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Vergrijzing</div>
+                                        <div class="text-sm text-gray-500">Meer ouderen, hogere AOW uitgaven, minder werkenden</div>
+                                    </div>
+                                </div>
+                            </button>
+                            <button type="button"
+                                    onclick="loadPreset('healthcare')"
+                                    class="w-full text-left px-4 py-3 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Zorgkosten Stijging</div>
+                                        <div class="text-sm text-gray-500">Hogere zorgpremies, meer zorgtoeslag nodig</div>
+                                    </div>
+                                </div>
                             </button>
                         </div>
                     </div>
@@ -657,70 +702,146 @@ function updateIncomeDistribution() {
 function loadPreset(presetName) {
     const presets = {
         'current': {
-            age_18_30: 18,
-            age_30_45: 25,
-            age_45_67: 32,
-            age_67_85: 20,
-            age_85_plus: 5,
-            income_low_pct: 30,
-            income_middle_pct: 50,
-            income_high_pct: 20,
-            zero_income_prob: 5,
-            rent_percentage: 43,
-            student_percentage_young: 40
+            demographics: {
+                age_18_30: 18,
+                age_30_45: 25,
+                age_45_67: 32,
+                age_67_85: 20,
+                age_85_plus: 5,
+                income_low_pct: 30,
+                income_middle_pct: 50,
+                income_high_pct: 20,
+                zero_income_prob: 5,
+                rent_percentage: 43,
+                student_percentage_young: 40
+            },
+            law_parameters: {}
         },
         'recession': {
-            age_18_30: 20,
-            age_30_45: 28,
-            age_45_67: 30,
-            age_67_85: 17,
-            age_85_plus: 5,
-            income_low_pct: 45,
-            income_middle_pct: 40,
-            income_high_pct: 15,
-            zero_income_prob: 15,
-            rent_percentage: 55,
-            student_percentage_young: 25
+            demographics: {
+                age_18_30: 20,
+                age_30_45: 28,
+                age_45_67: 30,
+                age_67_85: 17,
+                age_85_plus: 5,
+                income_low_pct: 45,
+                income_middle_pct: 40,
+                income_high_pct: 15,
+                zero_income_prob: 15,
+                rent_percentage: 55,
+                student_percentage_young: 25
+            },
+            law_parameters: {
+                bijstand: {
+                    basisbedrag_alleenstaande: 1350,  // Verhoogd vanwege crisis
+                    basisbedrag_gehuwd: 1900
+                }
+            }
         },
         'housing_crisis': {
-            age_18_30: 22,
-            age_30_45: 30,
-            age_45_67: 28,
-            age_67_85: 15,
-            age_85_plus: 5,
-            income_low_pct: 35,
-            income_middle_pct: 50,
-            income_high_pct: 15,
-            zero_income_prob: 5,
-            rent_percentage: 70,
-            student_percentage_young: 50
+            demographics: {
+                age_18_30: 22,
+                age_30_45: 30,
+                age_45_67: 28,
+                age_67_85: 15,
+                age_85_plus: 5,
+                income_low_pct: 35,
+                income_middle_pct: 50,
+                income_high_pct: 15,
+                zero_income_prob: 5,
+                rent_percentage: 70,
+                student_percentage_young: 50
+            },
+            law_parameters: {
+                huurtoeslag: {
+                    max_huur: 900,  // Verhoogd maximum
+                    basishuur: 300  // Verhoogde basishuur
+                }
+            }
         },
         'aging': {
-            age_18_30: 12,
-            age_30_45: 20,
-            age_45_67: 30,
-            age_67_85: 28,
-            age_85_plus: 10,
-            income_low_pct: 25,
-            income_middle_pct: 45,
-            income_high_pct: 30,
-            zero_income_prob: 3,
-            rent_percentage: 35,
-            student_percentage_young: 30
+            demographics: {
+                age_18_30: 12,
+                age_30_45: 20,
+                age_45_67: 30,
+                age_67_85: 28,
+                age_85_plus: 10,
+                income_low_pct: 25,
+                income_middle_pct: 45,
+                income_high_pct: 30,
+                zero_income_prob: 3,
+                rent_percentage: 35,
+                student_percentage_young: 30
+            },
+            law_parameters: {
+                aow: {
+                    bedrag_alleenstaande: 1550,  // Verhoogd AOW bedrag
+                    bedrag_gehuwd_per_persoon: 1100
+                }
+            }
+        },
+        'healthcare': {
+            demographics: {
+                age_18_30: 18,
+                age_30_45: 25,
+                age_45_67: 32,
+                age_67_85: 20,
+                age_85_plus: 5,
+                income_low_pct: 35,
+                income_middle_pct: 45,
+                income_high_pct: 20,
+                zero_income_prob: 5,
+                rent_percentage: 43,
+                student_percentage_young: 40
+            },
+            law_parameters: {
+                zorgtoeslag: {
+                    standaardpremie: 250  // Verhoogde zorgpremie
+                }
+            }
         }
     };
 
     const preset = presets[presetName];
     if (preset) {
-        for (const [key, value] of Object.entries(preset)) {
-            const element = document.getElementById(key);
-            if (element) {
-                element.value = value;
-                updateSliderValue(key);
+        // Load demographic parameters
+        if (preset.demographics) {
+            for (const [key, value] of Object.entries(preset.demographics)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = value;
+                    updateSliderValue(key);
+                }
+            }
+            validateAgeDistribution();
+            updateIncomeDistribution();
+        }
+        
+        // Load law parameters
+        if (preset.law_parameters) {
+            // Reset all law parameters to defaults first
+            document.querySelectorAll('#law-parameters-section input').forEach(input => {
+                const defaultValue = input.getAttribute('value');
+                if (defaultValue) input.value = defaultValue;
+            });
+            
+            // Apply preset law parameters
+            for (const [law, params] of Object.entries(preset.law_parameters)) {
+                for (const [param, value] of Object.entries(params)) {
+                    const element = document.getElementById(`${law}_${param}`);
+                    if (element) {
+                        element.value = value;
+                    }
+                }
             }
         }
-        validateAgeDistribution();
-        updateIncomeDistribution();
+        
+        // Show notification
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse';
+        notification.textContent = `Scenario "${presetName}" geladen`;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
     }
 }
 
