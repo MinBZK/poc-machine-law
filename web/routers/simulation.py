@@ -12,8 +12,9 @@ from starlette.responses import Response
 from web.dependencies import templates
 from web.law_parameters import get_default_law_parameters
 
-# Store simulation progress
+# Store simulation progress and results
 simulation_progress = {}
+simulation_results = {}
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
 
@@ -87,7 +88,18 @@ async def run_simulation(request: Request):
         if not result.stdout.strip():
             raise Exception("No output from simulation")
 
-        return JSONResponse(json.loads(result.stdout))
+        simulation_data = json.loads(result.stdout)
+        
+        # Generate a unique session ID for this simulation
+        session_id = str(uuid.uuid4())
+        
+        # Store the results for export
+        simulation_results[session_id] = simulation_data
+        
+        # Add session_id to response
+        simulation_data['session_id'] = session_id
+        
+        return JSONResponse(simulation_data)
 
     except Exception as e:
         import traceback
@@ -114,18 +126,43 @@ async def get_results(request: Request, session_id: str):
 @router.get("/export/{session_id}")
 async def export_results(session_id: str, format: str = "csv"):
     """Export simulation results in various formats"""
-    # TODO: Implement result export
-    # For now, return a placeholder CSV
-
-    # Example CSV content
-    csv_content = "bsn,age,income,zorgtoeslag_eligible,zorgtoeslag_amount\n"
-    csv_content += "100000001,35,25000,true,94.50\n"
-
-    return StreamingResponse(
-        iter([csv_content]),
-        media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=simulation_{session_id}.csv"},
-    )
+    import pandas as pd
+    import io
+    
+    # Check if we have results for this session
+    if session_id not in simulation_results:
+        raise HTTPException(status_code=404, detail="Simulation results not found")
+    
+    data = simulation_results[session_id]
+    
+    if format == "csv":
+        # Convert results to CSV
+        if 'results' in data:
+            df = pd.DataFrame(data['results'])
+            
+            # Create CSV content
+            csv_buffer = io.StringIO()
+            df.to_csv(csv_buffer, index=False)
+            csv_content = csv_buffer.getvalue()
+            
+            return StreamingResponse(
+                iter([csv_content]),
+                media_type="text/csv",
+                headers={"Content-Disposition": f"attachment; filename=simulation_{session_id}.csv"},
+            )
+    
+    elif format == "json":
+        # Return full JSON data
+        json_content = json.dumps(data, indent=2, ensure_ascii=False)
+        
+        return StreamingResponse(
+            iter([json_content]),
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename=simulation_{session_id}.json"},
+        )
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
 
 
 def calculate_summary_statistics(df) -> Dict:

@@ -229,8 +229,18 @@ class LawSimulator:
     def generate_paired_people(self, num_people):
         pairs = []  # Store people in pairs (person, partner or None)
 
-        while len([p for pair in pairs for p in pair if p is not None]) < num_people:
+        while True:
+            current_count = len([p for pair in pairs for p in pair if p is not None])
+            if current_count >= num_people:
+                break
+                
             person = self.generate_person()
+
+            # Check if we need only one more person
+            if current_count + 1 == num_people:
+                # Just add the single person without a partner
+                pairs.append((person, None))
+                break
 
             # Partnership probability based on age
             partner_prob = 0.1
@@ -241,7 +251,11 @@ class LawSimulator:
             elif person["age"] >= 60:
                 partner_prob = 0.6
 
-            if random.random() < partner_prob:  # Chance of partner
+            # Check if adding a partner would exceed our target
+            if current_count + 2 > num_people:
+                # Don't add a partner if it would exceed num_people
+                pairs.append((person, None))
+            elif random.random() < partner_prob:  # Chance of partner
                 age_diff = random.gauss(0, 5)
                 birth_year_min = person["birth_date"].year + int(age_diff) - 1
                 birth_year_max = person["birth_date"].year + int(age_diff) + 1
@@ -1123,11 +1137,11 @@ class LawSimulator:
 
         result.update(
             {
-                # Zorgtoeslag
+                # Zorgtoeslag (yearly amount in eurocents, convert to monthly euros)
                 "zorgtoeslag_eligible": zorgtoeslag.requirements_met,
-                "zorgtoeslag_amount": zorgtoeslag.output.get("hoogte_toeslag", 0) / 100,
+                "zorgtoeslag_amount": zorgtoeslag.output.get("hoogte_toeslag", 0) / 100 / 12,
                 # Zorgtoeslag 2024 comparison (if available)
-                "zorgtoeslag_2024_amount": zorgtoeslag_2024.output.get("hoogte_toeslag", 0) / 100
+                "zorgtoeslag_2024_amount": zorgtoeslag_2024.output.get("hoogte_toeslag", 0) / 100 / 12
                 if zorgtoeslag_2024
                 else None,
                 # AOW
