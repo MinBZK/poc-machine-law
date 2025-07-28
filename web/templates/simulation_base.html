@@ -1,0 +1,82 @@
+<!-- templates/simulation_base.html -->
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Machine Law Simulator</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
+        /* HTMX Indicator styles - hide the indicator by default */
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 200ms ease-in;
+            pointer-events: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+
+        /* Ensure dropdowns work correctly */
+        [x-cloak] {
+            display: none !important;
+        }
+        </style>
+        <!-- Chart.js for visualizations -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body class="min-h-screen bg-gray-100">
+        <div class="flex flex-col h-screen">
+            <header class="bg-slate-800 shadow flex-shrink-0">
+                <div class="px-6">
+                    <div class="flex justify-between items-center h-16">
+                        <div class="flex items-center">
+                            <h1 class="flex items-center">
+                                <a href="/simulation" class="flex items-center text-white">
+                                    <svg class="h-8 w-8 mr-3"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <span class="text-xl font-semibold">Machine Law Simulator</span>
+                                </a>
+                            </h1>
+                        </div>
+                        <!-- Right side: Navigation menu -->
+                        <div class="flex items-center">
+                            <!-- Shared dropdown menu -->
+                            {% include "admin/partials/navigation_menu.html" %}
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <main class="flex-1 overflow-hidden">
+                <div id="content" class="h-full">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+        <footer class="bg-gray-800 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="text-center">
+                    <p class="text-sm text-gray-400">
+                        Machine Law Simulator - Een analytisch instrument voor het simuleren van Nederlandse wetgeving
+                    </p>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Dit is een simulatie tool voor onderzoek en analyse, niet verbonden aan Burger.nl
+                    </p>
+                </div>
+            </div>
+        </footer>
+        {% block scripts %}{% endblock %}
+    </body>
+</html>
