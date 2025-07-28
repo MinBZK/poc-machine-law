@@ -11,10 +11,10 @@
             {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
                 <div class="flex space-x-2">
                     <button type="button"
-                            class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                            class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 cursor-pointer"
                             onclick="showDialog('{{ case.id }}', true)">Approve</button>
                     <button type="button"
-                            class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                            class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 cursor-pointer"
                             onclick="showDialog('{{ case.id }}', false)">Deny</button>
                 </div>
             {% endif %}
@@ -48,10 +48,10 @@
                               required></textarea>
                     <div class="mt-6 flex justify-end space-x-3">
                         <button type="button"
-                                class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base"
+                                class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base cursor-pointer"
                                 onclick="closeDialog('{{ case.id }}')">Cancel</button>
                         <button type="submit"
-                                class="px-5 py-2.5 text-white rounded-md text-base"
+                                class="px-5 py-2.5 text-white rounded-md text-base cursor-pointer"
                                 id="confirm-btn-{{ case.id }}">Confirm</button>
                     </div>
                 </form>

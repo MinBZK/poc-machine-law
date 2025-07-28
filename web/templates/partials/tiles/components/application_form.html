@@ -16,7 +16,7 @@
     <div class="border-t border-blue-200 pt-4 mb-4"
          x-data="{ showData: true }">
         <button @click="showData = !showData"
-                class="flex items-center justify-between w-full text-left">
+                class="flex items-center justify-between w-full text-left cursor-pointer">
             <span class="text-sm font-medium text-gray-900">Gebruikte gegevens</span>
             <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
                  :class="{ 'rotate-180': showData }"
@@ -59,13 +59,13 @@
             <div class="flex gap-2">
                 <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
                         :disabled="!isChecked"
-                        :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                        :class="{ 'bg-blue-600 hover:bg-blue-700 cursor-pointer': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
                         class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
                     Bevestig aanvraag
                 </button>
                 <button type="button"
                         @click="document.dispatchEvent(new CustomEvent('cancel-application-form'))"
-                        class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors">
+                        class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
                     Annuleren
                 </button>
             </div>
@@ -80,13 +80,13 @@
                 <div class="flex gap-2">
                     <button type="submit"
                             :disabled="!isChecked"
-                            :class="{ 'bg-blue-600 hover:bg-blue-700': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                            :class="{ 'bg-blue-600 hover:bg-blue-700 cursor-pointer': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
                             class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
                         Bevestig aanvraag
                     </button>
                     <button type="button"
                             @click="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
-                            class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors">
+                            class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
                         Annuleren
                     </button>
                 </div>

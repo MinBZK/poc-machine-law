@@ -41,7 +41,7 @@
                                           class="ml-2 inline">
                                         <input type="hidden" name="provider_name" value="{{ provider.name }}">
                                         <button type="submit"
-                                                class="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded">
+                                                class="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded cursor-pointer">
                                             Clear
                                         </button>
                                     </form>
@@ -60,7 +60,7 @@
                                        placeholder="Enter API key"
                                        class="border rounded px-2 py-1 text-sm w-36">
                                 <button type="submit"
-                                        class="ml-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                                        class="ml-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded cursor-pointer">
                                     Set
                                 </button>
                             </form>
@@ -74,7 +74,7 @@
                                   class="m-0 p-0 inline">
                                 <input type="hidden" name="provider_name" value="{{ provider.name }}">
                                 <button type="submit"
-                                        class="{% if provider.name == current_provider %}bg-green-500 hover:bg-green-700{% else %}bg-gray-300 hover:bg-gray-400{% endif %} text-white font-bold py-1 px-3 rounded">
+                                        class="{% if provider.name == current_provider %}bg-green-500 hover:bg-green-700{% else %}bg-gray-300 hover:bg-gray-400{% endif %} text-white font-bold py-1 px-3 rounded cursor-pointer">
                                     {% if provider.name == current_provider %}
                                         Active
                                     {% else %}

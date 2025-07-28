@@ -26,7 +26,7 @@
                     <h3 class="text-lg font-semibold">{{ rule_spec.name if rule_spec else 'Loading...' }}</h3>
                 </div>
                 <button @click="show = false; $dispatch('close-panel'); document.getElementById('shared-application-panel').innerHTML = '';"
-                        class="text-gray-500 hover:text-gray-700">
+                        class="text-gray-500 hover:text-gray-700 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -58,7 +58,7 @@
                 <!-- Explanation Section -->
                 <div class="border-t pt-4">
                     <button @click="showExplanation = !showExplanation"
-                            class="flex items-center justify-between w-full text-left">
+                            class="flex items-center justify-between w-full text-left cursor-pointer">
                         <span class="text-sm font-medium text-gray-900">Uitleg</span>
                         <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
                              :class="{ 'rotate-180': showExplanation }"
@@ -87,7 +87,7 @@
                 <!-- Technical Details Section -->
                 <div class="border-t pt-4">
                     <button @click="showTechnical = !showTechnical"
-                            class="flex items-center justify-between w-full text-left">
+                            class="flex items-center justify-between w-full text-left cursor-pointer">
                         <span class="text-sm font-medium text-gray-900">Technische details</span>
                         <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
                              :class="{ 'rotate-180': showTechnical }"

@@ -18,7 +18,7 @@
                 </div>
                 <button id="close-wallet-modal"
                         type="button"
-                        class="text-gray-500 hover:text-gray-700">
+                        class="text-gray-500 hover:text-gray-700 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -84,11 +84,11 @@
                 </div>
                 <div class="flex justify-center space-x-4">
                     <button @click="step = 1"
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
                         Annuleren
                     </button>
                     <button @click="goToStep4()"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
                         Toestaan
                     </button>
                 </div>
@@ -104,7 +104,7 @@
                             <h5 class="font-medium text-sm text-gray-700">Gegevens uit uw wallet</h5>
                             <button type="button"
                                     @click="fetchWalletData()"
-                                    class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
+                                    class="text-xs text-blue-600 hover:text-blue-800 flex items-center cursor-pointer">
                                 <svg class="w-4 h-4 mr-1"
                                      fill="none"
                                      viewBox="0 0 24 24"
@@ -133,11 +133,11 @@
                 </div>
                 <div class="flex justify-center space-x-4">
                     <button @click="step = 1"
-                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors">
+                            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
                         Annuleren
                     </button>
                     <button @click="step = 5"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
                         Gegevens delen
                     </button>
                 </div>
@@ -184,7 +184,7 @@
                 <p class="text-sm text-gray-600 mb-6">Uw gegevens zijn overgedragen aan burger.nl</p>
                 <button id="complete-wallet-flow"
                         onclick="document.getElementById('wallet-modal').style.display='none'; console.log('Direct close!'); setTimeout(function() { document.dispatchEvent(new CustomEvent('wallet-data-received', { detail: { success: true, bsn: new URLSearchParams(window.location.search).get('bsn') || '{{ bsn }}', profile: window.lastWalletData || {} }})); }, 100);"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
                     Sluiten
                 </button>
             </div>

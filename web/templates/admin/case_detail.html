@@ -273,7 +273,7 @@
                                     </div>
                                     {% if claim.status == 'PENDING' %}
                                         <div class="mt-4 flex justify-end gap-2">
-                                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200"
+                                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
                                                     hx-get="/edit/approve-claim"
                                                     hx-target="#edit-form-container"
                                                     hx-vals='{ "claim_id": "{{ claim.id }}" }'>
@@ -282,7 +282,7 @@
                                                 </svg>
                                                 Goedkeuren
                                             </button>
-                                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
+                                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
                                                     hx-get="/edit/reject_claim_form"
                                                     hx-target="#edit-form-container"
                                                     hx-vals='{ "claim_id": "{{ claim.id }}" }'>
@@ -331,8 +331,8 @@
                                 <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
                             </div>
                             <button type="submit"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                                Beoordeling Indienen
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
+                                Beoordeling indienen
                             </button>
                         </form>
                     </div>

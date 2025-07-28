@@ -24,7 +24,7 @@
                                   class="m-0 p-0 inline">
                                 <input type="hidden" name="engine_id" value="{{ engine.id }}">
                                 <button type="submit"
-                                        class="{% if engine.id == current_engine_id %}bg-green-500 hover:bg-green-700{% else %}bg-gray-300 hover:bg-gray-400{% endif %} text-white font-bold py-1 px-3 rounded">
+                                        class="{% if engine.id == current_engine_id %}bg-green-500 hover:bg-green-700{% else %}bg-gray-300 hover:bg-gray-400{% endif %} text-white font-bold py-1 px-3 rounded cursor-pointer">
                                     {% if engine.id == current_engine_id %}
                                         Active
                                     {% else %}

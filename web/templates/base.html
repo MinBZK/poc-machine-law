@@ -105,7 +105,7 @@
             <div class="container mx-auto px-4">
                 <div class="flex justify-between items-center py-4">
                     <!-- Mobile Menu Button (Left Side) -->
-                    <button class="lg:hidden focus:outline-none"
+                    <button class="lg:hidden focus:outline-none cursor-pointer"
                             @click="mobileMenuOpen = !mobileMenuOpen"
                             aria-label="Toon/verberg menu">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +254,7 @@
                     <!-- Mobile Navigation Menu -->
                     <div class="hidden">
                         <button @click="desktopMoreMenuOpen = !desktopMoreMenuOpen"
-                                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 focus:outline-none">
+                                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 focus:outline-none cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  class="h-5 w-5 text-white"
                                  fill="none"
@@ -292,7 +292,7 @@
                                 <li class="pt-4 border-t border-blue-800"
                                     x-data="{ mobilemoreMenuOpen: false }">
                                     <button @click="mobilemoreMenuOpen = !mobilemoreMenuOpen"
-                                            class="w-full text-white hover:text-blue-200 font-medium py-2 flex items-center justify-between">
+                                            class="w-full text-white hover:text-blue-200 font-medium py-2 flex items-center justify-between cursor-pointer">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                  class="h-5 w-5 mr-1"
@@ -374,7 +374,7 @@
                                     <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">Profiel Wisselen</div>
                                     <div x-data="{ mobileProfilesOpen: false }" class="relative">
                                         <button @click="mobileProfilesOpen = !mobileProfilesOpen"
-                                                class="w-full flex items-center justify-between bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded">
+                                                class="w-full flex items-center justify-between bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded cursor-pointer">
                                             <div class="flex items-center">
                                                 <div class="w-6 h-6 mr-2 rounded-md overflow-hidden">
                                                     <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />

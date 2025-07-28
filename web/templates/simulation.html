@@ -6,7 +6,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-gray-900">Simulatie Parameters</h2>
                 <button onclick="showKeyboardHelp()"
-                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
                         title="Sneltoetsen (?)">
                     <svg class="w-3.5 h-3.5"
                          fill="none"
@@ -33,7 +33,7 @@
                         <div class="space-y-2">
                             <button type="button"
                                     onclick="loadPreset('current')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5"
                                          fill="none"
@@ -50,7 +50,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('recession')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5"
                                          fill="none"
@@ -66,7 +66,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('housing_crisis')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-orange-400 mr-3 mt-0.5"
                                          fill="none"
@@ -83,7 +83,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('aging')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-purple-400 mr-3 mt-0.5"
                                          fill="none"
@@ -100,7 +100,7 @@
                             </button>
                             <button type="button"
                                     onclick="loadPreset('healthcare')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
                                 <div class="flex items-start">
                                     <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5"
                                          fill="none"
@@ -151,7 +151,7 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <button type="button"
                             onclick="toggleSection('demographics-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
                         <h2 class="text-base font-medium text-gray-900">Demografie</h2>
                         <svg id="demographics-section-chevron"
                              class="w-5 h-5 text-gray-500 transform transition-transform"
@@ -354,7 +354,7 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <button type="button"
                             onclick="toggleSection('law-parameters-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
                         <h2 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h2>
                         <svg id="law-parameters-section-chevron"
                              class="w-5 h-5 text-gray-500 transform transition-transform"
@@ -655,7 +655,7 @@
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <button type="button"
                             onclick="toggleSection('config-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
                         <h2 class="text-base font-medium text-gray-900">Eigen Configuraties</h2>
                         <svg id="config-section-chevron"
                              class="w-5 h-5 text-gray-500 transform transition-transform"
@@ -672,7 +672,7 @@
                         <div class="flex items-center space-x-3">
                             <button type="button"
                                     onclick="saveConfiguration()"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                                 <svg class="w-4 h-4 mr-2"
                                      fill="none"
                                      stroke="currentColor"
@@ -680,11 +680,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2">
                                     </path>
                                 </svg>
-                                Configuratie Opslaan
+                                Configuratie opslaan
                             </button>
                             <button type="button"
                                     onclick="loadConfiguration()"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                                 <svg class="w-4 h-4 mr-2"
                                      fill="none"
                                      stroke="currentColor"
@@ -692,7 +692,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                     </path>
                                 </svg>
-                                Configuratie Laden
+                                Configuratie laden
                             </button>
                         </div>
                         <div class="mt-4">
@@ -707,7 +707,7 @@
             <div class="mt-6 pb-6 space-y-3">
                 <button type="button"
                         onclick="runSimulation()"
-                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                     <svg class="mr-2 -ml-1 h-5 w-5"
                          xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 20 20"
@@ -719,7 +719,7 @@
                 <button type="button"
                         id="compare-button"
                         onclick="openComparisonView()"
-                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hidden">
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hidden cursor-pointer">
                     <svg class="mr-2 -ml-1 h-5 w-5"
                          xmlns="http://www.w3.org/2000/svg"
                          fill="none"
@@ -1170,10 +1170,10 @@ function displaySavedConfigs() {
         .sort((a, b) => new Date(b[1].timestamp) - new Date(a[1].timestamp))
         .map(([name, config]) => `
             <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                <button onclick="applySavedConfig('${name}')" class="text-sm text-blue-600 hover:text-blue-800 truncate flex-1 text-left">
+                <button onclick="applySavedConfig('${name}')" class="text-sm text-blue-600 hover:text-blue-800 truncate flex-1 text-left cursor-pointer">
                     ${name}
                 </button>
-                <button onclick="deleteSavedConfig('${name}')" class="ml-2 text-red-500 hover:text-red-700">
+                <button onclick="deleteSavedConfig('${name}')" class="ml-2 text-red-500 hover:text-red-700 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
@@ -1424,7 +1424,7 @@ function showKeyboardHelp() {
                     <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">?</kbd>
                 </div>
             </div>
-            <button onclick="document.getElementById('help-modal').remove()" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+            <button onclick="document.getElementById('help-modal').remove()" class="mt-6 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer">
                 Sluiten
             </button>
         </div>
@@ -1502,7 +1502,7 @@ function createTab(simulationId, params) {
             </svg>
         </span>
         <span onclick="switchTab('${simulationId}')" title="${params.num_people} personen, ${params.simulation_date}">${tabName}</span>
-        <button onclick="closeTab('${simulationId}')" class="ml-2 p-0.5 rounded hover:bg-gray-200">
+        <button onclick="closeTab('${simulationId}')" class="ml-2 p-0.5 rounded hover:bg-gray-200 cursor-pointer">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -1735,7 +1735,7 @@ function displayResults(data, simulationId) {
         if (changedParams.length > 0) {
             parameterInfo = `
                 <div class="bg-amber-50 border border-amber-200 rounded-lg mb-4 overflow-hidden">
-                    <button onclick="toggleParameterDetails('${simulationId}')" class="w-full px-3 py-2 flex justify-between items-center hover:bg-amber-100 transition-colors text-left">
+                    <button onclick="toggleParameterDetails('${simulationId}')" class="w-full px-3 py-2 flex justify-between items-center hover:bg-amber-100 transition-colors cursor-pointer text-left">
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
@@ -1951,7 +1951,7 @@ function displayResults(data, simulationId) {
 
             <!-- Besteedbaar Inkomen - Final Result -->
             <div class="mt-8 bg-green-50 border-2 border-green-200 rounded-lg p-6">
-                <div class="cursor-pointer hover:bg-green-100 transition-colors -m-6 p-6" onclick="toggleLawDetails('besteedbaar-inkomen', this)">
+                <div class="cursor-pointer hover:bg-green-100 transition-colors cursor-pointer -m-6 p-6" onclick="toggleLawDetails('besteedbaar-inkomen', this)">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
                             <div class="flex items-center mb-4">
@@ -1990,19 +1990,19 @@ function displayResults(data, simulationId) {
 
             <!-- Export Options -->
             <div class="mt-6 flex justify-end space-x-4">
-                <button onclick="exportResults('csv')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button onclick="exportResults('csv')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                     <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                     Export CSV
                 </button>
-                <button onclick="exportResults('json')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button onclick="exportResults('json')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                     <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                     Export JSON
                 </button>
-                <button onclick="copyResultsAsMarkdown('${simulationId}')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button onclick="copyResultsAsMarkdown('${simulationId}')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                     <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
@@ -2184,7 +2184,7 @@ function openComparisonView() {
     content.innerHTML = `
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-900">Vergelijk Simulaties</h2>
-            <button onclick="closeComparisonView()" class="text-gray-400 hover:text-gray-500">
+            <button onclick="closeComparisonView()" class="text-gray-400 hover:text-gray-500 cursor-pointer">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -2196,7 +2196,7 @@ function openComparisonView() {
                 ${renderComparisonContent(completedSims.slice(0, Math.min(4, completedSims.length)))}
             </div>
             <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="exportComparison('csv')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <button onclick="exportComparison('csv')" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
                     <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
                     </svg>

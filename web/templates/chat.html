@@ -12,7 +12,7 @@
             <div class="relative" x-data="{ settingsOpen: false }">
                 <button @click="settingsOpen = !settingsOpen"
                         @click.away="settingsOpen = false"
-                        class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        class="text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="h-5 w-5"
                          viewBox="0 0 20 20"
@@ -34,7 +34,7 @@
                             <input type="hidden" name="provider" value="{{ provider }}">
                             <button type="submit"
                                     @click="settingsOpen = false"
-                                    class="w-full text-left flex items-center px-4 py-2 hover:bg-gray-100 {% if provider == current_provider %}font-semibold text-indigo-600{% else %}text-gray-700{% endif %}">
+                                    class="w-full text-left flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer {% if provider == current_provider %}font-semibold text-indigo-600{% else %}text-gray-700{% endif %}">
                                 {{ provider|capitalize }}
                                 {% if provider == current_provider %}
                                     <svg class="ml-1.5 h-2 w-2 text-indigo-600"
@@ -142,7 +142,7 @@
                        placeholder="Stel uw vraag..."
                        @keydown.enter="sendMessage">
                 <button type="submit"
-                        class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none">
+                        class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="h-6 w-6"
                          fill="none"
