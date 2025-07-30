@@ -1363,7 +1363,7 @@ document.addEventListener('keydown', (e) => {
 // Show keyboard shortcuts help
 function showKeyboardHelp() {
     const helpModal = document.createElement('div');
-    helpModal.className = 'fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50';
+    helpModal.className = 'fixed inset-0 bg-gray-500/75 flex items-center justify-center z-50';
     helpModal.id = 'help-modal';
     helpModal.onclick = (e) => {
         if (e.target === helpModal) {
@@ -2174,7 +2174,7 @@ function openComparisonView() {
 
     // Create comparison modal
     const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50';
+    modal.className = 'fixed inset-0 bg-gray-500/75 flex items-center justify-center z-50';
     modal.id = 'comparison-modal';
 
     const content = document.createElement('div');

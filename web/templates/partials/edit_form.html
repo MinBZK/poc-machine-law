@@ -1,9 +1,9 @@
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[100]" id="edit-modal" x-data='{ value: {{ value|tojson }}, newValueType: null,
+<div class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-[100]" id="edit-modal" x-data='{ value: {{ value|tojson }}, newValueType: null,
     {% if claim_data %}
         newValue: {{ claim_data.new_value|tojson }}, reason: {{ claim_data.reason|tojson }}, autoApprove: {{ claim_data.auto_approve|tojson }}, status: {{ claim_data.status|tojson }},
     {% else %}
         newValue: {{ value|tojson }}, reason: "", autoApprove: false, status: null, {% endif %} selectedHardheidsclausule: "", showHardheidsclausuleInfo: false, hasDetails: {{ (details is defined and details)|tojson }}, details: {% if details %}{{ details|tojson }}{% else %}null{% endif %}, isEurocent: function() { return this.hasDetails && this.details && this.details.type === "amount" && this.details.type_spec && this.details.type_spec.unit === "eurocent"; }, displayValue: function(val) { if (this.isEurocent() && typeof val === "number") { return (val / 100).toFixed(2); } return val; }, parseValue: function(val) { if (this.isEurocent() && !isNaN(parseFloat(val))) { return Math.round(parseFloat(val) * 100); } return val; }, formatDate: function(dateStr) { if (!dateStr) return ""; const date = new Date(dateStr); return date.toISOString().split("T")[0]; } }' x-init="$nextTick(() => { if (isEurocent()) { setTimeout(() => { const displayInput = document.getElementById('display-new-value'); if (displayInput) { displayInput.value = displayValue(newValue); } }, 50); } }) ">
-        <div class="relative top-20 mx-auto p-6 border w-[800px] shadow-lg rounded-lg bg-white z-[100]">
+        <div class="relative top-20 mx-auto p-6 border border-gray-500/75 w-[800px] shadow-lg rounded-lg bg-white z-[100]">
             <!-- Header -->
             <div class="mb-6">
                 <h3 class="text-xl font-semibold text-gray-900">Waarde wijzigen voor {{ key|title|replace('_', ' ') }}</h3>

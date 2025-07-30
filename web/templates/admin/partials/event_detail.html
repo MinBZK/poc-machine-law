@@ -27,13 +27,13 @@
         {% if event.data.reason %}
             <div class="mt-3">
                 <h4 class="text-sm font-medium text-gray-900 mb-1">Reden:</h4>
-                <p class="text-sm bg-white bg-opacity-75 rounded p-3">{{ event.data.reason }}</p>
+                <p class="text-sm bg-white/75 rounded p-3">{{ event.data.reason }}</p>
             </div>
         {% endif %}
         {% if event.event_type == 'Submitted' %}
             <div class="mt-3">
                 <h4 class="text-sm font-medium text-gray-900 mb-1">Geclaimde Resultaten:</h4>
-                <div class="bg-white bg-opacity-75 rounded p-3">
+                <div class="bg-white/75 rounded p-3">
                     {% for key, value in event.data.claimed_result.items() %}
                         <div class="grid grid-cols-2 gap-2 text-sm">
                             <span class="text-gray-600">{{ key|title|replace('_', ' ') }}</span>
@@ -44,7 +44,7 @@
             </div>
         {% elif event.event_type in ['AutomaticallyDecided', 'Decided'] %}
             <div class="mt-3">
-                <div class="bg-white bg-opacity-75 rounded p-3 mb-3">
+                <div class="bg-white/75 rounded p-3 mb-3">
                     <div class="grid grid-cols-2 gap-2 text-sm">
                         <span class="text-gray-600">Beslissing</span>
                         <span class="text-gray-900 font-medium">
@@ -58,7 +58,7 @@
                 </div>
                 {% if event.data.verified_result %}
                     <h4 class="text-sm font-medium text-gray-900 mb-1">Geverifieerde Resultaten:</h4>
-                    <div class="bg-white bg-opacity-75 rounded p-3">
+                    <div class="bg-white/75 rounded p-3">
                         {% for key, value in event.data.verified_result.items() %}
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <span class="text-gray-600">{{ key|title|replace('_', ' ') }}</span>
@@ -71,7 +71,7 @@
         {% elif event.event_type == 'AddedToManualReview' %}
             <div class="mt-3">
                 <h4 class="text-sm font-medium text-gray-900 mb-1">Vergelijking Resultaten:</h4>
-                <div class="bg-white bg-opacity-75 rounded p-3">
+                <div class="bg-white/75 rounded p-3">
                     <div class="grid grid-cols-3 gap-2 text-sm border-b border-gray-200 pb-2 mb-2">
                         <span class="font-medium text-gray-900">Veld</span>
                         <span class="font-medium text-gray-900">Geclaimd</span>
