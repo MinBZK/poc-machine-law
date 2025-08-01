@@ -88,6 +88,36 @@
     "legal_basis": {
       "$ref": "#/definitions/legalBasis"
     },
+    "data_minimization": {
+      "type": "object",
+      "properties": {
+        "min_age": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum age required for this law to apply"
+        },
+        "max_age": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum age for this law to apply"
+        },
+        "requires_partner": {
+          "type": "boolean",
+          "description": "Whether this law requires having a partner"
+        },
+        "requires_children": {
+          "type": "boolean",
+          "description": "Whether this law requires having children"
+        },
+        "early_elimination_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of fields that can be checked early to eliminate this law"
+        }
+      }
+    },
     "properties": {
       "type": "object",
       "properties": {
@@ -217,6 +247,12 @@
         },
         "legal_basis": {
           "$ref": "#/definitions/legalBasis"
+        },
+        "data_sensitivity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Data sensitivity level: 1=lowest (administrative), 2=low (demographics), 3=medium (ranges), 4=high (exact personal), 5=highest (identifiers)"
         }
       }
     },

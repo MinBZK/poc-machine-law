@@ -1,0 +1,1434 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
+uuid: cdd0ec9f-4975-4969-9d8a-808f2d6abfc9
+name: Inkomstenbelasting
+law: wet_inkomstenbelasting
+valid_from: 2001-01-01
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "AANSLAG"
+discoverable: "CITIZEN"
+service: "BELASTINGDIENST"
+legal_basis:
+  law: "Wet inkomstenbelasting 2001"
+  bwb_id: "BWBR0011353"
+  article: "2.1"
+  url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.1"
+  juriconnect: "jci1.3:c:BWBR0011353&artikel=2.1&z=2025-01-01&g=2025-01-01"
+  explanation: "Artikel 2.1 Wet IB 2001 bepaalt dat inkomstenbelasting wordt geheven over het inkomen uit werk en woning, inkomen uit aanmerkelijk belang en inkomen uit sparen en beleggen"
+description: >
+  Regels voor het berekenen van de inkomstenbelasting volgens de Wet inkomstenbelasting.
+  De inkomstenbelasting wordt opgelegd op inkomen dat natuurlijke personen ontvangen,
+  onderverdeeld in drie 'boxen': box 1 (werk en woning), box 2 (aanmerkelijk belang),
+  en box 3 (sparen en beleggen). De wet regelt ook de berekening van heffingskortingen
+  die de te betalen belasting verminderen.
+
+references:
+  - law: "Wet inkomstenbelasting"
+    article: "2.3"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.3"
+  - law: "Wet inkomstenbelasting"
+    article: "2.10"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.10"
+  - law: "Wet inkomstenbelasting"
+    article: "2.12"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.12"
+  - law: "Wet inkomstenbelasting"
+    article: "2.13"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.13"
+  - law: "Wet inkomstenbelasting"
+    article: "8.10"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk8_Artikel8.10"
+  - law: "Wet inkomstenbelasting"
+    article: "8.11"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk8_Artikel8.11"
+  - law: "Wet inkomstenbelasting"
+    article: "8.14a"
+    url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk8_Artikel8.14a"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet inkomstenbelasting 2001"
+        bwb_id: "BWBR0011353"
+        article: "2.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0011353/2025-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.14"
+        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.14&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 2.14 lid 1 Wet IB 2001 bepaalt dat binnenlandse belastingplichtigen worden geïdentificeerd via hun BSN"
+
+  sources:
+    # Box 1 bronnen
+    - name: "BOX1_DIENSTBETREKKING"
+      description: "Inkomsten uit loondienst"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "loon_uit_dienstbetrekking"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX1_UITKERINGEN"
+      description: "Uitkeringen en pensioenen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "uitkeringen_en_pensioenen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX1_ONDERNEMING"
+      description: "Winst uit onderneming"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "winst_uit_onderneming"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX1_OVERIGE_WERKZAAMHEDEN"
+      description: "Resultaat overige werkzaamheden"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "resultaat_overige_werkzaamheden"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX1_EIGEN_WONING"
+      description: "Eigen woning"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "eigen_woning"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    # Box 2 bronnen
+    - name: "BOX2_DIVIDEND"
+      description: "Reguliere voordelen (dividend)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box2"
+        field: "reguliere_voordelen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX2_AANDELEN"
+      description: "Vervreemdingsvoordelen (verkoop aandelen)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box2"
+        field: "vervreemdingsvoordelen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    # Box 3 bronnen
+    - name: "BOX3_SPAREN"
+      description: "Spaargeld"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "spaargeld"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX3_BELEGGEN"
+      description: "Beleggingen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "beleggingen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX3_ONROEREND_GOED"
+      description: "Overig onroerend goed"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "onroerend_goed"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "BOX3_SCHULDEN"
+      description: "Schulden"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "schulden"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    # Persoonsgebonden aftrek
+    - name: "PERSOONSGEBONDEN_AFTREK"
+      description: "Persoonsgebonden aftrek"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "aftrekposten"
+        field: "persoonsgebonden_aftrek"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    # Partner Box 1 bronnen
+    - name: "PARTNER_BOX1_DIENSTBETREKKING"
+      description: "Partner inkomsten uit loondienst"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "loon_uit_dienstbetrekking"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX1_UITKERINGEN"
+      description: "Partner uitkeringen en pensioenen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "uitkeringen_en_pensioenen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX1_ONDERNEMING"
+      description: "Partner winst uit onderneming"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "winst_uit_onderneming"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN"
+      description: "Partner resultaat overige werkzaamheden"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "resultaat_overige_werkzaamheden"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX1_EIGEN_WONING"
+      description: "Partner eigen woning"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box1"
+        field: "eigen_woning"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    # Partner Box 2 bronnen
+    - name: "PARTNER_BOX2_DIVIDEND"
+      description: "Partner reguliere voordelen (dividend)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box2"
+        field: "reguliere_voordelen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX2_AANDELEN"
+      description: "Partner vervreemdingsvoordelen (verkoop aandelen)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "box2"
+        field: "vervreemdingsvoordelen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    # Partner Box 3 bronnen
+    - name: "PARTNER_BOX3_SPAREN"
+      description: "Partner spaargeld"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "spaargeld"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX3_BELEGGEN"
+      description: "Partner beleggingen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "beleggingen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX3_ONROEREND_GOED"
+      description: "Partner overig onroerend goed"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "onroerend_goed"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNER_BOX3_SCHULDEN"
+      description: "Partner schulden"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      source_reference:
+        table: "box3"
+        field: "schulden"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    # Partner buitenlands inkomen
+    - name: "PARTNER_BUITENLANDS_INKOMEN"
+      description: "Partner niet in Nederland belastbaar inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "buitenlands"
+        field: "inkomen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    # Buitenlands inkomen
+    - name: "BUITENLANDS_INKOMEN"
+      description: "Niet in Nederland belastbaar inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "buitenlands"
+        field: "inkomen"
+        select_on:
+          - name: "bsn"
+            description: "BSN nummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  input:
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de persoon"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "GEBOORTEDATUM"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "geboortedatum"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "PENSIOENLEEFTIJD"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "pensioenleeftijd"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "GEBOORTEDATUM"
+            reference: "$GEBOORTEDATUM"
+
+    - name: "HEEFT_PARTNER"
+      description: "Heeft de persoon een fiscale partner"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "heeft_partner"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "PARTNER_BSN"
+      description: "BSN van de fiscale partner"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+    - name: "HEEFT_KINDEREN_ONDER_12"
+      description: "Heeft de persoon kinderen jonger dan 12 jaar"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "heeft_kinderen_onder_12"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+  output:
+    # Outputs for tax calculation
+    - name: "totale_belastingschuld"
+      description: "Totaal verschuldigde inkomstenbelasting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: primary
+
+    - name: "box1_inkomen"
+      description: "Belastbaar inkomen uit werk en woning (box 1)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box1_belasting"
+      description: "Belasting box 1 (werk en woning)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box2_inkomen"
+      description: "Belastbaar inkomen uit aanmerkelijk belang (box 2)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box2_belasting"
+      description: "Belasting box 2 (aanmerkelijk belang)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box3_inkomen"
+      description: "Belastbaar inkomen uit sparen en beleggen (box 3)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "box3_belasting"
+      description: "Belasting box 3 (sparen en beleggen)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "algemene_heffingskorting"
+      description: "Algemene heffingskorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "arbeidskorting"
+      description: "Arbeidskorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "inkomensafhankelijke_combinatiekorting"
+      description: "Inkomensafhankelijke combinatiekorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "totale_heffingskortingen"
+      description: "Totaal aan heffingskortingen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "belastbaar_inkomen"
+      description: "Verzamelinkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    # Additional outputs for other governmental services
+    - name: "buitenlands_inkomen"
+      description: "Niet in Nederland belastbaar inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "inkomen"
+      description: "Verzamelinkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "vermogen"
+      description: "Vermogen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "partner_box1_inkomen"
+      description: "Partner inkomen uit werk en woning"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "partner_box2_inkomen"
+      description: "Partner inkomen uit aanmerkelijk belang"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "partner_box3_inkomen"
+      description: "Partner inkomen uit sparen en beleggen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "partner_buitenlands_inkomen"
+      description: "Partner niet in Nederland belastbaar inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "partner_inkomen"
+      description: "Totaal inkomen partner"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+
+    - name: "gezamenlijk_vermogen"
+      description: "Gezamenlijk vermogen met partner"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "bezittingen"
+      description: "Totale bezittingen (voor participatiewet)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "bedrijfsinkomen"
+      description: "Inkomen uit onderneming (voor participatiewet)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "maandelijks_inkomen"
+      description: "Maandelijks inkomen (voor participatiewet)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+
+
+  definitions:
+    # Box 1 definities
+    BOX1_SCHIJF1_GRENS: 7457300  # €74.573
+    BOX1_SCHIJF2_GRENS: 11932700 # €119.327 (voor volledige tabel)
+    BOX1_TARIEF1: 0.3693  # 36,93%
+    BOX1_TARIEF2: 0.4953  # 49,53%
+
+    # Box 1 definities voor AOW-gerechtigden
+    BOX1_TARIEF1_AOW: 0.1975  # 19,75% (lager percentage vanwege geen AOW-premie)
+    BOX1_TARIEF2_AOW: 0.4953  # 49,53% (gelijk aan regulier tarief)
+
+    # Box 2 definities
+    BOX2_SCHIJF1_GRENS: 6700000  # €67.000
+    BOX2_TARIEF1: 0.245  # 24,5%
+    BOX2_TARIEF2: 0.33  # 33%
+
+    # Box 3 definities
+    BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND: 5772900  # €57.729
+    BOX3_HEFFINGSVRIJE_VOET_PARTNERS: 11545800  # €115.458
+    BOX3_FORFAITAIR_RENDEMENT: 0.06  # 6% fictief rendement
+    BOX3_BELASTINGTARIEF: 0.34  # 34% belastingtarief
+    BOX3_RENDEMENT: 0.0674  # 6,74% rendement box 3
+    HEFFINGSVRIJ_VERMOGEN: 5720000  # 57.200 euro voor 2025
+
+    # Heffingskortingen definities
+    ALGEMENE_HEFFINGSKORTING_MAX: 310400  # €3.104
+    ALGEMENE_HEFFINGSKORTING_AFBOUW_START: 2466800  # €24.668
+    ALGEMENE_HEFFINGSKORTING_AFBOUW: 0.06578  # 6,578%
+    ALGEMENE_HEFFINGSKORTING_NULPUNT: 7243000  # €72.430
+
+    # Heffingskortingen definities voor AOW-gerechtigden
+    ALGEMENE_HEFFINGSKORTING_MAX_AOW: 165800  # €1.658 (lager vanwege geen AOW-premie)
+    ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW: 0.03427  # 3,427% (lager vanwege geen AOW-premie)
+
+    ARBEIDSKORTING_MAX: 446400  # €4.464
+    ARBEIDSKORTING_AFBOUW_START: 4081200  # €40.812
+    ARBEIDSKORTING_AFBOUW: 0.06510  # 6,51%
+    ARBEIDSKORTING_NULPUNT: 11932700  # €119.327
+
+    # Arbeidskorting voor AOW-gerechtigden
+    ARBEIDSKORTING_MAX_AOW: 238500  # €2.385 (lager vanwege geen AOW-premie)
+    ARBEIDSKORTING_AFBOUW_AOW: 0.03400  # 3,40% (lager vanwege geen AOW-premie)
+
+    INKOMENSAFHANKELIJKE_COMBINATIEKORTING_BASIS: 88800  # €888
+    INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE: 0.11213  # 11,213%
+    INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN: 550300  # €5.503
+    INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX: 265000  # €2.650
+
+    # Minimum persoonlijk inkomen
+    MIN_PERSONAL_INCOME: 0
+
+actions:
+  # Box 1 inkomen berekening
+  - output: "box1_inkomen"
+    operation: ADD
+    values:
+      - "$BOX1_DIENSTBETREKKING"
+      - "$BOX1_ONDERNEMING"
+      - "$BOX1_UITKERINGEN"
+      - "$BOX1_OVERIGE_WERKZAAMHEDEN"
+      - "$BOX1_EIGEN_WONING"
+
+  # Box 2 inkomen berekening
+  - output: "box2_inkomen"
+    operation: ADD
+    values:
+      - "$BOX2_DIVIDEND"
+      - "$BOX2_AANDELEN"
+
+  # Box 3 bezittingen berekening (zonder belasting)
+  - output: "box3_bezittingen"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - operation: ADD
+            values:
+              - "$BOX3_SPAREN"
+              - "$BOX3_BELEGGEN"
+              - "$BOX3_ONROEREND_GOED"
+          - "$BOX3_SCHULDEN"
+          - operation: IF
+            conditions:
+              - test:
+                  subject: "$HEEFT_PARTNER"
+                  operation: EQUALS
+                  value: true
+                then: "$BOX3_HEFFINGSVRIJE_VOET_PARTNERS"
+              - else: "$BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND"
+      - 0
+
+  # Box 3 inkomen berekening (belastbare vermogen x fictief rendement)
+  - output: "box3_inkomen"
+    operation: MULTIPLY
+    values:
+      - "$box3_bezittingen"
+      - "$BOX3_FORFAITAIR_RENDEMENT"
+
+  # Totaal belastbaar inkomen berekening
+  - output: "belastbaar_inkomen"
+    operation: ADD
+    values:
+      - "$box1_inkomen"
+      - "$box2_inkomen"
+      - "$box3_inkomen"
+      - operation: SUBTRACT
+        values:
+          - 0
+          - "$PERSOONSGEBONDEN_AFTREK"
+
+  # Verrekening van persoonsgebonden aftrek in vaste volgorde (eerst box 1, dan 3, dan 2)
+  - output: "box1_inkomen_na_aftrek"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$box1_inkomen"
+          - "$PERSOONSGEBONDEN_AFTREK"
+      - 0
+
+  - output: "resterende_aftrek_na_box1"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$PERSOONSGEBONDEN_AFTREK"
+          - "$box1_inkomen"
+      - 0
+
+  - output: "box3_inkomen_na_aftrek"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$box3_inkomen"
+          - "$resterende_aftrek_na_box1"
+      - 0
+
+  - output: "resterende_aftrek_na_box3"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$resterende_aftrek_na_box1"
+          - "$box3_inkomen"
+      - 0
+
+  - output: "box2_inkomen_na_aftrek"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$box2_inkomen"
+          - "$resterende_aftrek_na_box3"
+      - 0
+
+  # Bepaal is_aow_leeftijd
+  - output: "is_aow_leeftijd"
+    operation: GREATER_OR_EQUAL
+    values:
+      - "$LEEFTIJD"
+      - "$PENSIOENLEEFTIJD"
+
+  # Box 1 belasting herberekening na aftrek
+  - output: "box1_belasting"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_aow_leeftijd"
+          operation: EQUALS
+          value: true
+        then:
+          operation: IF
+          conditions:
+            - test:
+                operation: LESS_OR_EQUAL
+                values:
+                  - "$box1_inkomen_na_aftrek"
+                  - "$BOX1_SCHIJF1_GRENS"
+              then:
+                operation: MULTIPLY
+                values:
+                  - "$box1_inkomen_na_aftrek"
+                  - "$BOX1_TARIEF1_AOW"
+            - else:
+                operation: ADD
+                values:
+                  - operation: MULTIPLY
+                    values:
+                      - "$BOX1_SCHIJF1_GRENS"
+                      - "$BOX1_TARIEF1_AOW"
+                  - operation: MULTIPLY
+                    values:
+                      - operation: SUBTRACT
+                        values:
+                          - "$box1_inkomen_na_aftrek"
+                          - "$BOX1_SCHIJF1_GRENS"
+                      - "$BOX1_TARIEF2_AOW"
+      - else:
+          operation: IF
+          conditions:
+            - test:
+                operation: LESS_OR_EQUAL
+                values:
+                  - "$box1_inkomen_na_aftrek"
+                  - "$BOX1_SCHIJF1_GRENS"
+              then:
+                operation: MULTIPLY
+                values:
+                  - "$box1_inkomen_na_aftrek"
+                  - "$BOX1_TARIEF1"
+            - else:
+                operation: ADD
+                values:
+                  - operation: MULTIPLY
+                    values:
+                      - "$BOX1_SCHIJF1_GRENS"
+                      - "$BOX1_TARIEF1"
+                  - operation: MULTIPLY
+                    values:
+                      - operation: SUBTRACT
+                        values:
+                          - "$box1_inkomen_na_aftrek"
+                          - "$BOX1_SCHIJF1_GRENS"
+                      - "$BOX1_TARIEF2"
+
+  # Box 2 belasting herberekening na aftrek
+  - output: "box2_belasting"
+    operation: IF
+    conditions:
+      - test:
+          operation: LESS_OR_EQUAL
+          values:
+            - "$box2_inkomen_na_aftrek"
+            - "$BOX2_SCHIJF1_GRENS"
+        then:
+          operation: MULTIPLY
+          values:
+            - "$box2_inkomen_na_aftrek"
+            - "$BOX2_TARIEF1"
+      - else:
+          operation: ADD
+          values:
+            - operation: MULTIPLY
+              values:
+                - "$BOX2_SCHIJF1_GRENS"
+                - "$BOX2_TARIEF1"
+            - operation: MULTIPLY
+              values:
+                - operation: SUBTRACT
+                  values:
+                    - "$box2_inkomen_na_aftrek"
+                    - "$BOX2_SCHIJF1_GRENS"
+                - "$BOX2_TARIEF2"
+
+  # Box 3 belasting herberekening na aftrek
+  - output: "box3_belasting"
+    operation: MULTIPLY
+    values:
+      - "$box3_inkomen_na_aftrek"
+      - "$BOX3_BELASTINGTARIEF"
+
+  # Algemene heffingskorting berekening met verschillende regels voor AOW-gerechtigden
+  - output: "algemene_heffingskorting"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_aow_leeftijd"
+          operation: EQUALS
+          value: true
+        then:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$ALGEMENE_HEFFINGSKORTING_MAX_AOW"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$box1_inkomen"
+                          - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$box1_inkomen"
+                                  - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$ALGEMENE_HEFFINGSKORTING_NULPUNT"
+                                  - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_START"
+                          - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW"
+                    - else: 0
+            - 0
+      - else:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$ALGEMENE_HEFFINGSKORTING_MAX"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$box1_inkomen"
+                          - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$box1_inkomen"
+                                  - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$ALGEMENE_HEFFINGSKORTING_NULPUNT"
+                                  - "$ALGEMENE_HEFFINGSKORTING_AFBOUW_START"
+                          - "$ALGEMENE_HEFFINGSKORTING_AFBOUW"
+                    - else: 0
+            - 0
+
+  # Arbeidskorting berekening met verschillende regels voor AOW-gerechtigden
+  - output: "arbeidskorting"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_aow_leeftijd"
+          operation: EQUALS
+          value: true
+        then:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$ARBEIDSKORTING_MAX_AOW"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$BOX1_DIENSTBETREKKING"
+                          - "$ARBEIDSKORTING_AFBOUW_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$BOX1_DIENSTBETREKKING"
+                                  - "$ARBEIDSKORTING_AFBOUW_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$ARBEIDSKORTING_NULPUNT"
+                                  - "$ARBEIDSKORTING_AFBOUW_START"
+                          - "$ARBEIDSKORTING_AFBOUW_AOW"
+                    - else: 0
+            - 0
+      - else:
+          operation: MAX
+          values:
+            - operation: SUBTRACT
+              values:
+                - "$ARBEIDSKORTING_MAX"
+                - operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_THAN
+                        values:
+                          - "$BOX1_DIENSTBETREKKING"
+                          - "$ARBEIDSKORTING_AFBOUW_START"
+                      then:
+                        operation: MULTIPLY
+                        values:
+                          - operation: MIN
+                            values:
+                              - operation: SUBTRACT
+                                values:
+                                  - "$BOX1_DIENSTBETREKKING"
+                                  - "$ARBEIDSKORTING_AFBOUW_START"
+                              - operation: SUBTRACT
+                                values:
+                                  - "$ARBEIDSKORTING_NULPUNT"
+                                  - "$ARBEIDSKORTING_AFBOUW_START"
+                          - "$ARBEIDSKORTING_AFBOUW"
+                    - else: 0
+            - 0
+
+  # Inkomensafhankelijke combinatiekorting berekening
+  - output: "inkomensafhankelijke_combinatiekorting"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - subject: "$HEEFT_KINDEREN_ONDER_12"
+              operation: EQUALS
+              value: true
+            - operation: GREATER_THAN
+              values:
+                - "$BOX1_DIENSTBETREKKING"
+                - "$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN"
+        then:
+          operation: MIN
+          values:
+            - operation: ADD
+              values:
+                - "$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_BASIS"
+                - operation: MULTIPLY
+                  values:
+                    - operation: SUBTRACT
+                      values:
+                        - "$BOX1_DIENSTBETREKKING"
+                        - "$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN"
+                    - "$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE"
+            - "$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX"
+      - else: 0
+
+  # Totaal aan heffingskortingen
+  - output: "totale_heffingskortingen"
+    operation: ADD
+    values:
+      - "$algemene_heffingskorting"
+      - "$arbeidskorting"
+      - "$inkomensafhankelijke_combinatiekorting"
+
+  # Totaal verschuldigde belasting
+  - output: "totale_belastingschuld"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - operation: ADD
+            values:
+              - "$box1_belasting"
+              - "$box2_belasting"
+              - "$box3_belasting"
+          - "$totale_heffingskortingen"
+      - 0
+
+  # Berekeningen voor de missende outputs die nodig zijn voor andere wetten
+  # Foreign inkomen
+  - output: "buitenlands_inkomen"
+    value: "$BUITENLANDS_INKOMEN"
+
+  # Income (= verzamelinkomen, equivalent aan belastbaar_inkomen)
+  - output: "inkomen"
+    operation: ADD
+    values:
+      - "$box1_inkomen"
+      - "$box2_inkomen"
+      - "$box3_inkomen"
+      - "$buitenlands_inkomen"
+
+  # Net worth berekening
+  - output: "vermogen"
+    operation: SUBTRACT
+    values:
+      - operation: ADD
+        values:
+          - "$BOX3_SPAREN"
+          - "$BOX3_BELEGGEN"
+          - "$BOX3_ONROEREND_GOED"
+      - "$BOX3_SCHULDEN"
+
+  # Partner box 1 inkomen berekening
+  - output: "partner_box1_inkomen"
+    operation: ADD
+    values:
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$PARTNER_BSN"
+              operation: NOT_NULL
+            then:
+              operation: ADD
+              values:
+                - "$PARTNER_BOX1_DIENSTBETREKKING"
+                - "$PARTNER_BOX1_UITKERINGEN"
+                - "$PARTNER_BOX1_ONDERNEMING"
+                - "$PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN"
+                - "$PARTNER_BOX1_EIGEN_WONING"
+          - else: 0
+
+  # Partner box 2 inkomen berekening
+  - output: "partner_box2_inkomen"
+    operation: ADD
+    values:
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$PARTNER_BSN"
+              operation: NOT_NULL
+            then:
+              operation: ADD
+              values:
+                - "$PARTNER_BOX2_DIVIDEND"
+                - "$PARTNER_BOX2_AANDELEN"
+          - else: 0
+
+  # Partner box 3 inkomen berekening
+  - output: "partner_box3_inkomen"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$PARTNER_BSN"
+          operation: NOT_NULL
+        then:
+          operation: MULTIPLY
+          values:
+            - operation: MAX
+              values:
+                - operation: SUBTRACT
+                  values:
+                    - operation: ADD
+                      values:
+                        - "$PARTNER_BOX3_SPAREN"
+                        - "$PARTNER_BOX3_BELEGGEN"
+                        - "$PARTNER_BOX3_ONROEREND_GOED"
+                    - "$PARTNER_BOX3_SCHULDEN"
+                    - "$HEFFINGSVRIJ_VERMOGEN"
+                - 0
+            - "$BOX3_RENDEMENT"
+      - else: 0
+
+  # Partner foreign inkomen
+  - output: "partner_buitenlands_inkomen"
+    value: "$PARTNER_BUITENLANDS_INKOMEN"
+
+  # Partner totaal inkomen berekening
+  - output: "partner_inkomen"
+    operation: ADD
+    values:
+      - "$partner_box1_inkomen"
+      - "$partner_box2_inkomen"
+      - "$partner_box3_inkomen"
+      - "$partner_buitenlands_inkomen"
+
+  # Gezamenlijk vermogen berekening
+  - output: "gezamenlijk_vermogen"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$PARTNER_BSN"
+          operation: NOT_NULL
+        then:
+          operation: ADD
+          values:
+            - "$vermogen"
+            - operation: SUBTRACT
+              values:
+                - operation: ADD
+                  values:
+                    - "$PARTNER_BOX3_SPAREN"
+                    - "$PARTNER_BOX3_BELEGGEN"
+                    - "$PARTNER_BOX3_ONROEREND_GOED"
+                - "$PARTNER_BOX3_SCHULDEN"
+      - else: "$vermogen"
+
+  # Bezittingen voor participatiewet berekening
+  - output: "bezittingen"
+    operation: ADD
+    values:
+      - "$BOX3_SPAREN"
+      - "$BOX3_BELEGGEN"
+      - "$BOX3_ONROEREND_GOED"
+
+  # Maandelijks bedrijfsinkomen voor participatiewet berekening
+  - output: "bedrijfsinkomen"
+    operation: DIVIDE
+    values:
+      - "$BOX1_ONDERNEMING"
+      - 12  # Jaar naar maand
+
+  # Maandelijks inkomen voor participatiewet berekening
+  - output: "maandelijks_inkomen"
+    operation: DIVIDE
+    values:
+      - operation: ADD
+        values:
+          - "$box1_inkomen"
+          - "$box2_inkomen"
+          - "$box3_inkomen"
+      - 12  # Jaar naar maand

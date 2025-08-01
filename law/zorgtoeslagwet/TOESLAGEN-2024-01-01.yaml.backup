@@ -1,0 +1,343 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json
+uuid: 5be9dbe7-f565-40e2-8931-da82825dcf21
+name: Zorgtoeslag
+law: zorgtoeslagwet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2024-01-01
+service: "TOESLAGEN"
+description: >
+  Berekeningsregels voor het bepalen van het recht op en de hoogte van de zorgtoeslag volgens artikel 2
+  van de Wet op de zorgtoeslag, geldend voor het jaar 2024.
+
+references:
+  - law: "Wet op de zorgtoeslag"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0018451/2024-01-01#Paragraaf2_Artikel2"
+  - law: "Wet op de zorgtoeslag"
+    article: "2a"
+    url: "https://wetten.overheid.nl/BWBR0018451/2024-01-01#Paragraaf2_Artikel2a"
+  - law: "Wet op de zorgtoeslag"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0018451/2024-01-01#Paragraaf2_Artikel3"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  output:
+    - name: "is_verzekerde_zorgtoeslag"
+      description: "Geeft aan of iemand recht heeft op zorgtoeslag"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: secondary
+
+    - name: "hoogte_toeslag"
+      description: "De hoogte van de zorgtoeslag"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: primary
+
+  input:
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "HEEFT_PARTNER"
+      description: "Partnerschap status"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "heeft_partner"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "HEEFT_VERZEKERING"
+      description: "Verzekeringsstatus"
+      type: "boolean"
+      service_reference:
+        service: "RVZ"
+        field: "heeft_verzekering"
+        law: "zvw"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "HEEFT_VERDRAGSVERZEKERING"
+      description: "Verdragsverzekering status"
+      type: "boolean"
+      service_reference:
+        service: "RVZ"
+        field: "heeft_zorgverzekering"
+        law: "zvw"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "IS_GEDETINEERD"
+      description: "Detentiestatus"
+      type: "boolean"
+      service_reference:
+        service: "DJI"
+        field: "is_gedetineerd"
+        law: "penitentiaire_beginselenwet"
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "IS_FORENSISCH"
+      description: "Forensische status"
+      type: "boolean"
+      service_reference:
+        service: "DJI"
+        field: "is_forensisch"
+        law: "wet_forensische_zorg"
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "INKOMEN"
+      description: "Toetsingsinkomen"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "inkomen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        immutable_after: "P2Y"
+
+    - name: "VERMOGEN"
+      description: "Vermogen"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "vermogen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "GEZAMENLIJK_VERMOGEN"
+      description: "Gezamenlijk vermogen"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "gezamenlijk_vermogen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+
+    - name: "PARTNER_INKOMEN"
+      description: "Partnerinkomen"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "partner_inkomen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        immutable_after: "P2Y"
+
+    - name: "STANDAARDPREMIE"
+      description: "Standaardpremie"
+      type: "amount"
+      service_reference:
+        service: "VWS"
+        field: "standaardpremie"
+        law: "zorgtoeslagwet/regelingen/regeling_vaststelling_standaardpremie_en_bestuursrechtelijke_premies"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+
+  definitions:
+    MINIMUM_LEEFTIJD: 18
+    PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.0486
+    PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.0486
+    AFBOUWPERCENTAGE_MINIMUM: 0.13670
+    AFBOUWPERCENTAGE_BOVEN_DREMPEL: 0.0387
+    DREMPELINKOMEN_ALLEENSTAANDE: 3749600
+    DREMPELINKOMEN_TOESLAGPARTNER: 4821800
+    VERMOGENSGRENS_ALLEENSTAANDE: 14193900
+    VERMOGENSGRENS_TOESLAGPARTNER: 17942900
+
+requirements:
+  - all:
+      - or:
+          - subject: "$HEEFT_VERZEKERING"
+            operation: EQUALS
+            value: true
+          - subject: "$HEEFT_VERDRAGSVERZEKERING"
+            operation: EQUALS
+            value: true
+      - subject: "$LEEFTIJD"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_LEEFTIJD"
+      - subject: "$IS_GEDETINEERD"
+        operation: EQUALS
+        value: false
+      - subject: "$IS_FORENSISCH"
+        operation: EQUALS
+        value: false
+
+actions:
+  - output: "is_verzekerde_zorgtoeslag"
+    value: true
+
+  - output: "hoogte_toeslag"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HEEFT_PARTNER"
+          operation: EQUALS
+          value: false
+        then:
+          operation: IF
+          conditions:
+            - test:
+                subject: "$INKOMEN"
+                operation: GREATER_THAN
+                value: "$DREMPELINKOMEN_ALLEENSTAANDE"
+              then: 0
+            - test:
+                subject: "$VERMOGEN"
+                operation: GREATER_THAN
+                value: "$VERMOGENSGRENS_ALLEENSTAANDE"
+              then: 0
+            - else:
+                operation: SUBTRACT
+                values:
+                  - "$STANDAARDPREMIE"
+                  - operation: ADD
+                    values:
+                      - operation: MULTIPLY
+                        values:
+                          - "$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND"
+                          - operation: MIN
+                            values:
+                              - "$INKOMEN"
+                              - "$DREMPELINKOMEN_ALLEENSTAANDE"
+                      - operation: IF
+                        conditions:
+                          - test:
+                              operation: GREATER_THAN
+                              values:
+                                - "$INKOMEN"
+                                - "$DREMPELINKOMEN_ALLEENSTAANDE"
+                            then:
+                              operation: MULTIPLY
+                              values:
+                                - operation: SUBTRACT
+                                  values:
+                                    - "$INKOMEN"
+                                    - "$DREMPELINKOMEN_ALLEENSTAANDE"
+                                - "$AFBOUWPERCENTAGE_MINIMUM"
+                          - else: 0
+      - test:
+          subject: "$HEEFT_PARTNER"
+          operation: EQUALS
+          value: true
+        then:
+          operation: IF
+          conditions:
+            - test:
+                operation: GREATER_THAN
+                values:
+                  - operation: ADD
+                    values:
+                      - "$INKOMEN"
+                      - "$PARTNER_INKOMEN"
+                  - "$DREMPELINKOMEN_TOESLAGPARTNER"
+              then: 0
+            - test:
+                subject: "$GEZAMENLIJK_VERMOGEN"
+                operation: GREATER_THAN
+                value: "$VERMOGENSGRENS_TOESLAGPARTNER"
+              then: 0
+            - else:
+                operation: SUBTRACT
+                values:
+                  - operation: MULTIPLY
+                    values:
+                      - "$STANDAARDPREMIE"
+                      - 2
+                  - operation: ADD
+                    values:
+                      - operation: MULTIPLY
+                        values:
+                          - "$PERCENTAGE_DREMPELINKOMEN_MET_PARTNER"
+                          - operation: MIN
+                            values:
+                              - operation: ADD
+                                values:
+                                  - "$INKOMEN"
+                                  - "$PARTNER_INKOMEN"
+                              - "$DREMPELINKOMEN_TOESLAGPARTNER"
+                      - operation: IF
+                        conditions:
+                          - test:
+                              operation: GREATER_THAN
+                              values:
+                                - operation: ADD
+                                  values:
+                                    - "$INKOMEN"
+                                    - "$PARTNER_INKOMEN"
+                                - "$DREMPELINKOMEN_TOESLAGPARTNER"
+                            then:
+                              operation: MULTIPLY
+                              values:
+                                - operation: SUBTRACT
+                                  values:
+                                    - operation: ADD
+                                      values:
+                                        - "$INKOMEN"
+                                        - "$PARTNER_INKOMEN"
+                                    - "$DREMPELINKOMEN_TOESLAGPARTNER"
+                                - "$AFBOUWPERCENTAGE_BOVEN_DREMPEL"
+                          - else: 0

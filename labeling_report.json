@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "total_fields": 284,
+    "sensitivity_distribution": {
+      "4": 91,
+      "5": 80,
+      "1": 49,
+      "3": 33,
+      "2": 31
+    },
+    "confidence_distribution": {
+      "high (\u22650.85)": 40,
+      "medium (0.7-0.85)": 2,
+      "low (<0.7)": 242
+    },
+    "needs_manual_review": 242,
+    "auto_labeled_successfully": 42
+  },
+  "rule_usage": {
+    "BSN_identifiers": 20,
+    "exact_financial_amounts": 48,
+    "dates_administrative": 1,
+    "age_demographics": 15,
+    "location_categories": 4,
+    "boolean_flags": 40,
+    "detailed_income": 46,
+    "partner_personal_data": 35,
+    "identifiers_administrative": 7,
+    "general_categories": 8,
+    "housing_situation": 4,
+    "education_level": 3,
+    "detailed_assets": 4,
+    "birth_dates": 6,
+    "system_metadata": 1,
+    "household_composition": 5,
+    "full_addresses": 12,
+    "work_categories": 4
+  },
+  "service_breakdown": {
+    

@@ -1,0 +1,697 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
+uuid: c4fda809-15f2-454a-9e9b-f645b905ca12
+name: Algemene wet bestuursrecht - Beroepmogelijkheid en Termijnen
+law: awb/beroep
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2024-01-01
+service: "JenV"
+legal_basis:
+  law: "Algemene wet bestuursrecht"
+  bwb_id: "BWBR0005537"
+  article: "8:1"
+  url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+  juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 8:1 Awb bepaalt dat belanghebbenden beroep kunnen instellen tegen een besluit bij de bestuursrechter"
+description: >
+  Bepaalt of beroep mogelijk is tegen een besluit en wat de geldende termijnen zijn
+  volgens de Algemene wet bestuursrecht, met inachtneming van specifieke wetgeving.
+
+references:
+  - law: "Algemene wet bestuursrecht"
+    article: "7:1"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+  - law: "Algemene wet bestuursrecht"
+    article: "8:1"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+  - law: "Algemene wet bestuursrecht"
+    article: "6:7"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk6_Afdeling6.2_Artikel6:7"
+
+properties:
+  applies:
+    - name: "ZAAK"
+      aggregate: "Case"
+      events:
+        - type: "Decided"
+          filter:
+            approved: false
+      update:
+        - method: "determine_appeal_status"
+          mapping:
+            possible: "$beroep_mogelijk"
+            not_possible_reason: "$reden_niet_mogelijk"
+            appeal_period: "$beroepstermijn"
+            direct_appeal: "$direct_beroep"
+            direct_appeal_reason: "$reden_direct_beroep"
+            competent_court: "$bevoegde_rechtbank"
+            court_type: "$type_rechter"
+
+  sources:
+    - name: "WET"
+      description: "De wet waar dit besluit op gebaseerd is"
+      type: "object"
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "1:3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk1_Titeldeel1.1_Artikel1:3"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=1:3&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1:3 lid 1 Awb definieert wat een besluit is: een schriftelijke beslissing van een bestuursorgaan, inhoudende een publiekrechtelijke rechtshandeling"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "laws"
+        table: "laws"
+        fields:
+          [
+            "decision_type",
+            "name",
+            "valid_from",
+            "legal_character",
+            "voorbereidingsprocedure",
+            "beroepstermijn_weken",
+            "competent_court",
+          ]
+        select_on:
+          - name: "uuid"
+            description: "UUID van de wet"
+            type: "string"
+            value: "$ZAAK.rulespec_uuid"
+
+    - name: "ADRES"
+      description: "Woonadres van de persoon"
+      type: "object"
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "8:119"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.5_Afdeling8.5.5_Artikel8:119"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=8:119&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8:119 Awb bepaalt de bevoegdheidsregels voor rechtbanken, inclusief het uitgangspunt dat de rechtbank van de woonplaats van de indiener bevoegd is"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "woonplaats"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$ZAAK.bsn"
+
+    - name: "JURISDICTIE"
+      description: "Mapping van gemeentes naar rechtbank arrondissementen"
+      type: "object"
+      legal_basis:
+        law: "Wet op de rechterlijke indeling"
+        bwb_id: "BWBR0001830"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0001830/2019-01-01#HoofdstukII_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0001830&artikel=2&z=2019-01-01&g=2019-01-01"
+        explanation: "Artikel 2 Wet op de rechterlijke indeling bepaalt de arrondissementen waarin Nederland is verdeeld voor de rechtbanken"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "reference_data"
+        table: "jurisdicties"
+        fields: ["gemeente", "arrondissement", "rechtbank"]
+        select_on:
+          - name: "gemeente"
+            description: "Gemeente waar persoon woont"
+            type: "string"
+            value: "$ADRES"
+
+    - name: "GEBEURTENISSEN"
+      description: "De gebeurtenissen rondom deze zaak"
+      type: "object"
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "7:1"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7:1 Awb bepaalt dat tegen een besluit bezwaar kan worden gemaakt voordat beroep kan worden ingesteld"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "events"
+        table: "events"
+        fields: ["case_id", "event_type", "approved"]
+        select_on:
+          - name: "case_id"
+            description: "Zaak identifier"
+            type: "string"
+            value: "$ZAAK.id"
+
+  output:
+    - name: "beroep_mogelijk"
+      description: "Is beroep mogelijk tegen dit besluit"
+      type: "boolean"
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "8:1"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8:1 Awb bepaalt dat belanghebbenden beroep kunnen instellen tegen een besluit"
+
+    - name: "reden_niet_mogelijk"
+      description: "Reden waarom geen beroep mogelijk is"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "8:3"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:3"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=8:3&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8:3 Awb bepaalt tegen welke besluiten geen beroep openstaat"
+
+    - name: "beroepstermijn"
+      description: "Termijn voor het indienen van beroep (standaard artikel 6:7 Awb)"
+      type: "number"
+      type_spec:
+        unit: "weeks"
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "6:7"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk6_Afdeling6.2_Artikel6:7"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=6:7&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 6:7 Awb bepaalt dat de termijn voor het indienen van bezwaar of beroep zes weken bedraagt"
+
+    - name: "direct_beroep"
+      description: "Is direct beroep mogelijk zonder bezwaar"
+      type: "boolean"
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "7:1a"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1a"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7:1a Awb bepaalt wanneer rechtstreeks beroep kan worden ingesteld zonder voorafgaand bezwaar"
+
+    - name: "reden_direct_beroep"
+      description: "Reden waarom direct beroep mogelijk is"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "3:11"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 3:11 lid 2 Awb bepaalt dat bij besluiten voorbereid met de uitgebreide voorbereidingsprocedure direct beroep mogelijk is"
+
+    - name: "bevoegde_rechtbank"
+      description: "De rechtbank die bevoegd is voor het beroep"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "8:7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:7"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=8:7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8:7 lid 1 Awb bepaalt de relatieve bevoegdheid van de rechtbank, in beginsel de rechtbank binnen het rechtsgebied waarvan de indiener woonplaats heeft"
+
+    - name: "type_rechter"
+      description: "Het type rechter (rechtbank/hof/etc)"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        bwb_id: "BWBR0005537"
+        article: "8:6"
+        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:6"
+        juriconnect: "jci1.3:c:BWBR0005537&artikel=8:6&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 8:6 Awb bepaalt de absolute bevoegdheid, waarbij bijzondere wetten kunnen bepalen welke rechter bevoegd is"
+
+  definitions:
+    EXCLUDED_DECISION_TYPES:
+      - "ALGEMEEN_VERBINDEND_VOORSCHRIFT"
+      - "BELEIDSREGEL"
+      - "VOORBEREIDINGSBESLUIT"
+      - "ANDERE_HANDELING"
+    REQUIRED_LEGAL_CHARACTER:
+      - "BESCHIKKING"
+      - "BESLUIT_VAN_ALGEMENE_STREKKING"
+    DEFAULT_TERMIJN_BEROEP_WEKEN: 6
+    DEFAULT_COURT_TYPE: "RECHTBANK"
+    DEFAULT_COURT: "RECHTBANK_DEN_HAAG"
+
+actions:
+  # Bepaal eerst type rechter op basis van wet
+  - output: "type_rechter"
+    operation: IF
+    conditions:
+      - test:
+          operation: EQUALS
+          subject: "$WET.name"
+          value: "wet_studiefinanciering"
+          legal_basis:
+            law: "Beroepswet"
+            bwb_id: "BWBR0002170"
+            article: "2"
+            url: "https://wetten.overheid.nl/BWBR0002170/2022-05-01#Artikel2"
+            juriconnect: "jci1.3:c:BWBR0002170&artikel=2&z=2022-05-01&g=2022-05-01"
+            explanation: "Artikel 2 Beroepswet bepaalt dat de Centrale Raad van Beroep bevoegd is voor sociale verzekeringszaken"
+        then: "CENTRALE_RAAD_VAN_BEROEP"
+      - test:
+          operation: EQUALS
+          subject: "$WET.name"
+          value: "wet_inkomstenbelasting"
+          legal_basis:
+            law: "Algemene wet inzake rijksbelastingen"
+            bwb_id: "BWBR0002320"
+            article: "26"
+            url: "https://wetten.overheid.nl/BWBR0002320/2023-01-01#HoofdstukV_Artikel26"
+            juriconnect: "jci1.3:c:BWBR0002320&artikel=26&z=2023-01-01&g=2023-01-01"
+            explanation: "Artikel 26 AWR bepaalt dat tegen belastingbeschikkingen beroep bij het gerechtshof mogelijk is"
+        then: "GERECHTSHOF"
+      - test:
+          operation: EQUALS
+          subject: "$WET.name"
+          value: "vreemdelingenwet"
+          legal_basis:
+            law: "Vreemdelingenwet 2000"
+            bwb_id: "BWBR0011823"
+            article: "84"
+            url: "https://wetten.overheid.nl/BWBR0011823/2024-01-01#Hoofdstuk7_Afdeling3_Artikel84"
+            juriconnect: "jci1.3:c:BWBR0011823&artikel=84&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 84 Vw 2000 bepaalt dat de rechtbank Den Haag bevoegd is voor vreemdelingenzaken"
+        then: "$DEFAULT_COURT"
+      - test:
+          operation: EQUALS
+          subject: "$WET.name"
+          value: "wet_marktordening_gezondheidszorg"
+          legal_basis:
+            law: "Wet bestuursrechtspraak bedrijfsorganisatie"
+            bwb_id: "BWBR0002144"
+            article: "2"
+            url: "https://wetten.overheid.nl/BWBR0002144/2023-01-01#Artikel2"
+            juriconnect: "jci1.3:c:BWBR0002144&artikel=2&z=2023-01-01&g=2023-01-01"
+            explanation: "Artikel 2 Wbbo bepaalt dat het College van Beroep voor het bedrijfsleven bevoegd is voor marktordeningszaken"
+        then: "COLLEGE_VAN_BEROEP_BEDRIJFSLEVEN"
+      - else: "$DEFAULT_COURT_TYPE"
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "8:6"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:6"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=8:6&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 8:6 Awb bepaalt de absolute bevoegdheid van rechters voor verschillende wetten"
+
+  # Bepaal specifieke rechtbank als het type RECHTBANK is
+  - output: "bevoegde_rechtbank"
+    operation: IF
+    conditions:
+      - test:
+          operation: EQUALS
+          subject: "$type_rechter"
+          value: "RECHTBANK"
+        then:
+          operation: IF
+          conditions:
+            - test:
+                operation: NOT_NULL
+                subject: "$ADRES"
+                legal_basis:
+                  law: "Algemene wet bestuursrecht"
+                  bwb_id: "BWBR0005537"
+                  article: "8:7"
+                  paragraph: "1"
+                  url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:7"
+                  juriconnect: "jci1.3:c:BWBR0005537&artikel=8:7&lid=1&z=2024-01-01&g=2024-01-01"
+                  explanation: "Artikel 8:7 lid 1 Awb bepaalt dat de rechtbank van de woonplaats van indiener bevoegd is"
+              then: "$JURISDICTIE.rechtbank"
+            - else: "$DEFAULT_COURT"
+      - test:
+          operation: EQUALS
+          subject: "$type_rechter"
+          value: "$DEFAULT_COURT"
+        then: "$DEFAULT_COURT"
+      - test:
+          operation: EQUALS
+          subject: "$type_rechter"
+          value: "GERECHTSHOF"
+        then: "$WET.competent_court"
+      - else: "$type_rechter"
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "8:7"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Afdeling8.1.2_Artikel8:7"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=8:7&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 8:7 lid 1 Awb bepaalt de relatieve bevoegdheid van rechtbanken"
+  - output: "beroep_mogelijk"
+    operation: AND
+    values:
+      - operation: NOT_IN
+        subject: "$WET.decision_type"
+        values: "$EXCLUDED_DECISION_TYPES"
+        legal_basis:
+          law: "Algemene wet bestuursrecht"
+          bwb_id: "BWBR0005537"
+          article: "8:3"
+          url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:3"
+          juriconnect: "jci1.3:c:BWBR0005537&artikel=8:3&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 8:3 Awb somt op tegen welke besluiten geen beroep openstaat"
+      - operation: IN
+        subject: "$WET.legal_character"
+        values: "$REQUIRED_LEGAL_CHARACTER"
+        legal_basis:
+          law: "Algemene wet bestuursrecht"
+          bwb_id: "BWBR0005537"
+          article: "1:3"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk1_Titeldeel1.1_Artikel1:3"
+          juriconnect: "jci1.3:c:BWBR0005537&artikel=1:3&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 1:3 lid 1 Awb definieert wat een besluit is waartegen beroep mogelijk is"
+      # Of direct beroep, of bezwaar is afgewezen
+      - operation: OR
+        values:
+          - operation: EQUALS
+            subject: "$WET.voorbereidingsprocedure"
+            value: "UITGEBREID"
+            legal_basis:
+              law: "Algemene wet bestuursrecht"
+              bwb_id: "BWBR0005537"
+              article: "3:11"
+              paragraph: "2"
+              url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11"
+              juriconnect: "jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 3:11 lid 2 Awb bepaalt dat bij uitgebreide voorbereidingsprocedure direct beroep mogelijk is"
+          - operation: AND
+            values:
+              # Check dat er bezwaar is gemaakt
+              - operation: GREATER_THAN
+                values:
+                  - operation: FOREACH
+                    subject: "$GEBEURTENISSEN"
+                    combine: ADD
+                    value:
+                      - operation: EQUALS
+                        subject: "$event_type"
+                        value: "Objected"
+                        legal_basis:
+                          law: "Algemene wet bestuursrecht"
+                          bwb_id: "BWBR0005537"
+                          article: "7:1"
+                          url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                          juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                          explanation: "Artikel 7:1 Awb bepaalt wanneer bezwaar kan worden gemaakt"
+                    legal_basis:
+                      law: "Algemene wet bestuursrecht"
+                      bwb_id: "BWBR0005537"
+                      article: "7:1"
+                      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                      juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                      explanation: "Artikel 7:1 Awb controleert of bezwaar is gemaakt voordat beroep mogelijk is"
+                  - 0
+                legal_basis:
+                  law: "Algemene wet bestuursrecht"
+                  bwb_id: "BWBR0005537"
+                  article: "7:1"
+                  url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                  juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                  explanation: "Artikel 7:1 Awb vereist dat eerst bezwaar wordt gemaakt"
+              # Check huidige status en approved
+              - operation: AND
+                values:
+                  - operation: EQUALS
+                    subject: "$ZAAK.status"
+                    value: "DECIDED"
+                    legal_basis:
+                      law: "Algemene wet bestuursrecht"
+                      bwb_id: "BWBR0005537"
+                      article: "7:1"
+                      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                      juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                      explanation: "Artikel 7:1 Awb vereist dat er een beslissing is op bezwaar voordat beroep mogelijk is"
+                  - operation: EQUALS
+                    subject: "$ZAAK.approved"
+                    value: false
+                    legal_basis:
+                      law: "Algemene wet bestuursrecht"
+                      bwb_id: "BWBR0005537"
+                      article: "8:1"
+                      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+                      juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+                      explanation: "Artikel 8:1 Awb bepaalt dat beroep mogelijk is tegen afwijzende beslissingen"
+                legal_basis:
+                  law: "Algemene wet bestuursrecht"
+                  bwb_id: "BWBR0005537"
+                  article: "8:1"
+                  url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+                  juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+                  explanation: "Artikel 8:1 Awb vereist dat bezwaar is afgewezen voordat beroep mogelijk is"
+            legal_basis:
+              law: "Algemene wet bestuursrecht"
+              bwb_id: "BWBR0005537"
+              article: "8:1"
+              url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+              juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 8:1 Awb bepaalt dat beroep mogelijk is na afwijzing bezwaar"
+        legal_basis:
+          law: "Algemene wet bestuursrecht"
+          bwb_id: "BWBR0005537"
+          article: "8:1"
+          url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+          juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 8:1 Awb bepaalt de voorwaarden voor beroepsmogelijkheid"
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "8:1"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 8:1 Awb bepaalt of beroep mogelijk is tegen een besluit"
+
+  - output: "reden_niet_mogelijk"
+    operation: IF
+    conditions:
+      - test:
+          operation: IN
+          subject: "$WET.decision_type"
+          values: "$EXCLUDED_DECISION_TYPES"
+          legal_basis:
+            law: "Algemene wet bestuursrecht"
+            bwb_id: "BWBR0005537"
+            article: "8:3"
+            url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:3"
+            juriconnect: "jci1.3:c:BWBR0005537&artikel=8:3&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 8:3 Awb somt uitgesloten besluittypen op"
+        then: "tegen dit type besluit is geen beroep mogelijk"
+      - test:
+          operation: NOT_IN
+          subject: "$WET.legal_character"
+          values: "$REQUIRED_LEGAL_CHARACTER"
+          legal_basis:
+            law: "Algemene wet bestuursrecht"
+            bwb_id: "BWBR0005537"
+            article: "1:3"
+            paragraph: "1"
+            url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk1_Titeldeel1.1_Artikel1:3"
+            juriconnect: "jci1.3:c:BWBR0005537&artikel=1:3&lid=1&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 1:3 lid 1 Awb definieert wat een besluit is"
+        then: "dit is geen besluit in de zin van de AWB"
+      # Check of er bezwaar is als er geen direct beroep mogelijk is
+      - test:
+          operation: AND
+          values:
+            - operation: NOT_EQUALS
+              subject: "$WET.voorbereidingsprocedure"
+              value: "UITGEBREID"
+            - operation: EQUALS
+              values:
+                - operation: FOREACH
+                  subject: "$GEBEURTENISSEN"
+                  combine: ADD
+                  value:
+                    - operation: EQUALS
+                      subject: "$event_type"
+                      value: "Objected"
+                      legal_basis:
+                        law: "Algemene wet bestuursrecht"
+                        bwb_id: "BWBR0005537"
+                        article: "7:1"
+                        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                        juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                        explanation: "Artikel 7:1 Awb bepaalt wanneer bezwaar kan worden gemaakt"
+                  legal_basis:
+                    law: "Algemene wet bestuursrecht"
+                    bwb_id: "BWBR0005537"
+                    article: "7:1"
+                    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                    juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                    explanation: "Artikel 7:1 Awb controleert of bezwaar is gemaakt"
+                - 0
+              legal_basis:
+                law: "Algemene wet bestuursrecht"
+                bwb_id: "BWBR0005537"
+                article: "7:1"
+                url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                explanation: "Artikel 7:1 Awb vereist dat geen bezwaar is gemaakt"
+        then: "er moet eerst bezwaar worden gemaakt"
+        legal_basis:
+          law: "Algemene wet bestuursrecht"
+          bwb_id: "BWBR0005537"
+          article: "7:1"
+          url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+          juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 7:1 Awb bepaalt dat eerst bezwaar moet worden gemaakt"
+      # Check of er een afwijzende beslissing is op het bezwaar
+      - test:
+          operation: AND
+          values:
+            - operation: GREATER_THAN
+              values:
+                - operation: FOREACH
+                  subject: "$GEBEURTENISSEN"
+                  combine: ADD
+                  value:
+                    - operation: EQUALS
+                      subject: "$event_type"
+                      value: "Objected"
+                      legal_basis:
+                        law: "Algemene wet bestuursrecht"
+                        bwb_id: "BWBR0005537"
+                        article: "7:1"
+                        url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                        juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                        explanation: "Artikel 7:1 Awb bepaalt wanneer bezwaar kan worden gemaakt"
+                  legal_basis:
+                    law: "Algemene wet bestuursrecht"
+                    bwb_id: "BWBR0005537"
+                    article: "7:1"
+                    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                    juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                    explanation: "Artikel 7:1 Awb controleert of bezwaar is gemaakt"
+                - 0
+              legal_basis:
+                law: "Algemene wet bestuursrecht"
+                bwb_id: "BWBR0005537"
+                article: "7:1"
+                url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                explanation: "Artikel 7:1 Awb vereist dat bezwaar is gemaakt"
+            - operation: OR
+              values:
+                - operation: NOT_EQUALS
+                  subject: "$ZAAK.status"
+                  value: "DECIDED"
+                  legal_basis:
+                    law: "Algemene wet bestuursrecht"
+                    bwb_id: "BWBR0005537"
+                    article: "7:1"
+                    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk7_Afdeling7.1_Artikel7:1"
+                    juriconnect: "jci1.3:c:BWBR0005537&artikel=7:1&z=2024-01-01&g=2024-01-01"
+                    explanation: "Artikel 7:1 Awb vereist dat er een beslissing is op bezwaar"
+                - operation: NOT_EQUALS
+                  subject: "$ZAAK.approved"
+                  value: false
+                  legal_basis:
+                    law: "Algemene wet bestuursrecht"
+                    bwb_id: "BWBR0005537"
+                    article: "8:1"
+                    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+                    juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+                    explanation: "Artikel 8:1 Awb bepaalt dat beroep mogelijk is tegen afwijzende beslissingen"
+              legal_basis:
+                law: "Algemene wet bestuursrecht"
+                bwb_id: "BWBR0005537"
+                article: "8:1"
+                url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+                juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+                explanation: "Artikel 8:1 Awb bepaalt wanneer beroep mogelijk is"
+        then: "er is nog geen afwijzende beslissing op bezwaar"
+        legal_basis:
+          law: "Algemene wet bestuursrecht"
+          bwb_id: "BWBR0005537"
+          article: "8:1"
+          url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:1"
+          juriconnect: "jci1.3:c:BWBR0005537&artikel=8:1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 8:1 Awb vereist afwijzende beslissing voor beroep"
+      - else: null
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "8:3"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk8_Titeldeel8.1_Artikel8:3"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=8:3&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 8:3 Awb bepaalt redenen waarom beroep niet mogelijk is"
+
+  - output: "beroepstermijn"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$WET.beroepstermijn_weken"
+          operation: NOT_NULL
+          legal_basis:
+            law: "Algemene wet bestuursrecht"
+            bwb_id: "BWBR0005537"
+            article: "6:7"
+            url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk6_Afdeling6.2_Artikel6:7"
+            juriconnect: "jci1.3:c:BWBR0005537&artikel=6:7&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 6:7 Awb bepaalt dat een wet kan afwijken van de standaard beroepstermijn"
+        then: "$WET.beroepstermijn_weken"
+      - else: "$DEFAULT_TERMIJN_BEROEP_WEKEN"
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "6:7"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk6_Afdeling6.2_Artikel6:7"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=6:7&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 6:7 Awb bepaalt de termijn voor het indienen van beroep"
+
+  - output: "direct_beroep"
+    operation: EQUALS
+    subject: "$WET.voorbereidingsprocedure"
+    value: "UITGEBREID"
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "3:11"
+      paragraph: "2"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 3:11 lid 2 Awb bepaalt dat bij uitgebreide voorbereidingsprocedure direct beroep mogelijk is"
+
+  - output: "reden_direct_beroep"
+    operation: IF
+    conditions:
+      - test:
+          operation: EQUALS
+          subject: "$WET.voorbereidingsprocedure"
+          value: "UITGEBREID"
+          legal_basis:
+            law: "Algemene wet bestuursrecht"
+            bwb_id: "BWBR0005537"
+            article: "3:11"
+            paragraph: "2"
+            url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11"
+            juriconnect: "jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 3:11 lid 2 Awb bepaalt wanneer direct beroep mogelijk is"
+        then: "besluit is voorbereid met uitgebreide procedure"
+      - else: null
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      bwb_id: "BWBR0005537"
+      article: "3:11"
+      paragraph: "2"
+      url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.3_Artikel3:11"
+      juriconnect: "jci1.3:c:BWBR0005537&artikel=3:11&lid=2&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 3:11 lid 2 Awb bepaalt de reden voor direct beroep"

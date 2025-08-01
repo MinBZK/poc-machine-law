@@ -2,265 +2,265 @@ $id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/sc
 uuid: 06c43099-444f-415d-a98a-cb686954ed24
 name: Bepalen toetsingsinkomen
 law: wet_inkomstenbelasting
-law_type: "FORMELE_WET"
-legal_character: "BESCHIKKING"
-decision_type: "TOEKENNING"
+law_type: FORMELE_WET
+legal_character: BESCHIKKING
+decision_type: TOEKENNING
 valid_from: 2020-01-01
-service: "UWV"
+service: UWV
 legal_basis:
-  law: "Wet inkomstenbelasting 2001"
-  bwb_id: "BWBR0011353"
-  article: "2.11"
-  url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.11"
-  juriconnect: "jci1.3:c:BWBR0011353&artikel=2.11&z=2024-01-01&g=2024-01-01"
-  explanation: "Artikel 2.11 Wet IB 2001 bepaalt het toetsingsinkomen als basis voor het verzamelinkomen"
-description: >
-  Regels voor het bepalen van het toetsingsinkomen volgens de Wet inkomstenbelasting 2001,
-  artikel 2.11 en 2.12. Het toetsingsinkomen is een samentelling van inkomen uit verschillende
-  boxen en eventuele niet in Nederland belastbare inkomsten.
+  law: Wet inkomstenbelasting 2001
+  bwb_id: BWBR0011353
+  article: '2.11'
+  url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.11
+  juriconnect: jci1.3:c:BWBR0011353&artikel=2.11&z=2024-01-01&g=2024-01-01
+  explanation: Artikel 2.11 Wet IB 2001 bepaalt het toetsingsinkomen als basis voor
+    het verzamelinkomen
+description: 'Regels voor het bepalen van het toetsingsinkomen volgens de Wet inkomstenbelasting
+  2001, artikel 2.11 en 2.12. Het toetsingsinkomen is een samentelling van inkomen
+  uit verschillende boxen en eventuele niet in Nederland belastbare inkomsten.
 
+  '
 references:
-  - law: "Wet inkomstenbelasting 2001"
-    article: "2.11"
-    url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.11"
-  - law: "Wet inkomstenbelasting 2001"
-    article: "2.12"
-    url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.12"
-
+- law: Wet inkomstenbelasting 2001
+  article: '2.11'
+  url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.11
+- law: Wet inkomstenbelasting 2001
+  article: '2.12'
+  url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.12
 properties:
   parameters:
-    - name: "BSN"
-      description: "BSN van de persoon"
-      type: "string"
-      required: true
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.14"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.14"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.14&lid=1&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.14 lid 1 Wet IB 2001 bepaalt dat binnenlandse belastingplichtigen worden geïdentificeerd via hun BSN"
-
+  - name: BSN
+    description: BSN van de persoon
+    type: string
+    required: true
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.14'
+      paragraph: '1'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.14
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.14&lid=1&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.14 lid 1 Wet IB 2001 bepaalt dat binnenlandse belastingplichtigen
+        worden geïdentificeerd via hun BSN
   input:
-    - name: "BOX1_INKOMEN"
-      description: "Inkomen uit werk en woning"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.3"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.3"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.3&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.3 Wet IB 2001 bepaalt het belastbaar inkomen uit werk en woning (box 1)"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "box1_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "BOX2_INKOMEN"
-      description: "Inkomen uit aanmerkelijk belang"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.12"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.12"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.12&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.12 Wet IB 2001 bepaalt het belastbaar inkomen uit aanmerkelijk belang (box 2)"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "box2_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "BOX3_INKOMEN"
-      description: "Inkomen uit sparen en beleggen"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.13"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.13"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.13&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.13 Wet IB 2001 bepaalt het belastbaar inkomen uit sparen en beleggen (box 3)"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "box3_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "BUITENLANDS_INKOMEN"
-      description: "Niet in Nederland belastbaar inkomen"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.8"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.2_Artikel2.8"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.8&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.8 Wet IB 2001 bepaalt buitenlandse belastingplicht voor bepaalde Nederlandse inkomstenbronnen"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "buitenlands_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "PARTNER_BOX1_INKOMEN"
-      description: "Partner inkomen uit werk en woning"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.17"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.4_Artikel2.17"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.17&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.17 Wet IB 2001 bepaalt de toerekening van gemeenschappelijke inkomensbestanddelen tussen partners"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "partner_box1_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "PARTNER_BOX2_INKOMEN"
-      description: "Partner inkomen uit aanmerkelijk belang"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.17"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.4_Artikel2.17"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.17&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.17 Wet IB 2001 bepaalt de toerekening van gemeenschappelijke inkomensbestanddelen tussen partners"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "partner_box2_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "PARTNER_BOX3_INKOMEN"
-      description: "Partner inkomen uit sparen en beleggen"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.17"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.4_Artikel2.17"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.17&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.17 Wet IB 2001 bepaalt de toerekening van gemeenschappelijke inkomensbestanddelen tussen partners"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "partner_box3_inkomen"
-        law: "wet_inkomstenbelasting"
-
-    - name: "PARTNER_BUITENLANDS_INKOMEN"
-      description: "Partner niet in Nederland belastbaar inkomen"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.8"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.2_Artikel2.8"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.8&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.8 Wet IB 2001 bepaalt buitenlandse belastingplicht voor bepaalde Nederlandse inkomstenbronnen"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-      service_reference:
-        service: "BELASTINGDIENST"
-        field: "partner_buitenlands_inkomen"
-        law: "wet_inkomstenbelasting"
-
+  - name: BOX1_INKOMEN
+    description: Inkomen uit werk en woning
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.3'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.1_Artikel2.3
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.3&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.3 Wet IB 2001 bepaalt het belastbaar inkomen uit werk
+        en woning (box 1)
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: box1_inkomen
+      law: wet_inkomstenbelasting
+  - name: BOX2_INKOMEN
+    description: Inkomen uit aanmerkelijk belang
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.12'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.12
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.12&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.12 Wet IB 2001 bepaalt het belastbaar inkomen uit aanmerkelijk
+        belang (box 2)
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: box2_inkomen
+      law: wet_inkomstenbelasting
+  - name: BOX3_INKOMEN
+    description: Inkomen uit sparen en beleggen
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.13'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.3_Artikel2.13
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.13&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.13 Wet IB 2001 bepaalt het belastbaar inkomen uit sparen
+        en beleggen (box 3)
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: box3_inkomen
+      law: wet_inkomstenbelasting
+  - name: BUITENLANDS_INKOMEN
+    description: Niet in Nederland belastbaar inkomen
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.8'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.2_Artikel2.8
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.8&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.8 Wet IB 2001 bepaalt buitenlandse belastingplicht voor
+        bepaalde Nederlandse inkomstenbronnen
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: buitenlands_inkomen
+      law: wet_inkomstenbelasting
+  - name: PARTNER_BOX1_INKOMEN
+    description: Partner inkomen uit werk en woning
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.17'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.4_Artikel2.17
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.17&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.17 Wet IB 2001 bepaalt de toerekening van gemeenschappelijke
+        inkomensbestanddelen tussen partners
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: partner_box1_inkomen
+      law: wet_inkomstenbelasting
+  - name: PARTNER_BOX2_INKOMEN
+    description: Partner inkomen uit aanmerkelijk belang
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.17'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.4_Artikel2.17
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.17&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.17 Wet IB 2001 bepaalt de toerekening van gemeenschappelijke
+        inkomensbestanddelen tussen partners
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: partner_box2_inkomen
+      law: wet_inkomstenbelasting
+  - name: PARTNER_BOX3_INKOMEN
+    description: Partner inkomen uit sparen en beleggen
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.17'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.4_Artikel2.17
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.17&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.17 Wet IB 2001 bepaalt de toerekening van gemeenschappelijke
+        inkomensbestanddelen tussen partners
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: partner_box3_inkomen
+      law: wet_inkomstenbelasting
+  - name: PARTNER_BUITENLANDS_INKOMEN
+    description: Partner niet in Nederland belastbaar inkomen
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.8'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.2_Artikel2.8
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.8&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.8 Wet IB 2001 bepaalt buitenlandse belastingplicht voor
+        bepaalde Nederlandse inkomstenbronnen
+    type_spec:
+      unit: eurocent
+      precision: 0
+    temporal:
+      type: period
+      period_type: year
+    service_reference:
+      service: BELASTINGDIENST
+      field: partner_buitenlands_inkomen
+      law: wet_inkomstenbelasting
   output:
-    - name: "inkomen"
-      description: "Toetsingsinkomen"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.18"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.5_Artikel2.18"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.18&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.18 Wet IB 2001 bepaalt het verzamelinkomen als som van de inkomens uit de drie boxen"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-
-    - name: "partner_inkomen"
-      description: "Toetsingsinkomen van de partner"
-      type: "amount"
-      legal_basis:
-        law: "Wet inkomstenbelasting 2001"
-        bwb_id: "BWBR0011353"
-        article: "2.18"
-        url: "https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.5_Artikel2.18"
-        juriconnect: "jci1.3:c:BWBR0011353&artikel=2.18&z=2024-01-01&g=2024-01-01"
-        explanation: "Artikel 2.18 Wet IB 2001 bepaalt het verzamelinkomen als som van de inkomens uit de drie boxen voor partners"
-      type_spec:
-        unit: "eurocent"
-        precision: 0
-        min: 0
-      temporal:
-        type: "period"
-        period_type: "year"
-
+  - name: inkomen
+    description: Toetsingsinkomen
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.18'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.5_Artikel2.18
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.18&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.18 Wet IB 2001 bepaalt het verzamelinkomen als som van
+        de inkomens uit de drie boxen
+    type_spec:
+      unit: eurocent
+      precision: 0
+      min: 0
+    temporal:
+      type: period
+      period_type: year
+  - name: partner_inkomen
+    description: Toetsingsinkomen van de partner
+    type: amount
+    legal_basis:
+      law: Wet inkomstenbelasting 2001
+      bwb_id: BWBR0011353
+      article: '2.18'
+      url: https://wetten.overheid.nl/BWBR0011353/2024-01-01#Hoofdstuk2_Afdeling2.5_Artikel2.18
+      juriconnect: jci1.3:c:BWBR0011353&artikel=2.18&z=2024-01-01&g=2024-01-01
+      explanation: Artikel 2.18 Wet IB 2001 bepaalt het verzamelinkomen als som van
+        de inkomens uit de drie boxen voor partners
+    type_spec:
+      unit: eurocent
+      precision: 0
+      min: 0
+    temporal:
+      type: period
+      period_type: year
+    data_sensitivity: 4
 actions:
-  - output: "inkomen"
-    operation: ADD
-    values:
-      - "$BOX1_INKOMEN"
-      - "$BOX2_INKOMEN"
-      - "$BOX3_INKOMEN"
-      - "$BUITENLANDS_INKOMEN"
-
-  - output: "partner_inkomen"
-    operation: ADD
-    values:
-      - "$PARTNER_BOX1_INKOMEN"
-      - "$PARTNER_BOX2_INKOMEN"
-      - "$PARTNER_BOX3_INKOMEN"
-      - "$PARTNER_BUITENLANDS_INKOMEN"
+- output: inkomen
+  operation: ADD
+  values:
+  - $BOX1_INKOMEN
+  - $BOX2_INKOMEN
+  - $BOX3_INKOMEN
+  - $BUITENLANDS_INKOMEN
+- output: partner_inkomen
+  operation: ADD
+  values:
+  - $PARTNER_BOX1_INKOMEN
+  - $PARTNER_BOX2_INKOMEN
+  - $PARTNER_BOX3_INKOMEN
+  - $PARTNER_BUITENLANDS_INKOMEN

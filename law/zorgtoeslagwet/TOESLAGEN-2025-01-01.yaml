@@ -20,6 +20,13 @@ legal_basis:
   juriconnect: "jci1.3:c:BWBR0018451&artikel=2&z=2025-01-01&g=2025-01-01"
   explanation: "Artikel 2 stelt de algemene regels voor de zorgtoeslag vast: recht op toeslag wanneer de normpremie lager is dan de standaardpremie"
 
+data_minimization:
+  min_age: 18
+  requires_partner: false
+  early_elimination_fields:
+    - "age"
+    - "residence_country"
+
 references:
   - law: "Wet op de zorgtoeslag"
     article: "2"
@@ -41,6 +48,7 @@ properties:
       description: "BSN van de persoon"
       type: "string"
       required: true
+      data_sensitivity: 5
 
   output:
     - name: "is_verzekerde_zorgtoeslag"
@@ -50,6 +58,7 @@ properties:
         type: "period"
         period_type: "year"
       citizen_relevance: secondary
+      data_sensitivity: 1
       legal_basis:
         law: "Zorgtoeslagwet"
         bwb_id: "BWBR0018451"
@@ -70,6 +79,7 @@ properties:
         type: "period"
         period_type: "year"
       citizen_relevance: primary
+      data_sensitivity: 3
       legal_basis:
         law: "Zorgtoeslagwet"
         bwb_id: "BWBR0018451"

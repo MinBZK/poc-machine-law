@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any
+from datetime import datetime, date
+from typing import Any, Optional
 
 import pandas as pd
 from eventsourcing.system import SingleThreadedRunner, System
@@ -14,6 +14,8 @@ from .events.claim.application import ClaimManager
 from .events.claim.processor import ClaimProcessor
 from .logging_config import IndentLogger
 from .utils import RuleResolver
+from .sensitivity import DataSensitivityClassifier, DataMinimizationMetrics
+from .early_filter import EarlyEliminationFilter
 
 logger = IndentLogger(logging.getLogger("service"))
 
@@ -152,6 +154,12 @@ class Services:
         self.resolver = RuleResolver()
         self.services = {service: RuleService(service, self) for service in self.resolver.get_service_laws()}
         self.root_reference_date = reference_date
+
+        # Data minimization components
+        self.data_minimization_metrics = DataMinimizationMetrics()
+        self.sensitivity_classifier = DataSensitivityClassifier()
+        self.early_filter = EarlyEliminationFilter(self.data_minimization_metrics)
+        self.data_minimization_enabled = True  # Flag to enable/disable data minimization
 
         outer_self = self
 
@@ -353,9 +361,128 @@ class Services:
         # Sort by calculated impact (descending), then by name
         return sorted(law_infos, key=lambda x: (-x.get("impact_value", 0), x["law"]))
 
+    def get_data_minimized_sorted_laws(self, bsn: str, enable_early_elimination: bool = True) -> dict:
+        """
+        Return laws sorted by data minimization priority (least sensitive data first).
+
+        This method implements the data minimization optimization strategy by:
+        1. Using minimal data to eliminate laws early where possible
+        2. Sorting remaining laws by sensitivity score (least sensitive first)
+        3. Providing detailed metrics on data minimization effectiveness
+
+        Args:
+            bsn: Burgerservicenummer of the person
+            enable_early_elimination: Whether to use early elimination filtering
+
+        Returns:
+            Dictionary containing:
+            - 'applicable_laws': Laws that need to be processed, sorted by sensitivity
+            - 'eliminated_laws': Laws eliminated early without sensitive data access
+            - 'metrics': Data minimization effectiveness metrics
+        """
+        # Reset metrics for this evaluation
+        self.data_minimization_metrics.reset()
+
+        # Get basic discoverable laws
+        discoverable_laws = self.get_discoverable_service_laws()
+
+        # Convert to list format
+        all_laws = []
+        for service in discoverable_laws:
+            for law in discoverable_laws[service]:
+                try:
+                    # Get rule spec to include in law data
+                    rule_spec = self.resolver.get_rule_spec(law, datetime.now().strftime("%Y-%m-%d"), service=service)
+                    all_laws.append(
+                        {"service": service, "law": law, "name": f"{service}.{law}", "rule_spec": rule_spec}
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to load rule spec for {service}.{law}: {e}")
+                    continue
+
+        eliminated_laws = []
+        applicable_laws = all_laws
+
+        # Step 1: Early elimination using minimal data
+        if enable_early_elimination and self.data_minimization_enabled:
+            try:
+                # Get minimal data for early filtering (uses least sensitive data)
+                minimal_data = self.early_filter.get_minimal_eligibility_data(bsn, date.today())
+
+                # Filter laws using minimal data
+                applicable_laws, eliminated_law_names = self.early_filter.filter_applicable_laws(all_laws, minimal_data)
+                eliminated_laws = eliminated_law_names
+
+                logger.info(f"Early elimination removed {len(eliminated_laws)}/{len(all_laws)} laws")
+
+            except Exception as e:
+                logger.warning(f"Early elimination failed, proceeding with all laws: {e}")
+                applicable_laws = all_laws
+                eliminated_laws = []
+
+        # Step 2: Sort remaining laws by sensitivity score (least sensitive first)
+        if self.data_minimization_enabled:
+            try:
+                # Calculate sensitivity scores for remaining laws
+                for law_info in applicable_laws:
+                    rule_spec = law_info.get("rule_spec", {})
+                    sensitivity_score = self.sensitivity_classifier.get_law_sensitivity_score(rule_spec)
+                    law_info["sensitivity_score"] = sensitivity_score
+
+                    # Record law processing for metrics
+                    self.data_minimization_metrics.record_law_processing(law_info["name"], sensitivity_score)
+
+                # Sort by sensitivity score (ascending - least sensitive first)
+                # Primary sort: max sensitivity level (lower = better)
+                # Secondary sort: average sensitivity (lower = better)
+                # Tertiary sort: total field count (fewer = better)
+                applicable_laws.sort(key=lambda x: x.get("sensitivity_score", (5, 5.0, 999)))
+
+                logger.info(f"Sorted {len(applicable_laws)} laws by sensitivity (least sensitive first)")
+
+            except Exception as e:
+                logger.warning(f"Sensitivity-based sorting failed, using alphabetical: {e}")
+                applicable_laws.sort(key=lambda x: x.get("name", ""))
+        else:
+            # Fallback to original impact-based sorting if data minimization disabled
+            logger.info("Data minimization disabled, falling back to impact-based sorting")
+            return {"applicable_laws": self.get_sorted_discoverable_service_laws(bsn)}
+
+        # Step 3: Prepare return data with metrics
+        result = {
+            "applicable_laws": applicable_laws,
+            "eliminated_laws": eliminated_laws,
+            "metrics": self.data_minimization_metrics.get_summary(),
+        }
+
+        # Log summary
+        metrics = result["metrics"]
+        logger.info(
+            f"Data minimization summary: "
+            f"{metrics['early_elimination_rate_percent']:.1f}% early elimination, "
+            f"max sensitivity: {metrics['max_sensitivity_accessed']}, "
+            f"avg sensitivity: {metrics['average_sensitivity_score']:.2f}"
+        )
+
+        return result
+
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
+
+    def set_data_minimization_enabled(self, enabled: bool) -> None:
+        """Enable or disable data minimization optimization"""
+        self.data_minimization_enabled = enabled
+        logger.info(f"Data minimization {'enabled' if enabled else 'disabled'}")
+
+    def get_data_minimization_metrics(self) -> dict:
+        """Get current data minimization metrics"""
+        return self.data_minimization_metrics.get_summary()
+
+    def reset_data_minimization_metrics(self) -> None:
+        """Reset data minimization metrics"""
+        self.data_minimization_metrics.reset()
+        logger.info("Data minimization metrics reset")
 
     def evaluate(
         self,

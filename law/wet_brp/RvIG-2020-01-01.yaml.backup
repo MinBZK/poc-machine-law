@@ -1,0 +1,912 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.5/schema.json
+uuid: fcf09c18-1584-4565-9223-e8a86fbddc09
+name: Bepalen persoonsgegevens BRP
+law: wet_brp
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2020-01-01
+service: "RvIG"
+legal_basis:
+  law: "Wet basisregistratie personen"
+  bwb_id: "BWBR0033715"
+  article: "1.1"
+  url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.1_Artikel1.1"
+  juriconnect: "jci1.3:c:BWBR0033715&artikel=1.1&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 1.1 Wet BRP bepaalt dat de basisregistratie persoonsgegevens bevat van ingezetenen en niet-ingezetenen"
+description: >
+  Regels voor het bepalen van persoonsgegevens volgens de Wet Basisregistratie
+  Personen (RvIG). Dit omvat basisgegevens (artikel 1.6 en 1.7), woonsituatie (artikel 2.4)
+  en verblijfsgegevens (artikel 2.7).
+
+references:
+  - law: "Wet BRP"
+    article: "1.6"
+    url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6"
+  - law: "Wet BRP"
+    article: "1.7"
+    url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.7"
+  - law: "Wet BRP"
+    article: "2.4"
+    url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2.4"
+  - law: "Wet BRP"
+    article: "2.7"
+    url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "1.1"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.1_Artikel1.1"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=1.1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1.1 Wet BRP definieert BSN als burgerservicenummer dat aan personen wordt toegekend"
+
+  sources:
+    - name: "GEBOORTEDATUM"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.7 lid 1 Wet BRP bepaalt dat algemene gegevens zoals geboortedatum worden opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "personen"
+        field: "geboortedatum"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "PARTNER_GEBOORTEDATUM"
+      description: "Geboortedatum van de partner"
+      type: "date"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.8"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.8"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.8&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.8 Wet BRP bepaalt dat gegevens over huwelijk en geregistreerd partnerschap worden opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "personen"
+        field: "geboortedatum"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de partner"
+            type: "string"
+            value: "$PARTNER_BSN"
+
+    - name: "PARTNERTYPE"
+      description: "Type partnerschap registratie"
+      type: "object"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.8"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.8"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.8&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.8 Wet BRP bepaalt registratie van huwelijk en geregistreerd partnerschap"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "relaties"
+        field: "partnerschap_type"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "PARTNER_BSN"
+      description: "BSN nummer van de partner"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.8"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.8"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.8&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.8 Wet BRP bepaalt dat persoonsgegevens van de echtgenoot of partner worden opgenomen"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "relaties"
+        field: "partner_bsn"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "KINDEREN_GEGEVENS"
+      description: "Gegevens van de kinderen van de persoon"
+      type: "array"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.9"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.9 Wet BRP bepaalt dat gegevens over kinderen worden opgenomen"
+      source_reference:
+        table: "relaties"
+        field: "kinderen"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "VERBLIJFSADRES"
+      description: "Woonadres van de persoon"
+      type: "object"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP bepaalt dat gegevens over verblijfplaats worden opgenomen"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "personen"
+        field: "verblijfsadres"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "OUDER_ADRESSEN"
+      description: "Woonadressen van de ouders"
+      type: "array"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.9"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.9 Wet BRP bepaalt dat gegevens over ouders worden opgenomen"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "relaties"
+        field: "ouder_adressen"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "LAND_VAN_VERBLIJF"
+      description: "Land van verblijf"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.11"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.11"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.11&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.11 Wet BRP bepaalt dat gegevens over immigratie en emigratie worden opgenomen"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "personen"
+        field: "land_verblijf"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "NATIONALITEIT"
+      description: "Nationaliteit"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.7 lid 1 Wet BRP bepaalt dat nationaliteit wordt opgenomen als algemeen gegeven"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "personen"
+        field: "nationaliteit"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "ADRES"
+      description: "Adresgegevens"
+      type: "object"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP bepaalt dat adresgegevens van de verblijfplaats worden opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "verblijfplaats"
+        fields: [ "straat", "huisnummer", "postcode", "woonplaats", "type" ]
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "HUISHOUDEN"
+      description: "Huishoudgegevens"
+      type: "array"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP maakt het mogelijk medebewoners op hetzelfde adres te identificeren"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bewoners"
+        field: "medebewoners"
+        select_on:
+          - name: "postcode"
+            value: "$ADRES.postcode"
+            description: "Postcode van het adres van de persoon"
+            type: "string"
+          - name: "huisnummer"
+            value: "$ADRES.huisnummer"
+            description: "Huisnummer van het adres van de persoon"
+            type: "string"
+
+  output:
+    - name: "leeftijd"
+      description: "Leeftijd van de persoon in jaren"
+      type: "number"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "1.6"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1.6 Wet BRP bepaalt dat overheidsorganen verplicht gegevens uit de basisregistratie gebruiken"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "heeft_partner"
+      description: "Heeft de persoon een partner volgens RvIG"
+      type: "boolean"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "1.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=1.7&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1.7 Wet BRP verplicht gebruik van authentieke gegevens waaronder huwelijks- en partnerschapsgegevens"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "partner_bsn"
+      description: "BSN nummber van de partner"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.8"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.8"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.8&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.8 Wet BRP bepaalt dat BSN van echtgenoot of partner wordt opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "woonsituatie"
+      description: "Woonsituatie van de persoon (UIT/THUIS)"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.4"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2.4"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.4 Wet BRP bepaalt dat ingeschrevenen meldingsplicht hebben bij adreswijziging"
+      temporal:
+        type: "period"
+        period_type: "month"
+
+    - name: "land_van_verblijf"
+      description: "Land van verblijf volgens RvIG"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.7 Wet BRP bepaalt dat land van verblijf wordt geregistreerd"
+      temporal:
+        type: "period"
+        reference: "$calculation_date"
+
+    - name: "heeft_nederlandse_nationaliteit"
+      description: "Heeft Nederlandse nationaliteit"
+      type: "boolean"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.7 lid 1 Wet BRP bepaalt dat nationaliteit als algemeen gegeven wordt opgenomen"
+      temporal:
+        type: "period"
+        reference: "$calculation_date"
+
+    - name: "geboortedatum"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.7 lid 1 Wet BRP bepaalt dat geboortedatum als algemeen gegeven wordt opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "partner_geboortedatum"
+      description: "Geboortedatum van de persoon"
+      type: "date"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.8"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.8"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.8&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.8 Wet BRP bepaalt dat persoonsgegevens van echtgenoot of partner worden opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+    - name: "heeft_vast_adres"
+      description: "Heeft vast woonadres"
+      type: "boolean"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP bepaalt dat verblijfplaatsgegevens worden geregistreerd"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "kinderen_bsns"
+      description: "BSNs van de kinderen van de aanvrager"
+      type: "array"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.9"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.9 Wet BRP bepaalt dat gegevens over kinderen worden opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "verblijfsadres"
+      description: "Volledig adres"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP bepaalt dat adresgegevens van verblijfplaats worden opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "postadres"
+      description: "Volledig post adres"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP bepaalt dat briefadres wordt opgenomen indien van toepassing"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "woonplaats"
+      description: "Woonplaats"
+      type: "string"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP bepaalt dat woonplaats als onderdeel van verblijfplaats wordt opgenomen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "huishoudgrootte"
+      description: "Aantal personen in huishouden"
+      type: "number"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP maakt het mogelijk aantal personen op hetzelfde adres te bepalen"
+      type_spec:
+        precision: 0
+        min: 1
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "huishoudleden"
+      description: "Lijst met gegevens van medebewoners"
+      type: "array"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.10"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.10 Wet BRP maakt het mogelijk personen op hetzelfde adres te identificeren"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "kinderen"
+      description: "Lijst met gegevens van kinderen"
+      type: "array"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.9"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.9 Wet BRP bepaalt dat gegevens over kinderen worden geregistreerd"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    # Nieuwe output voor de inkomstenbelastingwet
+    - name: "heeft_kinderen_onder_12"
+      description: "Heeft de persoon kinderen jonger dan 12 jaar"
+      type: "boolean"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.9"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.9 Wet BRP bepaalt dat gegevens over kinderen inclusief geboortedatum worden geregistreerd"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    NEDERLANDSE_NATIONALITEITEN:
+      - "NEDERLANDS"
+    ADDRESS_MATCH_DISTANCE_M: 100
+    GELDIGE_PARTNERTYPEN:
+      - "HUWELIJK"
+      - "GEREGISTREERD_PARTNERSCHAP"
+    VASTE_ADRES_TYPEN:
+      - "WOONADRES"
+    POST_ADRES_TYPEN:
+      - "BRIEFADRES"
+    KIND_MAX_LEEFTIJD_COMBINATIEKORTING: 12
+
+requirements:
+  - all:
+      - subject: "$GEBOORTEDATUM"
+        operation: NOT_NULL
+
+actions:
+  - output: "geboortedatum"
+    value: "$GEBOORTEDATUM"
+  - output: "partner_geboortedatum"
+    value: "$PARTNER_GEBOORTEDATUM"
+  - output: "partner_bsn"
+    operation: IF
+    conditions:
+        - test:
+            subject: "$PARTNERTYPE"
+            operation: IN
+            values: "$GELDIGE_PARTNERTYPEN"
+            legal_basis:
+              law: "Wet basisregistratie personen"
+              bwb_id: "BWBR0033715"
+              article: "2.8"
+              url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.8"
+              juriconnect: "jci1.3:c:BWBR0033715&artikel=2.8&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 2.8 Wet BRP bepaalt registratie van huwelijk en geregistreerd partnerschap"
+          then: "$PARTNER_BSN"
+        - else: null
+  - output: "leeftijd"
+    operation: SUBTRACT_DATE
+    unit: "years"
+    values:
+      - "$calculation_date"
+      - "$GEBOORTEDATUM"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "1.6"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens"
+  - output: "kinderen_bsns"
+    operation: FOREACH
+    subject: "$KINDEREN_GEGEVENS"
+    value: "$bsn"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.9"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.9 Wet BRP bepaalt registratie van gegevens over kinderen"
+  - output: "heeft_partner"
+    subject: "$PARTNERTYPE"
+    operation: IN
+    values: "$GELDIGE_PARTNERTYPEN"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "1.7"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.7"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=1.7&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 1.7 Wet BRP verplicht gebruik authentieke gegevens over huwelijk en partnerschap"
+
+  - output: "woonsituatie"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$VERBLIJFSADRES"
+          operation: EQUALS
+          value: "$OUDER_ADRESSEN"
+        then: "THUIS"
+      - else: "UIT"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.4"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2.4"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.4&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging en woonsituatie"
+
+  - output: "land_van_verblijf"
+    value: "$LAND_VAN_VERBLIJF"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.7"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.7 Wet BRP bepaalt registratie van algemene gegevens zoals nationaliteit"
+
+  - output: "heeft_nederlandse_nationaliteit"
+    subject: "$NATIONALITEIT"
+    operation: IN
+    values: "$NEDERLANDSE_NATIONALITEITEN"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.7"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.7 lid 1 Wet BRP bepaalt dat nationaliteit als algemeen gegeven wordt geregistreerd"
+
+  - output: "heeft_vast_adres"
+    operation: IN
+    subject: "$ADRES.type"
+    values: "$VASTE_ADRES_TYPEN"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.10"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.10 Wet BRP bepaalt registratie van verblijfplaatsgegevens"
+
+  - output: "verblijfsadres"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$ADRES"
+          operation: NOT_NULL
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP bepaalt registratie van verblijfplaatsgegevens"
+        then:
+          operation: CONCAT
+          values:
+            - "$ADRES.straat"
+            - " "
+            - "$ADRES.huisnummer"
+            - ", "
+            - "$ADRES.postcode"
+            - " "
+            - "$ADRES.woonplaats"
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP bepaalt opname van adresgegevens zoals straat, huisnummer, postcode en woonplaats"
+      - else: null
+
+  - output: "huishoudgrootte"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HUISHOUDEN"
+          operation: NOT_NULL
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP maakt het mogelijk personen op hetzelfde adres te identificeren"
+        then:
+          operation: ADD
+          values:
+            - 1  # De persoon zelf
+            - operation: FOREACH
+              subject: "$HUISHOUDEN"
+              combine: "ADD"
+              value: 1
+              legal_basis:
+                law: "Wet basisregistratie personen"
+                bwb_id: "BWBR0033715"
+                article: "2.10"
+                url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+                juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+                explanation: "Artikel 2.10 Wet BRP maakt berekening van het aantal huishoudleden mogelijk"
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP maakt optelling huishoudgrootte mogelijk"
+      - else: 1
+
+  - output: "postadres"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$ADRES.type"
+          operation: IN
+          values: "$POST_ADRES_TYPEN"
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP bepaalt registratie van briefadres indien van toepassing"
+        then:
+          operation: CONCAT
+          values:
+            - "$ADRES.straat"
+            - " "
+            - "$ADRES.huisnummer"
+            - ", "
+            - "$ADRES.postcode"
+            - " "
+            - "$ADRES.woonplaats"
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP bepaalt opname van postadresgegevens"
+      - else: null
+
+  - output: "woonplaats"
+    value: "$ADRES.woonplaats"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.10"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.10 Wet BRP bepaalt registratie van woonplaats als onderdeel van verblijfplaatsgegevens"
+
+  - output: "huishoudleden"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HUISHOUDEN"
+          operation: NOT_NULL
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.10"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.10"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.10&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.10 Wet BRP maakt identificatie medebewoners mogelijk"
+        then: "$HUISHOUDEN"
+      - else:
+          value: null  # Leeg resultaat
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.4"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2.4"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.4&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.4 Wet BRP bepaalt meldingsplicht bij adreswijziging en woonsituatie"
+
+  - output: "kinderen"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HUISHOUDEN"
+          operation: NOT_NULL
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.9"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.9 Wet BRP bepaalt registratie van gegevens over kinderen"
+        then:
+          operation: FOREACH  # Gebruik FOREACH voor filtering
+          subject: "$HUISHOUDEN"
+          combine: "ADD"      # Combineer resultaten in een array
+          value:
+            operation: IF
+            conditions:
+              - test:
+                  operation: LESS_THAN
+                  values:
+                    - "$leeftijd"
+                    - 18
+                  legal_basis:
+                    law: "Wet basisregistratie personen"
+                    bwb_id: "BWBR0033715"
+                    article: "2.9"
+                    url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+                    juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+                    explanation: "Artikel 2.9 Wet BRP bepaalt meerderjarigheid op 18 jaar"
+                then: "$item"  # Voeg dit item toe als kind
+              - else: null     # Anders niets toevoegen
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.9"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.9 Wet BRP maakt filtering van minderjarige kinderen mogelijk"
+      - else:
+          value: null  # Leeg resultaat
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "1.6"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens"
+
+  # Nieuwe actie voor het bepalen of de persoon kinderen jonger dan 12 jaar heeft
+  - output: "heeft_kinderen_onder_12"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$KINDEREN_GEGEVENS"
+          operation: NOT_NULL
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.9"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.9 Wet BRP bepaalt registratie van kindergegevens"
+        then:
+          operation: EXISTS
+          subject: "$KINDEREN_GEGEVENS"
+          value:
+            operation: LESS_THAN
+            values:
+              - operation: SUBTRACT_DATE
+                unit: "years"
+                values:
+                  - "$calculation_date"
+                  - "$item.geboortedatum"
+                legal_basis:
+                  law: "Wet basisregistratie personen"
+                  bwb_id: "BWBR0033715"
+                  article: "2.9"
+                  url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+                  juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+                  explanation: "Artikel 2.9 Wet BRP maakt leeftijdsberekening van kinderen mogelijk"
+              - "$KIND_MAX_LEEFTIJD_COMBINATIEKORTING"
+            legal_basis:
+              law: "Wet basisregistratie personen"
+              bwb_id: "BWBR0033715"
+              article: "2.9"
+              url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+              juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+              explanation: "Artikel 2.9 Wet BRP maakt identificatie kinderen onder 12 jaar mogelijk"
+          legal_basis:
+            law: "Wet basisregistratie personen"
+            bwb_id: "BWBR0033715"
+            article: "2.9"
+            url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.9"
+            juriconnect: "jci1.3:c:BWBR0033715&artikel=2.9&z=2024-01-01&g=2024-01-01"
+            explanation: "Artikel 2.9 Wet BRP maakt vaststelling aanwezigheid jonge kinderen mogelijk"
+      - else: false
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "1.6"
+      url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk1_Paragraaf1.2_Artikel1.6"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=1.6&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 1.6 Wet BRP bepaalt verplicht gebruik van basisregistratie voor persoonsgegevens"
