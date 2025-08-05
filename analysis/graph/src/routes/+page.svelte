@@ -240,23 +240,30 @@
     }
   })();
 
-  function handleNodeClick(event: any) {
-    // If the click is on a button.close, remove the node. IMPROVE: remove the child nodes first
-    if ((event.detail.event.target as HTMLElement).closest('.close')) {
-      const node = event.detail.node;
+  function handleNodeClick({ node, event }: any) {
+    // If the click is on a button.close, set the node and connected edges as hidden (using ID prefix matching)
+    if ((event.target as HTMLElement).closest('.close')) {
+      nodes = nodes.map((n) => {
+        if (n.id.startsWith(node.id)) {
+          return { ...n, hidden: true };
+        }
+        return n;
+      });
 
-      // Remove the node and all its children (using ID prefix matching)
-      nodes = nodes.filter((n) => !n.id.startsWith(node.id));
-
-      // Remove all edges connected to the removed nodes
-      edges = edges.filter((e) => !e.source.startsWith(node.id) && !e.target.startsWith(node.id));
+      edges = edges.map((e) => {
+        if (e.source.startsWith(node.id) || e.target.startsWith(node.id)) {
+          return { ...e, hidden: true };
+        }
+        return e;
+      });
     }
   }
 
   // Handle changes to selectedLaws
   $effect(() => {
     // Note: empty code block to ensure the effect runs when selectedLaws changes (otherwise not triggered by Svelte)
-    if (selectedLaws) {}
+    if (selectedLaws) {
+    }
 
     // Hide nodes that are not selected and not connected to any selected law
     nodes = untrack(() => nodes).map((node) => ({
@@ -296,7 +303,7 @@
       <label class="group inline-flex items-start">
         <input
           bind:group={selectedLaws}
-          class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           type="checkbox"
           value={law.uuid}
         />
@@ -307,7 +314,7 @@
             onclick={() => {
               selectedLaws = [law.uuid];
             }}
-            class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
+            class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
             >alleen</button
           ></span
         >
