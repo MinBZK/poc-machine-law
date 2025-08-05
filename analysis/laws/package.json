@@ -21,6 +21,7 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/vite": "^4.1.11",
     "@types/eslint": "9.6.1",
+    "@types/js-yaml": "^4.0.9",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "autoprefixer": "^10.4.21",
@@ -40,6 +41,6 @@
   },
   "type": "module",
   "dependencies": {
-    "yaml": "^2.8.0"
+    "js-yaml": "^4.1.0"
   }
 }
