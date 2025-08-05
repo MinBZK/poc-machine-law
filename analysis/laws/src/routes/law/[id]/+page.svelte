@@ -19,11 +19,18 @@
 <div class="mx-auto max-w-6xl px-4 py-8">
   <h1 class="mb-2 text-3xl font-bold text-gray-800">{law.name}</h1>
 
+  <a href="/" class="mb-6 inline-flex items-center text-blue-600 hover:text-blue-800">
+    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    Terug naar alle wetten
+  </a>
+
   <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
     <div class="grid gap-6">
       {#if law.description}
         <div>
-          <h2 class="mb-2 text-lg font-semibold text-gray-700">Description</h2>
+          <h2 class="mb-2 text-lg font-semibold text-gray-700">Omschrijving</h2>
           <p class="text-gray-600">{law.description}</p>
         </div>
       {/if}
@@ -36,19 +43,19 @@
             <dd class="mt-1 text-gray-900">{law.service}</dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-gray-500">Valid from</dt>
+            <dt class="text-sm font-medium text-gray-500">Geldig vanaf</dt>
             <dd class="mt-1 text-gray-900">
               {new Date(law.valid_from).toLocaleDateString('nl-NL')}
             </dd>
           </div>
           {#if law.legal_basis}
             <div class="sm:col-span-2">
-              <dt class="text-sm font-medium text-gray-500">Legal basis</dt>
+              <dt class="text-sm font-medium text-gray-500">Wettelijke basis</dt>
               <dd class="mt-1 text-gray-900">
                 {law.legal_basis.law}
                 {law.legal_basis.article}
                 {#if law.legal_basis.paragraph}
-                  paragraph {law.legal_basis.paragraph}
+                  paragraaf {law.legal_basis.paragraph}
                 {/if}
                 {#if law.legal_basis.url}
                   <a
