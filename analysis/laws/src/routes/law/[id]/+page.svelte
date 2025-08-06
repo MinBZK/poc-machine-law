@@ -6,7 +6,7 @@
   import 'prismjs/components/prism-yaml';
   import 'prismjs/themes/prism-coy.css'; // IMPROVE: use some theme from https://github.com/PrismJS/prism-themes instead?
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
   const { id } = page.params;
 
   const law = data.laws.find((law) => law.uuid === id);
@@ -114,7 +114,7 @@
                         <p class="text-sm text-gray-600">{source.description}</p>
                         <div class="mt-1 flex gap-3 text-xs text-gray-500">
                           <span>Type: {source.type}</span>
-                          <span>Tijdseenheid: {source.temporal.type}</span>
+                          <span>Tijdseenheid: {source.temporal?.type || 'geen'}</span>
                         </div>
                       </div>
                     </div>
@@ -136,7 +136,7 @@
                         <p class="text-sm text-gray-600">{input.description}</p>
                         <div class="mt-1 flex gap-3 text-xs text-gray-500">
                           <span>Type: {input.type}</span>
-                          <span>Tijdseenheid: {input.temporal.type}</span>
+                          <span>Tijdseenheid: {input.temporal?.type || 'geen'}</span>
                         </div>
                       </div>
                     </div>
@@ -158,7 +158,7 @@
                         <p class="text-sm text-gray-600">{output.description}</p>
                         <div class="mt-1 flex gap-3 text-xs text-gray-500">
                           <span>Type: {output.type}</span>
-                          <span>Tijdseenheid: {output.temporal.type}</span>
+                          <span>Tijdseenheid: {output.temporal?.type || 'geen'}</span>
                         </div>
                       </div>
                     </div>

@@ -66,19 +66,19 @@ export interface Parameter extends BaseProperty {
 }
 
 export interface Source extends BaseProperty {
-	temporal: Temporal;
+	temporal?: Temporal;
 	source_reference: SourceReference;
 }
 
 export interface Input extends BaseProperty {
 	type_spec?: TypeSpec;
 	service_reference: ServiceReference;
-	temporal: Temporal;
+	temporal?: Temporal;
 }
 
 export interface Output extends BaseProperty {
 	type_spec?: TypeSpec;
-	temporal: Temporal;
+	temporal?: Temporal;
 }
 
 export interface Temporal {

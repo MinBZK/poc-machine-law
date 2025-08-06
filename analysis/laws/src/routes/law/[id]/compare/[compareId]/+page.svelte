@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Dropdown from '$lib/Dropdown.svelte';
   import { page } from '$app/state';
   import type { PageData } from './$types';
   import Prism from 'prismjs';
@@ -8,8 +9,10 @@
   import 'prismjs/themes/prism-coy.css'; // IMPROVE: use some theme from https://github.com/PrismJS/prism-themes instead?
   import 'prismjs/plugins/diff-highlight/prism-diff-highlight';
   import 'prismjs/plugins/diff-highlight/prism-diff-highlight.css';
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
   const { id, compareId } = page.params;
 
   const lawA = data.laws.find((law) => law.uuid === id);
@@ -19,10 +22,29 @@
     throw new Error(`Law with id ${id} and/or ${compareId} not found`);
   }
 
+  // Create the options for the dropdowns
+  const dropdownOptions = [
+    { label: '- Kies een variant -', isHidden: true },
+    ...data.laws.map((law) => ({
+      value: law.uuid,
+      label: `${law.name} (${law.service}), geldig vanaf ${new Date(law.valid_from).toLocaleDateString('nl-NL')}`,
+    })),
+  ];
+
+  let selectedLawA = $state(id);
+  let selectedLawB = $state(compareId);
+
+  $effect(() => {
+    // Navigate to the selected laws when they change
+    if (selectedLawA !== id || selectedLawB !== compareId) {
+      goto(resolve(`/law/${selectedLawA}/compare/${selectedLawB}`));
+    }
+  });
+
+  // Function to create a diff between two source strings
   function createDiff(sourceA: string, sourceB: string): string {
     const linesA = sourceA.split('\n');
     const linesB = sourceB.split('\n');
-    let diff = '';
 
     // Implementation of Longest Common Subsequence (LCS)
     function getLCS(a: string[], b: string[]): number[][] {
@@ -89,7 +111,14 @@
     Terug naar alle wetten
   </a>
 
-  <p>Vergelijk met andere wet: TODO</p>
+  <div>
+    Vergelijk
+    <Dropdown options={dropdownOptions} bind:value={selectedLawA} extraMenuClasses="text-sm" />
+
+    <p class="inline-block">met</p>
+
+    <Dropdown options={dropdownOptions} bind:value={selectedLawB} extraMenuClasses="text-sm" />
+  </div>
 
   <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
     <h2 class="mb-2 text-lg font-semibold">Code</h2>
@@ -97,12 +126,19 @@
     <div class="mb-4 text-sm text-gray-600">
       <div class="mb-0.5 flex items-center">
         <span class="mr-2 inline-block h-4 w-4 rounded-sm bg-red-200"></span>
-        <span>Verwijderd ten opzichte van {lawA.service}</span>
+        <span
+          >Verwijderd ten opzichte van <strong class="font-medium"
+            >{lawA.name} ({lawA.service})</strong
+          >, geldig vanaf {new Date(lawA.valid_from).toLocaleDateString('nl-NL')}</span
+        >
       </div>
 
       <div class="flex items-center">
         <span class="mr-2 inline-block h-4 w-4 rounded-sm bg-green-200"></span>
-        <span>Toegevoegd in {lawB.service}</span>
+        <span
+          >Toegevoegd in <strong class="font-medium">{lawB.name} ({lawB.service})</strong>, geldig
+          vanaf {new Date(lawB.valid_from).toLocaleDateString('nl-NL')}</span
+        >
       </div>
     </div>
 

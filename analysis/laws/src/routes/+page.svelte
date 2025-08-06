@@ -1,9 +1,9 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import type { LayoutData } from './$types';
+  import type { PageData } from './$types';
   import type { Law } from '../app';
 
-  export let data: LayoutData;
+  let { data }: { data: PageData } = $props();
   const laws: Law[] = data.laws;
 
   // Group laws by name
