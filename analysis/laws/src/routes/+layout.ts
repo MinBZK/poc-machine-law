@@ -19,7 +19,9 @@ export const load: LayoutLoad = async ({ fetch }) => {
         throw new Error(`Failed to fetch law from ${url}`);
       }
       const text = await lawRes.text();
-      return yaml.load(text) as Law;
+      const law = yaml.load(text) as Law;
+      law.source = text; // Store the original YAML source
+      return law;
     })
   );
 

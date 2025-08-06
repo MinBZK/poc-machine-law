@@ -26,6 +26,8 @@ export interface Law {
 	properties: Properties;
 	actions: Action[];
 	definitions?: Record<string, (string[] | number)>;
+
+	source: string; // Original YAML source
 }
 
 export interface LegalBasis {

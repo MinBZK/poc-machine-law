@@ -41,6 +41,7 @@
   },
   "type": "module",
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "prismjs": "^1.30.0"
   }
 }

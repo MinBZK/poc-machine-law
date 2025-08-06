@@ -11,6 +11,9 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
+      prismjs:
+        specifier: ^1.30.0
+        version: 1.30.0
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^6.0.1
@@ -1343,6 +1346,10 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
+  prismjs@1.30.0:
+    resolution: {integrity: sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==}
+    engines: {node: '>=6'}
+
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -2607,6 +2614,8 @@ snapshots:
       prettier-plugin-svelte: 3.4.0(prettier@3.6.2)(svelte@5.37.3)
 
   prettier@3.6.2: {}
+
+  prismjs@1.30.0: {}
 
   punycode@2.3.1: {}
 
