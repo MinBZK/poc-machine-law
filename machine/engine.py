@@ -482,44 +482,90 @@ class RulesEngine:
         return result
 
     @staticmethod
-    def _evaluate_date_operation(op: str, values: list[Any], unit: str, context: RuleContext) -> int:
-        """Handle date-specific operations"""
-        result = None
+    def _evaluate_date_operation(op: str, values: list[Any], unit: str, context: RuleContext) -> int | None:
+        """Handle date-specific operations with comprehensive validation"""
+
+        def validate_and_convert_date(date_val: Any, name: str) -> datetime | None:
+            """Validate and convert a date value to datetime with comprehensive error handling"""
+            if date_val is None:
+                context.missing_required = True
+                logger.warning(f"Missing date value for {name} in {op} operation")
+                return None
+
+            if isinstance(date_val, datetime):
+                return date_val
+
+            # Check for empty or invalid string types
+            if isinstance(date_val, str):
+                if not date_val.strip():
+                    context.missing_required = True
+                    logger.warning(f"Empty date string for {name} in {op} operation")
+                    return None
+            elif not isinstance(date_val, str | int | float):
+                # Invalid type that can't be converted to string
+                context.missing_required = True
+                logger.warning(f"Invalid date type for {name}: {type(date_val)} = {date_val}")
+                return None
+
+            try:
+                return datetime.fromisoformat(str(date_val))
+            except (ValueError, TypeError) as e:
+                context.missing_required = True
+                logger.warning(f"Cannot parse date for {name}: {date_val} ({e})")
+                return None
+
         if op == "SUBTRACT_DATE":
+            # Validate quantity
             if len(values) != 2:
-                logger.warning("Warning: SUBTRACT_DATE requires exactly 2 values")
-                return 0
+                context.missing_required = True
+                logger.warning(f"SUBTRACT_DATE requires exactly 2 values, got {len(values)}")
+                return None
 
             end_date, start_date = values
 
-            if not end_date:
+            # Apply default for end_date if falsy (but not None, which is handled in validation)
+            if not end_date and end_date is not None:
                 end_date = context.calculation_date
 
-            if not isinstance(end_date, datetime):
-                end_date = datetime.fromisoformat(str(end_date))
-            if not isinstance(start_date, datetime):
-                start_date = datetime.fromisoformat(str(start_date))
+            # Validate and convert both dates
+            end_date_converted = validate_and_convert_date(end_date, "end_date")
+            start_date_converted = validate_and_convert_date(start_date, "start_date")
 
-            delta = end_date - start_date
+            # Return None if either date is invalid
+            if end_date_converted is None or start_date_converted is None:
+                return None
 
+            # Calculate the difference
+            delta = end_date_converted - start_date_converted
+
+            # Convert to requested unit
             if unit == "days":
                 result = delta.days
             elif unit == "years":
                 result = (
-                    end_date.year
-                    - start_date.year
-                    - ((end_date.month, end_date.day) < (start_date.month, start_date.day))
+                    end_date_converted.year
+                    - start_date_converted.year
+                    - (
+                        (end_date_converted.month, end_date_converted.day)
+                        < (start_date_converted.month, start_date_converted.day)
+                    )
                 )
             elif unit == "months":
-                result = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month
+                result = (
+                    (end_date_converted.year - start_date_converted.year) * 12
+                    + end_date_converted.month
+                    - start_date_converted.month
+                )
             else:
-                logger.warning(f"Warning: Unknown date unit {unit}")
+                logger.warning(f"Unknown date unit '{unit}', defaulting to days")
+                result = delta.days
+
             logger.debug(f"Compute {op}({values}, {unit}) = {result}")
+            return result
 
-        if result is None:
-            logger.warning("Warning: date operation resulted in None")
-
-        return result
+        # Handle other date operations if added in the future
+        logger.warning(f"Unknown date operation: {op}")
+        return None
 
     def _evaluate_operation(self, operation: dict[str, Any], context: RuleContext) -> Any:
         """Evaluate an operation or condition"""
