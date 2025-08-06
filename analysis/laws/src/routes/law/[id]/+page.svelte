@@ -4,7 +4,7 @@
   import Prism from 'prismjs';
   const { highlight, languages } = Prism;
   import 'prismjs/components/prism-yaml';
-  import 'prismjs/themes/prism-coy.css';
+  import 'prismjs/themes/prism-coy.css'; // IMPROVE: use some theme from https://github.com/PrismJS/prism-themes instead?
 
   export let data: PageData;
   const id = page.params.id;
@@ -43,7 +43,7 @@
         <h2 class="mb-2 text-lg font-semibold">Details</h2>
         <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <dt class="text-sm font-medium text-gray-500">Service</dt>
+            <dt class="text-sm font-medium text-gray-500">Dienst</dt>
             <dd class="mt-1">{law.service}</dd>
           </div>
           <div>
@@ -75,8 +75,101 @@
         </dl>
       </div>
 
+      {#if law.properties?.parameters?.length || law.properties?.sources?.length || law.properties?.input?.length || law.properties?.output?.length}
+        <h2 class="mb-2 text-lg font-semibold">Eigenschappen</h2>
+        <div class="grid gap-6 sm:grid-cols-2">
+          {#if law.properties.parameters?.length}
+            <div>
+              <h3 class="mb-2 text-base font-medium">Parameters</h3>
+              <ul class="space-y-3">
+                {#each law.properties.parameters as param}
+                  <li class="rounded-md bg-gray-50 p-3">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="font-medium">{param.name}</p>
+                        <p class="text-sm text-gray-600">{param.description}</p>
+                        <div class="mt-1 flex gap-3 text-xs text-gray-500">
+                          <span>Type: {param.type}</span>
+                          <span>{param.required ? 'Vereist' : 'Optioneel'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if law.properties.sources?.length}
+            <div>
+              <h3 class="mb-2 text-base font-medium">Sources</h3>
+              <ul class="space-y-3">
+                {#each law.properties.sources as source}
+                  <li class="rounded-md bg-gray-50 p-3">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="font-medium">{source.name}</p>
+                        <p class="text-sm text-gray-600">{source.description}</p>
+                        <div class="mt-1 flex gap-3 text-xs text-gray-500">
+                          <span>Type: {source.type}</span>
+                          <span>Tijdseenheid: {source.temporal.type}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if law.properties.input?.length}
+            <div>
+              <h3 class="mb-2 text-base font-medium">Inputs</h3>
+              <ul class="space-y-3">
+                {#each law.properties.input as input}
+                  <li class="rounded-md bg-gray-50 p-3">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="font-medium">{input.name}</p>
+                        <p class="text-sm text-gray-600">{input.description}</p>
+                        <div class="mt-1 flex gap-3 text-xs text-gray-500">
+                          <span>Type: {input.type}</span>
+                          <span>Tijdseenheid: {input.temporal.type}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+
+          {#if law.properties.output?.length}
+            <div>
+              <h3 class="mb-2 text-base font-medium">Outputs</h3>
+              <ul class="space-y-3">
+                {#each law.properties.output as output}
+                  <li class="rounded-md bg-gray-50 p-3">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="font-medium">{output.name}</p>
+                        <p class="text-sm text-gray-600">{output.description}</p>
+                        <div class="mt-1 flex gap-3 text-xs text-gray-500">
+                          <span>Type: {output.type}</span>
+                          <span>Tijdseenheid: {output.temporal.type}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+        </div>
+      {/if}
+
       <div>
-        <h2 class="mb-2 text-lg font-semibold">Bron</h2>
+        <h2 class="mb-2 text-lg font-semibold">Code</h2>
         <pre class="!rounded-md !bg-gray-50 !px-4 !py-3 !text-sm/6 whitespace-pre-wrap"><code
             >{@html highlight(law.source, languages.yaml, 'yaml')}</code
           ></pre>
