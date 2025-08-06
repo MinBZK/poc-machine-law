@@ -7,7 +7,7 @@
   import 'prismjs/themes/prism-coy.css'; // IMPROVE: use some theme from https://github.com/PrismJS/prism-themes instead?
 
   export let data: PageData;
-  const id = page.params.id;
+  const { id } = page.params;
 
   const law = data.laws.find((law) => law.uuid === id);
 
@@ -29,6 +29,8 @@
     </svg>
     Terug naar alle wetten
   </a>
+
+  <p>Vergelijk met andere wet: TODO</p>
 
   <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
     <div class="grid gap-6">
@@ -168,12 +170,10 @@
         </div>
       {/if}
 
-      <div>
-        <h2 class="mb-2 text-lg font-semibold">Code</h2>
-        <pre class="!rounded-md !bg-gray-50 !px-4 !py-3 !text-sm/6 whitespace-pre-wrap"><code
-            >{@html highlight(law.source, languages.yaml, 'yaml')}</code
-          ></pre>
-      </div>
+      <h2 class="mb-2 text-lg font-semibold">Code</h2>
+      <pre class="!rounded-md !bg-gray-50 !px-4 !py-3 !text-sm/6 whitespace-pre-wrap"><code
+          >{@html highlight(law.source, languages.yaml, 'yaml')}</code
+        ></pre>
     </div>
   </div>
 </div>
