@@ -15,10 +15,14 @@
   let { data }: { data: PageData } = $props();
   const { id, compareId } = page.params;
 
-  const lawA = data.laws.find((law) => law.uuid === id);
-  const lawB = data.laws.find((law) => law.uuid === compareId);
+  let selectedLawA = $state(id);
+  let selectedLawB = $state(compareId);
 
-  if (!lawA || !lawB) {
+  const lawA = $derived(data.laws.find((law) => law.uuid === selectedLawA));
+  const lawB = $derived(data.laws.find((law) => law.uuid === selectedLawB));
+
+  // svelte-ignore state_referenced_locally // This is checked intentionally only once
+    if (!lawA || !lawB) {
     throw new Error(`Law with id ${id} and/or ${compareId} not found`);
   }
 
@@ -31,13 +35,13 @@
     })),
   ];
 
-  let selectedLawA = $state(id);
-  let selectedLawB = $state(compareId);
-
   $effect(() => {
     // Navigate to the selected laws when they change
-    if (selectedLawA !== id || selectedLawB !== compareId) {
-      goto(resolve(`/law/${selectedLawA}/compare/${selectedLawB}`));
+    if (selectedLawA !== page.params.id || selectedLawB !== page.params.compareId) {
+      console.log('here');
+      goto(resolve(`/law/${selectedLawA}/compare/${selectedLawB}`), {
+        replaceState: true, // For now, replace the state since the dropdowns will change the URL. IMPROVE: maybe use a different approach to avoid replacing the state?
+      });
     }
   });
 
@@ -94,7 +98,7 @@
     return reconstructDiff(lcsMatrix, linesA, linesB, linesA.length, linesB.length);
   }
 
-  const diffText = createDiff(lawA.source, lawB.source);
+  const diffText = $derived(createDiff(lawA.source, lawB.source));
 </script>
 
 <svelte:head>
