@@ -24,7 +24,7 @@
 
   // Create the options for the dropdowns
   const dropdownOptions = [
-    { label: '- Kies een variant -', isHidden: true },
+    { label: '- Kies een wet -', isHidden: true },
     ...data.laws.map((law) => ({
       value: law.uuid,
       label: `${law.name} (${law.service}), geldig vanaf ${new Date(law.valid_from).toLocaleDateString('nl-NL')}`,

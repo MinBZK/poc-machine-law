@@ -5,6 +5,9 @@
   const { highlight, languages } = Prism;
   import 'prismjs/components/prism-yaml';
   import 'prismjs/themes/prism-coy.css'; // IMPROVE: use some theme from https://github.com/PrismJS/prism-themes instead?
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
+  import Dropdown from '$lib/Dropdown.svelte';
 
   let { data }: { data: PageData } = $props();
   const { id } = page.params;
@@ -14,6 +17,24 @@
   if (!law) {
     throw new Error(`Law with id ${id} not found`);
   }
+
+  // Create the options for the dropdown
+  const dropdownOptions = [
+    { label: '- Kies een wet -', isHidden: true },
+    ...data.laws.map((law) => ({
+      value: law.uuid,
+      label: `${law.name} (${law.service}), geldig vanaf ${new Date(law.valid_from).toLocaleDateString('nl-NL')}`,
+    })),
+  ];
+
+  let selectedLaw: string | undefined = $state();
+
+  $effect(() => {
+    // Navigate to the selected law comparison when selected
+    if (selectedLaw) {
+      goto(resolve(`/law/${id}/compare/${selectedLaw}`));
+    }
+  });
 </script>
 
 <svelte:head>
@@ -30,7 +51,13 @@
     Terug naar alle wetten
   </a>
 
-  <p>Vergelijk met andere wet: TODO</p>
+  <p>
+    Vergelijk met andere wet: <Dropdown
+      options={dropdownOptions}
+      bind:value={selectedLaw}
+      extraMenuClasses="text-sm"
+    />
+  </p>
 
   <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
     <div class="grid gap-6">
