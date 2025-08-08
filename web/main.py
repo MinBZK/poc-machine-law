@@ -37,11 +37,19 @@ app.include_router(importer.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 
+app.mount(
+    "/analysis/laws",
+    StaticFiles(
+        # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/laws/build",  # Note: absolute path is required when follow_symlink=True
+        directory="analysis/laws/build",
+        html=True,
+    ),
+)
+
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
 app.mount(
     "/analysis/graph",
     StaticFiles(
-        # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/graph/build",  # Note: absolute path is required when follow_symlink=True
         directory="analysis/graph/build",
         html=True,
     ),
