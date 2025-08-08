@@ -37,6 +37,7 @@ app.include_router(importer.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 
+app.mount("/analysis/laws/law", StaticFiles(directory="law"))
 app.mount(
     "/analysis/laws",
     StaticFiles(

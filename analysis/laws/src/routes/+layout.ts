@@ -7,8 +7,7 @@ import type { Law } from '../app';
 import yaml from 'js-yaml';
 
 export const load: LayoutLoad = async ({ fetch }) => {
-  // @ts-expect-error ts(2345) // The type definition for `resolve` seems incorrect
-  const res = await fetch(resolve('/temp.json'));
+  const res = await fetch('/laws/list');
   const urls = await res.json() as string[];
 
   // Fetching laws from the provided URLs

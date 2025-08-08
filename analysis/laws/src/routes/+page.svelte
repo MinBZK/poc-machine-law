@@ -39,7 +39,7 @@
         <div class="space-y-3">
           {#each versions as version}
             <a
-              href={resolve(`/law/${version.uuid}`)}
+              href={resolve(`/details/${version.uuid}`)}
               class="block rounded-md bg-gray-50 p-4 transition-colors hover:bg-gray-100"
             >
               <div class="flex items-center justify-between">

@@ -22,7 +22,7 @@
   const lawB = $derived(data.laws.find((law) => law.uuid === selectedLawB));
 
   // svelte-ignore state_referenced_locally // This is checked intentionally only once
-    if (!lawA || !lawB) {
+  if (!lawA || !lawB) {
     throw new Error(`Law with id ${id} and/or ${compareId} not found`);
   }
 
@@ -39,7 +39,7 @@
     // Navigate to the selected laws when they change
     if (selectedLawA !== page.params.id || selectedLawB !== page.params.compareId) {
       console.log('here');
-      goto(resolve(`/law/${selectedLawA}/compare/${selectedLawB}`), {
+      goto(resolve(`/details/${selectedLawA}/compare/${selectedLawB}`), {
         replaceState: true, // For now, replace the state since the dropdowns will change the URL. IMPROVE: maybe use a different approach to avoid replacing the state?
       });
     }
@@ -108,7 +108,7 @@
 <div class="mx-auto max-w-6xl px-4 py-8">
   <h1 class="mb-2 text-3xl font-bold">{lawA.name}</h1>
 
-  <a href="/" class="mb-6 inline-flex items-center text-blue-600 hover:text-blue-800">
+  <a href={resolve('/')} class="mb-6 inline-flex items-center text-blue-600 hover:text-blue-800">
     <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
     </svg>
