@@ -1,8 +1,10 @@
 import sys
 from pathlib import Path
+import os
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
@@ -38,14 +40,32 @@ app.include_router(wallet.router)
 app.include_router(simulation.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="law"))
-app.mount(
-    "/analysis/laws",
-    StaticFiles(
-        # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/laws/build",  # Note: absolute path is required when follow_symlink=True
-        directory="analysis/laws/build",
-        html=True,
-    ),
-)
+# app.mount(
+#     "/analysis/laws",
+#     StaticFiles(
+#         # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/laws/build",  # Note: absolute path is required when follow_symlink=True
+#         directory="analysis/laws/build",
+#         html=True,
+#     ),
+# )
+
+
+@app.get("/analysis/laws/", response_class=FileResponse)
+def read_index():
+    return FileResponse("analysis/laws/build/index.html")
+
+
+@app.get("/analysis/laws/{catchall:path}", response_class=FileResponse)
+def read_index(request: Request):
+    # Check first if requested file exists
+    file = "analysis/laws/build/" + request.path_params["catchall"]
+
+    if os.path.exists(file):
+        return FileResponse(file)
+
+    # Fallback to the index file
+    return FileResponse("analysis/laws/build/index.html")
+
 
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
 app.mount(
@@ -65,7 +85,11 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)):
+async def root(
+    request: Request,
+    bsn: str = "100000001",
+    services: EngineInterface = Depends(get_machine_service),
+):
     """Render the main dashboard page"""
     profile = services.get_profile_data(bsn)
     if not profile:
@@ -79,7 +103,9 @@ async def root(request: Request, bsn: str = "100000001", services: EngineInterfa
             "bsn": bsn,
             "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
-            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
+            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(
+                bsn
+            ),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
         },
