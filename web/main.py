@@ -1,10 +1,9 @@
 import sys
 from pathlib import Path
-import os
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
@@ -51,20 +50,21 @@ app.mount("/analysis/laws/law", StaticFiles(directory="law"))
 
 
 @app.get("/analysis/laws/", response_class=FileResponse)
-def read_index():
+def analysis_laws_index():
     return FileResponse("analysis/laws/build/index.html")
 
 
 @app.get("/analysis/laws/{catchall:path}", response_class=FileResponse)
-def read_index(request: Request):
-    # Check first if requested file exists
-    file = "analysis/laws/build/" + request.path_params["catchall"]
+def analysis_laws_fallback(request: Request):
+    # Prevent path traversal by resolving the absolute path and checking its parent
+    base_dir = Path("analysis/laws/build").resolve()
+    requested_path = (base_dir / request.path_params["catchall"]).resolve()
 
-    if os.path.exists(file):
-        return FileResponse(file)
+    if base_dir in requested_path.parents and requested_path.exists():
+        return FileResponse(str(requested_path))
 
     # Fallback to the index file
-    return FileResponse("analysis/laws/build/index.html")
+    return FileResponse(str(base_dir / "index.html"))
 
 
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
@@ -103,9 +103,7 @@ async def root(
             "bsn": bsn,
             "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
-            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(
-                bsn
-            ),
+            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
         },
