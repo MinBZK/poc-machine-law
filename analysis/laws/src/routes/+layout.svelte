@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import '../app.pcss';
 
   let menuOpen = $state(false);
@@ -20,19 +21,27 @@
   }
 </script>
 
-<div class="bg-white shadow">
+<div class="bg-linear-to-b from-slate-50 to-slate-100 shadow">
   <div class="mx-auto flex max-w-6xl items-center px-4 py-6">
-    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-8 w-8 text-gray-600" viewBox="0 0 24 24"
-      ><path
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M10 21h7a2 2 0 0 0 2-2V9.414a1 1 0 0 0-.293-.707l-5.414-5.414A1 1 0 0 0 12.586 3H7a2 2 0 0 0-2 2v11m0 5l4.879-4.879m0 0a3 3 0 1 0 4.243-4.242a3 3 0 0 0-4.243 4.242"
-      /></svg
-    >
-    <h1 class="mr-auto text-2xl font-bold">Wet-details</h1>
+    <h1 class="mr-auto text-2xl font-bold text-blue-900">
+      <a class="flex items-center" href={resolve('/')}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="mr-2 h-8 w-8 text-blue-600"
+          viewBox="0 0 24 24"
+          ><path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 21h7a2 2 0 0 0 2-2V9.414a1 1 0 0 0-.293-.707l-5.414-5.414A1 1 0 0 0 12.586 3H7a2 2 0 0 0-2 2v11m0 5l4.879-4.879m0 0a3 3 0 1 0 4.243-4.242a3 3 0 0 0-4.243 4.242"
+          /></svg
+        >
+        Wet-details</a
+      >
+    </h1>
+
     <div use:clickOutside class="relative">
       <button
         onclick={() => (menuOpen = !menuOpen)}

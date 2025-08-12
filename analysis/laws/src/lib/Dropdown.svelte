@@ -44,7 +44,7 @@
       isOpen ? closeMenu() : openMenu();
     }}
     {id}
-    class="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 hover:bg-gray-100 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 {extraClasses}"
+    class="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 hover:bg-gray-100 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 {extraClasses}"
     type="button"
   >
     {options.find((el) => el.value === value)?.label}
