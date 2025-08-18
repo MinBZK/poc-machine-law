@@ -19,13 +19,13 @@ def after_scenario(context, scenario) -> None:
     clear_topic_cache()
 
     # Close Playwright browser and context if they exist
-    if hasattr(context, 'page'):
+    if hasattr(context, "page"):
         context.page.close()
-    if hasattr(context, 'browser_context'):
+    if hasattr(context, "browser_context"):
         context.browser_context.close()
-    if hasattr(context, 'browser'):
+    if hasattr(context, "browser"):
         context.browser.close()
-    if hasattr(context, 'playwright'):
+    if hasattr(context, "playwright"):
         context.playwright.stop()
 
     # Reset application state by restarting the server
@@ -38,7 +38,5 @@ def after_scenario(context, scenario) -> None:
     time.sleep(1)
 
     # Restart the server in the background
-    subprocess.Popen(["uv", "run", "web/main.py"],
-                     stdout=subprocess.DEVNULL,
-                     stderr=subprocess.DEVNULL)
+    subprocess.Popen(["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(3)  # Give the server time to start
