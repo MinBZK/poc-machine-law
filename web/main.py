@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -37,11 +38,39 @@ app.include_router(importer.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 
+app.mount("/analysis/laws/law", StaticFiles(directory="law"))
+# app.mount(
+#     "/analysis/laws",
+#     StaticFiles(
+#         # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/laws/build",  # Note: absolute path is required when follow_symlink=True
+#         directory="analysis/laws/build",
+#         html=True,
+#     ),
+# )
+
+
+@app.get("/analysis/laws/", response_class=FileResponse)
+def analysis_laws_index():
+    return FileResponse("analysis/laws/build/index.html")
+
+
+@app.get("/analysis/laws/{catchall:path}", response_class=FileResponse)
+def analysis_laws_fallback(request: Request):
+    # Prevent path traversal by resolving the absolute path and checking its parent
+    base_dir = Path("analysis/laws/build").resolve()
+    requested_path = (base_dir / request.path_params["catchall"]).resolve()
+
+    if base_dir in requested_path.parents and requested_path.exists():
+        return FileResponse(str(requested_path))
+
+    # Fallback to the index file
+    return FileResponse(str(base_dir / "index.html"))
+
+
 app.mount("/analysis/graph/law", StaticFiles(directory="law"))
 app.mount(
     "/analysis/graph",
     StaticFiles(
-        # directory=f"{os.path.dirname(os.path.realpath(__file__))}/../analysis/graph/build",  # Note: absolute path is required when follow_symlink=True
         directory="analysis/graph/build",
         html=True,
     ),
@@ -56,7 +85,11 @@ app.mount(
 
 
 @app.get("/")
-async def root(request: Request, bsn: str = "100000001", services: EngineInterface = Depends(get_machine_service)):
+async def root(
+    request: Request,
+    bsn: str = "100000001",
+    services: EngineInterface = Depends(get_machine_service),
+):
     """Render the main dashboard page"""
     profile = services.get_profile_data(bsn)
     if not profile:

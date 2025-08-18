@@ -292,7 +292,7 @@
 </script>
 
 <svelte:head>
-  <title>Dependency graph — Digilab</title>
+  <title>Dependency graph — Burger.nl</title>
 </svelte:head>
 
 <div class="float-right h-screen w-80 overflow-y-auto px-6 py-4 text-sm">
