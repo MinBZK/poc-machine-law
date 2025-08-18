@@ -30,28 +30,28 @@ def get_tile_template(service: str, law: str) -> str:
 
 
 def evaluate_law(
-    bsn: str, 
-    law: str, 
-    service: str, 
-    machine_service: EngineInterface, 
+    bsn: str,
+    law: str,
+    service: str,
+    machine_service: EngineInterface,
     approved: bool = True,
-    claim_manager: ClaimManagerInterface | None = None
+    claim_manager: ClaimManagerInterface | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
     """Evaluate a law for a given BSN"""
 
     parameters = {"BSN": bsn}
     overwrite_input = None
-    
+
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
     if not approved and claim_manager:
         claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
         # Filter claims for this service and law that are pending or approved
         relevant_claims = [
-            claim for claim in claims 
-            if claim.service == service and claim.law == law 
-            and claim.status in ['PENDING', 'APPROVED']
+            claim
+            for claim in claims
+            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
         ]
-        
+
         # Build overwrite_input from claims
         if relevant_claims:
             overwrite_input = {}
@@ -60,12 +60,12 @@ def evaluate_law(
 
     # Execute the law using EngineInterface
     result = machine_service.evaluate(
-        service=service, 
-        law=law, 
-        parameters=parameters, 
-        reference_date=TODAY, 
+        service=service,
+        law=law,
+        parameters=parameters,
+        reference_date=TODAY,
         approved=approved,
-        overwrite_input=overwrite_input
+        overwrite_input=overwrite_input,
     )
 
     return law, result, parameters
@@ -98,7 +98,9 @@ async def execute_law(
     """Execute a law and render its result"""
     try:
         law = unquote(law)
-        law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=False, claim_manager=claim_manager)
+        law, result, parameters = evaluate_law(
+            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager
+        )
 
     except Exception as e:
         print(e)
@@ -154,7 +156,9 @@ async def submit_case(
     """Submit a new case"""
     law = unquote(law)
 
-    law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager)
+    law, result, parameters = evaluate_law(
+        bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+    )
 
     case_id = case_manager.submit_case(
         bsn=bsn,
@@ -258,7 +262,9 @@ async def explanation(
     try:
         print(f"Explanation requested for {service}, {law}, with provider: {provider}")
         law = unquote(law)
-        law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager)
+        law, result, parameters = evaluate_law(
+            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+        )
 
         # Convert path and rule_spec to JSON strings
         path_dict = node_to_dict(result.path, skip_services=True)
@@ -359,7 +365,9 @@ async def application_panel(
     """Get the application panel with tabs"""
     try:
         law = unquote(law)
-        law, result, parameters = evaluate_law(bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager)
+        law, result, parameters = evaluate_law(
+            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+        )
 
         value_tree = machine_service.extract_value_tree(result.path)
         existing_case = case_manager.get_case(bsn, service, law)

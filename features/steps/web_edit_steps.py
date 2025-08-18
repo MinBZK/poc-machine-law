@@ -8,7 +8,7 @@ from behave import given, then, when
 from playwright.sync_api import sync_playwright
 
 
-@given('the web server is running')
+@given("the web server is running")
 def step_web_server_running(context):
     """Check if the web server is running and initialize Playwright."""
     try:
@@ -21,12 +21,11 @@ def step_web_server_running(context):
         # Run in headless mode with a fresh browser context for isolation
         context.browser = context.playwright.chromium.launch(
             headless=True,
-            args=['--no-sandbox', '--disable-setuid-sandbox']  # For CI/CD compatibility
+            args=["--no-sandbox", "--disable-setuid-sandbox"],  # For CI/CD compatibility
         )
         # Create an isolated browser context
         context.browser_context = context.browser.new_context(
-            viewport={'width': 1280, 'height': 720},
-            ignore_https_errors=True
+            viewport={"width": 1280, "height": 720}, ignore_https_errors=True
         )
         context.page = context.browser_context.new_page()
 
@@ -75,10 +74,7 @@ def step_start_requesting_benefit(context, benefit, bsn):
 def step_change_field_value(context, field, old_value, new_value):
     """Submit a claim to change a field value."""
     # Map field names to internal keys
-    field_mapping = {
-        "Box1 dienstbetrekking": "box1_inkomen",
-        "box1_inkomen": "box1_inkomen"
-    }
+    field_mapping = {"Box1 dienstbetrekking": "box1_inkomen", "box1_inkomen": "box1_inkomen"}
 
     internal_key = field_mapping.get(field, field)
 
@@ -91,7 +87,7 @@ def step_change_field_value(context, field, old_value, new_value):
         "law": context.law,
         "bsn": context.bsn,
         "claimant": "CITIZEN",
-        "auto_approve": "false"
+        "auto_approve": "false",
     }
 
     response = requests.post(f"{context.base_url}/edit/update-value", data=edit_data)
@@ -176,7 +172,9 @@ def step_change_field_to_value(context, field, new_value):
         context.page.screenshot(path="debug_no_box1_button.png")
 
 
-@when('I provide required housing data with huurprijs "{rent}", subsidiabele servicekosten "{subsidiabele_service_costs}", and servicekosten "{service_costs}"')
+@when(
+    'I provide required housing data with huurprijs "{rent}", subsidiabele servicekosten "{subsidiabele_service_costs}", and servicekosten "{service_costs}"'
+)
 def step_provide_housing_data(context, rent, subsidiabele_service_costs, service_costs):
     """Fill in the required housing data in the form."""
     time.sleep(1)
@@ -214,34 +212,31 @@ def step_provide_housing_data(context, rent, subsidiabele_service_costs, service
             time.sleep(2)
 
 
-
-@when('I provide housing data')
+@when("I provide housing data")
 def step_provide_housing_data_table(context):
     """Provide housing data from a table."""
     for row in context.table:
         edit_data = {
             "service": context.service,
-            "key": row['Field'],
-            "new_value": row['Value'],
+            "key": row["Field"],
+            "new_value": row["Value"],
             "old_value": "",
             "reason": "Providing required housing data",
             "law": context.law,
             "bsn": context.bsn,
             "claimant": "CITIZEN",
-            "auto_approve": "false"
+            "auto_approve": "false",
         }
         requests.post(f"{context.base_url}/edit/update-value", data=edit_data)
 
 
-@then('the huurtoeslag should be recalculated')
+@then("the huurtoeslag should be recalculated")
 def step_huurtoeslag_recalculated(context):
     """Verify that huurtoeslag is recalculated with pending claims."""
-    response = requests.get(f"{context.base_url}/laws/application-panel", params={
-        "service": context.service,
-        "law": context.law,
-        "bsn": context.bsn,
-        "approved": "false"
-    })
+    response = requests.get(
+        f"{context.base_url}/laws/application-panel",
+        params={"service": context.service, "law": context.law, "bsn": context.bsn, "approved": "false"},
+    )
     assert response.status_code == 200, f"Failed to get application panel: {response.status_code}"
     context.panel_response = response.text
 
@@ -249,7 +244,7 @@ def step_huurtoeslag_recalculated(context):
     assert "€" in context.panel_response, "No euro amount found in response"
 
 
-@then('the huurtoeslag amount should increase significantly due to lower income')
+@then("the huurtoeslag amount should increase significantly due to lower income")
 def step_huurtoeslag_increased(context):
     """Verify that the huurtoeslag amount has increased."""
     # With income of 600 instead of 14650, the huurtoeslag should be much higher
@@ -258,29 +253,35 @@ def step_huurtoeslag_increased(context):
 
     # Look for amounts over 400 euro (typical for low income)
     # This is a simple check - could be made more sophisticated
-    amounts = re.findall(r'(\d+)[,.](\d+)\s*€', context.panel_response)
+    amounts = re.findall(r"(\d+)[,.](\d+)\s*€", context.panel_response)
     has_high_amount = any(int(whole) > 400 for whole, _ in amounts)
     assert has_high_amount, "Expected a higher huurtoeslag amount for low income"
 
 
-@then('the amount should be different from the original')
+@then("the amount should be different from the original")
 def step_amount_different_from_original(context):
     """Verify that the amount has changed from the original calculation."""
     # Get the calculation WITHOUT pending claims (original)
-    response_original = requests.get(f"{context.base_url}/laws/application-panel", params={
-        "service": context.service,
-        "law": context.law,
-        "bsn": context.bsn,
-        "approved": "true"  # Without pending claims
-    })
+    response_original = requests.get(
+        f"{context.base_url}/laws/application-panel",
+        params={
+            "service": context.service,
+            "law": context.law,
+            "bsn": context.bsn,
+            "approved": "true",  # Without pending claims
+        },
+    )
 
     # Get the calculation WITH pending claims (new)
-    response_new = requests.get(f"{context.base_url}/laws/application-panel", params={
-        "service": context.service,
-        "law": context.law,
-        "bsn": context.bsn,
-        "approved": "false"  # With pending claims
-    })
+    response_new = requests.get(
+        f"{context.base_url}/laws/application-panel",
+        params={
+            "service": context.service,
+            "law": context.law,
+            "bsn": context.bsn,
+            "approved": "false",  # With pending claims
+        },
+    )
 
     assert response_original.status_code == 200
     assert response_new.status_code == 200
@@ -310,7 +311,7 @@ def step_huurtoeslag_calculated_as(context, amount):
         amount_locator = context.page.locator(f"text={amount}")
 
     # Store the initial amount if this is the first check
-    if not hasattr(context, 'initial_amount'):
+    if not hasattr(context, "initial_amount"):
         context.initial_amount = amount
 
     # Take a screenshot for debugging if amount not found
@@ -318,7 +319,8 @@ def step_huurtoeslag_calculated_as(context, amount):
         context.page.screenshot(path="debug_screenshot.png")
         page_text = context.page.inner_text("body")
         import re
-        amounts = re.findall(r'\d+[,\.]\d+\s*€', page_text)
+
+        amounts = re.findall(r"\d+[,\.]\d+\s*€", page_text)
         print(f"Amounts found on page: {amounts[:10]}")
         print(f"Page text sample: {page_text[:500]}")
 
@@ -326,60 +328,54 @@ def step_huurtoeslag_calculated_as(context, amount):
     assert amount_locator.count() > 0, f"Expected amount {amount} not found on page"
 
 
-
-
-@then('I capture the initial huurtoeslag amount')
+@then("I capture the initial huurtoeslag amount")
 def step_capture_initial_huurtoeslag(context):
     """Capture the initial huurtoeslag amount."""
-    response = requests.get(f"{context.base_url}/laws/application-panel", params={
-        "service": context.service,
-        "law": context.law,
-        "bsn": context.bsn,
-        "approved": "false"
-    })
+    response = requests.get(
+        f"{context.base_url}/laws/application-panel",
+        params={"service": context.service, "law": context.law, "bsn": context.bsn, "approved": "false"},
+    )
     assert response.status_code == 200, f"Failed to get application panel: {response.status_code}"
 
     context.panel_response = response.text
 
     # Extract the amount from the response - look for the main result
     # Look for amounts in the format "123,45 €" in text-4xl font (main result)
-    matches = re.findall(r'text-4xl[^>]*>(\d+),(\d+)\s*€', response.text)
+    matches = re.findall(r"text-4xl[^>]*>(\d+),(\d+)\s*€", response.text)
     if matches:
         context.initial_amount = f"{matches[0][0]},{matches[0][1]}"
     else:
         # Fallback to any amount
-        amounts = re.findall(r'(\d+),(\d+)\s*€', response.text)
+        amounts = re.findall(r"(\d+),(\d+)\s*€", response.text)
         assert amounts, "No amount found in response"
         context.initial_amount = f"{amounts[0][0]},{amounts[0][1]}"
 
     print(f"Initial huurtoeslag amount: {context.initial_amount} €")
 
 
-@then('the huurtoeslag amount should be higher than before')
+@then("the huurtoeslag amount should be higher than before")
 def step_huurtoeslag_higher_than_before(context):
     """Verify that the huurtoeslag amount increased."""
-    response = requests.get(f"{context.base_url}/laws/application-panel", params={
-        "service": context.service,
-        "law": context.law,
-        "bsn": context.bsn,
-        "approved": "false"
-    })
+    response = requests.get(
+        f"{context.base_url}/laws/application-panel",
+        params={"service": context.service, "law": context.law, "bsn": context.bsn, "approved": "false"},
+    )
     assert response.status_code == 200, f"Failed to get application panel: {response.status_code}"
 
     # Extract the new amount - look for the main result
-    matches = re.findall(r'text-4xl[^>]*>(\d+),(\d+)\s*€', response.text)
+    matches = re.findall(r"text-4xl[^>]*>(\d+),(\d+)\s*€", response.text)
     if matches:
         new_amount = f"{matches[0][0]},{matches[0][1]}"
     else:
         # Fallback to any amount
-        amounts = re.findall(r'(\d+),(\d+)\s*€', response.text)
+        amounts = re.findall(r"(\d+),(\d+)\s*€", response.text)
         assert amounts, "No amount found in response"
         new_amount = f"{amounts[0][0]},{amounts[0][1]}"
 
     print(f"New huurtoeslag amount: {new_amount} €")
 
     # Compare amounts (convert to float for comparison)
-    initial_value = float(context.initial_amount.replace(',', '.'))
-    new_value = float(new_amount.replace(',', '.'))
+    initial_value = float(context.initial_amount.replace(",", "."))
+    new_value = float(new_amount.replace(",", "."))
 
     assert new_value > initial_value, f"Amount did not increase: {context.initial_amount} € → {new_amount} €"
