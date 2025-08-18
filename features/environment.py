@@ -10,7 +10,7 @@ from machine.logging_config import configure_logging
 def before_all(context) -> None:
     log_level = context.config.userdata.get("log_level", "DEBUG")
     context.loggers = configure_logging(log_level)
-    
+
     # Start the web server once for all tests that need it
     # Check if server is already running
     server_running = False
@@ -21,22 +21,20 @@ def before_all(context) -> None:
             print("Web server is already running")
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         pass
-    
+
     if not server_running:
         print("Starting web server for tests...")
         context.web_server_process = subprocess.Popen(
-            ["uv", "run", "web/main.py"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            ["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
-        
+
         # Wait for server to be ready
         max_retries = 30
         for i in range(max_retries):
             try:
                 response = requests.get("http://localhost:8000", timeout=1)
                 if response.status_code == 200:
-                    print(f"Web server started successfully after {i+1} attempts")
+                    print(f"Web server started successfully after {i + 1} attempts")
                     break
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
                 time.sleep(1)
@@ -48,7 +46,7 @@ def before_all(context) -> None:
 
 def after_all(context) -> None:
     # Clean up the web server if we started it
-    if hasattr(context, 'web_server_process'):
+    if hasattr(context, "web_server_process"):
         print("Stopping web server...")
         context.web_server_process.terminate()
         try:

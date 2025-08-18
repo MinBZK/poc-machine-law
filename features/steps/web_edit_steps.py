@@ -19,7 +19,7 @@ def step_web_server_running(context):
         assert response.status_code == 200, f"Web server returned status {response.status_code}"
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
         raise AssertionError(f"Web server is not accessible at http://localhost:8000: {e}")
-    
+
     context.base_url = "http://localhost:8000"
 
     # Initialize Playwright with isolation
