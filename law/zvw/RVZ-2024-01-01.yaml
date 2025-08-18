@@ -147,7 +147,7 @@ properties:
         type: "period"
         period_type: "month"
 
-    - name: "heeft_zorgverzekering"
+    - name: "heeft_verdragsverzekering"
       description: "Heeft de persoon een verdragsverzekering"
       type: "boolean"
       legal_basis:
@@ -217,7 +217,7 @@ actions:
       juriconnect: "jci1.3:c:BWBR0018450&artikel=2&z=2025-01-01&g=2025-01-01"
       explanation: "Artikel 2 Zvw bepaalt de vaststelling van verzekeringsstatus"
 
-  - output: "heeft_zorgverzekering"
+  - output: "heeft_verdragsverzekering"
     operation: AND
     values:
       - operation: NOT_NULL
@@ -272,7 +272,7 @@ actions:
               url: "https://wetten.overheid.nl/BWBR0018450/2025-01-01#Hoofdstuk2_Paragraaf2.1_Artikel2"
               juriconnect: "jci1.3:c:BWBR0018450&artikel=2&z=2025-01-01&g=2025-01-01"
               explanation: "Artikel 2 Zvw bepaalt verzekeringsplicht ingezetenen"
-          - subject: "$heeft_zorgverzekering"
+          - subject: "$heeft_verdragsverzekering"
             operation: EQUALS
             value: true
             legal_basis:
