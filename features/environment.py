@@ -1,3 +1,7 @@
+import subprocess
+import time
+
+import requests
 from eventsourcing.utils import clear_topic_cache
 
 from machine.logging_config import configure_logging
@@ -6,6 +10,51 @@ from machine.logging_config import configure_logging
 def before_all(context) -> None:
     log_level = context.config.userdata.get("log_level", "DEBUG")
     context.loggers = configure_logging(log_level)
+    
+    # Start the web server once for all tests that need it
+    # Check if server is already running
+    server_running = False
+    try:
+        response = requests.get("http://localhost:8000", timeout=2)
+        if response.status_code == 200:
+            server_running = True
+            print("Web server is already running")
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        pass
+    
+    if not server_running:
+        print("Starting web server for tests...")
+        context.web_server_process = subprocess.Popen(
+            ["uv", "run", "web/main.py"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        
+        # Wait for server to be ready
+        max_retries = 30
+        for i in range(max_retries):
+            try:
+                response = requests.get("http://localhost:8000", timeout=1)
+                if response.status_code == 200:
+                    print(f"Web server started successfully after {i+1} attempts")
+                    break
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+                time.sleep(1)
+        else:
+            # Clean up if we couldn't start
+            context.web_server_process.terminate()
+            raise AssertionError("Failed to start web server after 30 seconds")
+
+
+def after_all(context) -> None:
+    # Clean up the web server if we started it
+    if hasattr(context, 'web_server_process'):
+        print("Stopping web server...")
+        context.web_server_process.terminate()
+        try:
+            context.web_server_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            context.web_server_process.kill()
 
 
 def before_scenario(context, scenario) -> None:
@@ -27,16 +76,3 @@ def after_scenario(context, scenario) -> None:
         context.browser.close()
     if hasattr(context, "playwright"):
         context.playwright.stop()
-
-    # Reset application state by restarting the server
-    # This ensures we don't have persisted claims between test runs
-    import subprocess
-    import time
-
-    # Kill the existing server process
-    subprocess.run(["pkill", "-f", "web/main.py"], capture_output=True)
-    time.sleep(1)
-
-    # Restart the server in the background
-    subprocess.Popen(["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(3)  # Give the server time to start

@@ -1,6 +1,7 @@
 """Step definitions for web interface value editing tests."""
 
 import re
+import subprocess
 import time
 
 import requests
@@ -11,26 +12,28 @@ from playwright.sync_api import sync_playwright
 @given("the web server is running")
 def step_web_server_running(context):
     """Check if the web server is running and initialize Playwright."""
+    # The server should already be started by before_all in environment.py
+    # Just verify it's accessible
     try:
-        response = requests.get("http://localhost:8000")
-        assert response.status_code == 200
-        context.base_url = "http://localhost:8000"
+        response = requests.get("http://localhost:8000", timeout=5)
+        assert response.status_code == 200, f"Web server returned status {response.status_code}"
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        raise AssertionError(f"Web server is not accessible at http://localhost:8000: {e}")
+    
+    context.base_url = "http://localhost:8000"
 
-        # Initialize Playwright with isolation
-        context.playwright = sync_playwright().start()
-        # Run in headless mode with a fresh browser context for isolation
-        context.browser = context.playwright.chromium.launch(
-            headless=True,
-            args=["--no-sandbox", "--disable-setuid-sandbox"],  # For CI/CD compatibility
-        )
-        # Create an isolated browser context
-        context.browser_context = context.browser.new_context(
-            viewport={"width": 1280, "height": 720}, ignore_https_errors=True
-        )
-        context.page = context.browser_context.new_page()
-
-    except requests.exceptions.ConnectionError:
-        raise AssertionError("Web server is not running. Please start it with 'uv run web/main.py'")
+    # Initialize Playwright with isolation
+    context.playwright = sync_playwright().start()
+    # Run in headless mode with a fresh browser context for isolation
+    context.browser = context.playwright.chromium.launch(
+        headless=True,
+        args=["--no-sandbox", "--disable-setuid-sandbox"],  # For CI/CD compatibility
+    )
+    # Create an isolated browser context
+    context.browser_context = context.browser.new_context(
+        viewport={"width": 1280, "height": 720}, ignore_https_errors=True
+    )
+    context.page = context.browser_context.new_page()
 
 
 @when('I start requesting "{benefit}" for BSN "{bsn}"')
