@@ -94,7 +94,7 @@ properties:
       type: "boolean"
       service_reference:
         service: "RVZ"
-        field: "heeft_zorgverzekering"
+        field: "heeft_verdragsverzekering"
         law: "zvw"
       temporal:
         type: "period"
