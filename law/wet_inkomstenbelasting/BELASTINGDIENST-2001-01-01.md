@@ -91,16 +91,16 @@ Geldig vanaf: 2001-01-01
 De <span style="color: green">box3_bezittingen</span> is
 <span style="color:green">$BOX3_SPAREN</span> plus <span style="color:green">$BOX3_BELEGGEN</span> plus <span style="color:green">$BOX3_ONROEREND_GOED</span>
 
- min <span style="color:green">$BOX3_SCHULDEN</span> min 
+ min <span style="color:green">$BOX3_SCHULDEN</span> min
   - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">true</span>
-  
-  
+
+
     dan <span style="color:blue">$BOX3_HEFFINGSVRIJE_VOET_PARTNERS</span>
-  
-	
+
+
   - Anders <span style="color:blue">$BOX3_HEFFINGSVRIJE_VOET_ALLEENSTAAND</span>
-  
-	
+
+
 
 
 
@@ -180,48 +180,48 @@ Geldig vanaf: 2001-01-01
 De <span style="color: green">box1_belasting</span> is
 
   - Indien <span style="color:green">$is_aow_leeftijd</span> gelijk aan <span style="color:green">true</span>
-  
-  
-    dan 
+
+
+    dan
     - Indien <span style="color:green">$box1_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
-    
-    
+
+
       dan <span style="color:green">$box1_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX1_TARIEF1_AOW</span>
-    
-    
-  	
+
+
+
     - Anders <span style="color:blue">$BOX1_SCHIJF1_GRENS</span> keer <span style="color:blue">$BOX1_TARIEF1_AOW</span>
-    
+
      plus <span style="color:green">$box1_inkomen_na_aftrek</span> min <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
-    
+
      keer <span style="color:blue">$BOX1_TARIEF2_AOW</span>
-    
-    
-    
-    
-  	
-  
-	
-  - Anders 
+
+
+
+
+
+
+
+  - Anders
     - Indien <span style="color:green">$box1_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
-    
-    
+
+
       dan <span style="color:green">$box1_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX1_TARIEF1</span>
-    
-    
-  	
+
+
+
     - Anders <span style="color:blue">$BOX1_SCHIJF1_GRENS</span> keer <span style="color:blue">$BOX1_TARIEF1</span>
-    
+
      plus <span style="color:green">$box1_inkomen_na_aftrek</span> min <span style="color:blue">$BOX1_SCHIJF1_GRENS</span>
-    
+
      keer <span style="color:blue">$BOX1_TARIEF2</span>
-    
-    
-    
-    
-  	
-  
-	
+
+
+
+
+
+
+
 
 Regel bepaal/bereken box2 belasting \
 Geldig vanaf: 2001-01-01
@@ -229,22 +229,22 @@ Geldig vanaf: 2001-01-01
 De <span style="color: green">box2_belasting</span> is
 
   - Indien <span style="color:green">$box2_inkomen_na_aftrek</span> minder dan of gelijk aan <span style="color:blue">$BOX2_SCHIJF1_GRENS</span>
-  
-  
+
+
     dan <span style="color:green">$box2_inkomen_na_aftrek</span> keer <span style="color:blue">$BOX2_TARIEF1</span>
-  
-  
-	
+
+
+
   - Anders <span style="color:blue">$BOX2_SCHIJF1_GRENS</span> keer <span style="color:blue">$BOX2_TARIEF1</span>
-  
+
    plus <span style="color:green">$box2_inkomen_na_aftrek</span> min <span style="color:blue">$BOX2_SCHIJF1_GRENS</span>
-  
+
    keer <span style="color:blue">$BOX2_TARIEF2</span>
-  
-  
-  
-  
-	
+
+
+
+
+
 
 Regel bepaal/bereken box3 belasting \
 Geldig vanaf: 2001-01-01
@@ -259,54 +259,54 @@ Geldig vanaf: 2001-01-01
 De <span style="color: green">algemene_heffingskorting</span> is
 
   - Indien <span style="color:green">$is_aow_leeftijd</span> gelijk aan <span style="color:green">true</span>
-  
-  
-    dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_MAX_AOW</span> min 
+
+
+    dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_MAX_AOW</span> min
     - Indien <span style="color:green">$box1_inkomen</span> groter dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
-    
-    
+
+
       dan <span style="color:green">$box1_inkomen</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
-    
+
      minimaal <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_NULPUNT</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
-    
-    
-    
+
+
+
      keer <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_AOW</span>
-    
-    
-  	
+
+
+
     - Anders <span style="color:green">0</span>
-    
-  	
-  
-  
-  
-  
-  
-	
-  - Anders <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_MAX</span> min 
+
+
+
+
+
+
+
+
+  - Anders <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_MAX</span> min
     - Indien <span style="color:green">$box1_inkomen</span> groter dan <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
-    
-    
+
+
       dan <span style="color:green">$box1_inkomen</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
-    
+
      minimaal <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_NULPUNT</span> min <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW_START</span>
-    
-    
-    
+
+
+
      keer <span style="color:blue">$ALGEMENE_HEFFINGSKORTING_AFBOUW</span>
-    
-    
-  	
+
+
+
     - Anders <span style="color:green">0</span>
-    
-  	
-  
-  
-  
-  
-  
-	
+
+
+
+
+
+
+
+
 
 Regel bepaal/bereken arbeidskorting \
 Geldig vanaf: 2001-01-01
@@ -314,54 +314,54 @@ Geldig vanaf: 2001-01-01
 De <span style="color: green">arbeidskorting</span> is
 
   - Indien <span style="color:green">$is_aow_leeftijd</span> gelijk aan <span style="color:green">true</span>
-  
-  
-    dan <span style="color:blue">$ARBEIDSKORTING_MAX_AOW</span> min 
+
+
+    dan <span style="color:blue">$ARBEIDSKORTING_MAX_AOW</span> min
     - Indien <span style="color:green">$BOX1_DIENSTBETREKKING</span> groter dan <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
-    
-    
+
+
       dan <span style="color:green">$BOX1_DIENSTBETREKKING</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
-    
+
      minimaal <span style="color:blue">$ARBEIDSKORTING_NULPUNT</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
-    
-    
-    
+
+
+
      keer <span style="color:blue">$ARBEIDSKORTING_AFBOUW_AOW</span>
-    
-    
-  	
+
+
+
     - Anders <span style="color:green">0</span>
-    
-  	
-  
-  
-  
-  
-  
-	
-  - Anders <span style="color:blue">$ARBEIDSKORTING_MAX</span> min 
+
+
+
+
+
+
+
+
+  - Anders <span style="color:blue">$ARBEIDSKORTING_MAX</span> min
     - Indien <span style="color:green">$BOX1_DIENSTBETREKKING</span> groter dan <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
-    
-    
+
+
       dan <span style="color:green">$BOX1_DIENSTBETREKKING</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
-    
+
      minimaal <span style="color:blue">$ARBEIDSKORTING_NULPUNT</span> min <span style="color:blue">$ARBEIDSKORTING_AFBOUW_START</span>
-    
-    
-    
+
+
+
      keer <span style="color:blue">$ARBEIDSKORTING_AFBOUW</span>
-    
-    
-  	
+
+
+
     - Anders <span style="color:green">0</span>
-    
-  	
-  
-  
-  
-  
-  
-	
+
+
+
+
+
+
+
+
 
 Regel bepaal/bereken inkomensafhankelijke combinatiekorting \
 Geldig vanaf: 2001-01-01
@@ -369,25 +369,25 @@ Geldig vanaf: 2001-01-01
 De <span style="color: green">inkomensafhankelijke_combinatiekorting</span> is
 
   - Indien <span style="color:green">$HEEFT_KINDEREN_ONDER_12</span> gelijk aan <span style="color:green">true</span>
-  
+
    en <span style="color:green">$BOX1_DIENSTBETREKKING</span> groter dan <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN</span>
-  
-  
-  
-  
+
+
+
+
     dan <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_BASIS</span> plus <span style="color:green">$BOX1_DIENSTBETREKKING</span> min <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MIN_INKOMEN</span>
-  
+
    keer <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_PERCENTAGE</span>
-  
-  
-  
+
+
+
    minimaal <span style="color:blue">$INKOMENSAFHANKELIJKE_COMBINATIEKORTING_MAX</span>
-  
-  
-	
+
+
+
   - Anders <span style="color:green">0</span>
-  
-	
+
+
 
 Regel bepaal/bereken totale heffingskortingen \
 Geldig vanaf: 2001-01-01
@@ -435,15 +435,15 @@ Geldig vanaf: 2001-01-01
 
 De <span style="color: green">partner_box1_inkomen</span> is
 
-  - Indien 
-  
+  - Indien
+
     dan <span style="color:green">$PARTNER_BOX1_DIENSTBETREKKING</span> plus <span style="color:green">$PARTNER_BOX1_UITKERINGEN</span> plus <span style="color:green">$PARTNER_BOX1_ONDERNEMING</span> plus <span style="color:green">$PARTNER_BOX1_OVERIGE_WERKZAAMHEDEN</span> plus <span style="color:green">$PARTNER_BOX1_EIGEN_WONING</span>
-  
-  
-	
+
+
+
   - Anders <span style="color:green">0</span>
-  
-	
+
+
 
 
 
@@ -452,15 +452,15 @@ Geldig vanaf: 2001-01-01
 
 De <span style="color: green">partner_box2_inkomen</span> is
 
-  - Indien 
-  
+  - Indien
+
     dan <span style="color:green">$PARTNER_BOX2_DIVIDEND</span> plus <span style="color:green">$PARTNER_BOX2_AANDELEN</span>
-  
-  
-	
+
+
+
   - Anders <span style="color:green">0</span>
-  
-	
+
+
 
 
 
@@ -469,21 +469,21 @@ Geldig vanaf: 2001-01-01
 
 De <span style="color: green">partner_box3_inkomen</span> is
 
-  - Indien 
-  
+  - Indien
+
     dan <span style="color:green">$PARTNER_BOX3_SPAREN</span> plus <span style="color:green">$PARTNER_BOX3_BELEGGEN</span> plus <span style="color:green">$PARTNER_BOX3_ONROEREND_GOED</span>
-  
+
    min <span style="color:green">$PARTNER_BOX3_SCHULDEN</span> min <span style="color:blue">$HEFFINGSVRIJ_VERMOGEN</span>
-  
-  
-  
+
+
+
    keer <span style="color:blue">$BOX3_RENDEMENT</span>
-  
-  
-	
+
+
+
   - Anders <span style="color:green">0</span>
-  
-	
+
+
 
 Regel bepaal/bereken partner buitenlands inkomen \
 Geldig vanaf: 2001-01-01
@@ -504,19 +504,19 @@ Geldig vanaf: 2001-01-01
 
 De <span style="color: green">gezamenlijk_vermogen</span> is
 
-  - Indien 
-  
+  - Indien
+
     dan <span style="color:green">$vermogen</span> plus <span style="color:green">$PARTNER_BOX3_SPAREN</span> plus <span style="color:green">$PARTNER_BOX3_BELEGGEN</span> plus <span style="color:green">$PARTNER_BOX3_ONROEREND_GOED</span>
-  
+
    min <span style="color:green">$PARTNER_BOX3_SCHULDEN</span>
-  
-  
-  
-  
-	
+
+
+
+
+
   - Anders <span style="color:green">$vermogen</span>
-  
-	
+
+
 
 Regel bepaal/bereken bezittingen \
 Geldig vanaf: 2001-01-01
@@ -539,5 +539,3 @@ De <span style="color: green">maandelijks_inkomen</span> is
 <span style="color:green">$box1_inkomen</span> plus <span style="color:green">$box2_inkomen</span> plus <span style="color:green">$box3_inkomen</span>
 
  delen door <span style="color:green">12</span>
-
-

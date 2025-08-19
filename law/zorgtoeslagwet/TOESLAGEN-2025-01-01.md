@@ -41,95 +41,94 @@ Geldig vanaf: 2025-01-01
 De <span style="color: green">hoogte_toeslag</span> is
 
   - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">false</span>
-  
-  
-    dan 
+
+
+    dan
     - Indien <span style="color:green">$INKOMEN</span> groter dan <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-    
-    
+
+
       dan <span style="color:green">0</span>
-    
-  	
+
+
     - Indien <span style="color:green">$VERMOGEN</span> groter dan <span style="color:blue">$VERMOGENSGRENS_ALLEENSTAANDE</span>
-    
-    
+
+
       dan <span style="color:green">0</span>
-    
-  	
+
+
     - Anders <span style="color:green">$STANDAARDPREMIE</span> min <span style="color:blue">$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND</span> keer <span style="color:green">$INKOMEN</span> minimaal <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-    
-    
-    
-     plus 
+
+
+
+     plus
       - Indien <span style="color:green">$INKOMEN</span> groter dan <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-      
-      
+
+
         dan <span style="color:green">$INKOMEN</span> min <span style="color:blue">$DREMPELINKOMEN_ALLEENSTAANDE</span>
-      
+
        keer <span style="color:blue">$AFBOUWPERCENTAGE_MINIMUM</span>
-      
-      
-    	
+
+
+
       - Anders <span style="color:green">0</span>
-      
-    	
-    
-    
-    
-    
-    
-  	
-  
-	
+
+
+
+
+
+
+
+
+
+
   - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">true</span>
-  
-  
-    dan 
+
+
+    dan
     - Indien <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
-    
+
      groter dan <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-    
-    
+
+
       dan <span style="color:green">0</span>
-    
-  	
+
+
     - Indien <span style="color:green">$GEZAMENLIJK_VERMOGEN</span> groter dan <span style="color:blue">$VERMOGENSGRENS_TOESLAGPARTNER</span>
-    
-    
+
+
       dan <span style="color:green">0</span>
-    
-  	
+
+
     - Anders <span style="color:green">$STANDAARDPREMIE</span> keer <span style="color:green">2</span>
-    
+
      min <span style="color:blue">$PERCENTAGE_DREMPELINKOMEN_MET_PARTNER</span> keer <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
-    
+
      minimaal <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-    
-    
-    
-     plus 
+
+
+
+     plus
       - Indien <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
-      
+
        groter dan <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-      
-      
+
+
         dan <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
-      
+
        min <span style="color:blue">$DREMPELINKOMEN_TOESLAGPARTNER</span>
-      
+
        keer <span style="color:blue">$AFBOUWPERCENTAGE_BOVEN_DREMPEL</span>
-      
-      
-    	
+
+
+
       - Anders <span style="color:green">0</span>
-      
-    	
-    
-    
-    
-    
-    
-  	
-  
-	
+
+
+
+
+
+
+
+
+
 

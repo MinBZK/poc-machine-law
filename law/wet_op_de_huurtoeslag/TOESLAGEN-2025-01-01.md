@@ -53,17 +53,17 @@ Geldig vanaf: 2025-01-01
 De <span style="color: green">basishuur</span> is
 <span style="color:green">$HUURPRIJS</span> plus <span style="color:green">$SERVICEKOSTEN</span>
 
- min 
+ min
   - Indien <span style="color:green">$HEEFT_PARTNER</span> gelijk aan <span style="color:green">true</span>
-  
-  
+
+
     dan <span style="color:green">$INKOMEN</span> plus <span style="color:green">$PARTNER_INKOMEN</span>
-  
-  
-	
+
+
+
   - Anders <span style="color:green">$INKOMEN</span>
-  
-	
+
+
  keer <span style="color:blue">$MINIMUM_BASISHUUR_PERCENTAGE</span>
 
 
@@ -77,16 +77,16 @@ De <span style="color: green">subsidiebedrag</span> is
 
  keer <span style="color:blue">$SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS</span>
 
- plus  maximaal <span style="color:green">$basishuur</span> minimaal 
+ plus  maximaal <span style="color:green">$basishuur</span> minimaal
   - Indien <span style="color:green">$HUISHOUDGROOTTE</span> minder dan of gelijk aan <span style="color:green">2</span>
-  
-  
+
+
     dan <span style="color:blue">$AFTOPPINGSGRENS_1_2</span>
-  
-	
+
+
   - Anders <span style="color:blue">$AFTOPPINGSGRENS_3_PLUS</span>
-  
-	
+
+
 
 
  min <span style="color:blue">$KWALITEITSKORTINGSGRENS</span>
@@ -95,22 +95,18 @@ De <span style="color: green">subsidiebedrag</span> is
 
  keer <span style="color:blue">$SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP</span>
 
- plus  maximaal <span style="color:green">$basishuur</span> min 
+ plus  maximaal <span style="color:green">$basishuur</span> min
   - Indien <span style="color:green">$HUISHOUDGROOTTE</span> minder dan of gelijk aan <span style="color:green">2</span>
-  
-  
+
+
     dan <span style="color:blue">$AFTOPPINGSGRENS_1_2</span>
-  
-	
+
+
   - Anders <span style="color:blue">$AFTOPPINGSGRENS_3_PLUS</span>
-  
-	
+
+
 
 
 
 
  keer <span style="color:blue">$SUBSIDIEPERCENTAGE_BOVEN_AFTOP</span>
-
-
-
-
