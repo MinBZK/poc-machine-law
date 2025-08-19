@@ -125,13 +125,3 @@ De <span style="color: green">hoogte_toeslag</span> is
 
 
       - Anders <span style="color:green">0</span>
-
-
-
-
-
-
-
-
-
-
