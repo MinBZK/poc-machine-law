@@ -27,6 +27,7 @@ export interface Law {
 	actions: Action[];
 	definitions?: Record<string, (string[] | number)>;
 
+	path: string; // Path to the law file
 	source: string; // Original YAML source
 }
 

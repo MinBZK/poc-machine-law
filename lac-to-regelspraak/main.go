@@ -278,7 +278,7 @@ func main() {
 
 		files, err := doublestar.Glob(fsys, pattern)
 		if err != nil {
-			logger.Error("glob mattching", "err", err)
+			logger.Error("glob matching", "err", err)
 			continue
 		}
 

@@ -8,6 +8,8 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import Dropdown from '$lib/Dropdown.svelte';
+  import Markdown from 'svelte-exmarkdown';
+  import rehypeRaw from 'rehype-raw';
 
   let { data }: { data: PageData } = $props();
   const { id } = page.params;
@@ -35,6 +37,25 @@
       goto(resolve(`/details/${id}/compare/${selectedLaw}`));
     }
   });
+
+  // Fetch the regelspraak code for the law
+  let regelspraak: string = $state('');
+  const path = law.path.replace('.yaml', '.md'); // Assuming the path is stored
+  fetch(resolve(`/law/${path}`))
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch regelspraak for law ${id}`);
+      }
+      return response.text();
+    })
+    .then((text) => {
+      regelspraak = text.trim();
+      console.log('Regelspraak fetched:', regelspraak);
+    })
+    .catch((error) => {
+      console.error('Error fetching regelspraak:', error);
+      regelspraak = 'Geen Regelspraak beschikbaar voor deze wet.';
+    });
 </script>
 
 <svelte:head>
@@ -60,7 +81,7 @@
   </p>
 
   <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-    <div class="grid gap-6">
+    <div class="mb-8 grid gap-6">
       {#if law.description}
         <div>
           <h2 class="mb-2 text-lg font-semibold">Omschrijving</h2>
@@ -196,11 +217,58 @@
           {/if}
         </div>
       {/if}
-
-      <h2 class="mb-2 text-lg font-semibold">Code</h2>
-      <pre class="!rounded-md !bg-gray-50 !px-4 !py-3 !text-sm/6 whitespace-pre-wrap"><code
-          >{@html highlight(law.source, languages.yaml, 'yaml')}</code
-        ></pre>
     </div>
+
+    <h2 class="mb-3 text-lg font-semibold">Regelspraak-weergave</h2>
+    <div class="regelspraak mb-8 rounded-md bg-gray-50 px-4 py-3 font-mono text-sm/6">
+      <Markdown md={regelspraak} plugins={[{ rehypePlugin: rehypeRaw }]} />
+    </div>
+
+    <h2 class="mb-3 text-lg font-semibold">Code</h2>
+    <pre class="!rounded-md !bg-gray-50 !px-4 !py-3 !text-sm/6 whitespace-pre-wrap"><code
+        >{@html highlight(law.source, languages.yaml, 'yaml')}</code
+      ></pre>
   </div>
 </div>
+
+<style lang="postcss">
+  @reference "tailwindcss/theme";
+
+  .regelspraak {
+    :global(h1) {
+      @apply text-2xl font-semibold;
+
+      &:not(:first-child) {
+        @apply mt-8;
+      }
+    }
+
+    :global(h2) {
+      @apply text-lg font-semibold;
+
+      &:not(:first-child) {
+        @apply mt-6;
+      }
+    }
+
+    :global(h3) {
+      @apply text-base font-semibold;
+
+      &:not(:first-child) {
+        @apply mt-4;
+      }
+    }
+
+    :global(h4) {
+      @apply text-sm font-semibold;
+
+      &:not(:first-child) {
+        @apply mt-2;
+      }
+    }
+
+    :global(p:not(:last-child)) {
+      @apply mb-3;
+    }
+  }
+</style>

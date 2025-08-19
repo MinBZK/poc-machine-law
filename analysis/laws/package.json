@@ -42,6 +42,8 @@
   "type": "module",
   "dependencies": {
     "js-yaml": "^4.1.0",
-    "prismjs": "^1.30.0"
+    "prismjs": "^1.30.0",
+    "rehype-raw": "^7.0.0",
+    "svelte-exmarkdown": "^5.0.2"
   }
 }
