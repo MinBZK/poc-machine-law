@@ -26,13 +26,11 @@ def before_all(context) -> None:
         print("Starting web server for tests...")
         # Capture server logs for debugging in CI
         import os
+
         if os.getenv("CI"):
             # In CI, capture logs for debugging
             context.web_server_process = subprocess.Popen(
-                ["uv", "run", "web/main.py"], 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.STDOUT,
-                text=True
+                ["uv", "run", "web/main.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
             )
         else:
             # Locally, suppress output as before
@@ -54,7 +52,7 @@ def before_all(context) -> None:
                 time.sleep(1)
         else:
             # Clean up if we couldn't start
-            if os.getenv("CI") and hasattr(context.web_server_process, 'stdout'):
+            if os.getenv("CI") and hasattr(context.web_server_process, "stdout"):
                 # Print server logs for debugging in CI
                 print("Server logs:")
                 if context.web_server_process.poll() is None:
