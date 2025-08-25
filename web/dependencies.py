@@ -110,8 +110,21 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
         if value is None:
             return ""
 
-        # Use locale.currency for proper formatting. Note: on some systems, the locale definitions use 'Eu' as the currency symbol instead of the actual euro sign €, so we replace it
-        return locale.currency(value, grouping=True).replace("Eu", "€")
+        try:
+            # Try to set locale if not already set properly
+            try:
+                import os
+                if os.getenv("CI") and locale.getlocale()[0] in (None, 'C'):
+                    # In CI, try to set Dutch locale
+                    locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
+            except (locale.Error, OSError):
+                pass  # Ignore if locale setting fails
+            
+            # Use locale.currency for proper formatting
+            return locale.currency(value, grouping=True).replace("Eu", "€")
+        except ValueError:
+            # Fallback formatting if locale doesn't support currency
+            return f"€{value:,.2f}".replace(",", ".")
 
     templates.env.filters["format_currency"] = format_currency
 
