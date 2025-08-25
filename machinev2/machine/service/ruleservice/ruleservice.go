@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice/httpservice"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice/memory"
 )
@@ -17,7 +17,7 @@ type RuleServicer interface {
 	Reset(ctx context.Context) error
 }
 
-func New(logger logging.Logger, service string, services contexter.ServiceProvider) (RuleServicer, error) {
+func New(logger logger.Logger, service string, services service.ServiceProvider) (RuleServicer, error) {
 	resolver := services.GetServiceResolver()
 
 	if services.RuleServicesInMemory() {

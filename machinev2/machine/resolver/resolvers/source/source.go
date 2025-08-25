@@ -1,43 +1,48 @@
-package context
+package source
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 )
 
-var _ Resolver = &PropertySpecSourceResolver{}
+type externalResolver interface {
+	do(ctx context.Context, key string, table string, field string, filters Filters) (any, error)
+}
+
+var _ resolver.Resolver = &PropertySpecSourceResolver{}
 
 type PropertySpecSourceResolver struct {
-	rc                    *RuleContext
+	rc                    resolver.RuleContexter
+	sp                    service.ServiceProvider
+	sources               model.SourceDataFrame
 	propertySpec          map[string]ruleresolver.Field
 	externalClaimResolver *ExternalClaimResolver
 }
 
-func NewPropertySpecSourceResolver(rc *RuleContext, propertySpec map[string]ruleresolver.Field) *PropertySpecSourceResolver {
+func New(rc resolver.RuleContexter, sp service.ServiceProvider, sources model.SourceDataFrame, propertySpec map[string]ruleresolver.Field) *PropertySpecSourceResolver {
 	var externalClaimResolver *ExternalClaimResolver
-	if rc.ServiceProvider.HasExternalClaimResolverEndpoint() {
-		externalClaimResolver = NewExternalClaimResolver(rc.ServiceProvider.GetExternalClaimResolverEndpoint(), propertySpec)
+	if sp.HasExternalClaimResolverEndpoint() {
+		externalClaimResolver = NewExternalClaimResolver(sp.GetExternalClaimResolverEndpoint(), propertySpec)
 	}
 
 	return &PropertySpecSourceResolver{
 		rc:                    rc,
+		sp:                    sp,
+		sources:               sources,
 		propertySpec:          propertySpec,
 		externalClaimResolver: externalClaimResolver,
 	}
 }
 
 // Resolve implements Resolver.
-func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*Resolved, bool) {
+func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*resolver.Resolved, bool) {
 	spec, ok := l.propertySpec[key]
 	if !ok {
 		return nil, false
@@ -53,9 +58,9 @@ func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*
 		return nil, false
 	}
 
-	value, err := l.resolveFromSourceReference(ctx, *sourceRef)
+	value, err := l.resolveFromSourceReference(ctx, key, *sourceRef)
 	if err != nil {
-		// logger.Debugf(ctx, "resolving from source: %s", err)
+		// logger.Debugf( "resolving from source: %s", err)
 		return nil, false
 	}
 
@@ -68,22 +73,21 @@ func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*
 		required = *spec.GetBase().Required
 	}
 
-	resolved := &Resolved{
+	resolved := &resolver.Resolved{
 		Value:    value,
 		Required: required,
-		Details:  make(map[string]any),
 	}
 
 	// Add type information to the node
 	if spec.GetBase().Type != "" {
-		resolved.Details["type"] = spec.GetBase().Type
+		resolved.Details.Type = spec.GetBase().Type
 	}
 
 	if spec.GetBase().TypeSpec != nil {
-		resolved.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
+		resolved.Details.TypeSpec = spec.GetBase().TypeSpec.ToMap()
 	}
 
-	logging.FromContext(ctx).Debugf(ctx, "Resolving from SOURCE %v: %v", sourceRef.Table, value)
+	logger.FromContext(ctx).Debugf("Resolving from SOURCE %v: %v", sourceRef.Table, value)
 
 	return resolved, true
 
@@ -97,7 +101,10 @@ func (l *PropertySpecSourceResolver) ResolveType() string {
 // resolveFromSourceReference resolves a value from a data source
 func (l *PropertySpecSourceResolver) resolveFromSourceReference(
 	ctx context.Context,
+	key string,
 	sourceRef ruleresolver.SourceReference) (any, error) {
+
+	logger := logger.FromContext(ctx)
 
 	var df model.DataFrame
 	var err error
@@ -110,7 +117,7 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReference(
 	case "events":
 		df, err = l.resolveFromSourceReferenceEvents(ctx, sourceRef)
 	default:
-		df, err = l.resolveFromSourceReferenceTable(ctx, sourceRef)
+		df, err = l.resolveFromSourceReferenceTable(ctx, key, sourceRef)
 	}
 
 	if err != nil {
@@ -130,7 +137,7 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReference(
 		}
 
 		if len(missingFields) > 0 {
-			l.rc.logger.WithIndent().Warningf(ctx, "Fields %v not found in source for table %s", missingFields, tableName)
+			logger.WithIndent().Warningf("Fields %v not found in source for table %s", missingFields, tableName)
 		}
 
 		// Get existing fields
@@ -144,7 +151,7 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReference(
 		result = df.Select(existingFields).ToRecords()
 	} else if sourceRef.Field != nil {
 		if !df.HasColumn(*sourceRef.Field) {
-			l.rc.logger.WithIndent().Warningf(ctx, "Field %s not found in source for table %s", *sourceRef.Field, tableName)
+			logger.WithIndent().Warningf("Field %s not found in source for table %s", *sourceRef.Field, tableName)
 			return nil, nil
 		}
 		result = df.GetColumnValues(*sourceRef.Field)
@@ -179,7 +186,7 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReference(
 
 // resolveFromSourceReference resolves a value from a data source
 func (l *PropertySpecSourceResolver) resolveFromSourceReferenceLaws(ctx context.Context, sourceRef ruleresolver.SourceReference) (model.DataFrame, error) {
-	df := model.DataFrame(dataframe.New(l.rc.ServiceProvider.GetRuleResolver().RulesDataFrame()))
+	df := model.DataFrame(dataframe.New(l.sp.GetRuleResolver().RulesDataFrame()))
 	df, err := l.filter(ctx, sourceRef, df)
 	if err != nil {
 		return nil, fmt.Errorf("filter: %w", err)
@@ -190,7 +197,7 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReferenceLaws(ctx context.
 
 func (l *PropertySpecSourceResolver) resolveFromSourceReferenceEvents(ctx context.Context, sourceRef ruleresolver.SourceReference) (model.DataFrame, error) {
 	// TODO: improve, currently all events are getting queried
-	caseManager := l.rc.ServiceProvider.GetCaseManager()
+	caseManager := l.sp.GetCaseManager()
 
 	// Get events from case manager
 	events := caseManager.GetEvents(nil)
@@ -210,8 +217,8 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReferenceEvents(ctx contex
 	return df, nil
 }
 
-func (l *PropertySpecSourceResolver) resolveFromSourceReferenceTable(ctx context.Context, sourceRef ruleresolver.SourceReference) (model.DataFrame, error) {
-	if df, exists := l.rc.Sources.Get(sourceRef.Table); exists {
+func (l *PropertySpecSourceResolver) resolveFromSourceReferenceTable(ctx context.Context, key string, sourceRef ruleresolver.SourceReference) (model.DataFrame, error) {
+	if df, exists := l.sources.Get(sourceRef.Table); exists {
 		df, err := l.filter(ctx, sourceRef, df)
 		if err != nil {
 			return nil, fmt.Errorf("filter: %w", err)
@@ -253,10 +260,16 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReferenceTable(ctx context
 			}
 		}
 
-		filters = append(filters, Filter{Value: value, Operation: operation, Key: selectCond.Name})
+		if value != nil && selectCond.Name != "" {
+			filters = append(filters, Filter{Value: value, Operation: operation, Key: selectCond.Name})
+		}
 	}
 
-	resolved, ok := l.externalClaimResolver.Resolve(ctx, sourceRef.Table, *sourceRef.Field, filters)
+	if len(filters) == 0 {
+		return nil, fmt.Errorf("zero filters active")
+	}
+
+	resolved, ok := l.externalClaimResolver.Resolve(ctx, key, sourceRef.Table, *sourceRef.Field, filters)
 	if !ok {
 		return nil, fmt.Errorf("external claim did not resolve")
 	}
@@ -306,138 +319,6 @@ func (l *PropertySpecSourceResolver) filter(ctx context.Context, sourceRef ruler
 	}
 
 	return df, nil
-}
-
-type ExternalClaimResolver struct {
-	endpoint     string
-	client       *http.Client
-	propertySpec map[string]ruleresolver.Field
-}
-
-type Filter struct {
-	Key       string `json:"key"`
-	Value     any    `json:"value"`
-	Operation string `json:"operation"`
-}
-
-type Filters []Filter
-
-func NewExternalClaimResolver(endpoint string, propertySpec map[string]ruleresolver.Field) *ExternalClaimResolver {
-	return &ExternalClaimResolver{
-		propertySpec: propertySpec,
-		endpoint:     endpoint,
-		client:       http.DefaultClient,
-	}
-}
-
-// Resolve implements Resolver.
-func (c *ExternalClaimResolver) Resolve(ctx context.Context, table string, field string, filters Filters) (*Resolved, bool) {
-	logger := logging.FromContext(ctx)
-	logger = logger.WithField("resolver", "external_claim")
-
-	value, err := c.do(ctx, table, field, filters)
-	if err != nil {
-		logger.Errorf(ctx, "could not execute external claim: %w", err)
-		return nil, false
-	}
-
-	if value == nil {
-		logger.Warningf(ctx, "external claim empty")
-		return nil, false
-	}
-
-	logger.Debugf(ctx, "value: %v", value)
-
-	resolved := &Resolved{
-		Value:   value,
-		Details: make(map[string]any),
-	}
-
-	// Add type information for claims
-	if spec, ok := c.propertySpec[field]; ok {
-		if spec.GetBase().Type != "" {
-			resolved.Details["type"] = spec.GetBase().Type
-		}
-
-		if spec.GetBase().TypeSpec != nil {
-			resolved.Details["type_spec"] = map[string]any{
-				"type":      spec.GetBase().TypeSpec.Type,
-				"unit":      spec.GetBase().TypeSpec.Unit,
-				"precision": spec.GetBase().TypeSpec.Precision,
-				"min":       spec.GetBase().TypeSpec.Min,
-				"max":       spec.GetBase().TypeSpec.Max,
-			}
-		}
-
-		required := false
-		if spec.GetBase().Required != nil {
-			required = *spec.GetBase().Required
-		}
-		resolved.Required = required
-	}
-
-	return resolved, true
-}
-
-// Resolve implements Resolver.
-func (c *ExternalClaimResolver) do(ctx context.Context, table string, field string, filters Filters) (any, error) {
-	logger := logging.FromContext(ctx)
-	logger = logger.WithField("resolver", "external_claim").
-		WithField("table", table).
-		WithField("field", field).
-		WithField("filters", filters)
-
-	endpoint, err := url.Parse(fmt.Sprintf("%s%s", c.endpoint, table))
-	if err != nil {
-		return nil, fmt.Errorf("url parse: %w", err)
-	}
-
-	b := &bytes.Buffer{}
-	if err := json.NewEncoder(b).Encode(filters); err != nil {
-		return nil, fmt.Errorf("encode: %w", err)
-	}
-
-	values := url.Values{}
-	values.Add("fields", field)
-	values.Add("filter", b.String())
-
-	endpoint.RawQuery = values.Encode()
-
-	logger.Debug(ctx, "url parse", logging.NewField("endpoint", endpoint))
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("new request with context: %w", err)
-	}
-	logger.Debug(ctx, "do request")
-
-	response, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
-
-	logger.Debug(ctx, "request done")
-
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		dump, _ := httputil.DumpResponse(response, true)
-		return nil, fmt.Errorf("invalid http status: %d %v", response.StatusCode, string(dump))
-	}
-
-	body := []map[string]any{}
-	if err := json.NewDecoder(response.Body).Decode(&body); err != nil {
-		return nil, fmt.Errorf("json decode: %w", err)
-	}
-
-	switch len(body) {
-	case 0:
-		return nil, fmt.Errorf("field not found")
-	case 1:
-		return body[0][field], nil
-	default:
-		panic("unimplemented, multiple returns")
-	}
 }
 
 func (c *ExternalClaimResolver) ResolveType() string {

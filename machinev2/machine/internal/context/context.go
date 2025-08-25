@@ -3,50 +3,30 @@ package context
 import (
 	"context"
 	"fmt"
-	"maps"
 	"reflect"
 	"strings"
-	"sync"
 	"time"
 	"unicode"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver"
+	claimresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/claim"
+	definitionresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/definition"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/local"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/output"
+	overwriteresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/overwrite"
+	parameterresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/parameter"
+	serviceresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/service"
+	sourceresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/source"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 )
 
-// ServiceProvider interface defines what a service provider needs to implement
-type ServiceProvider interface {
-	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
-		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
-	GetRuleResolver() *ruleresolver.RuleResolver
-	GetServiceResolver() *serviceresolver.ServiceResolver
-	GetCaseManager() CaseManagerAccessor
-	GetClaimManager() ClaimManagerAccessor
-	RuleServicesInMemory() bool
-	HasOrganizationName() bool
-	GetOrganizationName() string
-	InStandAloneMode() bool
-	HasExternalClaimResolverEndpoint() bool
-	GetExternalClaimResolverEndpoint() string
-}
-
-// CaseManagerAccessor interface for accessing case manager events
-type CaseManagerAccessor interface {
-	GetEvents(caseID any) []model.Event
-}
-
-// ClaimManagerAccessor interface for accessing claim manager functionality
-type ClaimManagerAccessor interface {
-	GetClaimsByBSN(bsn string, approved bool, includeRejected bool) ([]model.Claim, error)
-	GetClaimByBSNServiceLaw(bsn string, service string, law string, approved bool, includeRejected bool) (map[string]model.Claim, error)
-}
-
 type RuleContextData struct {
-	ServiceProvider ServiceProvider
+	ServiceProvider service.ServiceProvider
 	Parameters      map[string]any
 	PropertySpecs   map[string]ruleresolver.Field
 	Sources         model.SourceDataFrame
@@ -56,55 +36,46 @@ type RuleContextData struct {
 
 // RuleContext holds context for rule evaluation
 type RuleContext struct {
-	ServiceProvider ServiceProvider
-	Parameters      map[string]any
-	PropertySpecs   map[string]ruleresolver.Field
-	Sources         model.SourceDataFrame
-	ValuesCache     *sync.Map
-	OverwriteInput  map[string]map[string]any
-	CalculationDate string
-	LocalResolver   *LocalResolver
-	OutputsResolver *OutputsResolver
-	Resolvers       []Resolver
-	Approved        bool
+	logger          logger.Logger
+	ServiceProvider service.ServiceProvider
+	propertySpecs   map[string]ruleresolver.Field
+	calculationDate string
+	LocalResolver   *local.LocalResolver
+	OutputsResolver *output.OutputsResolver
+	Resolvers       []resolver.Resolver
 	MissingRequired bool
-	logger          logging.Logger
 }
 
 // NewRuleContext creates a new rule context
-func NewRuleContext(logr logging.Logger, definitions map[string]any, serviceProvider ServiceProvider,
+func NewRuleContext(
+	logger logger.Logger,
+	definitions map[string]any, serviceProvider service.ServiceProvider,
 	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
-	outputSpecs map[string]model.TypeSpec, sources model.SourceDataFrame,
+	sources model.SourceDataFrame,
 	overwriteInput map[string]map[string]any, calculationDate string,
-	serviceName string, claims map[string]model.Claim, approved bool) *RuleContext {
+	claims map[string]model.Claim, approved bool) *RuleContext {
 
-	local := NewLocalResolver()
-	output := NewOutputsResolver()
+	localresolver := local.NewLocalResolver()
+	outputresolver := output.NewOutputsResolver()
 
 	rc := &RuleContext{
-		ServiceProvider: serviceProvider,
-		Parameters:      parameters,
-		PropertySpecs:   propertySpecs,
-		Sources:         sources,
-		ValuesCache:     new(sync.Map),
-		OverwriteInput:  overwriteInput,
-		CalculationDate: calculationDate,
-		Approved:        approved,
+		logger:          logger,
+		propertySpecs:   propertySpecs,
+		calculationDate: calculationDate,
 		MissingRequired: false,
-		LocalResolver:   local,
-		OutputsResolver: output,
-		logger:          logr.WithName("context"),
+		LocalResolver:   localresolver,
+		OutputsResolver: outputresolver,
 	}
 
-	rc.Resolvers = []Resolver{
-		NewClaimResolver(claims, propertySpecs),
-		local,
-		NewDefinitionsResolver(definitions),
-		NewParametersResolver(parameters),
-		output,
-		NewPropertySpecOverwriteResolver(propertySpecs, overwriteInput),
-		NewPropertySpecSourceResolver(rc, propertySpecs),
-		NewPropertySpecServiceResolver(rc, propertySpecs),
+	rc.Resolvers = []resolver.Resolver{
+		claimresolver.New(claims, propertySpecs),
+		localresolver,
+		definitionresolver.New(definitions),
+		parameterresolver.New(parameters),
+		outputresolver,
+		overwriteresolver.New(propertySpecs, overwriteInput),
+		sourceresolver.New(rc, serviceProvider, sources, propertySpecs),
+		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, calculationDate, approved),
 	}
 
 	return rc
@@ -126,8 +97,10 @@ func (rc *RuleContext) ResolveAction(ctx context.Context, action ruleresolver.Ac
 
 // ResolveValue resolves a value from definitions, services, or sources
 func (rc *RuleContext) ResolveValue(ctx context.Context, path any) (any, error) {
+	logr := rc.logger.WithContext(ctx)
+
 	var value any
-	if err := rc.logger.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
+	if err := logr.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
 		var err error
 		if value, err = rc.resolveValueInternal(ctx, path); err != nil {
 			return err
@@ -165,12 +138,12 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 
 	strPath = strPath[1:]
 
-	logger := logging.FromContext(ctx)
+	logger := rc.logger.WithContext(ctx)
 
 	// Resolve dates first
-	dateValue, err := resolveDate(strPath, rc.CalculationDate)
+	dateValue, err := resolveDate(strPath, rc.calculationDate)
 	if err == nil && dateValue != nil {
-		logger.Debugf(ctx, "Resolved date $%s: %v", strPath, dateValue)
+		logger.Debugf("Resolved date $%s: %v", strPath, dateValue)
 		node.Result = dateValue
 		return dateValue, nil
 	}
@@ -186,7 +159,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		}
 
 		if rootValue == nil {
-			logger.Warningf(ctx, "Value is nil, could not resolve value $%s: nil", strPath)
+			logger.Warningf("Value is nil, could not resolve value $%s: nil", strPath)
 			node.Result = nil
 			return nil, nil
 		}
@@ -202,7 +175,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 			}
 
 			if currentValue == nil {
-				logger.Warningf(ctx, "Value is nil, could not resolve nested path $%s.%s", root, rest)
+				logger.Warningf("Value is nil, could not resolve nested path $%s.%s", root, rest)
 				node.Result = nil
 				return nil, nil
 			}
@@ -211,7 +184,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 			if rValue.Kind() == reflect.Map {
 				mapValue := rValue.MapIndex(reflect.ValueOf(part))
 				if !mapValue.IsValid() {
-					logger.Warningf(ctx, "Key %s not found in map, could not resolve value $%s", part, strPath)
+					logger.Warningf("Key %s not found in map, could not resolve value $%s", part, strPath)
 					node.Result = nil
 					return nil, nil
 				}
@@ -224,7 +197,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 					// Handle struct
 					field = rValue.FieldByName(part)
 					if !field.IsValid() {
-						logger.Warningf(ctx, "Field %s not found in struct, could not resolve value $%s", part, strPath)
+						logger.Warningf("Field %s not found in struct, could not resolve value $%s", part, strPath)
 						node.Result = nil
 						return nil, nil
 					}
@@ -256,13 +229,13 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 
 				currentValue = field.Interface()
 			} else {
-				logger.Warningf(ctx, "Value is not map or struct, could not resolve value $%s", strPath)
+				logger.Warningf("Value is not map or struct, could not resolve value $%s", strPath)
 				node.Result = nil
 				return nil, nil
 			}
 		}
 
-		logger.Debugf(ctx, "Resolved value $%s: %v", strPath, currentValue)
+		logger.Debugf("Resolved value $%s: %v", strPath, currentValue)
 		node.Result = currentValue
 		return currentValue, nil
 	}
@@ -271,16 +244,20 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		if resolved, ok := resolve.Resolve(ctx, strPath); ok {
 			node.Result = resolved.Value
 			node.ResolveType = resolve.ResolveType()
-			maps.Copy(node.Details, resolved.Details)
+			node.Details = resolved.Details.ToMap()
 
-			logger.Debugf(ctx, "Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
+			if resolved.MissingRequired != nil {
+				rc.MissingRequired = rc.MissingRequired || *resolved.MissingRequired
+			}
+
+			logger.Debugf("Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
 
 			return resolved.Value, nil
 		}
 	}
 
 	// Handle property specs
-	if spec, exists := rc.PropertySpecs[strPath]; exists {
+	if spec, exists := rc.propertySpecs[strPath]; exists {
 		// Handle required fields
 		node.Required = false
 		if spec.GetBase().Required != nil {
@@ -301,7 +278,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		}
 	}
 
-	logger.Warningf(ctx, "Could not resolve value for %s", strPath)
+	logger.Warningf("Could not resolve value for %s", strPath)
 	node.Result = nil
 	node.ResolveType = "NONE"
 

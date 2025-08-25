@@ -16,6 +16,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/backend/interface/api"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/service"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/trace"
+	mdw "gitlab.com/digilab.overheid.nl/ecosystem/common/middleware"
 )
 
 var _ api.StrictServerInterface = &Handler{}
@@ -48,11 +49,15 @@ func New(logger *slog.Logger, cfg *config.Config, servicer service.Servicer) (*H
 }
 
 func router(handler *Handler) (http.Handler, error) {
+	swagger, _ := api.GetSwagger()
+
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(NewStructuredLogger(handler.logger))
 	r.Use(middleware.Recoverer)
 	r.Use(handler.Heartbeat("/healthz"))
+	r.Use(mdw.OpenAPI(swagger))
+
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			next.ServeHTTP(w, r.WithContext(trace.Extract(r.Context(), r.Header)))

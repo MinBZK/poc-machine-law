@@ -17,7 +17,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -87,7 +87,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^heeft de persoon recht op kinderopvangtoeslag$`, heeftDePersoonRechtOpKinderopvangtoeslag)
 
 	ctx.StepContext().After(func(ctx context.Context, st *godog.Step, status godog.StepResultStatus, err error) (context.Context, error) {
-		services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+		services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 		if !ok || services == nil {
 			return ctx, nil
 		}
@@ -110,7 +110,7 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 		FullTimestamp:    true,
 	})
 
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -203,7 +203,7 @@ func deDatumIs(ctx context.Context, arg1 string) (context.Context, error) {
 	}
 
 	// services, err := service.NewServices(t1, service.WithOrganizationName("TOESLAGEN"))
-	services, err := service.NewServices(t1, service.WithRuleServiceInMemory())
+	services, err := serviceprovider.NewServices(t1, serviceprovider.WithRuleServiceInMemory())
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
@@ -270,7 +270,7 @@ func isHetToeslagbedragEuro(ctx context.Context, expected float64) error {
 }
 
 func alleAanvragenWordenBeoordeeld(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -281,7 +281,7 @@ func alleAanvragenWordenBeoordeeld(ctx context.Context) error {
 }
 
 func deBeoordelaarDeAanvraagAfwijstMetReden(ctx context.Context, reason string) (context.Context, error) {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -301,7 +301,7 @@ func deBeoordelaarDeAanvraagAfwijstMetReden(ctx context.Context, reason string) 
 func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve string, reason string) (context.Context, error) {
 	approved := approve == "toewijst"
 
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -319,7 +319,7 @@ func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve stri
 }
 
 func deBurgerBezwaarMaaktMetReden(ctx context.Context, reason string) (context.Context, error) {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -375,7 +375,7 @@ func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Ta
 		return ctx, fmt.Errorf("BSN not set in parameters")
 	}
 
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -405,7 +405,7 @@ func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Ta
 }
 
 func dePersoonDitAanvraagt(ctx context.Context) (context.Context, error) {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return ctx, fmt.Errorf("services not set")
 	}
@@ -451,7 +451,7 @@ func heeftDePersoonGeenStemrecht(ctx context.Context) error {
 }
 
 func isDeAanvraagAfgewezen(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -470,7 +470,7 @@ func isDeAanvraagAfgewezen(ctx context.Context) error {
 }
 
 func isDeAanvraagToegekend(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -504,7 +504,7 @@ func isDeHuurtoeslagEuro(ctx context.Context, expected float64) error {
 }
 
 func isDeStatus(ctx context.Context, expected string) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -588,7 +588,7 @@ func isVoldaanAanDeVoorwaarden(ctx context.Context) error {
 }
 
 func kanDeBurgerInBeroepGaanBij(ctx context.Context, competentCourt string) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -609,7 +609,7 @@ func kanDeBurgerInBeroepGaanBij(ctx context.Context, competentCourt string) erro
 }
 
 func kanDeBurgerInBezwaarGaan(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -626,7 +626,7 @@ func kanDeBurgerInBezwaarGaan(ctx context.Context) error {
 }
 
 func kanDeBurgerNietInBezwaarGaanMetReden(ctx context.Context, expectedReason string) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -667,7 +667,7 @@ func ontbrekenErVerplichteGegevens(ctx context.Context) error {
 }
 
 func wordtDeAanvraagToegevoegdAanHandmatigeBeoordeling(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*service.Services)
+	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
 		return fmt.Errorf("services not set")
 	}
@@ -719,7 +719,7 @@ func compareCaseCanAppeal(c *casemanager.Case) bool {
 	return c.CanAppeal()
 }
 
-func getCaseByID(ctx context.Context, cm *service.CaseManager, caseID uuid.UUID, fn func(c *casemanager.Case) bool) (*casemanager.Case, error) {
+func getCaseByID(ctx context.Context, cm *serviceprovider.CaseManager, caseID uuid.UUID, fn func(c *casemanager.Case) bool) (*casemanager.Case, error) {
 	var err error
 	var c *casemanager.Case
 	for range 500 {

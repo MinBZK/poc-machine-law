@@ -16,12 +16,12 @@ import (
 	"github.com/schollz/progressbar/v3"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 )
 
 type Res struct {
 	persons  []Person
-	services *service.Services
+	services *serviceprovider.Services
 }
 
 // Person represents an individual in the simulation
@@ -182,7 +182,7 @@ func (ls *LawSimulator) GeneratePairedPeople(numPeople int, people chan []Person
 func (ls *LawSimulator) SetupTestData(ctx context.Context, date time.Time, people <-chan []Person, data chan<- Res) error {
 
 	for persons := range people {
-		services, err := service.NewServices(date, service.WithRuleServiceInMemory())
+		services, err := serviceprovider.NewServices(date, serviceprovider.WithRuleServiceInMemory())
 		if err != nil {
 			return fmt.Errorf("new services: %w", err)
 		}

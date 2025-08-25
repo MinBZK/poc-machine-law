@@ -56,6 +56,7 @@ COPY ./services /app/web/services
 COPY ./machine /app/machine
 COPY ./explain /app/explain
 COPY ./web /app/web
+COPY ./script /app/script
 
 WORKDIR /app/web
 

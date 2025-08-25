@@ -1,4 +1,4 @@
-package service_test
+package serviceprovider_test
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -19,17 +19,17 @@ func TestService(t *testing.T) {
 
 	start := time.Now()
 
-	logger := logging.New("main", os.Stdout, logrus.DebugLevel)
+	logger := logger.New("main", os.Stdout, logrus.DebugLevel)
 
 	// Set up context
 	ctx := context.Background()
 
 	// Initialize services with current date
 	currentDate := time.Now()
-	services, err := service.NewServices(currentDate, service.WithRuleServiceInMemory())
+	services, err := serviceprovider.NewServices(currentDate, serviceprovider.WithRuleServiceInMemory())
 	require.NoError(t, err)
 
-	logger.Infof(ctx, "Direct rules engine evaluation example:")
+	logger.Infof("Direct rules engine evaluation example:")
 
 	evalParams := map[string]any{
 		"BSN": "999993653",
@@ -120,7 +120,7 @@ func TestService(t *testing.T) {
 	)
 
 	if err != nil {
-		logger.WithIndent().Errorf(ctx, "Error evaluating rules: %v", err)
+		logger.WithIndent().Errorf("Error evaluating rules: %v", err)
 	} else {
 		resultJSON, _ := json.MarshalIndent(evalResult.Output, "", "  ")
 		fmt.Printf("Direct Evaluation Result:\n%s\n", string(resultJSON))
@@ -151,7 +151,7 @@ func TestService(t *testing.T) {
 
 	fmt.Printf("time.Since(start): %v\n", time.Since(start))
 
-	logger.Infof(ctx, "Successfully completed demo!")
+	logger.Infof("Successfully completed demo!")
 }
 
 func BenchmarkService(b *testing.B) {
@@ -159,7 +159,7 @@ func BenchmarkService(b *testing.B) {
 
 	// Initialize services with current date
 	currentDate := time.Now()
-	services, err := service.NewServices(currentDate, service.WithRuleServiceInMemory())
+	services, err := serviceprovider.NewServices(currentDate, serviceprovider.WithRuleServiceInMemory())
 	if err != nil {
 		b.Errorf("new services: %v", err)
 	}

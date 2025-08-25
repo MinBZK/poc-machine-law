@@ -4,18 +4,18 @@ import (
 	"context"
 
 	eh "github.com/looplab/eventhorizon"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 )
 
 var _ eh.EventHandler = &Executor{}
 
 // Executor is a simple event handler for logging all events.
 type Executor struct {
-	logger logging.Logger
+	logger logger.Logger
 	cb     Callback
 }
 
-func NewExecutor(logger logging.Logger, cb Callback) *Executor {
+func NewExecutor(logger logger.Logger, cb Callback) *Executor {
 	return &Executor{
 		logger: logger,
 		cb:     cb,

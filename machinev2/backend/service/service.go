@@ -11,7 +11,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/backend/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
-	machine "github.com/minbzk/poc-machine-law/machinev2/machine/service"
+	machine "github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 )
 
 var _ Servicer = &Service{}
