@@ -1,0 +1,103 @@
+# Data Minimization Elimination Rules Configuration
+#
+# This file defines rules for early elimination of laws during data minimization.
+# Rules are evaluated using basic demographic data to avoid accessing sensitive information.
+
+# Field sensitivity classification - IMAGINARY WORLD: BSN is NOT sensitive
+sensitivity:
+  high_sensitivity_fields:
+    # - "BSN"           # REMOVED: In imaginary world BSN is not sensitive
+    # - "BURGERSERVICENUMMER"  # REMOVED: Same as BSN
+    - "VERBLIJFSADRES"
+    - "POSTADRES"
+    - "GEBOORTEDATUM"
+    # - "PARTNER_BSN"   # REMOVED: Partner BSN also not sensitive
+    - "INKOMEN"
+    - "VERMOGEN"
+    - "TOETSINGSINKOMEN"
+    - "GEZINSINKOMEN"
+    - "PARTNER_INKOMEN"
+  
+  high_sensitivity_keywords:
+    # - "BSN"           # REMOVED: BSN keywords not sensitive
+    - "ADRES"
+    - "ADDRESS"
+    - "GEBOORTE"
+    - "BIRTH"
+    - "INKOMEN"
+    - "INCOME"
+    - "VERMOGEN"
+    - "BEDRAG"
+    - "AMOUNT"
+
+# Early elimination rules based on basic demographic data
+elimination_rules:
+  age_based:
+    - rule_id: "aow_age_requirement"
+      name: "AOW Age Requirement"
+      description: "AOW (pension) requires age 67 or older"
+      triggers:
+        law_name_contains: ["aow", "ouderdom"]
+      conditions:
+        - field: "age_bracket"
+          operator: "not_equals"
+          value: "67+"
+      action: "eliminate"
+      log_message: "age requirement not met"
+    
+    - rule_id: "student_age_limit"
+      name: "Student Age Upper Limit"
+      description: "Student benefits not available for people 67 or older"
+      triggers:
+        law_name_contains: ["student"]
+      conditions:
+        - field: "age_bracket"
+          operator: "equals"
+          value: "67+"
+      action: "eliminate"
+      log_message: "too old for student benefits"
+    
+    - rule_id: "youth_age_requirement"
+      name: "Youth Benefits Age Requirement"
+      description: "Youth benefits only for people under 18"
+      triggers:
+        law_name_contains: ["jeugd", "youth"]
+      conditions:
+        - field: "age_bracket"
+          operator: "not_equals"
+          value: "0-17"
+      action: "eliminate"
+      log_message: "not applicable to age group"
+
+  partner_based:
+    - rule_id: "requires_partner"
+      name: "Partner Requirement"
+      description: "Law requires having a partner"
+      triggers:
+        law_name_contains: ["partner"]
+      conditions:
+        - field: "has_partner"
+          operator: "equals"
+          value: false
+      action: "eliminate"
+      log_message: "requires partner"
+
+  children_based:
+    - rule_id: "child_allowance_requirement"
+      name: "Child Allowance Requirement"
+      description: "Child allowances require having children"
+      triggers:
+        law_name_contains: ["kind", "child"]
+        and_contains: ["bijslag", "toeslag"]
+      conditions:
+        - field: "has_children"
+          operator: "equals"
+          value: false
+      action: "eliminate"
+      log_message: "requires children"
+
+# Rule evaluation settings
+settings:
+  case_sensitive: false
+  log_eliminations: true
+  fail_on_unknown_operator: true

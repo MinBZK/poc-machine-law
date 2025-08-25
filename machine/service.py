@@ -1,4 +1,5 @@
 import logging
+import os
 from dataclasses import dataclass
 from datetime import datetime, date
 from typing import Any, Optional
@@ -8,6 +9,7 @@ from eventsourcing.system import SingleThreadedRunner, System
 
 from .context import PathNode
 from .engine import RulesEngine
+from .minimization_engine import MinimizationEngine
 from .events.case.application import CaseManager
 from .events.case.processor import CaseProcessor
 from .events.claim.application import ClaimManager
@@ -86,7 +88,14 @@ class RuleService:
                 raise ValueError(
                     f"Rule spec service '{spec.get('service')}' does not match service '{self.service_name}'"
                 )
-            engine = RulesEngine(spec=spec, service_provider=self.services)
+            # Check if data minimization is enabled via environment variable
+            use_minimization = os.getenv('USE_DATA_MINIMIZATION', 'false').lower() in ('true', '1', 'yes')
+            
+            if use_minimization:
+                logger.info(f"🛡️  Using MinimizationEngine for {law}")
+                engine = MinimizationEngine(spec=spec, service_provider=self.services)
+            else:
+                engine = RulesEngine(spec=spec, service_provider=self.services)
             self._engines[law][reference_date] = engine
             engines_cache[cache_key] = engine
 
@@ -123,6 +132,22 @@ class RuleService:
             requested_output=requested_output,
             approved=approved,
         )
+        
+        # Handle MinimizationEngine results (which may have been eliminated early)
+        if isinstance(engine, MinimizationEngine) and result.get("eliminated"):
+            logger.info(f"🚫 Law {law} eliminated early: {result.get('reason', 'unknown')}")
+            minimization_info = result.get('minimization', {})
+            logger.info(f"📊 Data minimization: {minimization_info}")
+            
+            # Create empty result for eliminated law
+            result = {
+                "output": {},
+                "requirements_met": False, 
+                "input": parameters,
+                "eliminated": True,
+                "minimization": minimization_info
+            }
+        
         return RuleResult.from_engine_result(result, engine.spec.get("uuid"))
 
     def get_rule_info(self, law: str, reference_date: str) -> dict[str, Any] | None:
