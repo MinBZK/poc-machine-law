@@ -80,7 +80,7 @@ def test_application_panel(page: Page):
 
     # Test interacting with the panel
 
-    # 1. Check that the close button exists  
+    # 1. Check that the close button exists
     close_button = panel.locator("button svg path[d*='M6 18L18 6M6 6l12 12']").first
     assert close_button.is_visible(), "Close button should be visible"
 
