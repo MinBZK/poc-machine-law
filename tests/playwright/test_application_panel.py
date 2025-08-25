@@ -54,14 +54,14 @@ def test_application_panel(page: Page):
     # Method 1: Look for the panel element with completed transition
     try:
         panel_selector = "#application-panel > div:not([x-transition\\:enter-start])"
-        panel = page.wait_for_selector(panel_selector, timeout=10000)
-        assert panel.is_visible(), "Panel should be visible"
+        panel_element = page.wait_for_selector(panel_selector, timeout=10000)
+        assert panel_element.is_visible(), "Panel should be visible"
+        panel = page.locator("#application-panel")
     except:
         # Method 2: Check for close button in panel
         try:
-            close_button = page.wait_for_selector(
-                "#application-panel button svg path[d*='M6 18L18 6M6 6l12 12']", timeout=10000
-            )
+            close_button = page.locator("#application-panel button svg path[d*='M6 18L18 6M6 6l12 12']").first
+            close_button.wait_for(timeout=10000)
             assert close_button.is_visible(), "Close button should be visible"
             panel = page.locator("#application-panel")
         except:
@@ -80,15 +80,15 @@ def test_application_panel(page: Page):
 
     # Test interacting with the panel
 
-    # 1. Check that the close button exists
-    close_button = panel.locator("button svg path[d*='M6 18L18 6M6 6l12 12']")
+    # 1. Check that the close button exists  
+    close_button = panel.locator("button svg path[d*='M6 18L18 6M6 6l12 12']").first
     assert close_button.is_visible(), "Close button should be visible"
 
     # 2. Toggle the explanation section
     explanation_toggle = page.locator("button >> text=Uitleg")
     explanation_toggle.click()
 
-    explanation_content = page.locator("#explanation-content")
+    explanation_content = page.locator("#application-panel #explanation-content")
     expect(explanation_content).to_be_visible()
 
     # 3. Toggle it back
