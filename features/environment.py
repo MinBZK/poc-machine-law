@@ -30,11 +30,7 @@ def before_all(context) -> None:
         # Set up environment with proper locale
         env = os.environ.copy()
         if os.getenv("CI"):
-            env.update({
-                "LANG": "nl_NL.UTF-8",
-                "LC_ALL": "nl_NL.UTF-8",
-                "LC_MONETARY": "nl_NL.UTF-8"
-            })
+            env.update({"LANG": "nl_NL.UTF-8", "LC_ALL": "nl_NL.UTF-8", "LC_MONETARY": "nl_NL.UTF-8"})
             # In CI, capture logs for debugging
             context.web_server_process = subprocess.Popen(
                 ["uv", "run", "web/main.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env
