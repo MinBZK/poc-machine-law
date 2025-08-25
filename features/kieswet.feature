@@ -38,7 +38,7 @@ Feature: Bepalen kiesrecht Tweede Kamer
     And de volgende JUSTID ontzettingen gegevens:
       | bsn       | type      | startdatum | einddatum  |
       | 999993653 | KIESRECHT | 2023-01-01 | 2024-01-01 |
-      | 999993653 | KIESRECHT | 2024-06-01 | 2025-06-01 |
+      | 999993653 | KIESRECHT | 2024-06-01 | 2025-12-01 |
     When de kieswet wordt uitgevoerd door KIESRAAD
     Then heeft de persoon geen stemrecht
 
