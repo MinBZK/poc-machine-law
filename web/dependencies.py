@@ -114,12 +114,13 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
             # Try to set locale if not already set properly
             try:
                 import os
-                if os.getenv("CI") and locale.getlocale()[0] in (None, 'C'):
+
+                if os.getenv("CI") and locale.getlocale()[0] in (None, "C"):
                     # In CI, try to set Dutch locale
-                    locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
+                    locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
             except (locale.Error, OSError):
                 pass  # Ignore if locale setting fails
-            
+
             # Use locale.currency for proper formatting
             return locale.currency(value, grouping=True).replace("Eu", "€")
         except ValueError:
