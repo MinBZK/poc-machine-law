@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 # Global service data that applies to all profiles
 GLOBAL_SERVICES = {
     "CBS": {"levensverwachting": [{"jaar": 2025, "verwachting_65": 20.5}]},
-    "KIESRAAD": {"verkiezingen": [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-05-05"}]},
+    "KIESRAAD": {"verkiezingen": [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-10-29"}]},
     "JenV": {
         "jurisdicties": [
             {"gemeente": "Amsterdam", "arrondissement": "AMSTERDAM", "rechtbank": "RECHTBANK_AMSTERDAM"},

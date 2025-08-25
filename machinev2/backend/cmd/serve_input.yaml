@@ -6,7 +6,7 @@ globalServices:
   KIESRAAD:
     verkiezingen:
       - type: TWEEDE_KAMER
-        verkiezingsdatum: "2025-05-05"
+        verkiezingsdatum: "2025-10-29"
   JenV:
     jurisdicties:
       - gemeente: Amsterdam

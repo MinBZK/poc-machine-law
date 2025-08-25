@@ -289,7 +289,7 @@ class LawSimulator:
         sources = {
             ("CBS", "levensverwachting"): [{"jaar": "2025", "verwachting_65": 20.5}],
             # KIESRAAD data for elections
-            ("KIESRAAD", "verkiezingen"): [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-05-05"}],
+            ("KIESRAAD", "verkiezingen"): [{"type": "TWEEDE_KAMER", "verkiezingsdatum": "2025-10-29"}],
             # RvIG data (Personal Information)
             ("RvIG", "personen"): [
                 {

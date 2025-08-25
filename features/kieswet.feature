@@ -8,7 +8,7 @@ Feature: Bepalen kiesrecht Tweede Kamer
     And een persoon met BSN "999993653"
     And de volgende KIESRAAD verkiezingen gegevens:
       | type          | verkiezingsdatum |
-      | TWEEDE_KAMER  | 2025-05-05       |
+      | TWEEDE_KAMER  | 2025-10-29       |
 
   Scenario: Persoon met Nederlandse nationaliteit van 18+ mag stemmen
     Given de volgende RvIG personen gegevens:
