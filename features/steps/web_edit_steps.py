@@ -1,7 +1,6 @@
 """Step definitions for web interface value editing tests."""
 
 import re
-import subprocess
 import time
 
 import requests
