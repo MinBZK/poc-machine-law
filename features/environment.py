@@ -24,9 +24,21 @@ def before_all(context) -> None:
 
     if not server_running:
         print("Starting web server for tests...")
-        context.web_server_process = subprocess.Popen(
-            ["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
+        # Capture server logs for debugging in CI
+        import os
+        if os.getenv("CI"):
+            # In CI, capture logs for debugging
+            context.web_server_process = subprocess.Popen(
+                ["uv", "run", "web/main.py"], 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+        else:
+            # Locally, suppress output as before
+            context.web_server_process = subprocess.Popen(
+                ["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
 
         # Wait for server to be ready
         max_retries = 30
@@ -36,10 +48,22 @@ def before_all(context) -> None:
                 if response.status_code == 200:
                     print(f"Web server started successfully after {i + 1} attempts")
                     break
+                elif response.status_code != 200:
+                    print(f"Server responded with status {response.status_code} on attempt {i + 1}")
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
                 time.sleep(1)
         else:
             # Clean up if we couldn't start
+            if os.getenv("CI") and hasattr(context.web_server_process, 'stdout'):
+                # Print server logs for debugging in CI
+                print("Server logs:")
+                if context.web_server_process.poll() is None:
+                    context.web_server_process.terminate()
+                    try:
+                        stdout, _ = context.web_server_process.communicate(timeout=5)
+                        print(stdout)
+                    except subprocess.TimeoutExpired:
+                        context.web_server_process.kill()
             context.web_server_process.terminate()
             raise AssertionError("Failed to start web server after 30 seconds")
 
