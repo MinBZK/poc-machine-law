@@ -342,15 +342,19 @@ def step_capture_initial_huurtoeslag(context):
     context.panel_response = response.text
 
     # Extract the amount from the response - look for the main result
-    # Look for amounts in the format "123,45 €" in text-4xl font (main result)
-    matches = re.findall(r"text-4xl[^>]*>(\d+),(\d+)\s*€", response.text)
+    # Look for amounts in the format "123,45 €" or "1.234,56 €" in text-4xl font (main result)
+    matches = re.findall(r"text-4xl[^>]*>([\d.]+),(\d+)\s*€", response.text)
     if matches:
-        context.initial_amount = f"{matches[0][0]},{matches[0][1]}"
+        # Remove thousands separators for consistent format
+        amount_whole = matches[0][0].replace(".", "")
+        context.initial_amount = f"{amount_whole},{matches[0][1]}"
     else:
-        # Fallback to any amount
-        amounts = re.findall(r"(\d+),(\d+)\s*€", response.text)
+        # Fallback to any amount - handle both formats
+        amounts = re.findall(r"([\d.]+),(\d+)\s*€", response.text)
         assert amounts, "No amount found in response"
-        context.initial_amount = f"{amounts[0][0]},{amounts[0][1]}"
+        # Remove thousands separators for consistent format
+        amount_whole = amounts[0][0].replace(".", "")
+        context.initial_amount = f"{amount_whole},{amounts[0][1]}"
 
     print(f"Initial huurtoeslag amount: {context.initial_amount} €")
 
@@ -365,14 +369,18 @@ def step_huurtoeslag_higher_than_before(context):
     assert response.status_code == 200, f"Failed to get application panel: {response.status_code}"
 
     # Extract the new amount - look for the main result
-    matches = re.findall(r"text-4xl[^>]*>(\d+),(\d+)\s*€", response.text)
+    matches = re.findall(r"text-4xl[^>]*>([\d.]+),(\d+)\s*€", response.text)
     if matches:
-        new_amount = f"{matches[0][0]},{matches[0][1]}"
+        # Remove thousands separators for consistent format
+        amount_whole = matches[0][0].replace(".", "")
+        new_amount = f"{amount_whole},{matches[0][1]}"
     else:
         # Fallback to any amount
-        amounts = re.findall(r"(\d+),(\d+)\s*€", response.text)
+        amounts = re.findall(r"([\d.]+),(\d+)\s*€", response.text)
         assert amounts, "No amount found in response"
-        new_amount = f"{amounts[0][0]},{amounts[0][1]}"
+        # Remove thousands separators for consistent format
+        amount_whole = amounts[0][0].replace(".", "")
+        new_amount = f"{amount_whole},{amounts[0][1]}"
 
     print(f"New huurtoeslag amount: {new_amount} €")
 
