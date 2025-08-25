@@ -13,7 +13,7 @@ import (
 	"github.com/looplab/eventhorizon/commandhandler/aggregate"
 	"github.com/looplab/eventhorizon/commandhandler/bus"
 	"github.com/looplab/eventhorizon/eventhandler/projector"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 )
 
 var registerSync sync.Once
@@ -28,7 +28,7 @@ type Callback func(caseID uuid.UUID, eventType string, data map[string]any)
 // Setup sets up the case manager with all required components.
 func Setup(
 	ctx context.Context,
-	logger logging.Logger,
+	logger logger.Logger,
 	eventStore eh.EventStore,
 	local, global HandlerAdder,
 	commandBus *bus.CommandHandler,

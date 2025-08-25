@@ -1,4 +1,4 @@
-package service
+package serviceprovider
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 
 	eh "github.com/looplab/eventhorizon"
@@ -24,7 +24,7 @@ import (
 
 // CaseManager manages service cases using the EventHorizon-based casemanager.
 type CaseManager struct {
-	logger       logging.Logger
+	logger       logger.Logger
 	Services     *Services
 	caseIndex    map[string]uuid.UUID // Maps (bsn:service:law) -> case_id
 	SampleRate   float64
@@ -40,7 +40,7 @@ type CaseManager struct {
 var ErrCaseNotFound = errors.New("case_not_found")
 
 // NewCaseManager creates a new case manager with EventHorizon components.
-func NewCaseManager(logger logging.Logger, services *Services) *CaseManager {
+func NewCaseManager(logger logger.Logger, services *Services) *CaseManager {
 	// Create the event buses
 	eventBus := localEventBus.NewEventBus()
 	observerBus := localEventBus.NewEventBus()
@@ -121,7 +121,7 @@ func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[
 	go func() {
 		ctx := context.Background()
 		if err := cm.Services.ApplyRules(ctx, event); err != nil {
-			cm.logger.WithIndent().Errorf(ctx, "Error applying rules: %v", err)
+			cm.logger.WithIndent().Errorf("Error applying rules: %v", err)
 		}
 
 		cm.wg.Done()

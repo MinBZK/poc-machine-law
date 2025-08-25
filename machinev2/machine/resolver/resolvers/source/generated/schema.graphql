@@ -1,0 +1,62 @@
+# The `DateTime` scalar type represents a DateTime. The DateTime is serialized as an RFC 3339 quoted string
+scalar DateTime
+
+#
+type Query {
+  #
+  ClaimAttributesByClaimID(
+    TransactionID: ID
+    claimID: ID!
+    dimensionData: dimensionData
+  ): SampleResult
+
+  #
+  ClaimAttributesByObjectID(
+    TransactionID: ID
+    objectID: ID!
+    claimTypeName: String!
+    dimensionData: dimensionData
+  ): SampleResult
+}
+
+#
+type SampleResult {
+  # Name of the originating claim type of the values
+  name: String!
+
+  # Claims containing references to the originating claim type
+  subvalues: [SampleResult]
+
+  # Data contained in the originating claim type
+  values: [values]!
+}
+
+#
+input dimensionData {
+  # Name of the claim type of the start annotation for the secondary dimension
+  startType: String!
+
+  # Name of the claim type of the end annotation for the secondary dimension
+  endType: String!
+
+  # Point in time on the registration timeline to query
+  registrationTime: DateTime!
+
+  # Point in time on the secondary timeline to query
+  secondaryTime: DateTime!
+}
+
+#
+type values {
+  #
+  key: String
+
+  #
+  value: String
+}
+
+#
+type Mutation {
+  # Dummy field to allow empty qraphql root object, when no claimtypes are defined
+  _EMPTY_: Boolean
+}

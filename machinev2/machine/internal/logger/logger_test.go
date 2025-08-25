@@ -1,4 +1,4 @@
-package logging_test
+package logger_test
 
 import (
 	"context"
@@ -8,30 +8,67 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/sirupsen/logrus"
 )
 
 func TestLogger(t *testing.T) {
-	var logger logging.Logger = logging.New("test", os.Stdout, logrus.DebugLevel)
+	var logr logger.Logger = logger.New("test", os.Stdout, logrus.DebugLevel)
 
 	ctx := t.Context()
 
-	logger.Debug(ctx, "HI")
+	logr.Debug("HI")
 
-	ctx = logging.WithLogger(ctx, logger)
+	ctx = logger.WithLogger(ctx, logr)
 
-	logger2 := logging.FromContext(ctx)
-	logger2.Debug(ctx, "WOW")
-	logger2.Warning(ctx, "asdf")
-	logger2.WithIndent().Warning(ctx, "asdf 2")
+	logger2 := logger.FromContext(ctx)
+	logger2.Debug("WOW")
+	logger2.Warning("asdf")
+	logger2.WithIndent().Warning("asdf 2")
 
-	test(logger, ctx, "test", 2)
-	test(logger, ctx, "test", 2)
+	// logger2 -> default
+	//
+	//
+	//
+	//
+	//
+	//
+
+	logger2.IndentBlock(context.Background(), "What", func(ctx context.Context) error {
+		logr := logger.FromContext(ctx)
+
+		logr.Info("This")
+
+		logr.IndentBlock(ctx, "What 2", func(ctx context.Context) error {
+			logr := logger.FromContext(ctx)
+
+			logr.Info("This 2")
+
+			logr.(*logger.LoggerImpl).Print("test1")
+
+			logr.IndentBlock(ctx, "What 3", func(ctx context.Context) error {
+				logr := logger.FromContext(ctx)
+
+				logr.(*logger.LoggerImpl).Print("test2")
+				logr.Info("This 3")
+
+				return nil
+			})
+
+			return nil
+		})
+
+		return nil
+	},
+		logger.OptionWithDoubleLine,
+	)
+
+	test(logr, ctx, "test", 2)
+	test(logr, ctx, "test", 2)
 }
 
 func TestRace(t *testing.T) {
-	var logger logging.Logger = logging.New("test", os.Stdout, logrus.DebugLevel)
+	var logger logger.Logger = logger.New("test", os.Stdout, logrus.DebugLevel)
 
 	var wg sync.WaitGroup
 	for range 100 {
@@ -46,23 +83,31 @@ func TestRace(t *testing.T) {
 	wg.Wait()
 }
 
-func test(logger logging.Logger, ctx context.Context, path string, index int) {
-	if err := logger.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
+func test(logr logger.Logger, ctx context.Context, path string, index int) {
+	var op []logger.Options
+	if index == 1 {
+		op = append(op, logger.OptionWithDoubleLine)
+	}
+	if err := logr.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
+		logr := logger.FromContext(ctx)
+
 		if index != 0 {
-			test(logger, ctx, path, index-1)
+			test(logr, ctx, path, index-1)
 		}
 
-		logger.Debugf(ctx, "what is going on")
-		logger.WithIndent().Info(ctx, "this is going on")
+		logr.Debugf("what is going on")
+		logr.WithIndent().Info("this is going on")
 
-		logger.Debugf(ctx, "Result")
+		logr.Debugf("Result")
 		return nil
-	}); err != nil {
-		logger.Error(ctx, "error")
+	},
+		op...,
+	); err != nil {
+		logr.Error("error")
 	}
 }
 
-// Field represents a key-value pair for logging
+// Field represents a key-value pair for logger
 type Field struct {
 	Key   string
 	Value interface{}
@@ -323,14 +368,14 @@ func BenchmarkCreateEntryCachedAlloc(b *testing.B) {
 }
 
 // Benchmark for a real-world scenario with mixed calls (mostly empty fields)
-func BenchmarkMixedLoggingScenario(b *testing.B) {
+func BenchmarkMixedloggerScenario(b *testing.B) {
 	l := setupLogger()
 	fields1 := createFields(1)
 	fields5 := createFields(5)
 	b.ResetTimer()
 
 	for i := range b.N {
-		// Simulate typical logging pattern: 80% with no fields, 15% with 1 field, 5% with multiple fields
+		// Simulate typical logger pattern: 80% with no fields, 15% with 1 field, 5% with multiple fields
 		switch i % 20 {
 		case 0, 1, 2:
 			l.createEntryOriginal(fields1...)
@@ -343,7 +388,7 @@ func BenchmarkMixedLoggingScenario(b *testing.B) {
 }
 
 // Same mixed scenario with optimized implementation
-func BenchmarkMixedLoggingScenarioOptimized(b *testing.B) {
+func BenchmarkMixedloggerScenarioOptimized(b *testing.B) {
 	l := setupLogger()
 	fields1 := createFields(1)
 	fields5 := createFields(5)
@@ -362,7 +407,7 @@ func BenchmarkMixedLoggingScenarioOptimized(b *testing.B) {
 }
 
 // Same mixed scenario with cached implementation
-func BenchmarkMixedLoggingScenarioCached(b *testing.B) {
+func BenchmarkMixedloggerScenarioCached(b *testing.B) {
 	l := setupLogger()
 	fields1 := createFields(1)
 	fields5 := createFields(5)

@@ -12,16 +12,17 @@ import (
 	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 )
 
 // RulesEngine evaluates business rules
 type RulesEngine struct {
-	logger          logging.Logger
+	logger          logger.Logger
 	Spec            ruleresolver.RuleSpec
 	ServiceName     string
 	Law             string
@@ -31,51 +32,40 @@ type RulesEngine struct {
 	PropertySpecs   map[string]ruleresolver.Field
 	OutputSpecs     map[string]model.TypeSpec
 	Definitions     map[string]any
-	ServiceProvider contexter.ServiceProvider
+	ServiceProvider service.ServiceProvider
 	referenceDate   time.Time
 }
 
 // NewRulesEngine creates a new rules engine instance
-func NewRulesEngine(logger logging.Logger, spec ruleresolver.RuleSpec, serviceProvider contexter.ServiceProvider, referenceDate string) *RulesEngine {
+func NewRulesEngine(
+	logger logger.Logger,
+	spec ruleresolver.RuleSpec,
+	serviceProvider service.ServiceProvider,
+	referenceDate string,
+) *RulesEngine {
 	t, err := time.Parse("2006-01-02", referenceDate)
 	if err != nil {
 		panic("invalid reference date")
 	}
 
-	engine := &RulesEngine{
-		logger:          logger.WithName("rules_engine"),
+	logger = logger.WithName("rules_engine").
+		WithService(spec.Service).
+		WithLaw(spec.Law)
+
+	return &RulesEngine{
+		logger:          logger,
 		Spec:            spec,
 		ServiceProvider: serviceProvider,
-		PropertySpecs:   make(map[string]ruleresolver.Field),
-		OutputSpecs:     make(map[string]model.TypeSpec),
+		ServiceName:     spec.Service,
+		Law:             spec.Law,
+		Requirements:    spec.Requirements,
+		Actions:         spec.Actions,
+		ParameterSpecs:  spec.Properties.Parameters,
+		PropertySpecs:   buildPropertySpecs(spec.Properties),
+		OutputSpecs:     buildOutputSpecs(spec.Properties),
+		Definitions:     spec.Properties.Definitions,
 		referenceDate:   t,
 	}
-
-	// Extract main components
-
-	serviceName := spec.Service
-	engine.ServiceName = serviceName
-	engine.logger = engine.logger.WithService(serviceName)
-
-	law := spec.Law
-	engine.Law = law
-	engine.logger = engine.logger.WithLaw(law)
-
-	engine.Requirements = spec.Requirements
-	engine.Actions = spec.Actions
-
-	engine.ParameterSpecs = spec.Properties.Parameters
-
-	// Extract properties
-	engine.PropertySpecs = buildPropertySpecs(spec.Properties)
-
-	// Build output specs
-	engine.OutputSpecs = buildOutputSpecs(spec.Properties)
-
-	// Get definitions
-	engine.Definitions = spec.Properties.Definitions
-
-	return engine
 }
 
 // buildPropertySpecs builds a mapping of property paths to their specifications
@@ -125,11 +115,13 @@ func buildOutputSpecs(properties ruleresolver.Properties) map[string]model.TypeS
 
 // enforceOutputType enforces type specifications on an output value
 func (re *RulesEngine) enforceOutputType(ctx context.Context, name string, value any) any {
+	logr := re.logger.WithContext(ctx)
+
 	if spec, exists := re.OutputSpecs[name]; exists {
 		result := typespec.Enforce(spec, value)
 
 		if equal, _ := utils.Equal(result, value); !equal {
-			re.logger.Debugf(ctx, "Enforcing type spec changed value from: %v to %v", value, result)
+			logr.Debugf("Enforcing type spec changed value from: %v to %v", value, result)
 		}
 
 		return result
@@ -413,19 +405,20 @@ func (re *RulesEngine) Evaluate(
 	requestedOutput string,
 	approved bool,
 ) (model.EvaluateResult, error) {
+	logr := re.logger.WithContext(ctx)
 
 	// Check required parameters
 	if re.ParameterSpecs != nil {
 		for _, spec := range re.ParameterSpecs {
 			if spec.Required != nil && *spec.Required {
 				if _, exists := parameters[spec.Name]; !exists {
-					re.logger.WithIndent().Warningf(ctx, "Required parameter %s not found in %v", spec.Name, parameters)
+					logr.WithIndent().Warningf("Required parameter %s not found in %v", spec.Name, parameters)
 				}
 			}
 		}
 	}
 
-	re.logger.Debugf(ctx, "Evaluating rules for %s %s (%s %s)",
+	logr.Debugf("Evaluating rules for %s %s (%s %s)",
 		re.ServiceName, re.Law, calculationDate, requestedOutput)
 
 	// Handle claims
@@ -434,7 +427,7 @@ func (re *RulesEngine) Evaluate(
 		claimManager := re.ServiceProvider.GetClaimManager()
 		claimsList, err := claimManager.GetClaimsByBSN(bsn, approved, true)
 		if err != nil {
-			re.logger.WithIndent().Warningf(ctx, "Failed to get claims for BSN %s: %v", bsn, err)
+			logr.WithIndent().Warningf("Failed to get claims for BSN %s: %v", bsn, err)
 		} else {
 			// Convert claims list to map indexed by key
 			claims = make(map[string]model.Claim, len(claimsList))
@@ -465,16 +458,14 @@ func (re *RulesEngine) Evaluate(
 
 	// Create context
 	ruleCtx := contexter.NewRuleContext(
-		re.logger,
+		logr,
 		re.Definitions,
 		re.ServiceProvider,
 		parameters,
 		re.PropertySpecs,
-		re.OutputSpecs,
 		sources,
 		overwriteInput,
 		calculationDate,
-		re.ServiceName,
 		claims,
 		approved,
 	)
@@ -489,7 +480,7 @@ func (re *RulesEngine) Evaluate(
 	p.Add(requirementsNode)
 
 	var requirementsMet bool
-	err := re.logger.IndentBlock(ctx, "", func(ctx context.Context) error {
+	err := logr.IndentBlock(ctx, "", func(ctx context.Context) error {
 		var err error
 		requirementsMet, err = re.evaluateRequirements(ctx, re.Requirements, ruleCtx)
 		requirementsNode.Result = requirementsMet
@@ -510,7 +501,7 @@ func (re *RulesEngine) Evaluate(
 		}
 
 		for _, action := range requiredActions {
-			outputDef, outputName, err := re.evaluateAction(ctx, action, ruleCtx)
+			outputDef, outputName, err := re.evaluateAction(ctx, action, ruleCtx, overwriteInput)
 			if err != nil {
 				return model.EvaluateResult{}, err
 			}
@@ -519,20 +510,20 @@ func (re *RulesEngine) Evaluate(
 			outputValues[outputName] = outputDef
 
 			if ruleCtx.MissingRequired {
-				re.logger.WithIndent().Warningf(ctx, "Missing required values, breaking")
+				logr.WithIndent().Warningf("Missing required values, breaking")
 				break
 			}
 		}
 	}
 
 	if ruleCtx.MissingRequired {
-		re.logger.WithIndent().Warningf(ctx, "Missing required values, requirements not met, setting outputs to empty.")
+		logr.WithIndent().Warningf("Missing required values, requirements not met, setting outputs to empty.")
 		outputValues = make(map[string]model.EvaluateActionResult)
 		requirementsMet = false
 	}
 
 	if len(outputValues) == 0 {
-		re.logger.WithIndent().Warningf(ctx, "No output values computed for %s %s", calculationDate, requestedOutput)
+		logr.WithIndent().Warningf("No output values computed for %s %s", calculationDate, requestedOutput)
 	}
 
 	return model.EvaluateResult{
@@ -549,11 +540,16 @@ func (re *RulesEngine) evaluateAction(
 	ctx context.Context,
 	action ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
+	overwriteInput map[string]map[string]any,
 ) (model.EvaluateActionResult, string, error) {
+	logr := re.logger.WithContext(ctx)
+
 	var result any
 
 	var outputSpec *ruleresolver.OutputField
-	err := re.logger.IndentBlock(ctx, fmt.Sprintf("Computing %s", action.Output), func(ctx context.Context) error {
+	err := logr.IndentBlock(ctx, fmt.Sprintf("Computing %s", action.Output), func(ctx context.Context) error {
+		logr := logger.FromContext(ctx)
+
 		actionNode := &model.PathNode{
 			Type:   "action",
 			Name:   fmt.Sprintf("Evaluate action for %s", action.Output),
@@ -572,10 +568,10 @@ func (re *RulesEngine) evaluateAction(
 		}
 
 		// Check if we should use overwrite value
-		if ruleCtx.OverwriteInput != nil {
-			if serviceMap, ok := ruleCtx.OverwriteInput[re.ServiceName]; ok {
+		if overwriteInput != nil {
+			if serviceMap, ok := overwriteInput[re.ServiceName]; ok {
 				if val, ok := serviceMap[action.Output]; ok {
-					re.logger.WithIndent().Debugf(ctx, "Resolving value %s/%s from OVERWRITE %v",
+					logr.WithIndent().Debugf("Resolving value %s/%s from OVERWRITE %v",
 						re.ServiceName, action.Output, val)
 					result = val
 				}
@@ -611,7 +607,7 @@ func (re *RulesEngine) evaluateAction(
 		return model.EvaluateActionResult{}, "", err
 	}
 
-	re.logger.Debugf(ctx, "Result of %s: %v", action.Output, result)
+	logr.Debugf("Result of %s: %v", action.Output, result)
 
 	outputDef := model.EvaluateActionResult{
 		Value: result,
@@ -673,8 +669,10 @@ func (re *RulesEngine) evaluateRequirements(
 	requirements []ruleresolver.Requirement,
 	ruleCtx *contexter.RuleContext,
 ) (bool, error) {
+	logr := re.logger.WithContext(ctx)
+
 	if len(requirements) == 0 {
-		re.logger.WithIndent().Debugf(ctx, "No requirements found")
+		logr.WithIndent().Debugf("No requirements found")
 		return true, nil
 	}
 
@@ -690,7 +688,9 @@ func (re *RulesEngine) evaluateRequirements(
 
 		var result bool
 
-		err := re.logger.IndentBlock(ctx, fmt.Sprintf("Requirements %+v", req), func(ctx context.Context) error {
+		err := logr.IndentBlock(ctx, fmt.Sprintf("Requirements %+v", req), func(ctx context.Context) error {
+			logr := logger.FromContext(ctx)
+
 			node := &model.PathNode{
 				Type:   "requirement",
 				Name:   nodeName,
@@ -712,12 +712,12 @@ func (re *RulesEngine) evaluateRequirements(
 					results = append(results, res)
 
 					if !res {
-						re.logger.Debugf(ctx, "False value found in an ALL, no need to compute the rest, breaking.")
+						logr.Debugf("False value found in an ALL, no need to compute the rest, breaking.")
 						break
 					}
 
 					if ruleCtx.MissingRequired {
-						re.logger.WithIndent().Warningf(ctx, "Missing required values, breaking")
+						logr.WithIndent().Warningf("Missing required values, breaking")
 						break
 					}
 				}
@@ -742,12 +742,12 @@ func (re *RulesEngine) evaluateRequirements(
 					results = append(results, res)
 
 					if res {
-						re.logger.Debugf(ctx, "True value found in an OR, no need to compute the rest, breaking.")
+						logr.Debugf("True value found in an OR, no need to compute the rest, breaking.")
 						break
 					}
 
 					if ruleCtx.MissingRequired {
-						re.logger.WithIndent().Warningf(ctx, "Missing required values, breaking")
+						logr.WithIndent().Warningf("Missing required values, breaking")
 						break
 					}
 				}
@@ -768,7 +768,7 @@ func (re *RulesEngine) evaluateRequirements(
 			return false, err
 		}
 
-		re.logger.WithIndent().Debugf(ctx, "Requirement met: %v", result)
+		logr.WithIndent().Debugf("Requirement met: %v", result)
 
 		if !result {
 			return false, nil
@@ -867,6 +867,8 @@ func (re *RulesEngine) evaluateForeach(
 	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
+	logr := re.logger.WithContext(ctx)
+
 	if operation.Combine == nil {
 		return nil, fmt.Errorf("combine operation not specified for FOREACH")
 	}
@@ -877,7 +879,7 @@ func (re *RulesEngine) evaluateForeach(
 	}
 
 	if arrayData == nil {
-		re.logger.WithIndent().Warningf(ctx, "No data found to run FOREACH on")
+		logr.WithIndent().Warningf("No data found to run FOREACH on")
 		return re.evaluateAggregateOps(ctx, *operation.Subject, []any{}), nil
 	}
 
@@ -897,9 +899,11 @@ func (re *RulesEngine) evaluateForeach(
 
 	var values []any
 
-	err = re.logger.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", *operation.Combine), func(ctx context.Context) error {
+	err = logr.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", *operation.Combine), func(ctx context.Context) error {
+		logr := logger.FromContext(ctx)
+
 		for _, item := range arrayItems {
-			err := re.logger.IndentBlock(ctx, fmt.Sprintf("Item %v", item), func(ctx context.Context) error {
+			err := logr.IndentBlock(ctx, fmt.Sprintf("Item %v", item), func(ctx context.Context) error {
 				// Create a new context with the item as local scope
 				itemCtx := *ruleCtx // Shallow copy
 
@@ -943,7 +947,7 @@ func (re *RulesEngine) evaluateForeach(
 			}
 		}
 
-		re.logger.WithIndent().Debugf(ctx, "Foreach values: %v", values)
+		logr.WithIndent().Debugf("Foreach values: %v", values)
 		return nil
 	})
 	if err != nil {
@@ -952,7 +956,7 @@ func (re *RulesEngine) evaluateForeach(
 
 	// Apply combine operation
 	result := re.evaluateAggregateOps(ctx, *operation.Combine, values)
-	re.logger.WithIndent().Debugf(ctx, "Foreach result: %v", result)
+	logr.WithIndent().Debugf("Foreach result: %v", result)
 
 	return result, nil
 }
@@ -1041,6 +1045,8 @@ func convertToFloat(v any) (float64, error) {
 
 // evaluateAggregateOps evaluates aggregate operations
 func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, values []any) any {
+	logr := re.logger.WithContext(ctx)
+
 	// Filter out nil values
 	filteredValues := make([]any, 0, len(values))
 	for _, v := range values {
@@ -1050,10 +1056,10 @@ func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, valu
 	}
 
 	if len(filteredValues) == 0 {
-		re.logger.WithIndent().Warningf(ctx, "No values found (or they were nil), returning 0 for %s(%v)", op, values)
+		logr.WithIndent().Warningf("No values found (or they were nil), returning 0 for %s(%v)", op, values)
 		return 0
 	} else if len(filteredValues) < len(values) {
-		re.logger.WithIndent().Warningf(ctx, "Dropped %d values because they were nil", len(values)-len(filteredValues))
+		logr.WithIndent().Warningf("Dropped %d values because they were nil", len(values)-len(filteredValues))
 	}
 
 	var result any
@@ -1147,7 +1153,7 @@ func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, valu
 			for _, v := range filteredValues {
 				f, err := convertToFloat(v)
 				if err != nil {
-					re.logger.Warningf(ctx, "could not convert value to float: %w", err)
+					logr.Warningf("could not convert value to float: %w", err)
 					continue
 				}
 				prod *= f
@@ -1196,16 +1202,18 @@ func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, valu
 		}
 
 	default:
-		re.logger.WithIndent().Warningf(ctx, "Unknown aggregate operation: %s", op)
+		logr.WithIndent().Warningf("Unknown aggregate operation: %s", op)
 		result = 0.0
 	}
 
-	re.logger.Debugf(ctx, "Compute %s(%v) = %v", op, filteredValues, result)
+	logr.Debugf("Compute %s(%v) = %v", op, filteredValues, result)
 	return result
 }
 
 // evaluateComparison evaluates comparison operations
 func (re *RulesEngine) evaluateComparison(ctx context.Context, op string, left, right any) (bool, error) {
+	logr := re.logger.WithContext(ctx)
+
 	// Handle date comparisons
 	leftTime, leftIsTime := left.(time.Time)
 	rightTime, rightIsTime := right.(time.Time)
@@ -1262,22 +1270,24 @@ func (re *RulesEngine) evaluateComparison(ctx context.Context, op string, left, 
 
 	result, err := compFunc(left, right)
 	if err != nil {
-		re.logger.WithIndent().Warningf(ctx, "Error computing %s(%v, %v): %v", op, left, right, err)
+		logr.WithIndent().Warningf("Error computing %s(%v, %v): %v", op, left, right, err)
 		return false, err
 	}
 
-	re.logger.Debugf(ctx, "Compute %s(%v, %v) = %v", op, left, right, result)
+	logr.Debugf("Compute %s(%v, %v) = %v", op, left, right, result)
 	return result, nil
 }
 
 // evaluateDateOperation evaluates date-specific operations
 func (re *RulesEngine) evaluateDateOperation(ctx context.Context, op string, values []any, unit string) (int, error) {
+	logr := re.logger.WithContext(ctx)
+
 	if op != "SUBTRACT_DATE" {
 		return 0, fmt.Errorf("unknown date operation: %s", op)
 	}
 
 	if len(values) != 2 {
-		re.logger.WithIndent().Warningf(ctx, "Warning: SUBTRACT_DATE requires exactly 2 values")
+		logr.WithIndent().Warningf("Warning: SUBTRACT_DATE requires exactly 2 values")
 		return 0, nil
 	}
 
@@ -1323,11 +1333,11 @@ func (re *RulesEngine) evaluateDateOperation(ctx context.Context, op string, val
 		result = yearDiff*12 + monthDiff
 
 	default:
-		re.logger.WithIndent().Warningf(ctx, "Warning: Unknown date unit %s", unit)
+		logr.WithIndent().Warningf("Warning: Unknown date unit %s", unit)
 		result = 0
 	}
 
-	re.logger.Debugf(ctx, "Compute %s(%v, %s) = %d", op, values, unit, result)
+	logr.Debugf("Compute %s(%v, %s) = %d", op, values, unit, result)
 	return result, nil
 }
 
@@ -1354,6 +1364,8 @@ func (re *RulesEngine) evaluateOperation(
 	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
+	logr := re.logger.WithContext(ctx)
+
 	// Direct value assignment - no operation needed
 	if operation.Value != nil && operation.Operation == nil {
 		node := &model.PathNode{
@@ -1376,7 +1388,7 @@ func (re *RulesEngine) evaluateOperation(
 	}
 
 	if operation.Operation == nil || *operation.Operation == "" {
-		re.logger.WithIndent().Warningf(ctx, "Operation type is nil (or missing).")
+		logr.WithIndent().Warningf("Operation type is nil (or missing).")
 		return nil, nil
 	}
 
@@ -1406,7 +1418,9 @@ func (re *RulesEngine) evaluateOperation(
 		}
 
 	case "IN", "NOT_IN":
-		err = re.logger.IndentBlock(ctx, *operation.Operation, func(ctx context.Context) error {
+		err = logr.IndentBlock(ctx, *operation.Operation, func(ctx context.Context) error {
+			logr := logger.FromContext(ctx)
+
 			subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 			if err != nil {
 				return err
@@ -1456,7 +1470,7 @@ func (re *RulesEngine) evaluateOperation(
 			node.Details["subject_value"] = subject
 			node.Details["allowed_values"] = allowedValues
 
-			re.logger.Debugf(ctx, "Result %v %s %v: %v", subject, *operation.Operation, allowedValues, result)
+			logr.Debugf("Result %v %s %v: %v", subject, *operation.Operation, allowedValues, result)
 			return nil
 		})
 
@@ -1477,7 +1491,9 @@ func (re *RulesEngine) evaluateOperation(
 		result = subject == nil
 		node.Details["subject_value"] = subject
 	case "AND":
-		err = re.logger.IndentBlock(ctx, "AND", func(ctx context.Context) error {
+		err = logr.IndentBlock(ctx, "AND", func(ctx context.Context) error {
+			logr := logger.FromContext(ctx)
+
 			values := []any{}
 
 			for _, v := range *operation.Values.ActionValues {
@@ -1490,7 +1506,7 @@ func (re *RulesEngine) evaluateOperation(
 
 				// Short-circuit on first false value
 				if !isTruthy(r) {
-					re.logger.Debugf(ctx, "False value found in an AND, no need to compute the rest, breaking.")
+					logr.Debugf("False value found in an AND, no need to compute the rest, breaking.")
 					break
 				}
 			}
@@ -1505,12 +1521,14 @@ func (re *RulesEngine) evaluateOperation(
 			}
 
 			node.Details["evaluated_values"] = values
-			re.logger.Debugf(ctx, "Result %v AND: %v", values, result)
+			logr.Debugf("Result %v AND: %v", values, result)
 			return nil
 		})
 
 	case "OR":
-		err = re.logger.IndentBlock(ctx, "OR", func(ctx context.Context) error {
+		err = logr.IndentBlock(ctx, "OR", func(ctx context.Context) error {
+			logr := logger.FromContext(ctx)
+
 			values := []any{}
 			for _, v := range *operation.Values.ActionValues {
 				r, err := re.evaluateActionValue(ctx, ruleCtx, v)
@@ -1522,7 +1540,7 @@ func (re *RulesEngine) evaluateOperation(
 
 				// Short-circuit on first true value
 				if isTruthy(r) {
-					re.logger.Debugf(ctx, "True value found in an OR, no need to compute the rest, breaking.")
+					logr.Debugf("True value found in an OR, no need to compute the rest, breaking.")
 					break
 				}
 			}
@@ -1537,7 +1555,7 @@ func (re *RulesEngine) evaluateOperation(
 			}
 
 			node.Details["evaluated_values"] = values
-			re.logger.Debugf(ctx, "Result %v OR: %v", values, result)
+			logr.Debugf("Result %v OR: %v", values, result)
 			return nil
 		})
 
@@ -1593,7 +1611,7 @@ func (re *RulesEngine) evaluateOperation(
 			subject = values[0]
 			value = values[1]
 		} else {
-			re.logger.WithIndent().Warningf(ctx, "Comparison operation expects two values or subject/value")
+			logr.WithIndent().Warningf("Comparison operation expects two values or subject/value")
 			return nil, fmt.Errorf("invalid comparison format")
 		}
 
@@ -1646,7 +1664,7 @@ func (re *RulesEngine) evaluateOperation(
 	default:
 		result = nil
 		node.Details["error"] = "Invalid operation format"
-		re.logger.WithIndent().Errorf(ctx, "Not matched to any operation %s", *operation.Operation)
+		logr.WithIndent().Errorf("Not matched to any operation %s", *operation.Operation)
 	}
 
 	node.Result = result
