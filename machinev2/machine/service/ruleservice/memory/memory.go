@@ -66,7 +66,7 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 		return nil, fmt.Errorf("rule spec service '%s' does not match service '%s'", spec.Service, rs.ServiceName)
 	}
 
-	ruleEngine := engine.NewRulesEngine(rs.logger, spec, rs.Services, referenceDate)
+	ruleEngine := engine.NewRulesEngine(spec, rs.Services, referenceDate)
 	rs.engines[law][referenceDate] = ruleEngine
 
 	return ruleEngine, nil

@@ -38,6 +38,7 @@ func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field)
 func (c ubbResolver) do(ctx context.Context, key string, table string, field string, filters Filters) (any, error) {
 	logr := logger.FromContext(ctx)
 	logr = logr.WithField("resolver", "external_claim").
+		WithField("resolver_type", "ubb").
 		WithField("table", table).
 		WithField("field", field).
 		WithField("filters", filters)

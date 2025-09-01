@@ -77,7 +77,7 @@ func (l *PropertySpecServiceResolver) Resolve(ctx context.Context, key string) (
 		return nil, false
 	}
 
-	logger.FromContext(ctx).
+	logger.FromContext(ctx).WithName("resolver").
 		Debugf("Result for $%s from %s field %s: %v", key, serviceRef.Service, serviceRef.Field, value)
 
 	required := false

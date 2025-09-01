@@ -26,8 +26,9 @@ func newDefaultResolver(endpoint string) defaultResolver {
 
 // Resolve implements Resolver.
 func (c defaultResolver) do(ctx context.Context, key string, table string, field string, filters Filters) (any, error) {
-	logr := logger.FromContext(ctx)
+	logr := logger.FromContext(ctx).WithName("resolver")
 	logr = logr.WithField("resolver", "external_claim").
+		WithField("resolver_type", "default").
 		WithField("table", table).
 		WithField("field", field).
 		WithField("filters", filters)

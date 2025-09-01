@@ -36,7 +36,6 @@ type RuleContextData struct {
 
 // RuleContext holds context for rule evaluation
 type RuleContext struct {
-	logger          logger.Logger
 	ServiceProvider service.ServiceProvider
 	propertySpecs   map[string]ruleresolver.Field
 	calculationDate string
@@ -48,7 +47,6 @@ type RuleContext struct {
 
 // NewRuleContext creates a new rule context
 func NewRuleContext(
-	logger logger.Logger,
 	definitions map[string]any, serviceProvider service.ServiceProvider,
 	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
 	sources model.SourceDataFrame,
@@ -59,7 +57,6 @@ func NewRuleContext(
 	outputresolver := output.NewOutputsResolver()
 
 	rc := &RuleContext{
-		logger:          logger,
 		propertySpecs:   propertySpecs,
 		calculationDate: calculationDate,
 		MissingRequired: false,
@@ -97,7 +94,7 @@ func (rc *RuleContext) ResolveAction(ctx context.Context, action ruleresolver.Ac
 
 // ResolveValue resolves a value from definitions, services, or sources
 func (rc *RuleContext) ResolveValue(ctx context.Context, path any) (any, error) {
-	logr := rc.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx).WithName("context")
 
 	var value any
 	if err := logr.IndentBlock(ctx, fmt.Sprintf("Resolving path: %v", path), func(ctx context.Context) error {
@@ -138,7 +135,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 
 	strPath = strPath[1:]
 
-	logger := rc.logger.WithContext(ctx)
+	logger := logger.FromContext(ctx)
 
 	// Resolve dates first
 	dateValue, err := resolveDate(strPath, rc.calculationDate)

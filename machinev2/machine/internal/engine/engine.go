@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"maps"
-
 	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
@@ -22,7 +20,6 @@ import (
 
 // RulesEngine evaluates business rules
 type RulesEngine struct {
-	logger          logger.Logger
 	Spec            ruleresolver.RuleSpec
 	ServiceName     string
 	Law             string
@@ -38,7 +35,6 @@ type RulesEngine struct {
 
 // NewRulesEngine creates a new rules engine instance
 func NewRulesEngine(
-	logger logger.Logger,
 	spec ruleresolver.RuleSpec,
 	serviceProvider service.ServiceProvider,
 	referenceDate string,
@@ -48,12 +44,7 @@ func NewRulesEngine(
 		panic("invalid reference date")
 	}
 
-	logger = logger.WithName("rules_engine").
-		WithService(spec.Service).
-		WithLaw(spec.Law)
-
 	return &RulesEngine{
-		logger:          logger,
 		Spec:            spec,
 		ServiceProvider: serviceProvider,
 		ServiceName:     spec.Service,
@@ -115,7 +106,7 @@ func buildOutputSpecs(properties ruleresolver.Properties) map[string]model.TypeS
 
 // enforceOutputType enforces type specifications on an output value
 func (re *RulesEngine) enforceOutputType(ctx context.Context, name string, value any) any {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	if spec, exists := re.OutputSpecs[name]; exists {
 		result := typespec.Enforce(spec, value)
@@ -405,7 +396,7 @@ func (re *RulesEngine) Evaluate(
 	requestedOutput string,
 	approved bool,
 ) (model.EvaluateResult, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx).WithName("engine")
 
 	// Check required parameters
 	if re.ParameterSpecs != nil {
@@ -428,19 +419,12 @@ func (re *RulesEngine) Evaluate(
 		claimsList, err := claimManager.GetClaimsByBSN(bsn, approved, true)
 		if err != nil {
 			logr.WithIndent().Warningf("Failed to get claims for BSN %s: %v", bsn, err)
-		} else {
-			// Convert claims list to map indexed by key
-			claims = make(map[string]model.Claim, len(claimsList))
-			for _, claim := range claimsList {
-				claims[claim.Key] = claim
-			}
+		}
 
-			// Also try to get any service/law specific claims
-			if serviceClaims, err := claimManager.GetClaimByBSNServiceLaw(
-				bsn, re.ServiceName, re.Law, approved, true); err == nil && serviceClaims != nil {
-				// Add service-specific claims to the map
-				maps.Copy(claims, serviceClaims)
-			}
+		// Convert claims list to map indexed by key
+		claims = make(map[string]model.Claim, len(claimsList))
+		for _, claim := range claimsList {
+			claims[claim.Key] = claim
 		}
 	}
 
@@ -458,7 +442,6 @@ func (re *RulesEngine) Evaluate(
 
 	// Create context
 	ruleCtx := contexter.NewRuleContext(
-		logr,
 		re.Definitions,
 		re.ServiceProvider,
 		parameters,
@@ -542,7 +525,7 @@ func (re *RulesEngine) evaluateAction(
 	ruleCtx *contexter.RuleContext,
 	overwriteInput map[string]map[string]any,
 ) (model.EvaluateActionResult, string, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	var result any
 
@@ -669,7 +652,7 @@ func (re *RulesEngine) evaluateRequirements(
 	requirements []ruleresolver.Requirement,
 	ruleCtx *contexter.RuleContext,
 ) (bool, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	if len(requirements) == 0 {
 		logr.WithIndent().Debugf("No requirements found")
@@ -867,7 +850,7 @@ func (re *RulesEngine) evaluateForeach(
 	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	if operation.Combine == nil {
 		return nil, fmt.Errorf("combine operation not specified for FOREACH")
@@ -1045,7 +1028,7 @@ func convertToFloat(v any) (float64, error) {
 
 // evaluateAggregateOps evaluates aggregate operations
 func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, values []any) any {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	// Filter out nil values
 	filteredValues := make([]any, 0, len(values))
@@ -1212,7 +1195,7 @@ func (re *RulesEngine) evaluateAggregateOps(ctx context.Context, op string, valu
 
 // evaluateComparison evaluates comparison operations
 func (re *RulesEngine) evaluateComparison(ctx context.Context, op string, left, right any) (bool, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	// Handle date comparisons
 	leftTime, leftIsTime := left.(time.Time)
@@ -1280,7 +1263,7 @@ func (re *RulesEngine) evaluateComparison(ctx context.Context, op string, left, 
 
 // evaluateDateOperation evaluates date-specific operations
 func (re *RulesEngine) evaluateDateOperation(ctx context.Context, op string, values []any, unit string) (int, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	if op != "SUBTRACT_DATE" {
 		return 0, fmt.Errorf("unknown date operation: %s", op)
@@ -1364,7 +1347,7 @@ func (re *RulesEngine) evaluateOperation(
 	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
-	logr := re.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	// Direct value assignment - no operation needed
 	if operation.Value != nil && operation.Operation == nil {

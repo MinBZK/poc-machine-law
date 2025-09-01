@@ -219,12 +219,12 @@ func (s *Services) Evaluate(
 		referenceDate = s.RootReferenceDate
 	}
 
-	if s.ldvEnabled {
-		spec, err := s.RuleResolver.GetRuleSpec(law, referenceDate, service)
-		if err != nil {
-			return nil, fmt.Errorf("get rule spec: %w", err)
-		}
+	spec, err := s.RuleResolver.GetRuleSpec(law, referenceDate, service)
+	if err != nil {
+		return nil, fmt.Errorf("get rule spec: %w", err)
+	}
 
+	if s.ldvEnabled {
 		ctx, span = tracer.Action(ctx, s.tracer,
 			fmt.Sprintf("uri://%s.example/activities/evaluate-do", strings.ToLower(s.GetOrganizationName())),
 			tracer.SetAttributeBSN(parameters["BSN"].(string)),
@@ -234,6 +234,13 @@ func (s *Services) Evaluate(
 
 		defer span.End()
 	}
+
+	ctx = logger.WithLogger(ctx,
+		logger.FromContext(ctx).
+			WithName("serviceprovider").
+			WithService(spec.Service).
+			WithLaw(spec.Law),
+	)
 
 	result, err := s.evaluate(ctx, service, law, parameters, referenceDate, overwriteInput, requestedOutput, approved)
 	if err != nil {
@@ -273,7 +280,7 @@ func (s *Services) evaluate(
 	var result *model.RuleResult
 	var err error
 
-	logr := s.logger.WithContext(ctx)
+	logr := logger.FromContext(ctx)
 
 	// TODO add double line into logger
 	err = logr.IndentBlock(

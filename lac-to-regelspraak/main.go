@@ -241,8 +241,8 @@ func toActionConditionRequirement(v any) *ActionConditionRequirement {
 	case ActionConditionRequirement:
 		return &i
 	default:
-		return nil
 		panic(fmt.Sprintf("unsupported type: %s", i))
+		return nil
 	}
 }
 

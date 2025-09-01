@@ -87,7 +87,7 @@ func (l *PropertySpecSourceResolver) Resolve(ctx context.Context, key string) (*
 		resolved.Details.TypeSpec = spec.GetBase().TypeSpec.ToMap()
 	}
 
-	logger.FromContext(ctx).Debugf("Resolving from SOURCE %v: %v", sourceRef.Table, value)
+	logger.FromContext(ctx).WithName("resolver").Debugf("Resolving from SOURCE %v: %v", sourceRef.Table, value)
 
 	return resolved, true
 

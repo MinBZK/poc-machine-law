@@ -35,7 +35,7 @@ func NewExternalClaimResolver(endpoint string, propertySpec map[string]ruleresol
 
 // Resolve implements Resolver.
 func (c *ExternalClaimResolver) Resolve(ctx context.Context, key string, table string, field string, filters Filters) (*resolver.Resolved, bool) {
-	logr := logger.FromContext(ctx)
+	logr := logger.FromContext(ctx).WithName("resolver")
 	logr = logr.WithField("resolver", "external_claim")
 
 	value, err := c.resolver.do(ctx, key, table, field, filters)
