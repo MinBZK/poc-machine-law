@@ -4,18 +4,18 @@ import (
 	"context"
 
 	eh "github.com/looplab/eventhorizon"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 )
 
 var _ eh.EventHandler = &Executor{}
 
 // Executor is a simple event handler for logging all events.
 type Transaction struct {
-	logger   logging.Logger
+	logger   logger.Logger
 	handlers []eh.EventHandler
 }
 
-func NewTransaction(logger logging.Logger, handlers ...eh.EventHandler) *Transaction {
+func NewTransaction(logger logger.Logger, handlers ...eh.EventHandler) *Transaction {
 	return &Transaction{
 		logger:   logger,
 		handlers: handlers,

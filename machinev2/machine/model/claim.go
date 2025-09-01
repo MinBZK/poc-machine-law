@@ -44,6 +44,30 @@ type Claim struct {
 	RejectedAt      *time.Time  `json:"rejected_at,omitempty"`
 }
 
+type ClaimRejection struct {
+	By     string
+	Reason string
+}
+
+type ClaimVerification struct {
+	By    string
+	Value any
+}
+
+type ClaimCreate struct {
+	Service      string
+	Law          string
+	Key          string
+	OldValue     any
+	NewValue     any
+	Reason       string
+	Claimant     string
+	BSN          string
+	CaseID       *uuid.UUID
+	EvidencePath string
+	AutoApprove  bool
+}
+
 // NewClaim creates a new Claim
 func NewClaim(
 	service string,

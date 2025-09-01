@@ -9,27 +9,27 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/oapi-codegen/runtime/types"
 
-	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice/httpservice/api"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/trace"
 )
 
 type HTTPService struct {
-	logger         logging.Logger
+	logger         logger.Logger
 	service        string
 	client         *api.ClientWithResponses
-	services       contexter.ServiceProvider
+	services       service.ServiceProvider
 	svcresolver    serviceresolver.ServiceSpec
 	standaloneMode bool
 }
 
-func New(logger logging.Logger, service string, services contexter.ServiceProvider, svcresolver serviceresolver.ServiceSpec) (*HTTPService, error) {
-	logger.Warningf(context.Background(), "creating http ruleservice: %s @ %s", service, svcresolver.Endpoint)
+func New(logger logger.Logger, service string, services service.ServiceProvider, svcresolver serviceresolver.ServiceSpec) (*HTTPService, error) {
+	logger.Warningf("creating http ruleservice: %s @ %s", service, svcresolver.Endpoint)
 
 	retryClient := retryablehttp.NewClient()
 	retryClient.RetryMax = 10
@@ -71,7 +71,7 @@ func (h *HTTPService) Evaluate(
 		return nil, fmt.Errorf("reference date parse: %w", err)
 	}
 
-	h.logger.Debugf(ctx, "sending evaluate to: %s", h.svcresolver.Name)
+	h.logger.Debugf("sending evaluate to: %s", h.svcresolver.Name)
 
 	body := api.EvaluateJSONRequestBody{
 		Data: api.Evaluate{
@@ -109,7 +109,7 @@ func (h *HTTPService) Evaluate(
 		RulespecUUID:    resp.JSON201.Data.RulespecId,
 	}
 
-	h.logger.Debugf(ctx, "evaluate done: %#+v", rs)
+	h.logger.Debugf("evaluate done: %#+v", rs)
 
 	return rs, nil
 }
@@ -165,11 +165,6 @@ func toPathNode(pathNode api.PathNode) *model.PathNode {
 		resolveType = *pathNode.ResolveType
 	}
 
-	var result any
-	if pathNode.Result != nil {
-		result = *pathNode.Result
-	}
-
 	var required bool
 	if pathNode.Required != nil {
 		required = *pathNode.Required
@@ -191,7 +186,7 @@ func toPathNode(pathNode api.PathNode) *model.PathNode {
 		Name:        pathNode.Name,
 		Required:    required,
 		ResolveType: resolveType,
-		Result:      result,
+		Result:      pathNode.Result,
 		Type:        pathNode.Type,
 	}
 }
