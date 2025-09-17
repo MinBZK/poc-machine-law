@@ -329,6 +329,31 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
+
+            # Get law metadata to provide context
+            law_metadata = {}
+            try:
+                reference_date = arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d"))
+                rule_spec = machine_service.get_rule_spec(
+                    law=arguments["law"],
+                    reference_date=reference_date,
+                    service=arguments["service"]
+                )
+                law_metadata = {
+                    "name": rule_spec.get("name", arguments["law"]),
+                    "description": rule_spec.get("description", ""),
+                    "service": rule_spec.get("service", arguments["service"]),
+                    "law_type": rule_spec.get("law_type", ""),
+                    "legal_character": rule_spec.get("legal_character", "")
+                }
+            except Exception as e:
+                logger.warning(f"Could not get law metadata: {e}")
+                law_metadata = {
+                    "name": arguments["law"],
+                    "description": f"Law: {arguments['law']}",
+                    "service": arguments["service"]
+                }
+
             # Return both human-readable content and structured data
             result_data = {
                 "success": True,
@@ -338,6 +363,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                     "input": result.input,
                     "rulespec_uuid": result.rulespec_uuid,
                     "missing_required": result.missing_required,
+                    "law_metadata": law_metadata
                 },
             }
             return {

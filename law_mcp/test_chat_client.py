@@ -22,8 +22,8 @@ async def test_mcp_connection():
 
     try:
         await client.initialize()
-        print(f"\n✅ Successfully connected to MCP server!")
-        print(f"📋 Available tools:")
+        print("\n✅ Successfully connected to MCP server!")
+        print("📋 Available tools:")
 
         for tool in client.available_tools:
             print(f"   • {tool['name']}: {tool['description']}")

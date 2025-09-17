@@ -37,7 +37,7 @@ async def test_mcp_response():
             }
         )
 
-        print(f"\n📤 Returned text content:")
+        print("\n📤 Returned text content:")
         print(response)
 
     except Exception as e:

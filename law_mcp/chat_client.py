@@ -18,7 +18,7 @@ import asyncio
 import json
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 import anthropic
 from fastmcp.client import Client
@@ -62,14 +62,14 @@ class MCPChatClient:
             print(f"   Make sure the server is running on {self.mcp_url}")
             sys.exit(1)
 
-    async def call_mcp_tool(self, tool_name: str, arguments: Dict[str, Any]) -> str:
+    async def call_mcp_tool(self, tool_name: str, arguments: dict[str, Any]) -> str:
         """Call an MCP tool and return the result as a string"""
         try:
             print(f"🔧 Calling MCP tool: {tool_name} with {arguments}")
             result = await self.mcp_client.call_tool(tool_name, arguments=arguments)
 
             # Print the complete MCP response for debugging
-            print(f"\n📋 Complete MCP Response:")
+            print("\n📋 Complete MCP Response:")
             print(f"   Type: {type(result)}")
 
             if hasattr(result, 'content'):
@@ -91,7 +91,7 @@ class MCPChatClient:
                 if result.structured_content:
                     print(f"   Structured content: {json.dumps(result.structured_content, indent=2)}")
             else:
-                print(f"   No structured_content attribute found")
+                print("   No structured_content attribute found")
 
             print(f"   All attributes: {[attr for attr in dir(result) if not attr.startswith('_')]}")
             print("-" * 60)
@@ -110,7 +110,7 @@ class MCPChatClient:
             print(f"❌ Error calling {tool_name}: {str(e)}")
             return f"Error calling {tool_name}: {str(e)}"
 
-    def create_claude_tools(self) -> List[Dict[str, Any]]:
+    def create_claude_tools(self) -> list[dict[str, Any]]:
         """Convert MCP tools to Claude-compatible format"""
         claude_tools = []
 
