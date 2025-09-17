@@ -5,8 +5,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, Response
 from sse_starlette import EventSourceResponse
 
 from law_mcp.prompt_templates import PROMPT_TEMPLATES
@@ -107,9 +106,175 @@ async def handle_rpc(request: Request):
         }
 
 
+@router.post("/")
+@router.get("/")
+async def mcp_streamable_endpoint(request: Request):
+    """MCP Streamable HTTP endpoint (2025 specification)."""
+
+    # Security: Validate Origin header to prevent DNS rebinding attacks
+    origin = request.headers.get("origin")
+    if origin and not origin.startswith(("http://localhost", "http://127.0.0.1", "https://localhost")):
+        return {"error": "Invalid origin", "status": 403}
+
+    # Check Accept header
+    accept_header = request.headers.get("accept", "")
+    wants_sse = "text/event-stream" in accept_header
+    wants_json = "application/json" in accept_header
+
+    if request.method == "GET":
+        # GET method: Open SSE stream for server-to-client messages
+        if not wants_sse:
+            return {"error": "GET requires Accept: text/event-stream", "status": 400}
+
+        async def event_generator():
+            session_id = manager.create_session()
+
+            try:
+                # Keep connection alive - MCP client will send POST requests
+                # This stream is for server-initiated messages only
+                while True:
+                    # Check if request was disconnected
+                    if await request.is_disconnected():
+                        break
+                    await asyncio.sleep(60)  # Keep connection alive
+
+            except asyncio.CancelledError:
+                pass
+            finally:
+                manager.cleanup_session(session_id)
+
+        return EventSourceResponse(event_generator())
+
+    elif request.method == "POST":
+        # POST method: Handle JSON-RPC messages
+        try:
+            data = await request.json()
+            machine_service = get_machine_service()
+
+            # Handle both single messages and batched messages
+            if isinstance(data, list):
+                # Batch request
+                results = []
+                for msg in data:
+                    result = await handle_jsonrpc_message(msg, machine_service)
+                    if result:  # Only add non-None results (notifications return None)
+                        results.append(result)
+
+                # Return SSE stream if client accepts it, otherwise JSON
+                if wants_sse and not wants_json:
+                    return await stream_batch_responses(results)
+                else:
+                    return results if results else Response(status_code=202)
+            else:
+                # Single request
+                result = await handle_jsonrpc_message(data, machine_service)
+
+                # Return SSE stream if client accepts it, otherwise JSON
+                if wants_sse and not wants_json:
+                    return await stream_single_response(result)
+                else:
+                    return result if result else Response(status_code=202)
+
+        except Exception as e:
+            logger.error(f"Error handling MCP request: {e}")
+            error_response = {
+                "jsonrpc": "2.0",
+                "error": {"code": -32603, "message": str(e)},
+                "id": data.get("id") if "data" in locals() else None,
+            }
+
+            if wants_sse and not wants_json:
+                return await stream_single_response(error_response)
+            else:
+                return error_response
+
+
+async def handle_jsonrpc_message(data: dict, machine_service) -> dict | None:
+    """Handle a single JSON-RPC message."""
+    method = data.get("method")
+    params = data.get("params", {})
+    request_id = data.get("id")
+
+    # Notifications don't have an id and don't expect a response
+    is_notification = request_id is None
+
+    try:
+        if method == "initialize":
+            result = {
+                "protocolVersion": "2025-03-26",
+                "capabilities": {
+                    "tools": {"listChanged": False},
+                    "resources": {"subscribe": False, "listChanged": False},
+                    "prompts": {"listChanged": False},
+                    "logging": {},
+                    "experimental": {},
+                },
+                "serverInfo": {"name": "machine-law-executor", "version": "0.1.0"},
+            }
+        elif method == "tools/list":
+            result = await list_tools()
+        elif method == "tools/call":
+            result = await call_tool(machine_service, params)
+        elif method == "resources/list":
+            result = await list_resources(machine_service)
+        elif method == "resources/read":
+            result = await read_resource(machine_service, params)
+        elif method == "prompts/list":
+            result = await list_prompts()
+        elif method == "prompts/get":
+            result = await get_prompt(params)
+        else:
+            if is_notification:
+                return None  # Unknown notifications are ignored
+            return {
+                "jsonrpc": "2.0",
+                "error": {"code": -32601, "message": f"Method not found: {method}"},
+                "id": request_id,
+            }
+
+        # Don't send response for notifications
+        if is_notification:
+            return None
+
+        return {"jsonrpc": "2.0", "result": result, "id": request_id}
+
+    except Exception as e:
+        logger.error(f"Error handling method {method}: {e}")
+        if is_notification:
+            return None
+        return {
+            "jsonrpc": "2.0",
+            "error": {"code": -32603, "message": str(e)},
+            "id": request_id,
+        }
+
+
+async def stream_single_response(response: dict | None):
+    """Stream a single response via SSE."""
+    if response is None:
+        return Response(status_code=202)  # No content for notifications
+
+    async def event_generator():
+        yield {"id": "1", "event": "message", "data": json.dumps(response)}
+
+    return EventSourceResponse(event_generator())
+
+
+async def stream_batch_responses(responses: list[dict]):
+    """Stream batch responses via SSE."""
+    if not responses:
+        return Response(status_code=202)
+
+    async def event_generator():
+        for i, response in enumerate(responses, 1):
+            yield {"id": str(i), "event": "message", "data": json.dumps(response)}
+
+    return EventSourceResponse(event_generator())
+
+
 @router.get("/sse")
 async def mcp_sse_endpoint(request: Request):
-    """SSE endpoint for MCP communication (future enhancement)"""
+    """Legacy SSE endpoint for backwards compatibility"""
 
     async def event_generator():
         session_id = manager.create_session()
@@ -143,252 +308,6 @@ async def mcp_sse_endpoint(request: Request):
     return EventSourceResponse(event_generator())
 
 
-# MCP Streamable HTTP endpoint (2025 spec compatible)
-@router.post("/")
-@router.get("/")
-async def mcp_streamable_endpoint(request: Request):
-    """
-    MCP Streamable HTTP endpoint compatible with 2025 specification.
-
-    Supports both GET (for SSE streaming) and POST (for JSON-RPC requests).
-    Single endpoint design as per latest MCP spec.
-    """
-    session_id = str(uuid.uuid4())
-
-    if request.method == "GET":
-        # Handle GET request - return SSE stream for server-initiated communication
-        accept_header = request.headers.get("accept", "")
-
-        if "text/event-stream" not in accept_header:
-            raise HTTPException(status_code=405, detail="Method Not Allowed")
-
-        async def event_generator():
-            try:
-                # Send initial capabilities
-                capabilities = {
-                    "tools": list(TOOL_SCHEMAS.keys()),
-                    "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{parameter}"],
-                    "prompts": list(PROMPT_TEMPLATES.keys()),
-                }
-
-                yield {
-                    "event": "mcp.initialize",
-                    "data": json.dumps(
-                        {
-                            "jsonrpc": "2.0",
-                            "method": "initialize",
-                            "params": {
-                                "protocolVersion": "2025-03-26",
-                                "capabilities": capabilities,
-                                "serverInfo": {"name": "machine-law-executor", "version": "1.0.0"},
-                            },
-                            "id": f"init-{session_id}",
-                        }
-                    ),
-                }
-
-                # Keep connection alive
-                while True:
-                    await asyncio.sleep(30)
-                    yield {"event": "heartbeat", "data": json.dumps({"timestamp": datetime.now().isoformat()})}
-
-            except asyncio.CancelledError:
-                pass
-
-        response = EventSourceResponse(event_generator())
-        response.headers["Mcp-Session-Id"] = session_id
-        return response
-
-    elif request.method == "POST":
-        # Handle POST request - process JSON-RPC messages
-        accept_header = request.headers.get("accept", "")
-        content_type = request.headers.get("content-type", "")
-
-        if "application/json" not in content_type:
-            raise HTTPException(status_code=400, detail="Content-Type must be application/json")
-
-        try:
-            body = await request.json()
-        except Exception:
-            raise HTTPException(status_code=400, detail="Invalid JSON")
-
-        # Process JSON-RPC request(s)
-        if isinstance(body, list):
-            # Batch request - respond with SSE stream
-            async def batch_event_generator():
-                for rpc_request in body:
-                    result = await process_mcp_request(rpc_request)
-                    yield {"event": "mcp.response", "data": json.dumps(result)}
-
-            response = EventSourceResponse(batch_event_generator())
-            response.headers["Mcp-Session-Id"] = session_id
-            return response
-
-        else:
-            # Single request - can respond with JSON or SSE
-            result = await process_mcp_request(body)
-
-            if "text/event-stream" in accept_header:
-                # Client accepts streaming - use SSE
-                async def single_event_generator():
-                    yield {"event": "mcp.response", "data": json.dumps(result)}
-
-                response = EventSourceResponse(single_event_generator())
-                response.headers["Mcp-Session-Id"] = session_id
-                return response
-            else:
-                # Standard JSON response
-                response = JSONResponse(result)
-                response.headers["Mcp-Session-Id"] = session_id
-                return response
-
-
-async def process_mcp_request(rpc_request: dict) -> dict:
-    """Process a single MCP JSON-RPC request"""
-    try:
-        method = rpc_request.get("method")
-        params = rpc_request.get("params", {})
-        request_id = rpc_request.get("id")
-
-        if method == "tools/list":
-            return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": list(TOOL_SCHEMAS.values())}}
-
-        elif method == "tools/call":
-            # Use existing tool call logic
-            from web.dependencies import get_machine_service
-
-            machine_service = get_machine_service()
-
-            tool_result = await call_tool_mcp_compatible(params, machine_service)
-
-            return {"jsonrpc": "2.0", "id": request_id, "result": tool_result}
-
-        elif method == "resources/list":
-            return {
-                "jsonrpc": "2.0",
-                "id": request_id,
-                "result": {
-                    "resources": [
-                        {"uri": "laws://list", "name": "Available Laws", "description": "List of all discoverable laws"}
-                    ]
-                },
-            }
-
-        elif method == "resources/read":
-            uri = params.get("uri")
-            if uri == "laws://list":
-                from web.dependencies import get_machine_service
-
-                machine_service = get_machine_service()
-
-                # Get both citizen and business laws
-                available_laws = []
-                try:
-                    citizen_laws = machine_service.get_discoverable_service_laws("CITIZEN")
-                    for service, law_list in citizen_laws.items():
-                        for law in law_list:
-                            available_laws.append(
-                                {"service": service, "law": law, "type": "CITIZEN", "parameter_type": "BSN"}
-                            )
-                except Exception as e:
-                    logger.warning(f"Could not get citizen laws: {e}")
-
-                try:
-                    business_laws = machine_service.get_discoverable_service_laws("BUSINESS")
-                    for service, law_list in business_laws.items():
-                        for law in law_list:
-                            available_laws.append(
-                                {"service": service, "law": law, "type": "BUSINESS", "parameter_type": "KVK_NUMMER"}
-                            )
-                except Exception as e:
-                    logger.warning(f"Could not get business laws: {e}")
-
-                return {
-                    "jsonrpc": "2.0",
-                    "id": request_id,
-                    "result": {
-                        "contents": [
-                            {
-                                "uri": uri,
-                                "mimeType": "application/json",
-                                "text": json.dumps(
-                                    {"available_laws": available_laws, "total_count": len(available_laws)}, indent=2
-                                ),
-                            }
-                        ]
-                    },
-                }
-            else:
-                return {"jsonrpc": "2.0", "id": request_id, "error": {"code": -32602, "message": "Resource not found"}}
-
-        else:
-            return {"jsonrpc": "2.0", "id": request_id, "error": {"code": -32601, "message": "Method not found"}}
-
-    except Exception as e:
-        logger.error(f"MCP request processing error: {e}")
-        return {
-            "jsonrpc": "2.0",
-            "id": rpc_request.get("id"),
-            "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
-        }
-
-
-async def call_tool_mcp_compatible(params: dict, machine_service) -> dict:
-    """Call tool in MCP-compatible format"""
-    tool_name = params.get("name")
-    arguments = params.get("arguments", {})
-
-    try:
-        if tool_name == "execute_law":
-            result = machine_service.evaluate(
-                service=arguments["service"],
-                law=arguments["law"],
-                parameters=arguments["parameters"],
-                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
-            )
-            return {
-                "content": [
-                    {
-                        "type": "application/json",
-                        "data": {
-                            "output": result.output,
-                            "requirements_met": result.requirements_met,
-                            "input": result.input,
-                            "rulespec_uuid": result.rulespec_uuid,
-                            "missing_required": result.missing_required,
-                        },
-                    }
-                ]
-            }
-
-        elif tool_name == "check_eligibility":
-            result = machine_service.evaluate(
-                service=arguments["service"],
-                law=arguments["law"],
-                parameters=arguments["parameters"],
-                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
-            )
-            return {"content": [{"type": "text", "text": f"Eligible: {result.requirements_met}"}]}
-
-        elif tool_name == "calculate_benefit_amount":
-            result = machine_service.evaluate(
-                service=arguments["service"],
-                law=arguments["law"],
-                parameters=arguments["parameters"],
-                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
-                requested_output=arguments["output_field"],
-            )
-            output_field = arguments["output_field"]
-            amount = result.output.get(output_field, "Not available")
-            return {"content": [{"type": "text", "text": f"Amount: {amount}"}]}
-        else:
-            raise ValueError(f"Unknown tool: {tool_name}")
-
-    except Exception as e:
-        logger.error(f"Tool call failed: {e}")
-        raise
-
-
 # Tool handlers
 async def list_tools():
     """List available MCP tools"""
@@ -409,18 +328,24 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
-            # Return the result object directly as JSON
+            # Return the result as JSON text (MCP standard)
+            import json
+
+            result_data = {
+                "success": True,
+                "data": {
+                    "output": result.output,
+                    "requirements_met": result.requirements_met,
+                    "input": result.input,
+                    "rulespec_uuid": result.rulespec_uuid,
+                    "missing_required": result.missing_required,
+                },
+            }
             return {
                 "content": [
                     {
-                        "type": "application/json",
-                        "data": {
-                            "output": result.output,
-                            "requirements_met": result.requirements_met,
-                            "input": result.input,
-                            "rulespec_uuid": result.rulespec_uuid,
-                            "missing_required": result.missing_required,
-                        },
+                        "type": "text",
+                        "text": json.dumps(result_data, indent=2),
                     }
                 ]
             }
