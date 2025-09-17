@@ -29,6 +29,7 @@ class SecurityConfig:
 @dataclass
 class PerformanceConfig:
     """Performance configuration"""
+
     enable_lazy_loading: bool = True
     connection_timeout: float = 30.0
     execution_timeout: float = 120.0

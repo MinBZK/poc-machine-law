@@ -73,8 +73,6 @@ def format_eligibility_response(eligible: bool, arguments: dict[str, Any]) -> di
     return add_common_metadata({"eligible": eligible}, arguments)
 
 
-
-
 def format_execution_response(result, arguments: dict[str, Any]) -> dict[str, Any]:
     """Format law execution response with all fields"""
     data = {

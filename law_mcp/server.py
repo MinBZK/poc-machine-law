@@ -104,8 +104,6 @@ async def _handle_calculate_benefit_amount(args: dict[str, Any]) -> dict[str, An
     return format_benefit_response(amount, args)
 
 
-
-
 # =============================================================================
 # RESOURCES - Clean resource handling
 # =============================================================================

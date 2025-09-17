@@ -230,7 +230,6 @@ class LawEngineAdapter:
             logger.error(f"Failed to get available laws: {e}")
             raise
 
-
     async def check_eligibility(self, bsn: str, service: str, law: str, reference_date: str | None = None) -> bool:
         """Check if a person is eligible for a specific benefit/law"""
         try:
