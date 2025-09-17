@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
 from web.engines import EngineInterface
 from web.feature_flags import is_chat_enabled, is_wallet_enabled
-from web.routers import admin, chat, edit, importer, laws, simulation, wallet
+from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
 
 app = FastAPI(title="Burger.nl")
 
@@ -35,6 +35,7 @@ app.include_router(admin.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
 app.include_router(importer.router)
+app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 
