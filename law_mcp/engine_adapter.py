@@ -59,19 +59,19 @@ class LawEngineAdapter:
 
     async def execute_law(
         self,
-        bsn: str,
         service: str,
         law: str,
+        parameters: dict[str, Any],
         reference_date: str | None = None,
         overrides: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
     ) -> LawExecutionResult:
-        """Execute a law for a specific person"""
+        """Execute a law with generic parameters"""
         try:
-            # Validate BSN
-            if not validate_bsn(bsn):
-                raise BSNValidationError(bsn)
+            # Validate parameters - check for BSN if present for backward compatibility
+            if "BSN" in parameters and not validate_bsn(parameters["BSN"]):
+                raise BSNValidationError(parameters["BSN"])
 
             # Use current date if no reference date provided
             if reference_date is None:
@@ -84,7 +84,7 @@ class LawEngineAdapter:
             # Check cache first
             cache_key = generate_cache_key(
                 "law_execution",
-                bsn=bsn,
+                parameters=parameters,
                 service=service,
                 law=law,
                 reference_date=reference_date,
@@ -99,7 +99,9 @@ class LawEngineAdapter:
                     logger.debug(f"Cache hit for law execution: {service}.{law}")
                     return cached_result
 
-            logger.info(f"Executing law {service}.{law} for BSN {bsn} on {reference_date}")
+            # Create log message based on available parameters
+            param_info = ", ".join([f"{k}={v}" for k, v in parameters.items()])
+            logger.info(f"Executing law {service}.{law} with parameters ({param_info}) on {reference_date}")
 
             # Get the rule service
             rule_service = self._get_rule_service(service)
@@ -109,15 +111,15 @@ class LawEngineAdapter:
             if not spec:
                 raise LawNotFoundError(service, law)
 
-            # Execute the rule
-            parameters = {"BSN": bsn}
+            # Execute the rule with provided parameters
+            execution_parameters = dict(parameters)
             if overrides:
-                parameters.update(overrides)
+                execution_parameters.update(overrides)
 
             result = rule_service.evaluate(
                 law=law,
                 reference_date=reference_date,
-                parameters=parameters,
+                parameters=execution_parameters,
                 overwrite_input=overrides,
                 requested_output=requested_output,
                 approved=approved,
@@ -150,7 +152,8 @@ class LawEngineAdapter:
         except Exception as e:
             if not isinstance(e, BSNValidationError | LawNotFoundError | ServiceNotFoundError):
                 e = LawExecutionError(service, law, str(e))
-            logger.error(f"Failed to execute law {service}.{law} for BSN {bsn}: {e}")
+            param_info = ", ".join([f"{k}={v}" for k, v in parameters.items()])
+            logger.error(f"Failed to execute law {service}.{law} with parameters ({param_info}): {e}")
             raise e
 
     def get_law_specification(self, service: str, law: str, reference_date: str | None = None) -> LawSpec:
@@ -201,10 +204,20 @@ class LawEngineAdapter:
         try:
             laws = []
 
-            # Get discoverable laws from rule resolver
-            discoverable_laws = self.rule_resolver.get_discoverable_service_laws(
-                "CITIZEN" if discoverable_only else None
-            )
+            if discoverable_only:
+                # Get both CITIZEN and BUSINESS discoverable laws
+                citizen_laws = self.rule_resolver.get_discoverable_service_laws("CITIZEN")
+                business_laws = self.rule_resolver.get_discoverable_service_laws("BUSINESS")
+
+                # Merge the two dictionaries
+                discoverable_laws = {}
+                for service, law_list in citizen_laws.items():
+                    discoverable_laws.setdefault(service, []).extend(law_list)
+                for service, law_list in business_laws.items():
+                    discoverable_laws.setdefault(service, []).extend(law_list)
+            else:
+                # Get all laws
+                discoverable_laws = self.rule_resolver.get_discoverable_service_laws(None)
 
             for service in discoverable_laws:
                 for law in discoverable_laws[service]:
@@ -230,21 +243,24 @@ class LawEngineAdapter:
             logger.error(f"Failed to get available laws: {e}")
             raise
 
-    async def check_eligibility(self, bsn: str, service: str, law: str, reference_date: str | None = None) -> bool:
-        """Check if a person is eligible for a specific benefit/law"""
+    async def check_eligibility(
+        self, service: str, law: str, parameters: dict[str, Any], reference_date: str | None = None
+    ) -> bool:
+        """Check if someone is eligible for a specific benefit/law"""
         try:
-            result = await self.execute_law(bsn, service, law, reference_date)
+            result = await self.execute_law(service, law, parameters, reference_date)
             return result.requirements_met and not result.missing_required
         except Exception as e:
-            logger.error(f"Failed to check eligibility for {service}.{law} for BSN {bsn}: {e}")
+            param_info = ", ".join([f"{k}={v}" for k, v in parameters.items()])
+            logger.error(f"Failed to check eligibility for {service}.{law} with parameters ({param_info}): {e}")
             return False
 
     async def calculate_benefit_amount(
-        self, bsn: str, service: str, law: str, output_field: str, reference_date: str | None = None
+        self, service: str, law: str, parameters: dict[str, Any], output_field: str, reference_date: str | None = None
     ) -> float | None:
-        """Calculate a specific benefit amount for a person"""
+        """Calculate a specific benefit amount for someone"""
         try:
-            result = await self.execute_law(bsn, service, law, reference_date, requested_output=output_field)
+            result = await self.execute_law(service, law, parameters, reference_date, requested_output=output_field)
 
             if output_field in result.output:
                 value = result.output[output_field]
@@ -254,7 +270,10 @@ class LawEngineAdapter:
             return None
 
         except Exception as e:
-            logger.error(f"Failed to calculate benefit amount for {service}.{law}.{output_field} for BSN {bsn}: {e}")
+            param_info = ", ".join([f"{k}={v}" for k, v in parameters.items()])
+            logger.error(
+                f"Failed to calculate benefit amount for {service}.{law}.{output_field} with parameters ({param_info}): {e}"
+            )
             return None
 
     def cleanup(self) -> None:

@@ -73,9 +73,9 @@ async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextCon
 async def _handle_execute_law(args: dict[str, Any]) -> dict[str, Any]:
     """Handle law execution with clean parameter extraction"""
     result = await law_engine.execute_law(
-        bsn=args["bsn"],
         service=args["service"],
         law=args["law"],
+        parameters=args["parameters"],
         reference_date=args.get("reference_date"),
         overrides=args.get("overrides"),
         requested_output=args.get("requested_output"),
@@ -87,7 +87,10 @@ async def _handle_execute_law(args: dict[str, Any]) -> dict[str, Any]:
 async def _handle_check_eligibility(args: dict[str, Any]) -> dict[str, Any]:
     """Handle eligibility checking"""
     eligible = await law_engine.check_eligibility(
-        bsn=args["bsn"], service=args["service"], law=args["law"], reference_date=args.get("reference_date")
+        service=args["service"],
+        law=args["law"],
+        parameters=args["parameters"],
+        reference_date=args.get("reference_date"),
     )
     return format_eligibility_response(eligible, args)
 
@@ -95,9 +98,9 @@ async def _handle_check_eligibility(args: dict[str, Any]) -> dict[str, Any]:
 async def _handle_calculate_benefit_amount(args: dict[str, Any]) -> dict[str, Any]:
     """Handle benefit amount calculation"""
     amount = await law_engine.calculate_benefit_amount(
-        bsn=args["bsn"],
         service=args["service"],
         law=args["law"],
+        parameters=args["parameters"],
         output_field=args["output_field"],
         reference_date=args.get("reference_date"),
     )

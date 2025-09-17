@@ -101,7 +101,7 @@ async def demonstrate_mcp_server():
         print("-" * 50)
 
         eligibility_result = await session.call_tool(
-            "check_eligibility", {"bsn": "123456782", "service": "TOESLAGEN", "law": "zorgtoeslagwet"}
+            "check_eligibility", {"parameters": {"BSN": "123456782"}, "service": "TOESLAGEN", "law": "zorgtoeslagwet"}
         )
         eligibility_data = json.loads(eligibility_result.content[0].text)
 
@@ -117,7 +117,12 @@ async def demonstrate_mcp_server():
 
         execution_result = await session.call_tool(
             "execute_law",
-            {"bsn": "123456782", "service": "TOESLAGEN", "law": "zorgtoeslagwet", "reference_date": "2024-01-01"},
+            {
+                "parameters": {"BSN": "123456782"},
+                "service": "TOESLAGEN",
+                "law": "zorgtoeslagwet",
+                "reference_date": "2024-01-01",
+            },
         )
         execution_data = json.loads(execution_result.content[0].text)
 
@@ -146,7 +151,12 @@ async def demonstrate_mcp_server():
 
         benefit_result = await session.call_tool(
             "calculate_benefit_amount",
-            {"bsn": "123456782", "service": "TOESLAGEN", "law": "zorgtoeslagwet", "output_field": "hoogte_toeslag"},
+            {
+                "parameters": {"BSN": "123456782"},
+                "service": "TOESLAGEN",
+                "law": "zorgtoeslagwet",
+                "output_field": "hoogte_toeslag",
+            },
         )
         benefit_data = json.loads(benefit_result.content[0].text)
 
@@ -155,8 +165,28 @@ async def demonstrate_mcp_server():
             formatted_amount = benefit_data["data"].get("formatted_amount")
             print(f"Zorgtoeslag monthly amount: {formatted_amount or f'€{amount:.2f}' if amount else 'Not available'}")
 
-        # Scenario 8: Using prompts for guided analysis
-        print("\n💬 SCENARIO 8: Generating Guided Analysis Prompt")
+        # Scenario 8: Testing WPM law with KvK nummer (Business law)
+        print("\n🏢 SCENARIO 8: Testing WPM Business Law")
+        print("-" * 50)
+
+        try:
+            wpm_result = await session.call_tool(
+                "check_eligibility", {"parameters": {"kvk-nummer": "12345678"}, "service": "RVO", "law": "wpm"}
+            )
+            wpm_data = json.loads(wpm_result.content[0].text)
+
+            print("WPM law execution test:")
+            if wpm_data.get("success"):
+                eligible = wpm_data["data"]["eligible"]
+                status = "✅ ELIGIBLE" if eligible else "❌ NOT ELIGIBLE"
+                print(f"  WPM eligibility for KvK 12345678: {status}")
+            else:
+                print(f"  ❌ WPM test failed: {wpm_data.get('error', 'Unknown error')}")
+        except Exception as e:
+            print(f"  ⚠️  WPM test error: {str(e)}")
+
+        # Scenario 9: Using prompts for guided analysis
+        print("\n💬 SCENARIO 9: Generating Guided Analysis Prompt")
         print("-" * 50)
 
         prompt_result = await session.get_prompt("check_all_benefits", {"bsn": "123456782", "include_details": "true"})

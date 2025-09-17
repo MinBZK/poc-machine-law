@@ -18,9 +18,22 @@ law_mcp/
 ## Key Design Principles
 
 - **Law-Agnostic**: No hardcoded law logic, only generic protocol handling
+- **Parameter-Agnostic**: Supports any parameter type (BSN, kvk-nummer, or custom parameters)
 - **Thin Layer**: Minimal code that delegates to the core law engine
 - **Clean Separation**: Mock data isolated from business logic
 - **Extensible**: New laws work automatically without code changes
+- **Backward Compatible**: Existing BSN-based integrations continue to work
+
+## Major Updates (v2.0)
+
+🎉 **Generic Parameter Support**: The MCP server now supports any parameter type:
+- ✅ **Citizen Laws**: Use `BSN` parameter for individual citizens
+- ✅ **Business Laws**: Use `kvk-nummer` parameter for business entities
+- ✅ **Custom Laws**: Use any parameter combination your law requires
+- ✅ **Mixed Parameters**: Combine multiple identifiers in a single call
+- ✅ **Backward Compatible**: All existing BSN-based calls continue to work
+
+🏢 **Business Law Support**: New discoverable business laws like WPM are now fully supported and appear in law discovery.
 
 ## Usage
 
@@ -77,9 +90,9 @@ https://ui.lac.apps.digilab.network/mcp/
 ## Available Capabilities
 
 ### Tools (3)
-- `execute_law` - Execute laws with parameters and overrides
-- `check_eligibility` - Quick eligibility checking
-- `calculate_benefit_amount` - Calculate specific outputs
+- `execute_law` - Execute laws with generic parameters (BSN for citizens, kvk-nummer for businesses, etc.)
+- `check_eligibility` - Quick eligibility checking for any law type
+- `calculate_benefit_amount` - Calculate specific outputs for any parameter type
 
 ### Resources (3)
 - `laws://list` - Browse available laws
@@ -121,7 +134,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
 
 **Response:** Returns detailed tool schemas with required parameters and descriptions.
 
-### Example 3: Check Zorgtoeslag Eligibility
+### Example 3: Check Zorgtoeslag Eligibility (Citizen Law)
 ```bash
 curl -s -X POST http://localhost:8000/mcp/rpc \
   -H "Content-Type: application/json" \
@@ -131,9 +144,9 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
     "params": {
       "name": "check_eligibility",
       "arguments": {
-        "bsn": "100000001",
         "service": "TOESLAGEN",
-        "law": "zorgtoeslagwet"
+        "law": "zorgtoeslagwet",
+        "parameters": {"BSN": "100000001"}
       }
     },
     "id": 2
@@ -161,9 +174,9 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
     "params": {
       "name": "execute_law",
       "arguments": {
-        "bsn": "100000001",
         "service": "TOESLAGEN",
-        "law": "zorgtoeslagwet"
+        "law": "zorgtoeslagwet",
+        "parameters": {"BSN": "100000001"}
       }
     },
     "id": 3
@@ -186,9 +199,9 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
     "params": {
       "name": "calculate_benefit_amount",
       "arguments": {
-        "bsn": "100000001",
         "service": "TOESLAGEN",
         "law": "zorgtoeslagwet",
+        "parameters": {"BSN": "100000001"},
         "output_field": "hoogte_toeslag"
       }
     },
@@ -251,9 +264,9 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
     "params": {
       "name": "check_eligibility",
       "arguments": {
-        "bsn": "100000001",
         "service": "SVB",
-        "law": "algemene_ouderdomswet"
+        "law": "algemene_ouderdomswet",
+        "parameters": {"BSN": "100000001"}
       }
     },
     "id": 7
@@ -270,9 +283,9 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
     "params": {
       "name": "check_eligibility",
       "arguments": {
-        "bsn": "100000001",
         "service": "GEMEENTE_AMSTERDAM",
-        "law": "participatiewet/bijstand"
+        "law": "participatiewet/bijstand",
+        "parameters": {"BSN": "100000001"}
       }
     },
     "id": 8
@@ -289,20 +302,110 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
     "params": {
       "name": "execute_law",
       "arguments": {
-        "bsn": "100000001",
         "service": "KIESRAAD",
-        "law": "kieswet"
+        "law": "kieswet",
+        "parameters": {"BSN": "100000001"}
       }
     },
     "id": 9
   }' | jq
 ```
 
-## Available Test BSNs
+### Example 11: Check WPM Business Law (NEW!)
+```bash
+curl -s -X POST http://localhost:8000/mcp/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "check_eligibility",
+      "arguments": {
+        "service": "RVO",
+        "law": "wpm",
+        "parameters": {"kvk-nummer": "12345678"}
+      }
+    },
+    "id": 10
+  }' | jq
+```
 
+**Response:**
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "content": [{"type": "text", "text": "Eligible: false"}]
+  },
+  "id": 10
+}
+```
+
+### Example 12: Execute WPM Law with Full Details (NEW!)
+```bash
+curl -s -X POST http://localhost:8000/mcp/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "execute_law",
+      "arguments": {
+        "service": "RVO",
+        "law": "wpm",
+        "parameters": {"kvk-nummer": "12345678"}
+      }
+    },
+    "id": 11
+  }' | jq
+```
+
+## Available Test Data
+
+### Test BSNs (Citizen Laws)
 The following BSNs have complete test data:
 - `100000001` - ZZP'er in thuiszorg, alleenstaande ouder (€1,550/month income)
 - `123456782` - Basic profile for testing (may have limited data)
+
+### Test KvK Numbers (Business Laws)
+The following KvK numbers can be used for business law testing:
+- `12345678` - Basic test business registration
+- `87654321` - Alternative test business registration
+
+## Parameter System
+
+The MCP server now supports **generic parameters** for maximum flexibility:
+
+### Citizen Laws (use BSN)
+```json
+{
+  "service": "TOESLAGEN",
+  "law": "zorgtoeslagwet",
+  "parameters": {"BSN": "100000001"}
+}
+```
+
+### Business Laws (use kvk-nummer)
+```json
+{
+  "service": "RVO",
+  "law": "wpm",
+  "parameters": {"kvk-nummer": "12345678"}
+}
+```
+
+### Mixed Parameters (if law requires multiple identifiers)
+```json
+{
+  "service": "EXAMPLE",
+  "law": "mixed_law",
+  "parameters": {
+    "BSN": "100000001",
+    "kvk-nummer": "12345678",
+    "other_param": "value"
+  }
+}
+```
 
 ## Mock Data
 
