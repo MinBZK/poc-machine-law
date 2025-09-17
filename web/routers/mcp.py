@@ -318,6 +318,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
     """Execute a tool call"""
     tool_name = params.get("name")
     arguments = params.get("arguments", {})
+    logger.info(f"call_tool called with tool: {tool_name}, args: {arguments}")
 
     try:
         if tool_name == "execute_law":
@@ -328,9 +329,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
-            # Return the result as JSON text (MCP standard)
-            import json
-
+            # Return both human-readable content and structured data
             result_data = {
                 "success": True,
                 "data": {
@@ -345,9 +344,10 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 "content": [
                     {
                         "type": "text",
-                        "text": json.dumps(result_data, indent=2),
+                        "text": f"Law execution completed. Requirements met: {result.requirements_met}",
                     }
-                ]
+                ],
+                "structured_content": result_data
             }
 
         elif tool_name == "check_eligibility":
@@ -360,7 +360,14 @@ async def call_tool(machine_service, params: dict[str, Any]):
             )
             # Check if requirements are met
             eligible = result.requirements_met
-            return {"content": [{"type": "text", "text": f"Eligible: {eligible}"}]}
+            return {
+                "content": [{"type": "text", "text": f"Eligible: {eligible}"}],
+                "structured_content": {
+                    "eligible": eligible,
+                    "requirements_met": result.requirements_met,
+                    "missing_required": result.missing_required
+                }
+            }
 
         elif tool_name == "calculate_benefit_amount":
             # Calculate benefit amount using machine service
@@ -374,7 +381,15 @@ async def call_tool(machine_service, params: dict[str, Any]):
             # Extract the requested output field
             output_field = arguments["output_field"]
             amount = result.output.get(output_field, "Not available")
-            return {"content": [{"type": "text", "text": f"Amount: {amount}"}]}
+            return {
+                "content": [{"type": "text", "text": f"Amount: {amount}"}],
+                "structured_content": {
+                    "amount": amount,
+                    "output_field": output_field,
+                    "full_output": result.output,
+                    "requirements_met": result.requirements_met
+                }
+            }
 
         else:
             raise ValueError(f"Unknown tool: {tool_name}")
