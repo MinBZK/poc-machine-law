@@ -55,8 +55,8 @@ async def health_check():
         "capabilities": {
             "tools": ["execute_law", "check_eligibility", "calculate_benefit_amount"],
             "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{bsn}"],
-            "prompts": ["check_all_benefits", "explain_calculation", "compare_scenarios"]
-        }
+            "prompts": ["check_all_benefits", "explain_calculation", "compare_scenarios"],
+        },
     }
 
 
@@ -90,21 +90,17 @@ async def handle_rpc(request: Request):
             return {
                 "jsonrpc": "2.0",
                 "error": {"code": -32601, "message": f"Method not found: {method}"},
-                "id": request_id
+                "id": request_id,
             }
 
-        return {
-            "jsonrpc": "2.0",
-            "result": result,
-            "id": request_id
-        }
+        return {"jsonrpc": "2.0", "result": result, "id": request_id}
 
     except Exception as e:
         logger.error(f"Error handling RPC request: {e}")
         return {
             "jsonrpc": "2.0",
             "error": {"code": -32603, "message": str(e)},
-            "id": data.get("id") if 'data' in locals() else None
+            "id": data.get("id") if "data" in locals() else None,
         }
 
 
@@ -119,23 +115,22 @@ async def mcp_sse_endpoint(request: Request):
             # Send initial connection event
             yield {
                 "event": "connected",
-                "data": json.dumps({
-                    "session_id": session_id,
-                    "capabilities": {
-                        "tools": ["execute_law", "check_eligibility", "calculate_benefit_amount"],
-                        "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{bsn}"],
-                        "prompts": ["check_all_benefits", "explain_calculation", "compare_scenarios"]
+                "data": json.dumps(
+                    {
+                        "session_id": session_id,
+                        "capabilities": {
+                            "tools": ["execute_law", "check_eligibility", "calculate_benefit_amount"],
+                            "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{bsn}"],
+                            "prompts": ["check_all_benefits", "explain_calculation", "compare_scenarios"],
+                        },
                     }
-                })
+                ),
             }
 
             # Keep connection alive (for future streaming capabilities)
             while True:
                 await asyncio.sleep(30)  # Send heartbeat every 30 seconds
-                yield {
-                    "event": "heartbeat",
-                    "data": json.dumps({"timestamp": asyncio.get_event_loop().time()})
-                }
+                yield {"event": "heartbeat", "data": json.dumps({"timestamp": asyncio.get_event_loop().time()})}
 
         except asyncio.CancelledError:
             pass
@@ -160,10 +155,10 @@ async def list_tools():
                         "service": {"type": "string", "description": "Service provider code"},
                         "law": {"type": "string", "description": "Law identifier"},
                         "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
-                        "parameters": {"type": "object", "description": "Additional parameters"}
+                        "parameters": {"type": "object", "description": "Additional parameters"},
                     },
-                    "required": ["bsn", "service", "law"]
-                }
+                    "required": ["bsn", "service", "law"],
+                },
             },
             {
                 "name": "check_eligibility",
@@ -174,10 +169,10 @@ async def list_tools():
                         "bsn": {"type": "string", "description": "BSN van de persoon"},
                         "service": {"type": "string", "description": "Service provider code"},
                         "law": {"type": "string", "description": "Law identifier"},
-                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"}
+                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
                     },
-                    "required": ["bsn", "service", "law"]
-                }
+                    "required": ["bsn", "service", "law"],
+                },
             },
             {
                 "name": "calculate_benefit_amount",
@@ -189,11 +184,11 @@ async def list_tools():
                         "service": {"type": "string", "description": "Service provider code"},
                         "law": {"type": "string", "description": "Law identifier"},
                         "output_field": {"type": "string", "description": "Output field to calculate"},
-                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"}
+                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
                     },
-                    "required": ["bsn", "service", "law", "output_field"]
-                }
-            }
+                    "required": ["bsn", "service", "law", "output_field"],
+                },
+            },
         ]
     }
 
@@ -210,7 +205,7 @@ async def call_tool(machine_service, params: Dict[str, Any]):
                 service=arguments["service"],
                 law=arguments["law"],
                 parameters={"BSN": arguments["bsn"]},
-                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d"))
+                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
             return {"content": [{"type": "text", "text": json.dumps(result.__dict__, indent=2, default=str)}]}
 
@@ -220,7 +215,7 @@ async def call_tool(machine_service, params: Dict[str, Any]):
                 service=arguments["service"],
                 law=arguments["law"],
                 parameters={"BSN": arguments["bsn"]},
-                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d"))
+                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
             # Check if requirements are met
             eligible = result.requirements_met
@@ -233,7 +228,7 @@ async def call_tool(machine_service, params: Dict[str, Any]):
                 law=arguments["law"],
                 parameters={"BSN": arguments["bsn"]},
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
-                requested_output=arguments["output_field"]
+                requested_output=arguments["output_field"],
             )
             # Extract the requested output field
             output_field = arguments["output_field"]
@@ -255,20 +250,20 @@ async def list_resources(machine_service):
                 "uri": "laws://list",
                 "name": "Available Laws",
                 "description": "List of all available laws and regulations",
-                "mimeType": "application/json"
+                "mimeType": "application/json",
             },
             {
                 "uri": "law://{service}/{law}/spec",
                 "name": "Law Specification",
                 "description": "Detailed specification for a specific law",
-                "mimeType": "application/json"
+                "mimeType": "application/json",
             },
             {
                 "uri": "profile://{bsn}",
                 "name": "Citizen Profile",
                 "description": "Profile data for a specific citizen",
-                "mimeType": "application/json"
-            }
+                "mimeType": "application/json",
+            },
         ]
     }
 
@@ -281,13 +276,7 @@ async def read_resource(machine_service, params: Dict[str, Any]):
         if uri == "laws://list":
             # Get available laws from machine service
             laws = machine_service.get_sorted_discoverable_service_laws("123456782")
-            return {
-                "contents": [{
-                    "uri": uri,
-                    "mimeType": "application/json",
-                    "text": json.dumps(laws, indent=2)
-                }]
-            }
+            return {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(laws, indent=2)}]}
         elif uri.startswith("law://"):
             # Parse law://{service}/{law}/spec
             parts = uri.replace("law://", "").split("/")
@@ -295,24 +284,12 @@ async def read_resource(machine_service, params: Dict[str, Any]):
                 service, law = parts[0], parts[1]
                 # Get basic law info - this is a simplified implementation
                 spec = {"service": service, "law": law, "description": f"Specification for {service}.{law}"}
-                return {
-                    "contents": [{
-                        "uri": uri,
-                        "mimeType": "application/json",
-                        "text": json.dumps(spec, indent=2)
-                    }]
-                }
+                return {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(spec, indent=2)}]}
         elif uri.startswith("profile://"):
             # Parse profile://{bsn}
             bsn = uri.replace("profile://", "")
             profile = machine_service.get_profile_data(bsn)
-            return {
-                "contents": [{
-                    "uri": uri,
-                    "mimeType": "application/json",
-                    "text": json.dumps(profile, indent=2)
-                }]
-            }
+            return {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(profile, indent=2)}]}
         else:
             raise ValueError(f"Unknown resource URI: {uri}")
 
@@ -327,25 +304,23 @@ async def list_prompts():
             {
                 "name": "check_all_benefits",
                 "description": "Check all benefits for BSN 123456782",
-                "arguments": [
-                    {"name": "bsn", "description": "BSN van de persoon", "required": True}
-                ]
+                "arguments": [{"name": "bsn", "description": "BSN van de persoon", "required": True}],
             },
             {
                 "name": "explain_calculation",
                 "description": "Explain calculation",
                 "arguments": [
                     {"name": "service", "description": "Service provider code", "required": True},
-                    {"name": "law", "description": "Law identifier", "required": True}
-                ]
+                    {"name": "law", "description": "Law identifier", "required": True},
+                ],
             },
             {
                 "name": "compare_scenarios",
                 "description": "Compare scenarios",
                 "arguments": [
                     {"name": "scenarios", "description": "List of scenarios to compare (JSON)", "required": True}
-                ]
-            }
+                ],
+            },
         ]
     }
 
@@ -362,10 +337,7 @@ async def get_prompt(params: Dict[str, Any]):
         "messages": [
             {
                 "role": "user",
-                "content": {
-                    "type": "text",
-                    "text": f"Execute {name} with arguments: {json.dumps(arguments)}"
-                }
+                "content": {"type": "text", "text": f"Execute {name} with arguments: {json.dumps(arguments)}"},
             }
-        ]
+        ],
     }
