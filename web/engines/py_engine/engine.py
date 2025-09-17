@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from machine.service import Services
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
-from .services.profiles import get_all_profiles, get_profile_data, get_business_data
+from .services.profiles import get_all_profiles, get_business_data, get_profile_data
 
 
 class PythonMachineService(EngineInterface):
