@@ -159,7 +159,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
             result = machine_service.evaluate(
                 service=arguments["service"],
                 law=arguments["law"],
-                parameters={"BSN": arguments["bsn"]},
+                parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
             return {"content": [{"type": "text", "text": json.dumps(result.__dict__, indent=2, default=str)}]}
@@ -169,7 +169,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
             result = machine_service.evaluate(
                 service=arguments["service"],
                 law=arguments["law"],
-                parameters={"BSN": arguments["bsn"]},
+                parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
             # Check if requirements are met
@@ -181,7 +181,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
             result = machine_service.evaluate(
                 service=arguments["service"],
                 law=arguments["law"],
-                parameters={"BSN": arguments["bsn"]},
+                parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
                 requested_output=arguments["output_field"],
             )
@@ -194,6 +194,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
             raise ValueError(f"Unknown tool: {tool_name}")
 
     except Exception as e:
+        logger.error(f"Tool call failed: {e}")
         return {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "isError": True}
 
 
@@ -229,9 +230,47 @@ async def read_resource(machine_service, params: dict[str, Any]):
 
     try:
         if uri == "laws://list":
-            # Get available laws from machine service
-            laws = machine_service.get_sorted_discoverable_service_laws("123456782")
-            return {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(laws, indent=2)}]}
+            # Get available laws from machine service - include both citizen and business laws
+            available_laws = []
+
+            # Get citizen laws
+            try:
+                citizen_laws = machine_service.get_discoverable_service_laws("CITIZEN")
+                for service, law_list in citizen_laws.items():
+                    for law in law_list:
+                        available_laws.append(
+                            {
+                                "service": service,
+                                "law": law,
+                                "discoverable": True,
+                                "name": law.replace("_", " ").title(),
+                                "description": f"Citizen law {law} managed by {service}",
+                            }
+                        )
+            except Exception as e:
+                logger.warning(f"Could not get citizen laws: {e}")
+
+            # Get business laws
+            try:
+                business_laws = machine_service.get_discoverable_service_laws("BUSINESS")
+                for service, law_list in business_laws.items():
+                    for law in law_list:
+                        available_laws.append(
+                            {
+                                "service": service,
+                                "law": law,
+                                "discoverable": True,
+                                "name": law.replace("_", " ").title(),
+                                "description": f"Business law {law} managed by {service}",
+                            }
+                        )
+            except Exception as e:
+                logger.warning(f"Could not get business laws: {e}")
+
+            response_data = {"available_laws": available_laws, "total_count": len(available_laws)}
+            return {
+                "contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(response_data, indent=2)}]
+            }
         elif uri.startswith("law://"):
             # Parse law://{service}/{law}/spec
             parts = uri.replace("law://", "").split("/")

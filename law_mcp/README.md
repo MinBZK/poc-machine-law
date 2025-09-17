@@ -30,7 +30,7 @@ law_mcp/
 - ✅ **Citizen Laws**: Use `BSN` parameter for individual citizens
 - ✅ **Business Laws**: Use `kvk-nummer` parameter for business entities
 - ✅ **Custom Laws**: Use any parameter combination your law requires
-- ✅ **Mixed Parameters**: Combine multiple identifiers in a single call
+- ✅ **Custom Parameters**: Support any parameter type (case_id, reference_date, etc.)
 - ✅ **Backward Compatible**: All existing BSN-based calls continue to work
 
 🏢 **Business Law Support**: New discoverable business laws like WPM are now fully supported and appear in law discovery.
@@ -394,15 +394,15 @@ The MCP server now supports **generic parameters** for maximum flexibility:
 }
 ```
 
-### Mixed Parameters (if law requires multiple identifiers)
+### Custom Parameters (for laws with specific requirements)
 ```json
 {
   "service": "EXAMPLE",
-  "law": "mixed_law",
+  "law": "custom_law",
   "parameters": {
-    "BSN": "100000001",
-    "kvk-nummer": "12345678",
-    "other_param": "value"
+    "case_id": "CASE-12345",
+    "reference_date": "2024-01-01",
+    "custom_field": "value"
   }
 }
 ```
