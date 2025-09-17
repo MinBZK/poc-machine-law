@@ -19,7 +19,8 @@ from law_mcp.exceptions import (
     LawNotFoundError,
     ServiceNotFoundError,
 )
-from law_mcp.mock_data import get_mock_profile_data
+
+# Mock data moved to web/engines/py_engine/services/profiles.py
 from law_mcp.models import AvailableLaw, LawExecutionResult, LawSpec, ProfileData
 from law_mcp.utils import get_current_date, sanitize_input, validate_bsn
 from machine.service import Services
@@ -191,7 +192,8 @@ class LawEngineAdapter:
 
             # Use mock data for now
             # In production, this would fetch from RvIG/BRP or other sources
-            profile_data = get_mock_profile_data(bsn)
+            # profile_data = get_mock_profile_data(bsn)  # Mock data moved to profiles.py
+            profile_data = None  # TODO: Use proper mock data or remove this function
 
             return ProfileData(bsn=bsn, data=profile_data)
 

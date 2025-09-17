@@ -1349,6 +1349,73 @@ def get_profile_properties(profile: dict) -> list[str]:
     return properties
 
 
+def get_business_data(kvk_nummer: str) -> dict[str, Any]:
+    """
+    Get mock business data for a KVK nummer.
+    In production, this would fetch from real business registries.
+    """
+    # Create mock business data structure similar to profile data
+    if kvk_nummer == "12345678":
+        return {
+            "kvk_nummer": kvk_nummer,
+            "sources": {
+                "KVK": {
+                    "organisaties": [
+                        {
+                            "kvk_nummer": kvk_nummer,
+                            "aantal_werknemers": 150,
+                            "status": "ACTIEF",
+                            "bedrijfsnaam": "Test Transport BV",
+                            "rechtsvorm": "BV",
+                        }
+                    ]
+                },
+                "RVO": {
+                    "wpm_data": [
+                        {
+                            "kvk_nummer": kvk_nummer,
+                            "woon_werk_auto_benzine": 25000,
+                            "woon_werk_auto_diesel": 18000,
+                            "zakelijk_auto_benzine": 35000,
+                            "zakelijk_auto_diesel": 42000,
+                            "woon_werk_ov": 8000,
+                        }
+                    ]
+                },
+            },
+        }
+
+    # Default mock data for unknown KVK numbers
+    return {
+        "kvk_nummer": kvk_nummer,
+        "sources": {
+            "KVK": {
+                "organisaties": [
+                    {
+                        "kvk_nummer": kvk_nummer,
+                        "aantal_werknemers": 50,  # Below 100 threshold
+                        "status": "ACTIEF",
+                        "bedrijfsnaam": "Mock Bedrijf",
+                        "rechtsvorm": "BV",
+                    }
+                ]
+            },
+            "RVO": {
+                "wpm_data": [
+                    {
+                        "kvk_nummer": kvk_nummer,
+                        "woon_werk_auto_benzine": 0,
+                        "woon_werk_auto_diesel": 0,
+                        "zakelijk_auto_benzine": 0,
+                        "zakelijk_auto_diesel": 0,
+                        "woon_werk_ov": 0,
+                    }
+                ]
+            },
+        },
+    }
+
+
 def get_all_profiles() -> dict[str, dict[str, Any]]:
     """Get all available profiles with properties"""
     profiles = PROFILES.copy()
