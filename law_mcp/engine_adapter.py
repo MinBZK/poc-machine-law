@@ -19,6 +19,7 @@ from law_mcp.exceptions import (
     LawNotFoundError,
     ServiceNotFoundError,
 )
+
 # Mock data moved to web/engines/py_engine/services/profiles.py
 from law_mcp.models import AvailableLaw, LawExecutionResult, LawSpec, ProfileData
 from law_mcp.utils import get_current_date, sanitize_input, validate_bsn

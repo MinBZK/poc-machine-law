@@ -1366,7 +1366,7 @@ def get_business_data(kvk_nummer: str) -> dict[str, Any]:
                             "aantal_werknemers": 150,
                             "status": "ACTIEF",
                             "bedrijfsnaam": "Test Transport BV",
-                            "rechtsvorm": "BV"
+                            "rechtsvorm": "BV",
                         }
                     ]
                 },
@@ -1378,11 +1378,11 @@ def get_business_data(kvk_nummer: str) -> dict[str, Any]:
                             "woon_werk_auto_diesel": 18000,
                             "zakelijk_auto_benzine": 35000,
                             "zakelijk_auto_diesel": 42000,
-                            "woon_werk_ov": 8000
+                            "woon_werk_ov": 8000,
                         }
                     ]
-                }
-            }
+                },
+            },
         }
 
     # Default mock data for unknown KVK numbers
@@ -1396,7 +1396,7 @@ def get_business_data(kvk_nummer: str) -> dict[str, Any]:
                         "aantal_werknemers": 50,  # Below 100 threshold
                         "status": "ACTIEF",
                         "bedrijfsnaam": "Mock Bedrijf",
-                        "rechtsvorm": "BV"
+                        "rechtsvorm": "BV",
                     }
                 ]
             },
@@ -1408,11 +1408,11 @@ def get_business_data(kvk_nummer: str) -> dict[str, Any]:
                         "woon_werk_auto_diesel": 0,
                         "zakelijk_auto_benzine": 0,
                         "zakelijk_auto_diesel": 0,
-                        "woon_werk_ov": 0
+                        "woon_werk_ov": 0,
                     }
                 ]
-            }
-        }
+            },
+        },
     }
 
 

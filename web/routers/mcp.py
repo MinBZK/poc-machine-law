@@ -172,8 +172,8 @@ async def call_tool(machine_service, params: dict[str, Any]):
                             "requirements_met": result.requirements_met,
                             "input": result.input,
                             "rulespec_uuid": result.rulespec_uuid,
-                            "missing_required": result.missing_required
-                        }
+                            "missing_required": result.missing_required,
+                        },
                     }
                 ]
             }
