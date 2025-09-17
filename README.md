@@ -175,6 +175,39 @@ uv run web/main.py
 
 Dit zou een interface hier http://0.0.0.0:8000 en hier http://0.0.0.0:8000/admin op moeten leveren.
 
+### MCP Server (Model Context Protocol)
+
+De applicatie biedt ook een MCP (Model Context Protocol) server die AI agents toegang geeft tot Nederlandse wetgeving:
+
+```bash
+# Start de web server (inclusief MCP endpoint)
+uv run web/main.py
+```
+
+De MCP server is beschikbaar op http://0.0.0.0:8001/mcp/ en ondersteunt:
+
+**🔧 Tools:**
+- `execute_law` - Voer een Nederlandse wet uit voor specifieke parameters
+- `check_eligibility` - Controleer geschiktheid voor uitkeringen/toeslagen
+- `calculate_benefit_amount` - Bereken uitkeringsbedragen
+
+**📚 Resources:**
+- `laws://list` - Lijst van alle beschikbare wetten
+- `law://{service}/{law}/spec` - Specificatie van een specifieke wet
+- `profile://{bsn}` - Burgerprofiel gegevens
+
+**💬 Prompts:**
+- `check_all_benefits` - Controleer alle mogelijke uitkeringen
+- `explain_calculation` - Leg berekeningen uit
+- `compare_scenarios` - Vergelijk verschillende scenario's
+
+**Test de MCP client:**
+```bash
+uv run python law_mcp/test_client.py
+```
+
+De MCP implementatie volgt de 2025-03-26 specificatie en ondersteunt Streamable HTTP transport voor AI agents.
+
 ### Go server starten (backend)
 
 De web interface is geconfigureerd om standaard de Go engine te gebruiken (zie `web/config/config.yaml`). Om de Go server te starten:
