@@ -8,6 +8,8 @@ from typing import Any
 from fastapi import APIRouter, Request
 from sse_starlette import EventSourceResponse
 
+from law_mcp.schemas import TOOL_SCHEMAS
+
 # Import our components
 from web.dependencies import get_machine_service
 
@@ -142,54 +144,7 @@ async def mcp_sse_endpoint(request: Request):
 # Tool handlers
 async def list_tools():
     """List available MCP tools"""
-    return {
-        "tools": [
-            {
-                "name": "execute_law",
-                "description": "Execute a Dutch law for a specific citizen with optional parameter overrides",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "bsn": {"type": "string", "description": "BSN van de persoon"},
-                        "service": {"type": "string", "description": "Service provider code"},
-                        "law": {"type": "string", "description": "Law identifier"},
-                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
-                        "parameters": {"type": "object", "description": "Additional parameters"},
-                    },
-                    "required": ["bsn", "service", "law"],
-                },
-            },
-            {
-                "name": "check_eligibility",
-                "description": "Check if a citizen is eligible for a specific benefit or law",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "bsn": {"type": "string", "description": "BSN van de persoon"},
-                        "service": {"type": "string", "description": "Service provider code"},
-                        "law": {"type": "string", "description": "Law identifier"},
-                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
-                    },
-                    "required": ["bsn", "service", "law"],
-                },
-            },
-            {
-                "name": "calculate_benefit_amount",
-                "description": "Calculate a specific benefit amount for a citizen",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "bsn": {"type": "string", "description": "BSN van de persoon"},
-                        "service": {"type": "string", "description": "Service provider code"},
-                        "law": {"type": "string", "description": "Law identifier"},
-                        "output_field": {"type": "string", "description": "Output field to calculate"},
-                        "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
-                    },
-                    "required": ["bsn", "service", "law", "output_field"],
-                },
-            },
-        ]
-    }
+    return {"tools": list(TOOL_SCHEMAS.values())}
 
 
 async def call_tool(machine_service, params: dict[str, Any]):

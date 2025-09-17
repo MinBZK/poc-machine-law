@@ -5,13 +5,26 @@ Schema definitions for MCP tools - DRY principle applied
 from typing import Any
 
 # Base schema components - reusable building blocks
-BSN_FIELD = {"type": "string", "description": "Dutch citizen identifier (BSN)"}
+BSN_FIELD = {"type": "string", "description": "Dutch citizen identifier (BSN)", "examples": ["100000001", "123456782"]}
 
-SERVICE_FIELD = {"type": "string", "description": "Service provider code (e.g., TOESLAGEN)"}
+SERVICE_FIELD = {
+    "type": "string",
+    "description": "Service provider code (e.g., TOESLAGEN)",
+    "examples": ["TOESLAGEN", "SVB", "GEMEENTE_AMSTERDAM", "KIESRAAD"],
+}
 
-LAW_FIELD = {"type": "string", "description": "Law identifier (e.g., zorgtoeslagwet)"}
+LAW_FIELD = {
+    "type": "string",
+    "description": "Law identifier (e.g., zorgtoeslagwet)",
+    "examples": ["zorgtoeslagwet", "algemene_ouderdomswet", "participatiewet/bijstand", "kieswet"],
+}
 
-REFERENCE_DATE_FIELD = {"type": "string", "description": "Reference date (YYYY-MM-DD)", "format": "date"}
+REFERENCE_DATE_FIELD = {
+    "type": "string",
+    "description": "Reference date (YYYY-MM-DD)",
+    "format": "date",
+    "examples": ["2024-01-01", "2024-12-31"],
+}
 
 # Base law execution schema
 BASE_LAW_SCHEMA = {
@@ -55,9 +68,22 @@ TOOL_SCHEMAS = {
         "execute_law",
         "Execute a Dutch law for a specific citizen with optional parameter overrides",
         {
-            "overrides": {"type": "object", "description": "Parameter overrides"},
-            "requested_output": {"type": "string", "description": "Specific output field to calculate"},
-            "approved": {"type": "boolean", "description": "Whether this is for an approved claim", "default": False},
+            "overrides": {
+                "type": "object",
+                "description": "Parameter overrides",
+                "examples": [{"inkomen": 25000}, {"woonsituatie": "alleenstaand"}],
+            },
+            "requested_output": {
+                "type": "string",
+                "description": "Specific output field to calculate",
+                "examples": ["hoogte_toeslag", "is_verzekerde_zorgtoeslag", "uitkering_bedrag"],
+            },
+            "approved": {
+                "type": "boolean",
+                "description": "Whether this is for an approved claim",
+                "default": False,
+                "examples": [True, False],
+            },
         },
     ),
     "check_eligibility": create_tool_schema(
@@ -66,7 +92,13 @@ TOOL_SCHEMAS = {
     "calculate_benefit_amount": create_tool_schema(
         "calculate_benefit_amount",
         "Calculate a specific benefit amount for a citizen",
-        {"output_field": {"type": "string", "description": "Output field to calculate"}},
+        {
+            "output_field": {
+                "type": "string",
+                "description": "Output field to calculate",
+                "examples": ["hoogte_toeslag", "uitkering_bedrag", "pensioen_bedrag"],
+            }
+        },
         ["output_field"],
     ),
 }
