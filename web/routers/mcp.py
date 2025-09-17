@@ -207,12 +207,9 @@ async def handle_jsonrpc_message(data: dict, machine_service) -> dict | None:
                     "resources": {"subscribe": False, "listChanged": False},
                     "prompts": {"listChanged": False},
                     "logging": {},
-                    "experimental": {}
+                    "experimental": {},
                 },
-                "serverInfo": {
-                    "name": "machine-law-executor",
-                    "version": "0.1.0"
-                }
+                "serverInfo": {"name": "machine-law-executor", "version": "0.1.0"},
             }
         elif method == "tools/list":
             result = await list_tools()
@@ -258,11 +255,7 @@ async def stream_single_response(response: dict | None):
         return Response(status_code=202)  # No content for notifications
 
     async def event_generator():
-        yield {
-            "id": "1",
-            "event": "message",
-            "data": json.dumps(response)
-        }
+        yield {"id": "1", "event": "message", "data": json.dumps(response)}
 
     return EventSourceResponse(event_generator())
 
@@ -274,11 +267,7 @@ async def stream_batch_responses(responses: list[dict]):
 
     async def event_generator():
         for i, response in enumerate(responses, 1):
-            yield {
-                "id": str(i),
-                "event": "message",
-                "data": json.dumps(response)
-            }
+            yield {"id": str(i), "event": "message", "data": json.dumps(response)}
 
     return EventSourceResponse(event_generator())
 
@@ -343,6 +332,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
             )
             # Return the result as JSON text (MCP standard)
             import json
+
             result_data = {
                 "success": True,
                 "data": {
@@ -351,7 +341,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                     "input": result.input,
                     "rulespec_uuid": result.rulespec_uuid,
                     "missing_required": result.missing_required,
-                }
+                },
             }
             return {
                 "content": [

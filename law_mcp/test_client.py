@@ -12,8 +12,11 @@ Requirements:
     - MCP server running on http://localhost:8001/mcp/
     - FastMCP client library
 """
+
 import asyncio
+
 from fastmcp.client import Client
+
 
 async def test_fastmcp_client():
     """Test using FastMCP client against our MCP server"""
@@ -33,29 +36,27 @@ async def test_fastmcp_client():
         # Call execute_law tool
         print("\n2️⃣ Executing WPM law...")
         result = await client.call_tool(
-            "execute_law",
-            arguments={
-                "service": "RVO",
-                "law": "wpm",
-                "parameters": {"KVK_NUMMER": "12345678"}
-            }
+            "execute_law", arguments={"service": "RVO", "law": "wpm", "parameters": {"KVK_NUMMER": "12345678"}}
         )
 
         print(f"   Tool call result: {len(result.content)} content items")
         for content in result.content:
-            if hasattr(content, 'text'):
+            if hasattr(content, "text"):
                 import json
+
                 try:
                     parsed_data = json.loads(content.text)
                     print(f"   Success: {parsed_data.get('success')}")
-                    if parsed_data.get('success'):
-                        data = parsed_data['data']
+                    if parsed_data.get("success"):
+                        data = parsed_data["data"]
                         print(f"   WPM Requirements Met: {data.get('requirements_met')}")
                         print(f"   Employees: {data.get('output', {}).get('aantal_werknemers')}")
                 except json.JSONDecodeError:
                     print(f"   Text: {content.text[:100]}...")
-            elif hasattr(content, 'data'):
-                print(f"   Data keys: {list(content.data.keys()) if isinstance(content.data, dict) else type(content.data)}")
+            elif hasattr(content, "data"):
+                print(
+                    f"   Data keys: {list(content.data.keys()) if isinstance(content.data, dict) else type(content.data)}"
+                )
 
         # List resources
         print("\n3️⃣ Listing resources...")
@@ -71,8 +72,9 @@ async def test_fastmcp_client():
 
         # Parse the resource content
         for content in resource_content:
-            if hasattr(content, 'text'):
+            if hasattr(content, "text"):
                 import json
+
                 try:
                     laws_data = json.loads(content.text)
                     total = laws_data.get("total_count", 0)
@@ -83,6 +85,7 @@ async def test_fastmcp_client():
                     print(f"   Raw text: {content.text[:100]}...")
 
         print("\n✅ FastMCP client test completed successfully!")
+
 
 if __name__ == "__main__":
     asyncio.run(test_fastmcp_client())
