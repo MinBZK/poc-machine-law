@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from machine.service import Services
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
-from .services.profiles import get_all_profiles, get_profile_data
+from .services.profiles import get_all_profiles, get_profile_data, get_business_data
 
 
 class PythonMachineService(EngineInterface):
@@ -58,9 +58,11 @@ class PythonMachineService(EngineInterface):
         if not rule_spec:
             raise HTTPException(status_code=400, detail="Invalid law specified")
 
-        # Only set profile data if BSN parameter is provided (for citizen laws)
+        # Load profile/business data based on parameter type
         if "BSN" in parameters:
             self.set_profile_data(parameters["BSN"])
+        elif "KVK_NUMMER" in parameters:
+            self.set_business_data(parameters["KVK_NUMMER"])
 
         result = self.services.evaluate(
             service=service,
@@ -133,6 +135,24 @@ class PythonMachineService(EngineInterface):
 
         # Load source data into services
         for service_name, tables in profile_data["sources"].items():
+            for table_name, data in tables.items():
+                df = pd.DataFrame(data)
+                self.set_source_dataframe(service_name, table_name, df)
+
+    def set_business_data(self, kvk_nummer: str) -> None:
+        """
+        Load business data for a KVK nummer into the machine service.
+
+        Args:
+            kvk_nummer: KVK nummer identifier for the business
+        """
+        # Get business data for the KVK nummer
+        business_data = get_business_data(kvk_nummer)
+        if not business_data:
+            raise HTTPException(status_code=404, detail="Business not found")
+
+        # Load source data into services
+        for service_name, tables in business_data["sources"].items():
             for table_name, data in tables.items():
                 df = pd.DataFrame(data)
                 self.set_source_dataframe(service_name, table_name, df)

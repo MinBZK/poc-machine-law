@@ -162,7 +162,21 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
-            return {"content": [{"type": "text", "text": json.dumps(result.__dict__, indent=2, default=str)}]}
+            # Return the result object directly as JSON
+            return {
+                "content": [
+                    {
+                        "type": "application/json",
+                        "data": {
+                            "output": result.output,
+                            "requirements_met": result.requirements_met,
+                            "input": result.input,
+                            "rulespec_uuid": result.rulespec_uuid,
+                            "missing_required": result.missing_required
+                        }
+                    }
+                ]
+            }
 
         elif tool_name == "check_eligibility":
             # Check eligibility using machine service
