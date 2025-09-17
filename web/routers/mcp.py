@@ -3,10 +3,9 @@ import json
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
-from fastapi import APIRouter, Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Request
 from sse_starlette import EventSourceResponse
 
 # Import our components
@@ -21,7 +20,7 @@ class MCPConnectionManager:
     """Manages active MCP connections for HTTP/SSE transport"""
 
     def __init__(self):
-        self.active_sessions: Dict[str, Dict[str, Any]] = {}
+        self.active_sessions: dict[str, dict[str, Any]] = {}
 
     def create_session(self) -> str:
         """Create a new MCP session"""
@@ -31,7 +30,7 @@ class MCPConnectionManager:
         }
         return session_id
 
-    def get_session(self, session_id: str) -> Dict[str, Any] | None:
+    def get_session(self, session_id: str) -> dict[str, Any] | None:
         """Get an existing session"""
         return self.active_sessions.get(session_id)
 
@@ -193,7 +192,7 @@ async def list_tools():
     }
 
 
-async def call_tool(machine_service, params: Dict[str, Any]):
+async def call_tool(machine_service, params: dict[str, Any]):
     """Execute a tool call"""
     tool_name = params.get("name")
     arguments = params.get("arguments", {})
@@ -268,7 +267,7 @@ async def list_resources(machine_service):
     }
 
 
-async def read_resource(machine_service, params: Dict[str, Any]):
+async def read_resource(machine_service, params: dict[str, Any]):
     """Read a specific resource"""
     uri = params.get("uri", "")
 
@@ -325,7 +324,7 @@ async def list_prompts():
     }
 
 
-async def get_prompt(params: Dict[str, Any]):
+async def get_prompt(params: dict[str, Any]):
     """Get a specific prompt"""
     name = params.get("name")
     arguments = params.get("arguments", {})
