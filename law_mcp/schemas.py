@@ -5,18 +5,16 @@ Schema definitions for MCP tools - DRY principle applied
 from typing import Any
 
 # Base schema components - reusable building blocks
-BSN_FIELD = {"type": "string", "description": "Dutch citizen identifier (BSN)", "examples": ["100000001", "123456782"]}
-
 SERVICE_FIELD = {
     "type": "string",
-    "description": "Service provider code (e.g., TOESLAGEN)",
-    "examples": ["TOESLAGEN", "SVB", "GEMEENTE_AMSTERDAM", "KIESRAAD"],
+    "description": "Service provider code (e.g., TOESLAGEN, RVO)",
+    "examples": ["TOESLAGEN", "SVB", "GEMEENTE_AMSTERDAM", "KIESRAAD", "RVO"],
 }
 
 LAW_FIELD = {
     "type": "string",
-    "description": "Law identifier (e.g., zorgtoeslagwet)",
-    "examples": ["zorgtoeslagwet", "algemene_ouderdomswet", "participatiewet/bijstand", "kieswet"],
+    "description": "Law identifier (e.g., zorgtoeslagwet, wpm)",
+    "examples": ["zorgtoeslagwet", "algemene_ouderdomswet", "participatiewet/bijstand", "kieswet", "wpm"],
 }
 
 REFERENCE_DATE_FIELD = {
@@ -26,16 +24,27 @@ REFERENCE_DATE_FIELD = {
     "examples": ["2024-01-01", "2024-12-31"],
 }
 
+PARAMETERS_FIELD = {
+    "type": "object",
+    "description": "Parameters required by the law (e.g., BSN for citizen laws, kvk-nummer for business laws)",
+    "examples": [
+        {"BSN": "100000001"},
+        {"kvk-nummer": "12345678"},
+        {"BSN": "100000001", "inkomen": 25000},
+    ],
+    "additionalProperties": True,
+}
+
 # Base law execution schema
 BASE_LAW_SCHEMA = {
     "type": "object",
     "properties": {
-        "bsn": BSN_FIELD,
         "service": SERVICE_FIELD,
         "law": LAW_FIELD,
+        "parameters": PARAMETERS_FIELD,
         "reference_date": REFERENCE_DATE_FIELD,
     },
-    "required": ["bsn", "service", "law"],
+    "required": ["service", "law", "parameters"],
 }
 
 
