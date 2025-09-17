@@ -167,38 +167,30 @@ async def mcp_streamable_endpoint(request: Request):
                 # Send initial capabilities
                 capabilities = {
                     "tools": list(TOOL_SCHEMAS.keys()),
-                    "resources": [
-                        "laws://list",
-                        "law://{service}/{law}/spec",
-                        "profile://{parameter}"
-                    ],
-                    "prompts": list(PROMPT_TEMPLATES.keys())
+                    "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{parameter}"],
+                    "prompts": list(PROMPT_TEMPLATES.keys()),
                 }
 
                 yield {
                     "event": "mcp.initialize",
-                    "data": json.dumps({
-                        "jsonrpc": "2.0",
-                        "method": "initialize",
-                        "params": {
-                            "protocolVersion": "2025-03-26",
-                            "capabilities": capabilities,
-                            "serverInfo": {
-                                "name": "machine-law-executor",
-                                "version": "1.0.0"
-                            }
-                        },
-                        "id": f"init-{session_id}"
-                    })
+                    "data": json.dumps(
+                        {
+                            "jsonrpc": "2.0",
+                            "method": "initialize",
+                            "params": {
+                                "protocolVersion": "2025-03-26",
+                                "capabilities": capabilities,
+                                "serverInfo": {"name": "machine-law-executor", "version": "1.0.0"},
+                            },
+                            "id": f"init-{session_id}",
+                        }
+                    ),
                 }
 
                 # Keep connection alive
                 while True:
                     await asyncio.sleep(30)
-                    yield {
-                        "event": "heartbeat",
-                        "data": json.dumps({"timestamp": datetime.now().isoformat()})
-                    }
+                    yield {"event": "heartbeat", "data": json.dumps({"timestamp": datetime.now().isoformat()})}
 
             except asyncio.CancelledError:
                 pass
@@ -226,10 +218,7 @@ async def mcp_streamable_endpoint(request: Request):
             async def batch_event_generator():
                 for rpc_request in body:
                     result = await process_mcp_request(rpc_request)
-                    yield {
-                        "event": "mcp.response",
-                        "data": json.dumps(result)
-                    }
+                    yield {"event": "mcp.response", "data": json.dumps(result)}
 
             response = EventSourceResponse(batch_event_generator())
             response.headers["Mcp-Session-Id"] = session_id
@@ -242,10 +231,7 @@ async def mcp_streamable_endpoint(request: Request):
             if "text/event-stream" in accept_header:
                 # Client accepts streaming - use SSE
                 async def single_event_generator():
-                    yield {
-                        "event": "mcp.response",
-                        "data": json.dumps(result)
-                    }
+                    yield {"event": "mcp.response", "data": json.dumps(result)}
 
                 response = EventSourceResponse(single_event_generator())
                 response.headers["Mcp-Session-Id"] = session_id
@@ -265,24 +251,17 @@ async def process_mcp_request(rpc_request: dict) -> dict:
         request_id = rpc_request.get("id")
 
         if method == "tools/list":
-            return {
-                "jsonrpc": "2.0",
-                "id": request_id,
-                "result": {"tools": list(TOOL_SCHEMAS.values())}
-            }
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": list(TOOL_SCHEMAS.values())}}
 
         elif method == "tools/call":
             # Use existing tool call logic
             from web.dependencies import get_machine_service
+
             machine_service = get_machine_service()
 
             tool_result = await call_tool_mcp_compatible(params, machine_service)
 
-            return {
-                "jsonrpc": "2.0",
-                "id": request_id,
-                "result": tool_result
-            }
+            return {"jsonrpc": "2.0", "id": request_id, "result": tool_result}
 
         elif method == "resources/list":
             return {
@@ -290,19 +269,16 @@ async def process_mcp_request(rpc_request: dict) -> dict:
                 "id": request_id,
                 "result": {
                     "resources": [
-                        {
-                            "uri": "laws://list",
-                            "name": "Available Laws",
-                            "description": "List of all discoverable laws"
-                        }
+                        {"uri": "laws://list", "name": "Available Laws", "description": "List of all discoverable laws"}
                     ]
-                }
+                },
             }
 
         elif method == "resources/read":
             uri = params.get("uri")
             if uri == "laws://list":
                 from web.dependencies import get_machine_service
+
                 machine_service = get_machine_service()
 
                 # Get both citizen and business laws
@@ -311,12 +287,9 @@ async def process_mcp_request(rpc_request: dict) -> dict:
                     citizen_laws = machine_service.get_discoverable_service_laws("CITIZEN")
                     for service, law_list in citizen_laws.items():
                         for law in law_list:
-                            available_laws.append({
-                                "service": service,
-                                "law": law,
-                                "type": "CITIZEN",
-                                "parameter_type": "BSN"
-                            })
+                            available_laws.append(
+                                {"service": service, "law": law, "type": "CITIZEN", "parameter_type": "BSN"}
+                            )
                 except Exception as e:
                     logger.warning(f"Could not get citizen laws: {e}")
 
@@ -324,12 +297,9 @@ async def process_mcp_request(rpc_request: dict) -> dict:
                     business_laws = machine_service.get_discoverable_service_laws("BUSINESS")
                     for service, law_list in business_laws.items():
                         for law in law_list:
-                            available_laws.append({
-                                "service": service,
-                                "law": law,
-                                "type": "BUSINESS",
-                                "parameter_type": "KVK_NUMMER"
-                            })
+                            available_laws.append(
+                                {"service": service, "law": law, "type": "BUSINESS", "parameter_type": "KVK_NUMMER"}
+                            )
                 except Exception as e:
                     logger.warning(f"Could not get business laws: {e}")
 
@@ -337,36 +307,29 @@ async def process_mcp_request(rpc_request: dict) -> dict:
                     "jsonrpc": "2.0",
                     "id": request_id,
                     "result": {
-                        "contents": [{
-                            "uri": uri,
-                            "mimeType": "application/json",
-                            "text": json.dumps({
-                                "available_laws": available_laws,
-                                "total_count": len(available_laws)
-                            }, indent=2)
-                        }]
-                    }
+                        "contents": [
+                            {
+                                "uri": uri,
+                                "mimeType": "application/json",
+                                "text": json.dumps(
+                                    {"available_laws": available_laws, "total_count": len(available_laws)}, indent=2
+                                ),
+                            }
+                        ]
+                    },
                 }
             else:
-                return {
-                    "jsonrpc": "2.0",
-                    "id": request_id,
-                    "error": {"code": -32602, "message": "Resource not found"}
-                }
+                return {"jsonrpc": "2.0", "id": request_id, "error": {"code": -32602, "message": "Resource not found"}}
 
         else:
-            return {
-                "jsonrpc": "2.0",
-                "id": request_id,
-                "error": {"code": -32601, "message": "Method not found"}
-            }
+            return {"jsonrpc": "2.0", "id": request_id, "error": {"code": -32601, "message": "Method not found"}}
 
     except Exception as e:
         logger.error(f"MCP request processing error: {e}")
         return {
             "jsonrpc": "2.0",
             "id": rpc_request.get("id"),
-            "error": {"code": -32603, "message": f"Internal error: {str(e)}"}
+            "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
         }
 
 
@@ -384,16 +347,18 @@ async def call_tool_mcp_compatible(params: dict, machine_service) -> dict:
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
             return {
-                "content": [{
-                    "type": "application/json",
-                    "data": {
-                        "output": result.output,
-                        "requirements_met": result.requirements_met,
-                        "input": result.input,
-                        "rulespec_uuid": result.rulespec_uuid,
-                        "missing_required": result.missing_required
+                "content": [
+                    {
+                        "type": "application/json",
+                        "data": {
+                            "output": result.output,
+                            "requirements_met": result.requirements_met,
+                            "input": result.input,
+                            "rulespec_uuid": result.rulespec_uuid,
+                            "missing_required": result.missing_required,
+                        },
                     }
-                }]
+                ]
             }
 
         elif tool_name == "check_eligibility":
@@ -403,12 +368,7 @@ async def call_tool_mcp_compatible(params: dict, machine_service) -> dict:
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
             )
-            return {
-                "content": [{
-                    "type": "text",
-                    "text": f"Eligible: {result.requirements_met}"
-                }]
-            }
+            return {"content": [{"type": "text", "text": f"Eligible: {result.requirements_met}"}]}
 
         elif tool_name == "calculate_benefit_amount":
             result = machine_service.evaluate(
@@ -420,12 +380,7 @@ async def call_tool_mcp_compatible(params: dict, machine_service) -> dict:
             )
             output_field = arguments["output_field"]
             amount = result.output.get(output_field, "Not available")
-            return {
-                "content": [{
-                    "type": "text",
-                    "text": f"Amount: {amount}"
-                }]
-            }
+            return {"content": [{"type": "text", "text": f"Amount: {amount}"}]}
         else:
             raise ValueError(f"Unknown tool: {tool_name}")
 
