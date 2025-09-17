@@ -1,0 +1,111 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f
+name: Bedrijfsgegevens organisatie
+law: handelsregisterwet/bedrijfsgegevens
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2024-01-01
+service: "KVK"
+legal_basis:
+  law: "Handelsregisterwet 2007"
+  bwb_id: "BWBR0021777"
+  article: "14"
+  url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+  juriconnect: "jci1.3:c:BWBR0021777&artikel=14&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 14 Handelsregisterwet bepaalt welke gegevens over organisaties en werknemers moeten worden bijgehouden"
+description: >
+  Regels voor het verstrekken van bedrijfsgegevens uit het Handelsregister,
+  inclusief aantal werknemers en organisatiestatus voor rapportageverplichtingen.
+
+references:
+  - law: "Handelsregisterwet 2007"
+    article: "14"
+    url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+
+properties:
+  parameters:
+    - name: "KVK_NUMMER"
+      description: "KvK nummer van de organisatie"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "2"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk1_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=2&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "KvK-nummer is de unieke identificatie van organisaties in het handelsregister"
+
+  sources:
+    - name: "ORGANISATIE_GEGEVENS"
+      description: "Gegevens van de organisatie uit het handelsregister"
+      type: "object"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=14&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 bepaalt welke gegevens over organisaties worden bijgehouden"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "organisaties"
+        fields: ["kvk_nummer", "rechtsvorm", "status", "aantal_werknemers", "datum_telling"]
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+
+  output:
+    - name: "aantal_werknemers"
+      description: "Aantal werknemers van de organisatie"
+      type: "number"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=14&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 lid 1 bepaalt dat gegevens over werknemers moeten worden bijgehouden"
+
+    - name: "status"
+      description: "Status van de organisatie"
+      type: "string"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 bepaalt dat wijzigingen in status moeten worden opgegeven"
+
+    - name: "rechtsvorm"
+      description: "Rechtsvorm van de organisatie"
+      type: "string"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=14&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 lid 1 bepaalt dat rechtsvorm moet worden opgegeven"
+
+actions:
+  - output: "aantal_werknemers"
+    value: "$ORGANISATIE_GEGEVENS.aantal_werknemers"
+
+  - output: "status"
+    value: "$ORGANISATIE_GEGEVENS.status"
+
+  - output: "rechtsvorm"
+    value: "$ORGANISATIE_GEGEVENS.rechtsvorm"
