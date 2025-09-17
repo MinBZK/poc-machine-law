@@ -5,8 +5,8 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import JSONResponse, Response
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse
 from sse_starlette import EventSourceResponse
 
 from law_mcp.prompt_templates import PROMPT_TEMPLATES
