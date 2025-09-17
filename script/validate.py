@@ -177,7 +177,7 @@ def validate_variable_definitions(yaml_files: List[Path]) -> None:
 
 def main():
     BASE_DIR = Path("law")
-    schema = "schema/v0.1.4/schema.json"
+    schema = "schema/v0.1.6/schema.json"
 
     # Find all YAML files
     yaml_files = list(BASE_DIR.rglob("*.yaml")) + list(BASE_DIR.rglob("*.yml"))
