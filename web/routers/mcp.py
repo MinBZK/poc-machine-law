@@ -308,8 +308,6 @@ async def mcp_sse_endpoint(request: Request):
     return EventSourceResponse(event_generator())
 
 
-
-
 # Tool handlers
 async def list_tools():
     """List available MCP tools"""
