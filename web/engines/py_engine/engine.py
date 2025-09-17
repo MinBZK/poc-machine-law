@@ -58,7 +58,9 @@ class PythonMachineService(EngineInterface):
         if not rule_spec:
             raise HTTPException(status_code=400, detail="Invalid law specified")
 
-        self.set_profile_data(parameters["BSN"])
+        # Only set profile data if BSN parameter is provided (for citizen laws)
+        if "BSN" in parameters:
+            self.set_profile_data(parameters["BSN"])
 
         result = self.services.evaluate(
             service=service,
