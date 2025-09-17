@@ -80,7 +80,7 @@ class MCPChatClient:
                     if hasattr(content, 'type'):
                         print(f"     Content type: {content.type}")
                     if hasattr(content, 'text'):
-                        print(f"     Text: {content.text[:200]}{'...' if len(content.text) > 200 else ''}")
+                        print(f"     Text: {content.text}")
                     if hasattr(content, 'data'):
                         print(f"     Data: {content.data}")
                     print()
