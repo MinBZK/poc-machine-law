@@ -323,7 +323,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
       "arguments": {
         "service": "RVO",
         "law": "wpm",
-        "parameters": {"kvk-nummer": "12345678"}
+        "parameters": {"KVK_NUMMER": "12345678"}
       }
     },
     "id": 10
@@ -353,7 +353,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
       "arguments": {
         "service": "RVO",
         "law": "wpm",
-        "parameters": {"kvk-nummer": "12345678"}
+        "parameters": {"KVK_NUMMER": "12345678"}
       }
     },
     "id": 11
@@ -385,7 +385,7 @@ The MCP server now supports **generic parameters** for maximum flexibility:
 }
 ```
 
-### Business Laws (use kvk-nummer)
+### Business Laws (use KVK_NUMMER)
 ```json
 {
   "service": "RVO",
