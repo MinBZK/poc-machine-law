@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, Request
 from sse_starlette import EventSourceResponse
 
+from law_mcp.prompt_templates import PROMPT_TEMPLATES
 from law_mcp.schemas import TOOL_SCHEMAS
 
 # Import our components
@@ -56,7 +57,7 @@ async def health_check():
         "capabilities": {
             "tools": ["execute_law", "check_eligibility", "calculate_benefit_amount"],
             "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{bsn}"],
-            "prompts": ["check_all_benefits", "explain_calculation", "compare_scenarios"],
+            "prompts": list(PROMPT_TEMPLATES.keys()),
         },
     }
 
@@ -122,7 +123,7 @@ async def mcp_sse_endpoint(request: Request):
                         "capabilities": {
                             "tools": ["execute_law", "check_eligibility", "calculate_benefit_amount"],
                             "resources": ["laws://list", "law://{service}/{law}/spec", "profile://{bsn}"],
-                            "prompts": ["check_all_benefits", "explain_calculation", "compare_scenarios"],
+                            "prompts": list(PROMPT_TEMPLATES.keys()),
                         },
                     }
                 ),
@@ -253,30 +254,63 @@ async def read_resource(machine_service, params: dict[str, Any]):
 
 async def list_prompts():
     """List available MCP prompts"""
-    return {
-        "prompts": [
+    prompts = []
+    for name, template in PROMPT_TEMPLATES.items():
+        # Create argument schema based on prompt type
+        if name == "check_all_benefits":
+            arguments = [
+                {"name": "bsn", "description": "BSN van de persoon", "required": True},
+                {"name": "include_details", "description": "Include detailed explanations", "required": False},
+            ]
+        elif name == "explain_calculation":
+            arguments = [
+                {"name": "bsn", "description": "BSN van de persoon", "required": True},
+                {"name": "service", "description": "Service provider code", "required": True},
+                {"name": "law", "description": "Law identifier", "required": True},
+            ]
+        elif name == "compare_scenarios":
+            arguments = [
+                {"name": "bsn", "description": "BSN van de persoon", "required": True},
+                {"name": "scenarios", "description": "List of scenarios to compare (JSON)", "required": True},
+            ]
+        elif name == "generate_citizen_report":
+            arguments = [
+                {"name": "bsn", "description": "BSN van de persoon", "required": True},
+                {"name": "include_projections", "description": "Include future benefit projections", "required": False},
+            ]
+        elif name == "optimize_benefits":
+            arguments = [
+                {"name": "bsn", "description": "BSN van de persoon", "required": True},
+                {
+                    "name": "focus_area",
+                    "description": "Area to focus on (all, income, family, housing)",
+                    "required": False,
+                },
+            ]
+        elif name == "legal_research":
+            arguments = [
+                {"name": "topic", "description": "Research topic", "required": True},
+                {"name": "law", "description": "Specific law to research", "required": False},
+                {"name": "service", "description": "Specific service to research", "required": False},
+            ]
+        elif name == "appeal_assistance":
+            arguments = [
+                {"name": "bsn", "description": "BSN van de persoon", "required": True},
+                {"name": "decision_type", "description": "Type of decision to appeal", "required": False},
+                {"name": "service", "description": "Service that made the decision", "required": False},
+            ]
+        else:
+            arguments = []
+
+        prompts.append(
             {
-                "name": "check_all_benefits",
-                "description": "Check all benefits for BSN 123456782",
-                "arguments": [{"name": "bsn", "description": "BSN van de persoon", "required": True}],
-            },
-            {
-                "name": "explain_calculation",
-                "description": "Explain calculation",
-                "arguments": [
-                    {"name": "service", "description": "Service provider code", "required": True},
-                    {"name": "law", "description": "Law identifier", "required": True},
-                ],
-            },
-            {
-                "name": "compare_scenarios",
-                "description": "Compare scenarios",
-                "arguments": [
-                    {"name": "scenarios", "description": "List of scenarios to compare (JSON)", "required": True}
-                ],
-            },
-        ]
-    }
+                "name": name,
+                "description": template.description,
+                "arguments": arguments,
+            }
+        )
+
+    return {"prompts": prompts}
 
 
 async def get_prompt(params: dict[str, Any]):
@@ -284,14 +318,27 @@ async def get_prompt(params: dict[str, Any]):
     name = params.get("name")
     arguments = params.get("arguments", {})
 
-    # This would integrate with the existing prompt system from law_mcp/prompt_templates.py
-    # For now, return a simple response
-    return {
-        "description": f"Generated prompt for {name}",
-        "messages": [
-            {
-                "role": "user",
-                "content": {"type": "text", "text": f"Execute {name} with arguments: {json.dumps(arguments)}"},
-            }
-        ],
-    }
+    if name not in PROMPT_TEMPLATES:
+        return {
+            "error": {"code": -32602, "message": f"Unknown prompt: {name}"},
+        }
+
+    try:
+        template = PROMPT_TEMPLATES[name]
+        prompt_result = template.generate(arguments)
+
+        # Convert from MCP types to HTTP response format
+        return {
+            "description": prompt_result.description,
+            "messages": [
+                {
+                    "role": msg.role,
+                    "content": {"type": msg.content.type, "text": msg.content.text},
+                }
+                for msg in prompt_result.messages
+            ],
+        }
+    except Exception as e:
+        return {
+            "error": {"code": -32603, "message": f"Error generating prompt: {str(e)}"},
+        }
