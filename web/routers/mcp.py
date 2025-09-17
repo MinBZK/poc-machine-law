@@ -347,7 +347,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                         "text": f"Law execution completed. Requirements met: {result.requirements_met}",
                     }
                 ],
-                "structured_content": result_data
+                "structured_content": result_data,
             }
 
         elif tool_name == "check_eligibility":
@@ -365,8 +365,8 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 "structured_content": {
                     "eligible": eligible,
                     "requirements_met": result.requirements_met,
-                    "missing_required": result.missing_required
-                }
+                    "missing_required": result.missing_required,
+                },
             }
 
         elif tool_name == "calculate_benefit_amount":
@@ -387,8 +387,8 @@ async def call_tool(machine_service, params: dict[str, Any]):
                     "amount": amount,
                     "output_field": output_field,
                     "full_output": result.output,
-                    "requirements_met": result.requirements_met
-                }
+                    "requirements_met": result.requirements_met,
+                },
             }
 
         else:

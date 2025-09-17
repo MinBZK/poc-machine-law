@@ -49,14 +49,14 @@ async def test_fastmcp_client():
                 print(f"   Data: {content.data}")
 
         # Print structured content if available
-        if hasattr(result, 'structured_content') and result.structured_content:
-            print(f"   Structured content available!")
+        if hasattr(result, "structured_content") and result.structured_content:
+            print("   Structured content available!")
             structured = result.structured_content
             if isinstance(structured, dict):
-                if 'success' in structured:
+                if "success" in structured:
                     print(f"   Success: {structured.get('success')}")
-                    if structured.get('success') and 'data' in structured:
-                        data = structured['data']
+                    if structured.get("success") and "data" in structured:
+                        data = structured["data"]
                         print(f"   Requirements Met: {data.get('requirements_met')}")
                         print(f"   Employees: {data.get('output', {}).get('aantal_werknemers')}")
                 else:
@@ -66,6 +66,7 @@ async def test_fastmcp_client():
             for content in result.content:
                 if hasattr(content, "text"):
                     import json
+
                     try:
                         parsed_data = json.loads(content.text)
                         print(f"   (Fallback) Success: {parsed_data.get('success')}")
