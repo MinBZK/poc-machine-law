@@ -14,6 +14,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from law_mcp.chat_client import MCPChatClient
 
+
 async def test_mcp_connection():
     """Test MCP connection and tool discovery"""
     print("🧪 Testing MCP Chat Client Connection...")
@@ -34,8 +35,8 @@ async def test_mcp_connection():
 
         for tool in claude_tools[:2]:  # Show first 2 tools
             print(f"   • {tool['name']}")
-            if 'properties' in tool['input_schema']:
-                props = list(tool['input_schema']['properties'].keys())
+            if "properties" in tool["input_schema"]:
+                props = list(tool["input_schema"]["properties"].keys())
                 print(f"     Parameters: {props}")
 
     except Exception as e:
@@ -43,6 +44,7 @@ async def test_mcp_connection():
 
     finally:
         await client.cleanup()
+
 
 if __name__ == "__main__":
     asyncio.run(test_mcp_connection())

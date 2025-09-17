@@ -23,12 +23,11 @@ from typing import Any
 import anthropic
 from fastmcp.client import Client
 
+
 class MCPChatClient:
     def __init__(self, mcp_url: str = "http://localhost:8000/mcp/"):
         self.mcp_url = mcp_url
-        self.anthropic_client = anthropic.Anthropic(
-            api_key=os.getenv("ANTHROPIC_API_KEY")
-        )
+        self.anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         self.mcp_client = None
         self.available_tools = []
         self.conversation_history = []
@@ -48,7 +47,7 @@ class MCPChatClient:
                 {
                     "name": tool.name,
                     "description": tool.description,
-                    "input_schema": tool.inputSchema if hasattr(tool, 'inputSchema') else {}
+                    "input_schema": tool.inputSchema if hasattr(tool, "inputSchema") else {},
                 }
                 for tool in tools
             ]
@@ -72,21 +71,21 @@ class MCPChatClient:
             print("\n📋 Complete MCP Response:")
             print(f"   Type: {type(result)}")
 
-            if hasattr(result, 'content'):
+            if hasattr(result, "content"):
                 print(f"   Content items: {len(result.content)}")
                 for i, content in enumerate(result.content):
-                    print(f"   Content {i+1}:")
+                    print(f"   Content {i + 1}:")
                     print(f"     Type: {type(content)}")
-                    if hasattr(content, 'type'):
+                    if hasattr(content, "type"):
                         print(f"     Content type: {content.type}")
-                    if hasattr(content, 'text'):
+                    if hasattr(content, "text"):
                         print(f"     Text: {content.text}")
-                    if hasattr(content, 'data'):
+                    if hasattr(content, "data"):
                         print(f"     Data: {content.data}")
                     print()
 
             # Check for structured content
-            if hasattr(result, 'structured_content'):
+            if hasattr(result, "structured_content"):
                 print(f"   Structured content available: {result.structured_content is not None}")
                 if result.structured_content:
                     print(f"   Structured content: {json.dumps(result.structured_content, indent=2)}")
@@ -99,9 +98,9 @@ class MCPChatClient:
             # Extract text content from MCP response
             content_text = []
             for content in result.content:
-                if hasattr(content, 'text'):
+                if hasattr(content, "text"):
                     content_text.append(content.text)
-                elif hasattr(content, 'data'):
+                elif hasattr(content, "data"):
                     content_text.append(json.dumps(content.data, indent=2))
 
             return "\n".join(content_text)
@@ -118,11 +117,7 @@ class MCPChatClient:
             claude_tool = {
                 "name": tool["name"],
                 "description": tool["description"],
-                "input_schema": {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                }
+                "input_schema": {"type": "object", "properties": {}, "required": []},
             }
 
             # Add basic schema for known tools
@@ -130,8 +125,8 @@ class MCPChatClient:
                 claude_tool["input_schema"]["properties"] = {
                     "service": {"type": "string", "description": "Service provider (e.g., TOESLAGEN, RVO)"},
                     "law": {"type": "string", "description": "Law identifier (e.g., zorgtoeslagwet, wpm)"},
-                    "parameters": {"type": "object", "description": "Parameters for the law (e.g., {\"BSN\": \"123\"})"},
-                    "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"}
+                    "parameters": {"type": "object", "description": 'Parameters for the law (e.g., {"BSN": "123"})'},
+                    "reference_date": {"type": "string", "description": "Reference date (YYYY-MM-DD)"},
                 }
                 claude_tool["input_schema"]["required"] = ["service", "law", "parameters"]
 
@@ -139,7 +134,7 @@ class MCPChatClient:
                 claude_tool["input_schema"]["properties"] = {
                     "service": {"type": "string"},
                     "law": {"type": "string"},
-                    "parameters": {"type": "object"}
+                    "parameters": {"type": "object"},
                 }
                 claude_tool["input_schema"]["required"] = ["service", "law", "parameters"]
 
@@ -184,35 +179,31 @@ Geef altijd vriendelijke, duidelijke uitleg in het Nederlands."""
 
             for content_block in response.content:
                 if content_block.type == "text":
-                    assistant_message["content"].append({
-                        "type": "text",
-                        "text": content_block.text
-                    })
+                    assistant_message["content"].append({"type": "text", "text": content_block.text})
 
                 elif content_block.type == "tool_use":
                     # Execute MCP tool
-                    tool_result = await self.call_mcp_tool(
-                        content_block.name,
-                        content_block.input
-                    )
+                    tool_result = await self.call_mcp_tool(content_block.name, content_block.input)
 
-                    assistant_message["content"].append({
-                        "type": "tool_use",
-                        "id": content_block.id,
-                        "name": content_block.name,
-                        "input": content_block.input
-                    })
+                    assistant_message["content"].append(
+                        {
+                            "type": "tool_use",
+                            "id": content_block.id,
+                            "name": content_block.name,
+                            "input": content_block.input,
+                        }
+                    )
 
                     # Send tool result back to Claude
                     self.conversation_history.append(assistant_message)
-                    self.conversation_history.append({
-                        "role": "user",
-                        "content": [{
-                            "type": "tool_result",
-                            "tool_use_id": content_block.id,
-                            "content": tool_result
-                        }]
-                    })
+                    self.conversation_history.append(
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "tool_result", "tool_use_id": content_block.id, "content": tool_result}
+                            ],
+                        }
+                    )
 
                     # Get Claude's interpretation of the result
                     follow_up = self.anthropic_client.messages.create(
@@ -235,9 +226,9 @@ Geef altijd vriendelijke, duidelijke uitleg in het Nederlands."""
 
     async def start_chat(self):
         """Start interactive chat session"""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🤖 MCP + Claude Chat Client voor Nederlandse Wetgeving")
-        print("="*60)
+        print("=" * 60)
         print("\nVoorbeelden van vragen:")
         print("• 'Mijn BSN is 100000001. Heb ik recht op huurtoeslag?'")
         print("• 'Kan ik zorgtoeslag krijgen met BSN 100000002?'")
@@ -248,7 +239,7 @@ Geef altijd vriendelijke, duidelijke uitleg in het Nederlands."""
             try:
                 user_input = input("👤 Jij: ").strip()
 
-                if user_input.lower() in ['quit', 'exit', 'stop']:
+                if user_input.lower() in ["quit", "exit", "stop"]:
                     print("👋 Tot ziens!")
                     break
 
@@ -271,6 +262,7 @@ Geef altijd vriendelijke, duidelijke uitleg in het Nederlands."""
         if self.mcp_client:
             await self.mcp_client.__aexit__(None, None, None)
 
+
 async def main():
     """Main function"""
     # Check for API key
@@ -287,6 +279,7 @@ async def main():
         await chat_client.start_chat()
     finally:
         await chat_client.cleanup()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

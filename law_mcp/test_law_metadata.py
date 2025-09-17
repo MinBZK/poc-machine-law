@@ -15,6 +15,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from law_mcp.chat_client import MCPChatClient
 
+
 async def test_law_metadata():
     """Test if law metadata is included in MCP response"""
     print("🧪 Testing Law Metadata in MCP Response...")
@@ -29,12 +30,7 @@ async def test_law_metadata():
         print("\n🔧 Testing WPM law metadata...")
         response = await client.call_mcp_tool(
             "execute_law",
-            {
-                "service": "RVO",
-                "law": "wpm",
-                "parameters": {"KVK_NUMMER": "12345678"},
-                "reference_date": "2025-01-01"
-            }
+            {"service": "RVO", "law": "wpm", "parameters": {"KVK_NUMMER": "12345678"}, "reference_date": "2025-01-01"},
         )
 
         print("\n📤 Response should now include WPM description...")
@@ -60,6 +56,7 @@ async def test_law_metadata():
 
     finally:
         await client.cleanup()
+
 
 if __name__ == "__main__":
     asyncio.run(test_law_metadata())

@@ -15,6 +15,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from law_mcp.chat_client import MCPChatClient
 
+
 async def test_mcp_response():
     """Test MCP response format directly"""
     print("🧪 Testing MCP Response Format...")
@@ -33,8 +34,8 @@ async def test_mcp_response():
                 "service": "TOESLAGEN",
                 "law": "zorgtoeslagwet",
                 "parameters": {"BSN": "100000001"},
-                "reference_date": "2025-01-01"
-            }
+                "reference_date": "2025-01-01",
+            },
         )
 
         print("\n📤 Returned text content:")
@@ -45,6 +46,7 @@ async def test_mcp_response():
 
     finally:
         await client.cleanup()
+
 
 if __name__ == "__main__":
     asyncio.run(test_mcp_response())
