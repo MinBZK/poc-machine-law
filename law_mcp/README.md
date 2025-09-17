@@ -78,14 +78,86 @@ uv run python web/main.py
 ```
 
 ### HTTP Endpoints
+
+#### MCP Streamable HTTP: `/mcp/` (New - MCP 2025 spec compliant)
+- `GET /mcp/` - SSE stream for MCP initialization and server-initiated communication
+- `POST /mcp/` - JSON-RPC requests with session management
+- **Features**: Single endpoint design, session management, streaming support
+- **Compatible with**: Official MCP SDK clients
+
+#### Legacy Endpoints (for backward compatibility)
 - `GET /mcp/health` - Health check and capabilities
-- `POST /mcp/rpc` - JSON-RPC endpoint for tool calls
-- `GET /mcp/sse` - Server-Sent Events for streaming (future)
+- `POST /mcp/rpc` - Direct JSON-RPC endpoint (non-MCP standard)
+- `GET /mcp/sse` - Server-Sent Events streaming
 
 ### Production URL
 ```
 https://ui.lac.apps.digilab.network/mcp/
 ```
+
+## MCP Client Integration Examples
+
+### For MCP SDK Clients
+
+**Initialize connection (GET with SSE):**
+```bash
+curl -N -H "Accept: text/event-stream" https://ui.lac.apps.digilab.network/mcp/
+```
+
+**Execute business law (POST with JSON-RPC):**
+```bash
+curl -X POST https://ui.lac.apps.digilab.network/mcp/ \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "execute_law",
+      "arguments": {
+        "service": "RVO",
+        "law": "wpm",
+        "parameters": {"KVK_NUMMER": "12345678"}
+      }
+    },
+    "id": 1
+  }'
+```
+
+**List available tools:**
+```bash
+curl -X POST https://ui.lac.apps.digilab.network/mcp/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/list",
+    "params": {},
+    "id": 1
+  }'
+```
+
+**Get available laws:**
+```bash
+curl -X POST https://ui.lac.apps.digilab.network/mcp/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "resources/read",
+    "params": {"uri": "laws://list"},
+    "id": 1
+  }'
+```
+
+### Key Differences from Legacy `/rpc` Endpoint
+
+| Feature | MCP Streamable (`/mcp/`) | Legacy (`/mcp/rpc`) |
+|---------|-------------------------|---------------------|
+| Protocol | MCP 2025 spec | Custom JSON-RPC |
+| Client Support | Official MCP SDK | Manual HTTP clients |
+| Session Management | ✅ `Mcp-Session-Id` header | ❌ Stateless |
+| Streaming | ✅ Optional SSE | ❌ Request/response only |
+| Single Endpoint | ✅ GET + POST same URL | ❌ Separate endpoints |
+| Batch Requests | ✅ Multiple JSON-RPC | ❌ Single only |
 
 ## Available Capabilities
 
