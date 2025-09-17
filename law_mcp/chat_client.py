@@ -68,6 +68,34 @@ class MCPChatClient:
             print(f"🔧 Calling MCP tool: {tool_name} with {arguments}")
             result = await self.mcp_client.call_tool(tool_name, arguments=arguments)
 
+            # Print the complete MCP response for debugging
+            print(f"\n📋 Complete MCP Response:")
+            print(f"   Type: {type(result)}")
+
+            if hasattr(result, 'content'):
+                print(f"   Content items: {len(result.content)}")
+                for i, content in enumerate(result.content):
+                    print(f"   Content {i+1}:")
+                    print(f"     Type: {type(content)}")
+                    if hasattr(content, 'type'):
+                        print(f"     Content type: {content.type}")
+                    if hasattr(content, 'text'):
+                        print(f"     Text: {content.text[:200]}{'...' if len(content.text) > 200 else ''}")
+                    if hasattr(content, 'data'):
+                        print(f"     Data: {content.data}")
+                    print()
+
+            # Check for structured content
+            if hasattr(result, 'structured_content'):
+                print(f"   Structured content available: {result.structured_content is not None}")
+                if result.structured_content:
+                    print(f"   Structured content: {json.dumps(result.structured_content, indent=2)}")
+            else:
+                print(f"   No structured_content attribute found")
+
+            print(f"   All attributes: {[attr for attr in dir(result) if not attr.startswith('_')]}")
+            print("-" * 60)
+
             # Extract text content from MCP response
             content_text = []
             for content in result.content:
@@ -79,6 +107,7 @@ class MCPChatClient:
             return "\n".join(content_text)
 
         except Exception as e:
+            print(f"❌ Error calling {tool_name}: {str(e)}")
             return f"Error calling {tool_name}: {str(e)}"
 
     def create_claude_tools(self) -> List[Dict[str, Any]]:
