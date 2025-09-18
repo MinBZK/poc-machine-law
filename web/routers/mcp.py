@@ -480,21 +480,16 @@ async def call_tool(machine_service, params: dict[str, Any]):
 
     try:
         if tool_name == "execute_law":
-            overrides = arguments.get("overrides")
-
             # Use machine service to execute law
-            try:
-                result = machine_service.evaluate(
-                    service=arguments["service"],
-                    law=arguments["law"],
-                    parameters=arguments["parameters"],
-                    reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
-                    overwrite_input=overrides,
-                    requested_output=arguments.get("requested_output"),
-                    approved=arguments.get("approved", False),
-                )
-            except Exception:
-                raise
+            result = machine_service.evaluate(
+                service=arguments["service"],
+                law=arguments["law"],
+                parameters=arguments["parameters"],
+                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
+                overwrite_input=arguments.get("overrides"),
+                requested_output=arguments.get("requested_output"),
+                approved=arguments.get("approved", False),
+            )
 
             # Get law metadata to provide context
             law_metadata = {}
