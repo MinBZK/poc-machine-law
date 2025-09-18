@@ -1,75 +1,53 @@
 Feature: WPM Rapportageverplichting
   Als werkgever
   Wil ik weten of ik verplicht ben om te rapporteren over werkgebonden personenmobiliteit
-  Zodat ik voldoe aan de wettelijke verplichtingen
+  Zodat ik voldoe aan de wettelijke verplichtingen volgens de Omgevingswet
 
   Background:
     Given de datum is "2024-07-01"
 
   Scenario: Organisatie met 100 werknemers is verplicht te rapporteren
     Given een organisatie met KVK-nummer "12345678"
-    And de volgende KVK bedrijfsgegevens:
-      | kvk_nummer | rechtsvorm | status | aantal_werknemers | datum_telling |
-      | 12345678   | BV         | ACTIEF | 100               | 2024-07-01    |
-    When de wpm wordt uitgevoerd door RVO
+    And de volgende RVO wpm_gegevens gegevens:
+      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
+      | 12345678   | 100               | false                                 |
+    When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is voldaan aan de voorwaarden
     And is de rapportageverplichting "true"
-    And is de rapportage_deadline "2025-06-30"
     And is het aantal_werknemers "100"
 
   Scenario: Organisatie met 99 werknemers is niet verplicht te rapporteren
     Given een organisatie met KVK-nummer "87654321"
-    And de volgende KVK bedrijfsgegevens:
-      | kvk_nummer | rechtsvorm | status | aantal_werknemers | datum_telling |
-      | 87654321   | BV         | ACTIEF | 99                | 2024-07-01    |
-    When de wpm wordt uitgevoerd door RVO
-    Then is voldaan aan de voorwaarden
-    And is de rapportageverplichting "false"
-    And is het aantal_werknemers "99"
-
-  Scenario: Organisatie met meer dan 100 werknemers is verplicht te rapporteren
-    Given een organisatie met KVK-nummer "11111111"
-    And de volgende KVK bedrijfsgegevens:
-      | kvk_nummer | rechtsvorm | status | aantal_werknemers | datum_telling |
-      | 11111111   | BV         | ACTIEF | 150               | 2024-07-01    |
-    When de wpm wordt uitgevoerd door RVO
-    Then is voldaan aan de voorwaarden
-    And is de rapportageverplichting "true"
-    And is de rapportage_deadline "2025-06-30"
-    And is het aantal_werknemers "150"
-
-  Scenario: Niet-actieve organisatie hoeft niet te rapporteren
-    Given een organisatie met KVK-nummer "22222222"
-    And de volgende KVK bedrijfsgegevens:
-      | kvk_nummer | rechtsvorm | status    | aantal_werknemers | datum_telling |
-      | 22222222   | BV         | INACTIEF  | 120               | 2024-07-01    |
-    When de wpm wordt uitgevoerd door RVO
+    And de volgende RVO wpm_gegevens gegevens:
+      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
+      | 87654321   | 99                | false                                 |
+    When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is niet voldaan aan de voorwaarden
 
-  Scenario: Organisatie met werknemers bepaling vanaf 2025
-    Given een organisatie met KVK-nummer "33333333"
-    And de volgende KVK bedrijfsgegevens:
-      | kvk_nummer | rechtsvorm | status | aantal_werknemers | datum_telling |
-      | 33333333   | BV         | ACTIEF | 105               | 2024-07-01    |
-    When de wpm wordt uitgevoerd door RVO
+  Scenario: Organisatie zonder mobiliteitsvergoeding hoeft niet te rapporteren
+    Given een organisatie met KVK-nummer "44444444"
+    And de volgende RVO wpm_gegevens gegevens:
+      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
+      | 44444444   | 150               | true                                  |
+    When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
+    Then is niet voldaan aan de voorwaarden
+
+  Scenario: Organisatie rapporteert reisgegevens en CO2-uitstoot
+    Given een organisatie met KVK-nummer "55555555"
+    And de volgende RVO wpm_gegevens gegevens:
+      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
+      | 55555555   | 120               | false                                 |
+    And de volgende RVO wpm_reisgegevens gegevens:
+      | kvk_nummer | woon_werk_auto_benzine | woon_werk_auto_diesel | zakelijk_auto_benzine | zakelijk_auto_diesel | woon_werk_openbaar_vervoer |
+      | 55555555   | 10000                  | 5000                  | 3000                  | 2000                 | 8000                       |
+    When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is voldaan aan de voorwaarden
     And is de rapportageverplichting "true"
-    And is de rapportage_deadline "2025-06-30"
-    And is het aantal_werknemers "105"
-
-  Scenario: Organisatie verzamelt gegevens voor rapportage
-    Given een organisatie met KVK-nummer "44444444"
-    And de volgende KVK bedrijfsgegevens:
-      | kvk_nummer | rechtsvorm | status | aantal_werknemers | datum_telling |
-      | 44444444   | BV         | ACTIEF | 150               | 2024-07-01    |
-    When de werkgever deze WPM gegevens indient:
-      | service | law | key                      | nieuwe_waarde | reden               | bewijs |
-      | RVO     | wpm | WOON_WERK_AUTO_BENZINE   | 50000        | verplichte gegevens |        |
-      | RVO     | wpm | WOON_WERK_AUTO_DIESEL    | 30000        | verplichte gegevens |        |
-      | RVO     | wpm | ZAKELIJK_AUTO_BENZINE    | 25000        | verplichte gegevens |        |
-      | RVO     | wpm | ZAKELIJK_AUTO_DIESEL     | 15000        | verplichte gegevens |        |
-      | RVO     | wpm | WOON_WERK_OV             | 20000        | verplichte gegevens |        |
-    When de wpm wordt uitgevoerd door RVO met wijzigingen
-    Then ontbreken er geen verplichte gegevens
-    And is voldaan aan de voorwaarden
-    And is de co2_uitstoot_totaal groter dan 0
+    When de omgevingswet/werkgebonden_personenmobiliteit/gegevens wordt uitgevoerd door RVO
+    Then is voldaan aan de voorwaarden
+    And is de woon_werk_auto_benzine "10000"
+    And is de woon_werk_auto_diesel "5000"
+    And is de zakelijk_auto_benzine "3000"
+    And is de zakelijk_auto_diesel "2000"
+    And is de woon_werk_openbaar_vervoer "8000"
+    And is de co2_uitstoot_totaal "3500000"
