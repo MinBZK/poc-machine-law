@@ -527,6 +527,66 @@ def step_impl(context, number):
     )
 
 
+@then('is de woon_werk_auto_benzine "{number}"')
+def step_impl(context, number):
+    expected = int(number)
+    actual = context.result.output.get("woon_werk_auto_benzine")
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected woon_werk_auto_benzine to be {expected}, but was {actual}"
+    )
+
+
+@then('is de woon_werk_auto_diesel "{number}"')
+def step_impl(context, number):
+    expected = int(number)
+    actual = context.result.output.get("woon_werk_auto_diesel")
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected woon_werk_auto_diesel to be {expected}, but was {actual}"
+    )
+
+
+@then('is de zakelijk_auto_benzine "{number}"')
+def step_impl(context, number):
+    expected = int(number)
+    actual = context.result.output.get("zakelijk_auto_benzine")
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected zakelijk_auto_benzine to be {expected}, but was {actual}"
+    )
+
+
+@then('is de zakelijk_auto_diesel "{number}"')
+def step_impl(context, number):
+    expected = int(number)
+    actual = context.result.output.get("zakelijk_auto_diesel")
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected zakelijk_auto_diesel to be {expected}, but was {actual}"
+    )
+
+
+@then('is de woon_werk_openbaar_vervoer "{number}"')
+def step_impl(context, number):
+    expected = int(number)
+    actual = context.result.output.get("woon_werk_openbaar_vervoer")
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected woon_werk_openbaar_vervoer to be {expected}, but was {actual}"
+    )
+
+
+@then('is de co2_uitstoot_totaal "{number}"')
+def step_impl(context, number):
+    expected = int(number)
+    actual = context.result.output.get("co2_uitstoot_totaal")
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected co2_uitstoot_totaal to be {expected}, but was {actual}"
+    )
+
+
 @when("de werkgever deze WPM gegevens indient")
 def step_impl(context):
     if not hasattr(context, "test_data"):
