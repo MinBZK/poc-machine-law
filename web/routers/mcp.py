@@ -543,13 +543,25 @@ async def read_resource(machine_service, params: dict[str, Any]):
                 citizen_laws = machine_service.get_discoverable_service_laws("CITIZEN")
                 for service, law_list in citizen_laws.items():
                     for law in law_list:
+                        # Get the real law description from rule spec
+                        try:
+                            rule_spec = machine_service.get_rule_spec(law, "2025-01-01", service)
+                            if isinstance(rule_spec, dict):
+                                law_description = rule_spec.get(
+                                    "description", f"Citizen law {law} managed by {service}"
+                                )
+                            else:
+                                law_description = f"Citizen law {law} managed by {service}"
+                        except Exception:
+                            law_description = f"Citizen law {law} managed by {service}"
+
                         available_laws.append(
                             {
                                 "service": service,
                                 "law": law,
                                 "discoverable": True,
                                 "name": law.replace("_", " ").title(),
-                                "description": f"Citizen law {law} managed by {service}",
+                                "description": law_description,
                             }
                         )
             except Exception as e:
@@ -560,35 +572,121 @@ async def read_resource(machine_service, params: dict[str, Any]):
                 business_laws = machine_service.get_discoverable_service_laws("BUSINESS")
                 for service, law_list in business_laws.items():
                     for law in law_list:
+                        # Get the real law description from rule spec
+                        try:
+                            rule_spec = machine_service.get_rule_spec(law, "2025-01-01", service)
+                            if isinstance(rule_spec, dict):
+                                law_description = rule_spec.get(
+                                    "description", f"Business law {law} managed by {service}"
+                                )
+                            else:
+                                law_description = f"Business law {law} managed by {service}"
+                        except Exception:
+                            law_description = f"Business law {law} managed by {service}"
+
                         available_laws.append(
                             {
                                 "service": service,
                                 "law": law,
                                 "discoverable": True,
                                 "name": law.replace("_", " ").title(),
-                                "description": f"Business law {law} managed by {service}",
+                                "description": law_description,
                             }
                         )
             except Exception as e:
                 logger.warning(f"Could not get business laws: {e}")
 
-            response_data = {"available_laws": available_laws, "total_count": len(available_laws)}
-            return {
-                "contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(response_data, indent=2)}]
-            }
+            # Create plain text response with law descriptions
+            text_lines = [f"Available Laws ({len(available_laws)} total):\n"]
+
+            for law_info in available_laws:
+                service = law_info["service"]
+                law = law_info["law"]
+                name = law_info["name"]
+                description = law_info["description"]
+
+                text_lines.append(f"• {name}")
+                text_lines.append(f"  Service: {service}")
+                text_lines.append(f"  Law ID: {law}")
+                text_lines.append(f"  Resource: law://{service}/{law}/spec")
+                text_lines.append(f"  Description: {description}\n")
+
+            plain_text = "\n".join(text_lines)
+
+            return {"contents": [{"uri": uri, "mimeType": "text/plain", "text": plain_text}]}
         elif uri.startswith("law://"):
             # Parse law://{service}/{law}/spec
             parts = uri.replace("law://", "").split("/")
-            if len(parts) >= 3:
-                service, law = parts[0], parts[1]
-                # Get basic law info - this is a simplified implementation
-                spec = {"service": service, "law": law, "description": f"Specification for {service}.{law}"}
-                return {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(spec, indent=2)}]}
+            if len(parts) >= 3 and parts[-1] == "spec":
+                service, law = parts[0], "/".join(parts[1:-1])  # Handle multi-part law names
+                try:
+                    # Get the actual rule specification
+                    rule_spec = machine_service.get_rule_spec(law, "2025-01-01", service)
+
+                    # Create plain text specification
+                    text_lines = [f"Law Specification: {service}/{law}\n"]
+                    text_lines.append(f"Service: {service}")
+                    text_lines.append(f"Law ID: {law}")
+
+                    # Debug: show what we got
+                    text_lines.append(f"Rule spec type: {type(rule_spec)}")
+
+                    # Handle different rule_spec formats safely
+                    if isinstance(rule_spec, dict):
+                        name = rule_spec.get("name", law)
+                        description = rule_spec.get("description", "No description available")
+                        text_lines.append(f"Name: {name}")
+                        text_lines.append(f"Description: {description}")
+                    elif isinstance(rule_spec, list):
+                        text_lines.append(f"List with {len(rule_spec)} items:")
+                        for i, item in enumerate(rule_spec[:3]):  # Show first 3 items
+                            text_lines.append(f"  [{i}]: {type(item)} - {str(item)[:100]}...")
+                        if len(rule_spec) > 3:
+                            text_lines.append(f"  ... and {len(rule_spec) - 3} more items")
+                    else:
+                        text_lines.append(f"Raw specification: {str(rule_spec)[:500]}...")
+
+                    plain_text = "\n".join(text_lines)
+                    return {"contents": [{"uri": uri, "mimeType": "text/plain", "text": plain_text}]}
+
+                except Exception as e:
+                    import traceback
+
+                    error_detail = traceback.format_exc()
+                    return {
+                        "contents": [
+                            {
+                                "uri": uri,
+                                "mimeType": "text/plain",
+                                "text": f"Error loading law specification: {str(e)}\n\nDetails:\n{error_detail}",
+                            }
+                        ]
+                    }
         elif uri.startswith("profile://"):
             # Parse profile://{bsn}
             bsn = uri.replace("profile://", "")
             profile = machine_service.get_profile_data(bsn)
-            return {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(profile, indent=2)}]}
+
+            # Create plain text profile
+            text_lines = [f"Citizen Profile: {profile.get('name', 'Unknown')}\n"]
+            text_lines.append(f"BSN: {bsn}")
+            text_lines.append(f"Description: {profile.get('description', 'No description available')}\n")
+
+            # Add data sources
+            if profile.get("sources"):
+                text_lines.append("Available Data Sources:")
+                for source_name, source_data in profile["sources"].items():
+                    text_lines.append(f"  • {source_name}")
+                    if isinstance(source_data, dict):
+                        for key, value in source_data.items():
+                            if isinstance(value, str | int | float | bool):
+                                text_lines.append(f"    - {key}: {value}")
+                            elif isinstance(value, list) and value:
+                                text_lines.append(f"    - {key}: {len(value)} items")
+                    text_lines.append("")
+
+            plain_text = "\n".join(text_lines)
+            return {"contents": [{"uri": uri, "mimeType": "text/plain", "text": plain_text}]}
         else:
             raise ValueError(f"Unknown resource URI: {uri}")
 
