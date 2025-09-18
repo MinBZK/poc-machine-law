@@ -13,10 +13,59 @@ from law_mcp.schemas import TOOL_SCHEMAS
 
 # Import our components
 from web.dependencies import get_machine_service
+from web.routers.laws import node_to_dict
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/mcp", tags=["mcp"])
+
+
+def extract_execution_details(result, machine_service, law: str, service: str, reference_date: str) -> dict[str, Any]:
+    """
+    Extract path and rule_spec information from law execution result.
+
+    Args:
+        result: RuleResult from machine service evaluation
+        machine_service: Machine service instance
+        law: Law identifier
+        service: Service identifier
+        reference_date: Reference date for rule spec
+
+    Returns:
+        Dictionary containing path_dict and rule_spec_dict
+    """
+    execution_details = {}
+
+    # Extract path information
+    try:
+        path_dict = node_to_dict(result.path, skip_services=True) if result.path else None
+        execution_details["path"] = path_dict
+    except Exception as e:
+        logger.warning(f"Could not extract path information: {e}")
+        execution_details["path"] = None
+
+    # Extract rule specification
+    try:
+        rule_spec = machine_service.get_rule_spec(law, reference_date, service)
+        # Filter relevant parts of rule_spec (same logic as laws router)
+        relevant_spec = {
+            "name": rule_spec.get("name"),
+            "description": rule_spec.get("description"),
+            "properties": {
+                "input": rule_spec.get("properties", {}).get("input", []),
+                "output": rule_spec.get("properties", {}).get("output", []),
+                "parameters": rule_spec.get("properties", {}).get("parameters", []),
+                "definitions": rule_spec.get("properties", {}).get("definitions", []),
+            },
+            "requirements": rule_spec.get("requirements"),
+            "actions": rule_spec.get("actions"),
+        }
+        execution_details["rule_spec"] = relevant_spec
+    except Exception as e:
+        logger.warning(f"Could not extract rule specification: {e}")
+        execution_details["rule_spec"] = None
+
+    return execution_details
 
 
 class MCPConnectionManager:
@@ -352,17 +401,23 @@ async def call_tool(machine_service, params: dict[str, Any]):
                     "service": arguments["service"],
                 }
 
+            # Extract execution details (path and rule spec)
+            reference_date = arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d"))
+            execution_details = extract_execution_details(
+                result, machine_service, arguments["law"], arguments["service"], reference_date
+            )
+
             # Return both human-readable content and structured data
             result_data = {
                 "success": True,
-                "data": {
-                    "output": result.output,
-                    "requirements_met": result.requirements_met,
-                    "input": result.input,
-                    "rulespec_uuid": result.rulespec_uuid,
-                    "missing_required": result.missing_required,
-                    "law_metadata": law_metadata,
-                },
+                "output": result.output,
+                "requirements_met": result.requirements_met,
+                "input": result.input,
+                "rulespec_uuid": result.rulespec_uuid,
+                "missing_required": result.missing_required,
+                "law_metadata": law_metadata,
+                "path": execution_details["path"],
+                "rule_spec": execution_details["rule_spec"],
             }
             return {
                 "content": [
@@ -371,7 +426,8 @@ async def call_tool(machine_service, params: dict[str, Any]):
                         "text": f"Law execution completed. Requirements met: {result.requirements_met}",
                     }
                 ],
-                "structured_content": result_data,
+                "structuredContent": result_data,
+                "isError": False,
             }
 
         elif tool_name == "check_eligibility":
@@ -384,13 +440,25 @@ async def call_tool(machine_service, params: dict[str, Any]):
             )
             # Check if requirements are met
             eligible = result.requirements_met
+
+            # Extract execution details (path and rule spec)
+            reference_date = arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d"))
+            execution_details = extract_execution_details(
+                result, machine_service, arguments["law"], arguments["service"], reference_date
+            )
+
+            eligibility_data = {
+                "eligible": eligible,
+                "requirements_met": result.requirements_met,
+                "missing_required": result.missing_required,
+                "path": execution_details["path"],
+                "rule_spec": execution_details["rule_spec"],
+            }
+
             return {
                 "content": [{"type": "text", "text": f"Eligible: {eligible}"}],
-                "structured_content": {
-                    "eligible": eligible,
-                    "requirements_met": result.requirements_met,
-                    "missing_required": result.missing_required,
-                },
+                "structuredContent": eligibility_data,
+                "isError": False,
             }
 
         elif tool_name == "calculate_benefit_amount":
@@ -405,14 +473,26 @@ async def call_tool(machine_service, params: dict[str, Any]):
             # Extract the requested output field
             output_field = arguments["output_field"]
             amount = result.output.get(output_field, "Not available")
+
+            # Extract execution details (path and rule spec)
+            reference_date = arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d"))
+            execution_details = extract_execution_details(
+                result, machine_service, arguments["law"], arguments["service"], reference_date
+            )
+
+            amount_data = {
+                "amount": amount,
+                "output_field": output_field,
+                "full_output": result.output,
+                "requirements_met": result.requirements_met,
+                "path": execution_details["path"],
+                "rule_spec": execution_details["rule_spec"],
+            }
+
             return {
                 "content": [{"type": "text", "text": f"Amount: {amount}"}],
-                "structured_content": {
-                    "amount": amount,
-                    "output_field": output_field,
-                    "full_output": result.output,
-                    "requirements_met": result.requirements_met,
-                },
+                "structuredContent": amount_data,
+                "isError": False,
             }
 
         else:
