@@ -31,34 +31,34 @@ async def test_all_mcp_tools():
                 "service": "TOESLAGEN",
                 "law": "zorgtoeslagwet",
                 "parameters": {"BSN": "100000001"},
-                "reference_date": "2025-01-01"
-            }
+                "reference_date": "2025-01-01",
+            },
         )
 
         structured1 = result1.structured_content
-        if structured1 and 'path' in structured1 and 'rule_spec' in structured1:
-            print(f"   ✅ execute_law: path={structured1['path'] is not None}, rule_spec={structured1['rule_spec'] is not None}")
+        if structured1 and "path" in structured1 and "rule_spec" in structured1:
+            print(
+                f"   ✅ execute_law: path={structured1['path'] is not None}, rule_spec={structured1['rule_spec'] is not None}"
+            )
         else:
-            print(f"   ❌ execute_law: Missing path or rule_spec")
+            print("   ❌ execute_law: Missing path or rule_spec")
 
         # Test 2: check_eligibility
         print("\n🔧 Testing check_eligibility tool...")
         result2 = await client.call_tool(
             "check_eligibility",
-            arguments={
-                "service": "TOESLAGEN",
-                "law": "wet_op_de_huurtoeslag",
-                "parameters": {"BSN": "100000002"}
-            }
+            arguments={"service": "TOESLAGEN", "law": "wet_op_de_huurtoeslag", "parameters": {"BSN": "100000002"}},
         )
 
         structured2 = result2.structured_content
-        if structured2 and 'path' in structured2 and 'rule_spec' in structured2:
-            print(f"   ✅ check_eligibility: path={structured2['path'] is not None}, rule_spec={structured2['rule_spec'] is not None}")
-            if structured2['path']:
+        if structured2 and "path" in structured2 and "rule_spec" in structured2:
+            print(
+                f"   ✅ check_eligibility: path={structured2['path'] is not None}, rule_spec={structured2['rule_spec'] is not None}"
+            )
+            if structured2["path"]:
                 print(f"   📊 Path root type: {structured2['path'].get('type', 'N/A')}")
         else:
-            print(f"   ❌ check_eligibility: Missing path or rule_spec")
+            print("   ❌ check_eligibility: Missing path or rule_spec")
 
         # Test 3: calculate_benefit_amount
         print("\n🔧 Testing calculate_benefit_amount tool...")
@@ -68,24 +68,26 @@ async def test_all_mcp_tools():
                 "service": "TOESLAGEN",
                 "law": "zorgtoeslagwet",
                 "parameters": {"BSN": "100000003"},
-                "output_field": "hoogte_toeslag"
-            }
+                "output_field": "hoogte_toeslag",
+            },
         )
 
         structured3 = result3.structured_content
-        if structured3 and 'path' in structured3 and 'rule_spec' in structured3:
-            print(f"   ✅ calculate_benefit_amount: path={structured3['path'] is not None}, rule_spec={structured3['rule_spec'] is not None}")
-            if structured3['rule_spec']:
+        if structured3 and "path" in structured3 and "rule_spec" in structured3:
+            print(
+                f"   ✅ calculate_benefit_amount: path={structured3['path'] is not None}, rule_spec={structured3['rule_spec'] is not None}"
+            )
+            if structured3["rule_spec"]:
                 print(f"   📋 Rule name: {structured3['rule_spec'].get('name', 'N/A')}")
         else:
-            print(f"   ❌ calculate_benefit_amount: Missing path or rule_spec")
+            print("   ❌ calculate_benefit_amount: Missing path or rule_spec")
 
         # Summary
-        print(f"\n📊 Summary:")
+        print("\n📊 Summary:")
         results = [
-            ("execute_law", structured1 and 'path' in structured1 and 'rule_spec' in structured1),
-            ("check_eligibility", structured2 and 'path' in structured2 and 'rule_spec' in structured2),
-            ("calculate_benefit_amount", structured3 and 'path' in structured3 and 'rule_spec' in structured3)
+            ("execute_law", structured1 and "path" in structured1 and "rule_spec" in structured1),
+            ("check_eligibility", structured2 and "path" in structured2 and "rule_spec" in structured2),
+            ("calculate_benefit_amount", structured3 and "path" in structured3 and "rule_spec" in structured3),
         ]
 
         for tool_name, has_data in results:
@@ -98,6 +100,7 @@ async def test_all_mcp_tools():
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
     finally:
