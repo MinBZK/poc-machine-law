@@ -1544,7 +1544,7 @@ BUSINESS_PROFILES = {
                         "zakelijk_vliegtuig_europa": 180000,
                         "zakelijk_vliegtuig_intercontinentaal": 320000,
                     }
-                ]
+                ],
             },
         },
     },
@@ -1606,7 +1606,7 @@ BUSINESS_PROFILES = {
                         "client_visits": 85000,
                         "team_meetups": 32000,
                     }
-                ]
+                ],
             },
         },
     },
@@ -1768,7 +1768,7 @@ BUSINESS_PROFILES = {
                         "fuel_efficiency_tracking": True,
                         "emissions_monitoring": "ACTIEF",
                     }
-                ]
+                ],
             },
         },
     },
