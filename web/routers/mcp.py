@@ -480,13 +480,21 @@ async def call_tool(machine_service, params: dict[str, Any]):
 
     try:
         if tool_name == "execute_law":
+            overrides = arguments.get("overrides")
+
             # Use machine service to execute law
-            result = machine_service.evaluate(
-                service=arguments["service"],
-                law=arguments["law"],
-                parameters=arguments["parameters"],
-                reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
-            )
+            try:
+                result = machine_service.evaluate(
+                    service=arguments["service"],
+                    law=arguments["law"],
+                    parameters=arguments["parameters"],
+                    reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
+                    overwrite_input=overrides,
+                    requested_output=arguments.get("requested_output"),
+                    approved=arguments.get("approved", False),
+                )
+            except Exception:
+                raise
 
             # Get law metadata to provide context
             law_metadata = {}
@@ -552,6 +560,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 law=arguments["law"],
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
+                overwrite_input=arguments.get("overrides"),
             )
             # Check if requirements are met
             eligible = result.requirements_met
@@ -589,6 +598,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 law=arguments["law"],
                 parameters=arguments["parameters"],
                 reference_date=arguments.get("reference_date", datetime.today().strftime("%Y-%m-%d")),
+                overwrite_input=arguments.get("overrides"),
                 requested_output=arguments["output_field"],
             )
             # Extract the requested output field
@@ -844,8 +854,11 @@ async def read_resource(machine_service, params: dict[str, Any]):
                             text_lines.append(
                                 f"    - {param_name} ({param_type}): {param_desc} [from {source_service}/{source_law}]"
                             )
+                            text_lines.append(f'      Override: {{"{source_service}": {{"{param_name}": value}}}}')
                         else:
                             text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
+                            if param_type in ["amount", "number", "string", "boolean"]:
+                                text_lines.append(f'      Override: {{"{service}": {{"{param_name}": value}}}}')
                 else:
                     text_lines.append("  Required Parameters: None")
 
