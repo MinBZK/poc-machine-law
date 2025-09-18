@@ -286,10 +286,9 @@ properties:
 
   definitions:
     # TODO: Deze emissiefactoren zijn voorbeelden - werkelijke factoren moeten worden vastgesteld via ministeriële regeling
-    CO2_FACTOREN:
-      AUTO_BENZINE: 170  # gram CO2 per kilometer
-      AUTO_DIESEL: 150   # gram CO2 per kilometer
-      OPENBAAR_VERVOER: 30  # gram CO2 per kilometer
+    CO2_FACTOR_AUTO_BENZINE: 170  # gram CO2 per kilometer
+    CO2_FACTOR_AUTO_DIESEL: 150   # gram CO2 per kilometer
+    CO2_FACTOR_OPENBAAR_VERVOER: 30  # gram CO2 per kilometer
 
 requirements:
   - all:
@@ -367,23 +366,23 @@ actions:
       - operation: MULTIPLY
         values:
           - "$WOON_WERK_AUTO_BENZINE"
-          - "$CO2_FACTOREN.AUTO_BENZINE"
+          - "$CO2_FACTOR_AUTO_BENZINE"
       - operation: MULTIPLY
         values:
           - "$WOON_WERK_AUTO_DIESEL"
-          - "$CO2_FACTOREN.AUTO_DIESEL"
+          - "$CO2_FACTOR_AUTO_DIESEL"
       - operation: MULTIPLY
         values:
           - "$ZAKELIJK_AUTO_BENZINE"
-          - "$CO2_FACTOREN.AUTO_BENZINE"
+          - "$CO2_FACTOR_AUTO_BENZINE"
       - operation: MULTIPLY
         values:
           - "$ZAKELIJK_AUTO_DIESEL"
-          - "$CO2_FACTOREN.AUTO_DIESEL"
+          - "$CO2_FACTOR_AUTO_DIESEL"
       - operation: MULTIPLY
         values:
           - "$WOON_WERK_OPENBAAR_VERVOER"
-          - "$CO2_FACTOREN.OPENBAAR_VERVOER"
+          - "$CO2_FACTOR_OPENBAAR_VERVOER"
     legal_basis:
       law: "Besluit activiteiten leefomgeving"
       bwb_id: "BWBR0041330"
