@@ -1,12 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <title>Chatbot met MCP</title>
-    <style>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <title>Chatbot met MCP</title>
+        <style>
       /* Basic styling for markdown elements inside .message-content */
       .message-content h1 {
         font-size: 1.875rem;
@@ -99,76 +99,52 @@
         margin-bottom: 0.75rem;
         font-style: italic;
       }
-    </style>
-  </head>
-  <body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-      <!-- Header -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">
-          🤖 Chatbot met MCP
-        </h1>
-        <p class="text-gray-600">
-          Typ berichten en kijk wanneer MCP inschakelt.
-        </p>
-      </div>
-
-      <!-- Connection Status -->
-      <div
-        id="connection-status"
-        class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6"
-      >
-        <strong class="font-bold">Status:</strong>
-        <span class="block sm:inline">Connecting to server...</span>
-      </div>
-
-      <!-- Chat Container -->
-      <div
-        class="bg-white rounded-lg shadow-md flex flex-col"
-        style="height: 600px"
-      >
-        <!-- Messages Area -->
-        <div
-          id="messages"
-          class="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
-        >
-          <!-- Messages will be dynamically added here -->
+        </style>
+    </head>
+    <body class="bg-gray-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8 max-w-4xl">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">🤖 Chatbot met MCP</h1>
+                <p class="text-gray-600">Typ berichten en kijk wanneer MCP inschakelt.</p>
+            </div>
+            <!-- Connection Status -->
+            <div id="connection-status"
+                 class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
+                <strong class="font-bold">Status:</strong>
+                <span class="block sm:inline">Connecting to server...</span>
+            </div>
+            <!-- Chat Container -->
+            <div class="bg-white rounded-lg shadow-md flex flex-col"
+                 style="height: 600px">
+                <!-- Messages Area -->
+                <div id="messages"
+                     class="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+                <!-- Quick Replies -->
+                <div id="quick-replies" class="px-6 py-2 border-t border-gray-200 hidden">
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Quick reply buttons will be added here -->
+                    </div>
+                </div>
+                <!-- Input Area -->
+                <div class="p-6 border-t border-gray-200">
+                    <div class="flex space-x-4">
+                        <input type="text"
+                               id="message-input"
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Typ een bericht..."
+                               disabled />
+                        <button onclick="sendMessage()"
+                                id="send-button"
+                                class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-6 rounded-md transition duration-200"
+                                disabled>Verstuur</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Quick Replies -->
-        <div
-          id="quick-replies"
-          class="px-6 py-2 border-t border-gray-200 hidden"
-        >
-          <div class="flex flex-wrap gap-2">
-            <!-- Quick reply buttons will be added here -->
-          </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="p-6 border-t border-gray-200">
-          <div class="flex space-x-4">
-            <input
-              type="text"
-              id="message-input"
-              class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Typ een bericht..."
-              disabled
-            />
-            <button
-              onclick="sendMessage()"
-              id="send-button"
-              class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-6 rounded-md transition duration-200"
-              disabled
-            >
-              Verstuur
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script>
+        <script>
       let ws = null;
       let isConnected = false;
 
@@ -426,6 +402,6 @@
       window.addEventListener("load", function () {
         connectWebSocket();
       });
-    </script>
-  </body>
+        </script>
+    </body>
 </html>

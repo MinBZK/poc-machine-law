@@ -42,12 +42,14 @@ router = APIRouter()
 mcp_client = None
 dynamic_tools = []
 
+
 async def initialize_mcp_client():
     global mcp_client
     if mcp_client is None:
         mcp_client = Client("https://ui.lac.apps.digilab.network/mcp/")
         await mcp_client.__aenter__()
     return mcp_client
+
 
 async def create_dynamic_tools() -> List:
     """Dynamically create tools from MCP endpoint"""
@@ -64,7 +66,7 @@ async def create_dynamic_tools() -> List:
 
         for mcp_tool in mcp_tools:
             tool_name = mcp_tool.name
-            tool_description = getattr(mcp_tool, 'description', f'MCP tool: {tool_name}')
+            tool_description = getattr(mcp_tool, "description", f"MCP tool: {tool_name}")
 
             print(f"🔨 Creating dynamic tool: {tool_name}")
 
@@ -78,9 +80,9 @@ async def create_dynamic_tools() -> List:
                         client = await initialize_mcp_client()
 
                         # First, unwrap kwargs if they're wrapped
-                        if len(kwargs) == 1 and 'kwargs' in kwargs:
+                        if len(kwargs) == 1 and "kwargs" in kwargs:
                             # Arguments are wrapped in a 'kwargs' key, unwrap them
-                            actual_kwargs = kwargs['kwargs']
+                            actual_kwargs = kwargs["kwargs"]
                         else:
                             # Arguments are passed directly
                             actual_kwargs = kwargs
@@ -88,17 +90,13 @@ async def create_dynamic_tools() -> List:
                         # Format arguments based on the tool type
                         if name == "execute_law":
                             # For execute_law, restructure to expected format
-                            service = actual_kwargs.get('service')
-                            law = actual_kwargs.get('law')
+                            service = actual_kwargs.get("service")
+                            law = actual_kwargs.get("law")
 
                             # Put all other parameters into the parameters object
-                            parameters = {k: v for k, v in actual_kwargs.items() if k not in ['service', 'law']}
+                            parameters = {k: v for k, v in actual_kwargs.items() if k not in ["service", "law"]}
 
-                            arguments = {
-                                "service": service,
-                                "law": law,
-                                "parameters": parameters
-                            }
+                            arguments = {"service": service, "law": law, "parameters": parameters}
                         else:
                             # For other tools, pass arguments directly
                             arguments = actual_kwargs
@@ -114,10 +112,10 @@ async def create_dynamic_tools() -> List:
                         await send_debug_message(f"📥 MCP response received: {result_preview}")
 
                         # Handle different response formats from MCP
-                        if hasattr(result, 'content') and result.content:
+                        if hasattr(result, "content") and result.content:
                             if len(result.content) > 0:
                                 content_item = result.content[0]
-                                if hasattr(content_item, 'text'):
+                                if hasattr(content_item, "text"):
                                     return str(content_item.text)
                                 else:
                                     return str(content_item)
@@ -145,15 +143,12 @@ async def create_dynamic_tools() -> List:
         # Return empty list if tool creation fails
         return []
 
-model = ChatAnthropic(
-    model="claude-sonnet-4-20250514",
-    temperature=0,
-    max_retries=2,
-    max_tokens_to_sample=4000
-)
+
+model = ChatAnthropic(model="claude-sonnet-4-20250514", temperature=0, max_retries=2, max_tokens_to_sample=4000)
 
 # Global variable to store current thread_id for debug messages
 current_thread_id = None
+
 
 async def send_debug_message(content: str):
     """Send debug message to current WebSocket connection"""
@@ -171,6 +166,7 @@ async def send_debug_message(content: str):
 # Dynamic tools will be created at startup
 tools = []
 model_with_tools = None
+
 
 async def initialize_model_with_tools():
     """Initialize model with dynamically created tools"""
@@ -245,6 +241,7 @@ async def chatbot(state: State):
 # Add nodes
 workflow.add_node("chatbot", chatbot)
 
+
 # Tool node will be created dynamically after tools are initialized
 async def create_tool_node():
     """Create tool node with dynamic tools"""
@@ -254,7 +251,9 @@ async def create_tool_node():
         # Return a dummy tool node if no tools available
         return ToolNode([])
 
+
 # We'll initialize the tool node when the workflow is compiled
+
 
 # Initialize workflow after lifespan startup
 async def initialize_workflow():
@@ -358,23 +357,22 @@ async def websocket_endpoint(websocket: WebSocket):
                                 for message in node_output["messages"]:
                                     # Check if this is a tool result message
                                     is_tool_result = (
-                                        hasattr(message, '__class__') and
-                                        message.__class__.__name__ == 'ToolMessage'
+                                        hasattr(message, "__class__") and message.__class__.__name__ == "ToolMessage"
                                     ) or node_name == "tools"
 
                                     # Extract text content from different message formats
                                     content_str = ""
 
-                                    if hasattr(message, 'content'):
+                                    if hasattr(message, "content"):
                                         if isinstance(message.content, list):
                                             # Handle list format - extract text from each item
                                             text_items = []
                                             for item in message.content:
                                                 if isinstance(item, dict):
-                                                    if item.get('type') == 'text' and 'text' in item:
-                                                        text_items.append(item['text'])
+                                                    if item.get("type") == "text" and "text" in item:
+                                                        text_items.append(item["text"])
                                                     # Skip tool_use and other non-text items
-                                                elif hasattr(item, 'text'):
+                                                elif hasattr(item, "text"):
                                                     text_items.append(str(item.text))
                                             content_str = " ".join(text_items)
                                         elif isinstance(message.content, str):
@@ -384,7 +382,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
                                     # Only process if we have actual text content
                                     if content_str.strip():
-
                                         if is_tool_result:
                                             # Send tool results as debug messages
                                             await manager.send_debug_message(f"Tool result: {content_str}", thread_id)
@@ -394,7 +391,7 @@ async def websocket_endpoint(websocket: WebSocket):
                                             chunk_size = 5  # Send 5 words at a time
 
                                             for i in range(0, len(words), chunk_size):
-                                                word_chunk = " ".join(words[i:i + chunk_size])
+                                                word_chunk = " ".join(words[i : i + chunk_size])
 
                                                 if not contains_yaml:
                                                     chunk_content_so_far += word_chunk + " "
@@ -404,7 +401,9 @@ async def websocket_endpoint(websocket: WebSocket):
                                                 # Only add quick replies on the last chunk
                                                 quick_replies = []
                                                 if i + chunk_size >= len(words):
-                                                    stop_reason = getattr(message, 'response_metadata', {}).get("stop_reason")
+                                                    stop_reason = getattr(message, "response_metadata", {}).get(
+                                                        "stop_reason"
+                                                    )
                                                     if stop_reason == "max_tokens":
                                                         quick_replies = ["Ga door"]
                                                     elif contains_yaml and stop_reason == "end_turn":
@@ -412,9 +411,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
                                                 await manager.send_message(
                                                     {
-                                                        "id": getattr(message, 'id', str(uuid.uuid4())),
+                                                        "id": getattr(message, "id", str(uuid.uuid4())),
                                                         "type": "chunk",
-                                                        "content": word_chunk + (" " if i + chunk_size < len(words) else ""),
+                                                        "content": word_chunk
+                                                        + (" " if i + chunk_size < len(words) else ""),
                                                         "quick_replies": quick_replies,
                                                     },
                                                     thread_id,
