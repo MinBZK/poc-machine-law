@@ -79,8 +79,13 @@ TOOL_SCHEMAS = {
         {
             "overrides": {
                 "type": "object",
-                "description": "Parameter overrides",
-                "examples": [{"inkomen": 25000}, {"woonsituatie": "alleenstaand"}],
+                "description": "Service-specific parameter overrides (SERVICE_NAME -> FIELD_NAME -> value)",
+                "examples": [
+                    {"UWV": {"INKOMEN": 3000000}},
+                    {"BELASTINGDIENST": {"VERMOGEN": 500000}},
+                    {"UWV": {"INKOMEN": 2500000}, "RvIG": {"LEEFTIJD": 25}},
+                ],
+                "additionalProperties": {"type": "object", "additionalProperties": True},
             },
             "requested_output": {
                 "type": "string",
@@ -96,7 +101,16 @@ TOOL_SCHEMAS = {
         },
     ),
     "check_eligibility": create_tool_schema(
-        "check_eligibility", "Check if a citizen is eligible for a specific benefit or law"
+        "check_eligibility",
+        "Check if a citizen is eligible for a specific benefit or law",
+        {
+            "overrides": {
+                "type": "object",
+                "description": "Service-specific parameter overrides for eligibility check (SERVICE_NAME -> FIELD_NAME -> value)",
+                "examples": [{"UWV": {"INKOMEN": 3000000}}, {"BELASTINGDIENST": {"VERMOGEN": 500000}}],
+                "additionalProperties": {"type": "object", "additionalProperties": True},
+            }
+        },
     ),
     "calculate_benefit_amount": create_tool_schema(
         "calculate_benefit_amount",
@@ -106,7 +120,13 @@ TOOL_SCHEMAS = {
                 "type": "string",
                 "description": "Output field to calculate",
                 "examples": ["hoogte_toeslag", "uitkering_bedrag", "pensioen_bedrag"],
-            }
+            },
+            "overrides": {
+                "type": "object",
+                "description": "Service-specific parameter overrides for benefit calculation (SERVICE_NAME -> FIELD_NAME -> value)",
+                "examples": [{"UWV": {"INKOMEN": 3000000}}, {"BELASTINGDIENST": {"VERMOGEN": 500000}}],
+                "additionalProperties": {"type": "object", "additionalProperties": True},
+            },
         },
         ["output_field"],
     ),
