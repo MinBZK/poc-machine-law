@@ -54,13 +54,8 @@ properties:
         type: "period"
         period_type: "year"
       source_reference:
-        table: "wpm_submissions"
-        fields: ["kvk_nummer", "woon_werk_auto_benzine", "woon_werk_auto_diesel", "zakelijk_auto_benzine", "zakelijk_auto_diesel", "woon_werk_ov", "submission_date"]
-        select_on:
-          - name: "kvk_nummer"
-            description: "KvK nummer van de organisatie"
-            type: "string"
-            value: "$KVK_NUMMER"
+        type: claim
+        required: true
 
   output:
     - name: "woon_werk_auto_benzine"

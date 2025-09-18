@@ -23,7 +23,7 @@ async def test_fastmcp_client():
     print("🚀 Testing with FastMCP Client Library")
 
     # Connect to our MCP server
-    async with Client("http://localhost:8001/mcp/") as client:
+    async with Client("http://localhost:8002/mcp/") as client:
         print("✅ Connected to MCP server")
 
         # List tools (FastMCP auto-initializes)
@@ -40,23 +40,42 @@ async def test_fastmcp_client():
         )
 
         print(f"   Tool call result: {len(result.content)} content items")
+
+        # Print human-readable content
         for content in result.content:
             if hasattr(content, "text"):
-                import json
-
-                try:
-                    parsed_data = json.loads(content.text)
-                    print(f"   Success: {parsed_data.get('success')}")
-                    if parsed_data.get("success"):
-                        data = parsed_data["data"]
-                        print(f"   WPM Requirements Met: {data.get('requirements_met')}")
-                        print(f"   Employees: {data.get('output', {}).get('aantal_werknemers')}")
-                except json.JSONDecodeError:
-                    print(f"   Text: {content.text[:100]}...")
+                print(f"   Human-readable: {content.text}")
             elif hasattr(content, "data"):
-                print(
-                    f"   Data keys: {list(content.data.keys()) if isinstance(content.data, dict) else type(content.data)}"
-                )
+                print(f"   Data: {content.data}")
+
+        # Print structured content if available
+        if hasattr(result, "structured_content") and result.structured_content:
+            print("   Structured content available!")
+            structured = result.structured_content
+            if isinstance(structured, dict):
+                if "success" in structured:
+                    print(f"   Success: {structured.get('success')}")
+                    if structured.get("success") and "data" in structured:
+                        data = structured["data"]
+                        print(f"   Requirements Met: {data.get('requirements_met')}")
+                        print(f"   Employees: {data.get('output', {}).get('aantal_werknemers')}")
+                else:
+                    print(f"   Structured data: {structured}")
+        else:
+            # Fallback to old JSON parsing for backward compatibility
+            for content in result.content:
+                if hasattr(content, "text"):
+                    import json
+
+                    try:
+                        parsed_data = json.loads(content.text)
+                        print(f"   (Fallback) Success: {parsed_data.get('success')}")
+                        if parsed_data.get("success"):
+                            data = parsed_data["data"]
+                            print(f"   (Fallback) Requirements Met: {data.get('requirements_met')}")
+                            print(f"   (Fallback) Employees: {data.get('output', {}).get('aantal_werknemers')}")
+                    except json.JSONDecodeError:
+                        print(f"   (Fallback) Text: {content.text[:100]}...")
 
         # List resources
         print("\n3️⃣ Listing resources...")
