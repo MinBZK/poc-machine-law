@@ -847,7 +847,7 @@ async def read_resource(machine_service, params: dict[str, Any]):
                         else:
                             text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
                 else:
-                    text_lines.append(f"  Required Parameters: None")
+                    text_lines.append("  Required Parameters: None")
 
                 text_lines.append("")  # Empty line between laws
 
