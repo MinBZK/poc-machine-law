@@ -47,6 +47,34 @@ uv run python -m law_mcp.server
 uv run python law_mcp/demo.py
 ```
 
+### Interactive Chat (NEW!)
+
+Setup and run:
+```bash
+# Set your Anthropic API key
+export ANTHROPIC_API_KEY="sk-ant-api03-..."
+
+# Start the MCP server (in another terminal)
+uv run web/main.py
+
+# Start interactive chat
+uv run law_mcp/interactive_chat.py
+```
+
+Experience an interactive command-line chat that combines:
+- **Official LangChain MCP integration** using `langchain-mcp-adapters`
+- **LangGraph ReAct agents** for reasoning and tool usage
+- **Dutch law execution** via MCP protocol
+- **Claude for natural language understanding**
+
+This demonstrates the complete 2025 integration stack for AI-powered legal assistance.
+
+**Try these example questions:**
+- `"Mijn BSN is 100000001. Heb ik recht op zorgtoeslag?"`
+- `"Hoeveel zorgtoeslag krijg ik precies per maand?"`
+- `"Wat als mijn inkomen €35.000 wordt?"`
+- `"Mijn bedrijf heeft KVK 58372941. Wat kan ik krijgen?"`
+
 ### Run Tests
 ```bash
 uv run python law_mcp/test_integration.py
@@ -478,6 +506,180 @@ The MCP server now supports **generic parameters** for maximum flexibility:
   }
 }
 ```
+
+## Parameter Overrides Guide
+
+The MCP server supports **parameter overrides** to test different scenarios and "what-if" calculations. There are two types of overrides:
+
+### Service Overrides (External Data)
+
+Override data from external services like UWV, Belastingdienst, etc.
+
+**Rules:**
+- Use **lowercase field names**
+- Format: `{"SERVICE_NAME": {"field_name": value}}`
+
+**Common Service Override Examples:**
+
+```json
+{
+  "overrides": {
+    "UWV": {
+      "inkomen": 3500000,           // Override income to €35,000
+      "werkgever": "TechCorp BV",   // Override employer
+      "dienstverband": "VAST"       // Override employment type
+    },
+    "BELASTINGDIENST": {
+      "vermogen": 75000,            // Override assets to €75,000
+      "aow_uitkering": 150000       // Override AOW pension
+    },
+    "RVZ": {
+      "verzekerd": true,            // Override insurance status
+      "premie": 140000              // Override premium amount
+    }
+  }
+}
+```
+
+### Source Overrides (Internal Law Data)
+
+Override internal law source data like demographic stats, business metrics, etc.
+
+**Rules:**
+- Use **ALL CAPS field names**
+- Format: `{"SOURCE_TYPE": {"FIELD_NAME": value}}`
+
+**Common Source Override Examples:**
+
+```json
+{
+  "overrides": {
+    "RVO": {
+      "AANTAL_WERKNEMERS": 150,           // Override employee count
+      "VERSTREKT_MOBILITEITSVERGOEDING": true  // Override mobility allowance
+    },
+    "KVK": {
+      "OMZET": 2500000,                   // Override business turnover
+      "RECHTSVORM": "BV"                  // Override legal form
+    },
+    "CBS": {
+      "LEVENSVERWACHTING": 85,            // Override life expectancy
+      "GEMIDDELD_INKOMEN": 3800000        // Override average income
+    }
+  }
+}
+```
+
+### Combined Overrides
+
+You can combine both service and source overrides:
+
+```json
+{
+  "overrides": {
+    "UWV": {"inkomen": 4000000},          // Service override
+    "RVO": {"AANTAL_WERKNEMERS": 200}     // Source override
+  }
+}
+```
+
+### Practical Examples
+
+#### Test Income Scenarios for Zorgtoeslag
+```bash
+curl -X POST http://localhost:8000/mcp/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "execute_law",
+      "arguments": {
+        "service": "TOESLAGEN",
+        "law": "zorgtoeslagwet",
+        "parameters": {"BSN": "100000001"},
+        "overrides": {"UWV": {"inkomen": 4500000}}
+      }
+    },
+    "id": 1
+  }'
+```
+
+#### Test WPM Business Scenarios
+```bash
+curl -X POST http://localhost:8000/mcp/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "execute_law",
+      "arguments": {
+        "service": "RVO",
+        "law": "wpm",
+        "parameters": {"KVK_NUMMER": "58372941"},
+        "overrides": {
+          "RVO": {
+            "AANTAL_WERKNEMERS": 99,
+            "VERSTREKT_MOBILITEITSVERGOEDING": false
+          }
+        }
+      }
+    },
+    "id": 1
+  }'
+```
+
+### When to Use Overrides
+
+- **Scenario Testing**: Test how benefit amounts change with different income levels
+- **Optimization**: Find optimal income/asset levels for maximum benefits
+- **Planning**: Model future situations (job change, retirement, etc.)
+- **Business Analysis**: Test regulatory compliance under different conditions
+- **Policy Impact**: Analyze effects of potential policy changes
+
+### Complete Override Example: Testing Income Scenarios
+
+Compare how different income levels affect zorgtoeslag eligibility:
+
+```bash
+# Test current situation
+curl -X POST http://localhost:8000/mcp/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "execute_law",
+      "arguments": {
+        "service": "TOESLAGEN",
+        "law": "zorgtoeslagwet",
+        "parameters": {"BSN": "100000001"}
+      }
+    },
+    "id": 1
+  }'
+
+# Test with higher income override
+curl -X POST http://localhost:8000/mcp/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "execute_law",
+      "arguments": {
+        "service": "TOESLAGEN",
+        "law": "zorgtoeslagwet",
+        "parameters": {"BSN": "100000001"},
+        "overrides": {"UWV": {"inkomen": 4500000}}
+      }
+    },
+    "id": 2
+  }'
+```
+
+This shows exactly how overrides change benefit calculations in practice.
 
 ## Mock Data
 
