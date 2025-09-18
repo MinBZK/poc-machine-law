@@ -9,8 +9,8 @@ Feature: WPM Rapportageverplichting
   Scenario: Organisatie met 100 werknemers is verplicht te rapporteren
     Given een organisatie met KVK-nummer "12345678"
     And de volgende RVO wpm_gegevens gegevens:
-      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
-      | 12345678   | 100               | false                                 |
+      | kvk_nummer | aantal_werknemers | verstrekt_mobiliteitsvergoeding |
+      | 12345678   | 100               | true                            |
     When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is voldaan aan de voorwaarden
     And is de rapportageverplichting "true"
@@ -19,24 +19,24 @@ Feature: WPM Rapportageverplichting
   Scenario: Organisatie met 99 werknemers is niet verplicht te rapporteren
     Given een organisatie met KVK-nummer "87654321"
     And de volgende RVO wpm_gegevens gegevens:
-      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
-      | 87654321   | 99                | false                                 |
+      | kvk_nummer | aantal_werknemers | verstrekt_mobiliteitsvergoeding |
+      | 87654321   | 99                | true                            |
     When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is niet voldaan aan de voorwaarden
 
   Scenario: Organisatie zonder mobiliteitsvergoeding hoeft niet te rapporteren
     Given een organisatie met KVK-nummer "44444444"
     And de volgende RVO wpm_gegevens gegevens:
-      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
-      | 44444444   | 150               | true                                  |
+      | kvk_nummer | aantal_werknemers | verstrekt_mobiliteitsvergoeding |
+      | 44444444   | 150               | false                           |
     When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is niet voldaan aan de voorwaarden
 
   Scenario: Organisatie rapporteert reisgegevens en CO2-uitstoot
     Given een organisatie met KVK-nummer "55555555"
     And de volgende RVO wpm_gegevens gegevens:
-      | kvk_nummer | aantal_werknemers | verstrekt_geen_mobiliteitsvergoeding |
-      | 55555555   | 120               | false                                 |
+      | kvk_nummer | aantal_werknemers | verstrekt_mobiliteitsvergoeding |
+      | 55555555   | 120               | true                            |
     And de volgende RVO wpm_reisgegevens gegevens:
       | kvk_nummer | woon_werk_auto_benzine | woon_werk_auto_diesel | zakelijk_auto_benzine | zakelijk_auto_diesel | woon_werk_openbaar_vervoer |
       | 55555555   | 10000                  | 5000                  | 3000                  | 2000                 | 8000                       |
