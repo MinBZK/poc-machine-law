@@ -1,7 +1,13 @@
-# 🤖 Machine-leesbare Wetgeving
 ![GitHub License](https://img.shields.io/github/license/minbzk/poc-machine-law)
+![RegelRecht](https://img.shields.io/badge/RegelRecht-PoC-blue)
 
-> Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wetgeving.
+# RegelRecht PoC
+*Van wet naar digitale werking*
+
+> **Note**: Dit project is nu de Proof of Concept voor **RegelRecht**.
+> Voorheen bekend als PoC Machine Law, Machine Law, Van wet naar werking, Van wet naar digitale werking, Project Zonder Naam, en Law as Code.
+
+> Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wet- en regelgeving.
 
 ## 💡 Motivatie
 
@@ -174,6 +180,39 @@ uv run web/main.py
 ```
 
 Dit zou een interface hier http://0.0.0.0:8000 en hier http://0.0.0.0:8000/admin op moeten leveren.
+
+### MCP Server (Model Context Protocol)
+
+De applicatie biedt ook een MCP (Model Context Protocol) server die AI agents toegang geeft tot Nederlandse wetgeving:
+
+```bash
+# Start de web server (inclusief MCP endpoint)
+uv run web/main.py
+```
+
+De MCP server is beschikbaar op http://0.0.0.0:8001/mcp/ en ondersteunt:
+
+**🔧 Tools:**
+- `execute_law` - Voer een Nederlandse wet uit voor specifieke parameters
+- `check_eligibility` - Controleer geschiktheid voor uitkeringen/toeslagen
+- `calculate_benefit_amount` - Bereken uitkeringsbedragen
+
+**📚 Resources:**
+- `laws://list` - Lijst van alle beschikbare wetten
+- `law://{service}/{law}/spec` - Specificatie van een specifieke wet
+- `profile://{bsn}` - Burgerprofiel gegevens
+
+**💬 Prompts:**
+- `check_all_benefits` - Controleer alle mogelijke uitkeringen
+- `explain_calculation` - Leg berekeningen uit
+- `compare_scenarios` - Vergelijk verschillende scenario's
+
+**Test de MCP client:**
+```bash
+uv run python law_mcp/test_client.py
+```
+
+De MCP implementatie volgt de 2025-03-26 specificatie en ondersteunt Streamable HTTP transport voor AI agents.
 
 ### Go server starten (backend)
 
