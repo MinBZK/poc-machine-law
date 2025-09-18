@@ -85,23 +85,26 @@ async def demonstrate_mcp_server():
         print("\n👤 SCENARIO 4: Looking Up Citizen Profile")
         print("-" * 50)
 
-        profile_result = await session.read_resource("profile://123456782")
+        profile_result = await session.read_resource("profile://100000001")
         profile_data = json.loads(profile_result.contents[0].text)
 
-        print("Citizen Profile (BSN: 123456782):")
+        print("Citizen Profile (BSN: 100000001):")
         citizen_data = profile_data.get("data", {})
-        print(f"  🎂 Birth date: {citizen_data.get('geboortedatum', 'N/A')}")
-        print(f"  📍 Postal code: {citizen_data.get('postcode', 'N/A')}")
-        print(f"  🏠 Household type: {citizen_data.get('huishouding', 'N/A')}")
-        print(f"  💰 Annual income: €{citizen_data.get('inkomen', 0):,}")
-        print(f"  🛡️  Insured: {citizen_data.get('verzekerd', 'N/A')}")
+        if citizen_data:
+            print(f"  🎂 Birth date: {citizen_data.get('geboortedatum', 'N/A')}")
+            print(f"  📍 Postal code: {citizen_data.get('postcode', 'N/A')}")
+            print(f"  🏠 Household type: {citizen_data.get('huishouding', 'N/A')}")
+            print(f"  💰 Annual income: €{citizen_data.get('inkomen', 0):,}")
+            print(f"  🛡️  Insured: {citizen_data.get('verzekerd', 'N/A')}")
+        else:
+            print(f"  ⚠️  No profile data found for BSN: 100000001")
 
         # Scenario 5: Check eligibility for specific benefit
         print("\n✅ SCENARIO 5: Checking Eligibility for Zorgtoeslag")
         print("-" * 50)
 
         eligibility_result = await session.call_tool(
-            "check_eligibility", {"parameters": {"BSN": "123456782"}, "service": "TOESLAGEN", "law": "zorgtoeslagwet"}
+            "check_eligibility", {"parameters": {"BSN": "100000001"}, "service": "TOESLAGEN", "law": "zorgtoeslagwet"}
         )
         eligibility_data = json.loads(eligibility_result.content[0].text)
 
@@ -118,7 +121,7 @@ async def demonstrate_mcp_server():
         execution_result = await session.call_tool(
             "execute_law",
             {
-                "parameters": {"BSN": "123456782"},
+                "parameters": {"BSN": "100000001"},
                 "service": "TOESLAGEN",
                 "law": "zorgtoeslagwet",
                 "reference_date": "2024-01-01",
@@ -152,7 +155,7 @@ async def demonstrate_mcp_server():
         benefit_result = await session.call_tool(
             "calculate_benefit_amount",
             {
-                "parameters": {"BSN": "123456782"},
+                "parameters": {"BSN": "100000001"},
                 "service": "TOESLAGEN",
                 "law": "zorgtoeslagwet",
                 "output_field": "hoogte_toeslag",
@@ -171,7 +174,7 @@ async def demonstrate_mcp_server():
 
         try:
             wpm_result = await session.call_tool(
-                "check_eligibility", {"parameters": {"kvk-nummer": "12345678"}, "service": "RVO", "law": "wpm"}
+                "check_eligibility", {"parameters": {"KVK_NUMMER": "58372941"}, "service": "RVO", "law": "omgevingswet/werkgebonden_personenmobiliteit"}
             )
             wpm_data = json.loads(wpm_result.content[0].text)
 
@@ -179,7 +182,7 @@ async def demonstrate_mcp_server():
             if wpm_data.get("success"):
                 eligible = wpm_data["data"]["eligible"]
                 status = "✅ ELIGIBLE" if eligible else "❌ NOT ELIGIBLE"
-                print(f"  WPM eligibility for KvK 12345678: {status}")
+                print(f"  WPM eligibility for KvK 58372941: {status}")
             else:
                 print(f"  ❌ WPM test failed: {wpm_data.get('error', 'Unknown error')}")
         except Exception as e:
@@ -189,7 +192,7 @@ async def demonstrate_mcp_server():
         print("\n💬 SCENARIO 9: Generating Guided Analysis Prompt")
         print("-" * 50)
 
-        prompt_result = await session.get_prompt("check_all_benefits", {"bsn": "123456782", "include_details": "true"})
+        prompt_result = await session.get_prompt("check_all_benefits", {"bsn": "100000001", "include_details": "true"})
 
         print("Generated prompt for comprehensive benefit analysis:")
         print(f"  📝 Description: {prompt_result.description}")

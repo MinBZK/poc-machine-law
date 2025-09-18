@@ -2,8 +2,6 @@
 Prompt template system for MCP server - DRY principle applied
 """
 
-import json
-
 from mcp.types import GetPromptResult, PromptMessage, TextContent
 
 
@@ -97,27 +95,48 @@ Use clear, non-technical language that a citizen can understand. Reference the s
 
 
 class ScenarioComparisonPrompt(PromptTemplate):
-    """Template for comparing scenarios"""
+    """Template for income and situation optimization analysis"""
 
     def __init__(self):
-        super().__init__("compare_scenarios", "Compare scenarios")
+        super().__init__("optimize_income", "Optimize income and benefits")
 
     def _build_prompt(self, arguments: dict[str, str]) -> str:
         bsn = arguments["bsn"]
-        scenarios = json.loads(arguments.get("scenarios", "[]"))
-        scenarios_text = "\n".join([f"- Scenario {i + 1}: {scenario}" for i, scenario in enumerate(scenarios)])
 
-        return f"""You are comparing different scenarios for citizen BSN {bsn}.
+        return f"""You are analyzing different income scenarios to optimize benefits for citizen BSN {bsn}.
 
-Scenarios to analyze:
-{scenarios_text}
-
-For each scenario:
+Test these common scenarios using overrides:
 
 1. Use the `execute_law` tool with appropriate overrides to simulate the scenario
 2. Calculate the difference in outcomes compared to the current situation
 3. Analyze which scenario provides the best financial outcome
 4. Consider any trade-offs or requirements for each scenario
+
+## Override Usage Guide:
+
+**Service Overrides** (for external service data like income, employment):
+- Use lowercase field names
+- Format: `{"SERVICE_NAME": {"field_name": value}}`
+- Examples:
+  - `{"UWV": {"inkomen": 3500000}}` (override income to €35,000)
+  - `{"BELASTINGDIENST": {"vermogen": 50000}}` (override assets to €50,000)
+  - `{"RVZ": {"verzekerd": true}}` (override insurance status)
+
+**Source Overrides** (for internal law source data):
+- Use ALL CAPS field names
+- Format: `{"SOURCE_TYPE": {"FIELD_NAME": value}}`
+- Examples:
+  - `{"RVO": {"AANTAL_WERKNEMERS": 150}}` (override employee count)
+  - `{"KVK": {"OMZET": 2000000}}` (override business turnover)
+  - `{"CBS": {"LEVENSVERWACHTING": 85}}` (override life expectancy)
+
+**Combined Example:**
+```json
+{"overrides": {"UWV": {"inkomen": 4000000},
+    "RVO": {"AANTAL_WERKNEMERS": 200}
+  }
+}
+```
 
 Present a clear comparison table showing:
 - Scenario description
@@ -206,6 +225,7 @@ Perform a comprehensive analysis to maximize this person's benefits:
    - Analyze if income adjustments could increase net benefits
    - Consider timing of income (monthly vs yearly variations)
    - Self-employment vs employment benefit impacts
+   - Use overrides to test different income scenarios: `{"UWV": {"inkomen": NEW_AMOUNT}}`
 
 3. **Family Structure Optimization**
    - Impact of marriage/partnership on combined benefits
@@ -345,7 +365,7 @@ Provide specific, actionable guidance tailored to this citizen's situation and t
 PROMPT_TEMPLATES = {
     "check_all_benefits": BenefitAnalysisPrompt(),
     "explain_calculation": CalculationExplanationPrompt(),
-    "compare_scenarios": ScenarioComparisonPrompt(),
+    "optimize_income": ScenarioComparisonPrompt(),
     "generate_citizen_report": CitizenReportPrompt(),
     "optimize_benefits": OptimizationPrompt(),
     "legal_research": LegalResearchPrompt(),

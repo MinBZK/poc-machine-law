@@ -79,11 +79,12 @@ TOOL_SCHEMAS = {
         {
             "overrides": {
                 "type": "object",
-                "description": "Service-specific parameter overrides (SERVICE_NAME -> FIELD_NAME -> value)",
+                "description": "Parameter overrides to test scenarios. Two types: (1) Service overrides use lowercase field names for external data like UWV income, (2) Source overrides use ALL CAPS for internal law sources like RVO employee counts. Format: SERVICE_NAME -> field_name -> value",
                 "examples": [
-                    {"UWV": {"INKOMEN": 3000000}},
-                    {"BELASTINGDIENST": {"VERMOGEN": 500000}},
-                    {"UWV": {"INKOMEN": 2500000}, "RvIG": {"LEEFTIJD": 25}},
+                    {"UWV": {"inkomen": 3000000}},
+                    {"BELASTINGDIENST": {"vermogen": 500000}},
+                    {"RVO": {"AANTAL_WERKNEMERS": 150}},
+                    {"UWV": {"inkomen": 2500000}, "RVO": {"AANTAL_WERKNEMERS": 200}},
                 ],
                 "additionalProperties": {"type": "object", "additionalProperties": True},
             },
@@ -106,8 +107,12 @@ TOOL_SCHEMAS = {
         {
             "overrides": {
                 "type": "object",
-                "description": "Service-specific parameter overrides for eligibility check (SERVICE_NAME -> FIELD_NAME -> value)",
-                "examples": [{"UWV": {"INKOMEN": 3000000}}, {"BELASTINGDIENST": {"VERMOGEN": 500000}}],
+                "description": "Parameter overrides for eligibility testing. Service overrides (lowercase): UWV income, tax data. Source overrides (ALL CAPS): internal law sources like employee counts",
+                "examples": [
+                    {"UWV": {"inkomen": 3000000}},
+                    {"BELASTINGDIENST": {"vermogen": 500000}},
+                    {"RVO": {"AANTAL_WERKNEMERS": 150}},
+                ],
                 "additionalProperties": {"type": "object", "additionalProperties": True},
             }
         },
@@ -123,8 +128,12 @@ TOOL_SCHEMAS = {
             },
             "overrides": {
                 "type": "object",
-                "description": "Service-specific parameter overrides for benefit calculation (SERVICE_NAME -> FIELD_NAME -> value)",
-                "examples": [{"UWV": {"INKOMEN": 3000000}}, {"BELASTINGDIENST": {"VERMOGEN": 500000}}],
+                "description": "Parameter overrides for benefit calculation scenarios. Service overrides (lowercase): external data. Source overrides (ALL CAPS): internal law sources",
+                "examples": [
+                    {"UWV": {"inkomen": 3000000}},
+                    {"BELASTINGDIENST": {"vermogen": 500000}},
+                    {"RVO": {"AANTAL_WERKNEMERS": 150}},
+                ],
                 "additionalProperties": {"type": "object", "additionalProperties": True},
             },
         },
