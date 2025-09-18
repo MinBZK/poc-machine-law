@@ -47,6 +47,34 @@ uv run python -m law_mcp.server
 uv run python law_mcp/demo.py
 ```
 
+### Interactive Chat (NEW!)
+
+Setup and run:
+```bash
+# Set your Anthropic API key
+export ANTHROPIC_API_KEY="sk-ant-api03-..."
+
+# Start the MCP server (in another terminal)
+uv run web/main.py
+
+# Start interactive chat
+uv run law_mcp/interactive_chat.py
+```
+
+Experience an interactive command-line chat that combines:
+- **Official LangChain MCP integration** using `langchain-mcp-adapters`
+- **LangGraph ReAct agents** for reasoning and tool usage
+- **Dutch law execution** via MCP protocol
+- **Claude for natural language understanding**
+
+This demonstrates the complete 2025 integration stack for AI-powered legal assistance.
+
+**Try these example questions:**
+- `"Mijn BSN is 100000001. Heb ik recht op zorgtoeslag?"`
+- `"Hoeveel zorgtoeslag krijg ik precies per maand?"`
+- `"Wat als mijn inkomen €35.000 wordt?"`
+- `"Mijn bedrijf heeft KVK 58372941. Wat kan ik krijgen?"`
+
 ### Run Tests
 ```bash
 uv run python law_mcp/test_integration.py

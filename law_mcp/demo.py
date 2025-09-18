@@ -97,7 +97,7 @@ async def demonstrate_mcp_server():
             print(f"  💰 Annual income: €{citizen_data.get('inkomen', 0):,}")
             print(f"  🛡️  Insured: {citizen_data.get('verzekerd', 'N/A')}")
         else:
-            print(f"  ⚠️  No profile data found for BSN: 100000001")
+            print("  ⚠️  No profile data found for BSN: 100000001")
 
         # Scenario 5: Check eligibility for specific benefit
         print("\n✅ SCENARIO 5: Checking Eligibility for Zorgtoeslag")
@@ -174,7 +174,12 @@ async def demonstrate_mcp_server():
 
         try:
             wpm_result = await session.call_tool(
-                "check_eligibility", {"parameters": {"KVK_NUMMER": "58372941"}, "service": "RVO", "law": "omgevingswet/werkgebonden_personenmobiliteit"}
+                "check_eligibility",
+                {
+                    "parameters": {"KVK_NUMMER": "58372941"},
+                    "service": "RVO",
+                    "law": "omgevingswet/werkgebonden_personenmobiliteit",
+                },
             )
             wpm_data = json.loads(wpm_result.content[0].text)
 
