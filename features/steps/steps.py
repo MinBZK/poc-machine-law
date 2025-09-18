@@ -36,7 +36,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn"} else parse_value(v)
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer"} else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)
@@ -404,6 +404,8 @@ def step_impl(context, chance):
         context.claims = []
 
     for row in context.table:
+        # Use BSN if available, otherwise use KVK_NUMMER for business laws
+        identifier = context.parameters.get("BSN") or context.parameters.get("KVK_NUMMER")
         claim_id = context.services.claim_manager.submit_claim(
             service=row["service"],
             key=row["key"],
@@ -413,7 +415,7 @@ def step_impl(context, chance):
             case_id=None,
             evidence_path=row.get("bewijs"),
             law=row["law"],
-            bsn=context.parameters["BSN"]
+            bsn=identifier
         )
         context.claims.append(claim_id)
 
