@@ -6,7 +6,6 @@ Direct test to see what the MCP server returns when we call a tool.
 """
 
 import asyncio
-import json
 import sys
 from pathlib import Path
 
