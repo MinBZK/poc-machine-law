@@ -64,8 +64,8 @@ properties:
         juriconnect: "jci1.3:c:BWBR0041330&artikel=18.11&lid=2&z=2024-07-01&g=2024-07-01"
         explanation: "De drempel van 100 werknemers wordt gemeten op 1 januari van het kalenderjaar conform artikel 18.11 lid 2 onder c"
 
-    - name: "VERSTREKT_GEEN_MOBILITEITSVERGOEDING"
-      description: "Verstrekt de organisatie geen financiële vergoeding of mobiliteitsvoorzieningen"
+    - name: "VERSTREKT_MOBILITEITSVERGOEDING"
+      description: "Verstrekt de organisatie een financiële vergoeding of mobiliteitsvoorzieningen"
       type: "boolean"
       required: true
       temporal:
@@ -74,7 +74,7 @@ properties:
       source_reference:
         source_type: "RVO"
         table: "wpm_gegevens"
-        field: "verstrekt_geen_mobiliteitsvergoeding"
+        field: "verstrekt_mobiliteitsvergoeding"
         select_on:
           - name: "kvk_nummer"
             description: "KvK nummer van de organisatie"
@@ -87,7 +87,7 @@ properties:
         paragraph: "2"
         url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.11"
         juriconnect: "jci1.3:c:BWBR0041330&artikel=18.11&lid=2&z=2024-07-01&g=2024-07-01"
-        explanation: "Organisaties die geen mobiliteitsvergoeding verstrekken vallen niet onder de rapportageverplichting conform artikel 18.11 lid 2 onder b"
+        explanation: "Organisaties die een mobiliteitsvergoeding verstrekken vallen onder de rapportageverplichting conform artikel 18.11 lid 2 onder b"
 
   output:
     - name: "rapportageverplichting"
@@ -129,9 +129,9 @@ variables: []
 
 requirements:
   - all:
-      - subject: "$VERSTREKT_GEEN_MOBILITEITSVERGOEDING"
+      - subject: "$VERSTREKT_MOBILITEITSVERGOEDING"
         operation: EQUALS
-        value: false
+        value: true
         legal_basis:
           law: "Besluit activiteiten leefomgeving"
           bwb_id: "BWBR0041330"
