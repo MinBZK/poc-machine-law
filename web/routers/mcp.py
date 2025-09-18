@@ -20,6 +20,115 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/mcp", tags=["mcp"])
 
 
+def extract_missing_parameters(
+    result, machine_service, law: str, service: str, reference_date: str, arguments: dict
+) -> list[dict]:
+    """Extract missing parameters information from execution result."""
+    missing_parameters = []
+    if hasattr(result, "missing_required") and result.missing_required:
+        provided_params = list(arguments.get("parameters", {}).keys()) or ["none"]
+
+        # Extract specific missing field names from the value tree (same logic as mcp_services.py)
+        missing_field_details = []
+        if result.path:
+            try:
+                value_tree = machine_service.extract_value_tree(result.path)
+
+                # Get rule specification to lookup parameter descriptions
+                rule_spec = None
+                try:
+                    rule_spec = machine_service.get_rule_spec(law, reference_date, service)
+                    logger.info(
+                        f"Rule spec keys: {list(rule_spec.keys()) if isinstance(rule_spec, dict) else 'not a dict'}"
+                    )
+                    if isinstance(rule_spec, dict) and "sources" in rule_spec:
+                        logger.info(f"Found sources in rule_spec: {rule_spec['sources']}")
+                    if (
+                        isinstance(rule_spec, dict)
+                        and "properties" in rule_spec
+                        and "sources" in rule_spec["properties"]
+                    ):
+                        logger.info(f"Found properties.sources in rule_spec: {rule_spec['properties']['sources']}")
+                except Exception as e:
+                    logger.warning(f"Could not get rule spec for descriptions: {e}")
+
+                for path, node_info in value_tree.items():
+                    if node_info.get("required") and not node_info.get("result"):
+                        # Get the field name (last part of the path)
+                        field_name = path.split(".")[-1]
+
+                        # Try to find description from rule spec
+                        description = None
+                        if rule_spec and isinstance(rule_spec, dict):
+                            # Check in parameters first
+                            parameters = rule_spec.get("properties", {}).get("parameters", [])
+                            if isinstance(parameters, list):
+                                for param in parameters:
+                                    if isinstance(param, dict) and param.get("name") == field_name:
+                                        description = param.get("description")
+                                        break
+
+                            # If not found in parameters, check in input sources
+                            if not description:
+                                inputs = rule_spec.get("properties", {}).get("input", [])
+                                if isinstance(inputs, list):
+                                    for input_item in inputs:
+                                        if isinstance(input_item, dict) and input_item.get("name") == field_name:
+                                            description = input_item.get("description")
+                                            break
+
+                            # If still not found, check in sources section at root level
+                            if not description:
+                                sources = rule_spec.get("sources", [])
+                                if isinstance(sources, list):
+                                    for source_item in sources:
+                                        if isinstance(source_item, dict) and source_item.get("name") == field_name:
+                                            description = source_item.get("description")
+                                            break
+
+                                # Also check in properties.sources
+                                if not description:
+                                    properties_sources = rule_spec.get("properties", {}).get("sources", [])
+                                    if isinstance(properties_sources, list):
+                                        for source_item in properties_sources:
+                                            if isinstance(source_item, dict) and source_item.get("name") == field_name:
+                                                description = source_item.get("description")
+                                                break
+
+                        logger.info(f"DEBUG: Looking for description for field: {field_name}, found: {description}")
+                        missing_field_details.append(
+                            {"name": field_name, "description": description or f"Required parameter {field_name}"}
+                        )
+
+            except Exception as e:
+                logger.warning(f"Could not extract missing fields from value tree: {e}")
+
+        # Create detailed missing parameter info
+        if missing_field_details:
+            missing_parameters.append(
+                {
+                    "status": "missing_required_parameters",
+                    "message": f"Required parameters are missing for {service}/{law}",
+                    "missing_fields": missing_field_details,
+                    "provided_parameters": provided_params,
+                    "suggestion": f"Provide the missing parameters: {', '.join([field['name'] for field in missing_field_details])}",
+                }
+            )
+        else:
+            # Fallback if we can't extract specific field names
+            missing_parameters.append(
+                {
+                    "status": "missing_required_parameters",
+                    "message": f"Required parameters are missing for {service}/{law}",
+                    "suggestion": f"Use the resource law://{service}/{law}/spec to see all required input parameters",
+                    "provided_parameters": provided_params,
+                    "help": "The law specification resource contains detailed information about required parameters, their types, and descriptions",
+                }
+            )
+
+    return missing_parameters
+
+
 def extract_execution_details(result, machine_service, law: str, service: str, reference_date: str) -> dict[str, Any]:
     """
     Extract path and rule_spec information from law execution result.
@@ -407,6 +516,11 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 result, machine_service, arguments["law"], arguments["service"], reference_date
             )
 
+            # Get detailed missing parameters information
+            missing_parameters = extract_missing_parameters(
+                result, machine_service, arguments["law"], arguments["service"], reference_date, arguments
+            )
+
             # Return both human-readable content and structured data
             result_data = {
                 "success": True,
@@ -415,6 +529,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 "input": result.input,
                 "rulespec_uuid": result.rulespec_uuid,
                 "missing_required": result.missing_required,
+                "missing_parameters": missing_parameters,
                 "law_metadata": law_metadata,
                 "path": execution_details["path"],
                 "rule_spec": execution_details["rule_spec"],
@@ -447,10 +562,16 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 result, machine_service, arguments["law"], arguments["service"], reference_date
             )
 
+            # Get detailed missing parameters information
+            missing_parameters = extract_missing_parameters(
+                result, machine_service, arguments["law"], arguments["service"], reference_date, arguments
+            )
+
             eligibility_data = {
                 "eligible": eligible,
                 "requirements_met": result.requirements_met,
                 "missing_required": result.missing_required,
+                "missing_parameters": missing_parameters,
                 "path": execution_details["path"],
                 "rule_spec": execution_details["rule_spec"],
             }
@@ -480,11 +601,18 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 result, machine_service, arguments["law"], arguments["service"], reference_date
             )
 
+            # Get detailed missing parameters information
+            missing_parameters = extract_missing_parameters(
+                result, machine_service, arguments["law"], arguments["service"], reference_date, arguments
+            )
+
             amount_data = {
                 "amount": amount,
                 "output_field": output_field,
                 "full_output": result.output,
                 "requirements_met": result.requirements_met,
+                "missing_required": getattr(result, "missing_required", False),
+                "missing_parameters": missing_parameters,
                 "path": execution_details["path"],
                 "rule_spec": execution_details["rule_spec"],
             }
