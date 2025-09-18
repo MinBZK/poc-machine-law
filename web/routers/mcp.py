@@ -493,7 +493,7 @@ async def call_tool(machine_service, params: dict[str, Any]):
                     requested_output=arguments.get("requested_output"),
                     approved=arguments.get("approved", False),
                 )
-            except Exception as e:
+            except Exception:
                 raise
 
             # Get law metadata to provide context
