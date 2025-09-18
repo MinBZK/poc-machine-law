@@ -1523,6 +1523,13 @@ BUSINESS_PROFILES = {
                 ]
             },
             "RVO": {
+                "wpm_gegevens": [
+                    {
+                        "kvk_nummer": "58372941",
+                        "aantal_werknemers": 2200,
+                        "verstrekt_mobiliteitsvergoeding": True,
+                    }
+                ],
                 "wpm_data": [
                     {
                         "kvk_nummer": "58372941",
@@ -1582,6 +1589,13 @@ BUSINESS_PROFILES = {
                 ]
             },
             "RVO": {
+                "wpm_gegevens": [
+                    {
+                        "kvk_nummer": "74185296",
+                        "aantal_werknemers": 52,
+                        "verstrekt_mobiliteitsvergoeding": False,
+                    }
+                ],
                 "wpm_data": [
                     {
                         "kvk_nummer": "74185296",
@@ -1738,6 +1752,13 @@ BUSINESS_PROFILES = {
                 ]
             },
             "RVO": {
+                "wpm_gegevens": [
+                    {
+                        "kvk_nummer": "67428591",
+                        "aantal_werknemers": 85,
+                        "verstrekt_mobiliteitsvergoeding": True,
+                    }
+                ],
                 "wpm_data": [
                     {
                         "kvk_nummer": "67428591",
