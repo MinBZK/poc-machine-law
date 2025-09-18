@@ -107,11 +107,11 @@ async def create_dynamic_tools() -> list:
 
                         # Handle different response formats from MCP
                         if hasattr(result, "content") and result.content and len(result.content) > 0:
-                                content_item = result.content[0]
-                                if hasattr(content_item, "text"):
-                                    return str(content_item.text)
-                                else:
-                                    return str(content_item)
+                            content_item = result.content[0]
+                            if hasattr(content_item, "text"):
+                                return str(content_item.text)
+                            else:
+                                return str(content_item)
                         return str(result)
                     except Exception as e:
                         await send_debug_message(f"❌ Error in dynamic tool {name}: {str(e)}")
