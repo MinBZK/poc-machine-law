@@ -631,6 +631,88 @@ async def call_tool(machine_service, params: dict[str, Any]):
         return {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "isError": True}
 
 
+def get_all_required_parameters(
+    machine_service, law: str, service: str, reference_date: str, visited_laws=None
+) -> list[dict]:
+    """
+    Recursively extract all required parameters from a law and its dependencies.
+    Returns a list of {name, description, source_law, source_service} objects.
+    """
+    if visited_laws is None:
+        visited_laws = set()
+
+    # Prevent infinite recursion
+    law_key = f"{service}/{law}"
+    if law_key in visited_laws:
+        return []
+    visited_laws.add(law_key)
+
+    required_params = []
+
+    try:
+        rule_spec = machine_service.get_rule_spec(law, reference_date, service)
+        if not isinstance(rule_spec, dict):
+            return required_params
+
+        properties = rule_spec.get("properties", {})
+
+        # Extract required parameters
+        for param in properties.get("parameters", []):
+            if param.get("required", False):
+                required_params.append(
+                    {
+                        "name": param.get("name"),
+                        "description": param.get("description", f"Required parameter {param.get('name')}"),
+                        "source_law": law,
+                        "source_service": service,
+                        "type": param.get("type", "unknown"),
+                    }
+                )
+
+        # Extract required input fields
+        for input_field in properties.get("input", []):
+            if input_field.get("required", True):  # input fields are typically required by default
+                required_params.append(
+                    {
+                        "name": input_field.get("name"),
+                        "description": input_field.get("description", f"Required input {input_field.get('name')}"),
+                        "source_law": law,
+                        "source_service": service,
+                        "type": input_field.get("type", "unknown"),
+                    }
+                )
+
+                # Check for service_reference dependencies
+                service_ref = input_field.get("service_reference")
+                if service_ref:
+                    dep_service = service_ref.get("service")
+                    dep_law = service_ref.get("law")
+                    if dep_service and dep_law:
+                        # Recursively get parameters from dependent law
+                        dep_params = get_all_required_parameters(
+                            machine_service, dep_law, dep_service, reference_date, visited_laws
+                        )
+                        required_params.extend(dep_params)
+
+        # Extract required sources
+        for source in properties.get("sources", []):
+            if source.get("required", False):
+                required_params.append(
+                    {
+                        "name": source.get("name"),
+                        "description": source.get("description", f"Required source {source.get('name')}"),
+                        "source_law": law,
+                        "source_service": service,
+                        "type": source.get("type", "unknown"),
+                    }
+                )
+
+    except Exception as e:
+        logger.warning(f"Could not get parameters for {law}/{service}: {e}")
+
+    return required_params
+
+
 async def list_resources(machine_service):
     """List available MCP resources"""
     return {
@@ -683,6 +765,9 @@ async def read_resource(machine_service, params: dict[str, Any]):
                         except Exception:
                             law_description = f"Citizen law {law} managed by {service}"
 
+                        # Get all required parameters recursively
+                        required_parameters = get_all_required_parameters(machine_service, law, service, "2025-01-01")
+
                         available_laws.append(
                             {
                                 "service": service,
@@ -690,6 +775,7 @@ async def read_resource(machine_service, params: dict[str, Any]):
                                 "discoverable": True,
                                 "name": law.replace("_", " ").title(),
                                 "description": law_description,
+                                "required_parameters": required_parameters,
                             }
                         )
             except Exception as e:
@@ -712,6 +798,9 @@ async def read_resource(machine_service, params: dict[str, Any]):
                         except Exception:
                             law_description = f"Business law {law} managed by {service}"
 
+                        # Get all required parameters recursively
+                        required_parameters = get_all_required_parameters(machine_service, law, service, "2025-01-01")
+
                         available_laws.append(
                             {
                                 "service": service,
@@ -719,6 +808,7 @@ async def read_resource(machine_service, params: dict[str, Any]):
                                 "discoverable": True,
                                 "name": law.replace("_", " ").title(),
                                 "description": law_description,
+                                "required_parameters": required_parameters,
                             }
                         )
             except Exception as e:
@@ -732,12 +822,34 @@ async def read_resource(machine_service, params: dict[str, Any]):
                 law = law_info["law"]
                 name = law_info["name"]
                 description = law_info["description"]
+                required_parameters = law_info.get("required_parameters", [])
 
                 text_lines.append(f"• {name}")
                 text_lines.append(f"  Service: {service}")
                 text_lines.append(f"  Law ID: {law}")
                 text_lines.append(f"  Resource: law://{service}/{law}/spec")
-                text_lines.append(f"  Description: {description}\n")
+                text_lines.append(f"  Description: {description}")
+
+                if required_parameters:
+                    text_lines.append(f"  Required Parameters ({len(required_parameters)}):")
+                    for param in required_parameters:
+                        param_name = param.get("name", "unknown")
+                        param_desc = param.get("description", "No description")
+                        param_type = param.get("type", "unknown")
+                        source_law = param.get("source_law", "")
+                        source_service = param.get("source_service", "")
+
+                        # Show parameter with source if it comes from a dependency
+                        if source_law != law or source_service != service:
+                            text_lines.append(
+                                f"    - {param_name} ({param_type}): {param_desc} [from {source_service}/{source_law}]"
+                            )
+                        else:
+                            text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
+                else:
+                    text_lines.append(f"  Required Parameters: None")
+
+                text_lines.append("")  # Empty line between laws
 
             plain_text = "\n".join(text_lines)
 
