@@ -96,7 +96,7 @@ class RuleService:
         reference_date: str,
         parameters: dict[str, Any],
         overwrite_input: dict[str, Any] | None = None,
-        requested_output: str | None = None,
+        requested_output: list[str] = (),
         approved: bool = False,
     ) -> RuleResult:
         """
@@ -364,12 +364,12 @@ class Services:
         parameters: dict[str, Any],
         reference_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
-        requested_output: str | None = None,
+        requested_output: list[str] = (),
         approved: bool = False,
     ) -> RuleResult:
         reference_date = reference_date or self.root_reference_date
         with logger.indent_block(
-            f"{service}: {law} ({reference_date} {parameters} {requested_output})",
+            f"{service}: {law} ({reference_date} {parameters} {','.join(requested_output)})",
             double_line=True,
         ):
             return self.services[service].evaluate(

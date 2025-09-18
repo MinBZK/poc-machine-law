@@ -77,12 +77,16 @@ def step_impl(context, date):
 
 
 def evaluate_law(context, service, law, approved=True):
+    if not hasattr(context, "requested_output"):
+        context.requested_output = []
+
     context.result = context.services.evaluate(
         service,
         law=law,
         parameters=context.parameters,
         reference_date=context.root_reference_date,
         overwrite_input=context.test_data,
+        requested_output=context.requested_output,
         approved=approved
     )
 
@@ -115,11 +119,26 @@ def step_impl(context, law, service):
 
     evaluate_law(context, service, law)
 
+@when("de {law} wordt gedeeltelijk uitgevoerd door {service} met gevraagde uitkomsten")
+def step_impl(context, law, service):
+    # Convert table to DataFrame for KVK service
+    data = []
+    for row in context.table:
+        processed_row = {
+            k: v if k in {"output"} else parse_value(v)
+            for k, v in row.items()
+        }
+        data.append(processed_row['output'])
+
+    if len(data) > 0:
+        context.requested_output = data
+
+    evaluate_law(context, service, law)
 
 @when("de {law} wordt uitgevoerd door {service}")
 def step_impl(context, law, service):
+    context.requested_output = []
     evaluate_law(context, service, law)
-
 
 @then("heeft de persoon recht op zorgtoeslag")
 def step_impl(context):
@@ -495,6 +514,9 @@ def step_impl(context):
     df = pd.DataFrame(data)
     context.services.set_source_dataframe("KVK", "organisaties", df)
 
+@given('de gewenste output {output}')
+def step_impl(context, output):
+    context.requested_output = output
 
 @then('is de rapportageverplichting "{value}"')
 def step_impl(context, value):
@@ -509,9 +531,10 @@ def step_impl(context, value):
 @then('is de rapportage_deadline "{date}"')
 def step_impl(context, date):
     actual_date = context.result.output.get("rapportage_deadline")
+    expected_date = None if date == "None" else date
     assertions.assertEqual(
-        actual_date, date,
-        f"Expected rapportage_deadline to be {date}, but was {actual_date}"
+        actual_date, expected_date,
+        f"Expected rapportage_deadline to be {expected_date}, but was {actual_date}"
     )
 
 

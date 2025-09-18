@@ -378,7 +378,7 @@ class RuleContext:
                 parameters,
                 reference_date,
                 self.overwrite_input,
-                requested_output=service_ref["field"],
+                requested_output=[service_ref["field"]],
                 approved=self.approved,
             )
 

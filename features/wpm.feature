@@ -17,6 +17,20 @@ Feature: WPM Rapportageverplichting
     And is de rapportage_deadline "2025-06-30"
     And is het aantal_werknemers "100"
 
+    # This is not a specific test for the WPM, where should this go?
+    Scenario: Organisatie met 100 werknemers voert gedeelte van de wet uit
+    Given een organisatie met KVK-nummer "12345678"
+    And de volgende KVK bedrijfsgegevens:
+      | kvk_nummer | rechtsvorm | status | aantal_werknemers | datum_telling |
+      | 12345678   | BV         | ACTIEF | 100               | 2024-07-01    |
+    When de wpm wordt gedeeltelijk uitgevoerd door RVO met gevraagde uitkomsten
+      | output                    |
+      | rapportageverplichting    |
+      | aantal_werknemers       |
+    Then is de rapportageverplichting "true"
+    And is de rapportage_deadline "None"
+    And is het aantal_werknemers "100"
+
   Scenario: Organisatie met 99 werknemers is niet verplicht te rapporteren
     Given een organisatie met KVK-nummer "87654321"
     And de volgende KVK bedrijfsgegevens:

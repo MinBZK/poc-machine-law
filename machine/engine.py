@@ -135,7 +135,7 @@ class RulesEngine:
         return deps
 
     @staticmethod
-    def get_required_actions(requested_output: str, actions: list) -> list:
+    def get_required_actions(requested_output: list[str], actions: list) -> list:
         """Get all actions needed to compute requested output in dependency order"""
         if not requested_output:
             return actions
@@ -150,7 +150,7 @@ class RulesEngine:
 
         # Find all required outputs
         required = set()
-        to_process = {requested_output}
+        to_process = set(requested_output)
 
         while to_process:
             output = to_process.pop()
@@ -173,7 +173,7 @@ class RulesEngine:
         overwrite_input: dict[str, Any] | None = None,
         sources: dict[str, pd.DataFrame] | None = None,
         calculation_date=None,
-        requested_output: str | None = None,
+        requested_output: list[str] = (),
         approved: bool = False,
     ) -> dict[str, Any]:
         """Evaluate rules using service context and sources"""
