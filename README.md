@@ -4,7 +4,7 @@
 # RegelRecht PoC
 *Van wet naar digitale werking*
 
-> **Note**: Dit project is nu de Proof of Concept voor **RegelRecht**. 
+> **Note**: Dit project is nu de Proof of Concept voor **RegelRecht**.
 > Voorheen bekend als PoC Machine Law, Machine Law, Van wet naar werking, Van wet naar digitale werking, Project Zonder Naam, en Law as Code.
 
 > Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wet- en regelgeving.
