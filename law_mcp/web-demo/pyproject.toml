@@ -10,5 +10,5 @@ dependencies = [
     "langchain-anthropic>=0.3.5",
     "langgraph>=0.2.70",
     "nest-asyncio>=1.6.0",
-    "uvicorn>=0.20.0",
+    "uvicorn[standard]>=0.20.0",
 ]

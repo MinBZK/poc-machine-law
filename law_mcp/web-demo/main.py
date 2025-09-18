@@ -1,21 +1,20 @@
 import asyncio
 import pprint
 import uuid
-from typing import Annotated, TypedDict, Any
-from fastmcp import Client
+from contextlib import asynccontextmanager
+from typing import Annotated, Any, TypedDict
 
 import nest_asyncio
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect
 import uvicorn
+from fastapi import APIRouter, FastAPI, WebSocket, WebSocketDisconnect
+from fastmcp import Client
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
-from langchain_core.tools import tool
-from typing import Dict, List
 
 
 # FastAPI lifespan event handler
@@ -51,7 +50,7 @@ async def initialize_mcp_client():
     return mcp_client
 
 
-async def create_dynamic_tools() -> List:
+async def create_dynamic_tools() -> list:
     """Dynamically create tools from MCP endpoint"""
     global dynamic_tools
 
@@ -80,12 +79,7 @@ async def create_dynamic_tools() -> List:
                         client = await initialize_mcp_client()
 
                         # First, unwrap kwargs if they're wrapped
-                        if len(kwargs) == 1 and "kwargs" in kwargs:
-                            # Arguments are wrapped in a 'kwargs' key, unwrap them
-                            actual_kwargs = kwargs["kwargs"]
-                        else:
-                            # Arguments are passed directly
-                            actual_kwargs = kwargs
+                        actual_kwargs = kwargs["kwargs"] if len(kwargs) == 1 and "kwargs" in kwargs else kwargs
 
                         # Format arguments based on the tool type
                         if name == "execute_law":
@@ -112,8 +106,7 @@ async def create_dynamic_tools() -> List:
                         await send_debug_message(f"📥 MCP response received: {result_preview}")
 
                         # Handle different response formats from MCP
-                        if hasattr(result, "content") and result.content:
-                            if len(result.content) > 0:
+                        if hasattr(result, "content") and result.content and len(result.content) > 0:
                                 content_item = result.content[0]
                                 if hasattr(content_item, "text"):
                                     return str(content_item.text)
@@ -188,14 +181,14 @@ async def initialize_model_with_tools():
 
 
 class State(TypedDict):
-    messages: Annotated[List[Any], add_messages]
+    messages: Annotated[list[Any], add_messages]
 
 
 class WebSocketMessage(TypedDict):
     id: str
     type: str  # E.g. "debug". Default: chunk
     content: str
-    quick_replies: List[str]
+    quick_replies: list[str]
 
 
 # Initialize the graph
@@ -284,7 +277,7 @@ graph = None
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: Dict[uuid.UUID, WebSocket] = {}
+        self.active_connections: dict[uuid.UUID, WebSocket] = {}
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -297,7 +290,7 @@ class ConnectionManager:
         if thread_id in self.active_connections:
             del self.active_connections[thread_id]
 
-    async def send_message(self, message: Dict, thread_id: uuid.UUID):
+    async def send_message(self, message: dict, thread_id: uuid.UUID):
         if thread_id in self.active_connections:
             await self.active_connections[thread_id].send_json(message)
 
