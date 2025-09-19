@@ -269,19 +269,8 @@ async def handle_rpc(request: Request):
 async def mcp_streamable_endpoint(request: Request):
     """MCP Streamable HTTP endpoint (2025 specification)."""
 
-    # Security: Validate Origin header to prevent DNS rebinding attacks
-    # Allow Claude Code connections from anthropic.com and localhost
-    origin = request.headers.get("origin")
-    allowed_origins = (
-        "http://localhost",
-        "http://127.0.0.1",
-        "https://localhost",
-        "https://claude.ai",
-        "https://anthropic.com"
-    )
-    if origin and not origin.startswith(allowed_origins):
-        logger.warning(f"Rejected connection from origin: {origin}")
-        return {"error": "Invalid origin", "status": 403}
+    # Note: MCP server doesn't require authentication - allowing all origins
+    # Origin validation removed to allow Claude Code connections
 
     # Check Accept header
     accept_header = request.headers.get("accept", "")
