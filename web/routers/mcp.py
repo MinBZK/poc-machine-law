@@ -270,8 +270,17 @@ async def mcp_streamable_endpoint(request: Request):
     """MCP Streamable HTTP endpoint (2025 specification)."""
 
     # Security: Validate Origin header to prevent DNS rebinding attacks
+    # Allow Claude Code connections from anthropic.com and localhost
     origin = request.headers.get("origin")
-    if origin and not origin.startswith(("http://localhost", "http://127.0.0.1", "https://localhost")):
+    allowed_origins = (
+        "http://localhost",
+        "http://127.0.0.1",
+        "https://localhost",
+        "https://claude.ai",
+        "https://anthropic.com"
+    )
+    if origin and not origin.startswith(allowed_origins):
+        logger.warning(f"Rejected connection from origin: {origin}")
         return {"error": "Invalid origin", "status": 403}
 
     # Check Accept header
