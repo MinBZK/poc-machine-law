@@ -129,6 +129,63 @@ def extract_missing_parameters(
     return missing_parameters
 
 
+def format_amount_with_units(
+    amount: int, output_field: str, machine_service, law: str, service: str, reference_date: str
+) -> str:
+    """Format amount with appropriate units and frequency based on law specification."""
+    if not isinstance(amount, int | float) or amount == 0:
+        return str(amount)
+
+    try:
+        # Get the law specification to extract unit and temporal information
+        rule_spec = machine_service.get_rule_spec(law, reference_date, service)
+
+        if isinstance(rule_spec, dict) and "properties" in rule_spec:
+            output_fields = rule_spec.get("properties", {}).get("output", [])
+
+            # Find the output field definition
+            field_definition = None
+            for field in output_fields:
+                if isinstance(field, dict) and field.get("name") == output_field:
+                    field_definition = field
+                    break
+
+            if field_definition:
+                # Extract unit information
+                type_spec = field_definition.get("type_spec", {})
+                unit = type_spec.get("unit", "unknown")
+
+                # Extract temporal information
+                temporal = field_definition.get("temporal", {})
+                period_type = temporal.get("period_type", "year")
+
+                # Convert based on unit
+                if unit == "eurocent":
+                    formatted_value = f"€{amount / 100:,.2f}"
+                elif unit == "euro":
+                    formatted_value = f"€{amount:,.2f}"
+                else:
+                    formatted_value = str(amount)
+
+                # Add frequency based on temporal information
+                if period_type == "year":
+                    frequency = "per year"
+                elif period_type == "month":
+                    frequency = "per month"
+                elif period_type == "day":
+                    frequency = "per day"
+                else:
+                    frequency = f"per {period_type}"
+
+                return f"{formatted_value} {frequency}"
+
+    except Exception as e:
+        logger.warning(f"Could not extract unit information for {output_field}: {e}")
+
+    # Fallback to basic formatting
+    return str(amount)
+
+
 def extract_execution_details(result, machine_service, law: str, service: str, reference_date: str) -> dict[str, Any]:
     """
     Extract path and rule_spec information from law execution result.
@@ -625,8 +682,13 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 "rule_spec": execution_details["rule_spec"],
             }
 
+            # Format amount with units for display
+            formatted_amount = format_amount_with_units(
+                amount, output_field, machine_service, arguments["law"], arguments["service"], reference_date
+            )
+
             return {
-                "content": [{"type": "text", "text": f"Amount: {amount}"}],
+                "content": [{"type": "text", "text": f"Amount: {formatted_amount}"}],
                 "structuredContent": amount_data,
                 "isError": False,
             }
@@ -639,12 +701,43 @@ async def call_tool(machine_service, params: dict[str, Any]):
         return {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "isError": True}
 
 
-def get_all_required_parameters(
-    machine_service, law: str, service: str, reference_date: str, visited_laws=None
-) -> list[dict]:
+def get_law_parameters(machine_service, law: str, service: str, reference_date: str) -> list[dict]:
     """
-    Recursively extract all required parameters from a law and its dependencies.
-    Returns a list of {name, description, source_law, source_service} objects.
+    Extract only the true parameters (from properties.parameters) for a law.
+    These are user-provided inputs, not service dependencies.
+    """
+    parameters = []
+
+    try:
+        rule_spec = machine_service.get_rule_spec(law, reference_date, service)
+        if not isinstance(rule_spec, dict):
+            return parameters
+
+        properties = rule_spec.get("properties", {})
+
+        # Extract only true parameters (user inputs)
+        for param in properties.get("parameters", []):
+            if param.get("required", False):
+                parameters.append(
+                    {
+                        "name": param.get("name"),
+                        "description": param.get("description", f"Required parameter {param.get('name')}"),
+                        "type": param.get("type", "unknown"),
+                        "source_law": law,
+                        "source_service": service,
+                    }
+                )
+
+    except Exception as e:
+        logger.warning(f"Could not extract parameters for {service}/{law}: {e}")
+
+    return parameters
+
+
+def get_law_sources(machine_service, law: str, service: str, reference_date: str, visited_laws=None) -> list[dict]:
+    """
+    Recursively extract all sources from properties.input and properties.sources.
+    These are data sources that can be overridden for testing.
     """
     if visited_laws is None:
         visited_laws = set()
@@ -655,70 +748,66 @@ def get_all_required_parameters(
         return []
     visited_laws.add(law_key)
 
-    required_params = []
+    sources = []
 
     try:
         rule_spec = machine_service.get_rule_spec(law, reference_date, service)
         if not isinstance(rule_spec, dict):
-            return required_params
+            return sources
 
         properties = rule_spec.get("properties", {})
 
-        # Extract required parameters
-        for param in properties.get("parameters", []):
-            if param.get("required", False):
-                required_params.append(
-                    {
-                        "name": param.get("name"),
-                        "description": param.get("description", f"Required parameter {param.get('name')}"),
-                        "source_law": law,
-                        "source_service": service,
-                        "type": param.get("type", "unknown"),
-                    }
-                )
-
-        # Extract required input fields
+        # Extract input fields (these are sources, not user parameters)
         for input_field in properties.get("input", []):
-            if input_field.get("required", True):  # input fields are typically required by default
-                required_params.append(
+            service_ref = input_field.get("service_reference")
+            if service_ref:
+                dep_service = service_ref.get("service")
+                dep_law = service_ref.get("law")
+
+                sources.append(
                     {
                         "name": input_field.get("name"),
-                        "description": input_field.get("description", f"Required input {input_field.get('name')}"),
-                        "source_law": law,
-                        "source_service": service,
+                        "description": input_field.get("description", f"Input field {input_field.get('name')}"),
                         "type": input_field.get("type", "unknown"),
+                        "source_law": dep_law,
+                        "source_service": dep_service,
                     }
                 )
 
-                # Check for service_reference dependencies
-                service_ref = input_field.get("service_reference")
-                if service_ref:
-                    dep_service = service_ref.get("service")
-                    dep_law = service_ref.get("law")
-                    if dep_service and dep_law:
-                        # Recursively get parameters from dependent law
-                        dep_params = get_all_required_parameters(
-                            machine_service, dep_law, dep_service, reference_date, visited_laws
-                        )
-                        required_params.extend(dep_params)
+                if dep_service and dep_law:
+                    # Recursively get sources from dependent law
+                    dep_sources = get_law_sources(machine_service, dep_law, dep_service, reference_date, visited_laws)
+                    sources.extend(dep_sources)
 
-        # Extract required sources
+        # Extract explicit sources
         for source in properties.get("sources", []):
             if source.get("required", False):
-                required_params.append(
+                sources.append(
                     {
                         "name": source.get("name"),
                         "description": source.get("description", f"Required source {source.get('name')}"),
+                        "type": source.get("type", "unknown"),
                         "source_law": law,
                         "source_service": service,
-                        "type": source.get("type", "unknown"),
                     }
                 )
 
     except Exception as e:
-        logger.warning(f"Could not get parameters for {law}/{service}: {e}")
+        logger.warning(f"Could not extract sources for {service}/{law}: {e}")
 
-    return required_params
+    return sources
+
+
+def get_all_required_parameters(
+    machine_service, law: str, service: str, reference_date: str, visited_laws=None
+) -> list[dict]:
+    """
+    Legacy function for backward compatibility.
+    Combines parameters and sources for existing callers.
+    """
+    parameters = get_law_parameters(machine_service, law, service, reference_date)
+    sources = get_law_sources(machine_service, law, service, reference_date, visited_laws)
+    return parameters + sources
 
 
 async def list_resources(machine_service):
@@ -773,8 +862,9 @@ async def read_resource(machine_service, params: dict[str, Any]):
                         except Exception:
                             law_description = f"Citizen law {law} managed by {service}"
 
-                        # Get all required parameters recursively
-                        required_parameters = get_all_required_parameters(machine_service, law, service, "2025-01-01")
+                        # Get parameters and sources separately
+                        parameters = get_law_parameters(machine_service, law, service, "2025-01-01")
+                        sources = get_law_sources(machine_service, law, service, "2025-01-01")
 
                         available_laws.append(
                             {
@@ -783,7 +873,8 @@ async def read_resource(machine_service, params: dict[str, Any]):
                                 "discoverable": True,
                                 "name": law.replace("_", " ").title(),
                                 "description": law_description,
-                                "required_parameters": required_parameters,
+                                "parameters": parameters,
+                                "sources": sources,
                             }
                         )
             except Exception as e:
@@ -806,8 +897,9 @@ async def read_resource(machine_service, params: dict[str, Any]):
                         except Exception:
                             law_description = f"Business law {law} managed by {service}"
 
-                        # Get all required parameters recursively
-                        required_parameters = get_all_required_parameters(machine_service, law, service, "2025-01-01")
+                        # Get parameters and sources separately
+                        parameters = get_law_parameters(machine_service, law, service, "2025-01-01")
+                        sources = get_law_sources(machine_service, law, service, "2025-01-01")
 
                         available_laws.append(
                             {
@@ -816,7 +908,8 @@ async def read_resource(machine_service, params: dict[str, Any]):
                                 "discoverable": True,
                                 "name": law.replace("_", " ").title(),
                                 "description": law_description,
-                                "required_parameters": required_parameters,
+                                "parameters": parameters,
+                                "sources": sources,
                             }
                         )
             except Exception as e:
@@ -830,7 +923,8 @@ async def read_resource(machine_service, params: dict[str, Any]):
                 law = law_info["law"]
                 name = law_info["name"]
                 description = law_info["description"]
-                required_parameters = law_info.get("required_parameters", [])
+                parameters = law_info.get("parameters", [])
+                sources = law_info.get("sources", [])
 
                 text_lines.append(f"• {name}")
                 text_lines.append(f"  Service: {service}")
@@ -838,27 +932,32 @@ async def read_resource(machine_service, params: dict[str, Any]):
                 text_lines.append(f"  Resource: law://{service}/{law}/spec")
                 text_lines.append(f"  Description: {description}")
 
-                if required_parameters:
-                    text_lines.append(f"  Required Parameters ({len(required_parameters)}):")
-                    for param in required_parameters:
+                # Show user parameters
+                if parameters:
+                    text_lines.append(f"  Required Parameters ({len(parameters)}):")
+                    for param in parameters:
                         param_name = param.get("name", "unknown")
                         param_desc = param.get("description", "No description")
                         param_type = param.get("type", "unknown")
-                        source_law = param.get("source_law", "")
-                        source_service = param.get("source_service", "")
-
-                        # Show parameter with source if it comes from a dependency
-                        if source_law != law or source_service != service:
-                            text_lines.append(
-                                f"    - {param_name} ({param_type}): {param_desc} [from {source_service}/{source_law}]"
-                            )
-                            text_lines.append(f'      Override: {{"{source_service}": {{"{param_name}": value}}}}')
-                        else:
-                            text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
-                            if param_type in ["amount", "number", "string", "boolean"]:
-                                text_lines.append(f'      Override: {{"{service}": {{"{param_name}": value}}}}')
+                        text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
                 else:
                     text_lines.append("  Required Parameters: None")
+
+                # Show sources/overrides separately
+                if sources:
+                    text_lines.append(f"  Sources (can be overridden) ({len(sources)}):")
+                    for source in sources:
+                        source_name = source.get("name", "unknown")
+                        source_desc = source.get("description", "No description")
+                        source_type = source.get("type", "unknown")
+                        source_law = source.get("source_law", "")
+                        source_service = source.get("source_service", "")
+                        text_lines.append(
+                            f"    - {source_name} ({source_type}): {source_desc} [from {source_service}/{source_law}]"
+                        )
+                        text_lines.append(f'      Override: {{"{source_service}": {{"{source_name}": value}}}}')
+                else:
+                    text_lines.append("  Sources: None")
 
                 text_lines.append("")  # Empty line between laws
 
