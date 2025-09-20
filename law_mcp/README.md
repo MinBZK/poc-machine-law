@@ -33,7 +33,7 @@ law_mcp/
 - ✅ **Custom Parameters**: Support any parameter type (case_id, reference_date, etc.)
 - ✅ **Backward Compatible**: All existing BSN-based calls continue to work
 
-🏢 **Business Law Support**: New discoverable business laws like WPM are now fully supported and appear in law discovery.
+🏢 **Business Law Support**: New discoverable business laws like Omgevingswet (Environmental Law) are now fully supported and appear in law discovery.
 
 ## Usage
 
@@ -130,7 +130,7 @@ Explain the zorgtoeslag calculation
 
 The server supports both:
 - **Citizen laws**: Use BSN parameters (healthcare, pensions, unemployment)
-- **Business laws**: Use KVK numbers (WPM, business regulations)
+- **Business laws**: Use KVK numbers (Environmental/Mobility laws, business regulations)
 
 ## HTTP Deployment (Production)
 
@@ -180,7 +180,7 @@ curl -X POST https://ui.lac.apps.digilab.network/mcp/ \
       "name": "execute_law",
       "arguments": {
         "service": "RVO",
-        "law": "wpm",
+        "law": "omgevingswet/werkgebonden_personenmobiliteit",
         "parameters": {"KVK_NUMMER": "12345678"}
       }
     },
@@ -447,7 +447,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
   }' | jq
 ```
 
-### Example 11: Check WPM Business Law (NEW!)
+### Example 11: Check Environmental/Mobility Business Law (NEW!)
 ```bash
 curl -s -X POST http://localhost:8000/mcp/rpc \
   -H "Content-Type: application/json" \
@@ -458,7 +458,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
       "name": "check_eligibility",
       "arguments": {
         "service": "RVO",
-        "law": "wpm",
+        "law": "omgevingswet/werkgebonden_personenmobiliteit",
         "parameters": {"KVK_NUMMER": "12345678"}
       }
     },
@@ -477,7 +477,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
 }
 ```
 
-### Example 12: Execute WPM Law with Full Details (NEW!)
+### Example 12: Execute Environmental/Mobility Law with Full Details (NEW!)
 ```bash
 curl -s -X POST http://localhost:8000/mcp/rpc \
   -H "Content-Type: application/json" \
@@ -488,7 +488,7 @@ curl -s -X POST http://localhost:8000/mcp/rpc \
       "name": "execute_law",
       "arguments": {
         "service": "RVO",
-        "law": "wpm",
+        "law": "omgevingswet/werkgebonden_personenmobiliteit",
         "parameters": {"KVK_NUMMER": "12345678"}
       }
     },
@@ -525,7 +525,7 @@ The MCP server now supports **generic parameters** for maximum flexibility:
 ```json
 {
   "service": "RVO",
-  "law": "wpm",
+  "law": "omgevingswet/werkgebonden_personenmobiliteit",
   "parameters": {"kvk-nummer": "12345678"}
 }
 ```
@@ -641,7 +641,7 @@ curl -X POST http://localhost:8000/mcp/rpc \
   }'
 ```
 
-#### Test WPM Business Scenarios
+#### Test Environmental/Mobility Business Scenarios
 ```bash
 curl -X POST http://localhost:8000/mcp/rpc \
   -H "Content-Type: application/json" \
@@ -652,7 +652,7 @@ curl -X POST http://localhost:8000/mcp/rpc \
       "name": "execute_law",
       "arguments": {
         "service": "RVO",
-        "law": "wpm",
+        "law": "omgevingswet/werkgebonden_personenmobiliteit",
         "parameters": {"KVK_NUMMER": "58372941"},
         "overrides": {
           "RVO": {
