@@ -129,6 +129,61 @@ def extract_missing_parameters(
     return missing_parameters
 
 
+def format_amount_with_units(amount: int, output_field: str, machine_service, law: str, service: str, reference_date: str) -> str:
+    """Format amount with appropriate units and frequency based on law specification."""
+    if not isinstance(amount, (int, float)) or amount == 0:
+        return str(amount)
+
+    try:
+        # Get the law specification to extract unit and temporal information
+        rule_spec = machine_service.get_rule_spec(law, reference_date, service)
+
+        if isinstance(rule_spec, dict) and "properties" in rule_spec:
+            output_fields = rule_spec.get("properties", {}).get("output", [])
+
+            # Find the output field definition
+            field_definition = None
+            for field in output_fields:
+                if isinstance(field, dict) and field.get("name") == output_field:
+                    field_definition = field
+                    break
+
+            if field_definition:
+                # Extract unit information
+                type_spec = field_definition.get("type_spec", {})
+                unit = type_spec.get("unit", "unknown")
+
+                # Extract temporal information
+                temporal = field_definition.get("temporal", {})
+                period_type = temporal.get("period_type", "year")
+
+                # Convert based on unit
+                if unit == "eurocent":
+                    formatted_value = f"€{amount / 100:,.2f}"
+                elif unit == "euro":
+                    formatted_value = f"€{amount:,.2f}"
+                else:
+                    formatted_value = str(amount)
+
+                # Add frequency based on temporal information
+                if period_type == "year":
+                    frequency = "per year"
+                elif period_type == "month":
+                    frequency = "per month"
+                elif period_type == "day":
+                    frequency = "per day"
+                else:
+                    frequency = f"per {period_type}"
+
+                return f"{formatted_value} {frequency}"
+
+    except Exception as e:
+        logger.warning(f"Could not extract unit information for {output_field}: {e}")
+
+    # Fallback to basic formatting
+    return str(amount)
+
+
 def extract_execution_details(result, machine_service, law: str, service: str, reference_date: str) -> dict[str, Any]:
     """
     Extract path and rule_spec information from law execution result.
@@ -625,8 +680,11 @@ async def call_tool(machine_service, params: dict[str, Any]):
                 "rule_spec": execution_details["rule_spec"],
             }
 
+            # Format amount with units for display
+            formatted_amount = format_amount_with_units(amount, output_field, machine_service, arguments["law"], arguments["service"], reference_date)
+
             return {
-                "content": [{"type": "text", "text": f"Amount: {amount}"}],
+                "content": [{"type": "text", "text": f"Amount: {formatted_amount}"}],
                 "structuredContent": amount_data,
                 "isError": False,
             }
@@ -839,7 +897,10 @@ async def read_resource(machine_service, params: dict[str, Any]):
                 text_lines.append(f"  Description: {description}")
 
                 if required_parameters:
-                    text_lines.append(f"  Required Parameters ({len(required_parameters)}):")
+                    # Separate user parameters from service dependencies
+                    user_parameters = []
+                    service_dependencies = []
+
                     for param in required_parameters:
                         param_name = param.get("name", "unknown")
                         param_desc = param.get("description", "No description")
@@ -847,16 +908,36 @@ async def read_resource(machine_service, params: dict[str, Any]):
                         source_law = param.get("source_law", "")
                         source_service = param.get("source_service", "")
 
-                        # Show parameter with source if it comes from a dependency
+                        # Check if this is a service dependency (from another service/law)
                         if source_law != law or source_service != service:
+                            service_dependencies.append(param)
+                        else:
+                            user_parameters.append(param)
+
+                    # Show user parameters first
+                    if user_parameters:
+                        text_lines.append(f"  Required Parameters ({len(user_parameters)}):")
+                        for param in user_parameters:
+                            param_name = param.get("name", "unknown")
+                            param_desc = param.get("description", "No description")
+                            param_type = param.get("type", "unknown")
+                            text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
+                    else:
+                        text_lines.append("  Required Parameters: None")
+
+                    # Show service dependencies separately
+                    if service_dependencies:
+                        text_lines.append(f"  Service Dependencies ({len(service_dependencies)}):")
+                        for param in service_dependencies:
+                            param_name = param.get("name", "unknown")
+                            param_desc = param.get("description", "No description")
+                            param_type = param.get("type", "unknown")
+                            source_law = param.get("source_law", "")
+                            source_service = param.get("source_service", "")
                             text_lines.append(
                                 f"    - {param_name} ({param_type}): {param_desc} [from {source_service}/{source_law}]"
                             )
                             text_lines.append(f'      Override: {{"{source_service}": {{"{param_name}": value}}}}')
-                        else:
-                            text_lines.append(f"    - {param_name} ({param_type}): {param_desc}")
-                            if param_type in ["amount", "number", "string", "boolean"]:
-                                text_lines.append(f'      Override: {{"{service}": {{"{param_name}": value}}}}')
                 else:
                     text_lines.append("  Required Parameters: None")
 
