@@ -129,9 +129,11 @@ def extract_missing_parameters(
     return missing_parameters
 
 
-def format_amount_with_units(amount: int, output_field: str, machine_service, law: str, service: str, reference_date: str) -> str:
+def format_amount_with_units(
+    amount: int, output_field: str, machine_service, law: str, service: str, reference_date: str
+) -> str:
     """Format amount with appropriate units and frequency based on law specification."""
-    if not isinstance(amount, (int, float)) or amount == 0:
+    if not isinstance(amount, int | float) or amount == 0:
         return str(amount)
 
     try:
@@ -681,7 +683,9 @@ async def call_tool(machine_service, params: dict[str, Any]):
             }
 
             # Format amount with units for display
-            formatted_amount = format_amount_with_units(amount, output_field, machine_service, arguments["law"], arguments["service"], reference_date)
+            formatted_amount = format_amount_with_units(
+                amount, output_field, machine_service, arguments["law"], arguments["service"], reference_date
+            )
 
             return {
                 "content": [{"type": "text", "text": f"Amount: {formatted_amount}"}],
