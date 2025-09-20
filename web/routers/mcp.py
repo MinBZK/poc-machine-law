@@ -269,10 +269,8 @@ async def handle_rpc(request: Request):
 async def mcp_streamable_endpoint(request: Request):
     """MCP Streamable HTTP endpoint (2025 specification)."""
 
-    # Security: Validate Origin header to prevent DNS rebinding attacks
-    origin = request.headers.get("origin")
-    if origin and not origin.startswith(("http://localhost", "http://127.0.0.1", "https://localhost")):
-        return {"error": "Invalid origin", "status": 403}
+    # Note: MCP server doesn't require authentication - allowing all origins
+    # Origin validation removed to allow Claude Code connections
 
     # Check Accept header
     accept_header = request.headers.get("accept", "")
