@@ -96,6 +96,42 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
+## Configuration for Claude Code
+
+For **Claude Code** (Anthropic's official CLI), use the HTTP endpoint:
+
+```bash
+claude mcp add --transport http regelrecht https://ui.lac.apps.digilab.network/mcp/
+```
+
+This gives you instant access to:
+
+**🏛️ Tools:**
+- `execute_law` - Full law execution with all calculations
+- `check_eligibility` - Quick eligibility checks
+- `calculate_benefit_amount` - Specific benefit amount calculations
+
+**📚 Resources:**
+- `laws://list` - Browse all available laws
+- `law://{service}/{law}/spec` - Get detailed law specifications
+- `profile://{bsn}` - Access citizen profile data
+
+**Example usage in Claude Code:**
+```
+Check healthcare allowance for BSN 100000001
+→ Uses execute_law tool automatically
+
+What business laws are available?
+→ Uses laws://list resource
+
+Explain the zorgtoeslag calculation
+→ Uses law://TOESLAGEN/zorgtoeslagwet/spec resource
+```
+
+The server supports both:
+- **Citizen laws**: Use BSN parameters (healthcare, pensions, unemployment)
+- **Business laws**: Use KVK numbers (WPM, business regulations)
+
 ## HTTP Deployment (Production)
 
 The MCP server is also available as HTTP endpoints at `/mcp` when integrated with the main web application:
