@@ -1,233 +1,786 @@
 <!-- templates/partials/dashboard.html -->
 <!-- Profile Info -->
 <section class="mb-8">
-    <div class="flex justify-between items-start">
-        <div>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Waar heb ik recht op? Wat zijn mijn plichten?</h2>
-            <p class="text-gray-600">
-                Bekijk hier uw toeslagen, uitkeringen, aangiften, en andere regelingen van de
-                overheid.
-            </p>
-        </div>
-        <div class="flex items-center space-x-2">
-            <span class="text-sm text-gray-600">Datum: {{ formatted_date }}</span>
-        </div>
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+        Waar heb ik recht op? Wat zijn mijn plichten?
+      </h2>
+      <p class="text-gray-600">
+        Bekijk hier uw toeslagen, uitkeringen, aangiften, en andere regelingen
+        van de overheid.
+      </p>
     </div>
+    <div class="flex items-center space-x-2">
+      <span class="text-sm text-gray-600">Datum: {{ formatted_date }}</span>
+    </div>
+  </div>
 </section>
 <!-- templates/partials/dashboard.html -->
 <section class="mb-8 bg-white rounded-lg shadow">
-    <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
-                <div class="text-sm text-gray-600 mt-1">
-                    BSN: {{ bsn }} | Geboortedatum: {{ profile.sources.RvIG.personen[0].geboortedatum|format_date }}
-                </div>
-            </div>
-            <button class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
-                    onclick="document.getElementById('profile-details').classList.toggle('hidden')">
-                <span class="mr-2">Bekijk alle gegevens</span>
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="h-5 w-5"
-                     viewBox="0 0 20 20"
-                     fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
+        <div class="text-sm text-gray-600 mt-1">
+          BSN: {{ bsn }} | Geboortedatum: {{
+          profile.sources.RvIG.personen[0].geboortedatum|format_date }}
         </div>
-        <!-- Uitklapbare sectie -->
-        <div id="profile-details" class="hidden">
-            <div class="border-t pt-4 mt-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Persoonsgegevens -->
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
-                        <dl class="space-y-2">
-                            <div>
-                                <dt class="text-sm text-gray-600">Nationaliteit</dt>
-                                <dd>
-                                    {{ profile.sources.RvIG.personen[0].nationaliteit }}
-                                </dd>
-                            </div>
-                            {% if profile.sources.RvIG.get('verblijfplaats') %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">
-                                        {% if profile.sources.RvIG.verblijfplaats[0].type == "BRIEFADRES" %}
-                                            Briefadres
-                                        {% else %}
-                                            Woonadres
-                                        {% endif %}
-                                    </dt>
-                                    <dd>
-                                        {{ profile.sources.RvIG.verblijfplaats[0].straat }} {{
-                                        profile.sources.RvIG.verblijfplaats[0].huisnummer }}
-                                    </dd>
-                                    <dd>
-                                        {{ profile.sources.RvIG.verblijfplaats[0].postcode }} {{
-                                        profile.sources.RvIG.verblijfplaats[0].woonplaats }}
-                                    </dd>
-                                </div>
-                            {% elif profile.sources.RvIG.personen[0].verblijfsadres %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">Verblijfplaats</dt>
-                                    <dd>
-                                        {{ profile.sources.RvIG.personen[0].verblijfsadres }}
-                                    </dd>
-                                </div>
-                            {% endif %}
-                            {% if profile.sources.RvIG.relaties and profile.sources.RvIG.relaties[0].partnerschap_type
-                                != "GEEN" %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">Partnerschap</dt>
-                                    <dd>
-                                        {{ profile.sources.RvIG.relaties[0].partnerschap_type }}
-                                    </dd>
-                                </div>
-                            {% endif %}
-                        </dl>
-                    </div>
-                    <!-- Inkomen -->
-                    {% if profile.sources.BELASTINGDIENST and profile.sources.BELASTINGDIENST.box1 %}
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">Inkomen</h4>
-                            <dl class="space-y-2">
-                                {% if profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Inkomen uit werk</dt>
-                                        <dd>
-                                            {{ (profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
-                                            / 100) | format_currency }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                                {% if profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Winst uit onderneming</dt>
-                                        <dd>
-                                            {{ (profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming /
-                                            100) | format_currency }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                                {% if profile.sources.BELASTINGDIENST.box3 and
-                                    profile.sources.BELASTINGDIENST.box3[0].spaargeld %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Spaargeld</dt>
-                                        <dd>
-                                            {{ (profile.sources.BELASTINGDIENST.box3[0].spaargeld / 100) | format_currency }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                            </dl>
-                        </div>
-                    {% endif %}
-                    <!-- Opleiding -->
-                    {% if profile.sources.DUO and profile.sources.DUO.inschrijvingen %}
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">Opleiding</h4>
-                            <dl class="space-y-2">
-                                <div>
-                                    <dt class="text-sm text-gray-600">Onderwijssoort</dt>
-                                    <dd>
-                                        {{ profile.sources.DUO.inschrijvingen[0].onderwijssoort }}
-                                    </dd>
-                                </div>
-                                {% if profile.sources.DUO.inschrijvingen[0].niveau %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Niveau</dt>
-                                        <dd>
-                                            Niveau {{ profile.sources.DUO.inschrijvingen[0].niveau }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                            </dl>
-                        </div>
-                    {% endif %}
-                    <!-- Werk en Re-integratie -->
-                    {% if profile.sources.GEMEENTE_AMSTERDAM and
-                        profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie %}
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">Werk & Re-integratie</h4>
-                            <dl class="space-y-2">
-                                <div>
-                                    <dt class="text-sm text-gray-600">Arbeidsvermogen</dt>
-                                    <dd>
-                                        {{ profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].arbeidsvermogen }}
-                                    </dd>
-                                </div>
-                                {% if profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Re-integratietraject</dt>
-                                        <dd>
-                                            {{ profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
-                                            }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                                {% if profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Ontheffing</dt>
-                                        <dd>
-                                            {{ profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                            </dl>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+      </div>
+      <button
+        class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
+        onclick="document.getElementById('profile-details').classList.toggle('hidden')"
+      >
+        <span class="mr-2">Bekijk alle gegevens</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
     </div>
+    <!-- Uitklapbare sectie -->
+    <div id="profile-details" class="hidden">
+      <div class="border-t pt-4 mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Persoonsgegevens -->
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-sm text-gray-600">Nationaliteit</dt>
+                <dd>{{ profile.sources.RvIG.personen[0].nationaliteit }}</dd>
+              </div>
+              {% if profile.sources.RvIG.get('verblijfplaats') %}
+              <div>
+                <dt class="text-sm text-gray-600">
+                  {% if profile.sources.RvIG.verblijfplaats[0].type ==
+                  "BRIEFADRES" %} Briefadres {% else %} Woonadres {% endif %}
+                </dt>
+                <dd>
+                  {{ profile.sources.RvIG.verblijfplaats[0].straat }} {{
+                  profile.sources.RvIG.verblijfplaats[0].huisnummer }}
+                </dd>
+                <dd>
+                  {{ profile.sources.RvIG.verblijfplaats[0].postcode }} {{
+                  profile.sources.RvIG.verblijfplaats[0].woonplaats }}
+                </dd>
+              </div>
+              {% elif profile.sources.RvIG.personen[0].verblijfsadres %}
+              <div>
+                <dt class="text-sm text-gray-600">Verblijfplaats</dt>
+                <dd>{{ profile.sources.RvIG.personen[0].verblijfsadres }}</dd>
+              </div>
+              {% endif %} {% if profile.sources.RvIG.relaties and
+              profile.sources.RvIG.relaties[0].partnerschap_type != "GEEN" %}
+              <div>
+                <dt class="text-sm text-gray-600">Partnerschap</dt>
+                <dd>
+                  {{ profile.sources.RvIG.relaties[0].partnerschap_type }}
+                </dd>
+              </div>
+              {% endif %}
+            </dl>
+          </div>
+          <!-- Inkomen -->
+          {% if profile.sources.BELASTINGDIENST and
+          profile.sources.BELASTINGDIENST.box1 %}
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">Inkomen</h4>
+            <dl class="space-y-2">
+              {% if
+              profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
+              %}
+              <div>
+                <dt class="text-sm text-gray-600">Inkomen uit werk</dt>
+                <dd>
+                  {{
+                  (profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
+                  / 100) | format_currency }}
+                </dd>
+              </div>
+              {% endif %} {% if
+              profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming %}
+              <div>
+                <dt class="text-sm text-gray-600">Winst uit onderneming</dt>
+                <dd>
+                  {{
+                  (profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming
+                  / 100) | format_currency }}
+                </dd>
+              </div>
+              {% endif %} {% if profile.sources.BELASTINGDIENST.box3 and
+              profile.sources.BELASTINGDIENST.box3[0].spaargeld %}
+              <div>
+                <dt class="text-sm text-gray-600">Spaargeld</dt>
+                <dd>
+                  {{ (profile.sources.BELASTINGDIENST.box3[0].spaargeld / 100) |
+                  format_currency }}
+                </dd>
+              </div>
+              {% endif %}
+            </dl>
+          </div>
+          {% endif %}
+          <!-- Opleiding -->
+          {% if profile.sources.DUO and profile.sources.DUO.inschrijvingen %}
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">Opleiding</h4>
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-sm text-gray-600">Onderwijssoort</dt>
+                <dd>
+                  {{ profile.sources.DUO.inschrijvingen[0].onderwijssoort }}
+                </dd>
+              </div>
+              {% if profile.sources.DUO.inschrijvingen[0].niveau %}
+              <div>
+                <dt class="text-sm text-gray-600">Niveau</dt>
+                <dd>
+                  Niveau {{ profile.sources.DUO.inschrijvingen[0].niveau }}
+                </dd>
+              </div>
+              {% endif %}
+            </dl>
+          </div>
+          {% endif %}
+          <!-- Werk en Re-integratie -->
+          {% if profile.sources.GEMEENTE_AMSTERDAM and
+          profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie %}
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">
+              Werk & Re-integratie
+            </h4>
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-sm text-gray-600">Arbeidsvermogen</dt>
+                <dd>
+                  {{
+                  profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].arbeidsvermogen
+                  }}
+                </dd>
+              </div>
+              {% if
+              profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
+              %}
+              <div>
+                <dt class="text-sm text-gray-600">Re-integratietraject</dt>
+                <dd>
+                  {{
+                  profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
+                  }}
+                </dd>
+              </div>
+              {% endif %} {% if
+              profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
+              %}
+              <div>
+                <dt class="text-sm text-gray-600">Ontheffing</dt>
+                <dd>
+                  {{
+                  profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
+                  }}
+                </dd>
+              </div>
+              {% endif %}
+            </dl>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
+<!-- Wijziging doorgeven Wizard -->
+<section class="mb-8 bg-white rounded-lg shadow">
+  <div class="p-6">
+    <h3 class="font-semibold text-lg mb-4">Wijziging doorgeven</h3>
+    <p class="text-gray-600 mb-6">
+      Geef hier wijzigingen door die van invloed kunnen zijn op uw toeslagen.
+    </p>
+
+    <div id="wizard-container">
+      <!-- Step 0: Select type -->
+      <div id="step-0" class="wizard-step">
+        <h4 class="mb-2 block font-medium">Type wijziging</h4>
+        <div class="grid grid-cols-2 gap-4">
+          <button type="button" class="wizard-type-btn" data-type="Inkomen">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <ellipse
+                cx="12"
+                cy="6"
+                rx="7"
+                ry="3"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+              />
+              <path
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6"
+              />
+              <path
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6"
+              />
+            </svg>
+            <span class="font-medium">Inkomen</span>
+          </button>
+          <button type="button" class="wizard-type-btn" data-type="Woonadres">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+            <span class="font-medium">Woonadres</span>
+          </button>
+          <button type="button" class="wizard-type-btn" data-type="Huurprijs">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-yellow-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <rect
+                x="6"
+                y="4"
+                width="12"
+                height="16"
+                rx="2"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+              />
+              <path
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                d="M9 8h6M9 12h6M9 16h2"
+              />
+            </svg>
+            <span class="font-medium">Huurprijs</span>
+          </button>
+          <button
+            type="button"
+            class="wizard-type-btn"
+            data-type="Gezin of huishouden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-pink-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <span class="font-medium">Gezin of huishouden</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Wizard steps will be dynamically generated here -->
+      <div id="wizard-steps" class="hidden">
+        <form id="wizard-form" class="space-y-6">
+          <div id="step-content"></div>
+          <div id="step-navigation" class="flex justify-between">
+            <button
+              type="button"
+              id="prev-btn"
+              class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none"
+            >
+              Terug
+            </button>
+            <button
+              type="button"
+              id="next-btn"
+              class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none"
+            >
+              Volgende
+            </button>
+            <button
+              type="submit"
+              id="submit-btn"
+              class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none hidden"
+            >
+              Wijziging doorgeven
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wizard-type-btn {
+    display: flex;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    padding: 1.5rem 1rem;
+    transition: border-color 0.15s ease-in-out;
+  }
+
+  .wizard-type-btn:hover {
+    border-color: #3b82f6;
+  }
+
+  .wizard-type-btn:focus {
+    outline: none;
+  }
+
+  .wizard-step {
+    display: none;
+  }
+
+  .wizard-step.active {
+    display: block;
+  }
+
+  .wizard-option-btn {
+    display: flex;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    padding: 1.5rem 1rem;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .wizard-option-btn:hover {
+    border-color: #3b82f6;
+  }
+
+  .wizard-option-btn.selected {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+</style>
+
+<script>
+  class WizardManager {
+    constructor() {
+      this.currentStep = 0;
+      this.selectedType = null;
+      this.answers = {};
+
+      // Step definitions converted from TypeScript
+      this.stepsByType = {
+        Inkomen: [
+          [
+            {
+              type: "input",
+              label: "Nieuw inkomen",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarinkomen…",
+            },
+            { type: "input", label: "Ingangsdatum", inputType: "date" },
+          ],
+        ],
+        Woonadres: [
+          [
+            {
+              type: "select",
+              label: "Type adreswijziging",
+              options: [
+                { value: "verhuizing", label: "Verhuizing", icon: "move" },
+                { value: "correctie", label: "Correctie", icon: "edit" },
+              ],
+            },
+          ],
+          [
+            {
+              type: "input",
+              label: "Nieuwe postcode",
+              inputType: "text",
+              placeholder: "Postcode…",
+            },
+            {
+              type: "input",
+              label: "Nieuw huisnummer",
+              inputType: "text",
+              placeholder: "Huisnummer…",
+            },
+          ],
+          [
+            {
+              type: "select",
+              label: "Wat voor soort woning is dit?",
+              options: [
+                { value: "koopwoning", label: "Koopwoning", icon: "buy" },
+                { value: "huurwoning", label: "Huurwoning", icon: "rent" },
+              ],
+            },
+          ],
+          [{ type: "input", label: "Ingangsdatum", inputType: "date" }],
+        ],
+        Huurprijs: [
+          [
+            {
+              type: "input",
+              label: "Nieuwe huurprijs",
+              inputType: "number",
+              placeholder: "Voer de nieuwe huurprijs in…",
+            },
+            {
+              type: "input",
+              label: "Servicekosten",
+              inputType: "number",
+              placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
+            },
+            { type: "input", label: "Ingangsdatum", inputType: "date" },
+          ],
+        ],
+        "Gezin of huishouden": [
+          [
+            {
+              type: "select",
+              label: "Wijziging gezin of huishouden",
+              options: [
+                {
+                  value: "samenwonen",
+                  label: "Ik ga trouwen of samenwonen",
+                  icon: "heart",
+                },
+                {
+                  value: "scheiden",
+                  label: "Ik ga scheiden of wij gaan uit elkaar",
+                  icon: "heart-broken",
+                },
+                {
+                  value: "co-ouder",
+                  label: "Ik word co-ouder",
+                  icon: "co-parent",
+                },
+                {
+                  value: "iemand-bij",
+                  label: "Er komt iemand bij mij wonen",
+                  icon: "person-more",
+                },
+                {
+                  value: "iemand-weg",
+                  label: "Er gaat iemand mijn huis uit",
+                  icon: "person-less",
+                },
+                {
+                  value: "overlijden",
+                  label: "Er is iemand overleden",
+                  icon: "death",
+                },
+                { value: "kind", label: "Ik krijg een kind", icon: "child" },
+              ],
+            },
+          ],
+          [{ type: "input", label: "Ingangsdatum", inputType: "date" }],
+        ],
+      };
+
+      this.init();
+    }
+
+    init() {
+      // Add event listeners for type selection
+      document.querySelectorAll(".wizard-type-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          this.selectType(btn.dataset.type);
+        });
+      });
+
+      // Add event listeners for navigation
+      document
+        .getElementById("prev-btn")
+        .addEventListener("click", () => this.prevStep());
+      document
+        .getElementById("next-btn")
+        .addEventListener("click", () => this.nextStep());
+      document.getElementById("wizard-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.submitWizard();
+      });
+
+      // Show initial step
+      document.getElementById("step-0").classList.add("active");
+    }
+
+    selectType(type) {
+      this.selectedType = type;
+      this.currentStep = 1;
+      this.answers = {};
+
+      document.getElementById("step-0").classList.remove("active");
+      document.getElementById("wizard-steps").classList.remove("hidden");
+
+      this.renderStep();
+    }
+
+    renderStep() {
+      if (!this.selectedType || this.currentStep === 0) return;
+
+      const stepIndex = this.currentStep - 1;
+      const fields = this.stepsByType[this.selectedType][stepIndex];
+      const stepContent = document.getElementById("step-content");
+
+      stepContent.innerHTML = "";
+
+      fields.forEach((field, i) => {
+        if (field.type === "input") {
+          const div = document.createElement("div");
+          div.innerHTML = `
+                    <label for="wizard-input-${i}" class="mb-2 block font-medium">${field.label}</label>
+                    <input
+                        id="wizard-input-${i}"
+                        type="${field.inputType}"
+                        class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                        placeholder="${field.placeholder || ""}"
+                        value="${this.answers[field.label] || ""}"
+                    />
+                `;
+
+          const input = div.querySelector("input");
+          input.addEventListener("input", (e) => {
+            this.answers[field.label] = e.target.value;
+          });
+
+          stepContent.appendChild(div);
+        } else if (field.type === "select") {
+          const div = document.createElement("div");
+          div.innerHTML = `
+                    <h4 class="mb-2 block font-medium">${field.label}</h4>
+                    <div class="grid grid-cols-2 gap-4" data-field="${field.label}">
+                        ${field.options
+                          .map(
+                            (option) => `
+                            <button type="button" class="wizard-option-btn" data-value="${option.value}">
+                                ${this.getIcon(option.icon || "")}
+                                <span class="font-medium">${option.label}</span>
+                            </button>
+                        `,
+                          )
+                          .join("")}
+                    </div>
+                `;
+
+          // Add event listeners for option buttons
+          div.querySelectorAll(".wizard-option-btn").forEach((btn) => {
+            if (this.answers[field.label] === btn.dataset.value) {
+              btn.classList.add("selected");
+            }
+
+            btn.addEventListener("click", () => {
+              // Remove selected class from siblings
+              btn.parentNode
+                .querySelectorAll(".wizard-option-btn")
+                .forEach((sibling) => {
+                  sibling.classList.remove("selected");
+                });
+
+              // Add selected class to clicked button
+              btn.classList.add("selected");
+
+              // Store answer
+              this.answers[field.label] = btn.dataset.value;
+            });
+          });
+
+          stepContent.appendChild(div);
+        }
+      });
+
+      // Handle final step (details textarea)
+      if (stepIndex === this.stepsByType[this.selectedType].length - 1) {
+        const detailsDiv = document.createElement("div");
+        detailsDiv.innerHTML = `
+                <label for="change-details" class="mb-2 block font-medium">Details van de wijziging</label>
+                <textarea
+                    id="change-details"
+                    rows="4"
+                    class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                    placeholder="Beschrijf hier de details van de wijziging…"
+                >${this.answers["Details"] || ""}</textarea>
+            `;
+
+        const textarea = detailsDiv.querySelector("textarea");
+        textarea.addEventListener("input", (e) => {
+          this.answers["Details"] = e.target.value;
+        });
+
+        stepContent.appendChild(detailsDiv);
+
+        // Show submit button instead of next button
+        document.getElementById("next-btn").classList.add("hidden");
+        document.getElementById("submit-btn").classList.remove("hidden");
+      } else {
+        document.getElementById("next-btn").classList.remove("hidden");
+        document.getElementById("submit-btn").classList.add("hidden");
+      }
+
+      // Handle back button visibility
+      document.getElementById("prev-btn").style.display =
+        this.currentStep > 0 ? "block" : "none";
+    }
+
+    nextStep() {
+      if (this.currentStep < this.stepsByType[this.selectedType].length) {
+        this.currentStep++;
+        this.renderStep();
+      }
+    }
+
+    prevStep() {
+      if (this.currentStep > 1) {
+        this.currentStep--;
+        this.renderStep();
+      } else {
+        // Go back to type selection
+        this.currentStep = 0;
+        this.selectedType = null;
+        document.getElementById("wizard-steps").classList.add("hidden");
+        document.getElementById("step-0").classList.add("active");
+      }
+    }
+
+    submitWizard() {
+      const result = {
+        type: this.selectedType,
+        ...this.answers,
+      };
+
+      alert("Wijziging doorgegeven:\n" + JSON.stringify(result, null, 2));
+
+      // Reset wizard
+      this.currentStep = 0;
+      this.selectedType = null;
+      this.answers = {};
+      document.getElementById("wizard-steps").classList.add("hidden");
+      document.getElementById("step-0").classList.add("active");
+    }
+
+    getIcon(name) {
+      const icons = {
+        move: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" viewBox="0 0 24 24"><path fill="currentColor" d="M18 18.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5m1.5-9H17V12h4.46zM6 18.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5M20 8l3 4v5h-2c0 1.66-1.34 3-3 3s-3-1.34-3-3H9c0 1.66-1.34 3-3 3s-3-1.34-3-3H1V6c0-1.11.89-2 2-2h14v4zM3 6v9h.76c.55-.61 1.35-1 2.24-1s1.69.39 2.24 1H15V6zm7 1l3.5 3.5L10 14v-2.5H5v-2h5z"/></svg>',
+        edit: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>',
+        heart:
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" viewBox="0 0 24 24"><path fill="currentColor" d="m12 21l-1.45-1.3q-2.525-2.275-4.175-3.925T3.75 12.812T2.388 10.4T2 8.15Q2 5.8 3.575 4.225T7.5 2.65q1.3 0 2.475.55T12 4.75q.85-1 2.025-1.55t2.475-.55q2.35 0 3.925 1.575T22 8.15q0 1.15-.387 2.25t-1.363 2.412t-2.625 2.963T13.45 19.7zm0-2.7q2.4-2.15 3.95-3.687t2.45-2.675t1.25-2.026T20 8.15q0-1.5-1-2.5t-2.5-1q-1.175 0-2.175.662T12.95 7h-1.9q-.375-1.025-1.375-1.687T7.5 4.65q-1.5 0-2.5 1t-1 2.5q0 .875.35 1.763t1.25 2.025t2.45 2.675T12 18.3m0-6.825"/></svg>',
+        "heart-broken":
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-500" viewBox="0 0 24 24"><path fill="currentColor" d="M12.025 21.925q-3.35-3.375-5.337-5.45t-3.025-3.45t-1.35-2.35T2 8.5q0-2.3 1.6-3.9T7.5 3q1.125 0 2.175.412T11.55 4.6L10 10h3l-.85 8.375L15 9h-3l1.775-5.3q.625-.35 1.313-.525T16.5 3q2.3 0 3.9 1.6T22 8.5q0 1.2-.325 2.2T20.3 13.088t-3.025 3.45t-5.25 5.387m-1.775-4.65L10.775 12H7.35l1.875-6.575q-.4-.2-.837-.312T7.5 5Q6.05 5 5.025 6.025T4 8.5q0 .775.288 1.55t1 1.763t1.924 2.3t3.038 3.162m4.7-1.2q2.775-2.825 3.913-4.5T20 8.5q0-1.45-1.025-2.475T16.5 5q-.275 0-.55.038t-.55.137L14.8 7h2.9zM7.35 12"/></svg>',
+        "co-parent":
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0-4 0m-2 8v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1M15 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2 5h2a2 2 0 0 1 2 2v1M5 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0m-2 8v-1a2 2 0 0 1 2-2h2"/></svg>',
+        "person-more":
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0a3.375 3.375 0 0 1 6.75 0M3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.3 12.3 0 0 1 9.374 21C7.043 21 4.862 20.355 3 19.234"/></svg>',
+        "person-less":
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0a3.375 3.375 0 0 1 6.75 0M4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.3 12.3 0 0 1 10.374 21C8.043 21 5.862 20.355 4 19.234"/></svg>',
+        death:
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M7 16.17V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v9.171M12 7v5m-2-3h4"/><path d="M5 21v-2a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v2z"/></g></svg>',
+        child:
+          '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-500" viewBox="0 0 24 24"><g fill="none"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m0 2a8 8 0 1 0 2.97.57a3 3 0 0 1-4.954 2.68a1 1 0 0 1 1.224-1.577l.099.077A1 1 0 1 0 12 4m2.64 11.232a1 1 0 0 1 .128 1.408C14.096 17.447 13.124 18 12 18s-2.096-.553-2.768-1.36a1 1 0 0 1 1.536-1.28c.359.43.798.64 1.232.64s.873-.21 1.232-.64a1 1 0 0 1 1.408-.128M8.5 10a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m7 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3"/></g></svg>',
+        buy: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 9l5 5v7H8v-4m0 4H3v-7l5-5m1 1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17h-8m0-14v.01M17 7v.01M17 11v.01M17 15v.01"/></svg>',
+        rent: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-500" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M5 21V7l8-4v18m6 0V11l-6-4M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>',
+      };
+
+      return icons[name] || "";
+    }
+  }
+
+  // Initialize wizard when DOM is loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    new WizardManager();
+  });
+</script>
+
 <!-- Laws Grid -->
 <section>
-    <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-        {% for law in discoverable_service_laws %}
-            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}"
-                 hx-trigger="load"
-                 hx-swap="outerHTML"
-                 class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
-        {% endfor %}
+  <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"
+  >
+    {% for law in discoverable_service_laws %}
+    <div
+      hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}"
+      hx-trigger="load"
+      hx-swap="outerHTML"
+      class="h-full bg-white rounded-lg shadow"
+    >
+      {% include "partials/loading.html" %}
     </div>
+    {% endfor %}
+  </div>
 </section>
 <!-- Info Section -->
 <section class="mt-12 grid md:grid-cols-2 gap-8">
-    <div class="bg-blue-50 rounded-lg p-6">
-        <h3 class="font-semibold text-lg mb-4">Over deze demo</h3>
-        <p class="text-gray-600">
-            Deze demo laat zien hoe wetten als code werken. De berekeningen zijn gebaseerd op echte wetteksten,
-            omgezet naar computercode. De getoonde profielen zijn voorbeelden uit de testscenarios.
-        </p>
-    </div>
-    <div class="bg-gray-50 rounded-lg p-6">
-        <h3 class="font-semibold text-lg mb-4">Beschikbare regelingen</h3>
-        <ul class="space-y-2">
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
-                <span>Zorgtoeslag (Wet op de zorgtoeslag)</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
-                <span>AOW (Algemene Ouderdomswet)</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
-                <span>Bijstand (Participatiewet)</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
-                <span>Inkomstenbelasting</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-indigo-200 rounded-full mr-2"></span>
-                <span>Huurtoeslag</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-pink-200 rounded-full mr-2"></span>
-                <span>Kieswet</span>
-            </li>
-        </ul>
-    </div>
+  <div class="bg-blue-50 rounded-lg p-6">
+    <h3 class="font-semibold text-lg mb-4">Over deze demo</h3>
+    <p class="text-gray-600">
+      Deze demo laat zien hoe wetten als code werken. De berekeningen zijn
+      gebaseerd op echte wetteksten, omgezet naar computercode. De getoonde
+      profielen zijn voorbeelden uit de testscenarios.
+    </p>
+  </div>
+  <div class="bg-gray-50 rounded-lg p-6">
+    <h3 class="font-semibold text-lg mb-4">Beschikbare regelingen</h3>
+    <ul class="space-y-2">
+      <li class="flex items-center">
+        <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
+        <span>Zorgtoeslag (Wet op de zorgtoeslag)</span>
+      </li>
+      <li class="flex items-center">
+        <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+        <span>AOW (Algemene Ouderdomswet)</span>
+      </li>
+      <li class="flex items-center">
+        <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
+        <span>Bijstand (Participatiewet)</span>
+      </li>
+      <li class="flex items-center">
+        <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+        <span>Inkomstenbelasting</span>
+      </li>
+      <li class="flex items-center">
+        <span class="w-4 h-4 bg-indigo-200 rounded-full mr-2"></span>
+        <span>Huurtoeslag</span>
+      </li>
+      <li class="flex items-center">
+        <span class="w-4 h-4 bg-pink-200 rounded-full mr-2"></span>
+        <span>Kieswet</span>
+      </li>
+    </ul>
+  </div>
 </section>
