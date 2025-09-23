@@ -256,6 +256,30 @@ async def post_reset(request: Request, services: EngineInterface = Depends(get_m
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 
+@router.get("/situations")
+async def situations(
+    request: Request,
+    # services: EngineInterface = Depends(get_machine_service),
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+):
+    """Show all situation claims"""
+    # all_laws = services.get_discoverable_service_laws()
+    # all_services = list(all_laws.keys())
+
+    claims = claim_manager.get_claims_by_bsn("100000001")  # Note: hardcoded BSN for now
+
+    # print("all services", all_services)
+    return templates.TemplateResponse(
+        "admin/situation_claims.html",
+        {
+            "request": request,
+            # "all_services": all_services,
+            # "get_claims_by_service": claim_manager.get_claims_by_service,
+            "claims": claims,
+        },
+    )
+
+
 @router.get("/{service}")
 async def admin_dashboard(
     request: Request,

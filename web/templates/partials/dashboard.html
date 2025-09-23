@@ -483,13 +483,13 @@
         if (field.type === 'input') {
           const div = document.createElement('div');
           div.innerHTML = `
-            <label for='wizard-input-${i}' class='mb-2 block font-medium'>${field.label}</label>
+            <label for="wizard-input-${i}" class="mb-2 block font-medium">${field.label}</label>
             <input
-              id='wizard-input-${i}'
-              type='${field.inputType}'
-              class='w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none'
-              placeholder='${field.placeholder || ''}'
-              value='${this.answers[field.label] || ''}'
+              id="wizard-input-${i}"
+              type="${field.inputType}"
+              class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none'"
+              placeholder="${field.placeholder || ''}"
+              value="${this.answers[field.label] || ''}"
             />
           `;
 
@@ -502,14 +502,14 @@
         } else if (field.type === 'select') {
           const div = document.createElement('div');
           div.innerHTML = `
-            <h4 class='mb-2 block font-medium'>${field.label}</h4>
-            <div class='grid grid-cols-2 gap-4' data-field='${field.label}'>
+            <h4 class="mb-2 block font-medium">${field.label}</h4>
+            <div class="grid grid-cols-2 gap-4" data-field="${field.label}">
             ${field.options
               .map(
                 (option) => `
-                  <button type='button' class='wizard-option-btn' data-value='${option.value}'>
+                  <button type="button" class="wizard-option-btn" data-value="${option.value}">
                     ${this.getIcon(option.icon || '')}
-                    <span class='font-medium'>${option.label}</span>
+                    <span class="font-medium">${option.label}</span>
                   </button>
                 `,
               )
@@ -547,12 +547,12 @@
       if (stepIndex === this.stepsByType[this.selectedType].length - 1) {
         const detailsDiv = document.createElement('div');
         detailsDiv.innerHTML = `
-          <label for='change-details' class='mb-2 block font-medium'>Details van de wijziging</label>
+          <label for="change-details" class="mb-2 block font-medium">Details van de wijziging</label>
           <textarea
-            id='change-details'
-            rows='4'
-            class='w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none'
-            placeholder='Beschrijf hier de details van de wijziging…'
+            id="change-details"
+            rows="4"
+            class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+            placeholder="Beschrijf hier de details van de wijziging…"
           >${this.answers['Details'] || ''}</textarea>
         `;
 
@@ -607,7 +607,7 @@
 
       fetch('/edit/update-situation', {
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(result)
       })
         .then(response => response.json())

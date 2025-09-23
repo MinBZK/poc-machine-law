@@ -1,0 +1,16 @@
+<h2>Situation Claims</h2>
+
+<ul>
+    {% for claim in claims %}
+    <li>
+        Claim ID: {{ claim.id }}<br>
+        BSN: {{ claim.bsn }}<br>
+        Law: {{ claim.law }}<br>
+        Key: {{ claim.key }}<br>
+        New Value: {{ claim.new_value }}<br>
+        Status: {{ claim.status }}<br>
+        Reason: {{ claim.reason }}<br>
+        Datum: {{ claim.created_at }}
+    </li>
+    {% endfor %}
+</ul>
