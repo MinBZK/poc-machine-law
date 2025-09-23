@@ -1,11 +1,11 @@
 import json
 import re
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import HTMLResponse, JSONResponse
 
-from web.dependencies import get_claim_manager, templates
-from web.engines import ClaimManagerInterface
+from web.dependencies import get_case_manager, get_claim_manager, templates
+from web.engines import CaseManagerInterface, ClaimManagerInterface
 
 router = APIRouter(prefix="/edit", tags=["edit"])
 
@@ -366,3 +366,48 @@ async def update_missing_values(
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed, reload-page"
     return response
+
+
+@router.post("/update-situation")
+async def update_situation(
+    request: Request,
+    payload: dict = Body(...),
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+):
+    """
+    Update a person's situation based on wizard input from the dashboard.
+    Submits the updated situation as a new claim via the claim manager.
+    """
+    try:
+        situation_type = payload.get("type")
+        details = payload.get("details", "")
+        # You may want to extract bsn, service, law, claimant, etc. from session or payload
+        # For now, expect them in the payload for demo purposes
+        bsn = payload.get("bsn")
+        service = payload.get("service")
+        law = payload.get("law")
+
+        if not all([bsn, service, law]):
+            return JSONResponse({"status": "error", "message": "bsn, service, and law are required"}, status_code=400)
+
+        # Prepare parameters for the case, using all payload fields except meta
+        parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn", "service", "law")}
+
+        # Submit the case
+        case_id = claim_manager.submit_claim(
+            service=service,
+            key=situation_type,
+            new_value=parameters,
+            reason=details,
+            claimant=bsn,
+            law=law,
+            bsn=bsn,
+            # case_id: UUID | None = None,
+            # old_value: Any | None = None, # TODO: fetch old value from existing case/situation if any?
+            # evidence_path: str | None = None,
+            # auto_approve: bool = False,
+        )
+
+        return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
+    except Exception as e:
+        return JSONResponse({"status": "error", "message": str(e)}, status_code=400)
