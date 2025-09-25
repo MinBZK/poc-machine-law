@@ -1,142 +1,150 @@
-{% extends "admin/base.html" %}
-{% from "macros/logos.html" import org_logo %}
+{% extends "admin/base.html" %} {% from "macros/logos.html" import org_logo %}
 {% block content %}
-    <div class="min-h-screen bg-gray-50">
-        {# Top navigation bar #}
-        <div class="bg-white shadow">
-            <div class="px-6 py-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Claimdetails</h1>
-                <div class="-mt-2 -mr-2">{{ org_logo(claim.service) }}</div>
-            </div>
-        </div>
-        <div class="p-6">
-            <div class="bg-white shadow rounded-lg">
-                <!-- Basic Information -->
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Basis Informatie</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-sm text-gray-600">BSN</p>
-                            <p class="font-medium">{{ claim.bsn }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Dienst</p>
-                            <p class="font-medium">{{ claim.service }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Wet</p>
-                            <p class="font-medium">{{ claim.law }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Status</p>
-                            <p class="font-medium">{{ claim.status }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Aanvrager</p>
-                            <p class="font-medium">{{ claim.claimant }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Aangemaakt op</p>
-                            <p class="font-medium">{{ claim.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Claim Details -->
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Claim Details</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
-                            <p class="text-sm text-gray-600">Parameter</p>
-                            <p class="font-medium">{{ claim.key }}</p>
-                        </div>
-                        {% if claim.old_value is not none %}
-                            <div class="col-span-2">
-                                <p class="text-sm text-gray-600">Oude Waarde</p>
-                                <p class="font-medium">{{ claim.old_value }}</p>
-                            </div>
-                        {% endif %}
-                        <div class="col-span-2">
-                            <p class="text-sm text-gray-600">Nieuwe Waarde</p>
-                            <p class="font-medium">{{ claim.new_value }}</p>
-                        </div>
-                        <div class="col-span-2">
-                            <p class="text-sm text-gray-600">Reden</p>
-                            <p class="font-medium">{{ claim.reason }}</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Verification Details -->
-                {% if claim.status == 'APPROVED' %}
-                    <div class="p-6 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold mb-4">Verificatie Details</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-600">Geverifieerd door</p>
-                                <p class="font-medium">{{ claim.verified_by }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Geverifieerd op</p>
-                                <p class="font-medium">{{ claim.verified_at.strftime("%Y-%m-%d %H:%M:%S") }}</p>
-                            </div>
-                            <div class="col-span-2">
-                                <p class="text-sm text-gray-600">Geverifieerde Waarde</p>
-                                <p class="font-medium">{{ claim.verified_value }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                <!-- Rejection Details -->
-                {% if claim.status == 'REJECTED' %}
-                    <div class="p-6 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold mb-4">Afwijzings Details</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-600">Afgewezen door</p>
-                                <p class="font-medium">{{ claim.rejected_by }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Afgewezen op</p>
-                                <p class="font-medium">{{ claim.rejected_at.strftime("%Y-%m-%d %H:%M:%S") }}</p>
-                            </div>
-                            <div class="col-span-2">
-                                <p class="text-sm text-gray-600">Reden voor afwijzing</p>
-                                <p class="font-medium">{{ claim.rejection_reason }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                <!-- Evidence -->
-                {% if claim.evidence_path %}
-                    <div class="p-6 border-b border-gray-200">
-                        <h2 class="text-lg font-semibold mb-4">Bewijsmateriaal</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="col-span-2">
-                                <p class="text-sm text-gray-600">Bewijsmateriaal Locatie</p>
-                                <p class="font-medium">{{ claim.evidence_path }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                <!-- Related Case -->
-                {% if related_case %}
-                    <div class="p-6">
-                        <h2 class="text-lg font-semibold mb-4">Gerelateerde Zaak</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-600">Zaak ID</p>
-                                <p class="font-medium">
-                                    <a href="/admin/cases/{{ related_case.id }}"
-                                       class="text-blue-600 hover:text-blue-800">{{ related_case.id }}</a>
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Zaak Status</p>
-                                <p class="font-medium">{{ related_case.status }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
+<div class="min-h-screen bg-gray-50">
+  {# Top navigation bar #}
+  <div class="bg-white shadow">
+    <div class="px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Claimdetails</h1>
+      <div class="-mt-2 -mr-2">{{ org_logo(claim.service) }}</div>
     </div>
+  </div>
+  <div class="p-6">
+    <div class="bg-white shadow rounded-lg">
+      <!-- Basic Information -->
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-semibold mb-4">Basisinformatie</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">BSN</p>
+            <p class="font-medium">{{ claim.bsn }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Dienst</p>
+            <p class="font-medium">{{ claim.service }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Wet</p>
+            <p class="font-medium">{{ claim.law }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Status</p>
+            <p class="font-medium">{{ claim.status }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Aanvrager</p>
+            <p class="font-medium">{{ claim.claimant }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Aangemaakt op</p>
+            <p class="font-medium">
+              {{ claim.created_at.strftime("%Y-%m-%d %H:%M:%S") }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Claim Details -->
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-semibold mb-4">Claim Details</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Parameter</p>
+            <p class="font-medium">{{ claim.key }}</p>
+          </div>
+          {% if claim.old_value is not none %}
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Oude Waarde</p>
+            <p class="font-medium">{{ claim.old_value }}</p>
+          </div>
+          {% endif %}
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Nieuwe Waarde</p>
+            <p class="font-medium">{{ claim.new_value }}</p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Reden</p>
+            <p class="font-medium">{{ claim.reason }}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Verification Details -->
+      {% if claim.status == 'APPROVED' %}
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-semibold mb-4">Verificatie Details</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Geverifieerd door</p>
+            <p class="font-medium">{{ claim.verified_by }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Geverifieerd op</p>
+            <p class="font-medium">
+              {{ claim.verified_at.strftime("%Y-%m-%d %H:%M:%S") }}
+            </p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Geverifieerde Waarde</p>
+            <p class="font-medium">{{ claim.verified_value }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <!-- Rejection Details -->
+      {% if claim.status == 'REJECTED' %}
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-semibold mb-4">Afwijzings Details</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Afgewezen door</p>
+            <p class="font-medium">{{ claim.rejected_by }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Afgewezen op</p>
+            <p class="font-medium">
+              {{ claim.rejected_at.strftime("%Y-%m-%d %H:%M:%S") }}
+            </p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Reden voor afwijzing</p>
+            <p class="font-medium">{{ claim.rejection_reason }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <!-- Evidence -->
+      {% if claim.evidence_path %}
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-semibold mb-4">Bewijsmateriaal</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <p class="text-sm text-gray-600">Bewijsmateriaal Locatie</p>
+            <p class="font-medium">{{ claim.evidence_path }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <!-- Related Case -->
+      {% if related_case %}
+      <div class="p-6">
+        <h2 class="text-lg font-semibold mb-4">Gerelateerde Zaak</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Zaak ID</p>
+            <p class="font-medium">
+              <a
+                href="/admin/cases/{{ related_case.id }}"
+                class="text-blue-600 hover:text-blue-800"
+                >{{ related_case.id }}</a
+              >
+            </p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Zaak Status</p>
+            <p class="font-medium">{{ related_case.status }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}
