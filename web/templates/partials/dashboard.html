@@ -203,7 +203,7 @@
       <div id="step-0" class="wizard-step">
         <h4 class="mb-2 block font-medium">Type wijziging</h4>
         <div class="grid grid-cols-2 gap-4">
-          <button type="button" class="wizard-type-btn" data-type="Inkomen">
+          <button type="button" class="wizard-type-btn" data-type="inkomen">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <ellipse cx="12" cy="6" rx="7" ry="3" stroke-width="2" stroke="currentColor" fill="none" />
@@ -212,7 +212,7 @@
             </svg>
             <span class="font-medium">Inkomen</span>
           </button>
-          <button type="button" class="wizard-type-btn" data-type="Woonadres">
+          <button type="button" class="wizard-type-btn" data-type="woonadres">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -220,7 +220,7 @@
             </svg>
             <span class="font-medium">Woonadres</span>
           </button>
-          <button type="button" class="wizard-type-btn" data-type="Huurprijs">
+          <button type="button" class="wizard-type-btn" data-type="huurprijs">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2" stroke="currentColor" fill="none" />
@@ -228,7 +228,7 @@
             </svg>
             <span class="font-medium">Huurprijs</span>
           </button>
-          <button type="button" class="wizard-type-btn" data-type="Gezin of huishouden">
+          <button type="button" class="wizard-type-btn" data-type="huishouden">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -242,7 +242,7 @@
       <!-- Wizard steps will be dynamically generated here -->
       <div id="wizard-steps" class="hidden">
         <form id="wizard-form" class="space-y-6">
-          <div id="step-content"></div>
+          <div id="step-content" class="space-y-3"></div>
           <div id="step-navigation" class="flex justify-between">
             <button type="button" id="prev-btn"
               class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
@@ -322,21 +322,23 @@
       this.answers = {};
 
       this.stepsByType = {
-        Inkomen: [
+        inkomen: [
           [
             {
               type: 'input',
-              label: 'Nieuw inkomen',
+              name: 'BOX1_DIENSTBETREKKING',
+              label: 'Nieuw inkomen uit dienstbetrekking',
               inputType: 'number',
               placeholder: 'Nieuw bruto jaarinkomen…',
             },
             { type: 'input', label: 'Ingangsdatum', inputType: 'date' },
           ],
         ],
-        Woonadres: [
+        woonadres: [
           [
             {
               type: 'select',
+              name: 'situation_move_change_type',
               label: 'Type adreswijziging',
               options: [
                 { value: 'verhuizing', label: 'Verhuizing', icon: 'move' },
@@ -347,12 +349,14 @@
           [
             {
               type: 'input',
+              name: 'POSTCODE',
               label: 'Nieuwe postcode',
               inputType: 'text',
               placeholder: 'Postcode…',
             },
             {
               type: 'input',
+              name: 'HUISNUMMER',
               label: 'Nieuw huisnummer',
               inputType: 'text',
               placeholder: 'Huisnummer…',
@@ -361,6 +365,7 @@
           [
             {
               type: 'select',
+              name: 'SOORT_WONING',
               label: 'Wat voor soort woning is dit?',
               options: [
                 { value: 'koopwoning', label: 'Koopwoning', icon: 'buy' },
@@ -370,16 +375,18 @@
           ],
           [{ type: 'input', label: 'Ingangsdatum', inputType: 'date' }],
         ],
-        Huurprijs: [
+        huurprijs: [
           [
             {
               type: 'input',
+              name: 'HUURPRIJS',
               label: 'Nieuwe huurprijs',
               inputType: 'number',
               placeholder: 'Voer de nieuwe huurprijs in…',
             },
             {
               type: 'input',
+              name: 'SERVICEKOSTEN',
               label: 'Servicekosten',
               inputType: 'number',
               placeholder: 'Voer de nieuwe maandelijkse servicekosten in…',
@@ -387,10 +394,11 @@
             { type: 'input', label: 'Ingangsdatum', inputType: 'date' },
           ],
         ],
-        'Gezin of huishouden': [
+        huishouden: [
           [
             {
               type: 'select',
+              name: 'situation_household_change_type',
               label: 'Wijziging gezin of huishouden',
               options: [
                 {
@@ -427,7 +435,11 @@
               ],
             },
           ],
-          [{ type: 'input', label: 'Ingangsdatum', inputType: 'date' }],
+          [{
+            type: 'input',
+            name: '',
+            label: 'Ingangsdatum', inputType: 'date'
+          }],
         ],
       };
 
@@ -475,8 +487,6 @@
       const stepIndex = this.currentStep - 1;
       const fields = this.stepsByType[this.selectedType][stepIndex];
       const stepContent = document.getElementById('step-content');
-      stepContent.className = 'space-y-3';
-
       stepContent.innerHTML = '';
 
       fields.forEach((field, i) => {
@@ -489,21 +499,25 @@
               type="${field.inputType}"
               class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none'"
               placeholder="${field.placeholder || ''}"
-              value="${this.answers[field.label] || ''}"
+              value="${this.answers[field.name] || ''}"
             />
           `;
 
           const input = div.querySelector('input');
           input.addEventListener('input', (e) => {
-            this.answers[field.label] = e.target.value;
+            if (field.inputType === 'number') {
+              this.answers[field.name] = parseFloat(e.target.value) * 100; // Parse to number and convert to cents
+            } else {
+              this.answers[field.name] = e.target.value;
+            }
           });
 
           stepContent.appendChild(div);
         } else if (field.type === 'select') {
           const div = document.createElement('div');
           div.innerHTML = `
-            <h4 class="mb-2 block font-medium">${field.label}</h4>
-            <div class="grid grid-cols-2 gap-4" data-field="${field.label}">
+            <h4 class="mb-2 block font-medium">${field.name}</h4>
+            <div class="grid grid-cols-2 gap-4" data-field="${field.name}">
             ${field.options
               .map(
                 (option) => `
@@ -519,7 +533,7 @@
 
           // Add event listeners for option buttons
           div.querySelectorAll('.wizard-option-btn').forEach((btn) => {
-            if (this.answers[field.label] === btn.dataset.value) {
+            if (this.answers[field.name] === btn.dataset.value) {
               btn.classList.add('selected');
             }
 
@@ -535,7 +549,7 @@
               btn.classList.add('selected');
 
               // Store answer
-              this.answers[field.label] = btn.dataset.value;
+              this.answers[field.name] = btn.dataset.value;
             });
           });
 
@@ -553,12 +567,12 @@
             rows="4"
             class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
             placeholder="Beschrijf hier de details van de wijziging…"
-          >${this.answers['Details'] || ''}</textarea>
+          >${this.answers['details'] || ''}</textarea>
         `;
 
         const textarea = detailsDiv.querySelector('textarea');
         textarea.addEventListener('input', (e) => {
-          this.answers['Details'] = e.target.value;
+          this.answers['details'] = e.target.value;
         });
 
         stepContent.appendChild(detailsDiv);
@@ -601,8 +615,6 @@
         type: this.selectedType,
         ...this.answers,
         bsn: "{{ bsn }}",
-        service: "{{ discoverable_service_laws[0]['service'] if discoverable_service_laws else '' }}",
-        law: "{{ discoverable_service_laws[0]['law'] if discoverable_service_laws else '' }}"
       };
 
       fetch('/edit/update-situation', {
@@ -613,7 +625,7 @@
         .then(response => response.json())
         .then(data => {
           if (data.status === 'ok') {
-            alert('Wijziging succesvol doorgegeven!');
+            alert('Wijziging succesvol doorgegeven!'); // IMPROVE: show a toast notification, also below
             window.location.reload();
           } else {
             alert('Fout bij doorgeven wijziging: ' + (data.message || 'Onbekende fout'));

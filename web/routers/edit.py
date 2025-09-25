@@ -1,7 +1,16 @@
 import json
 import re
 
-from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+)
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from web.dependencies import get_case_manager, get_claim_manager, templates
@@ -212,7 +221,9 @@ async def reject_claim(
             rejection_reason=f"Claim dropped: {reason}",
         )
 
-        response = templates.TemplateResponse("partials/claim_dropped.html", {"request": request})
+        response = templates.TemplateResponse(
+            "partials/claim_dropped.html", {"request": request}
+        )
         response.headers["HX-Trigger"] = "edit-dialog-closed"
         return response
     except ValueError as e:
@@ -248,7 +259,9 @@ async def approve_claim(
             verified_value=None,
         )
 
-        response = templates.TemplateResponse("partials/claim_approved.html", {"request": request})
+        response = templates.TemplateResponse(
+            "partials/claim_approved.html", {"request": request}
+        )
         response.headers["HX-Trigger"] = "edit-dialog-closed"
         return response
     except ValueError as e:
@@ -305,7 +318,9 @@ async def update_missing_values(
             continue
 
     # Sort by index
-    max_index = max(set(key_dict.keys()) | set(value_dict.keys()) | set(type_dict.keys()))
+    max_index = max(
+        set(key_dict.keys()) | set(value_dict.keys()) | set(type_dict.keys())
+    )
 
     for i in range(max_index + 1):
         if i in key_dict and i in value_dict and i in type_dict:
@@ -314,7 +329,9 @@ async def update_missing_values(
             types_list.append(type_dict[i])
 
     # Process each value with its proper type
-    for i, (key, value, type_name) in enumerate(zip(keys_list, values_list, types_list)):
+    for i, (key, value, type_name) in enumerate(
+        zip(keys_list, values_list, types_list)
+    ):
         parsed_value = value
         try:
             # Parse value based on type
@@ -372,6 +389,7 @@ async def update_missing_values(
 async def update_situation(
     request: Request,
     payload: dict = Body(...),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """
@@ -384,30 +402,53 @@ async def update_situation(
         # You may want to extract bsn, service, law, claimant, etc. from session or payload
         # For now, expect them in the payload for demo purposes
         bsn = payload.get("bsn")
-        service = payload.get("service")
-        law = payload.get("law")
 
-        if not all([bsn, service, law]):
-            return JSONResponse({"status": "error", "message": "bsn, service, and law are required"}, status_code=400)
+        if not all([situation_type, bsn]):
+            return JSONResponse(
+                {"status": "error", "message": "situation_type and bsn are required"},
+                status_code=400,
+            )
 
         # Prepare parameters for the case, using all payload fields except meta
-        parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn", "service", "law")}
+        parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn")}
 
-        # Submit the case
-        case_id = claim_manager.submit_claim(
-            service=service,
-            key=situation_type,
-            new_value=parameters,
-            reason=details,
-            claimant=bsn,
-            law=law,
+        # Split the payload into multiple claims and assign them to the same case
+        match situation_type:
+            case "inkomen":
+                service = "BELASTINGDIENST"
+                law = "wet_inkomstenbelasting"
+            case _:
+                service = ""  # TODO: handle / return exception
+                law = ""
+
+        # Create a case
+        case_id = case_manager.submit_case(
             bsn=bsn,
-            # case_id: UUID | None = None,
-            # old_value: Any | None = None, # TODO: fetch old value from existing case/situation if any?
-            # evidence_path: str | None = None,
-            # auto_approve: bool = False,
+            service=service,
+            law=law,
+            parameters=parameters,
+            claimed_result={},  # IMPROVE: other value?
+            approved_claims_only=False,  # IMPROVE: or True?
         )
 
-        return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
+        # Add the claim(s) to the case
+        for key, value in parameters.items():
+            claim_manager.submit_claim(
+                service=service,
+                key=key,
+                new_value=value,
+                reason=details,
+                claimant=bsn,
+                law=law,
+                bsn=bsn,
+                case_id=case_id,
+                # old_value: Any | None = None, # TODO: fetch old value from existing case/situation if any?
+                # evidence_path: str | None = None,
+                # auto_approve: bool = False,
+            )
+
+        return JSONResponse(
+            {"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id}
+        )
     except Exception as e:
         return JSONResponse({"status": "error", "message": str(e)}, status_code=400)
