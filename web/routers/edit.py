@@ -417,9 +417,20 @@ async def update_situation(
             case "inkomen":
                 service = "BELASTINGDIENST"
                 law = "wet_inkomstenbelasting"
+            case "woonadres":
+                service = "RvIG"
+                law = "wet_brp"
+            case "huurprijs":
+                service = "TOESLAGEN"
+                law = "wet_op_de_huurtoeslag"
+            case "huishouden":
+                service = "RvIG"
+                law = "wet_brp"
             case _:
-                service = ""  # TODO: handle / return exception
-                law = ""
+                return JSONResponse(
+                    {"status": "error", "message": f"unrecognized type: {situation_type}"},
+                    status_code=400,
+              )
 
         # Create a case
         case_id = case_manager.submit_case(
