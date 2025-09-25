@@ -9,6 +9,9 @@
 
 > Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wet- en regelgeving.
 
+Deze PoC is onderdeel van het **[RegelRecht Ecosysteem](https://minbzk.github.io/regelrecht/)**.
+
+
 ## 💡 Motivatie
 
 Veel Nederlandse wetten zijn in essentie mechanische processen. Dit wordt duidelijk uit deze drie voorbeelden:
