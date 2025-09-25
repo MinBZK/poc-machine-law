@@ -275,6 +275,15 @@ def step_impl(context, amount):
     actual_amount = context.result.output["woonkostentoeslag"]
     compare_euro_amount(actual_amount, amount)
 
+@then('heeft Nederlandse nationaliteit')
+def step_impl(context):
+    is_dutch = context.result.output["heeft_nederlandse_nationaliteit"]
+    assertions.assertTrue(is_dutch)
+
+@then('heeft geen Nederlandse nationaliteit')
+def step_impl(context):
+    is_dutch = context.result.output["heeft_nederlandse_nationaliteit"]
+    assertions.assertFalse(is_dutch)
 
 @then('is het startkapitaal "{amount}" euro')
 def step_impl(context, amount):
