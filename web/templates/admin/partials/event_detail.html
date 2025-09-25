@@ -5,7 +5,7 @@
         "AutomaticallyDecided": "bg-emerald-50 border-emerald-200",
         "AddedToManualReview": "bg-amber-50 border-amber-200",
         "Objected": "bg-rose-50 border-rose-200",
-        "ObjectionStatusSet": "bg-violet-50 border-violet-200"
+        "ObjectionStatusDetermined": "bg-violet-50 border-violet-200"
     } %}
     {# Bepaal kleur voor Decided op basis van approved #}
     {% if event.event_type == 'Decided' or event.event_type == 'AutomaticallyDecided' %}
@@ -20,7 +20,35 @@
     <div class="rounded-lg border shadow-sm p-4 {{ color_class }}">
         <div class="flex justify-between items-start mb-4">
             <div>
-                <h3 class="font-medium text-gray-900">{{ event.event_type|replace('_', ' ') |title }}</h3>
+                <h3 class="font-medium text-gray-900">
+                {% if event.event_type == 'Submitted' %}
+                Ingediend
+                {% elif event.event_type == 'Reset' %}
+                Reset
+                {% elif event.event_type == 'AutomaticallyDecided' %}
+                Automatisch besloten
+                {% elif event.event_type == 'AddedToManualReview' %}
+                Overgezet naar handmatige beoordeling
+                {% elif event.event_type == 'Decided' %}
+                Besloten
+                {% elif event.event_type == 'Objected' %}
+                In bezwaar
+                {% elif event.event_type == 'ObjectionStatusDetermined' %}
+                In bezwaar gesteld
+                {% elif event.event_type == 'ObjectionAdmissibilityDetermined' %}
+                Bezwaar ontvankelijkheid vastgesteld
+                {% elif event.event_type == 'AppealStatusDetermined' %}
+                In beroep gesteld
+                {% elif event.event_type == 'ClaimCreated' %}
+                Claim aangemaakt
+                {% elif event.event_type == 'ClaimApproved' %}
+                Claim goedgekeurd
+                {% elif event.event_type == 'ClaimRejected' %}
+                Claim afgewezen
+                {% else %}
+                {{ event.event_type|title }}
+                {% endif %}
+                </h3>
                 <p class="text-sm text-gray-600">{{ event.timestamp|format_date }}</p>
             </div>
         </div>
