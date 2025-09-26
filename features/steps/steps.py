@@ -75,6 +75,9 @@ def step_impl(context, bsn):
 def step_impl(context, date):
     context.parameters["VERKIEZINGSDATUM"] = date
 
+@given('een gevraagde uitvoer "{output}"')
+def step_impl(context, output):
+    context.requested_output = output
 
 def evaluate_law(context, service, law, approved=True):
     context.result = context.services.evaluate(
@@ -83,6 +86,7 @@ def evaluate_law(context, service, law, approved=True):
         parameters=context.parameters,
         reference_date=context.root_reference_date,
         overwrite_input=context.test_data,
+        requested_output=context.requested_output,
         approved=approved
     )
 

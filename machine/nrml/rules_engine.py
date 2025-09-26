@@ -8,6 +8,8 @@ from typing import Any
 import pandas as pd
 
 from ..context import PathNode, RuleContext, TypeSpec, logger
+from .item_type_analyzer import determine_item_type, NrmlItemType
+from .item_evaluator import NrmlItemEvaluator
 
 
 class NrmlRulesEngine:
@@ -19,6 +21,7 @@ class NrmlRulesEngine:
         self.items = {}
         self.law = spec.get("metadata", {}).get("description", {})
 
+
         # Fill items dictionary with JSON Pointer references
         for fact_id, fact in self.facts.items():
             items = fact.get("items", {})
@@ -26,9 +29,125 @@ class NrmlRulesEngine:
                 ref_key = f"#/facts/{fact_id}/items/{item_id}"
                 self.items[ref_key] = item
 
+        # Build dependency graph
+        self.dependencies = {}
+        self._build_dependency_graph()
+
         self.service_name = "NRML"
         self.service_provider = service_provider
 
+        # Initialize item evaluator
+        self.item_evaluator = NrmlItemEvaluator(self)
+
+    def _build_dependency_graph(self) -> None:
+        """Build dependency graph by finding all $ref references in items"""
+        for source_ref, item in self.items.items():
+            # Find all references and categorize them
+            all_references = self._find_references_recursive(item)
+            target_references = self._find_target_references(item)
+
+            # Regular dependencies are all references minus target references
+            regular_dependencies = all_references - target_references
+            if regular_dependencies:
+                self.dependencies[source_ref] = regular_dependencies
+
+            # Add inverted dependencies for target references
+            for target_ref in target_references:
+                # Invert the dependency: target depends on source
+                if target_ref not in self.dependencies:
+                    self.dependencies[target_ref] = set()
+                self.dependencies[target_ref].add(source_ref)
+
+    def _find_references_recursive(self, obj: Any) -> set[str]:
+        """
+        Recursively find all $ref references in an object structure.
+
+        Args:
+            obj: The object to search (dict, list, or primitive)
+
+        Returns:
+            Set of reference strings found
+        """
+        references = set()
+
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if key == "$ref" and isinstance(value, str):
+                    # Found a reference
+                    references.add(value)
+                else:
+                    # Recursively search nested objects
+                    references.update(self._find_references_recursive(value))
+
+        elif isinstance(obj, list):
+            # Search each item in the list
+            for item in obj:
+                references.update(self._find_references_recursive(item))
+
+        # For primitive types (str, int, bool, None), no references to find
+
+        return references
+
+    def _find_target_references(self, obj: Any) -> set[str]:
+        """
+        Find all $ref references that are specifically in 'target' nodes.
+
+        Args:
+            obj: The object to search
+
+        Returns:
+            Set of target reference strings found
+        """
+        references = set()
+
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if key == "target":
+                    # Found a target node, extract all references from it
+                    references.update(self._find_references_recursive(value))
+                elif isinstance(value, (dict, list)):
+                    # Continue searching in nested structures
+                    references.update(self._find_target_references(value))
+
+        elif isinstance(obj, list):
+            # Search each item in the list
+            for item in obj:
+                references.update(self._find_target_references(item))
+
+        return references
+
+    def get_dependencies(self, item_ref: str) -> set[str]:
+        """Get the dependencies for a specific item reference"""
+        return self.dependencies.get(item_ref, set())
+
+    def get_dependents(self, item_ref: str) -> set[str]:
+        """Get all items that depend on the specified item reference"""
+        dependents = set()
+        for source, targets in self.dependencies.items():
+            if item_ref in targets:
+                dependents.add(source)
+        return dependents
+
+    def get_dependency_chain(self, item_ref: str) -> list[str]:
+        """Get the complete dependency chain for an item in evaluation order"""
+        visited = set()
+        chain = []
+
+        def visit(ref: str):
+            if ref in visited:
+                return
+            visited.add(ref)
+
+            # Visit dependencies first
+            for dependency in self.get_dependencies(ref):
+                visit(dependency)
+
+            # Then add this item
+            if ref not in chain:
+                chain.append(ref)
+
+        visit(item_ref)
+        return chain
 
     @staticmethod
     def topological_sort(dependencies: dict[str, set]) -> list[str]:
@@ -152,6 +271,9 @@ class NrmlRulesEngine:
         # TODO: temp reference to result item in brp
         requested_output = "#/facts/f1e2d3c4-5b6a-7c8d-9e0f-1a2b3c4d5e6f/items/a2f3e4d5-6c7b-8d9e-0f1a-2b3c4d5e6f78"
 
+        items_to_process = [requested_output]
+
+
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
 
         claims = None
@@ -178,17 +300,14 @@ class NrmlRulesEngine:
         output_values = {}
         requirements_met = True
 
-
-        # Get required actions including dependencies in order
-        required_actions = self.get_required_actions(requested_output, self.items)
-
-        for action in required_actions:
-            output_def, output_name = self._evaluate_action(action, context)
-            context.outputs[output_name] = output_def["value"]
-            output_values[output_name] = output_def
-            if context.missing_required:
-                logger.warning("Missing required values, breaking")
-                break
+        for item in items_to_process:
+            self._evaluate_item(self.items.get(item), context)
+            # output_def, output_name = self._evaluate_item(item, context)
+            # context.outputs[output_name] = output_def["value"]
+            # output_values[output_name] = output_def
+            # if context.missing_required:
+            #     logger.warning("Missing required values, breaking")
+            #     break
 
         if context.missing_required:
             logger.warning("Missing required values, requirements not met, setting outputs to empty.")
@@ -205,52 +324,31 @@ class NrmlRulesEngine:
             "missing_required": context.missing_required,
         }
 
-    def _evaluate_action(self, action, context):
-        with logger.indent_block(f"Computing {action.get('output', '')}"):
-            if action["output"] == "partner_bsn":
-                pass
-            action_node = PathNode(
-                type="action",
-                name=f"Evaluate action for {action.get('output', '')}",
+    def _evaluate_item(self, item, context):
+        """Evaluate an NRML item based on its type"""
+        if not item:
+            logger.warning("Item is None or missing")
+            return
+
+        # Determine the item type
+        item_type = determine_item_type(item)
+        logger.debug(f"Item type determined: {item_type.value}")
+
+        with logger.indent_block(f"Evaluating item of type {item_type.value}"):
+            item_node = PathNode(
+                type="item",
+                name=f"Evaluate item: {item_type.value}",
                 result=None,
+                details={"item_type": item_type.value}
             )
-            context.add_to_path(action_node)
-            output_name = action["output"]
-            # Find output specification
-            output_spec = next(
-                (spec for spec in self.spec.get("properties", {}).get("output", []) if spec.get("name") == output_name),
-                {},
-            )
+            context.add_to_path(item_node)
 
-            if (
-                self.service_name in context.overwrite_input
-                and output_name in context.overwrite_input[self.service_name]
-            ):
-                raw_result = context.overwrite_input[self.service_name][output_name]
-                logger.debug(f"Resolving value {self.service_name}/{output_name} from OVERWRITE {raw_result}")
-            elif "operation" in action:
-                raw_result = self._evaluate_operation(action, context)
-            elif "value" in action:
-                raw_result = self._evaluate_value(action["value"], context)
-            else:
-                raw_result = None
+            # Delegate evaluation to the item evaluator
+            result = self.item_evaluator.evaluate_item(item, item_type, context)
 
-            result = self._enforce_output_type(output_name, raw_result)
-        action_node.result = result
-        logger.debug(f"Result of {action.get('output', '')}: {result}")
-        # Build output with metadata
-        output_def = {
-            "value": result,
-            "type": output_spec.get("type", "unknown"),
-            "description": output_spec.get("description", ""),
-        }
-        # Add type_spec if present
-        if "type_spec" in output_spec:
-            output_def["type_spec"] = output_spec["type_spec"]
-        # Add temporal if present
-        if "temporal" in output_spec:
-            output_def["temporal"] = output_spec["temporal"]
-        return output_def, output_name
+            item_node.result = result
+            context.pop_path()
+            return result
 
     def _evaluate_requirements(self, requirements: list, context: RuleContext) -> bool:
         """Evaluate all requirements"""

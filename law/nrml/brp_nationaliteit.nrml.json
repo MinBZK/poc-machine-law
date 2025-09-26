@@ -73,16 +73,18 @@
                 "condition": {
                   "type": "comparison",
                   "operator": "in",
-                  "left": [
+                  "arguments": [
+                    [
+                      {
+                        "$ref": "#/facts/3c8e2a5f-1b6d-4e9c-7f2d-a5c3b6e1d9f4/items/9d2c5b1e-7f3a-4d6c-b2e8-f5a1c9d3b7e6"
+                      }
+                    ],
                     {
-                      "$ref": "#/facts/3c8e2a5f-1b6d-4e9c-7f2d-a5c3b6e1d9f4/items/9d2c5b1e-7f3a-4d6c-b2e8-f5a1c9d3b7e6"
+                      "parameter": {
+                        "$ref": "#/facts/8c3f1d6a-5b9e-4f2c-d7b1-e3a6f4c8d5b2/items/2d9f5c1b-7e3a-4b6d-c8f2-1a5e9d3b7f4c"
+                      }
                     }
-                  ],
-                  "right": {
-                    "parameter": {
-                      "$ref": "#/facts/8c3f1d6a-5b9e-4f2c-d7b1-e3a6f4c8d5b2/items/2d9f5c1b-7e3a-4b6d-c8f2-1a5e9d3b7f4c"
-                    }
-                  }
+                  ]
                 },
                 "then": {
                   "value": true
@@ -98,8 +100,8 @@
     },
     "f1e2d3c4-5b6a-7c8d-9e0f-1a2b3c4d5e6f": {
       "name": {
-        "nl": "TOEKENNING",
-        "en": "TOEKENNING"
+        "nl": "BRP resultaat",
+        "en": "BRP result"
       },
       "items": {
         "a2f3e4d5-6c7b-8d9e-0f1a-2b3c4d5e6f78": {
