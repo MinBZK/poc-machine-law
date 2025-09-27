@@ -420,12 +420,27 @@ async def update_situation(
             case "woonadres":
                 service = "RvIG"
                 law = "wet_brp"
+                parameters["ADRES"] = {
+                  "straat": parameters["ADRES.straat"],
+                  "huisnummer": parameters["ADRES.huisnummer"],
+                  "postcode": parameters["ADRES.postcode"],
+                  "woonplaats": parameters["ADRES.woonplaats"],
+                  "type": "WOONADRES",
+                }
+                parameters["VERBLIJFSADRES"] = parameters["ADRES.woonplaats"]
             case "huurprijs":
                 service = "TOESLAGEN"
                 law = "wet_op_de_huurtoeslag"
             case "huishouden":
                 service = "RvIG"
                 law = "wet_brp"
+
+                match payload.get("situation_household_change_type"):
+                  case "scheiden":
+                    parameters["has_partner"] = False
+                    parameters["partnerschap_type"] = "GEEN"
+
+                  # IMPROVE: handle more 'huishouden' change types
             case _:
                 return JSONResponse(
                     {"status": "error", "message": f"unrecognized type: {situation_type}"},
