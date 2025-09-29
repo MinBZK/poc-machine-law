@@ -427,9 +427,9 @@ async def update_situation(
                   "woonplaats": parameters["ADRES.woonplaats"],
                   "type": "WOONADRES",
                 }
+                parameters["verblijfplaats"] = parameters["ADRES"]
                 parameters["VERBLIJFSADRES"] = parameters["ADRES.woonplaats"]
                 parameters["residence_address"] = f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
-                parameters["verblijfplaats"] = parameters["ADRES"]
 
                 # Remove address fields from parameters after grouping them
                 for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:

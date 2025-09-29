@@ -118,9 +118,31 @@
             <dl class="space-y-2">
               <div>
                 <dt class="text-sm text-gray-600">Nationaliteit</dt>
-                <dd>{{ profile.sources.RvIG.personen[0].nationaliteit }}</dd>
+                <dd>
+                  {{ accepted_claims["nationaliteit"] or profile.sources.RvIG.personen[0].nationaliteit }}
+                </dd>
               </div>
-              {% if profile.sources.RvIG.get('verblijfplaats') %}
+              {% if accepted_claims["verblijfplaats"] %}
+              <div>
+                <dt class="text-sm text-gray-600">
+                  {% if accepted_claims["verblijfplaats"].type == "BRIEFADRES" %}
+                  Briefadres {% else %} Woonadres {% endif %}
+                </dt>
+                <dd>
+                  {{ accepted_claims["verblijfplaats"].straat }} {{
+                  accepted_claims["verblijfplaats"].huisnummer }}
+                </dd>
+                <dd>
+                  {{ accepted_claims["verblijfplaats"].postcode }} {{
+                  accepted_claims["verblijfplaats"].woonplaats }}
+                </dd>
+              </div>
+              {% elif accepted_claims["verblijfsadres"] %}
+              <div>
+                <dt class="text-sm text-gray-600">Verblijfplaats</dt>
+                <dd>{{ accepted_claims["verblijfsadres"] }}</dd>
+              </div>
+              {% elif profile.sources.RvIG.get('verblijfplaats') %}
               <div>
                 <dt class="text-sm text-gray-600">
                   {% if profile.sources.RvIG.verblijfplaats[0].type ==
