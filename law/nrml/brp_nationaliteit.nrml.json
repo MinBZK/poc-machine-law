@@ -77,13 +77,11 @@
                     [
                       {
                         "$ref": "#/facts/3c8e2a5f-1b6d-4e9c-7f2d-a5c3b6e1d9f4/items/9d2c5b1e-7f3a-4d6c-b2e8-f5a1c9d3b7e6"
-                      }
-                    ],
-                    {
-                      "parameter": {
+                      },
+                      {
                         "$ref": "#/facts/8c3f1d6a-5b9e-4f2c-d7b1-e3a6f4c8d5b2/items/2d9f5c1b-7e3a-4b6d-c8f2-1a5e9d3b7f4c"
                       }
-                    }
+                    ]
                   ]
                 },
                 "then": {

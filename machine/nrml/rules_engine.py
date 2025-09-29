@@ -1,15 +1,15 @@
 import functools
 import operator
-from collections import defaultdict
 from copy import copy
 from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
 
-from ..context import PathNode, RuleContext, TypeSpec, logger
-from .item_type_analyzer import determine_item_type, NrmlItemType
+from ..context import PathNode, RuleContext, logger
+from .context import NrmlRuleContext
 from .item_evaluator import NrmlItemEvaluator
+from .item_type_analyzer import NrmlItemType, determine_item_type
 
 
 class NrmlRulesEngine:
@@ -44,19 +44,20 @@ class NrmlRulesEngine:
         for source_ref, item in self.items.items():
             # Find all references and categorize them
             all_references = self._find_references_recursive(item)
-            target_references = self._find_target_references(item)
+            target_reference = self._find_target_references(item)
 
-            # Regular dependencies are all references minus target references
-            regular_dependencies = all_references - target_references
+            # Regular dependencies are all references minus target reference
+            regular_dependencies = all_references - {target_reference} if target_reference else all_references
+
             if regular_dependencies:
                 self.dependencies[source_ref] = regular_dependencies
 
-            # Add inverted dependencies for target references
-            for target_ref in target_references:
+            # Add inverted dependency for target reference
+            if target_reference:
                 # Invert the dependency: target depends on source
-                if target_ref not in self.dependencies:
-                    self.dependencies[target_ref] = set()
-                self.dependencies[target_ref].add(source_ref)
+                if target_reference not in self.dependencies:
+                    self.dependencies[target_reference] = set()
+                self.dependencies[target_reference].add(source_ref)
 
     def _find_references_recursive(self, obj: Any) -> set[str]:
         """
@@ -88,33 +89,38 @@ class NrmlRulesEngine:
 
         return references
 
-    def _find_target_references(self, obj: Any) -> set[str]:
+    def _find_target_references(self, obj: Any) -> str | None:
         """
-        Find all $ref references that are specifically in 'target' nodes.
+        Find the $ref reference that is specifically in a 'target' node.
+        Returns immediately when target is found since there should be 0 or 1 targets per item.
 
         Args:
             obj: The object to search
 
         Returns:
-            Set of target reference strings found
+            Target reference string if found, None otherwise
         """
-        references = set()
-
         if isinstance(obj, dict):
             for key, value in obj.items():
                 if key == "target":
-                    # Found a target node, extract all references from it
-                    references.update(self._find_references_recursive(value))
-                elif isinstance(value, (dict, list)):
+                    # Found the target node, extract the reference from it and return immediately
+                    references = self._find_references_recursive(value)
+                    # Return the first (and should be only) reference found
+                    return next(iter(references)) if references else None
+                elif isinstance(value, dict | list):
                     # Continue searching in nested structures
-                    references.update(self._find_target_references(value))
+                    target_ref = self._find_target_references(value)
+                    if target_ref:
+                        return target_ref
 
         elif isinstance(obj, list):
             # Search each item in the list
             for item in obj:
-                references.update(self._find_target_references(item))
+                target_ref = self._find_target_references(item)
+                if target_ref:
+                    return target_ref
 
-        return references
+        return None
 
     def get_dependencies(self, item_ref: str) -> set[str]:
         """Get the dependencies for a specific item reference"""
@@ -149,113 +155,6 @@ class NrmlRulesEngine:
         visit(item_ref)
         return chain
 
-    @staticmethod
-    def topological_sort(dependencies: dict[str, set]) -> list[str]:
-        """
-        Perform topological sort on dependencies.
-        Returns outputs in order they should be calculated.
-        """
-        # First create complete set of all nodes including leaf nodes
-        all_nodes = set(dependencies.keys())
-        for deps in dependencies.values():
-            all_nodes.update(deps)
-
-        # Initialize complete dependency map
-        complete_dependencies = {node: set() for node in all_nodes}
-        complete_dependencies.update(dependencies)
-
-        # Build adjacency list
-        graph = defaultdict(set)
-        for output, deps in complete_dependencies.items():
-            for dep in deps:
-                graph[dep].add(output)
-
-        # Find nodes with no dependencies
-        ready = [node for node, deps in complete_dependencies.items() if not deps]
-        sorted_outputs = []
-
-        while ready:
-            node = ready.pop(0)
-            sorted_outputs.append(node)
-
-            # Remove this node as dependency
-            dependents = graph[node]
-            for dependent in list(dependents):
-                complete_dependencies[dependent].remove(node)
-                # If no more dependencies, add to ready
-                if not complete_dependencies[dependent]:
-                    ready.append(dependent)
-                dependents.remove(dependent)
-
-        if any(deps for deps in complete_dependencies.values()):
-            raise ValueError("Circular dependency detected")
-
-        return sorted_outputs
-
-    @staticmethod
-    def analyze_dependencies(action):
-        """Find all outputs this action depends on"""
-        deps = set()
-
-        def traverse(obj) -> None:
-            if isinstance(obj, str):
-                if obj.startswith("$"):
-                    value = obj[1:]  # Remove $ prefix
-                    if value.islower():  # Output reference
-                        deps.add(value)
-            elif isinstance(obj, dict):
-                for v in obj.values():
-                    traverse(v)
-            elif isinstance(obj, list):
-                for item in obj:
-                    traverse(item)
-
-        traverse(action)
-        return deps
-
-    @staticmethod
-    def get_required_actions(requested_output: list[str], items: dict[str, Any]) -> list:
-        """Get all actions needed to compute requested output in dependency order"""
-        if not requested_output:
-            return items
-
-        to_process = set(requested_output)
-        while to_process:
-            output = to_process.pop()
-            item = items.get(output)
-            # what if item is missing?
-
-            # TODO: recursively find where this item is used
-
-
-        # old stuff
-        # Build dependency graph
-        dependencies = {}
-        action_by_output = {}
-        for action in items:
-            output = action["output"]
-            action_by_output[output] = action
-            dependencies[output] = NrmlRulesEngine.analyze_dependencies(action)
-
-        # Find all required outputs
-        required = set()
-        to_process = set(requested_output)
-
-        while to_process:
-            output = to_process.pop()
-            required.add(output)
-            # Add dependencies to processing queue
-            deps = dependencies.get(output, set())
-            to_process.update(deps - required)
-
-        # Get execution order via topological sort
-        ordered_outputs = NrmlRulesEngine.topological_sort(
-            {output: deps for output, deps in dependencies.items() if output in required}
-        )
-
-        # Return actions in dependency order
-        return [action_by_output[output] for output in ordered_outputs if output in action_by_output]
-
     def evaluate(
         self,
         parameters: dict[str, Any] | None = None,
@@ -268,11 +167,7 @@ class NrmlRulesEngine:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
 
-        # TODO: temp reference to result item in brp
-        requested_output = "#/facts/f1e2d3c4-5b6a-7c8d-9e0f-1a2b3c4d5e6f/items/a2f3e4d5-6c7b-8d9e-0f1a-2b3c4d5e6f78"
-
-        items_to_process = [requested_output]
-
+        items_to_process = [requested_output] if requested_output else []
 
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
 
@@ -283,16 +178,12 @@ class NrmlRulesEngine:
                 bsn, self.service_name, self.law, approved=approved
             )
 
-        context = RuleContext(
-            definitions=self.facts,
-            service_provider="NRML",
+        context = NrmlRuleContext.from_nrml_engine(
+            self,
             parameters=parameters,
-            property_specs={},
-            output_specs={},
-            sources=sources or {},
-            overwrite_input=overwrite_input or {},
+            sources=sources,
+            overwrite_input=overwrite_input,
             calculation_date=calculation_date,
-            service_name=self.service_name,
             claims=claims,
             approved=approved,
         )
@@ -301,13 +192,7 @@ class NrmlRulesEngine:
         requirements_met = True
 
         for item in items_to_process:
-            self._evaluate_item(self.items.get(item), context)
-            # output_def, output_name = self._evaluate_item(item, context)
-            # context.outputs[output_name] = output_def["value"]
-            # output_values[output_name] = output_def
-            # if context.missing_required:
-            #     logger.warning("Missing required values, breaking")
-            #     break
+            self._evaluate_item(item, context)
 
         if context.missing_required:
             logger.warning("Missing required values, requirements not met, setting outputs to empty.")
@@ -330,25 +215,8 @@ class NrmlRulesEngine:
             logger.warning("Item is None or missing")
             return
 
-        # Determine the item type
-        item_type = determine_item_type(item)
-        logger.debug(f"Item type determined: {item_type.value}")
-
-        with logger.indent_block(f"Evaluating item of type {item_type.value}"):
-            item_node = PathNode(
-                type="item",
-                name=f"Evaluate item: {item_type.value}",
-                result=None,
-                details={"item_type": item_type.value}
-            )
-            context.add_to_path(item_node)
-
-            # Delegate evaluation to the item evaluator
-            result = self.item_evaluator.evaluate_item(item, item_type, context)
-
-            item_node.result = result
-            context.pop_path()
-            return result
+        # Delegate evaluation to the item evaluator
+        return self.item_evaluator.evaluate_item(item, context)
 
     def _evaluate_requirements(self, requirements: list, context: RuleContext) -> bool:
         """Evaluate all requirements"""
@@ -796,3 +664,42 @@ class NrmlRulesEngine:
             return self._evaluate_operation(value, context)
         else:
             return context.resolve_value(value)
+
+    def get_evaluation_order(self) -> list[str]:
+        """Get topologically sorted evaluation order for all items"""
+        # Simple topological sort using Kahn's algorithm
+        in_degree = {item_id: 0 for item_id in self.items}
+
+        # Calculate in-degrees
+        for item_id, deps in self.dependencies.items():
+            in_degree[item_id] = len(deps)
+
+        # Initialize queue with items that have no dependencies
+        queue = [item_id for item_id, degree in in_degree.items() if degree == 0]
+        result = []
+
+        while queue:
+            current = queue.pop(0)
+            result.append(current)
+
+            # Reduce in-degree for dependent items
+            for item_id, deps in self.dependencies.items():
+                if current in deps:
+                    in_degree[item_id] -= 1
+                    if in_degree[item_id] == 0:
+                        queue.append(item_id)
+
+        return result
+
+    def _get_all_target_references(self) -> dict[str, str]:
+        """Get all target references mapped to their source items (target_ref -> item_id)"""
+        target_refs = {}
+        for item_id, item in self.items.items():
+            ref = self._find_target_references(item)
+            if ref:
+                target_refs[ref] = item_id
+        return target_refs
+
+    def _get_item_type(self, item: dict[str, Any]) -> NrmlItemType:
+        """Get the type of an NRML item"""
+        return determine_item_type(item)
