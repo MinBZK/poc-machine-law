@@ -428,6 +428,12 @@ async def update_situation(
                   "type": "WOONADRES",
                 }
                 parameters["VERBLIJFSADRES"] = parameters["ADRES.woonplaats"]
+                parameters["residence_address"] = f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                parameters["verblijfplaats"] = parameters["ADRES"]
+
+                # Remove address fields from parameters after grouping them
+                for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:
+                    parameters.pop(k, None)
             case "huurprijs":
                 service = "TOESLAGEN"
                 law = "wet_op_de_huurtoeslag"
@@ -453,7 +459,7 @@ async def update_situation(
             service=service,
             law=law,
             parameters=parameters,
-            claimed_result={},  # IMPROVE: other value?
+            claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
         )
 
