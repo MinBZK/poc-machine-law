@@ -101,10 +101,9 @@ def group_cases_by_status(cases):
 @router.get("/")
 async def admin_redirect(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Redirect to first available service"""
-    discoverable_laws = {
-        **services.get_discoverable_service_laws("CITIZEN"),
-        **services.get_discoverable_service_laws("BUSINESS"),
-    }
+    discoverable_laws = services.get_discoverable_service_laws(
+        "CITIZEN"
+    ) | services.get_discoverable_service_laws("BUSINESS")
     available_services = list(discoverable_laws.keys())
     return RedirectResponse(f"/admin/{available_services[0]}")
 
@@ -278,10 +277,7 @@ async def admin_dashboard(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
-    discoverable_laws = {
-        **services.get_discoverable_service_laws("CITIZEN"),
-        **services.get_discoverable_service_laws("BUSINESS"),
-    }
+    discoverable_laws = services.get_discoverable_service_laws("CITIZEN") | services.get_discoverable_service_laws("BUSINESS")
     available_services = list(discoverable_laws.keys())
 
     # Get cases for selected service

@@ -180,32 +180,35 @@
             <h4 class="font-semibold text-gray-900 mb-3">Inkomen</h4>
             <dl class="space-y-2">
               {% if
+              accepted_claims["BOX1_DIENSTBETREKKING"] or
               profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
               %}
               <div>
                 <dt class="text-sm text-gray-600">Inkomen uit werk</dt>
                 <dd>
                   {{
-                  (profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
+                  ((accepted_claims["BOX1_DIENSTBETREKKING"] or profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking)
                   / 100) | format_currency }}
                 </dd>
               </div>
               {% endif %} {% if
+              accepted_claims["BOX1_ONDERNEMING"] or
               profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming %}
               <div>
                 <dt class="text-sm text-gray-600">Winst uit onderneming</dt>
                 <dd>
                   {{
-                  (profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming
+                  ((accepted_claims["BOX1_ONDERNEMING"] or profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming)
                   / 100) | format_currency }}
                 </dd>
               </div>
-              {% endif %} {% if profile.sources.BELASTINGDIENST.box3 and
-              profile.sources.BELASTINGDIENST.box3[0].spaargeld %}
+              {% endif %} {% if accepted_claims["BOX3_SPAREN"] or
+              (profile.sources.BELASTINGDIENST.box3 and
+              profile.sources.BELASTINGDIENST.box3[0].spaargeld) %}
               <div>
                 <dt class="text-sm text-gray-600">Spaargeld</dt>
                 <dd>
-                  {{ (profile.sources.BELASTINGDIENST.box3[0].spaargeld / 100) |
+                  {{ ((accepted_claims["BOX3_SPAREN"] or profile.sources.BELASTINGDIENST.box3[0].spaargeld) / 100) |
                   format_currency }}
                 </dd>
               </div>
@@ -554,17 +557,89 @@
       this.currentStep = 0;
       this.selectedType = null;
       this.answers = {};
-
       this.stepsByType = {
         inkomen: [
           [
             {
               type: "input",
               name: "BOX1_DIENSTBETREKKING",
-              label: "Nieuw inkomen uit dienstbetrekking",
+              label: "Box 1: Loon uit dienstbetrekking",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarinkomen…",
+              placeholder: "Nieuw bruto jaarloon…",
             },
+            {
+              type: "input",
+              name: "BOX1_UITKERINGEN",
+              label: "Box 1: Uitkeringen en pensioenen",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarbedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX1_ONDERNEMING",
+              label: "Box 1: Winst uit onderneming",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarbedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX1_OVERIGE_WERKZAAMHEDEN",
+              label: "Box 1: Resultaat overige werkzaamheden",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarbedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX1_EIGEN_WONING",
+              label: "Box 1: Inkomsten uit eigen woning",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarbedrag…",
+            },
+
+            {
+              type: "input",
+              name: "BOX2_DIVIDEND",
+              label: "Box 2: Reguliere voordelen (dividend)",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarbedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX2_AANDELEN",
+              label: "Box 2: Vervreemdingsvoordelen (verkoop aanmerkelijk belang)",
+              inputType: "number",
+              placeholder: "Nieuw bruto jaarbedrag…",
+            },
+
+            {
+              type: "input",
+              name: "BOX3_SPAREN",
+              label: "Box 3: Spaargeld",
+              inputType: "number",
+              placeholder: "Nieuw bedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX3_BELEGGEN",
+              label: "Box 3: Beleggingen",
+              inputType: "number",
+              placeholder: "Nieuw bedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX3_ONROEREND_GOED",
+              label: "Box 3: Onroerend goed",
+              inputType: "number",
+              placeholder: "Nieuw bedrag…",
+            },
+            {
+              type: "input",
+              name: "BOX3_SCHULDEN",
+              label: "Box 3: Schulden",
+              inputType: "number",
+              placeholder: "Nieuw bedrag…",
+            },
+
             { type: "input", label: "Ingangsdatum", inputType: "date" },
           ],
         ],
