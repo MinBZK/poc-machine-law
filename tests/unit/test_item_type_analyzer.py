@@ -229,7 +229,7 @@ class TestItemTypeAnalyzer:
         assert result == NrmlItemType.CONDITIONAL_CHARACTERISTIC
 
     def test_relation_definition(self):
-        """Test RELATION_DEFINITION with a and b fields"""
+        """Test RELATION_DEFINITION with arguments array"""
         item = {
             "name": {
                 "nl": "test relation",
@@ -238,20 +238,22 @@ class TestItemTypeAnalyzer:
             "versions": [
                 {
                     "validFrom": "2020-01-01",
-                    "a": {
-                        "name": {"nl": "persoon", "en": "person"},
-                        "cardinality": "one",
-                        "objectType": {
-                            "$ref": "#/facts/person-fact/items/person-item"
+                    "arguments": [
+                        {
+                            "name": {"nl": "persoon", "en": "person"},
+                            "cardinality": "one",
+                            "objectType": {
+                                "$ref": "#/facts/person-fact/items/person-item"
+                            }
+                        },
+                        {
+                            "name": {"nl": "adres", "en": "address"},
+                            "cardinality": "many",
+                            "objectType": {
+                                "$ref": "#/facts/address-fact/items/address-item"
+                            }
                         }
-                    },
-                    "b": {
-                        "name": {"nl": "adres", "en": "address"},
-                        "cardinality": "many",
-                        "objectType": {
-                            "$ref": "#/facts/address-fact/items/address-item"
-                        }
-                    }
+                    ]
                 }
             ]
         }

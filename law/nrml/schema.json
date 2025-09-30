@@ -199,13 +199,17 @@
       "not": {"required": ["target"]}
     },
     "relationDefinition": {
-      "description": "Relation definition: has 'a' and 'b' fields",
+      "description": "Relation definition: has 'arguments' array with 2 roles",
       "type": "object",
-      "required": ["validFrom", "a", "b"],
+      "required": ["validFrom", "arguments"],
       "properties": {
         "validFrom": {"type": "string"},
-        "a": {"$ref": "#/$defs/relationRole"},
-        "b": {"$ref": "#/$defs/relationRole"}
+        "arguments": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/relationRole"},
+          "minItems": 2,
+          "maxItems": 2
+        }
       },
       "additionalProperties": false
     },
@@ -265,12 +269,7 @@
         "expression": {"$ref": "#/$defs/expression"}
       },
       "additionalProperties": false,
-      "not": {
-        "anyOf": [
-          {"required": ["condition"]},
-          {"required": ["value"]}
-        ]
-      }
+      "not": {"required": ["value"]}
     },
     "conditionalValue": {
       "description": "Conditional value: has 'target' + 'value' + 'condition'",
@@ -348,24 +347,23 @@
       },
       "oneOf": [
         {
-          "description": "Comparison condition: requires operator, left, right",
+          "description": "Comparison condition: requires operator and arguments array",
           "properties": {
             "type": {"type": "string", "enum": ["comparison"]},
-            "operator": {"type": "string", "enum": ["equals", "greaterThan", "lessThan", "greaterThanOrEquals", "lessThanOrEquals", "notEquals", "in", "notIn"]},
-            "left": {
-              "oneOf": [
-                {"type": "array", "items": {"$ref": "#/$defs/reference"}},
-                {"$ref": "#/$defs/valueObject"}
-              ]
-            },
-            "right": {
-              "oneOf": [
-                {"type": "array", "items": {"$ref": "#/$defs/reference"}},
-                {"$ref": "#/$defs/valueObject"}
-              ]
+            "operator": {"type": "string", "enum": ["equal", "greaterThan", "lessThan", "greaterThanOrEqual", "lessThanOrEqual", "notEqual", "in", "notIn"]},
+            "arguments": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {"type": "array", "items": {"$ref": "#/$defs/reference"}},
+                  {"$ref": "#/$defs/valueObject"}
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 2
             }
           },
-          "required": ["type", "operator", "left", "right"],
+          "required": ["type", "operator", "arguments"],
           "additionalProperties": false
         },
         {
@@ -393,7 +391,7 @@
           "additionalProperties": false
         },
         {
-          "description": "ExactlyOneOf condition: requires conditions array", 
+          "description": "ExactlyOneOf condition: requires conditions array",
           "properties": {
             "type": {"type": "string", "enum": ["exactlyOneOf"]},
             "conditions": {
@@ -430,7 +428,7 @@
           "properties": {
             "type": {"type": "string", "enum": ["notExists"]},
             "characteristic": {
-              "type": "array", 
+              "type": "array",
               "items": {"$ref": "#/$defs/reference"}
             }
           },
@@ -450,23 +448,11 @@
     },
     "arithmeticExpression": {
       "type": "object",
-      "required": ["type", "operator"],
+      "required": ["type", "operator", "arguments"],
       "properties": {
         "type": {"type": "string", "enum": ["arithmetic"]},
         "operator": {"type": "string", "enum": ["add", "subtract", "multiply", "divide", "min", "max"]},
-        "left": {
-          "oneOf": [
-            {"type": "array", "items": {"$ref": "#/$defs/reference"}},
-            {"$ref": "#/$defs/expression"}
-          ]
-        },
-        "right": {
-          "oneOf": [
-            {"type": "array", "items": {"$ref": "#/$defs/reference"}},
-            {"$ref": "#/$defs/expression"}
-          ]
-        },
-        "operands": {
+        "arguments": {
           "type": "array",
           "items": {
             "oneOf": [
@@ -474,7 +460,8 @@
               {"$ref": "#/$defs/expression"},
               {"type": "object", "properties": {"parameter": {"$ref": "#/$defs/reference"}}, "additionalProperties": false}
             ]
-          }
+          },
+          "minItems": 2
         }
       },
       "additionalProperties": false
@@ -489,7 +476,8 @@
           "type": "array",
           "items": {"$ref": "#/$defs/reference"}
         },
-        "default": {"$ref": "#/$defs/valueObject"}
+        "default": {"$ref": "#/$defs/valueObject"},
+        "condition": {"$ref": "#/$defs/condition"}
       },
       "additionalProperties": false
     },
@@ -516,7 +504,7 @@
               },
               "order": {"type": "string", "enum": ["ascending", "descending"]},
               "value": {
-                "type": "array", 
+                "type": "array",
                 "items": {"$ref": "#/$defs/reference"}
               },
               "tiebreaker": {
@@ -577,18 +565,19 @@
           "properties": {
             "type": {"type": "string", "enum": ["function"]},
             "function": {"type": "string", "enum": ["timeDuration"]},
-            "from": {
+            "arguments": {
               "type": "array",
-              "items": {"$ref": "#/$defs/reference"}
-            },
-            "to": {
-              "type": "array", 
-              "items": {"$ref": "#/$defs/reference"}
+              "items": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/reference"}
+              },
+              "minItems": 2,
+              "maxItems": 2
             },
             "unit": {"type": "string", "enum": ["years", "months", "days", "hours", "minutes", "seconds"]},
             "whole": {"type": "boolean"}
           },
-          "required": ["type", "function"],
+          "required": ["type", "function", "arguments"],
           "additionalProperties": false
         },
         {

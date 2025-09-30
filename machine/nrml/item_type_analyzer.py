@@ -43,13 +43,12 @@ def determine_item_type(item: dict[str, Any]) -> NrmlItemType:
     has_condition = "condition" in version
     has_expression = "expression" in version
     has_value = "value" in version
-    has_a = "a" in version
-    has_b = "b" in version
+    has_arguments = "arguments" in version
 
     # Apply schema-based detection rules
 
-    # relationDefinition: has 'a' and 'b' fields
-    if has_a and has_b:
+    # relationDefinition: has 'arguments' array
+    if has_arguments:
         return NrmlItemType.RELATION_DEFINITION
 
     # typeDefinition: has 'type' but no 'target'
