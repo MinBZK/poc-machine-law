@@ -189,15 +189,14 @@ class NrmlRulesEngine:
         )
 
         output_values = {}
-        requirements_met = True
 
+        # TODO: determine output values
         for item in items_to_process:
-            self._evaluate_item(item, context)
-
-        if context.missing_required:
-            logger.warning("Missing required values, requirements not met, setting outputs to empty.")
-            output_values = {}
-            requirements_met = False
+            # TODO: process failures
+            output_values[item] = {
+                "description" : item, # TODO: create human readable description
+                "value": self._evaluate_item(item, context).Value
+            }
 
         if not output_values:
             logger.warning(f"No output values computed for {calculation_date} {requested_output}")
@@ -205,8 +204,6 @@ class NrmlRulesEngine:
         return {
             "input": context.resolved_paths,
             "output": output_values,
-            "requirements_met": requirements_met,
-            "missing_required": context.missing_required,
         }
 
     def _evaluate_item(self, item, context):

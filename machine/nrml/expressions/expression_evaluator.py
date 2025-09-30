@@ -93,24 +93,15 @@ class ExpressionEvaluator:
 
     def _check_in_collection(self, value: Any, collection: Any) -> bool:
         """Check if a value is in a collection"""
-        try:
-            if isinstance(collection, list | set | tuple):
+        if isinstance(collection, list | set | tuple):
+            try:
                 return value in collection
-            elif isinstance(collection, dict):
-                return value in collection.values() or value in collection
-            else:
-                # Try to convert to string and check
-                return str(value) in str(collection)
-        except TypeError:
-            # Handle unhashable types by converting to string comparison
-            str_value = str(value)
-            if isinstance(collection, list | set | tuple):
+            except TypeError:
+                # Handle unhashable types by converting to string comparison
+                str_value = str(value)
                 return any(str_value == str(item) for item in collection)
-            elif isinstance(collection, dict):
-                return any(str_value == str(item) for item in collection.values()) or \
-                       any(str_value == str(item) for item in collection)
-            else:
-                return str_value in str(collection)
+        else:
+            raise ValueError(f"Expected collection (list, set, or tuple), got {type(collection)}")
 
     def _resolve_argument(self, argument: Any, context: NrmlRuleContext) -> Any:
         """Resolve an argument which may contain references"""
