@@ -1,5 +1,10 @@
 default_language_version:
   python: python3.12
+
+ci:
+  submodules: true
+  skip: [check-submodule-uptodate]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -27,8 +32,29 @@ repos:
     hooks:
       - id: validate-schema
         name: validate schema
-        entry: sh -c './script/validate.py'
+        entry: sh -c './submodules/regelrecht-laws/script/validate.py'
         language: python
         additional_dependencies: [jsonschema, pyyaml]
+        pass_filenames: false
+        always_run: true
+
+      - id: check-submodule-initialized
+        name: check law submodule is initialized
+        entry: ./script/check-submodule-initialized.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: check-submodule-clean
+        name: check law submodule has no uncommitted changes
+        entry: ./script/check-submodule-clean.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: check-submodule-uptodate
+        name: check law submodule is up-to-date with remote
+        entry: ./script/check-submodule-uptodate.sh
+        language: system
         pass_filenames: false
         always_run: true
