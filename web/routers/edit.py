@@ -496,4 +496,6 @@ async def update_situation(
 
         return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
     except Exception as e:
-        return JSONResponse({"status": "error", "message": str(e)}, status_code=400)
+        print(f"Exception in update_situation: {e}")
+
+        return JSONResponse({"status": "error", "message": "Unknown error"}, status_code=400)
