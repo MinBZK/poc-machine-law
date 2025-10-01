@@ -1,0 +1,3 @@
+[submodule "law"]
+	path = law
+	url = git@github.com:MinBZK/regelrecht-laws.git
