@@ -36,7 +36,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer"} else parse_value(v)
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn"} else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)
@@ -623,3 +623,188 @@ def step_impl(context):
             co2_total, 0,
             f"Expected co2_uitstoot_totaal to be greater than 0, but was {co2_total}"
         )
+
+
+# Werkloosheidswet (WW) step definitions
+@then("heeft de persoon recht op WW")
+def step_impl(context):
+    assertions.assertTrue(
+        context.result.output.get("heeft_recht_op_ww", False),
+        "Expected person to have right to WW, but they did not"
+    )
+
+
+@then("heeft de persoon geen recht op WW")
+def step_impl(context):
+    assertions.assertFalse(
+        context.result.output.get("heeft_recht_op_ww", False),
+        "Expected person to not have right to WW, but they did"
+    )
+
+
+@then('is de WW duur "{maanden}" maanden')
+def step_impl(context, maanden):
+    expected_maanden = int(maanden)
+    actual_maanden = context.result.output.get("ww_duur_maanden")
+    assertions.assertEqual(
+        actual_maanden, expected_maanden,
+        f"Expected WW duration to be {expected_maanden} months, but was {actual_maanden}"
+    )
+
+
+@then('is de WW uitkering per maand ongeveer "{amount}"')
+def step_impl(context, amount):
+    # Parse amount like "€3.296,00" to cents
+    amount_clean = amount.replace("€", "").replace(".", "").replace(",", "")
+    expected_amount = int(amount_clean)
+    actual_amount = context.result.output.get("ww_uitkering_per_maand")
+    # Allow 1% tolerance for rounding
+    tolerance = expected_amount * 0.01
+    assertions.assertAlmostEqual(
+        actual_amount, expected_amount, delta=tolerance,
+        msg=f"Expected WW benefit to be approximately {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+    )
+
+
+@then('is de WW uitkering per maand maximaal "{amount}"')
+def step_impl(context, amount):
+    # Parse amount like "€4.741,55"
+    amount_clean = amount.replace("€", "").replace(".", "").replace(",", "")
+    expected_amount = int(amount_clean)
+    actual_amount = context.result.output.get("ww_uitkering_per_maand")
+    assertions.assertEqual(
+        actual_amount, expected_amount,
+        f"Expected WW benefit to be exactly {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+    )
+
+
+@then("is de WW uitkering maximaal omdat het dagloon gemaximeerd is")
+def step_impl(context):
+    # Check that dagloon is at maximum (€290.67 = 29067 cents)
+    max_dagloon = 29067
+    actual_dagloon = context.result.output.get("ww_dagloon")
+    assertions.assertEqual(
+        actual_dagloon, max_dagloon,
+        f"Expected dagloon to be maximized at €290.67, but was €{actual_dagloon/100:.2f}"
+    )
+
+
+# Kindgebonden Budget step definitions
+@then("heeft de persoon recht op kindgebonden budget")
+def step_impl(context):
+    assertions.assertTrue(
+        context.result.requirements_met,
+        "Expected person to have right to kindgebonden budget, but they did not"
+    )
+
+
+@then("heeft de persoon geen recht op kindgebonden budget")
+def step_impl(context):
+    assertions.assertFalse(
+        context.result.requirements_met,
+        "Expected person to not have right to kindgebonden budget, but they did"
+    )
+
+
+@then('is het ALO-kop bedrag "{amount}"')
+def step_impl(context, amount):
+    # Parse amount like "€3.480,00" to cents
+    amount_clean = amount.replace("€", "").replace(".", "").replace(",", "")
+    expected_amount = int(amount_clean)
+    actual_amount = context.result.output.get("alo_kop_bedrag", 0)
+    assertions.assertEqual(
+        actual_amount, expected_amount,
+        f"Expected ALO-kop to be {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+    )
+
+
+@then('is het kindgebonden budget ongeveer "{amount}" per jaar')
+def step_impl(context, amount):
+    # Parse amount like "€5.991,00" to cents
+    amount_clean = amount.replace("€", "").replace(".", "").replace(",", "")
+    expected_amount = int(amount_clean)
+    actual_amount = context.result.output.get("kindgebonden_budget_jaar")
+    # Allow 2% tolerance for rounding in complex calculations
+    tolerance = expected_amount * 0.02
+    assertions.assertAlmostEqual(
+        actual_amount, expected_amount, delta=tolerance,
+        msg=f"Expected kindgebonden budget to be approximately {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+    )
+
+
+@then('is het totale kindgebonden budget ongeveer "{amount}" per jaar')
+def step_impl(context, amount):
+    # Same as above - alias for integration tests
+    amount_clean = amount.replace("€", "").replace(".", "").replace(",", "")
+    expected_amount = int(amount_clean)
+    actual_amount = context.result.output.get("kindgebonden_budget_jaar")
+    tolerance = expected_amount * 0.02
+    assertions.assertAlmostEqual(
+        actual_amount, expected_amount, delta=tolerance,
+        msg=f"Expected total kindgebonden budget to be approximately {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+    )
+
+
+@then("is het kindgebonden budget lager door hoog inkomen")
+def step_impl(context):
+    # Verify that total budget is reduced from maximum due to income
+    # Maximum for single parent with 2 kids: 2*€2,511 base + €3,480 ALO-kop = €8,502
+    max_budget_2_kinderen_alo = 850200  # in cents
+    totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
+
+    # Budget should be less than maximum due to income-based reduction
+    assertions.assertLess(
+        totaal, max_budget_2_kinderen_alo,
+        f"Expected budget to be reduced from maximum €8,502, but was €{totaal/100:.2f}"
+    )
+
+
+@then("ontvangt de persoon de ALO-kop omdat deze alleenstaand is")
+def step_impl(context):
+    # Check dat persoon alleenstaand is én ALO-kop ontvangt
+    heeft_partner = context.result.output.get("heeft_partner", True)
+    alo_kop = context.result.output.get("alo_kop_bedrag", 0)
+
+    assertions.assertFalse(heeft_partner, "Expected person to be single (alleenstaand)")
+    assertions.assertGreater(alo_kop, 0, f"Expected ALO-kop for single parent, but was €{alo_kop/100:.2f}")
+
+
+@then("is het kindgebonden budget hoog door laag inkomen en meerdere kinderen")
+def step_impl(context):
+    # Verifieer dat er meerdere kinderen zijn en minimale/geen afbouw
+    totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
+    inkomen_afbouw = context.result.output.get("inkomen_afbouw", 0)
+
+    # Met 3 kinderen en laag inkomen, moet totaal hoog zijn
+    assertions.assertGreater(
+        totaal, 800000,  # More than €8000
+        f"Expected high budget for 3 children with low income, but was €{totaal/100:.2f}"
+    )
+    # Met laag inkomen zou afbouw minimaal moeten zijn
+    assertions.assertLess(
+        inkomen_afbouw, 100000,  # Less than €1000 afbouw
+        f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw/100:.2f}"
+    )
+
+
+@then("ontvangt de persoon extra bedragen voor kinderen 12+ en 16+")
+def step_impl(context):
+    # Verifieer dat budget hoger is dan basisbedrag door leeftijdssupplementen
+    totaal = context.result.output.get("kindgebonden_budget_jaar", 0)
+
+    # Met leeftijdssupplementen moet budget hoger zijn dan alleen basisbedrag
+    assertions.assertGreater(
+        totaal, 251100,  # More than just base amount
+        f"Expected budget with age supplements, but was only €{totaal/100:.2f}"
+    )
+
+
+@then("is het kindgebonden budget maximaal door laag inkomen")
+def step_impl(context):
+    # Met laag inkomen zou er geen/minimale afbouw moeten zijn
+    inkomen_afbouw = context.result.output.get("inkomen_afbouw", 0)
+
+    assertions.assertLess(
+        inkomen_afbouw, 50000,  # Less than €500 afbouw
+        f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw/100:.2f}"
+    )
