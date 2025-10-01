@@ -420,6 +420,8 @@ async def update_situation(
             case "woonadres":
                 service = "RvIG"
                 law = "wet_brp"
+
+                # Change sources
                 parameters["ADRES"] = {
                   "straat": parameters["ADRES.straat"],
                   "huisnummer": parameters["ADRES.huisnummer"],
@@ -427,9 +429,14 @@ async def update_situation(
                   "woonplaats": parameters["ADRES.woonplaats"],
                   "type": "WOONADRES",
                 }
-                parameters["verblijfplaats"] = parameters["ADRES"]
-                parameters["VERBLIJFSADRES"] = parameters["ADRES.woonplaats"]
-                parameters["residence_address"] = f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                parameters["VERBLIJFSADRES"] = parameters["ADRES.woonplaats"]  # Note: somehow only the city is used in the case system
+                parameters["LAND_VAN_VERBLIJF"] = "NEDERLAND"
+
+                # Change outputs accordingly
+                parameters["verblijfsadres"] = f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                parameters["woonplaats"] = parameters["ADRES.woonplaats"]
+                parameters["postadres"] = parameters["verblijfsadres"]
+                parameters["heeft_vast_adres"] = True
 
                 # Remove address fields from parameters after grouping them
                 for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:
@@ -443,10 +450,22 @@ async def update_situation(
 
                 match payload.get("situation_household_change_type"):
                   case "scheiden":
-                    parameters["has_partner"] = False
-                    parameters["partnerschap_type"] = "GEEN"
+                    # Change sources
+                    parameters["PARTNERTYPE"] = "GEEN"
+                    parameters["PARTNER_BSN"] = None
+                    parameters["PARTNER_GEBOORTEDATUM"] = None
 
-                  # IMPROVE: handle more 'huishouden' change types
+                    # Change outputs accordingly
+                    parameters["heeft_partner"] = False
+                    parameters["partner_bsn"] = None
+                    parameters["partner_geboortedatum"] = None
+
+                  # Show an error message for other household changes. IMPROVE: handle more household change types
+                  case _:
+                    return JSONResponse(
+                        {"status": "error", "message": "Deze flow is nog niet ondersteund."},
+                        status_code=400,
+                    )
             case _:
                 return JSONResponse(
                     {"status": "error", "message": f"unrecognized type: {situation_type}"},
