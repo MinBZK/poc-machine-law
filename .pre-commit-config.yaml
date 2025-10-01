@@ -2,6 +2,7 @@ default_language_version:
   python: python3.12
 
 ci:
+  submodules: true
   skip: [check-submodule-initialized, check-submodule-clean, check-submodule-uptodate]
 
 repos:
