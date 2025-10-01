@@ -26,6 +26,7 @@ dependencies = [
     "nest-asyncio>=1.6.0",
     "openai>=1.76.2",
     "pandas>=2.2.3",
+    "pillow>=11.3.0",
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
