@@ -38,13 +38,13 @@
                                     <div class="bg-gray-50 p-2 rounded-t border border-gray-200">
                                         <h4 class="font-medium">
                                             {% if status == 'SUBMITTED' %}
-                                            Ingediend
+                                                Ingediend
                                             {% elif status == 'DECIDED' %}
-                                            Besloten
+                                                Besloten
                                             {% elif status == 'IN_REVIEW' %}
-                                            In behandeling
+                                                In behandeling
                                             {% elif status == 'OBJECTED' %}
-                                            Onder bezwaar
+                                                Onder bezwaar
                                             {% endif %}
                                         </h4>
                                         <div class="text-sm text-gray-600">{{ service_cases[law][status]|length }} cases</div>

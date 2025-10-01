@@ -21,33 +21,33 @@
         <div class="flex justify-between items-start mb-4">
             <div>
                 <h3 class="font-medium text-gray-900">
-                {% if event.event_type == 'Submitted' %}
-                Ingediend
-                {% elif event.event_type == 'Reset' %}
-                Reset
-                {% elif event.event_type == 'AutomaticallyDecided' %}
-                Automatisch besloten
-                {% elif event.event_type == 'AddedToManualReview' %}
-                Overgezet naar handmatige beoordeling
-                {% elif event.event_type == 'Decided' %}
-                Besloten
-                {% elif event.event_type == 'Objected' %}
-                In bezwaar
-                {% elif event.event_type == 'ObjectionStatusDetermined' %}
-                In bezwaar gesteld
-                {% elif event.event_type == 'ObjectionAdmissibilityDetermined' %}
-                Bezwaar ontvankelijkheid vastgesteld
-                {% elif event.event_type == 'AppealStatusDetermined' %}
-                In beroep gesteld
-                {% elif event.event_type == 'ClaimCreated' %}
-                Claim aangemaakt
-                {% elif event.event_type == 'ClaimApproved' %}
-                Claim goedgekeurd
-                {% elif event.event_type == 'ClaimRejected' %}
-                Claim afgewezen
-                {% else %}
-                {{ event.event_type|title }}
-                {% endif %}
+                    {% if event.event_type == 'Submitted' %}
+                        Ingediend
+                    {% elif event.event_type == 'Reset' %}
+                        Reset
+                    {% elif event.event_type == 'AutomaticallyDecided' %}
+                        Automatisch besloten
+                    {% elif event.event_type == 'AddedToManualReview' %}
+                        Overgezet naar handmatige beoordeling
+                    {% elif event.event_type == 'Decided' %}
+                        Besloten
+                    {% elif event.event_type == 'Objected' %}
+                        In bezwaar
+                    {% elif event.event_type == 'ObjectionStatusDetermined' %}
+                        In bezwaar gesteld
+                    {% elif event.event_type == 'ObjectionAdmissibilityDetermined' %}
+                        Bezwaar ontvankelijkheid vastgesteld
+                    {% elif event.event_type == 'AppealStatusDetermined' %}
+                        In beroep gesteld
+                    {% elif event.event_type == 'ClaimCreated' %}
+                        Claim aangemaakt
+                    {% elif event.event_type == 'ClaimApproved' %}
+                        Claim goedgekeurd
+                    {% elif event.event_type == 'ClaimRejected' %}
+                        Claim afgewezen
+                    {% else %}
+                        {{ event.event_type|title }}
+                    {% endif %}
                 </h3>
                 <p class="text-sm text-gray-600">{{ event.timestamp|format_date }}</p>
             </div>

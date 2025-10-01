@@ -58,8 +58,8 @@
             <!-- Chat-specific buttons -->
             <div class="flex gap-2">
                 <button type="button"
-                    @click="document.dispatchEvent(new CustomEvent('cancel-application-form'))"
-                    class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
+                        @click="document.dispatchEvent(new CustomEvent('cancel-application-form'))"
+                        class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
                     Annuleren
                 </button>
                 <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
