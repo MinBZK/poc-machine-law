@@ -31,7 +31,7 @@ repos:
     hooks:
       - id: validate-schema
         name: validate schema
-        entry: sh -c './script/validate.py'
+        entry: sh -c './submodules/regelrecht-laws/script/validate.py'
         language: python
         additional_dependencies: [jsonschema, pyyaml]
         pass_filenames: false
