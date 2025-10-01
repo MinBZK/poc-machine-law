@@ -6,9 +6,9 @@ from ..context import NrmlRuleContext
 class ArgumentResolver:
     """Resolver for NRML expression arguments"""
 
-    def __init__(self, item_evaluator):
-        """Initialize with reference to the item evaluator"""
-        self.item_evaluator = item_evaluator
+    def __init__(self):
+        """Initialize stateless resolver"""
+        pass
 
     def resolve_argument(self, argument: Any, context: NrmlRuleContext) -> Any:
         """Resolve an argument which may contain references"""
@@ -17,9 +17,9 @@ class ArgumentResolver:
             return [self.resolve_argument(item, context) for item in argument]
         elif isinstance(argument, dict):
             if "$ref" in argument:
-                # Extract ref value and evaluate using item evaluator
+                # Extract ref value and evaluate using item evaluator from context
                 ref = argument["$ref"]
-                result = self.item_evaluator.evaluate_item(ref, context)
+                result = context.item_evaluator.evaluate_item(ref, context)
                 if result.Success:
                     return result.Value
                 else:

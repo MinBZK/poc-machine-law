@@ -2,14 +2,15 @@ from typing import Any
 
 from ..context import NrmlRuleContext
 from ..evaluation_result import FactItemEvaluationResult
+from ..expressions.expression_evaluator import ExpressionEvaluator
 
 
 class CalculatedValueEvaluator:
     """Evaluator for calculated value items"""
 
-    def __init__(self, expression_evaluator):
-        """Initialize with reference to the expression evaluator"""
-        self.expression_evaluator = expression_evaluator
+    def __init__(self):
+        """Initialize with expression evaluator"""
+        self.expression_evaluator = ExpressionEvaluator()
 
     def evaluate(self, item_key: str, item: dict[str, Any], context: NrmlRuleContext) -> FactItemEvaluationResult:
         """Evaluate a calculated value item with target and expression"""
@@ -29,7 +30,7 @@ class CalculatedValueEvaluator:
             return FactItemEvaluationResult(Success=False, Value="No target found in calculated value item")
 
         try:
-            # Evaluate the expression using the new expression evaluator
+            # Evaluate the expression using the expression evaluator
             result = self.expression_evaluator.evaluate(expression, context)
             return FactItemEvaluationResult(Success=True, Value=result)
         except Exception as e:

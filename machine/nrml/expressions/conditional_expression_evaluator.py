@@ -1,15 +1,17 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
+from .argument_resolver import ArgumentResolver
+from ..conditions.condition_evaluator import ConditionEvaluator
 
 
 class ConditionalExpressionEvaluator:
     """Evaluator for conditional expressions (type: 'conditional')"""
 
-    def __init__(self, expression_evaluator, argument_resolver):
-        """Initialize with reference to the main expression evaluator and argument resolver"""
-        self.expression_evaluator = expression_evaluator
-        self.argument_resolver = argument_resolver
+    def __init__(self):
+        """Initialize evaluator with internal state"""
+        self.condition_evaluator = ConditionEvaluator()
+        self.argument_resolver = ArgumentResolver()
 
     def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> Any:
         """Evaluate a conditional expression"""
@@ -18,7 +20,7 @@ class ConditionalExpressionEvaluator:
             raise ValueError("Conditional expression missing condition")
 
         # Evaluate the condition using condition evaluator
-        condition_result = self.expression_evaluator.condition_evaluator.evaluate(condition, context)
+        condition_result = self.condition_evaluator.evaluate(condition, context)
 
         # Handle then/else logic
         if condition_result:

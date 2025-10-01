@@ -1,14 +1,15 @@
 from typing import Any
 
-from ...context import NrmlRuleContext
+from ..context import NrmlRuleContext
+from ..expressions.argument_resolver import ArgumentResolver
 
 
 class ComparisonEvaluator:
     """Evaluator for comparison conditions"""
 
-    def __init__(self, expression_evaluator):
-        """Initialize with reference to the main expression evaluator"""
-        self.expression_evaluator = expression_evaluator
+    def __init__(self):
+        """Initialize evaluator with internal state"""
+        self.argument_resolver = ArgumentResolver()
 
     def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> Any:
         """Evaluate a comparison expression"""
@@ -29,10 +30,10 @@ class ComparisonEvaluator:
         right_arg = arguments[1]
 
         # Resolve the left argument (the value to check)
-        left_value = self.expression_evaluator.argument_resolver.resolve_argument(left_arg, context)
+        left_value = self.argument_resolver.resolve_argument(left_arg, context)
 
         # Resolve the right argument (the collection to check in)
-        right_value = self.expression_evaluator.argument_resolver.resolve_argument(right_arg, context)
+        right_value = self.argument_resolver.resolve_argument(right_arg, context)
 
         # Handle case where left_value is a list - check if any element is in right_value
         if isinstance(left_value, list):

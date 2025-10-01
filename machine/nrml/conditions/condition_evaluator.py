@@ -1,16 +1,15 @@
 from typing import Any
 
-from ...context import NrmlRuleContext
+from ..context import NrmlRuleContext
 from .comparison_evaluator import ComparisonEvaluator
 
 
 class ConditionEvaluator:
     """Evaluator for NRML conditions"""
 
-    def __init__(self, expression_evaluator):
-        """Initialize with reference to the main expression evaluator"""
-        self.expression_evaluator = expression_evaluator
-        self.comparison_evaluator = ComparisonEvaluator(expression_evaluator)
+    def __init__(self):
+        """Initialize evaluator with internal state"""
+        self.comparison_evaluator = ComparisonEvaluator()
 
     def evaluate(self, condition: dict[str, Any], context: NrmlRuleContext) -> Any:
         """Evaluate a condition"""

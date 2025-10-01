@@ -8,9 +8,9 @@ from ..item_helper import NrmlItemHelper
 class TypeDefinitionEvaluator:
     """Evaluator for type definition items"""
 
-    def __init__(self, item_evaluator):
-        """Initialize with reference to the item evaluator"""
-        self.item_evaluator = item_evaluator
+    def __init__(self):
+        """Initialize stateless evaluator"""
+        pass
 
     def evaluate(self, item_key: str, item: dict[str, Any], context: NrmlRuleContext) -> FactItemEvaluationResult:
         """Evaluate a type definition item"""
@@ -23,7 +23,7 @@ class TypeDefinitionEvaluator:
 
         source_item = context.get_target_source_item(item_key)
         if source_item:
-            source_result = self.item_evaluator.evaluate_item(source_item, context)
+            source_result = context.item_evaluator.evaluate_item(source_item, context)
             if source_result.Success:
                 active_version = NrmlItemHelper.get_active_version(item, context.calculation_date)
                 active_version["value"] = source_result.Value

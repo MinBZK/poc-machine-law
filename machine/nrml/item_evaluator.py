@@ -13,17 +13,12 @@ from .item_type_analyzer import NrmlItemType, determine_item_type
 class NrmlItemEvaluator:
     """Evaluator for different NRML item types"""
 
-    def __init__(self, rules_engine):
-        """Initialize with reference to the rules engine for context"""
-        self.rules_engine = rules_engine
-        self.expression_evaluator = ExpressionEvaluator(self)
-
+    def __init__(self):
         # Initialize evaluator dictionary
         self.evaluators = {
-            NrmlItemType.TYPE_DEFINITION: TypeDefinitionEvaluator(self),
-            NrmlItemType.CALCULATED_VALUE: CalculatedValueEvaluator(self.expression_evaluator),
+            NrmlItemType.TYPE_DEFINITION: TypeDefinitionEvaluator(),
+            NrmlItemType.CALCULATED_VALUE: CalculatedValueEvaluator(),
         }
-
 
     def evaluate_item(self, item_key: str, context: NrmlRuleContext) -> FactItemEvaluationResult:
         """
@@ -45,11 +40,7 @@ class NrmlItemEvaluator:
         #  or the optionality of any relations (ex in case of x OR y)
 
         with logger.indent_block("Evaluating item"):
-            item_node = PathNode(
-                type="item",
-                name=f"Evaluate item: {item_type.value}",
-                result=None
-            )
+            item_node = PathNode(type="item", name=f"Evaluate item: {item_type.value}", result=None)
             context.add_to_path(item_node)
 
             try:

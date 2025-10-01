@@ -20,12 +20,14 @@ class NrmlItemType(Enum):
     CONDITIONAL_CALCULATED_VALUE = "conditionalCalculatedValue"
     UNKNOWN = "unknown"
 
+
 # alternative approach to analyzing the item types, but very slow
 #   Speed Comparison:
 #
 #   - Rule-based analyzer: ~2.5 million calls/second
 #   - Schema-based analyzer: ~4 calls/second
 #   - Performance ratio: ~615,000x faster (rule-based)
+
 
 class NrmlSchemaBasedItemTypeAnalyzer:
     """Schema-based NRML item type analyzer that uses schema.json for validation"""
@@ -45,7 +47,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
     def _load_schema(self) -> Dict[str, Any]:
         """Load the JSON schema file"""
         try:
-            with open(self.schema_path, 'r', encoding='utf-8') as f:
+            with open(self.schema_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError(f"Schema file not found: {self.schema_path}")
@@ -65,7 +67,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
             NrmlItemType.CONDITIONAL_CHARACTERISTIC: "conditionalCharacteristic",
             NrmlItemType.CALCULATED_VALUE: "calculatedValue",
             NrmlItemType.CONDITIONAL_VALUE: "conditionalValue",
-            NrmlItemType.CONDITIONAL_CALCULATED_VALUE: "conditionalCalculatedValue"
+            NrmlItemType.CONDITIONAL_CALCULATED_VALUE: "conditionalCalculatedValue",
         }
 
         for item_type, schema_key in type_mappings.items():
@@ -81,10 +83,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
 
         try:
             # Create a temporary schema that includes the $defs for reference resolution
-            temp_schema = {
-                **self.item_type_schemas[item_type],
-                "$defs": self.schema.get("$defs", {})
-            }
+            temp_schema = {**self.item_type_schemas[item_type], "$defs": self.schema.get("$defs", {})}
 
             validate(instance=version, schema=temp_schema)
             return True
@@ -125,7 +124,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
             NrmlItemType.CONDITIONAL_CHARACTERISTIC,
             NrmlItemType.CALCULATED_VALUE,
             NrmlItemType.VALUE_INITIALIZATION,
-            NrmlItemType.TYPE_DEFINITION
+            NrmlItemType.TYPE_DEFINITION,
         ]
 
         for item_type in validation_order:
@@ -182,6 +181,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
 
 # Convenience function that uses the default analyzer
 _default_analyzer = None
+
 
 def determine_item_type(item: Dict[str, Any]) -> NrmlItemType:
     """

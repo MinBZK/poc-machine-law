@@ -31,9 +31,6 @@ class NrmlRulesEngine:
         self.service_name = "NRML"
         self.service_provider = service_provider
 
-        # Initialize item evaluator
-        self.item_evaluator = NrmlItemEvaluator(self)
-
     def _build_dependency_graph(self) -> None:
         """Build dependency graph by finding all $ref references in items"""
         for source_ref, item in self.items.items():
@@ -157,7 +154,7 @@ class NrmlRulesEngine:
             # TODO: process failures
             output_values[item] = {
                 "description": item,  # TODO: create human readable description
-                "value": self.item_evaluator.evaluate_item(item, context).Value,
+                "value": context.item_evaluator.evaluate_item(item, context).Value,
             }
 
         if not output_values:
