@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd law
+cd submodules/regelrecht-laws
 
 # Fetch latest from remote
 git fetch origin main --quiet
@@ -11,15 +11,15 @@ LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse origin/main)
 
 if [ "$LOCAL" != "$REMOTE" ]; then
-    echo "ERROR: law submodule is not up-to-date with remote."
+    echo "ERROR: regelrecht-laws submodule is not up-to-date with remote."
     echo "Local commit:  $LOCAL"
     echo "Remote commit: $REMOTE"
     echo ""
     echo "To update:"
-    echo "  cd law"
+    echo "  cd submodules/regelrecht-laws"
     echo "  git pull origin main"
-    echo "  cd .."
-    echo "  git add law"
+    echo "  cd ../.."
+    echo "  git add submodules/regelrecht-laws"
     exit 1
 fi
 

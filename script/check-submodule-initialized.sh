@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-if [ ! -f law/.git ]; then
-    echo "ERROR: law submodule not initialized."
-    echo "Run: git submodule update --init"
+if [ ! -f submodules/regelrecht-laws/.git ]; then
+    echo "ERROR: regelrecht-laws submodule not initialized."
+    echo "Run: git submodule update --init --recursive"
     exit 1
 fi
 

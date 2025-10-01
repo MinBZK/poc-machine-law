@@ -1,3 +1,3 @@
-[submodule "law"]
-	path = law
+[submodule "submodules/regelrecht-laws"]
+	path = submodules/regelrecht-laws
 	url = git@github.com:MinBZK/regelrecht-laws.git
