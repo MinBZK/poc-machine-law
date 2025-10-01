@@ -221,9 +221,7 @@ async def reject_claim(
             rejection_reason=f"Claim dropped: {reason}",
         )
 
-        response = templates.TemplateResponse(
-            "partials/claim_dropped.html", {"request": request}
-        )
+        response = templates.TemplateResponse("partials/claim_dropped.html", {"request": request})
         response.headers["HX-Trigger"] = "edit-dialog-closed"
         return response
     except ValueError as e:
@@ -259,9 +257,7 @@ async def approve_claim(
             verified_value=None,
         )
 
-        response = templates.TemplateResponse(
-            "partials/claim_approved.html", {"request": request}
-        )
+        response = templates.TemplateResponse("partials/claim_approved.html", {"request": request})
         response.headers["HX-Trigger"] = "edit-dialog-closed"
         return response
     except ValueError as e:
@@ -318,9 +314,7 @@ async def update_missing_values(
             continue
 
     # Sort by index
-    max_index = max(
-        set(key_dict.keys()) | set(value_dict.keys()) | set(type_dict.keys())
-    )
+    max_index = max(set(key_dict.keys()) | set(value_dict.keys()) | set(type_dict.keys()))
 
     for i in range(max_index + 1):
         if i in key_dict and i in value_dict and i in type_dict:
@@ -329,9 +323,7 @@ async def update_missing_values(
             types_list.append(type_dict[i])
 
     # Process each value with its proper type
-    for i, (key, value, type_name) in enumerate(
-        zip(keys_list, values_list, types_list)
-    ):
+    for i, (key, value, type_name) in enumerate(zip(keys_list, values_list, types_list)):
         parsed_value = value
         try:
             # Parse value based on type
@@ -423,17 +415,21 @@ async def update_situation(
 
                 # Change sources
                 parameters["ADRES"] = {
-                  "straat": parameters["ADRES.straat"],
-                  "huisnummer": parameters["ADRES.huisnummer"],
-                  "postcode": parameters["ADRES.postcode"],
-                  "woonplaats": parameters["ADRES.woonplaats"],
-                  "type": "WOONADRES",
+                    "straat": parameters["ADRES.straat"],
+                    "huisnummer": parameters["ADRES.huisnummer"],
+                    "postcode": parameters["ADRES.postcode"],
+                    "woonplaats": parameters["ADRES.woonplaats"],
+                    "type": "WOONADRES",
                 }
-                parameters["VERBLIJFSADRES"] = parameters["ADRES.woonplaats"]  # Note: somehow only the city is used in the case system
+                parameters["VERBLIJFSADRES"] = parameters[
+                    "ADRES.woonplaats"
+                ]  # Note: somehow only the city is used in the case system
                 parameters["LAND_VAN_VERBLIJF"] = "NEDERLAND"
 
                 # Change outputs accordingly
-                parameters["verblijfsadres"] = f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                parameters["verblijfsadres"] = (
+                    f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                )
                 parameters["woonplaats"] = parameters["ADRES.woonplaats"]
                 parameters["postadres"] = parameters["verblijfsadres"]
                 parameters["heeft_vast_adres"] = True
@@ -449,28 +445,28 @@ async def update_situation(
                 law = "wet_brp"
 
                 match payload.get("situation_household_change_type"):
-                  case "scheiden":
-                    # Change sources
-                    parameters["PARTNERTYPE"] = "GEEN"
-                    parameters["PARTNER_BSN"] = None
-                    parameters["PARTNER_GEBOORTEDATUM"] = None
+                    case "scheiden":
+                        # Change sources
+                        parameters["PARTNERTYPE"] = "GEEN"
+                        parameters["PARTNER_BSN"] = None
+                        parameters["PARTNER_GEBOORTEDATUM"] = None
 
-                    # Change outputs accordingly
-                    parameters["heeft_partner"] = False
-                    parameters["partner_bsn"] = None
-                    parameters["partner_geboortedatum"] = None
+                        # Change outputs accordingly
+                        parameters["heeft_partner"] = False
+                        parameters["partner_bsn"] = None
+                        parameters["partner_geboortedatum"] = None
 
-                  # Show an error message for other household changes. IMPROVE: handle more household change types
-                  case _:
-                    return JSONResponse(
-                        {"status": "error", "message": "Deze flow is nog niet ondersteund."},
-                        status_code=400,
-                    )
+                    # Show an error message for other household changes. IMPROVE: handle more household change types
+                    case _:
+                        return JSONResponse(
+                            {"status": "error", "message": "Deze flow is nog niet ondersteund."},
+                            status_code=400,
+                        )
             case _:
                 return JSONResponse(
                     {"status": "error", "message": f"unrecognized type: {situation_type}"},
                     status_code=400,
-              )
+                )
 
         # Create a case
         case_id = case_manager.submit_case(
@@ -498,8 +494,6 @@ async def update_situation(
                 # auto_approve: bool = False,
             )
 
-        return JSONResponse(
-            {"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id}
-        )
+        return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
     except Exception as e:
         return JSONResponse({"status": "error", "message": str(e)}, status_code=400)

@@ -8,7 +8,14 @@ from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_case_manager, get_claim_manager, get_machine_service, templates
+from web.dependencies import (
+    FORMATTED_DATE,
+    STATIC_DIR,
+    get_case_manager,
+    get_claim_manager,
+    get_machine_service,
+    templates,
+)
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.feature_flags import is_chat_enabled, is_wallet_enabled
 from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
@@ -105,7 +112,9 @@ async def root(
     # Build accepted_claims: {key: new_value} for claims belonging to accepted cases only
     accepted_claims = {}
     for case in accepted_cases:
-        claims = claim_manager.get_claim_by_bsn_service_law(bsn, case.service, case.law, approved=False)  # IMPROVE: use approved=True?
+        claims = claim_manager.get_claim_by_bsn_service_law(
+            bsn, case.service, case.law, approved=False
+        )  # IMPROVE: use approved=True?
         if claims:
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
