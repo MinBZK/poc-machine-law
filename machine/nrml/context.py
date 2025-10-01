@@ -5,6 +5,7 @@ import pandas as pd
 
 from machine.events.claim.aggregate import Claim
 from ..context import PathNode
+from .evaluation_result import EvaluationResult
 
 
 @dataclass
@@ -22,17 +23,19 @@ class NrmlRuleContext:
     items: dict[str, dict[str, Any]] = field(default_factory=dict)
     target_references: dict[str, str] = field(default_factory=dict)  # Maps target_ref -> item_id
     item_evaluator: Any = None  # Forward reference to avoid circular imports
+    evaluation_results: dict[str, EvaluationResult] = field(default_factory=dict)
+    language: str = "nl"
 
     @classmethod
     def from_nrml_engine(
-        cls,
-        nrml_engine,
-        parameters: dict[str, Any],
-        sources: dict[str, pd.DataFrame] = None,
-        overwrite_input: dict[str, Any] = None,
-        calculation_date: str = None,
-        claims: dict[str, Claim] = None,
-        approved: bool = True,
+            cls,
+            nrml_engine,
+            parameters: dict[str, Any],
+            sources: dict[str, pd.DataFrame] = None,
+            overwrite_input: dict[str, Any] = None,
+            calculation_date: str = None,
+            claims: dict[str, Claim] = None,
+            approved: bool = True,
     ) -> "NrmlRuleContext":
         """Create NrmlRuleContext from NRML rules engine"""
 
@@ -62,6 +65,16 @@ class NrmlRuleContext:
         """Remove last node from path"""
         if self.path:
             self.path.pop()
+
+    def get_evaluation_result(self, item_key: str) -> EvaluationResult | None:
+        """Get the evaluation result for an item key, or None if it doesn't exist"""
+        return self.evaluation_results.get(item_key)
+
+    def add_evaluation_result(self, item_key: str, result: EvaluationResult) -> None:
+        """Add an evaluation result for an item key"""
+        if item_key in self.evaluation_results:
+            raise ValueError(f"Evaluation result for item '{item_key}' already exists")
+        self.evaluation_results[item_key] = result
 
     def get_target_source_item(self, target_ref: str) -> str | None:
         """Get the item ID that has the given target reference"""

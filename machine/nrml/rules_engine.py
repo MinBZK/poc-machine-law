@@ -149,12 +149,17 @@ class NrmlRulesEngine:
 
         output_values = {}
 
-        # TODO: determine output values
+        # TODO: determine output values and combine processing?
         for item in items_to_process:
             # TODO: process failures
+            evaluation = context.item_evaluator.evaluate_item(item, context)
+
+            self.print_process(evaluation)
+
             output_values[item] = {
                 "description": item,  # TODO: create human readable description
-                "value": context.item_evaluator.evaluate_item(item, context).Value,
+                "process": evaluation,
+                "value": evaluation.Value,
             }
 
         if not output_values:
@@ -164,6 +169,14 @@ class NrmlRulesEngine:
             "input": context.resolved_paths,
             "output": output_values,
         }
+
+    def print_process(self, evaluation):
+        with logger.indent_block(f"{evaluation.Source} - ACTION: {evaluation.Action}"):
+            logger.debug(f"RESULT: {evaluation.Value}")
+            for child in evaluation.SubResults:
+                self.print_process(child)
+
+
 
     def get_evaluation_order(self) -> list[str]:
         """Get topologically sorted evaluation order for all items"""

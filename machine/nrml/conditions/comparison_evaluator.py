@@ -1,6 +1,7 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
+from ..evaluation_result import EvaluationResult, failure_result, success_result
 from ..expressions.argument_resolver import ArgumentResolver
 
 
@@ -11,7 +12,7 @@ class ComparisonEvaluator:
         """Initialize evaluator with internal state"""
         self.argument_resolver = ArgumentResolver()
 
-    def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> Any:
+    def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult:
         """Evaluate a comparison expression"""
         operator = expression.get("operator")
         arguments = expression.get("arguments", [])
@@ -21,10 +22,10 @@ class ComparisonEvaluator:
         else:
             raise ValueError(f"Unsupported comparison operator: {operator}")
 
-    def _evaluate_in_comparison(self, arguments: list[Any], context: NrmlRuleContext) -> bool:
+    def _evaluate_in_comparison(self, arguments: list[Any], context: NrmlRuleContext) -> EvaluationResult:
         """Evaluate an 'in' comparison"""
         if len(arguments) != 2:
-            raise ValueError(f"'in' operator expects 2 arguments, got {len(arguments)}")
+            return failure_result(error_message=f"'in' operator expects 2 arguments, got {len(arguments)}", source=self.__class__.__name__)
 
         left_arg = arguments[0]
         right_arg = arguments[1]
@@ -35,15 +36,11 @@ class ComparisonEvaluator:
         # Resolve the right argument (the collection to check in)
         right_value = self.argument_resolver.resolve_argument(right_arg, context)
 
-        # Handle case where left_value is a list - check if any element is in right_value
-        if isinstance(left_value, list):
-            if len(left_value) == 1:
-                left_value = left_value[0]  # Unwrap single-element list
-            else:
-                # For multi-element lists, check if any element is in right_value
-                return any(self._check_in_collection(item, right_value) for item in left_value)
+        if left_value.Success and right_value.Success:
+            comparison_result = self._check_in_collection(left_value.Value, right_value.Value)
+            return success_result(value=comparison_result, source=self.__class__.__name__, sub_results=[left_value, right_value], action=f"Compare: {left_value.Value} IN {right_value.Value} : {comparison_result}")
 
-        return self._check_in_collection(left_value, right_value)
+        return failure_result("Unable to resolve all arguments", source=self.__class__.__name__, sub_results=[left_value, right_value])
 
     def _check_in_collection(self, value: Any, collection: Any) -> bool:
         """Check if a value is in a collection"""

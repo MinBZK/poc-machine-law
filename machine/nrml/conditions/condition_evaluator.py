@@ -2,6 +2,7 @@ from typing import Any
 
 from ..context import NrmlRuleContext
 from .comparison_evaluator import ComparisonEvaluator
+from ..evaluation_result import EvaluationResult
 
 
 class ConditionEvaluator:
@@ -11,11 +12,8 @@ class ConditionEvaluator:
         """Initialize evaluator with internal state"""
         self.comparison_evaluator = ComparisonEvaluator()
 
-    def evaluate(self, condition: dict[str, Any], context: NrmlRuleContext) -> Any:
+    def evaluate(self, condition: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult:
         """Evaluate a condition"""
-        if not isinstance(condition, dict):
-            return condition
-
         condition_type = condition.get("type")
 
         if condition_type == "comparison":

@@ -2,10 +2,9 @@ from typing import Any
 
 from ..context import PathNode, RuleContext, logger
 from .context import NrmlRuleContext
-from .evaluators.calculated_value_evaluator import CalculatedValueEvaluator
-from .evaluators.type_definition_evaluator import TypeDefinitionEvaluator
-from .evaluation_result import FactItemEvaluationResult
-from .expressions.expression_evaluator import ExpressionEvaluator
+from .items.calculated_value_evaluator import CalculatedValueEvaluator
+from .items.type_definition_evaluator import TypeDefinitionEvaluator
+from .evaluation_result import EvaluationResult
 from .item_helper import NrmlItemHelper
 from .item_type_analyzer import NrmlItemType, determine_item_type
 
@@ -20,7 +19,7 @@ class NrmlItemEvaluator:
             NrmlItemType.CALCULATED_VALUE: CalculatedValueEvaluator(),
         }
 
-    def evaluate_item(self, item_key: str, context: NrmlRuleContext) -> FactItemEvaluationResult:
+    def evaluate_item(self, item_key: str, context: NrmlRuleContext) -> EvaluationResult:
         """
         Evaluate an NRML item based on its type
 
@@ -39,22 +38,22 @@ class NrmlItemEvaluator:
         # TODO: we could just process the items in topologically sorted order, but then we dont know the indentation
         #  or the optionality of any relations (ex in case of x OR y)
 
-        with logger.indent_block("Evaluating item"):
-            item_node = PathNode(type="item", name=f"Evaluate item: {item_type.value}", result=None)
-            context.add_to_path(item_node)
+        description = NrmlItemHelper.get_item_description(item, context.language)
+        item_node = PathNode(type="item", name=f"Evaluate item: {item_key} {description} (type: {item_type})", result=None)
+        context.add_to_path(item_node)
 
-            try:
-                existing_result = context.get_evaluation_result(item_key)
-                if existing_result:
-                    return existing_result
+        try:
+            existing_result = context.get_evaluation_result(item_key)
+            if existing_result:
+                return existing_result
 
-                # Handle different item types using evaluator dictionary
-                evaluator = self.evaluators.get(item_type)
-                if evaluator:
-                    result = evaluator.evaluate(item_key, item, context)
-                    context.add_evaluation_result(item_key, result)
-                else:
-                    raise NotImplementedError(f"Evaluator not implemented for item type: {item_type.value}")
-                return result
-            finally:
-                context.pop_path()
+            # Handle different item types using evaluator dictionary
+            evaluator = self.evaluators.get(item_type)
+            if evaluator:
+                result = evaluator.evaluate(item_key, item, context)
+                context.add_evaluation_result(item_key, result)
+            else:
+                raise NotImplementedError(f"Evaluator not implemented for item type: {item_type.value}")
+            return result
+        finally:
+            context.pop_path()

@@ -2,6 +2,7 @@ from typing import Any
 
 from ..context import NrmlRuleContext
 from .conditional_expression_evaluator import ConditionalExpressionEvaluator
+from ..evaluation_result import EvaluationResult
 
 
 class ExpressionEvaluator:
@@ -11,7 +12,7 @@ class ExpressionEvaluator:
         """Initialize evaluator with internal state"""
         self.conditional_expression_evaluator = ConditionalExpressionEvaluator()
 
-    def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> Any:
+    def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult:
         """
         Evaluate an NRML expression.
 
@@ -22,9 +23,6 @@ class ExpressionEvaluator:
         Returns:
             The evaluated result
         """
-        if not isinstance(expression, dict):
-            return expression
-
         expr_type = expression.get("type")
 
         # Schema-based expression type mapping

@@ -35,3 +35,12 @@ class NrmlItemHelper:
                 return version
 
         raise ValueError("No valid versions found for the calculation date")
+
+    @staticmethod
+    def get_item_description(item: dict[str, Any], language_key: str = "en") -> str | None:
+        """Get the item description based on the language key"""
+        name = item.get("name")
+        if isinstance(name, dict) and language_key in name:
+            return name[language_key]
+        return None
+

@@ -1,6 +1,7 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
+from ..evaluation_result import EvaluationResult, success_result, nested_result
 
 
 class ArgumentResolver:
@@ -10,26 +11,18 @@ class ArgumentResolver:
         """Initialize stateless resolver"""
         pass
 
-    def resolve_argument(self, argument: Any, context: NrmlRuleContext) -> Any:
+    def resolve_argument(self, argument: Any, context: NrmlRuleContext) -> EvaluationResult:
         """Resolve an argument which may contain references"""
-        if isinstance(argument, list):
-            # Handle list of arguments
-            return [self.resolve_argument(item, context) for item in argument]
-        elif isinstance(argument, dict):
-            if "$ref" in argument:
-                # Extract ref value and evaluate using item evaluator from context
-                ref = argument["$ref"]
-                result = context.item_evaluator.evaluate_item(ref, context)
-                if result.Success:
-                    return result.Value
-                else:
-                    raise ValueError(f"Failed to evaluate reference {ref}: {result.Value}")
 
-            if "value" in argument:
-                return argument["value"]
+        if "$ref" in argument:
+            # Extract ref value and evaluate using item evaluator from context
+            ref = argument["$ref"]
+            result = context.item_evaluator.evaluate_item(ref, context)
+            return nested_result(source=self.__class__.__name__, node=argument, action=f"Resolving argument $ref {ref}", child_result=result)
 
-            raise ValueError(f"Failed to resolve argument reference")
+        if "value" in argument:
+            return success_result(value=argument["value"], source=self.__class__.__name__, node=argument, action="Resolved from argument value")
 
-        else:
-            # Return primitive values as-is
-            return argument
+        raise ValueError(f"Failed to resolve argument reference")
+
+
