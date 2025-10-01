@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 from uuid import UUID
 
+from eventsourcing.application import AggregateNotFoundError
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
@@ -320,7 +321,10 @@ async def move_case(
         except KeyError:
             raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
 
-        case = case_manager.get_case_by_id(case_id)
+        try:
+            case = case_manager.get_case_by_id(case_id)
+        except AggregateNotFoundError:
+            raise HTTPException(status_code=404, detail="Case not found")
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
 
@@ -426,7 +430,10 @@ async def view_case(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """View details of a specific case"""
-    case = case_manager.get_case_by_id(case_id)
+    try:
+        case = case_manager.get_case_by_id(case_id)
+    except AggregateNotFoundError:
+        raise HTTPException(status_code=404, detail="Case not found")
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
