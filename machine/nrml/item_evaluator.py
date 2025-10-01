@@ -44,14 +44,17 @@ class NrmlItemEvaluator:
             context.add_to_path(item_node)
 
             try:
+                existing_result = context.get_evaluation_result(item_key)
+                if existing_result:
+                    return existing_result
+
                 # Handle different item types using evaluator dictionary
                 evaluator = self.evaluators.get(item_type)
                 if evaluator:
                     result = evaluator.evaluate(item_key, item, context)
+                    context.add_evaluation_result(item_key, result)
                 else:
                     raise NotImplementedError(f"Evaluator not implemented for item type: {item_type.value}")
-
-                item_node.result = result
                 return result
             finally:
                 context.pop_path()
