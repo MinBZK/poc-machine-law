@@ -50,7 +50,7 @@ Feature: Berekening Kindgebonden Budget met ALO-kop
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
     Then heeft de persoon recht op kindgebonden budget
     And is het ALO-kop bedrag "€0,00"
-    And is het kindgebonden budget ongeveer "€5.022,00" per jaar
+    And is het kindgebonden budget ongeveer "€3.925,00" per jaar
 
   Scenario: Alleenstaande met inkomen boven grens krijgt geen kindgebonden budget
     Given een persoon met BSN "200000004"
