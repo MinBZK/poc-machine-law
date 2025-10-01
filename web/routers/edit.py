@@ -391,9 +391,7 @@ async def update_situation(
     try:
         situation_type = payload.get("type")
         details = payload.get("details", "")
-        # You may want to extract bsn, service, law, claimant, etc. from session or payload
-        # For now, expect them in the payload for demo purposes
-        bsn = payload.get("bsn")
+        bsn = payload.get("bsn")  # IMPROVE: get from session?
 
         if not all([situation_type, bsn]):
             return JSONResponse(
@@ -489,9 +487,7 @@ async def update_situation(
                 law=law,
                 bsn=bsn,
                 case_id=case_id,
-                # old_value: Any | None = None, # TODO: fetch old value from existing case/situation if any?
-                # evidence_path: str | None = None,
-                # auto_approve: bool = False,
+                # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
             )
 
         return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
