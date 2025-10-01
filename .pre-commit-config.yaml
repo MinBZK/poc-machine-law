@@ -3,7 +3,6 @@ default_language_version:
 
 ci:
   submodules: true
-  skip: [check-submodule-initialized, check-submodule-clean, check-submodule-uptodate]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
