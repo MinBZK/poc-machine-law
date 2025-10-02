@@ -27,15 +27,22 @@ def before_all(context) -> None:
         # Capture server logs for debugging in CI
         import os
 
+        # Ensure locale environment variables are set for the subprocess
+        env = os.environ.copy()
+        if "LANG" not in env:
+            env["LANG"] = "nl_NL.UTF-8"
+        if "LC_ALL" not in env:
+            env["LC_ALL"] = "nl_NL.UTF-8"
+
         if os.getenv("CI"):
             # In CI, capture logs for debugging
             context.web_server_process = subprocess.Popen(
-                ["uv", "run", "web/main.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+                ["uv", "run", "web/main.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env
             )
         else:
             # Locally, suppress output as before
             context.web_server_process = subprocess.Popen(
-                ["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                ["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env
             )
 
         # Wait for server to be ready
