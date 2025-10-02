@@ -81,7 +81,7 @@
                                 <template x-if="typeof value === 'boolean'">
                                     <select id="new-value"
                                             name="new_value"
-                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                             x-model="newValue">
                                         <option value="true">Ja</option>
                                         <option value="false">Nee</option>
@@ -91,7 +91,7 @@
                                     <input type="date"
                                            id="new-value"
                                            name="new_value"
-                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                            x-model="newValue"
                                            required>
                                 </template>
@@ -101,7 +101,7 @@
                                         <div class="w-full">
                                             <input type="number"
                                                    id="display-new-value"
-                                                   class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                   class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                    step="0.01"
                                                    placeholder="0.00"
                                                    :value="displayValue(newValue)"
@@ -116,7 +116,7 @@
                                            id="new-value"
                                            name="new_value"
                                            x-model="newValue"
-                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                            required>
                                 </template>
                                 <template x-if="typeof value === 'string' && isNaN(Date.parse(value))">
@@ -124,7 +124,7 @@
                                            id="new-value"
                                            name="new_value"
                                            x-model="newValue"
-                                           class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                            required>
                                 </template>
                                 <template x-if="value === null || value === undefined">
@@ -135,7 +135,7 @@
                                         <template x-if="!(hasDetails && details && details.type)">
                                             <select id="new-value-type"
                                                     name="new_value_type"
-                                                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                    class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                     x-model="newValueType">
                                                 <option value="">Kies een type</option>
                                                 <option value="string">Tekst</option>
@@ -153,7 +153,7 @@
                                                     <div class="w-full">
                                                         <input type="number"
                                                                id="display-new-value-missing"
-                                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                                step="0.01"
                                                                placeholder="0.00"
                                                                @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
@@ -165,7 +165,7 @@
                                             <!-- When we have other type detail info -->
                                             <template x-if="hasDetails && details && details.type === 'boolean'">
                                                 <select name="new_value"
-                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                        class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                                     <option value="true">Ja</option>
                                                     <option value="false">Nee</option>
                                                 </select>
@@ -173,37 +173,37 @@
                                             <template x-if="hasDetails && details && details.type === 'date'">
                                                 <input type="date"
                                                        name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
                                             </template>
                                             <template x-if="hasDetails && details && details.type === 'number' && !(details.type === 'amount' && details.type_spec && details.type_spec.unit === 'eurocent')">
                                                 <input type="number"
                                                        name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
                                             </template>
                                             <template x-if="hasDetails && details && details.type === 'string'">
                                                 <input type="text"
                                                        name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
                                             </template>
                                             <!-- Fall back to user selected type when no details available -->
                                             <template x-if="!hasDetails && newValueType === 'string'">
                                                 <input type="text"
                                                        name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
                                             </template>
                                             <template x-if="!hasDetails && newValueType === 'number'">
                                                 <input type="number"
                                                        name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
                                             </template>
                                             <template x-if="!hasDetails && newValueType === 'boolean'">
                                                 <select name="new_value"
-                                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                                        class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                                     <option value="true">Ja</option>
                                                     <option value="false">Nee</option>
                                                 </select>
@@ -211,7 +211,7 @@
                                             <template x-if="!hasDetails && newValueType === 'date'">
                                                 <input type="date"
                                                        name="new_value"
-                                                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                       class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                        required>
                                             </template>
                                             <template x-if="!hasDetails && newValueType === 'amount'">
@@ -220,7 +220,7 @@
                                                     <div class="w-full">
                                                         <input type="number"
                                                                id="display-new-value-amount"
-                                                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                                step="0.01"
                                                                placeholder="0.00"
                                                                @change="$event.target.value = parseFloat($event.target.value || 0).toFixed(2)"
@@ -241,7 +241,7 @@
                         <textarea id="reason"
                                   name="reason"
                                   rows="3"
-                                  class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                  class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                   x-model="reason"
                                   required></textarea>
                     </div>
@@ -259,7 +259,7 @@
                             </label>
                             <select id="hardheidsclausule"
                                     name="hardheidsclausule"
-                                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                    class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                     x-model="selectedHardheidsclausule">
                                 <option value="">Selecteer een hardheidsclausule</option>
                                 <option value="Awb Art. 4:84">Awb Art. 4:84 - Inherente afwijkingsbevoegdheid bestuursorgaan</option>
