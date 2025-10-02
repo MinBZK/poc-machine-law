@@ -29,8 +29,22 @@ jobs:
         run: |
           uv sync
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales
+          sudo locale-gen nl_NL.UTF-8
+          sudo update-locale LANG=nl_NL.UTF-8
+
+      - name: Install Playwright browsers
+        run: |
+          uv run playwright install --with-deps chromium
+
       - name: Run tests
         run: ./script/test-behaviour
+        env:
+          LANG: nl_NL.UTF-8
+          LC_ALL: nl_NL.UTF-8
 
   go-test-features:
     name: Run Go Features
