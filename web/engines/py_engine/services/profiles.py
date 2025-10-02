@@ -71,9 +71,9 @@ PROFILES = {
                 "box1": [
                     {
                         "bsn": "100000001",
-                        "loon_uit_dienstbetrekking": 600000,  # Verlaagd naar €6.000 (onder bijstandsnorm)
+                        "loon_uit_dienstbetrekking": 0,  # ZZP'er, geen loondienst
                         "uitkeringen_en_pensioenen": 0,
-                        "winst_uit_onderneming": 950000,  # Verlaagd naar €9.500 (onder bijstandsnorm)
+                        "winst_uit_onderneming": 1550000,  # €15.500 winst uit ZZP thuiszorg
                         "resultaat_overige_werkzaamheden": 0,
                         "eigen_woning": -85000,
                     }
@@ -89,9 +89,9 @@ PROFILES = {
                     }
                 ],
                 "monthly_income": [{"bsn": "100000001", "bedrag": 129167}],
-                # (€6.000 + €9.500) / 12 = €1.291,67 per maand
+                # €15.500 / 12 = €1.291,67 per maand
                 "assets": [{"bsn": "100000001", "bedrag": 580000}],  # €5.800 spaargeld, onder vermogensgrens
-                "business_income": [{"bsn": "100000001", "bedrag": 950000}],  # €9.500 inkomsten uit onderneming
+                "business_income": [{"bsn": "100000001", "bedrag": 1550000}],  # €15.500 inkomsten uit onderneming
                 "buitenlands_inkomen": [{"bsn": "100000001", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000001", "persoonsgebonden_aftrek": 320000}],
                 "belastingdienst_vermogen": [
@@ -225,10 +225,10 @@ PROFILES = {
                 "box1": [
                     {
                         "bsn": "100000002",
-                        "loon_uit_dienstbetrekking": 950000,  # Verlaagd naar €9.500 (onder bijstandsnorm)
+                        "loon_uit_dienstbetrekking": 1900000,  # €19.000 parttime horeca werk
                         "uitkeringen_en_pensioenen": 0,
                         "winst_uit_onderneming": 0,
-                        "resultaat_overige_werkzaamheden": 180000,  # Kleine bijverdiensten
+                        "resultaat_overige_werkzaamheden": 0,
                         "eigen_woning": 0,
                     }
                 ],
@@ -244,7 +244,7 @@ PROFILES = {
                 ],
                 "buitenlands_inkomen": [{"bsn": "100000002", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000002", "persoonsgebonden_aftrek": 120000}],
-                "monthly_income": [{"bsn": "100000002", "bedrag": 79167}],  # €9.500 / 12 = €791,67 per maand
+                "monthly_income": [{"bsn": "100000002", "bedrag": 158333}],  # €19.000 / 12 = €1.583,33 per maand
                 "assets": [{"bsn": "100000002", "bedrag": 230000}],  # €2.300 spaargeld, onder vermogensgrens
                 "business_income": [{"bsn": "100000002", "bedrag": 0}],  # Geen ZZP inkomsten
                 "belastingdienst_vermogen": [
@@ -262,7 +262,7 @@ PROFILES = {
                     }
                 ],
                 "uwv_toetsingsinkomen": [
-                    {"bsn": "100000002", "toetsingsinkomen": 1130000}  # €11,300 annual income for kindgebonden budget
+                    {"bsn": "100000002", "toetsingsinkomen": 1900000}  # €19,000 annual income for kindgebonden budget
                 ],
                 "uwv_werkgegevens": [
                     {
@@ -699,7 +699,7 @@ PROFILES = {
                     }
                 ],
                 "uwv_toetsingsinkomen": [
-                    {"bsn": "300000001", "toetsingsinkomen": 1500000}  # €15,000 for kindgebonden budget calculation
+                    {"bsn": "300000001", "toetsingsinkomen": 3200000}  # €32,000 (2024 income for 2025 benefits)
                 ],
                 "uwv_werkgegevens": [
                     {
