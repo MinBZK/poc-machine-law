@@ -8,8 +8,15 @@ from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from web.dependencies import FORMATTED_DATE, STATIC_DIR, get_machine_service, templates
-from web.engines import EngineInterface
+from web.dependencies import (
+    FORMATTED_DATE,
+    STATIC_DIR,
+    get_case_manager,
+    get_claim_manager,
+    get_machine_service,
+    templates,
+)
+from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.feature_flags import is_chat_enabled, is_wallet_enabled
 from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
 
@@ -90,11 +97,27 @@ async def root(
     request: Request,
     bsn: str = "100000001",
     services: EngineInterface = Depends(get_machine_service),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
     profile = services.get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Get accepted cases for this BSN
+    all_cases = case_manager.get_cases_by_bsn(bsn)
+    accepted_cases = [case for case in all_cases if case.status.value == "DECIDED" and case.approved is True]
+
+    # Build accepted_claims: {key: new_value} for claims belonging to accepted cases only
+    accepted_claims = {}
+    for case in accepted_cases:
+        claims = claim_manager.get_claim_by_bsn_service_law(
+            bsn, case.service, case.law, approved=False
+        )  # IMPROVE: use approved=True?
+        if claims:
+            for key, claim in claims.items():
+                accepted_claims[key] = claim.new_value
 
     return templates.TemplateResponse(
         "index.html",
@@ -107,6 +130,7 @@ async def root(
             "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
+            "accepted_claims": accepted_claims,
         },
     )
 

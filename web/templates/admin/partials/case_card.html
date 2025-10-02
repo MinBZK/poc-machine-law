@@ -4,18 +4,19 @@
     <form hx-post="/admin/cases/{{ case.id }}/move"
           hx-swap="outerHTML"
           class="mb-2">
-        <input type="hidden" name="new_status" value="{{ status }}">
+        <input type="hidden" name="new_status" value="{{ status }}" />
         <div class="p-4 bg-white border rounded shadow-sm hover:bg-gray-50 cursor-move"
              data-case-id="{{ case.id }}">
-            <div class="font-medium mb-2">BSN: {{ case.bsn }}</div>
+            <div class="font-medium mb-2">{{ case.person_name }}</div>
+            <div class="text-sm text-gray-500 mb-2">BSN: {{ case.bsn }}</div>
             {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
                 <div class="flex space-x-2">
                     <button type="button"
                             class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 cursor-pointer"
-                            onclick="showDialog('{{ case.id }}', true)">Approve</button>
+                            onclick="showDialog('{{ case.id }}', true)">Goedkeuren</button>
                     <button type="button"
                             class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 cursor-pointer"
-                            onclick="showDialog('{{ case.id }}', false)">Deny</button>
+                            onclick="showDialog('{{ case.id }}', false)">Afwijzen</button>
                 </div>
             {% endif %}
             {% if case.status == 'DECIDED' %}
@@ -25,7 +26,7 @@
             {% endif %}
             <div class="mt-2">
                 <a href="/admin/cases/{{ case.id }}"
-                   class="text-sm text-blue-600 hover:underline">View Details</a>
+                   class="text-sm text-blue-600 hover:underline">Bekijk details</a>
             </div>
         </div>
     </form>
@@ -40,8 +41,8 @@
                 <form hx-post="/admin/cases/{{ case.id }}/complete-review"
                       hx-target="closest div.mb-2"
                       hx-swap="outerHTML">
-                    <input type="hidden" name="decision" id="decision-input-{{ case.id }}">
-                    <label class="block text-lg mb-3">Please enter a reason:</label>
+                    <input type="hidden" name="decision" id="decision-input-{{ case.id }}" />
+                    <label class="block mb-3">Reden:</label>
                     <textarea name="reason"
                               class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                               rows="4"
@@ -49,10 +50,10 @@
                     <div class="mt-6 flex justify-end space-x-3">
                         <button type="button"
                                 class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base cursor-pointer"
-                                onclick="closeDialog('{{ case.id }}')">Cancel</button>
+                                onclick="closeDialog('{{ case.id }}')">Annuleren</button>
                         <button type="submit"
                                 class="px-5 py-2.5 text-white rounded-md text-base cursor-pointer"
-                                id="confirm-btn-{{ case.id }}">Confirm</button>
+                                id="confirm-btn-{{ case.id }}">Bevestigen</button>
                     </div>
                 </form>
             </div>
@@ -70,10 +71,11 @@
         decisionInput.value = isApprove;
 
         // Set title and button style based on decision
-        title.textContent = isApprove ? 'Approve Case' : 'Deny Case';
-        confirmBtn.className = `px-5 py-2.5 text-white rounded-md text-base ${
-            isApprove ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
-        }`;
+        title.textContent = isApprove ? "Zaak goedkeuren" : "Zaak afwijzen";
+        confirmBtn.className = `px-5 py-2.5 text-white rounded-md text-base ${isApprove
+            ? "bg-green-600 hover:bg-green-700"
+            : "bg-red-600 hover:bg-red-700"
+            }`;
 
         dialog.showModal();
     }
