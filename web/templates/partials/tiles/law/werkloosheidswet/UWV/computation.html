@@ -1,0 +1,61 @@
+<!-- WW Benefit Amount Display -->
+<div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+    <div class="flex items-center justify-between mb-3">
+        <h4 class="font-medium text-gray-900">WW-uitkering per maand</h4>
+        {% if result.is_dagloon_gemaximeerd %}
+            <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">Gemaximeerd</span>
+        {% endif %}
+    </div>
+    <p class="text-3xl font-bold text-blue-900">
+        {{ (result.ww_uitkering_per_maand / 100) | format_currency }}
+    </p>
+    {% if result.ww_duur_maanden %}
+        <div class="mt-4 pt-3 border-t border-blue-200">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Duur van de uitkering</span>
+                <span class="font-semibold text-gray-900">{{ result.ww_duur_maanden }} maanden</span>
+            </div>
+            <!-- Duration visual indicator -->
+            <div class="mt-2 h-2 bg-blue-200 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full"
+                     style="width: {{ (result.ww_duur_maanden / 24 * 100) | int }}%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Maximaal 24 maanden mogelijk</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Calculation Breakdown -->
+{% if result.ww_uitkering_per_maand %}
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h4 class="font-medium text-gray-900 mb-3">Berekening</h4>
+        <div class="space-y-2 text-sm">
+            <div class="flex items-start">
+                <span class="text-gray-400 mr-2">•</span>
+                <div class="flex-1">
+                    <p class="text-gray-600">
+                        <span class="font-medium">Eerste 2 maanden:</span> 75% van uw dagloon
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <span class="text-gray-400 mr-2">•</span>
+                <div class="flex-1">
+                    <p class="text-gray-600">
+                        <span class="font-medium">Daarna:</span> 70% van uw dagloon
+                    </p>
+                </div>
+            </div>
+            {% if result.is_dagloon_gemaximeerd %}
+                <div class="flex items-start">
+                    <span class="text-blue-400 mr-2">ℹ</span>
+                    <div class="flex-1">
+                        <p class="text-blue-700 text-xs">
+                            Uw dagloon is hoger dan het maximale dagloon. De uitkering is berekend op basis van het maximale dagloon.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

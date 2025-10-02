@@ -617,6 +617,150 @@ PROFILES = {
             },
         },
     },
+    # Sophie Jansen - Recently unemployed single mother (WW + Kindgebonden Budget showcase)
+    "300000001": {
+        "name": "Sophie Jansen",
+        "description": "Recent werkloos geworden alleenstaande moeder, 1 kind, in aanmerking voor WW en kindgebonden budget met ALO-kop",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "300000001",
+                        "geboortedatum": "1990-03-18",  # 35 jaar in 2025
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 35,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Dapperstraat 142, 1093BS Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 2,  # Sophie + 1 kind
+                    }
+                ],
+                "relaties": [{"bsn": "300000001", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "300000001",
+                        "straat": "Dapperstraat",
+                        "huisnummer": "142",
+                        "postcode": "1093BS",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [
+                    {
+                        "bsn": "300000001",
+                        "kinderen": [
+                            {"geboortedatum": "2018-06-12"},  # 7 jaar in 2025
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "300000001",
+                        "loon_uit_dienstbetrekking": 3200000,  # €32,000 previous employment
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "300000001", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "300000001",
+                        "spaargeld": 320000,  # €3,200 savings
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "monthly_income": [{"bsn": "300000001", "bedrag": 0}],  # Currently unemployed
+                "assets": [{"bsn": "300000001", "bedrag": 320000}],  # €3,200 savings
+                "business_income": [{"bsn": "300000001", "bedrag": 0}],
+                "buitenlands_inkomen": [{"bsn": "300000001", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "300000001", "persoonsgebonden_aftrek": 150000}],
+                "belastingdienst_vermogen": [
+                    {"bsn": "300000001", "vermogen": 320000}  # €3,200 assets for kindgebonden budget
+                ],
+            },
+            "UWV": {
+                "arbeidsverhoudingen": [
+                    {
+                        "bsn": "300000001",
+                        "dienstverband_type": "GEEN",  # Recently unemployed
+                        "verzekerd_ww": True,
+                        "verzekerd_wia": True,
+                    }
+                ],
+                "uwv_toetsingsinkomen": [
+                    {"bsn": "300000001", "toetsingsinkomen": 1500000}  # €15,000 for kindgebonden budget calculation
+                ],
+                "uwv_werkgegevens": [
+                    {
+                        "bsn": "300000001",
+                        "gemiddeld_uren_per_week": 32.0,  # Previous parttime work
+                        "huidige_uren_per_week": 0.0,  # Currently unemployed
+                        "gewerkte_weken_36": 36,  # Full year worked in last 36 weeks
+                        "arbeidsverleden_jaren": 8,  # 8 years employment history
+                        "jaarloon": 3200000,  # €32,000 annual salary (previous job)
+                    }
+                ],
+                "ziektewet": [{"bsn": "300000001", "heeft_ziektewet_uitkering": False}],
+                "WIA": [{"bsn": "300000001", "heeft_wia_uitkering": False}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "300000001", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+            "DUO": {
+                "inschrijvingen": [{"bsn": "300000001", "onderwijssoort": "GEEN"}],
+                "studiefinanciering": [{"bsn": "300000001", "ontvangt_studiefinanciering": False}],
+                "is_student": [{"bsn": "300000001", "waarde": False}],
+                "receives_study_grant": [{"bsn": "300000001", "waarde": False}],
+            },
+            "DJI": {
+                "detenties": [{"bsn": "300000001", "is_gedetineerd": False}],
+                "is_detainee": [{"bsn": "300000001", "waarde": False}],
+                "detentie": [{"bsn": "300000001", "is_gedetineerd": False}],
+            },
+            "SVB": {
+                "retirement_age": [{"bsn": "300000001", "leeftijd": 68}],
+                "algemene_ouderdomswet_gegevens": [{"bsn": "300000001", "pensioenleeftijd": 68}],
+                "algemene_kinderbijslagwet": [
+                    {
+                        "ouder_bsn": "300000001",
+                        "aantal_kinderen": 1,
+                        "kinderen_leeftijden": [7],  # 1 child age 7
+                        "ontvangt_kinderbijslag": True,
+                    }
+                ],
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "300000001",
+                        "type": "PERMANENT",
+                        "status": "VERLEEND",
+                    }
+                ],
+                "residence_permit_type": [{"bsn": "300000001", "type": "PERMANENT"}],
+                "vreemdelingenwet": [
+                    {"bsn": "300000001", "verblijfsvergunning_type": None}  # Dutch national
+                ],
+            },
+            "KVK": {
+                "is_entrepreneur": [{"bsn": "300000001", "waarde": False}],
+                "is_active_entrepreneur": [{"bsn": "300000001", "waarde": False}],
+            },
+        },
+    },
     "999993653": {
         "name": "Jan Jansen",
         "description": "Jongere met part-time baan naast MBO opleiding, komt in aanmerking voor zorgtoeslag",
