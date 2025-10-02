@@ -90,8 +90,10 @@ PROFILES = {
                 ],
                 "monthly_income": [{"bsn": "100000001", "bedrag": 129167}],
                 # €15.500 / 12 = €1.291,67 per maand
+                "maandelijks_inkomen": [{"bsn": "100000001", "bedrag": 0}],  # Geen loon, alleen ZZP
                 "assets": [{"bsn": "100000001", "bedrag": 580000}],  # €5.800 spaargeld, onder vermogensgrens
                 "business_income": [{"bsn": "100000001", "bedrag": 1550000}],  # €15.500 inkomsten uit onderneming
+                "bedrijfsinkomen": [{"bsn": "100000001", "bedrag": 1550000}],  # €15.500 ZZP (for Participatiewet)
                 "buitenlands_inkomen": [{"bsn": "100000001", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000001", "persoonsgebonden_aftrek": 320000}],
                 "belastingdienst_vermogen": [
@@ -245,8 +247,10 @@ PROFILES = {
                 "buitenlands_inkomen": [{"bsn": "100000002", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000002", "persoonsgebonden_aftrek": 120000}],
                 "monthly_income": [{"bsn": "100000002", "bedrag": 158333}],  # €19.000 / 12 = €1.583,33 per maand
+                "maandelijks_inkomen": [{"bsn": "100000002", "bedrag": 158333}],  # €1.583,33 loon (for Participatiewet)
                 "assets": [{"bsn": "100000002", "bedrag": 230000}],  # €2.300 spaargeld, onder vermogensgrens
                 "business_income": [{"bsn": "100000002", "bedrag": 0}],  # Geen ZZP inkomsten
+                "bedrijfsinkomen": [{"bsn": "100000002", "bedrag": 0}],  # Geen ZZP (for Participatiewet)
                 "belastingdienst_vermogen": [
                     {"bsn": "100000002", "vermogen": 230000}  # €2,300 total assets for kindgebonden budget
                 ],
@@ -402,8 +406,10 @@ PROFILES = {
                 "buitenlands_inkomen": [{"bsn": "100000003", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000003", "persoonsgebonden_aftrek": 450000}],
                 "monthly_income": [{"bsn": "100000003", "bedrag": 104167}],  # €12.500 / 12 = €1.041,67 per maand
+                "maandelijks_inkomen": [{"bsn": "100000003", "bedrag": 0}],  # Geen loon, alleen ZZP
                 "assets": [{"bsn": "100000003", "bedrag": 120000}],  # €1.200 spaargeld, onder de vermogensgrens
                 "business_income": [{"bsn": "100000003", "bedrag": 1250000}],  # €12.500 inkomsten uit onderneming
+                "bedrijfsinkomen": [{"bsn": "100000003", "bedrag": 1250000}],  # €12.500 ZZP (for Participatiewet)
                 "partner_income": [{"bsn": "100000003", "bedrag": 350000}],  # €3.500 partner inkomen
                 "partner_assets": [{"bsn": "100000003", "bedrag": 95000}],  # €950 partner vermogen
                 "belastingschulden": [
@@ -681,8 +687,10 @@ PROFILES = {
                     }
                 ],
                 "monthly_income": [{"bsn": "300000001", "bedrag": 0}],  # Currently unemployed
+                "maandelijks_inkomen": [{"bsn": "300000001", "bedrag": 0}],  # Currently unemployed (for Participatiewet)
                 "assets": [{"bsn": "300000001", "bedrag": 320000}],  # €3,200 savings
                 "business_income": [{"bsn": "300000001", "bedrag": 0}],
+                "bedrijfsinkomen": [{"bsn": "300000001", "bedrag": 0}],  # No business income (for Participatiewet)
                 "buitenlands_inkomen": [{"bsn": "300000001", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "300000001", "persoonsgebonden_aftrek": 150000}],
                 "belastingdienst_vermogen": [
