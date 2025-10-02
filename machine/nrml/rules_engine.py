@@ -4,8 +4,6 @@ import pandas as pd
 
 from ..context import logger
 from .context import NrmlRuleContext
-from .item_evaluator import NrmlItemEvaluator
-from .item_type_analyzer import NrmlItemType, determine_item_type
 
 
 class NrmlRulesEngine:
@@ -14,44 +12,18 @@ class NrmlRulesEngine:
     def __init__(self, spec: dict[str, Any], service_provider: Any | None = None) -> None:
         self.spec = spec
         self.facts = spec.get("facts", {})
-        self.items = {}
         self.law = spec.get("metadata", {}).get("description", {})
 
-        # Fill items dictionary with JSON Pointer references
-        for fact_id, fact in self.facts.items():
-            items = fact.get("items", {})
-            for item_id, item in items.items():
-                ref_key = f"#/facts/{fact_id}/items/{item_id}"
-                self.items[ref_key] = item
+        self.inputs = spec.get("inputs", [])
+        self.outputs = self._extract_outputs_mapping(spec.get("outputs", []))
 
-        # Build dependency graph
-        self.dependencies = {}
-        self._build_dependency_graph()
+        self.items = self._extract_items_from_facts(self.facts)
 
         self.service_name = "NRML"
         self.service_provider = service_provider
 
-    def _build_dependency_graph(self) -> None:
-        """Build dependency graph by finding all $ref references in items"""
-        for source_ref, item in self.items.items():
-            # Find all references and categorize them
-            all_references = self._find_references_recursive(item)
-            target_reference = self._find_target_references(item)
-
-            # Regular dependencies are all references minus target reference
-            regular_dependencies = all_references - {target_reference} if target_reference else all_references
-
-            if regular_dependencies:
-                self.dependencies[source_ref] = regular_dependencies
-
-            # Add inverted dependency for target reference
-            if target_reference:
-                # Invert the dependency: target depends on source
-                if target_reference not in self.dependencies:
-                    self.dependencies[target_reference] = set()
-                self.dependencies[target_reference].add(source_ref)
-
-    def _find_references_recursive(self, obj: Any) -> set[str]:
+    @staticmethod
+    def _find_references_recursive(obj: Any) -> set[str]:
         """
         Recursively find all $ref references in an object structure.
 
@@ -70,18 +42,18 @@ class NrmlRulesEngine:
                     references.add(value)
                 else:
                     # Recursively search nested objects
-                    references.update(self._find_references_recursive(value))
+                    references.update(NrmlRulesEngine._find_references_recursive(value))
 
         elif isinstance(obj, list):
             # Search each item in the list
             for item in obj:
-                references.update(self._find_references_recursive(item))
+                references.update(NrmlRulesEngine._find_references_recursive(item))
 
         # For primitive types (str, int, bool, None), no references to find
-
         return references
 
-    def _find_target_references(self, obj: Any) -> str | None:
+    @staticmethod
+    def _find_target_references(obj: Any) -> str | None:
         """
         Find the $ref reference that is specifically in a 'target' node.
         Returns immediately when target is found since there should be 0 or 1 targets per item.
@@ -96,23 +68,73 @@ class NrmlRulesEngine:
             for key, value in obj.items():
                 if key == "target":
                     # Found the target node, extract the reference from it and return immediately
-                    references = self._find_references_recursive(value)
+                    references = NrmlRulesEngine._find_references_recursive(value)
                     # Return the first (and should be only) reference found
                     return next(iter(references)) if references else None
                 elif isinstance(value, dict | list):
                     # Continue searching in nested structures
-                    target_ref = self._find_target_references(value)
+                    target_ref = NrmlRulesEngine._find_target_references(value)
                     if target_ref:
                         return target_ref
 
         elif isinstance(obj, list):
             # Search each item in the list
             for item in obj:
-                target_ref = self._find_target_references(item)
+                target_ref = NrmlRulesEngine._find_target_references(item)
                 if target_ref:
                     return target_ref
 
         return None
+
+    @staticmethod
+    def _extract_items_from_facts(facts: dict[str, Any]) -> dict[str, dict[str, Any]]:
+        """Extract items from facts dictionary with JSON Pointer references as keys"""
+        items = {}
+        # Fill items dictionary with JSON Pointer references
+        for fact_id, fact in facts.items():
+            fact_items = fact.get("items", {})
+            for item_id, item in fact_items.items():
+                ref_key = f"#/facts/{fact_id}/items/{item_id}"
+                items[ref_key] = item
+        return items
+
+    @staticmethod
+    def _get_all_target_references(items: dict[str, dict[str, Any]]) -> dict[str, str]:
+        """Get all target references mapped to their source items (target_ref -> item_id)"""
+        target_refs = {}
+        for item_id, item in items.items():
+            ref = NrmlRulesEngine._find_target_references(item)
+            if ref:
+                target_refs[ref] = item_id
+        return target_refs
+
+    @staticmethod
+    def _extract_inputs_mapping(inputs: list[dict[str, Any]]) -> dict[str, str]:
+        """Extract inputs mapping from target.$ref to source"""
+        inputs_mapping = {}
+        for input_item in inputs:
+            source = input_item.get("name")
+            target = input_item.get("target", {})
+            target_ref = target.get("$ref")
+
+            if source and target_ref:
+                inputs_mapping[target_ref] = source
+
+        return inputs_mapping
+
+    @staticmethod
+    def _extract_outputs_mapping(outputs: list[dict[str, Any]]) -> dict[str, str]:
+        """Extract outputs mapping from name to source.$ref"""
+        outputs_mapping = {}
+        for output_item in outputs:
+            name = output_item.get("name")
+            source = output_item.get("source", {})
+            source_ref = source.get("$ref")
+
+            if name and source_ref:
+                outputs_mapping[name] = source_ref
+
+        return outputs_mapping
 
     def evaluate(
         self,
@@ -126,7 +148,7 @@ class NrmlRulesEngine:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
 
-        items_to_process = [requested_output] if requested_output else []
+        items_to_process = [requested_output] if self.outputs[requested_output] else []
 
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
 
@@ -145,6 +167,8 @@ class NrmlRulesEngine:
             calculation_date=calculation_date,
             claims=claims,
             approved=approved,
+            target_references=self._get_all_target_references(self.items),
+            inputs=self._extract_inputs_mapping(self.inputs),
         )
 
         output_values = {}
@@ -175,40 +199,3 @@ class NrmlRulesEngine:
             logger.debug(f"RESULT: {evaluation.Value}")
             for child in evaluation.SubResults:
                 self.print_process(child)
-
-
-
-    def get_evaluation_order(self) -> list[str]:
-        """Get topologically sorted evaluation order for all items"""
-        # Simple topological sort using Kahn's algorithm
-        in_degree = {item_id: 0 for item_id in self.items}
-
-        # Calculate in-degrees
-        for item_id, deps in self.dependencies.items():
-            in_degree[item_id] = len(deps)
-
-        # Initialize queue with items that have no dependencies
-        queue = [item_id for item_id, degree in in_degree.items() if degree == 0]
-        result = []
-
-        while queue:
-            current = queue.pop(0)
-            result.append(current)
-
-            # Reduce in-degree for dependent items
-            for item_id, deps in self.dependencies.items():
-                if current in deps:
-                    in_degree[item_id] -= 1
-                    if in_degree[item_id] == 0:
-                        queue.append(item_id)
-
-        return result
-
-    def _get_all_target_references(self) -> dict[str, str]:
-        """Get all target references mapped to their source items (target_ref -> item_id)"""
-        target_refs = {}
-        for item_id, item in self.items.items():
-            ref = self._find_target_references(item)
-            if ref:
-                target_refs[ref] = item_id
-        return target_refs

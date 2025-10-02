@@ -1,7 +1,7 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
-from ..evaluation_result import EvaluationResult, success_result, failure_result
+from ..evaluation_result import EvaluationResult, create_result
 from ..expressions.expression_evaluator import ExpressionEvaluator
 
 
@@ -17,22 +17,23 @@ class CalculatedValueEvaluator:
         # Get the first version (assuming all versions have the same structure)
         versions = item.get("versions", [])
         if not versions:
-            return failure_result(error_message="No versions found in calculated value item", source=self.__class__.__name__)
+            return create_result(success=False, error="No versions found in calculated value item", source=self.__class__.__name__)
 
         version = versions[0]
         expression = version.get("expression")
         target = version.get("target")
 
         if not expression:
-            return failure_result(error_message="No expression found in calculated value item", source=self.__class__.__name__)
+            return create_result(success=False, error="No expression found in calculated value item", source=self.__class__.__name__)
 
         if not target:
-            return failure_result(error_message="No target found in calculated value item", source=self.__class__.__name__)
+            return create_result(success=False, error="No target found in calculated value item", source=self.__class__.__name__)
 
         try:
             # Evaluate the expression using the expression evaluator
             expression_result = self.expression_evaluator.evaluate(expression, context)
-            return success_result(
+            return create_result(
+                success=True,
                 value=expression_result.Value,
                 source=self.__class__.__name__,
                 sub_results=[expression_result],
@@ -40,4 +41,4 @@ class CalculatedValueEvaluator:
                 action=f"Determining Calculated value for item {item_key}")
 
         except Exception as e:
-            return failure_result(error_message=f"Error evaluating expression: {str(e)}", source=self.__class__.__name__)
+            return create_result(success=False, error=f"Error evaluating expression: {str(e)}", source=self.__class__.__name__)

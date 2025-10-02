@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import pandas as pd
+from pydantic_core.core_schema import none_schema
 
 from machine.events.claim.aggregate import Claim
 from ..context import PathNode
@@ -22,6 +23,7 @@ class NrmlRuleContext:
     nrml_spec: dict[str, Any] = field(default_factory=dict)
     items: dict[str, dict[str, Any]] = field(default_factory=dict)
     target_references: dict[str, str] = field(default_factory=dict)  # Maps target_ref -> item_id
+    inputs: dict[str, str] = field(default_factory=dict)  # Maps target.$ref -> source
     item_evaluator: Any = None  # Forward reference to avoid circular imports
     evaluation_results: dict[str, EvaluationResult] = field(default_factory=dict)
     language: str = "nl"
@@ -31,11 +33,13 @@ class NrmlRuleContext:
             cls,
             nrml_engine,
             parameters: dict[str, Any],
+            target_references: dict[str, str],
+            inputs: dict[str, str],
             sources: dict[str, pd.DataFrame] = None,
             overwrite_input: dict[str, Any] = None,
             calculation_date: str = None,
             claims: dict[str, Claim] = None,
-            approved: bool = True,
+            approved: bool = True
     ) -> "NrmlRuleContext":
         """Create NrmlRuleContext from NRML rules engine"""
 
@@ -47,7 +51,8 @@ class NrmlRuleContext:
             parameters=parameters,
             nrml_spec=nrml_engine.spec,
             items=nrml_engine.items,
-            target_references=nrml_engine._get_all_target_references(),
+            target_references=target_references,
+            inputs=inputs,
         )
 
         # Create and store the item evaluator in context
@@ -79,3 +84,21 @@ class NrmlRuleContext:
     def get_target_source_item(self, target_ref: str) -> str | None:
         """Get the item ID that has the given target reference"""
         return self.target_references.get(target_ref)
+
+    def get_parameter_value(self, target_ref: str) -> str | None:
+        """Get the parameter name for the given target reference"""
+        param_name = self.inputs.get(target_ref)
+        if not param_name:
+            return None
+
+        param = self.parameters.get(param_name)
+        if param:
+            return param
+        else:
+            raise ValueError(f"Required parameter '{param_name}' not found in parameters")
+
+    def get_input_source(self, target_ref: str) -> str | None:
+        """Get the input source for the given target reference"""
+        return self.inputs.get(target_ref)
+
+

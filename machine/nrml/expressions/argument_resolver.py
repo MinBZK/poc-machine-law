@@ -1,7 +1,7 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
-from ..evaluation_result import EvaluationResult, success_result, nested_result
+from ..evaluation_result import EvaluationResult, create_result, nested_result
 
 
 class ArgumentResolver:
@@ -21,7 +21,7 @@ class ArgumentResolver:
             return nested_result(source=self.__class__.__name__, node=argument, action=f"Resolving argument $ref {ref}", child_result=result)
 
         if "value" in argument:
-            return success_result(value=argument["value"], source=self.__class__.__name__, node=argument, action="Resolved from argument value")
+            return create_result(success=True, value=argument["value"], source=self.__class__.__name__, node=argument, action="Resolved from argument value")
 
         raise ValueError(f"Failed to resolve argument reference")
 
