@@ -808,3 +808,77 @@ def step_impl(context):
         inkomen_afbouw, 50000,  # Less than €500 afbouw
         f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw/100:.2f}"
     )
+
+
+# Wet Adviescollege ICT-toetsing steps
+@given('een ICT-project met ID "{project_id}"')
+def step_impl(context, project_id):
+    context.parameters["PROJECT_ID"] = project_id
+
+
+@then("valt het project onder adviesplicht")
+def step_impl(context):
+    assertions.assertTrue(
+        context.result.output.get("adviesplicht", False),
+        "Expected project to fall under advisory obligation, but it did not"
+    )
+
+
+@then("valt het project niet onder adviesplicht")
+def step_impl(context):
+    assertions.assertFalse(
+        context.result.output.get("adviesplicht", False),
+        "Expected project to NOT fall under advisory obligation, but it did"
+    )
+
+
+@then('zijn de project kosten "{amount}" euro')
+def step_impl(context, amount):
+    # Parse amount like "10000000.00" to cents
+    amount_clean = amount.replace(".", "")
+    expected_amount = int(amount_clean)
+    actual_amount = context.result.output.get("project_kosten", 0)
+    assertions.assertEqual(
+        actual_amount, expected_amount,
+        f"Expected project costs to be €{amount} ({expected_amount} cents), but was {actual_amount} cents (€{actual_amount/100:.2f})"
+    )
+
+
+# AWB Article 1:1 Bestuursorgaan steps
+@given('een organisatie met ID "{org_id}"')
+def step_impl(context, org_id):
+    context.parameters["ORGANISATIE_ID"] = org_id
+
+
+@then("is de organisatie een bestuursorgaan")
+def step_impl(context):
+    assertions.assertTrue(
+        context.result.output.get("is_bestuursorgaan", False),
+        "Expected organization to be a bestuursorgaan, but it is not"
+    )
+
+
+@then("is de organisatie geen bestuursorgaan")
+def step_impl(context):
+    assertions.assertFalse(
+        context.result.output.get("is_bestuursorgaan", False),
+        "Expected organization NOT to be a bestuursorgaan, but it is"
+    )
+
+
+@then('is het bestuursorgaan type "{expected_type}"')
+def step_impl(context, expected_type):
+    actual_type = context.result.output.get("bestuursorgaan_type")
+    assertions.assertEqual(
+        actual_type, expected_type,
+        f"Expected bestuursorgaan type to be '{expected_type}', but was '{actual_type}'"
+    )
+
+
+@then('is de exclusion reason "{expected_reason}"')
+def step_impl(context, expected_reason):
+    actual_reason = context.result.output.get("exclusion_reason")
+    assertions.assertEqual(
+        actual_reason, expected_reason,
+        f"Expected exclusion reason to be '{expected_reason}', but was '{actual_reason}'"
+    )
