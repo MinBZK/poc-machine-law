@@ -12,9 +12,7 @@
             </button>
         </div>
         {% if result.alo_kop_bedrag and result.alo_kop_bedrag > 0 %}
-            <p class="text-sm text-purple-700 mt-2">
-                Inclusief ALO-kop: {{ (result.alo_kop_bedrag / 100) | format_currency }}
-            </p>
+            <p class="text-sm text-purple-700 mt-2">Inclusief ALO-kop: {{ (result.alo_kop_bedrag / 100) | format_currency }}</p>
         {% endif %}
     {% else %}
         <h4 class="text-sm font-medium text-gray-500 mb-1">U krijgt waarschijnlijk geen kindgebonden budget.</h4>
