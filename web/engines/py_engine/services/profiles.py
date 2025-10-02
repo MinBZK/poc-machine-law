@@ -687,7 +687,9 @@ PROFILES = {
                     }
                 ],
                 "monthly_income": [{"bsn": "300000001", "bedrag": 0}],  # Currently unemployed
-                "maandelijks_inkomen": [{"bsn": "300000001", "bedrag": 0}],  # Currently unemployed (for Participatiewet)
+                "maandelijks_inkomen": [
+                    {"bsn": "300000001", "bedrag": 0}
+                ],  # Currently unemployed (for Participatiewet)
                 "assets": [{"bsn": "300000001", "bedrag": 320000}],  # €3,200 savings
                 "business_income": [{"bsn": "300000001", "bedrag": 0}],
                 "bedrijfsinkomen": [{"bsn": "300000001", "bedrag": 0}],  # No business income (for Participatiewet)
