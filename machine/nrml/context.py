@@ -27,6 +27,14 @@ class NrmlRuleContext:
     item_evaluator: Any = None  # Forward reference to avoid circular imports
     evaluation_results: dict[str, EvaluationResult] = field(default_factory=dict)
     language: str = "nl"
+    value_providers: list[Any] = field(default_factory=list)
+
+    def get_value_provider_for(self, name: str) -> Any | None:
+        """Get the first value provider that can provide a value for the given name"""
+        for provider in self.value_providers:
+            if provider.can_provide_value(name):
+                return provider
+        return None
 
     @classmethod
     def from_nrml_engine(
@@ -39,7 +47,8 @@ class NrmlRuleContext:
             overwrite_input: dict[str, Any] = None,
             calculation_date: str = None,
             claims: dict[str, Claim] = None,
-            approved: bool = True
+            approved: bool = True,
+            table_value_providers: list[Any] = None
     ) -> "NrmlRuleContext":
         """Create NrmlRuleContext from NRML rules engine"""
 
@@ -53,6 +62,7 @@ class NrmlRuleContext:
             items=nrml_engine.items,
             target_references=target_references,
             inputs=inputs,
+            value_providers=table_value_providers or [],
         )
 
         # Create and store the item evaluator in context
@@ -85,17 +95,9 @@ class NrmlRuleContext:
         """Get the item ID that has the given target reference"""
         return self.target_references.get(target_ref)
 
-    def get_parameter_value(self, target_ref: str) -> str | None:
+    def get_parameter_value(self, input_source: str) -> str | None:
         """Get the parameter name for the given target reference"""
-        param_name = self.inputs.get(target_ref)
-        if not param_name:
-            return None
-
-        param = self.parameters.get(param_name)
-        if param:
-            return param
-        else:
-            raise ValueError(f"Required parameter '{param_name}' not found in parameters")
+        return self.parameters.get(input_source)
 
     def get_input_source(self, target_ref: str) -> str | None:
         """Get the input source for the given target reference"""

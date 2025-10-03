@@ -1,9 +1,18 @@
+from dataclasses import dataclass
 from typing import Any
 
 import pandas as pd
 
 from ..context import logger
 from .context import NrmlRuleContext
+from .value_providers import TableValueProvider
+
+
+@dataclass
+class OutputMapping:
+    """Mapping between public output name and internal reference"""
+    public_output: str
+    internal_reference: str
 
 
 class NrmlRulesEngine:
@@ -148,7 +157,15 @@ class NrmlRulesEngine:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
 
-        items_to_process = [requested_output] if self.outputs[requested_output] else []
+
+
+        #TODO: allow multiple outputs from method call
+        items_to_process = []
+        for public_output in [requested_output]:
+            # TODO: mapping from external to internal also needs some result object so we can see what happened
+            internal_reference = self.outputs[public_output]
+            if internal_reference:
+                items_to_process.append(OutputMapping(public_output, internal_reference))
 
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
 
@@ -169,19 +186,19 @@ class NrmlRulesEngine:
             approved=approved,
             target_references=self._get_all_target_references(self.items),
             inputs=self._extract_inputs_mapping(self.inputs),
+            table_value_providers=[TableValueProvider(sources)],
         )
 
         output_values = {}
 
-        # TODO: determine output values and combine processing?
         for item in items_to_process:
             # TODO: process failures
-            evaluation = context.item_evaluator.evaluate_item(item, context)
+            evaluation = context.item_evaluator.evaluate_item(item.internal_reference, context)
 
             self.print_process(evaluation)
 
-            output_values[item] = {
-                "description": item,  # TODO: create human readable description
+            output_values[item.public_output] = {
+                "description": public_output,  # TODO: create human readable description
                 "process": evaluation,
                 "value": evaluation.Value,
             }
@@ -196,6 +213,9 @@ class NrmlRulesEngine:
 
     def print_process(self, evaluation):
         with logger.indent_block(f"{evaluation.Source} - ACTION: {evaluation.Action}"):
+            logger.debug(f"SUCCESS: {evaluation.Success}")
+            if evaluation.Error is not None:
+                logger.debug(f"ERROR: {evaluation.Error}")
             logger.debug(f"RESULT: {evaluation.Value}")
             for child in evaluation.SubResults:
                 self.print_process(child)

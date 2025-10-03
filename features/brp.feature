@@ -38,4 +38,20 @@ Feature: Bepalen kiesrecht Tweede Kamer
     When de brp_nationaliteit_nrml wordt uitgevoerd door NRML
     Then heeft output heeft_nederlandse_nationaliteit met waarde True
 
+  Scenario: Persoon met Duitse nationaliteit heeft volgens NRML geen nederlandse nationaliteit via BSN
+    Given de volgende NRML personen gegevens:
+      | bsn       | geboortedatum | nationaliteit | verblijfsadres | land_verblijf |
+      | 999993653 | 2006-01-01    | DUITS         | Amsterdam      | NLD           |
+    And een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
+    When de brp_nationaliteit_nrml wordt uitgevoerd door NRML
+    Then heeft output heeft_nederlandse_nationaliteit met waarde False
+
+  Scenario: Persoon met Nederlandse nationaliteit heeft volgens NRML nederlandse nationaliteit via BSN
+    Given de volgende NRML personen gegevens:
+      | bsn       | geboortedatum | nationaliteit | verblijfsadres | land_verblijf |
+      | 999993653 | 2006-01-01    | NEDERLANDS    | Amsterdam      | NLD           |
+    And een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
+    When de brp_nationaliteit_nrml wordt uitgevoerd door NRML
+    Then heeft output heeft_nederlandse_nationaliteit met waarde True
+
 
