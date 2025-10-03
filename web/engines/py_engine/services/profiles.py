@@ -1254,6 +1254,192 @@ PROFILES = {
             },
         },
     },
+    "999991905": {
+        "name": "Linda Vieltlep",
+        "description": "Moeder van twee jonge kinderen, werkt parttime",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999991905",
+                        "geboortedatum": "1988-10-16",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "999991905",
+                        "partnerschap_type": "HUWELIJK",
+                        "partner_bsn": "999993872",
+                        "children": [
+                            {
+                                "bsn": "999991723",
+                                "geboortedatum": "2020-06-10",
+                                "naam": "Kind 1",
+                            },
+                            {
+                                "bsn": "999992740",
+                                "geboortedatum": "2022-08-15",
+                                "naam": "Kind 2",
+                            },
+                        ],
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999991905",
+                        "straat": "Glitterstraat",
+                        "huisnummer": "1",
+                        "postcode": "1103SK",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [
+                    {"kind_bsn": "999991723", "geboortedatum": "2020-06-10", "naam": "Kind 1"},
+                    {"kind_bsn": "999992740", "geboortedatum": "2022-08-15", "naam": "Kind 2"}
+                ]
+            },
+            "UWV": {
+                "dienstverbanden": [
+                    {
+                        "bsn": "999991905",
+                        "start_date": "2024-01-01",
+                        "end_date": "2024-12-31",
+                        "uren_per_week": 24,
+                        "worked_hours": 1248,
+                    }
+                ]
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999991905",
+                        "loon_uit_dienstbetrekking": 2000000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [
+                    {"bsn": "999991905", "dividend": 0, "vervreemding_aandelen": 0}
+                ],
+                "box3": [
+                    {
+                        "bsn": "999991905",
+                        "spaargeld": 1000000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999991905", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999991905", "persoonsgebonden_aftrek": 0}],
+                "monthly_income": [{"bsn": "999991905", "bedrag": 166700}],
+                "assets": [{"bsn": "999991905", "bedrag": 1000000}],
+                "business_income": [{"bsn": "999991905", "bedrag": 0}],
+                "partner_income": [{"bsn": "999991905", "bedrag": 4500000}],
+                "partner_assets": [{"bsn": "999991905", "bedrag": 3000000}],
+            },
+        },
+    },
+    "999993872": {
+        "name": "Peter-Jan van der Meijden",
+        "description": "Vader van twee jonge kinderen, eigen woning",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "999993872",
+                        "geboortedatum": "1986-04-17",
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                    }
+                ],
+                "relaties": [
+                    {
+                        "bsn": "999993872",
+                        "partnerschap_type": "HUWELIJK",
+                        "partner_bsn": "999991905",
+                        "children": [
+                            {
+                                "bsn": "999991723",
+                                "geboortedatum": "2020-06-10",
+                                "naam": "Kind 1",
+                            },
+                            {
+                                "bsn": "999992740",
+                                "geboortedatum": "2022-08-15",
+                                "naam": "Kind 2",
+                            },
+                        ],
+                    }
+                ],
+                "verblijfplaats": [
+                    {
+                        "bsn": "999993872",
+                        "straat": "Glitterstraat",
+                        "huisnummer": "1",
+                        "postcode": "1103SK",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [
+                    {"kind_bsn": "999991723", "geboortedatum": "2020-06-10", "naam": "Kind 1"},
+                    {"kind_bsn": "999992740", "geboortedatum": "2022-08-15", "naam": "Kind 2"}
+                ]
+            },
+            "UWV": {
+                "dienstverbanden": [
+                    {
+                        "bsn": "999993872",
+                        "start_date": "2024-01-01",
+                        "end_date": "2024-12-31",
+                        "uren_per_week": 40,
+                        "worked_hours": 2080,
+                    }
+                ]
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "999993872",
+                        "loon_uit_dienstbetrekking": 4500000,
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 192500,
+                    }
+                ],
+                "box2": [
+                    {"bsn": "999993872", "dividend": 0, "vervreemding_aandelen": 0}
+                ],
+                "box3": [
+                    {
+                        "bsn": "999993872",
+                        "spaargeld": 3000000,
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "buitenlands_inkomen": [{"bsn": "999993872", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "999993872", "persoonsgebonden_aftrek": 0}],
+                "monthly_income": [{"bsn": "999993872", "bedrag": 375000}],
+                "assets": [{"bsn": "999993872", "bedrag": 3000000}],
+                "business_income": [{"bsn": "999993872", "bedrag": 0}],
+                "partner_income": [{"bsn": "999993872", "bedrag": 2000000}],
+                "partner_assets": [{"bsn": "999993872", "bedrag": 1000000}],
+            },
+        },
+    },
 }
 
 

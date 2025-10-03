@@ -1400,6 +1400,277 @@ profiles:
         is_active_entrepreneur:
           - bsn: "999993659"
             waarde: false
+  999991905:
+    name: Linda Vieltlep
+    description: Moeder van twee jonge kinderen, werkt parttime
+    useGlobalServices: true
+    sources:
+      RvIG:
+        personen:
+          - bsn: "999991905"
+            geboortedatum: "1988-10-16"
+            verblijfsadres: Amsterdam
+            land_verblijf: NEDERLAND
+            nationaliteit: NEDERLANDS
+            age: 37
+            has_dutch_nationality: true
+            has_partner: true
+            residence_address: Glitterstraat 1, 1103SK Amsterdam
+            has_fixed_address: true
+            household_size: 4
+        relaties:
+          - bsn: "999991905"
+            partnerschap_type: HUWELIJK
+            partner_bsn: "999993872"
+        verblijfplaats:
+          - bsn: "999991905"
+            straat: Glitterstraat
+            huisnummer: "1"
+            postcode: "1103SK"
+            woonplaats: Amsterdam
+            type: WOONADRES
+        CHILDREN_DATA:
+          - bsn: "999991905"
+            kinderen:
+              - geboortedatum: "2020-06-10" # 5 jaar in 2025
+              - geboortedatum: "2022-08-15" # 3 jaar in 2025
+      BELASTINGDIENST:
+        box1:
+          - bsn: "999991905"
+            loon_uit_dienstbetrekking: 2000000
+            uitkeringen_en_pensioenen: 0
+            winst_uit_onderneming: 0
+            resultaat_overige_werkzaamheden: 0
+            eigen_woning: 0
+        box2:
+          - bsn: "999991905"
+            reguliere_voordelen: 0
+            vervreemdingsvoordelen: 0
+        box3:
+          - bsn: "999991905"
+            spaargeld: 1000000
+            beleggingen: 0
+            onroerend_goed: 0
+            schulden: 0
+        buitenlands_inkomen:
+          - bsn: "999991905"
+            bedrag: 0
+            land: GEEN
+        aftrekposten:
+          - bsn: "999991905"
+            persoonsgebonden_aftrek: 0
+        monthly_income:
+          - bsn: "999991905"
+            bedrag: 166700
+        assets:
+          - bsn: "999991905"
+            bedrag: 1000000
+        business_income:
+          - bsn: "999991905"
+            bedrag: 0
+        partner_income:
+          - bsn: "999991905"
+            bedrag: 4500000
+        partner_assets:
+          - bsn: "999991905"
+            bedrag: 3000000
+      UWV:
+        arbeidsverhoudingen:
+          - bsn: "999991905"
+            dienstverband_type: BEPAALDE_TIJD
+            dienstverband_uren: 24
+            verzekerd_ww: true
+            verzekerd_wia: true
+        arbeidsongeschiktheid:
+          - bsn: "999991905"
+            percentage: 0
+            diagnose_categorie: GEEN
+            uitkering_type: GEEN
+      GEMEENTE_AMSTERDAM:
+        werk_en_re_integratie:
+          - bsn: "999991905"
+            arbeidsvermogen: VOLLEDIG
+            re_integratie_traject: GEEN
+      RVZ:
+        verzekeringen:
+          - bsn: "999991905"
+            polis_status: ACTIEF
+            verdrag_status: GEEN
+            zorg_type: BASIS
+      DUO:
+        inschrijvingen:
+          - bsn: "999991905"
+            onderwijssoort: GEEN
+        studiefinanciering:
+          - bsn: "999991905"
+            ontvangt_studiefinanciering: false
+        is_student:
+          - bsn: "999991905"
+            waarde: false
+        receives_study_grant:
+          - bsn: "999991905"
+            waarde: false
+      DJI:
+        detenties:
+          - bsn: "999991905"
+            is_gedetineerd: false
+        is_detainee:
+          - bsn: "999991905"
+            waarde: false
+      SVB:
+        retirement_age:
+          - bsn: "999991905"
+            leeftijd: 68
+      IND:
+        verblijfsvergunningen:
+          - bsn: "999991905"
+            type: PERMANENT
+            status: VERLEEND
+        residence_permit_type:
+          - bsn: "999991905"
+            type: PERMANENT
+      KVK:
+        is_entrepreneur:
+          - bsn: "999991905"
+            waarde: false
+        is_active_entrepreneur:
+          - bsn: "999991905"
+            waarde: false
+  999993872:
+    name: Peter-Jan van der Meijden
+    description: Vader van twee jonge kinderen, eigen woning
+    useGlobalServices: true
+    sources:
+      RvIG:
+        personen:
+          - bsn: "999993872"
+            geboortedatum: "1986-04-17"
+            verblijfsadres: Amsterdam
+            land_verblijf: NEDERLAND
+            nationaliteit: NEDERLANDS
+            age: 39
+            has_dutch_nationality: true
+            has_partner: true
+            residence_address: Glitterstraat 1, 1103SK Amsterdam
+            has_fixed_address: true
+            household_size: 4
+        relaties:
+          - bsn: "999993872"
+            partnerschap_type: HUWELIJK
+            partner_bsn: "999991905"
+        verblijfplaats:
+          - bsn: "999993872"
+            straat: Glitterstraat
+            huisnummer: "1"
+            postcode: "1103SK"
+            woonplaats: Amsterdam
+            type: WOONADRES
+        CHILDREN_DATA:
+          - bsn: "999993872"
+            kinderen:
+              - geboortedatum: "2020-06-10" # 5 jaar in 2025
+              - geboortedatum: "2022-08-15" # 3 jaar in 2025
+      BELASTINGDIENST:
+        box1:
+          - bsn: "999993872"
+            loon_uit_dienstbetrekking: 4500000
+            uitkeringen_en_pensioenen: 0
+            winst_uit_onderneming: 0
+            resultaat_overige_werkzaamheden: 0
+            eigen_woning: 192500
+        box2:
+          - bsn: "999993872"
+            reguliere_voordelen: 0
+            vervreemdingsvoordelen: 0
+        box3:
+          - bsn: "999993872"
+            spaargeld: 3000000
+            beleggingen: 0
+            onroerend_goed: 0
+            schulden: 0
+        buitenlands_inkomen:
+          - bsn: "999993872"
+            bedrag: 0
+            land: GEEN
+        aftrekposten:
+          - bsn: "999993872"
+            persoonsgebonden_aftrek: 0
+        monthly_income:
+          - bsn: "999993872"
+            bedrag: 375000
+        assets:
+          - bsn: "999993872"
+            bedrag: 3000000
+        business_income:
+          - bsn: "999993872"
+            bedrag: 0
+        partner_income:
+          - bsn: "999993872"
+            bedrag: 2000000
+        partner_assets:
+          - bsn: "999993872"
+            bedrag: 1000000
+      UWV:
+        arbeidsverhoudingen:
+          - bsn: "999993872"
+            dienstverband_type: GEEN
+            verzekerd_ww: true
+            verzekerd_wia: false
+        arbeidsongeschiktheid:
+          - bsn: "999993872"
+            percentage: 0
+            diagnose_categorie: GEEN
+            uitkering_type: GEEN
+      GEMEENTE_AMSTERDAM:
+        werk_en_re_integratie:
+          - bsn: "999993872"
+            arbeidsvermogen: VOLLEDIG
+            re_integratie_traject: GEEN
+      RVZ:
+        verzekeringen:
+          - bsn: "999993872"
+            polis_status: ACTIEF
+            verdrag_status: GEEN
+            zorg_type: BASIS
+      DUO:
+        inschrijvingen:
+          - bsn: "999993872"
+            onderwijssoort: GEEN
+        studiefinanciering:
+          - bsn: "999993872"
+            ontvangt_studiefinanciering: false
+        is_student:
+          - bsn: "999993872"
+            waarde: false
+        receives_study_grant:
+          - bsn: "999993872"
+            waarde: false
+      DJI:
+        detenties:
+          - bsn: "999993872"
+            is_gedetineerd: false
+        is_detainee:
+          - bsn: "999993872"
+            waarde: false
+      SVB:
+        retirement_age:
+          - bsn: "999993872"
+            leeftijd: 68
+      IND:
+        verblijfsvergunningen:
+          - bsn: "999993872"
+            type: PERMANENT
+            status: VERLEEND
+        residence_permit_type:
+          - bsn: "999993872"
+            type: PERMANENT
+      KVK:
+        is_entrepreneur:
+          - bsn: "999993872"
+            waarde: false
+        is_active_entrepreneur:
+          - bsn: "999993872"
+            waarde: false
   777777777:
     name: Test Persoon
     description: Fictieve persoon voor test doeleinden
