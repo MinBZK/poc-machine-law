@@ -36,7 +36,17 @@
                             {% for status in ['SUBMITTED', 'IN_REVIEW', 'DECIDED', 'OBJECTED'] %}
                                 <div class="w-72 flex-shrink-0">
                                     <div class="bg-gray-50 p-2 rounded-t border border-gray-200">
-                                        <h4 class="font-medium">{{ status|replace('_', ' ') |title }}</h4>
+                                        <h4 class="font-medium">
+                                            {% if status == 'SUBMITTED' %}
+                                                Ingediend
+                                            {% elif status == 'DECIDED' %}
+                                                Besloten
+                                            {% elif status == 'IN_REVIEW' %}
+                                                In behandeling
+                                            {% elif status == 'OBJECTED' %}
+                                                Onder bezwaar
+                                            {% endif %}
+                                        </h4>
                                         <div class="text-sm text-gray-600">{{ service_cases[law][status]|length }} cases</div>
                                     </div>
                                     <div class="lane bg-white p-2 min-h-64 border-x border-b border-gray-200 rounded-b"

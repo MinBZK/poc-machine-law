@@ -1,11 +1,20 @@
 import json
 import re
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import HTMLResponse
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+)
+from fastapi.responses import HTMLResponse, JSONResponse
 
-from web.dependencies import get_claim_manager, templates
-from web.engines import ClaimManagerInterface
+from web.dependencies import get_case_manager, get_claim_manager, templates
+from web.engines import CaseManagerInterface, ClaimManagerInterface
 
 router = APIRouter(prefix="/edit", tags=["edit"])
 
@@ -366,3 +375,123 @@ async def update_missing_values(
     )
     response.headers["HX-Trigger"] = "edit-dialog-closed, reload-page"
     return response
+
+
+@router.post("/update-situation")
+async def update_situation(
+    request: Request,
+    payload: dict = Body(...),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+):
+    """
+    Update a person's situation based on wizard input from the dashboard.
+    Submits the updated situation as a new claim via the claim manager.
+    """
+    try:
+        situation_type = payload.get("type")
+        details = payload.get("details", "")
+        bsn = payload.get("bsn")  # IMPROVE: get from session?
+
+        if not all([situation_type, bsn]):
+            return JSONResponse(
+                {"status": "error", "message": "situation_type and bsn are required"},
+                status_code=400,
+            )
+
+        # Prepare parameters for the case, using all payload fields except meta
+        parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn")}
+
+        # Split the payload into multiple claims and assign them to the same case
+        match situation_type:
+            case "inkomen":
+                service = "BELASTINGDIENST"
+                law = "wet_inkomstenbelasting"
+            case "woonadres":
+                service = "RvIG"
+                law = "wet_brp"
+
+                # Change sources
+                parameters["ADRES"] = {
+                    "straat": parameters["ADRES.straat"],
+                    "huisnummer": parameters["ADRES.huisnummer"],
+                    "postcode": parameters["ADRES.postcode"],
+                    "woonplaats": parameters["ADRES.woonplaats"],
+                    "type": "WOONADRES",
+                }
+                parameters["VERBLIJFSADRES"] = parameters[
+                    "ADRES.woonplaats"
+                ]  # Note: somehow only the city is used in the case system
+                parameters["LAND_VAN_VERBLIJF"] = "NEDERLAND"
+
+                # Change outputs accordingly
+                parameters["verblijfsadres"] = (
+                    f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                )
+                parameters["woonplaats"] = parameters["ADRES.woonplaats"]
+                parameters["postadres"] = parameters["verblijfsadres"]
+                parameters["heeft_vast_adres"] = True
+
+                # Remove address fields from parameters after grouping them
+                for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:
+                    parameters.pop(k, None)
+            case "huurprijs":
+                service = "TOESLAGEN"
+                law = "wet_op_de_huurtoeslag"
+            case "huishouden":
+                service = "RvIG"
+                law = "wet_brp"
+
+                match payload.get("situation_household_change_type"):
+                    case "scheiden":
+                        # Change sources
+                        parameters["PARTNERTYPE"] = "GEEN"
+                        parameters["PARTNER_BSN"] = None
+                        parameters["PARTNER_GEBOORTEDATUM"] = None
+
+                        # Change outputs accordingly
+                        parameters["heeft_partner"] = False
+                        parameters["partner_bsn"] = None
+                        parameters["partner_geboortedatum"] = None
+
+                    # Show an error message for other household changes. IMPROVE: handle more household change types
+                    case _:
+                        return JSONResponse(
+                            {"status": "error", "message": "Deze flow is nog niet ondersteund."},
+                            status_code=400,
+                        )
+            case _:
+                return JSONResponse(
+                    {"status": "error", "message": f"unrecognized type: {situation_type}"},
+                    status_code=400,
+                )
+
+        # Create a case
+        case_id = case_manager.submit_case(
+            bsn=bsn,
+            service=service,
+            law=law,
+            parameters=parameters,
+            claimed_result=parameters,  # IMPROVE: other value?
+            approved_claims_only=False,  # IMPROVE: or True?
+        )
+
+        # Add the claim(s) to the case
+        for key, value in parameters.items():
+            claim_manager.submit_claim(
+                service=service,
+                key=key,
+                new_value=value,
+                reason=details,
+                claimant=bsn,
+                law=law,
+                bsn=bsn,
+                case_id=case_id,
+                # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
+            )
+
+        return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
+    except Exception as e:
+        print(f"Exception in update_situation: {e}")
+
+        return JSONResponse({"status": "error", "message": "Unknown error"}, status_code=400)

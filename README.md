@@ -142,9 +142,9 @@ Vooralsnog zijn deze wetten geïmplementeerd in `machine law` (met behulp van ee
 
 ## 🚀 Aan de slag
 
-Clone deze repository:
+Clone deze repository inclusief submodules:
 ```bash
-git clone git@github.com:MinBZK/poc-machine-law.git
+git clone --recurse-submodules git@github.com:MinBZK/poc-machine-law.git
 cd poc-machine-law
 ```
 
