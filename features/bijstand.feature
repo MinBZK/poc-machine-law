@@ -97,3 +97,22 @@ Feature: Bepalen recht op bijstand Amsterdam
     When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
     Then is voldaan aan de voorwaarden
     And is het bijstandsuitkeringsbedrag "1089.00" euro
+
+  Scenario: ZZP-er met voldoende inkomen krijgt geen bijstand
+    Given de volgende RvIG personen gegevens:
+      | bsn       | geboortedatum | verblijfsadres |
+      | 999993653 | 1985-01-01    | Amsterdam      |
+    And de volgende RvIG relaties gegevens:
+      | bsn       | partnerschap_type | partner_bsn |
+      | 999993653 | GEEN              | null        |
+    And de volgende BELASTINGDIENST box1 gegevens:
+      | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
+      | 999993653 | 0                         | 0                         | 1550000               | 0                               | 0            |
+    And de volgende RvIG verblijfplaats gegevens:
+      | bsn       | straat       | huisnummer | postcode | woonplaats | type      |
+      | 999993653 | Kalverstraat | 1          | 1012NX   | Amsterdam  | WOONADRES |
+    And de volgende KVK inschrijvingen gegevens:
+      | bsn       | rechtsvorm  | status | activiteit |
+      | 999993653 | EENMANSZAAK | ACTIEF | Thuiszorg  |
+    When de participatiewet/bijstand wordt uitgevoerd door GEMEENTE_AMSTERDAM
+    Then is niet voldaan aan de voorwaarden

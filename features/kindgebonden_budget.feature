@@ -1,4 +1,4 @@
-Feature: Berekening Kindgebonden Budget met ALO-kop
+Feature: Berekening Kindgebonden Budget
   Als ouder
   Wil ik weten of ik recht heb op kindgebonden budget
   Zodat ik financiële ondersteuning krijg voor mijn kinderen
