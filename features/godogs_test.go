@@ -55,6 +55,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Given(`^een persoon met BSN "([^"]*)"$`, eenPersoonMetBSN)
 	ctx.Given(`^alle aanvragen worden beoordeeld$`, alleAanvragenWordenBeoordeeld)
 	ctx.When(`^de ([^"]*) wordt uitgevoerd door ([^"]*) met wijzigingen$`, deWetWordtUitgevoerdDoorServiceMetWijzigingen)
+	ctx.When(`^de ([^"]*) wordt uitgevoerd door ([^"]*) met$`, deWetWordtUitgevoerdDoorServiceMet)
 	ctx.When(`^de ([^"]*) wordt uitgevoerd door ([^"]*)$`, deWetWordtUitgevoerdDoorService)
 	ctx.When(`^de beoordelaar de aanvraag afwijst met reden "([^"]*)"$`, deBeoordelaarDeAanvraagAfwijstMetReden)
 	ctx.When(`^de beoordelaar het bezwaar ([^"]*) met reden "([^"]*)"$`, deBeoordelaarHetBezwaarBeoordeeldMetReden)
@@ -106,6 +107,13 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^is het kindgebonden budget hoog door laag inkomen en meerdere kinderen$`, isHetKindgebondenBudgetHoogDoorLaagInkomenEnMeerdereKinderen)
 	ctx.Step(`^ontvangt de persoon extra bedragen voor kinderen 12\+ en 16\+$`, ontvangtDePersoonExtraBedragenVoorKinderen12Plus)
 	ctx.Step(`^is het kindgebonden budget maximaal door laag inkomen$`, isHetKindgebondenBudgetMaximaalDoorLaagInkomen)
+
+	// LAA (Landelijke Aanpak Adreskwaliteit) step definitions
+	ctx.Step(`^genereert wet_brp/laa een signaal$`, genereertWetBrpLaaEenSignaal)
+	ctx.Step(`^genereert wet_brp/laa geen signaal$`, genereertWetBrpLaaGeenSignaal)
+	ctx.Step(`^is het signaal_type "([^"]*)"$`, isHetSignaalType)
+	ctx.Step(`^is de reactietermijn_weken "([^"]*)"$`, isDeReactietermijnWeken)
+	ctx.Step(`^is de onderzoekstermijn_maanden "([^"]*)"$`, isDeOnderzoekstermijnMaanden)
 
 	ctx.StepContext().After(func(ctx context.Context, st *godog.Step, status godog.StepResultStatus, err error) (context.Context, error) {
 		services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
@@ -163,7 +171,7 @@ type input struct {
 }
 
 func doParseValue(key string) bool {
-	return !slices.Contains([]string{"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn"}, key)
+	return !slices.Contains([]string{"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer"}, key)
 }
 
 func parseValue(value string) any {
@@ -257,6 +265,53 @@ func deWetWordtUitgevoerdDoorService(ctx context.Context, law, service string) (
 
 func deWetWordtUitgevoerdDoorServiceMetWijzigingen(ctx context.Context, law, service string) (context.Context, error) {
 	return evaluateLaw(ctx, service, law, false)
+}
+
+func deWetWordtUitgevoerdDoorServiceMet(ctx context.Context, law, service string, table *godog.Table) (context.Context, error) {
+	if len(table.Rows) <= 1 {
+		return ctx, fmt.Errorf("table must have at least one data row")
+	}
+
+	// Get or create params map
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
+
+	// Process the table to get the input data
+	// First row is headers
+	headers := table.Rows[0].Cells
+
+	// For each data row
+	for idx := 1; idx < len(table.Rows); idx++ {
+		row := table.Rows[idx]
+
+		// Get the first column as the key
+		if len(headers) == 0 || len(row.Cells) == 0 {
+			continue
+		}
+
+		key := headers[0].Value
+		value := row.Cells[0].Value
+
+		// Special handling for JSON-like values
+		var parsedValue any = value
+		if strings.HasPrefix(value, "[") || strings.HasPrefix(value, "{") {
+			// Try to parse as JSON
+			if err := json.Unmarshal([]byte(value), &parsedValue); err != nil {
+				// If parsing fails, keep as string
+				parsedValue = value
+			}
+		}
+
+		params[key] = parsedValue
+	}
+
+	// Update context with params
+	ctx = context.WithValue(ctx, paramsCtxKey{}, params)
+
+	// Evaluate the law
+	return evaluateLaw(ctx, service, law, true)
 }
 
 func isNietVoldaanAanDeVoorwaarden(ctx context.Context) error {
@@ -1116,6 +1171,98 @@ func isHetKindgebondenBudgetMaximaalDoorLaagInkomen(ctx context.Context) error {
 	// Allow some tolerance (within €100)
 	tolerance := 10000
 	assert.InDelta(godog.T(ctx), expectedMax, actual, float64(tolerance), "Expected budget to be near maximum for low income")
+
+	return nil
+}
+
+// LAA (Landelijke Aanpak Adreskwaliteit) step definitions
+
+func genereertWetBrpLaaEenSignaal(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["genereer_signaal"]
+	if !ok {
+		assert.Fail(godog.T(ctx), "Expected LAA to generate a signal, but 'genereer_signaal' field not found in output")
+		return nil
+	}
+
+	genereertSignaal, ok := v.(bool)
+	require.True(godog.T(ctx), ok)
+
+	assert.True(godog.T(ctx), genereertSignaal, "Expected LAA to generate a signal, but it did not")
+
+	return nil
+}
+
+func genereertWetBrpLaaGeenSignaal(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["genereer_signaal"]
+	if !ok {
+		// If field doesn't exist, assume no signal (default false)
+		return nil
+	}
+
+	genereertSignaal, ok := v.(bool)
+	require.True(godog.T(ctx), ok)
+
+	assert.False(godog.T(ctx), genereertSignaal, "Expected LAA not to generate a signal, but it did")
+
+	return nil
+}
+
+func isHetSignaalType(ctx context.Context, expectedSignaalType string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["signaal_type"]
+	require.True(godog.T(ctx), ok, "Expected 'signaal_type' to be present in output")
+
+	actualSignaalType, ok := v.(string)
+	require.True(godog.T(ctx), ok)
+
+	assert.Equal(godog.T(ctx), expectedSignaalType, actualSignaalType,
+		fmt.Sprintf("Expected signaal_type to be '%s', but was '%s'", expectedSignaalType, actualSignaalType))
+
+	return nil
+}
+
+func isDeReactietermijnWeken(ctx context.Context, weken string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["reactietermijn_weken"]
+	require.True(godog.T(ctx), ok, "Expected 'reactietermijn_weken' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'reactietermijn_weken' to be an integer")
+
+	expected, err := strconv.Atoi(weken)
+	require.NoError(godog.T(ctx), err, "Failed to parse expected weeks")
+
+	assert.Equal(godog.T(ctx), expected, actual,
+		fmt.Sprintf("Expected reactietermijn_weken to be %d, but was %d", expected, actual))
+
+	return nil
+}
+
+func isDeOnderzoekstermijnMaanden(ctx context.Context, maanden string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["onderzoekstermijn_maanden"]
+	require.True(godog.T(ctx), ok, "Expected 'onderzoekstermijn_maanden' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'onderzoekstermijn_maanden' to be an integer")
+
+	expected, err := strconv.Atoi(maanden)
+	require.NoError(godog.T(ctx), err, "Failed to parse expected months")
+
+	assert.Equal(godog.T(ctx), expected, actual,
+		fmt.Sprintf("Expected onderzoekstermijn_maanden to be %d, but was %d", expected, actual))
 
 	return nil
 }
