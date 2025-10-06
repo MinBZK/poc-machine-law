@@ -194,8 +194,8 @@ PROFILES = {
                 ],
                 "CHILDREN_DATA": [
                     {"kind_bsn": "999991723", "geboortedatum": "2020-06-10", "naam": "Kind 1"},
-                    {"kind_bsn": "999992740", "geboortedatum": "2022-08-15", "naam": "Kind 2"}
-                ]
+                    {"kind_bsn": "999992740", "geboortedatum": "2022-08-15", "naam": "Kind 2"},
+                ],
             },
             "UWV": {
                 "dienstverbanden": [
@@ -219,9 +219,7 @@ PROFILES = {
                         "eigen_woning": 0,
                     }
                 ],
-                "box2": [
-                    {"bsn": "999991905", "dividend": 0, "vervreemding_aandelen": 0}
-                ],
+                "box2": [{"bsn": "999991905", "dividend": 0, "vervreemding_aandelen": 0}],
                 "box3": [
                     {
                         "bsn": "999991905",
@@ -1393,8 +1391,8 @@ PROFILES = {
                 ],
                 "CHILDREN_DATA": [
                     {"kind_bsn": "999991723", "geboortedatum": "2020-06-10", "naam": "Kind 1"},
-                    {"kind_bsn": "999992740", "geboortedatum": "2022-08-15", "naam": "Kind 2"}
-                ]
+                    {"kind_bsn": "999992740", "geboortedatum": "2022-08-15", "naam": "Kind 2"},
+                ],
             },
             "UWV": {
                 "dienstverbanden": [
@@ -1418,9 +1416,7 @@ PROFILES = {
                         "eigen_woning": 192500,
                     }
                 ],
-                "box2": [
-                    {"bsn": "999993872", "dividend": 0, "vervreemding_aandelen": 0}
-                ],
+                "box2": [{"bsn": "999993872", "dividend": 0, "vervreemding_aandelen": 0}],
                 "box3": [
                     {
                         "bsn": "999993872",
