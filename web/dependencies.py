@@ -111,7 +111,18 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
             return ""
 
         # Use locale.currency for proper formatting. Note: on some systems, the locale definitions use 'Eu' as the currency symbol instead of the actual euro sign €, so we replace it
-        return locale.currency(value, grouping=True).replace("Eu", "€")
+        try:
+            return locale.currency(value, grouping=True).replace("Eu", "€")
+        except (ValueError, locale.Error):
+            # Fallback to manual formatting if locale doesn't support currency formatting
+            # Format with Dutch conventions: . for thousands, , for decimals
+            sign = "-" if value < 0 else ""
+            abs_value = abs(value)
+            # Format with 2 decimals
+            formatted = f"{abs_value:,.2f}"
+            # Replace , with temporary marker, . with ,, marker with .
+            formatted = formatted.replace(",", "TEMP").replace(".", ",").replace("TEMP", ".")
+            return f"{sign}€ {formatted}"
 
     templates.env.filters["format_currency"] = format_currency
 

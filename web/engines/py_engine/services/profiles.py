@@ -71,9 +71,9 @@ PROFILES = {
                 "box1": [
                     {
                         "bsn": "100000001",
-                        "loon_uit_dienstbetrekking": 600000,  # Verlaagd naar €6.000 (onder bijstandsnorm)
+                        "loon_uit_dienstbetrekking": 0,  # ZZP'er, geen loondienst
                         "uitkeringen_en_pensioenen": 0,
-                        "winst_uit_onderneming": 950000,  # Verlaagd naar €9.500 (onder bijstandsnorm)
+                        "winst_uit_onderneming": 1550000,  # €15.500 winst uit ZZP thuiszorg
                         "resultaat_overige_werkzaamheden": 0,
                         "eigen_woning": -85000,
                     }
@@ -89,11 +89,16 @@ PROFILES = {
                     }
                 ],
                 "monthly_income": [{"bsn": "100000001", "bedrag": 129167}],
-                # (€6.000 + €9.500) / 12 = €1.291,67 per maand
+                # €15.500 / 12 = €1.291,67 per maand
+                "maandelijks_inkomen": [{"bsn": "100000001", "bedrag": 0}],  # Geen loon, alleen ZZP
                 "assets": [{"bsn": "100000001", "bedrag": 580000}],  # €5.800 spaargeld, onder vermogensgrens
-                "business_income": [{"bsn": "100000001", "bedrag": 950000}],  # €9.500 inkomsten uit onderneming
+                "business_income": [{"bsn": "100000001", "bedrag": 1550000}],  # €15.500 inkomsten uit onderneming
+                "bedrijfsinkomen": [{"bsn": "100000001", "bedrag": 1550000}],  # €15.500 ZZP (for Participatiewet)
                 "buitenlands_inkomen": [{"bsn": "100000001", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000001", "persoonsgebonden_aftrek": 320000}],
+                "belastingdienst_vermogen": [
+                    {"bsn": "100000001", "vermogen": 580000}  # €5,800 total assets for kindgebonden budget
+                ],
             },
             "KVK": {
                 "inschrijvingen": [
@@ -110,7 +115,22 @@ PROFILES = {
             "UWV": {
                 "arbeidsverhoudingen": [
                     {"bsn": "100000001", "dienstverband_type": "GEEN", "verzekerd_ww": False, "verzekerd_wia": False}
-                ]
+                ],
+                "uwv_toetsingsinkomen": [
+                    {"bsn": "100000001", "toetsingsinkomen": 1550000}  # €15,500 annual income for kindgebonden budget
+                ],
+                "uwv_werkgegevens": [
+                    {
+                        "bsn": "100000001",
+                        "gemiddeld_uren_per_week": 0.0,  # Currently ZZP, no employment
+                        "huidige_uren_per_week": 0.0,
+                        "gewerkte_weken_36": 0,
+                        "arbeidsverleden_jaren": 0,  # No recent employment history
+                        "jaarloon": 0,
+                    }
+                ],
+                "ziektewet": [{"bsn": "100000001", "heeft_ziektewet_uitkering": False}],
+                "WIA": [{"bsn": "100000001", "heeft_wia_uitkering": False}],
             },
             "RVZ": {
                 "verzekeringen": [
@@ -126,6 +146,7 @@ PROFILES = {
             "DJI": {
                 "detenties": [{"bsn": "100000001", "is_gedetineerd": False}],
                 "is_detainee": [{"bsn": "100000001", "waarde": False}],
+                "detentie": [{"bsn": "100000001", "is_gedetineerd": False}],  # For WW eligibility check
             },
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [
@@ -133,7 +154,16 @@ PROFILES = {
                 ]
             },
             "SVB": {
-                "retirement_age": [{"bsn": "100000001", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
+                "retirement_age": [{"bsn": "100000001", "leeftijd": 68}],  # Hogere AOW-leeftijd in 2025
+                "algemene_ouderdomswet_gegevens": [{"bsn": "100000001", "pensioenleeftijd": 68}],  # For WW age check
+                "algemene_kinderbijslagwet": [
+                    {
+                        "ouder_bsn": "100000001",
+                        "aantal_kinderen": 2,
+                        "kinderen_leeftijden": [5, 3],  # Ages in 2025
+                        "ontvangt_kinderbijslag": True,
+                    }
+                ],
             },
             "IND": {
                 "verblijfsvergunningen": [
@@ -144,6 +174,9 @@ PROFILES = {
                     }
                 ],
                 "residence_permit_type": [{"bsn": "100000001", "type": "PERMANENT"}],
+                "vreemdelingenwet": [
+                    {"bsn": "100000001", "verblijfsvergunning_type": None}  # Dutch national, no permit needed
+                ],
             },
         },
     },
@@ -286,10 +319,10 @@ PROFILES = {
                 "box1": [
                     {
                         "bsn": "100000002",
-                        "loon_uit_dienstbetrekking": 950000,  # Verlaagd naar €9.500 (onder bijstandsnorm)
+                        "loon_uit_dienstbetrekking": 1900000,  # €19.000 parttime horeca werk
                         "uitkeringen_en_pensioenen": 0,
                         "winst_uit_onderneming": 0,
-                        "resultaat_overige_werkzaamheden": 180000,  # Kleine bijverdiensten
+                        "resultaat_overige_werkzaamheden": 0,
                         "eigen_woning": 0,
                     }
                 ],
@@ -305,9 +338,14 @@ PROFILES = {
                 ],
                 "buitenlands_inkomen": [{"bsn": "100000002", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000002", "persoonsgebonden_aftrek": 120000}],
-                "monthly_income": [{"bsn": "100000002", "bedrag": 79167}],  # €9.500 / 12 = €791,67 per maand
+                "monthly_income": [{"bsn": "100000002", "bedrag": 158333}],  # €19.000 / 12 = €1.583,33 per maand
+                "maandelijks_inkomen": [{"bsn": "100000002", "bedrag": 158333}],  # €1.583,33 loon (for Participatiewet)
                 "assets": [{"bsn": "100000002", "bedrag": 230000}],  # €2.300 spaargeld, onder vermogensgrens
                 "business_income": [{"bsn": "100000002", "bedrag": 0}],  # Geen ZZP inkomsten
+                "bedrijfsinkomen": [{"bsn": "100000002", "bedrag": 0}],  # Geen ZZP (for Participatiewet)
+                "belastingdienst_vermogen": [
+                    {"bsn": "100000002", "vermogen": 230000}  # €2,300 total assets for kindgebonden budget
+                ],
             },
             "UWV": {
                 "arbeidsverhoudingen": [
@@ -318,7 +356,22 @@ PROFILES = {
                         "verzekerd_ww": True,
                         "verzekerd_wia": True,
                     }
-                ]
+                ],
+                "uwv_toetsingsinkomen": [
+                    {"bsn": "100000002", "toetsingsinkomen": 1900000}  # €19,000 annual income for kindgebonden budget
+                ],
+                "uwv_werkgegevens": [
+                    {
+                        "bsn": "100000002",
+                        "gemiddeld_uren_per_week": 16.0,  # Parttime work
+                        "huidige_uren_per_week": 16.0,  # Currently employed
+                        "gewerkte_weken_36": 36,  # Full year
+                        "arbeidsverleden_jaren": 6,  # 6 years employment history
+                        "jaarloon": 1900000,  # €19,000 annual salary (parttime)
+                    }
+                ],
+                "ziektewet": [{"bsn": "100000002", "heeft_ziektewet_uitkering": False}],
+                "WIA": [{"bsn": "100000002", "heeft_wia_uitkering": False}],
             },
             "RVZ": {
                 "verzekeringen": [
@@ -334,6 +387,7 @@ PROFILES = {
             "DJI": {
                 "detenties": [{"bsn": "100000002", "is_gedetineerd": False}],
                 "is_detainee": [{"bsn": "100000002", "waarde": False}],
+                "detentie": [{"bsn": "100000002", "is_gedetineerd": False}],  # For WW eligibility check
             },
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [
@@ -341,7 +395,16 @@ PROFILES = {
                 ]
             },
             "SVB": {
-                "retirement_age": [{"bsn": "100000002", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
+                "retirement_age": [{"bsn": "100000002", "leeftijd": 68}],  # Hogere AOW-leeftijd in 2025
+                "algemene_ouderdomswet_gegevens": [{"bsn": "100000002", "pensioenleeftijd": 68}],  # For WW age check
+                "algemene_kinderbijslagwet": [
+                    {
+                        "ouder_bsn": "100000002",
+                        "aantal_kinderen": 2,
+                        "kinderen_leeftijden": [11, 8],  # Ages in 2025
+                        "ontvangt_kinderbijslag": True,
+                    }
+                ],
             },
             "IND": {
                 "verblijfsvergunningen": [
@@ -352,6 +415,9 @@ PROFILES = {
                     }
                 ],
                 "residence_permit_type": [{"bsn": "100000002", "type": "PERMANENT"}],
+                "vreemdelingenwet": [
+                    {"bsn": "100000002", "verblijfsvergunning_type": None}  # Dutch national, no permit needed
+                ],
             },
             "KVK": {
                 "is_entrepreneur": [{"bsn": "100000002", "waarde": False}],
@@ -431,8 +497,10 @@ PROFILES = {
                 "buitenlands_inkomen": [{"bsn": "100000003", "bedrag": 0, "land": "GEEN"}],
                 "aftrekposten": [{"bsn": "100000003", "persoonsgebonden_aftrek": 450000}],
                 "monthly_income": [{"bsn": "100000003", "bedrag": 104167}],  # €12.500 / 12 = €1.041,67 per maand
+                "maandelijks_inkomen": [{"bsn": "100000003", "bedrag": 0}],  # Geen loon, alleen ZZP
                 "assets": [{"bsn": "100000003", "bedrag": 120000}],  # €1.200 spaargeld, onder de vermogensgrens
                 "business_income": [{"bsn": "100000003", "bedrag": 1250000}],  # €12.500 inkomsten uit onderneming
+                "bedrijfsinkomen": [{"bsn": "100000003", "bedrag": 1250000}],  # €12.500 ZZP (for Participatiewet)
                 "partner_income": [{"bsn": "100000003", "bedrag": 350000}],  # €3.500 partner inkomen
                 "partner_assets": [{"bsn": "100000003", "bedrag": 95000}],  # €950 partner vermogen
                 "belastingschulden": [
@@ -441,6 +509,9 @@ PROFILES = {
                         "totaalbedrag": 850000,  # €8.500 openstaande belastingschulden
                         "betalingsregeling": "LOPEND",
                     }
+                ],
+                "belastingdienst_vermogen": [
+                    {"bsn": "100000003", "vermogen": 120000}  # €1,200 total assets (has debts though)
                 ],
             },
             "KVK": {
@@ -456,6 +527,26 @@ PROFILES = {
                 "is_entrepreneur": [{"bsn": "100000003", "waarde": True}],
                 "is_active_entrepreneur": [{"bsn": "100000003", "waarde": True}],
             },
+            "UWV": {
+                "arbeidsverhoudingen": [
+                    {"bsn": "100000003", "dienstverband_type": "GEEN", "verzekerd_ww": False, "verzekerd_wia": False}
+                ],
+                "uwv_toetsingsinkomen": [
+                    {"bsn": "100000003", "toetsingsinkomen": 1600000}  # €16,000 combined income for kindgebonden budget
+                ],
+                "uwv_werkgegevens": [
+                    {
+                        "bsn": "100000003",
+                        "gemiddeld_uren_per_week": 0.0,  # Currently ZZP, no employment
+                        "huidige_uren_per_week": 0.0,
+                        "gewerkte_weken_36": 0,
+                        "arbeidsverleden_jaren": 0,  # No recent employment history
+                        "jaarloon": 0,
+                    }
+                ],
+                "ziektewet": [{"bsn": "100000003", "heeft_ziektewet_uitkering": False}],
+                "WIA": [{"bsn": "100000003", "heeft_wia_uitkering": False}],
+            },
             "RVZ": {
                 "verzekeringen": [
                     {"bsn": "100000003", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
@@ -470,6 +561,7 @@ PROFILES = {
             "DJI": {
                 "detenties": [{"bsn": "100000003", "is_gedetineerd": False}],
                 "is_detainee": [{"bsn": "100000003", "waarde": False}],
+                "detentie": [{"bsn": "100000003", "is_gedetineerd": False}],  # For WW eligibility check
             },
             "GEMEENTE_AMSTERDAM": {
                 "werk_en_re_integratie": [
@@ -477,7 +569,16 @@ PROFILES = {
                 ]
             },
             "SVB": {
-                "retirement_age": [{"bsn": "100000003", "leeftijd": 68}]  # Hogere AOW-leeftijd in 2025
+                "retirement_age": [{"bsn": "100000003", "leeftijd": 68}],  # Hogere AOW-leeftijd in 2025
+                "algemene_ouderdomswet_gegevens": [{"bsn": "100000003", "pensioenleeftijd": 68}],  # For WW age check
+                "algemene_kinderbijslagwet": [
+                    {
+                        "ouder_bsn": "100000003",
+                        "aantal_kinderen": 1,
+                        "kinderen_leeftijden": [14],  # Age in 2025
+                        "ontvangt_kinderbijslag": True,
+                    }
+                ],
             },
             "IND": {
                 "verblijfsvergunningen": [
@@ -488,6 +589,9 @@ PROFILES = {
                     }
                 ],
                 "residence_permit_type": [{"bsn": "100000003", "type": "PERMANENT"}],
+                "vreemdelingenwet": [
+                    {"bsn": "100000003", "verblijfsvergunning_type": None}  # Dutch national, no permit needed
+                ],
             },
         },
     },
@@ -607,6 +711,154 @@ PROFILES = {
             "KVK": {
                 "is_entrepreneur": [{"bsn": "100000004", "waarde": False}],
                 "is_active_entrepreneur": [{"bsn": "100000004", "waarde": False}],
+            },
+        },
+    },
+    # Sophie Jansen - Recently unemployed single mother (WW + Kindgebonden Budget showcase)
+    "300000001": {
+        "name": "Sophie Jansen",
+        "description": "Recent werkloos geworden alleenstaande moeder, 1 kind, in aanmerking voor WW en kindgebonden budget met ALO-kop",
+        "sources": {
+            **GLOBAL_SERVICES,
+            "RvIG": {
+                "personen": [
+                    {
+                        "bsn": "300000001",
+                        "geboortedatum": "1990-03-18",  # 35 jaar in 2025
+                        "verblijfsadres": "Amsterdam",
+                        "land_verblijf": "NEDERLAND",
+                        "nationaliteit": "NEDERLANDS",
+                        "age": 35,
+                        "has_dutch_nationality": True,
+                        "has_partner": False,
+                        "residence_address": "Dapperstraat 142, 1093BS Amsterdam",
+                        "has_fixed_address": True,
+                        "household_size": 2,  # Sophie + 1 kind
+                    }
+                ],
+                "relaties": [{"bsn": "300000001", "partnerschap_type": "GEEN", "partner_bsn": None}],
+                "verblijfplaats": [
+                    {
+                        "bsn": "300000001",
+                        "straat": "Dapperstraat",
+                        "huisnummer": "142",
+                        "postcode": "1093BS",
+                        "woonplaats": "Amsterdam",
+                        "type": "WOONADRES",
+                    }
+                ],
+                "CHILDREN_DATA": [
+                    {
+                        "bsn": "300000001",
+                        "kinderen": [
+                            {"geboortedatum": "2018-06-12"},  # 7 jaar in 2025
+                        ],
+                    }
+                ],
+            },
+            "BELASTINGDIENST": {
+                "box1": [
+                    {
+                        "bsn": "300000001",
+                        "loon_uit_dienstbetrekking": 3200000,  # €32,000 previous employment
+                        "uitkeringen_en_pensioenen": 0,
+                        "winst_uit_onderneming": 0,
+                        "resultaat_overige_werkzaamheden": 0,
+                        "eigen_woning": 0,
+                    }
+                ],
+                "box2": [{"bsn": "300000001", "reguliere_voordelen": 0, "vervreemdingsvoordelen": 0}],
+                "box3": [
+                    {
+                        "bsn": "300000001",
+                        "spaargeld": 320000,  # €3,200 savings
+                        "beleggingen": 0,
+                        "onroerend_goed": 0,
+                        "schulden": 0,
+                    }
+                ],
+                "monthly_income": [{"bsn": "300000001", "bedrag": 0}],  # Currently unemployed
+                "maandelijks_inkomen": [
+                    {"bsn": "300000001", "bedrag": 0}
+                ],  # Currently unemployed (for Participatiewet)
+                "assets": [{"bsn": "300000001", "bedrag": 320000}],  # €3,200 savings
+                "business_income": [{"bsn": "300000001", "bedrag": 0}],
+                "bedrijfsinkomen": [{"bsn": "300000001", "bedrag": 0}],  # No business income (for Participatiewet)
+                "buitenlands_inkomen": [{"bsn": "300000001", "bedrag": 0, "land": "GEEN"}],
+                "aftrekposten": [{"bsn": "300000001", "persoonsgebonden_aftrek": 150000}],
+                "belastingdienst_vermogen": [
+                    {"bsn": "300000001", "vermogen": 320000}  # €3,200 assets for kindgebonden budget
+                ],
+            },
+            "UWV": {
+                "arbeidsverhoudingen": [
+                    {
+                        "bsn": "300000001",
+                        "dienstverband_type": "GEEN",  # Recently unemployed
+                        "verzekerd_ww": True,
+                        "verzekerd_wia": True,
+                    }
+                ],
+                "uwv_toetsingsinkomen": [
+                    {"bsn": "300000001", "toetsingsinkomen": 3200000}  # €32,000 (2024 income for 2025 benefits)
+                ],
+                "uwv_werkgegevens": [
+                    {
+                        "bsn": "300000001",
+                        "gemiddeld_uren_per_week": 32.0,  # Previous parttime work
+                        "huidige_uren_per_week": 0.0,  # Currently unemployed
+                        "gewerkte_weken_36": 36,  # Full year worked in last 36 weeks
+                        "arbeidsverleden_jaren": 8,  # 8 years employment history
+                        "jaarloon": 3200000,  # €32,000 annual salary (previous job)
+                    }
+                ],
+                "ziektewet": [{"bsn": "300000001", "heeft_ziektewet_uitkering": False}],
+                "WIA": [{"bsn": "300000001", "heeft_wia_uitkering": False}],
+            },
+            "RVZ": {
+                "verzekeringen": [
+                    {"bsn": "300000001", "polis_status": "ACTIEF", "verdrag_status": "GEEN", "zorg_type": "BASIS"}
+                ]
+            },
+            "DUO": {
+                "inschrijvingen": [{"bsn": "300000001", "onderwijssoort": "GEEN"}],
+                "studiefinanciering": [{"bsn": "300000001", "ontvangt_studiefinanciering": False}],
+                "is_student": [{"bsn": "300000001", "waarde": False}],
+                "receives_study_grant": [{"bsn": "300000001", "waarde": False}],
+            },
+            "DJI": {
+                "detenties": [{"bsn": "300000001", "is_gedetineerd": False}],
+                "is_detainee": [{"bsn": "300000001", "waarde": False}],
+                "detentie": [{"bsn": "300000001", "is_gedetineerd": False}],
+            },
+            "SVB": {
+                "retirement_age": [{"bsn": "300000001", "leeftijd": 68}],
+                "algemene_ouderdomswet_gegevens": [{"bsn": "300000001", "pensioenleeftijd": 68}],
+                "algemene_kinderbijslagwet": [
+                    {
+                        "ouder_bsn": "300000001",
+                        "aantal_kinderen": 1,
+                        "kinderen_leeftijden": [7],  # 1 child age 7
+                        "ontvangt_kinderbijslag": True,
+                    }
+                ],
+            },
+            "IND": {
+                "verblijfsvergunningen": [
+                    {
+                        "bsn": "300000001",
+                        "type": "PERMANENT",
+                        "status": "VERLEEND",
+                    }
+                ],
+                "residence_permit_type": [{"bsn": "300000001", "type": "PERMANENT"}],
+                "vreemdelingenwet": [
+                    {"bsn": "300000001", "verblijfsvergunning_type": None}  # Dutch national
+                ],
+            },
+            "KVK": {
+                "is_entrepreneur": [{"bsn": "300000001", "waarde": False}],
+                "is_active_entrepreneur": [{"bsn": "300000001", "waarde": False}],
             },
         },
     },
