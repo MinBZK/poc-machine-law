@@ -17,7 +17,7 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
-from web.feature_flags import is_chat_enabled, is_wallet_enabled
+from web.feature_flags import is_change_wizard_enabled, is_chat_enabled, is_wallet_enabled
 from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
 
 app = FastAPI(title="Burger.nl")
@@ -130,6 +130,7 @@ async def root(
             "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
+            "change_wizard_enabled": is_change_wizard_enabled(),
             "accepted_claims": accepted_claims,
         },
     )

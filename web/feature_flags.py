@@ -20,6 +20,7 @@ class FeatureFlags:
     DEFAULTS = {
         "WALLET": False,  # Wallet feature is disabled by default
         "CHAT": True,  # Chat feature is enabled by default
+        "CHANGE_WIZARD": False,  # Change wizard is disabled by default
     }
 
     @classmethod
@@ -142,3 +143,8 @@ def is_wallet_enabled() -> bool:
 def is_chat_enabled() -> bool:
     """Check if the chat feature is enabled."""
     return FeatureFlags.is_enabled("CHAT")
+
+
+def is_change_wizard_enabled() -> bool:
+    """Check if the change wizard feature is enabled."""
+    return FeatureFlags.is_enabled("CHANGE_WIZARD")
