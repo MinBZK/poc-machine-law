@@ -112,6 +112,8 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^genereert wet_brp/laa een signaal$`, genereertWetBrpLaaEenSignaal)
 	ctx.Step(`^genereert wet_brp/laa geen signaal$`, genereertWetBrpLaaGeenSignaal)
 	ctx.Step(`^is het signaal_type "([^"]*)"$`, isHetSignaalType)
+	ctx.Step(`^is de reactietermijn_weken "([^"]*)"$`, isDeReactietermijnWeken)
+	ctx.Step(`^is de onderzoekstermijn_maanden "([^"]*)"$`, isDeOnderzoekstermijnMaanden)
 
 	ctx.StepContext().After(func(ctx context.Context, st *godog.Step, status godog.StepResultStatus, err error) (context.Context, error) {
 		services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
@@ -1223,6 +1225,44 @@ func isHetSignaalType(ctx context.Context, expectedSignaalType string) error {
 
 	assert.Equal(godog.T(ctx), expectedSignaalType, actualSignaalType,
 		fmt.Sprintf("Expected signaal_type to be '%s', but was '%s'", expectedSignaalType, actualSignaalType))
+
+	return nil
+}
+
+func isDeReactietermijnWeken(ctx context.Context, weken string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["reactietermijn_weken"]
+	require.True(godog.T(ctx), ok, "Expected 'reactietermijn_weken' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'reactietermijn_weken' to be an integer")
+
+	expected, err := strconv.Atoi(weken)
+	require.NoError(godog.T(ctx), err, "Failed to parse expected weeks")
+
+	assert.Equal(godog.T(ctx), expected, actual,
+		fmt.Sprintf("Expected reactietermijn_weken to be %d, but was %d", expected, actual))
+
+	return nil
+}
+
+func isDeOnderzoekstermijnMaanden(ctx context.Context, maanden string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["onderzoekstermijn_maanden"]
+	require.True(godog.T(ctx), ok, "Expected 'onderzoekstermijn_maanden' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'onderzoekstermijn_maanden' to be an integer")
+
+	expected, err := strconv.Atoi(maanden)
+	require.NoError(godog.T(ctx), err, "Failed to parse expected months")
+
+	assert.Equal(godog.T(ctx), expected, actual,
+		fmt.Sprintf("Expected onderzoekstermijn_maanden to be %d, but was %d", expected, actual))
 
 	return nil
 }
