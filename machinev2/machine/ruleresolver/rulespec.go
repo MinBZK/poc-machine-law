@@ -268,7 +268,7 @@ func (ov *ActionValue) UnmarshalYAML(unmarshal func(any) error) error {
 	}
 
 	var actions []Action
-	if err := unmarshal(&actions); err == nil {
+	if err := unmarshal(&actions); err == nil && len(actions) > 0 {
 		action := actions[0]
 		if !action.IsEmpty() {
 			ov.Action = &action
