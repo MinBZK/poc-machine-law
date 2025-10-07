@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
 
 import pandas as pd
 
@@ -52,7 +51,7 @@ def _initialize_profiles(services_instance: Services) -> None:
         # Load the raw YAML to access globalServices
         import yaml
 
-        with open(profiles_path, "r") as f:
+        with open(profiles_path) as f:
             raw_data = yaml.safe_load(f)
 
         global_services = raw_data.get("globalServices", {})
@@ -100,10 +99,13 @@ def _initialize_profiles(services_instance: Services) -> None:
 
                 for table_name, data in tables.items():
                     # Skip if this is global data (check object ID to detect YAML anchor references)
-                    if service_name in global_service_ids and table_name in global_service_ids[service_name]:
-                        if id(data) == global_service_ids[service_name][table_name]:
-                            logger.debug(f"Skipping global data reference for {service_name}.{table_name}")
-                            continue
+                    if (
+                        service_name in global_service_ids
+                        and table_name in global_service_ids[service_name]
+                        and id(data) == global_service_ids[service_name][table_name]
+                    ):
+                        logger.debug(f"Skipping global data reference for {service_name}.{table_name}")
+                        continue
 
                     # Convert data to DataFrame
                     if isinstance(data, list):

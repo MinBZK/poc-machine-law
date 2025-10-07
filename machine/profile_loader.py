@@ -44,7 +44,7 @@ def load_profiles_from_yaml(yaml_path: str | Path) -> dict[str, dict[str, Any]]:
 
     logger.info(f"Loading profiles from {yaml_path}")
 
-    with open(yaml_path, "r") as f:
+    with open(yaml_path) as f:
         data = yaml.safe_load(f)
 
     if not data or "profiles" not in data:

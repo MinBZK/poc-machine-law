@@ -34,7 +34,7 @@ def clean_nan_value(value: Any, expected_type: str | None = None) -> Any:
     try:
         is_nan = pd.isna(value)
         # Handle case where pd.isna returns an array (shouldn't happen after list check, but be safe)
-        if isinstance(is_nan, (pd.Series, np.ndarray)):
+        if isinstance(is_nan, pd.Series | np.ndarray):
             # If it's an array, we can't check it in boolean context, just return the value
             return value
         if is_nan:
@@ -408,7 +408,7 @@ class RuleContext:
         # Check cache - convert list values to strings for cache key
         def param_to_str(v):
             """Convert parameter value to string for cache key, handling lists and dicts"""
-            if isinstance(v, (list, dict)):
+            if isinstance(v, list | dict):
                 return str(v)
             return v
 
@@ -538,12 +538,14 @@ class RuleContext:
 
         # Smart deduplication: if all values are identical (e.g., global data duplicated per profile),
         # deduplicate to a single value
-        if isinstance(result, list) and len(result) > 1:
-            # For scalar values (strings, dates, numbers), check if all are identical
-            if all(isinstance(v, (str, int, float, bool, type(None))) for v in result):
-                if len(set(str(v) for v in result)) == 1:
-                    # All values are identical, return just one
-                    return result[0]
+        if (
+            isinstance(result, list)
+            and len(result) > 1
+            and all(isinstance(v, str | int | float | bool | type(None)) for v in result)
+            and len(set(str(v) for v in result)) == 1
+        ):
+            # All values are identical, return just one
+            return result[0]
 
         if len(result) == 1:
             return result[0]
