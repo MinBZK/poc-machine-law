@@ -23,8 +23,9 @@ class NrmlRulesEngine:
         self.facts = spec.get("facts", {})
         self.law = spec.get("metadata", {}).get("description", {})
 
-        self.inputs = spec.get("inputs", [])
-        self.outputs = self._extract_outputs_mapping(spec.get("outputs", []))
+        # Support both dict and list formats, defaulting to empty dict for new format
+        self.inputs = spec.get("inputs", {})
+        self.outputs = self._extract_outputs_mapping(spec.get("outputs", {}))
 
         self.items = self._extract_items_from_facts(self.facts)
 
@@ -118,30 +119,62 @@ class NrmlRulesEngine:
         return target_refs
 
     @staticmethod
-    def _extract_inputs_mapping(inputs: list[dict[str, Any]]) -> dict[str, str]:
-        """Extract inputs mapping from target.$ref to source"""
-        inputs_mapping = {}
-        for input_item in inputs:
-            source = input_item.get("name")
-            target = input_item.get("target", {})
-            target_ref = target.get("$ref")
+    def _extract_inputs_mapping(inputs: dict[str, Any] | list[dict[str, Any]]) -> dict[str, str]:
+        """Extract inputs mapping from target.$ref to source
 
-            if source and target_ref:
-                inputs_mapping[target_ref] = source
+        Args:
+            inputs: Either a dict {name: {target: {$ref: ...}}} or legacy list format
+
+        Returns:
+            Mapping from target.$ref to source name
+        """
+        inputs_mapping = {}
+
+        if isinstance(inputs, dict):
+            # New dict format: {"name": {"target": {"$ref": "..."}}}
+            for name, input_config in inputs.items():
+                target = input_config.get("target", {})
+                target_ref = target.get("$ref")
+                if target_ref:
+                    inputs_mapping[target_ref] = name
+        else:
+            # Legacy list format: [{"name": "...", "target": {"$ref": "..."}}]
+            for input_item in inputs:
+                source = input_item.get("name")
+                target = input_item.get("target", {})
+                target_ref = target.get("$ref")
+                if source and target_ref:
+                    inputs_mapping[target_ref] = source
 
         return inputs_mapping
 
     @staticmethod
-    def _extract_outputs_mapping(outputs: list[dict[str, Any]]) -> dict[str, str]:
-        """Extract outputs mapping from name to source.$ref"""
-        outputs_mapping = {}
-        for output_item in outputs:
-            name = output_item.get("name")
-            source = output_item.get("source", {})
-            source_ref = source.get("$ref")
+    def _extract_outputs_mapping(outputs: dict[str, Any] | list[dict[str, Any]]) -> dict[str, str]:
+        """Extract outputs mapping from name to source.$ref
 
-            if name and source_ref:
-                outputs_mapping[name] = source_ref
+        Args:
+            outputs: Either a dict {name: {source: {$ref: ...}}} or legacy list format
+
+        Returns:
+            Mapping from name to source.$ref
+        """
+        outputs_mapping = {}
+
+        if isinstance(outputs, dict):
+            # New dict format: {"name": {"source": {"$ref": "..."}}}
+            for name, output_config in outputs.items():
+                source = output_config.get("source", {})
+                source_ref = source.get("$ref")
+                if source_ref:
+                    outputs_mapping[name] = source_ref
+        else:
+            # Legacy list format: [{"name": "...", "source": {"$ref": "..."}}]
+            for output_item in outputs:
+                name = output_item.get("name")
+                source = output_item.get("source", {})
+                source_ref = source.get("$ref")
+                if name and source_ref:
+                    outputs_mapping[name] = source_ref
 
         return outputs_mapping
 

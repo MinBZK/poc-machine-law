@@ -84,9 +84,9 @@ properties:
       description: "Heeft persoon de Nederlandse nationaliteit"
       type: "boolean"
       service_reference:
-        service: "RvIG"
+        service: "NRML"
         field: "heeft_nederlandse_nationaliteit"
-        law: "wet_brp"
+        law: "brp_nationaliteit_nrml"
         parameters:
           - name: "BSN"
             reference: "$BSN"

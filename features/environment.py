@@ -13,6 +13,7 @@ def before_scenario(context, scenario) -> None:
     context.test_data = {}
     context.parameters = {}
     context.result = None
+    context.requested_output = None
 
 
 def after_scenario(context, scenario) -> None:

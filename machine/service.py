@@ -374,6 +374,9 @@ class Services:
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
+        # TODO: NRML is not a service on a specific domain, but for a specific rule system.
+        #  this might make the services with specific context obsolete
+        self.services['NRML'].set_source_dataframe(table, df)
 
     def evaluate(
         self,
