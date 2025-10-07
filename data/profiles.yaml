@@ -343,6 +343,11 @@ profiles:
           partnerschap_type: GEEN
           partner_bsn: null
           has_partner: false
+          kinderen:
+          - bsn: '200000003'
+            geboortedatum: '2014-05-15'
+          - bsn: '200000004'
+            geboortedatum: '2017-03-22'
         verblijfplaats:
         - bsn: '100000002'
           straat: Javastraat
@@ -516,6 +521,9 @@ profiles:
           partnerschap_type: HUWELIJK
           partner_bsn: '100000013'
           has_partner: true
+          kinderen:
+          - bsn: '200000005'
+            geboortedatum: '2011-08-30'
         verblijfplaats:
         - bsn: '100000003'
           straat: Kinkerstraat
@@ -832,6 +840,9 @@ profiles:
           partnerschap_type: GEEN
           partner_bsn: null
           has_partner: false
+          kinderen:
+          - bsn: '200000006'
+            geboortedatum: '2018-06-12'
         verblijfplaats:
         - bsn: '300000001'
           straat: Dapperstraat
@@ -1487,6 +1498,9 @@ profiles:
           partnerschap_type: GEEN
           partner_bsn: null
           has_partner: false
+          kinderen:
+          - bsn: '200000007'
+            geboortedatum: '2020-01-01'
         verblijfplaats:
         - bsn: '999993660'
           straat: Prinsengracht
