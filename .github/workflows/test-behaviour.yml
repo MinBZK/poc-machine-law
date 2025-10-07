@@ -61,7 +61,7 @@ jobs:
           submodules: recursive
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: "features/go.mod" # Replace with your desired Go version
           cache-dependency-path: |
@@ -86,7 +86,7 @@ jobs:
           submodules: recursive
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: "machinev2/machine/go.mod" # Replace with your desired Go version
           cache-dependency-path: |
