@@ -7,7 +7,7 @@ from typing import List
 from machine.nrml.item_type_analyzer import determine_item_type as rule_based_analyzer
 from machine.nrml.schema_based_item_type_analyzer import (
     NrmlSchemaBasedItemTypeAnalyzer,
-    determine_item_type as schema_based_analyzer
+    determine_item_type as schema_based_analyzer,
 )
 
 
@@ -16,13 +16,13 @@ def load_test_data():
     project_root = Path(__file__).parent.parent.parent
     brp_path = project_root / "law" / "nrml" / "brp_nationaliteit.nrml.json"
 
-    with open(brp_path, 'r') as f:
+    with open(brp_path, "r") as f:
         data = json.load(f)
 
     # Extract all items for testing
     items = []
-    for fact_id, fact in data['facts'].items():
-        for item_id, item in fact['items'].items():
+    for fact_id, fact in data["facts"].items():
+        for item_id, item in fact["items"].items():
             items.append((f"{fact_id}/{item_id}", item))
 
     return items
@@ -42,12 +42,12 @@ def measure_analyzer_performance(analyzer_func, items: List, iterations: int = 1
         times.append(end_time - start_time)
 
     return {
-        'mean': statistics.mean(times),
-        'median': statistics.median(times),
-        'stdev': statistics.stdev(times) if len(times) > 1 else 0,
-        'min': min(times),
-        'max': max(times),
-        'total_calls': len(items) * iterations
+        "mean": statistics.mean(times),
+        "median": statistics.median(times),
+        "stdev": statistics.stdev(times) if len(times) > 1 else 0,
+        "min": min(times),
+        "max": max(times),
+        "total_calls": len(items) * iterations,
     }
 
 
@@ -72,11 +72,11 @@ def test_single_call_performance():
     print(f"\n{'Metric':<20} {'Rule-Based':<15} {'Schema-Based':<15} {'Difference':<15}")
     print("-" * 70)
 
-    metrics = ['mean', 'median', 'min', 'max', 'stdev']
+    metrics = ["mean", "median", "min", "max", "stdev"]
     for metric in metrics:
         rule_val = rule_stats[metric] * 1000  # Convert to ms
         schema_val = schema_stats[metric] * 1000  # Convert to ms
-        diff = schema_val / rule_val if rule_val > 0 else float('inf')
+        diff = schema_val / rule_val if rule_val > 0 else float("inf")
 
         print(f"{metric.capitalize():<20} {rule_val:<14.4f}ms {schema_val:<14.4f}ms {diff:<14.2f}x")
 
@@ -99,16 +99,16 @@ def test_initialization_overhead():
         init_times.append(end_time - start_time)
 
     init_stats = {
-        'mean': statistics.mean(init_times),
-        'median': statistics.median(init_times),
-        'stdev': statistics.stdev(init_times) if len(init_times) > 1 else 0,
-        'min': min(init_times),
-        'max': max(init_times)
+        "mean": statistics.mean(init_times),
+        "median": statistics.median(init_times),
+        "stdev": statistics.stdev(init_times) if len(init_times) > 1 else 0,
+        "min": min(init_times),
+        "max": max(init_times),
     }
 
     print(f"Schema analyzer initialization ({iterations} runs):")
     for metric, value in init_stats.items():
-        print(f"  {metric.capitalize()}: {value*1000:.4f}ms")
+        print(f"  {metric.capitalize()}: {value * 1000:.4f}ms")
 
 
 def test_memory_usage_approximation():
@@ -123,15 +123,15 @@ def test_memory_usage_approximation():
     # Test schema-based (has loaded schema)
     schema_analyzer = NrmlSchemaBasedItemTypeAnalyzer()
     schema_size = (
-        sys.getsizeof(schema_analyzer) +
-        sys.getsizeof(schema_analyzer.schema) +
-        sys.getsizeof(schema_analyzer.item_type_schemas) +
-        sum(sys.getsizeof(schema) for schema in schema_analyzer.item_type_schemas.values())
+        sys.getsizeof(schema_analyzer)
+        + sys.getsizeof(schema_analyzer.schema)
+        + sys.getsizeof(schema_analyzer.item_type_schemas)
+        + sum(sys.getsizeof(schema) for schema in schema_analyzer.item_type_schemas.values())
     )
 
     print(f"Rule-based analyzer: ~{rule_size:,} bytes")
     print(f"Schema-based analyzer: ~{schema_size:,} bytes")
-    print(f"Difference: ~{schema_size - rule_size:,} bytes ({(schema_size/rule_size):.1f}x larger)")
+    print(f"Difference: ~{schema_size - rule_size:,} bytes ({(schema_size / rule_size):.1f}x larger)")
 
 
 def test_accuracy_comparison():

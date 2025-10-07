@@ -28,10 +28,7 @@ class TestConditionalExpressionEvaluator:
         then_result = create_result(success=True, value="then_value", source="ArgumentResolver")
         evaluator.argument_resolver.resolve_argument = Mock(return_value=then_result)
 
-        expression = {
-            "condition": {"type": "comparison"},
-            "then": {"value": "then_value"}
-        }
+        expression = {"condition": {"type": "comparison"}, "then": {"value": "then_value"}}
 
         result = evaluator.evaluate(expression, context)
 
@@ -50,10 +47,7 @@ class TestConditionalExpressionEvaluator:
         else_result = create_result(success=True, value="else_value", source="ArgumentResolver")
         evaluator.argument_resolver.resolve_argument = Mock(return_value=else_result)
 
-        expression = {
-            "condition": {"type": "comparison"},
-            "else": {"value": "else_value"}
-        }
+        expression = {"condition": {"type": "comparison"}, "else": {"value": "else_value"}}
 
         result = evaluator.evaluate(expression, context)
 
@@ -66,9 +60,7 @@ class TestConditionalExpressionEvaluator:
         condition_result = create_result(success=True, value=True, source="ConditionEvaluator")
         evaluator.condition_evaluator.evaluate = Mock(return_value=condition_result)
 
-        expression = {
-            "condition": {"type": "comparison"}
-        }
+        expression = {"condition": {"type": "comparison"}}
 
         result = evaluator.evaluate(expression, context)
 
@@ -80,9 +72,7 @@ class TestConditionalExpressionEvaluator:
         condition_result = create_result(success=True, value=False, source="ConditionEvaluator")
         evaluator.condition_evaluator.evaluate = Mock(return_value=condition_result)
 
-        expression = {
-            "condition": {"type": "comparison"}
-        }
+        expression = {"condition": {"type": "comparison"}}
 
         result = evaluator.evaluate(expression, context)
 
@@ -94,9 +84,7 @@ class TestConditionalExpressionEvaluator:
         condition_result = create_result(success=False, error="Condition failed", source="ConditionEvaluator")
         evaluator.condition_evaluator.evaluate = Mock(return_value=condition_result)
 
-        expression = {
-            "condition": {"type": "comparison"}
-        }
+        expression = {"condition": {"type": "comparison"}}
 
         result = evaluator.evaluate(expression, context)
 
@@ -119,10 +107,7 @@ class TestConditionalExpressionEvaluator:
         then_result = create_result(success=False, error="Resolution failed", source="ArgumentResolver")
         evaluator.argument_resolver.resolve_argument = Mock(return_value=then_result)
 
-        expression = {
-            "condition": {"type": "comparison"},
-            "then": {"$ref": "unknown"}
-        }
+        expression = {"condition": {"type": "comparison"}, "then": {"$ref": "unknown"}}
 
         result = evaluator.evaluate(expression, context)
 

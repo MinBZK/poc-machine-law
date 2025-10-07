@@ -39,7 +39,9 @@ class NrmlItemEvaluator:
         #  or the optionality of any relations (ex in case of x OR y)
 
         description = NrmlItemHelper.get_item_description(item, context.language)
-        item_node = PathNode(type="item", name=f"Evaluate item: {item_key} {description} (type: {item_type})", result=None)
+        item_node = PathNode(
+            type="item", name=f"Evaluate item: {item_key} {description} (type: {item_type})", result=None
+        )
         context.add_to_path(item_node)
 
         try:

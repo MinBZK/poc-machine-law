@@ -27,7 +27,7 @@ class EngineFactory:
         """Create a RulesEngine instance with the given specification and service provider"""
 
         # TODO: For now the existence of a schema means we are dealing with a JSON (NRML) file. Find a more direct way to determine this
-        if spec.get('$schema'):
+        if spec.get("$schema"):
             return NrmlRulesEngine(spec=spec, service_provider=service_provider)
         else:
             return RulesEngine(spec=spec, service_provider=service_provider)
@@ -376,7 +376,7 @@ class Services:
         self.services[service].set_source_dataframe(table, df)
         # TODO: NRML is not a service on a specific domain, but for a specific rule system.
         #  this might make the services with specific context obsolete
-        self.services['NRML'].set_source_dataframe(table, df)
+        self.services["NRML"].set_source_dataframe(table, df)
 
     def evaluate(
         self,

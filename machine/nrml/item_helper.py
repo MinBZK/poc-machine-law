@@ -43,4 +43,3 @@ class NrmlItemHelper:
         if isinstance(name, dict) and language_key in name:
             return name[language_key]
         return None
-

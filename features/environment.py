@@ -16,7 +16,7 @@ def before_all(context) -> None:
     if tag_expression:
         tag_str = str(tag_expression)
         # Behave converts ~@ui to -ui in the string representation
-        if '-ui' in tag_str or 'not ui' in tag_str:
+        if "-ui" in tag_str or "not ui" in tag_str:
             print("UI tests excluded via tags - skipping web server startup")
             return
 
@@ -107,9 +107,9 @@ def before_scenario(context, scenario) -> None:
 
     # Start web server on-demand if this is a UI test
     # Check both scenario tags and feature tags
-    all_tags = list(scenario.tags) + (list(scenario.feature.tags) if hasattr(scenario, 'feature') else [])
-    has_ui_tag = any(tag == 'ui' for tag in all_tags)
-    if has_ui_tag and not hasattr(context, 'web_server_process'):
+    all_tags = list(scenario.tags) + (list(scenario.feature.tags) if hasattr(scenario, "feature") else [])
+    has_ui_tag = any(tag == "ui" for tag in all_tags)
+    if has_ui_tag and not hasattr(context, "web_server_process"):
         print(f"Starting web server for UI test: {scenario.name}")
         import os
 
@@ -151,7 +151,7 @@ def before_scenario(context, scenario) -> None:
                 except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
                     time.sleep(1)
             else:
-                if hasattr(context, 'web_server_process'):
+                if hasattr(context, "web_server_process"):
                     context.web_server_process.terminate()
                 raise AssertionError("Failed to start web server after 30 seconds")
 

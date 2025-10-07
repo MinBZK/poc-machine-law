@@ -13,34 +13,23 @@ class TestNrmlRulesEngineIntegration:
             "language": "nl",
             "metadata": {"description": "test_simple"},
             "inputs": {},
-            "outputs": {
-                "my_value": {
-                    "source": {"$ref": "#/facts/constants/items/test-value"}
-                }
-            },
+            "outputs": {"my_value": {"source": {"$ref": "#/facts/constants/items/test-value"}}},
             "facts": {
                 "constants": {
                     "name": {"nl": "Constanten"},
                     "items": {
                         "test-value": {
                             "name": {"nl": "Test waarde"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "type": "number",
-                                "value": 42
-                            }]
+                            "versions": [{"validFrom": "2020-01-01", "type": "number", "value": 42}],
                         }
-                    }
+                    },
                 }
-            }
+            },
         }
 
         # Create engine and evaluate
         engine = NrmlRulesEngine(spec)
-        result = engine.evaluate(
-            parameters={},
-            requested_output="my_value"
-        )
+        result = engine.evaluate(parameters={}, requested_output="my_value")
 
         # Verify result
         assert "output" in result
@@ -56,38 +45,24 @@ class TestNrmlRulesEngineIntegration:
             "version": "3.0",
             "language": "nl",
             "metadata": {"description": "test_passthrough"},
-            "inputs": {
-                "my_input": {
-                    "target": {"$ref": "#/facts/data/items/input-value"}
-                }
-            },
-            "outputs": {
-                "my_output": {
-                    "source": {"$ref": "#/facts/data/items/input-value"}
-                }
-            },
+            "inputs": {"my_input": {"target": {"$ref": "#/facts/data/items/input-value"}}},
+            "outputs": {"my_output": {"source": {"$ref": "#/facts/data/items/input-value"}}},
             "facts": {
                 "data": {
                     "name": {"nl": "Data"},
                     "items": {
                         "input-value": {
                             "name": {"nl": "Input waarde"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "type": "text"
-                            }]
+                            "versions": [{"validFrom": "2020-01-01", "type": "text"}],
                         }
-                    }
+                    },
                 }
-            }
+            },
         }
 
         # Create engine and evaluate
         engine = NrmlRulesEngine(spec)
-        result = engine.evaluate(
-            parameters={"my_input": "Hello World"},
-            requested_output="my_output"
-        )
+        result = engine.evaluate(parameters={"my_input": "Hello World"}, requested_output="my_output")
 
         # Verify result - should return the input parameter value
         assert "output" in result
@@ -104,71 +79,59 @@ class TestNrmlRulesEngineIntegration:
             "language": "nl",
             "metadata": {"description": "test_conditional"},
             "inputs": {},
-            "outputs": {
-                "result": {
-                    "source": {"$ref": "#/facts/result/items/result-value"}
-                }
-            },
+            "outputs": {"result": {"source": {"$ref": "#/facts/result/items/result-value"}}},
             "facts": {
                 "data": {
                     "name": {"nl": "Data"},
                     "items": {
                         "check-value": {
                             "name": {"nl": "Controle waarde"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "type": "boolean",
-                                "value": True
-                            }]
+                            "versions": [{"validFrom": "2020-01-01", "type": "boolean", "value": True}],
                         }
-                    }
+                    },
                 },
                 "calculated": {
                     "name": {"nl": "Berekend"},
                     "items": {
                         "conditional-calc": {
                             "name": {"nl": "Conditionele berekening"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "target": [{"$ref": "#/facts/result/items/result-value"}],
-                                "expression": {
-                                    "type": "conditional",
-                                    "condition": {
-                                        "type": "comparison",
-                                        "operator": "in",
-                                        "arguments": [
-                                            {"$ref": "#/facts/data/items/check-value"},
-                                            {"value": [True]}
-                                        ]
+                            "versions": [
+                                {
+                                    "validFrom": "2020-01-01",
+                                    "target": [{"$ref": "#/facts/result/items/result-value"}],
+                                    "expression": {
+                                        "type": "conditional",
+                                        "condition": {
+                                            "type": "comparison",
+                                            "operator": "in",
+                                            "arguments": [
+                                                {"$ref": "#/facts/data/items/check-value"},
+                                                {"value": [True]},
+                                            ],
+                                        },
+                                        "then": {"value": 42},
+                                        "else": {"value": -1},
                                     },
-                                    "then": {"value": 42},
-                                    "else": {"value": -1}
                                 }
-                            }]
+                            ],
                         }
-                    }
+                    },
                 },
                 "result": {
                     "name": {"nl": "Resultaat"},
                     "items": {
                         "result-value": {
                             "name": {"nl": "Resultaat waarde"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "type": "number"
-                            }]
+                            "versions": [{"validFrom": "2020-01-01", "type": "number"}],
                         }
-                    }
-                }
-            }
+                    },
+                },
+            },
         }
 
         # Create engine and evaluate - condition is true, should return 42
         engine = NrmlRulesEngine(spec)
-        result = engine.evaluate(
-            parameters={},
-            requested_output="result"
-        )
+        result = engine.evaluate(parameters={}, requested_output="result")
 
         # Verify result
         assert "output" in result
@@ -185,71 +148,59 @@ class TestNrmlRulesEngineIntegration:
             "language": "nl",
             "metadata": {"description": "test_conditional_false"},
             "inputs": {},
-            "outputs": {
-                "result": {
-                    "source": {"$ref": "#/facts/result/items/result-value"}
-                }
-            },
+            "outputs": {"result": {"source": {"$ref": "#/facts/result/items/result-value"}}},
             "facts": {
                 "data": {
                     "name": {"nl": "Data"},
                     "items": {
                         "check-value": {
                             "name": {"nl": "Controle waarde"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "type": "boolean",
-                                "value": False
-                            }]
+                            "versions": [{"validFrom": "2020-01-01", "type": "boolean", "value": False}],
                         }
-                    }
+                    },
                 },
                 "calculated": {
                     "name": {"nl": "Berekend"},
                     "items": {
                         "conditional-calc": {
                             "name": {"nl": "Conditionele berekening"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "target": [{"$ref": "#/facts/result/items/result-value"}],
-                                "expression": {
-                                    "type": "conditional",
-                                    "condition": {
-                                        "type": "comparison",
-                                        "operator": "in",
-                                        "arguments": [
-                                            {"$ref": "#/facts/data/items/check-value"},
-                                            {"value": [True]}
-                                        ]
+                            "versions": [
+                                {
+                                    "validFrom": "2020-01-01",
+                                    "target": [{"$ref": "#/facts/result/items/result-value"}],
+                                    "expression": {
+                                        "type": "conditional",
+                                        "condition": {
+                                            "type": "comparison",
+                                            "operator": "in",
+                                            "arguments": [
+                                                {"$ref": "#/facts/data/items/check-value"},
+                                                {"value": [True]},
+                                            ],
+                                        },
+                                        "then": {"value": 42},
+                                        "else": {"value": -1},
                                     },
-                                    "then": {"value": 42},
-                                    "else": {"value": -1}
                                 }
-                            }]
+                            ],
                         }
-                    }
+                    },
                 },
                 "result": {
                     "name": {"nl": "Resultaat"},
                     "items": {
                         "result-value": {
                             "name": {"nl": "Resultaat waarde"},
-                            "versions": [{
-                                "validFrom": "2020-01-01",
-                                "type": "number"
-                            }]
+                            "versions": [{"validFrom": "2020-01-01", "type": "number"}],
                         }
-                    }
-                }
-            }
+                    },
+                },
+            },
         }
 
         # Create engine and evaluate - condition is false, should return -1
         engine = NrmlRulesEngine(spec)
-        result = engine.evaluate(
-            parameters={},
-            requested_output="result"
-        )
+        result = engine.evaluate(parameters={}, requested_output="result")
 
         # Verify result
         assert "output" in result

@@ -24,14 +24,7 @@ class TestCalculatedValueEvaluator:
         mock_result = create_result(success=True, value=42, source="ExpressionEvaluator")
         evaluator.expression_evaluator.evaluate = Mock(return_value=mock_result)
 
-        item = {
-            "versions": [
-                {
-                    "expression": {"type": "conditional"},
-                    "target": "result"
-                }
-            ]
-        }
+        item = {"versions": [{"expression": {"type": "conditional"}, "target": "result"}]}
 
         result = evaluator.evaluate("test_item", item, context)
 
@@ -60,13 +53,7 @@ class TestCalculatedValueEvaluator:
 
     def test_evaluate_no_expression(self, evaluator, context):
         """Test evaluation when version has no expression"""
-        item = {
-            "versions": [
-                {
-                    "target": "result"
-                }
-            ]
-        }
+        item = {"versions": [{"target": "result"}]}
 
         result = evaluator.evaluate("test_item", item, context)
 
@@ -75,13 +62,7 @@ class TestCalculatedValueEvaluator:
 
     def test_evaluate_no_target(self, evaluator, context):
         """Test evaluation when version has no target"""
-        item = {
-            "versions": [
-                {
-                    "expression": {"type": "conditional"}
-                }
-            ]
-        }
+        item = {"versions": [{"expression": {"type": "conditional"}}]}
 
         result = evaluator.evaluate("test_item", item, context)
 
@@ -92,14 +73,7 @@ class TestCalculatedValueEvaluator:
         """Test evaluation when expression evaluation raises an exception"""
         evaluator.expression_evaluator.evaluate = Mock(side_effect=ValueError("Invalid expression"))
 
-        item = {
-            "versions": [
-                {
-                    "expression": {"type": "conditional"},
-                    "target": "result"
-                }
-            ]
-        }
+        item = {"versions": [{"expression": {"type": "conditional"}, "target": "result"}]}
 
         result = evaluator.evaluate("test_item", item, context)
 
@@ -114,14 +88,8 @@ class TestCalculatedValueEvaluator:
 
         item = {
             "versions": [
-                {
-                    "expression": {"type": "conditional", "id": "first"},
-                    "target": "result1"
-                },
-                {
-                    "expression": {"type": "conditional", "id": "second"},
-                    "target": "result2"
-                }
+                {"expression": {"type": "conditional", "id": "first"}, "target": "result1"},
+                {"expression": {"type": "conditional", "id": "second"}, "target": "result2"},
             ]
         }
 

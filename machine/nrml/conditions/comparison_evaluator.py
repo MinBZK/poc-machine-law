@@ -25,7 +25,11 @@ class ComparisonEvaluator:
     def _evaluate_in_comparison(self, arguments: list[Any], context: NrmlRuleContext) -> EvaluationResult:
         """Evaluate an 'in' comparison"""
         if len(arguments) != 2:
-            return create_result(success=False, error=f"'in' operator expects 2 arguments, got {len(arguments)}", source=self.__class__.__name__)
+            return create_result(
+                success=False,
+                error=f"'in' operator expects 2 arguments, got {len(arguments)}",
+                source=self.__class__.__name__,
+            )
 
         left_arg = arguments[0]
         right_arg = arguments[1]
@@ -38,9 +42,20 @@ class ComparisonEvaluator:
 
         if left_value.Success and right_value.Success:
             comparison_result = self._check_in_collection(left_value.Value, right_value.Value)
-            return create_result(success=True, value=comparison_result, source=self.__class__.__name__, sub_results=[left_value, right_value], action=f"Compare: {left_value.Value} IN {right_value.Value} : {comparison_result}")
+            return create_result(
+                success=True,
+                value=comparison_result,
+                source=self.__class__.__name__,
+                sub_results=[left_value, right_value],
+                action=f"Compare: {left_value.Value} IN {right_value.Value} : {comparison_result}",
+            )
 
-        return create_result(success=False, error="Unable to resolve all arguments", source=self.__class__.__name__, sub_results=[left_value, right_value])
+        return create_result(
+            success=False,
+            error="Unable to resolve all arguments",
+            source=self.__class__.__name__,
+            sub_results=[left_value, right_value],
+        )
 
     def _check_in_collection(self, value: Any, collection: Any) -> bool:
         """Check if a value is in a collection"""

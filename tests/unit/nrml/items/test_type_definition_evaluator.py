@@ -24,14 +24,7 @@ class TestTypeDefinitionEvaluator:
 
     def test_evaluate_with_value_in_definition(self, evaluator, context):
         """Test evaluation when value is in the item definition"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "value": "predefined_value"
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "value": "predefined_value"}]}
 
         result = evaluator.evaluate("test_item", item, context)
 
@@ -41,14 +34,7 @@ class TestTypeDefinitionEvaluator:
 
     def test_evaluate_with_values_in_definition(self, evaluator, context):
         """Test evaluation when values (plural) is in the item definition"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "values": ["value1", "value2"]
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "values": ["value1", "value2"]}]}
 
         result = evaluator.evaluate("test_item", item, context)
 
@@ -58,13 +44,7 @@ class TestTypeDefinitionEvaluator:
 
     def test_evaluate_from_target_source(self, evaluator, context):
         """Test evaluation when value comes from target source item"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text"
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text"}]}
 
         # Mock target source resolution
         context.get_target_source_item = Mock(return_value="source_item")
@@ -80,13 +60,7 @@ class TestTypeDefinitionEvaluator:
 
     def test_evaluate_from_parameter(self, evaluator, context):
         """Test evaluation when value comes from a parameter"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text"
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text"}]}
 
         # Mock input source and parameter value
         context.get_target_source_item = Mock(return_value=None)
@@ -101,13 +75,7 @@ class TestTypeDefinitionEvaluator:
 
     def test_evaluate_from_value_provider(self, evaluator, context):
         """Test evaluation when value comes from a value provider"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text"
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text"}]}
 
         # Mock value provider
         mock_value_provider = Mock()
@@ -127,13 +95,7 @@ class TestTypeDefinitionEvaluator:
 
     def test_evaluate_no_value_found(self, evaluator, context):
         """Test evaluation when no value can be resolved"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text"
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text"}]}
 
         # Mock all sources returning None/empty
         context.get_target_source_item = Mock(return_value=None)
@@ -232,14 +194,7 @@ class TestTypeDefinitionEvaluator:
     def test_evaluation_priority_order(self, evaluator, context):
         """Test that evaluation follows the correct priority order"""
         # Definition has highest priority
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "value": "definition_value"
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "value": "definition_value"}]}
 
         # Mock other sources that would return values
         context.get_target_source_item = Mock(return_value="source_item")

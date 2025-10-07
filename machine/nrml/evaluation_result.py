@@ -27,7 +27,6 @@ def nested_result(
     if error is None:
         error = "Error occurred in dependency"
 
-
     return create_result(
         success=child_result.Success,
         value=child_result.Value,
@@ -35,7 +34,8 @@ def nested_result(
         node=node,
         action=action,
         error=None if child_result.Success else error,
-        sub_results=[child_result])
+        sub_results=[child_result],
+    )
 
 
 def create_result(
@@ -45,15 +45,9 @@ def create_result(
     node: Any = None,
     sub_results: list[EvaluationResult] | None = None,
     source: str | None = None,
-    action: str | None = None
+    action: str | None = None,
 ) -> EvaluationResult:
     """Create evaluation results with all properties"""
     return EvaluationResult(
-        Success=success,
-        Value=value,
-        Error=error,
-        Node=node,
-        SubResults=sub_results or [],
-        Source=source,
-        Action=action
+        Success=success, Value=value, Error=error, Node=node, SubResults=sub_results or [], Source=source, Action=action
     )

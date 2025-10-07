@@ -5,6 +5,7 @@ from typing import Any
 @dataclass
 class SelectOnField:
     """Field specification for selecting rows in source reference"""
+
     name: str
     description: str
     type: str
@@ -14,6 +15,7 @@ class SelectOnField:
 @dataclass
 class SourceReference:
     """Reference to a source table and field for value resolution"""
+
     table: str
     field: str
     select_on: list[SelectOnField]

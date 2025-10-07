@@ -24,14 +24,7 @@ class TestNrmlItemEvaluator:
 
     def test_evaluate_type_definition_item(self, evaluator, context):
         """Test evaluating a type definition item"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "description": {"nl": "Test item"}
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "description": {"nl": "Test item"}}]}
         context.items["test_item"] = item
 
         # Mock the type definition evaluator
@@ -48,11 +41,7 @@ class TestNrmlItemEvaluator:
         """Test evaluating a calculated value item"""
         item = {
             "versions": [
-                {
-                    "target": "result",
-                    "expression": {"type": "conditional"},
-                    "description": {"nl": "Calculated item"}
-                }
+                {"target": "result", "expression": {"type": "conditional"}, "description": {"nl": "Calculated item"}}
             ]
         }
         context.items["calc_item"] = item
@@ -69,14 +58,7 @@ class TestNrmlItemEvaluator:
 
     def test_evaluate_item_already_evaluated(self, evaluator, context):
         """Test that already evaluated items return cached result"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "description": {"nl": "Test item"}
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "description": {"nl": "Test item"}}]}
         context.items["test_item"] = item
 
         # Pre-populate evaluation result
@@ -94,7 +76,7 @@ class TestNrmlItemEvaluator:
             "versions": [
                 {
                     "arguments": [],  # This makes it a RELATION_DEFINITION
-                    "description": {"nl": "Relation item"}
+                    "description": {"nl": "Relation item"},
                 }
             ]
         }
@@ -105,14 +87,7 @@ class TestNrmlItemEvaluator:
 
     def test_evaluate_item_adds_to_path(self, evaluator, context):
         """Test that evaluation adds and removes path nodes correctly"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "description": {"nl": "Test item"}
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "description": {"nl": "Test item"}}]}
         context.items["test_item"] = item
 
         # Mock the evaluator
@@ -127,20 +102,11 @@ class TestNrmlItemEvaluator:
 
     def test_evaluate_item_cleans_up_path_on_error(self, evaluator, context):
         """Test that path is cleaned up even when evaluation fails"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "description": {"nl": "Test item"}
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "description": {"nl": "Test item"}}]}
         context.items["test_item"] = item
 
         # Mock evaluator to raise an exception
-        evaluator.evaluators[NrmlItemType.TYPE_DEFINITION].evaluate = Mock(
-            side_effect=ValueError("Evaluation error")
-        )
+        evaluator.evaluators[NrmlItemType.TYPE_DEFINITION].evaluate = Mock(side_effect=ValueError("Evaluation error"))
 
         initial_path_length = len(context.path)
 
@@ -152,14 +118,7 @@ class TestNrmlItemEvaluator:
 
     def test_evaluate_item_stores_result_in_context(self, evaluator, context):
         """Test that evaluation result is stored in context"""
-        item = {
-            "versions": [
-                {
-                    "type": "Text",
-                    "description": {"nl": "Test item"}
-                }
-            ]
-        }
+        item = {"versions": [{"type": "Text", "description": {"nl": "Test item"}}]}
         context.items["test_item"] = item
 
         mock_result = create_result(success=True, value="test", source="TypeDefinitionEvaluator")

@@ -11,6 +11,7 @@ from .value_providers import TableValueProvider
 @dataclass
 class OutputMapping:
     """Mapping between public output name and internal reference"""
+
     public_output: str
     internal_reference: str
 
@@ -190,9 +191,7 @@ class NrmlRulesEngine:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
 
-
-
-        #TODO: allow multiple outputs from method call
+        # TODO: allow multiple outputs from method call
         items_to_process = []
         for public_output in [requested_output]:
             # TODO: mapping from external to internal also needs some result object so we can see what happened

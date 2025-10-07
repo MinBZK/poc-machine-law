@@ -26,10 +26,7 @@ class TestComparisonEvaluator:
 
         evaluator.argument_resolver.resolve_argument = Mock(side_effect=[left_result, right_result])
 
-        expression = {
-            "operator": "in",
-            "arguments": [{"value": "apple"}, {"value": ["apple", "banana", "orange"]}]
-        }
+        expression = {"operator": "in", "arguments": [{"value": "apple"}, {"value": ["apple", "banana", "orange"]}]}
 
         result = evaluator.evaluate(expression, context)
 
@@ -44,10 +41,7 @@ class TestComparisonEvaluator:
 
         evaluator.argument_resolver.resolve_argument = Mock(side_effect=[left_result, right_result])
 
-        expression = {
-            "operator": "in",
-            "arguments": [{"value": "grape"}, {"value": ["apple", "banana", "orange"]}]
-        }
+        expression = {"operator": "in", "arguments": [{"value": "grape"}, {"value": ["apple", "banana", "orange"]}]}
 
         result = evaluator.evaluate(expression, context)
 
@@ -56,10 +50,7 @@ class TestComparisonEvaluator:
 
     def test_evaluate_in_comparison_wrong_argument_count(self, evaluator, context):
         """Test 'in' comparison with incorrect number of arguments"""
-        expression = {
-            "operator": "in",
-            "arguments": [{"value": "apple"}]
-        }
+        expression = {"operator": "in", "arguments": [{"value": "apple"}]}
 
         result = evaluator.evaluate(expression, context)
 
@@ -73,10 +64,7 @@ class TestComparisonEvaluator:
 
         evaluator.argument_resolver.resolve_argument = Mock(side_effect=[left_result, right_result])
 
-        expression = {
-            "operator": "in",
-            "arguments": [{"$ref": "unknown"}, {"value": ["apple", "banana"]}]
-        }
+        expression = {"operator": "in", "arguments": [{"$ref": "unknown"}, {"value": ["apple", "banana"]}]}
 
         result = evaluator.evaluate(expression, context)
 
@@ -105,10 +93,7 @@ class TestComparisonEvaluator:
 
     def test_evaluate_unsupported_operator(self, evaluator, context):
         """Test that unsupported operators raise ValueError"""
-        expression = {
-            "operator": "equals",
-            "arguments": []
-        }
+        expression = {"operator": "equals", "arguments": []}
 
         with pytest.raises(ValueError, match="Unsupported comparison operator: equals"):
             evaluator.evaluate(expression, context)

@@ -29,12 +29,13 @@ def load_file_cached(file_path: str) -> dict:
         return _file_cache[file_path]
 
     with open(file_path) as f:
-        if file_path.endswith('.json'):
+        if file_path.endswith(".json"):
             data = json.load(f)
         else:
             data = yaml.load(f, Loader=Loader)
     _file_cache[file_path] = data
     return data
+
 
 @dataclass
 class RuleSpec:
@@ -150,8 +151,6 @@ class RuleResolver:
                 self.rules.append(rule)
             except Exception as e:
                 print(f"Error loading JSON rule from {path}: {e}")
-
-
 
         self.laws_by_service = defaultdict(set)
         self.discoverable_laws_by_service = defaultdict(lambda: defaultdict(set))

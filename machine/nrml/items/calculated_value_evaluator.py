@@ -17,17 +17,23 @@ class CalculatedValueEvaluator:
         # Get the first version (assuming all versions have the same structure)
         versions = item.get("versions", [])
         if not versions:
-            return create_result(success=False, error="No versions found in calculated value item", source=self.__class__.__name__)
+            return create_result(
+                success=False, error="No versions found in calculated value item", source=self.__class__.__name__
+            )
 
         version = versions[0]
         expression = version.get("expression")
         target = version.get("target")
 
         if not expression:
-            return create_result(success=False, error="No expression found in calculated value item", source=self.__class__.__name__)
+            return create_result(
+                success=False, error="No expression found in calculated value item", source=self.__class__.__name__
+            )
 
         if not target:
-            return create_result(success=False, error="No target found in calculated value item", source=self.__class__.__name__)
+            return create_result(
+                success=False, error="No target found in calculated value item", source=self.__class__.__name__
+            )
 
         try:
             # Evaluate the expression using the expression evaluator
@@ -38,7 +44,10 @@ class CalculatedValueEvaluator:
                 source=self.__class__.__name__,
                 sub_results=[expression_result],
                 node=item,
-                action=f"Determining Calculated value for item {item_key}")
+                action=f"Determining Calculated value for item {item_key}",
+            )
 
         except Exception as e:
-            return create_result(success=False, error=f"Error evaluating expression: {str(e)}", source=self.__class__.__name__)
+            return create_result(
+                success=False, error=f"Error evaluating expression: {str(e)}", source=self.__class__.__name__
+            )

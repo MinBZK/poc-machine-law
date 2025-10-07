@@ -8,16 +8,8 @@ class TestItemTypeAnalyzer:
     def test_type_definition_text(self):
         """Test TYPE_DEFINITION with text type"""
         item = {
-            "name": {
-                "nl": "Nationaliteit definitie",
-                "en": "Nationality definition"
-            },
-            "versions": [
-                {
-                    "validFrom": "2020-01-01",
-                    "type": "text"
-                }
-            ]
+            "name": {"nl": "Nationaliteit definitie", "en": "Nationality definition"},
+            "versions": [{"validFrom": "2020-01-01", "type": "text"}],
         }
 
         result = determine_item_type(item)
@@ -26,19 +18,8 @@ class TestItemTypeAnalyzer:
     def test_type_definition_enumeration(self):
         """Test TYPE_DEFINITION with enumeration type"""
         item = {
-            "name": {
-                "nl": "Nederlandse nationaliteiten definitie",
-                "en": "Dutch nationalities definition"
-            },
-            "versions": [
-                {
-                    "validFrom": "2020-01-01",
-                    "type": "enumeration",
-                    "values": [
-                        "NEDERLANDS"
-                    ]
-                }
-            ]
+            "name": {"nl": "Nederlandse nationaliteiten definitie", "en": "Dutch nationalities definition"},
+            "versions": [{"validFrom": "2020-01-01", "type": "enumeration", "values": ["NEDERLANDS"]}],
         }
 
         result = determine_item_type(item)
@@ -47,16 +28,8 @@ class TestItemTypeAnalyzer:
     def test_type_definition_boolean(self):
         """Test TYPE_DEFINITION with boolean type"""
         item = {
-            "name": {
-                "nl": "Nederlandse nationaliteit resultaat",
-                "en": "Dutch nationality result"
-            },
-            "versions": [
-                {
-                    "validFrom": "2020-01-01",
-                    "type": "boolean"
-                }
-            ]
+            "name": {"nl": "Nederlandse nationaliteit resultaat", "en": "Dutch nationality result"},
+            "versions": [{"validFrom": "2020-01-01", "type": "boolean"}],
         }
 
         result = determine_item_type(item)
@@ -65,10 +38,7 @@ class TestItemTypeAnalyzer:
     def test_calculated_value_with_expression(self):
         """Test CALCULATED_VALUE with target and expression (no condition)"""
         item = {
-            "name": {
-                "nl": "heeft Nederlandse nationaliteit definitie",
-                "en": "has Dutch nationality definition"
-            },
+            "name": {"nl": "heeft Nederlandse nationaliteit definitie", "en": "has Dutch nationality definition"},
             "versions": [
                 {
                     "validFrom": "2020-01-01",
@@ -92,18 +62,14 @@ class TestItemTypeAnalyzer:
                                     "parameter": {
                                         "$ref": "#/facts/8c3f1d6a-5b9e-4f2c-d7b1-e3a6f4c8d5b2/items/2d9f5c1b-7e3a-4b6d-c8f2-1a5e9d3b7f4c"
                                     }
-                                }
-                            ]
+                                },
+                            ],
                         },
-                        "then": {
-                            "value": True
-                        },
-                        "else": {
-                            "value": False
-                        }
-                    }
+                        "then": {"value": True},
+                        "else": {"value": False},
+                    },
                 }
-            ]
+            ],
         }
 
         result = determine_item_type(item)
@@ -112,31 +78,15 @@ class TestItemTypeAnalyzer:
     def test_conditional_calculated_value(self):
         """Test CONDITIONAL_CALCULATED_VALUE with target, expression, and condition"""
         item = {
-            "name": {
-                "nl": "test conditional calculated value",
-                "en": "test conditional calculated value"
-            },
+            "name": {"nl": "test conditional calculated value", "en": "test conditional calculated value"},
             "versions": [
                 {
                     "validFrom": "2020-01-01",
-                    "target": [
-                        {
-                            "$ref": "#/facts/test-fact/items/test-item"
-                        }
-                    ],
-                    "expression": {
-                        "type": "arithmetic",
-                        "operator": "add",
-                        "operands": [10, 20]
-                    },
-                    "condition": {
-                        "type": "comparison",
-                        "operator": "equals",
-                        "left": "value1",
-                        "right": "value2"
-                    }
+                    "target": [{"$ref": "#/facts/test-fact/items/test-item"}],
+                    "expression": {"type": "arithmetic", "operator": "add", "operands": [10, 20]},
+                    "condition": {"type": "comparison", "operator": "equals", "left": "value1", "right": "value2"},
                 }
-            ]
+            ],
         }
 
         result = determine_item_type(item)
@@ -145,24 +95,14 @@ class TestItemTypeAnalyzer:
     def test_value_initialization(self):
         """Test VALUE_INITIALIZATION with target and value (no condition, no expression)"""
         item = {
-            "name": {
-                "nl": "test value initialization",
-                "en": "test value initialization"
-            },
+            "name": {"nl": "test value initialization", "en": "test value initialization"},
             "versions": [
                 {
                     "validFrom": "2020-01-01",
-                    "target": [
-                        {
-                            "$ref": "#/facts/test-fact/items/test-item"
-                        }
-                    ],
-                    "value": {
-                        "type": "boolean",
-                        "value": True
-                    }
+                    "target": [{"$ref": "#/facts/test-fact/items/test-item"}],
+                    "value": {"type": "boolean", "value": True},
                 }
-            ]
+            ],
         }
 
         result = determine_item_type(item)
@@ -171,30 +111,15 @@ class TestItemTypeAnalyzer:
     def test_conditional_value(self):
         """Test CONDITIONAL_VALUE with target, value, and condition"""
         item = {
-            "name": {
-                "nl": "test conditional value",
-                "en": "test conditional value"
-            },
+            "name": {"nl": "test conditional value", "en": "test conditional value"},
             "versions": [
                 {
                     "validFrom": "2020-01-01",
-                    "target": [
-                        {
-                            "$ref": "#/facts/test-fact/items/test-item"
-                        }
-                    ],
-                    "value": {
-                        "type": "numeric",
-                        "value": 100
-                    },
-                    "condition": {
-                        "type": "comparison",
-                        "operator": "greater_than",
-                        "left": "age",
-                        "right": 18
-                    }
+                    "target": [{"$ref": "#/facts/test-fact/items/test-item"}],
+                    "value": {"type": "numeric", "value": 100},
+                    "condition": {"type": "comparison", "operator": "greater_than", "left": "age", "right": 18},
                 }
-            ]
+            ],
         }
 
         result = determine_item_type(item)
@@ -203,26 +128,14 @@ class TestItemTypeAnalyzer:
     def test_conditional_characteristic(self):
         """Test CONDITIONAL_CHARACTERISTIC with target and condition (no value, no expression)"""
         item = {
-            "name": {
-                "nl": "test conditional characteristic",
-                "en": "test conditional characteristic"
-            },
+            "name": {"nl": "test conditional characteristic", "en": "test conditional characteristic"},
             "versions": [
                 {
                     "validFrom": "2020-01-01",
-                    "target": [
-                        {
-                            "$ref": "#/facts/test-fact/items/test-item"
-                        }
-                    ],
-                    "condition": {
-                        "type": "comparison",
-                        "operator": "equals",
-                        "left": "status",
-                        "right": "active"
-                    }
+                    "target": [{"$ref": "#/facts/test-fact/items/test-item"}],
+                    "condition": {"type": "comparison", "operator": "equals", "left": "status", "right": "active"},
                 }
-            ]
+            ],
         }
 
         result = determine_item_type(item)
@@ -231,10 +144,7 @@ class TestItemTypeAnalyzer:
     def test_relation_definition(self):
         """Test RELATION_DEFINITION with arguments array"""
         item = {
-            "name": {
-                "nl": "test relation",
-                "en": "test relation"
-            },
+            "name": {"nl": "test relation", "en": "test relation"},
             "versions": [
                 {
                     "validFrom": "2020-01-01",
@@ -242,20 +152,16 @@ class TestItemTypeAnalyzer:
                         {
                             "name": {"nl": "persoon", "en": "person"},
                             "cardinality": "one",
-                            "objectType": {
-                                "$ref": "#/facts/person-fact/items/person-item"
-                            }
+                            "objectType": {"$ref": "#/facts/person-fact/items/person-item"},
                         },
                         {
                             "name": {"nl": "adres", "en": "address"},
                             "cardinality": "many",
-                            "objectType": {
-                                "$ref": "#/facts/address-fact/items/address-item"
-                            }
-                        }
-                    ]
+                            "objectType": {"$ref": "#/facts/address-fact/items/address-item"},
+                        },
+                    ],
                 }
-            ]
+            ],
         }
 
         result = determine_item_type(item)
@@ -270,38 +176,21 @@ class TestItemTypeAnalyzer:
 
     def test_unknown_type_no_versions(self):
         """Test UNKNOWN type for item without versions"""
-        item = {
-            "name": {
-                "nl": "test item",
-                "en": "test item"
-            }
-        }
+        item = {"name": {"nl": "test item", "en": "test item"}}
 
         result = determine_item_type(item)
         assert result == NrmlItemType.UNKNOWN
 
     def test_unknown_type_empty_versions(self):
         """Test UNKNOWN type for item with empty versions array"""
-        item = {
-            "name": {
-                "nl": "test item",
-                "en": "test item"
-            },
-            "versions": []
-        }
+        item = {"name": {"nl": "test item", "en": "test item"}, "versions": []}
 
         result = determine_item_type(item)
         assert result == NrmlItemType.UNKNOWN
 
     def test_unknown_type_invalid_version(self):
         """Test UNKNOWN type for item with non-dict version"""
-        item = {
-            "name": {
-                "nl": "test item",
-                "en": "test item"
-            },
-            "versions": ["invalid"]
-        }
+        item = {"name": {"nl": "test item", "en": "test item"}, "versions": ["invalid"]}
 
         result = determine_item_type(item)
         assert result == NrmlItemType.UNKNOWN
@@ -309,16 +198,8 @@ class TestItemTypeAnalyzer:
     def test_unknown_type_unrecognized_pattern(self):
         """Test UNKNOWN type for unrecognized field pattern"""
         item = {
-            "name": {
-                "nl": "test item",
-                "en": "test item"
-            },
-            "versions": [
-                {
-                    "validFrom": "2020-01-01",
-                    "unknown_field": "unknown_value"
-                }
-            ]
+            "name": {"nl": "test item", "en": "test item"},
+            "versions": [{"validFrom": "2020-01-01", "unknown_field": "unknown_value"}],
         }
 
         result = determine_item_type(item)

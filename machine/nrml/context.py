@@ -38,17 +38,17 @@ class NrmlRuleContext:
 
     @classmethod
     def from_nrml_engine(
-            cls,
-            nrml_engine,
-            parameters: dict[str, Any],
-            target_references: dict[str, str],
-            inputs: dict[str, str],
-            sources: dict[str, pd.DataFrame] = None,
-            overwrite_input: dict[str, Any] = None,
-            calculation_date: str = None,
-            claims: dict[str, Claim] = None,
-            approved: bool = True,
-            table_value_providers: list[Any] = None
+        cls,
+        nrml_engine,
+        parameters: dict[str, Any],
+        target_references: dict[str, str],
+        inputs: dict[str, str],
+        sources: dict[str, pd.DataFrame] = None,
+        overwrite_input: dict[str, Any] = None,
+        calculation_date: str = None,
+        claims: dict[str, Claim] = None,
+        approved: bool = True,
+        table_value_providers: list[Any] = None,
     ) -> "NrmlRuleContext":
         """Create NrmlRuleContext from NRML rules engine"""
 
@@ -102,5 +102,3 @@ class NrmlRuleContext:
     def get_input_source(self, target_ref: str) -> str | None:
         """Get the input source for the given target reference"""
         return self.inputs.get(target_ref)
-
-

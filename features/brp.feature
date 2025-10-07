@@ -37,5 +37,3 @@ Feature: Bepalen kiesrecht Tweede Kamer
     And een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
     When de brp_nationaliteit_nrml wordt uitgevoerd door NRML
     Then heeft output heeft_nederlandse_nationaliteit met waarde True
-
-

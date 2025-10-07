@@ -12,14 +12,24 @@ class TypeDefinitionEvaluator:
         """Initialize stateless evaluator"""
         pass
 
-    def _try_resolve_from_definition(self, item_key: str, item: dict[str, Any], active_version: dict[str, Any]) -> EvaluationResult | None:
+    def _try_resolve_from_definition(
+        self, item_key: str, item: dict[str, Any], active_version: dict[str, Any]
+    ) -> EvaluationResult | None:
         """Try to resolve value from item definition"""
         if "value" in active_version or "values" in active_version:
             value = active_version.get("value", active_version.get("values"))
-            return create_result(success=True, value=value, source=self.__class__.__name__, node=item, action=f"Item {item_key} resolved from ITEM DEFINITION")
+            return create_result(
+                success=True,
+                value=value,
+                source=self.__class__.__name__,
+                node=item,
+                action=f"Item {item_key} resolved from ITEM DEFINITION",
+            )
         return None
 
-    def _try_resolve_from_target_source(self, item_key: str, item: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult | None:
+    def _try_resolve_from_target_source(
+        self, item_key: str, item: dict[str, Any], context: NrmlRuleContext
+    ) -> EvaluationResult | None:
         """Try to resolve value from target source item"""
         source_item = context.get_target_source_item(item_key)
         if source_item:
@@ -28,17 +38,26 @@ class TypeDefinitionEvaluator:
                 source=self.__class__.__name__,
                 child_result=source_result,
                 node=item,
-                action=f"Item {item_key} is target of {source_item}")
+                action=f"Item {item_key} is target of {source_item}",
+            )
         return None
 
-    def _try_resolve_from_input_source(self, item_key: str, item: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult | None:
+    def _try_resolve_from_input_source(
+        self, item_key: str, item: dict[str, Any], context: NrmlRuleContext
+    ) -> EvaluationResult | None:
         """Try to resolve value from input source (parameter or value provider)"""
         input_source = context.get_input_source(item_key)
         if input_source:
             value = context.get_parameter_value(input_source)
             if value:
                 # TODO: The item has a type (ex Text, boolean) check if this value is of the type?
-                return create_result(success=True, value=value, source=self.__class__.__name__, node=item, action=f"Item {item_key} resolved from PARAMETER")
+                return create_result(
+                    success=True,
+                    value=value,
+                    source=self.__class__.__name__,
+                    node=item,
+                    action=f"Item {item_key} resolved from PARAMETER",
+                )
 
             # Try to get value from value providers
             value_provider = context.get_value_provider_for(input_source)
@@ -48,7 +67,7 @@ class TypeDefinitionEvaluator:
                     source=self.__class__.__name__,
                     child_result=result,
                     node=item,
-                    action=f"Item {item_key} resolved from VALUE PROVIDER"
+                    action=f"Item {item_key} resolved from VALUE PROVIDER",
                 )
         return None
 
@@ -72,4 +91,5 @@ class TypeDefinitionEvaluator:
             success=False,
             error=f"Processing item definition failed: no input value found for: {item_key}",
             source=self.__class__.__name__,
-            node=item)
+            node=item,
+        )

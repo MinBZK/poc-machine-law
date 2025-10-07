@@ -11,11 +11,7 @@ class TestNrmlItemHelper:
 
     def test_get_active_version_single_version(self):
         """Test getting active version when only one version exists"""
-        item = {
-            "versions": [
-                {"type": "Text", "description": {"nl": "Single version"}}
-            ]
-        }
+        item = {"versions": [{"type": "Text", "description": {"nl": "Single version"}}]}
 
         result = NrmlItemHelper.get_active_version(item)
 
@@ -42,7 +38,7 @@ class TestNrmlItemHelper:
             "versions": [
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
                 {"validFrom": "2022-01-01", "type": "Text", "value": "v2"},
-                {"validFrom": "2024-01-01", "type": "Text", "value": "v3"}
+                {"validFrom": "2024-01-01", "type": "Text", "value": "v3"},
             ]
         }
 
@@ -56,7 +52,7 @@ class TestNrmlItemHelper:
         item = {
             "versions": [
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
-                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"}
+                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"},
             ]
         }
 
@@ -68,7 +64,7 @@ class TestNrmlItemHelper:
         item = {
             "versions": [
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
-                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"}
+                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"},
             ]
         }
 
@@ -81,7 +77,7 @@ class TestNrmlItemHelper:
             "versions": [
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
                 {"validFrom": "2022-01-01", "type": "Text", "value": "v2"},
-                {"validFrom": "2024-01-01", "type": "Text", "value": "v3"}
+                {"validFrom": "2024-01-01", "type": "Text", "value": "v3"},
             ]
         }
 
@@ -94,7 +90,7 @@ class TestNrmlItemHelper:
             "versions": [
                 {"validFrom": "2024-01-01", "type": "Text", "value": "v3"},
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
-                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"}
+                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"},
             ]
         }
 
@@ -106,12 +102,12 @@ class TestNrmlItemHelper:
         item = {
             "versions": [
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
-                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"}
+                {"validFrom": "2022-01-01", "type": "Text", "value": "v2"},
             ]
         }
 
         # Mock datetime.now() to return a known date
-        with patch('machine.nrml.item_helper.datetime') as mock_datetime:
+        with patch("machine.nrml.item_helper.datetime") as mock_datetime:
             mock_datetime.now.return_value = datetime(2023, 6, 15)
             mock_datetime.fromisoformat = datetime.fromisoformat
 
@@ -123,7 +119,7 @@ class TestNrmlItemHelper:
         item = {
             "versions": [
                 {"validFrom": "2020-01-01", "type": "Text", "value": "v1"},
-                {"type": "Text", "value": "v2"}  # Missing validFrom
+                {"type": "Text", "value": "v2"},  # Missing validFrom
             ]
         }
 
@@ -135,7 +131,7 @@ class TestNrmlItemHelper:
         item = {
             "versions": [
                 {"validFrom": "2020-01-01T00:00:00", "type": "Text", "value": "v1"},
-                {"validFrom": "2022-06-15T12:30:00", "type": "Text", "value": "v2"}
+                {"validFrom": "2022-06-15T12:30:00", "type": "Text", "value": "v2"},
             ]
         }
 
@@ -146,85 +142,56 @@ class TestNrmlItemHelper:
 
     def test_get_item_description_with_language_dict(self):
         """Test getting item description with multilingual name dictionary"""
-        item = {
-            "name": {
-                "en": "English description",
-                "nl": "Nederlandse beschrijving",
-                "de": "Deutsche Beschreibung"
-            }
-        }
+        item = {"name": {"en": "English description", "nl": "Nederlandse beschrijving", "de": "Deutsche Beschreibung"}}
 
         result = NrmlItemHelper.get_item_description(item, "nl")
         assert result == "Nederlandse beschrijving"
 
     def test_get_item_description_default_language(self):
         """Test getting item description with default language (en)"""
-        item = {
-            "name": {
-                "en": "English description",
-                "nl": "Nederlandse beschrijving"
-            }
-        }
+        item = {"name": {"en": "English description", "nl": "Nederlandse beschrijving"}}
 
         result = NrmlItemHelper.get_item_description(item, "en")
         assert result == "English description"
 
     def test_get_item_description_language_not_found(self):
         """Test getting item description when requested language is not available"""
-        item = {
-            "name": {
-                "en": "English description",
-                "nl": "Nederlandse beschrijving"
-            }
-        }
+        item = {"name": {"en": "English description", "nl": "Nederlandse beschrijving"}}
 
         result = NrmlItemHelper.get_item_description(item, "fr")
         assert result is None
 
     def test_get_item_description_name_is_string(self):
         """Test getting item description when name is a string instead of dict"""
-        item = {
-            "name": "Simple string name"
-        }
+        item = {"name": "Simple string name"}
 
         result = NrmlItemHelper.get_item_description(item, "en")
         assert result is None
 
     def test_get_item_description_name_missing(self):
         """Test getting item description when name key is missing"""
-        item = {
-            "type": "Text"
-        }
+        item = {"type": "Text"}
 
         result = NrmlItemHelper.get_item_description(item, "en")
         assert result is None
 
     def test_get_item_description_empty_name_dict(self):
         """Test getting item description with empty name dictionary"""
-        item = {
-            "name": {}
-        }
+        item = {"name": {}}
 
         result = NrmlItemHelper.get_item_description(item, "en")
         assert result is None
 
     def test_get_item_description_name_is_none(self):
         """Test getting item description when name is None"""
-        item = {
-            "name": None
-        }
+        item = {"name": None}
 
         result = NrmlItemHelper.get_item_description(item, "en")
         assert result is None
 
     def test_get_item_description_case_sensitive_language_key(self):
         """Test that language key lookup is case-sensitive"""
-        item = {
-            "name": {
-                "en": "English",
-                "EN": "ENGLISH UPPERCASE"
-            }
-        }
+        item = {"name": {"en": "English", "EN": "ENGLISH UPPERCASE"}}
 
         result_lower = NrmlItemHelper.get_item_description(item, "en")
         result_upper = NrmlItemHelper.get_item_description(item, "EN")
@@ -234,9 +201,7 @@ class TestNrmlItemHelper:
 
     def test_helper_methods_are_static(self):
         """Test that helper methods can be called without instantiation"""
-        item = {
-            "versions": [{"type": "Text"}]
-        }
+        item = {"versions": [{"type": "Text"}]}
 
         # Should not raise an error - can call without creating instance
         result = NrmlItemHelper.get_active_version(item)
@@ -247,7 +212,7 @@ class TestNrmlItemHelper:
         item = {
             "versions": [
                 {"validFrom": "2020-01-01T00:00:00+00:00", "type": "Text", "value": "v1"},
-                {"validFrom": "2022-01-01T00:00:00+00:00", "type": "Text", "value": "v2"}
+                {"validFrom": "2022-01-01T00:00:00+00:00", "type": "Text", "value": "v2"},
             ]
         }
 

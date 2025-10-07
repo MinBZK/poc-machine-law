@@ -14,18 +14,22 @@ class TableValueProvider:
 
     def __init__(self, dataframes: dict[str, pd.DataFrame]) -> None:
         self.dataframes = dataframes
-        self._source_references: dict[str, SourceReference] = { "NATIONALITEIT": SourceReference.from_dict({
-            "table": "personen",
-            "field": "nationaliteit",
-            "select_on": [
+        self._source_references: dict[str, SourceReference] = {
+            "NATIONALITEIT": SourceReference.from_dict(
                 {
-                    "name": "bsn",
-                    "description": "Burgerservicenummer van de persoon",
-                    "type": "string",
-                    "value": "bsn"
+                    "table": "personen",
+                    "field": "nationaliteit",
+                    "select_on": [
+                        {
+                            "name": "bsn",
+                            "description": "Burgerservicenummer van de persoon",
+                            "type": "string",
+                            "value": "bsn",
+                        }
+                    ],
                 }
-            ]
-        })}
+            )
+        }
         self.providable_values = self._compute_providable_values()
 
     def _compute_providable_values(self) -> set[str]:
@@ -49,7 +53,7 @@ class TableValueProvider:
                 success=False,
                 error=f"No source reference found for '{value_name}'",
                 source=f"TableValueProvider",
-                action="GET VALUE"
+                action="GET VALUE",
             )
 
         # Get the dataframe for the table
@@ -59,7 +63,7 @@ class TableValueProvider:
                 success=False,
                 error=f"Dataframe '{source_ref.table}' is empty or not found",
                 source=f"TableValueProvider",
-                action="GET VALUE"
+                action="GET VALUE",
             )
 
         # Filter dataframe using select_on fields
@@ -75,7 +79,7 @@ class TableValueProvider:
                     success=False,
                     error=f"Parameter '{param_name}' not found in context",
                     source=f"TableValueProvider",
-                    action="GET_VALUE"
+                    action="GET_VALUE",
                 )
 
             # Filter dataframe
@@ -87,7 +91,7 @@ class TableValueProvider:
                 success=False,
                 error=f"No rows found in table '{source_ref.table}' matching the filter criteria",
                 source=f"TableValueProvider",
-                action="GET_VALUE"
+                action="GET_VALUE",
             )
 
         # Find the column with matching field name (case-insensitive)
@@ -102,7 +106,7 @@ class TableValueProvider:
                 success=False,
                 error=f"Field '{source_ref.field}' not found in table '{source_ref.table}'",
                 source=f"TableValueProvider",
-                action="GET_VALUE"
+                action="GET_VALUE",
             )
 
         # Get the value from the first row of the matched column
@@ -112,5 +116,5 @@ class TableValueProvider:
             success=True,
             value=value,
             source=f"TableValueProvider",
-            action=f"GET_VALUE: Found value for {value_name} in '{source_ref.table}.{column_name}'"
+            action=f"GET_VALUE: Found value for {value_name} in '{source_ref.table}.{column_name}'",
         )
