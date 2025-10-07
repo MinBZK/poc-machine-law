@@ -241,7 +241,7 @@ profiles:
           partnerschap_type: HUWELIJK
           partner_bsn: '999993872'
           has_partner: true
-          children:
+          kinderen:
           - bsn: '999991723'
             geboortedatum: '2020-06-10'
             naam: Kind 1
@@ -1620,7 +1620,7 @@ profiles:
         - bsn: '888888888'
           partnerschap_type: GEEN
           partner_bsn: null
-          children:
+          kinderen:
           - bsn: '111111111'
           - bsn: '222222222'
           has_partner: false
@@ -1631,7 +1631,7 @@ profiles:
           postcode: 1015CJ
           woonplaats: Amsterdam
           type: WOONADRES
-        children:
+        kinderen:
         - kind_bsn: '111111111'
           geboortedatum: '2020-03-01'
           naam: Sem de Jong
@@ -1696,7 +1696,7 @@ profiles:
           partnerschap_type: HUWELIJK
           partner_bsn: '999991905'
           has_partner: true
-          children:
+          kinderen:
           - bsn: '999991723'
             geboortedatum: '2020-06-10'
             naam: Kind 1
