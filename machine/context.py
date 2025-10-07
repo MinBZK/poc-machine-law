@@ -495,7 +495,9 @@ class RuleContext:
                             field["enum_values"] = enum_value
                             logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
                         else:
-                            logger.warning(f"Enum reference {field['enum']} resolved to non-iterable type {type(enum_value).__name__}: {enum_value}. Skipping.")
+                            logger.warning(
+                                f"Enum reference {field['enum']} resolved to non-iterable type {type(enum_value).__name__}: {enum_value}. Skipping."
+                            )
 
         return type_spec_copy
 
