@@ -1,8 +1,8 @@
 from typing import Any
+
 from ..context import NrmlRuleContext
 from ..evaluation_result import EvaluationResult, create_result, nested_result
 from ..item_helper import NrmlItemHelper
-from ...context import logger
 
 
 class TypeDefinitionEvaluator:
@@ -10,7 +10,6 @@ class TypeDefinitionEvaluator:
 
     def __init__(self):
         """Initialize stateless evaluator"""
-        pass
 
     def _try_resolve_from_definition(
         self, item_key: str, item: dict[str, Any], active_version: dict[str, Any]

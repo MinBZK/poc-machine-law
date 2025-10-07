@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import Mock
-from machine.nrml.expressions.expression_evaluator import ExpressionEvaluator
+
+import pytest
+
 from machine.nrml.context import NrmlRuleContext
 from machine.nrml.evaluation_result import create_result
+from machine.nrml.expressions.expression_evaluator import ExpressionEvaluator
 
 
 class TestExpressionEvaluator:

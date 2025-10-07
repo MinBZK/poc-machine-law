@@ -1,12 +1,10 @@
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import json
-
-import jsonref
 import pandas as pd
 import yaml
 
@@ -29,10 +27,7 @@ def load_file_cached(file_path: str) -> dict:
         return _file_cache[file_path]
 
     with open(file_path) as f:
-        if file_path.endswith(".json"):
-            data = json.load(f)
-        else:
-            data = yaml.load(f, Loader=Loader)
+        data = json.load(f) if file_path.endswith(".json") else yaml.load(f, Loader=Loader)
     _file_cache[file_path] = data
     return data
 
@@ -97,10 +92,7 @@ class RuleSpec:
                 break
 
         # Parse the date or use a default
-        if valid_from_str:
-            valid_from = datetime.strptime(valid_from_str, "%Y-%m-%d")
-        else:
-            valid_from = datetime(2020, 1, 1)  # Default placeholder date
+        valid_from = datetime.strptime(valid_from_str, "%Y-%m-%d") if valid_from_str else datetime(2020, 1, 1)
 
         return cls(
             path=path,

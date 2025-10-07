@@ -21,10 +21,7 @@ class NrmlItemHelper:
             raise ValueError("Multiple versions found but not all have validFrom dates")
 
         # Parse calculation date or use current date
-        if calculation_date:
-            calc_date = datetime.fromisoformat(calculation_date)
-        else:
-            calc_date = datetime.now()
+        calc_date = datetime.fromisoformat(calculation_date) if calculation_date else datetime.now()
 
         # Sort versions by validFrom date in descending order and find the first valid one
         sorted_versions = sorted(versions, key=lambda v: datetime.fromisoformat(v["validFrom"]), reverse=True)

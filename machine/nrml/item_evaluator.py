@@ -1,12 +1,10 @@
-from typing import Any
-
-from ..context import PathNode, RuleContext, logger
+from ..context import PathNode
 from .context import NrmlRuleContext
-from .items.calculated_value_evaluator import CalculatedValueEvaluator
-from .items.type_definition_evaluator import TypeDefinitionEvaluator
 from .evaluation_result import EvaluationResult
 from .item_helper import NrmlItemHelper
 from .item_type_analyzer import NrmlItemType, determine_item_type
+from .items.calculated_value_evaluator import CalculatedValueEvaluator
+from .items.type_definition_evaluator import TypeDefinitionEvaluator
 
 
 class NrmlItemEvaluator:

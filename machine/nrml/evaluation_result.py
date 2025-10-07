@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from enum import nonmember
 from typing import Any
 
 

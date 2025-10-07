@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import pandas as pd
-from pydantic_core.core_schema import none_schema
 
 from machine.events.claim.aggregate import Claim
+
 from ..context import PathNode
 from .evaluation_result import EvaluationResult
 

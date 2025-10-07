@@ -9,7 +9,6 @@ class ArgumentResolver:
 
     def __init__(self):
         """Initialize stateless resolver"""
-        pass
 
     def resolve_argument(self, argument: Any, context: NrmlRuleContext) -> EvaluationResult:
         """Resolve an argument which may contain references"""
@@ -34,4 +33,4 @@ class ArgumentResolver:
                 action="Resolved from argument value",
             )
 
-        raise ValueError(f"Failed to resolve argument reference")
+        raise ValueError("Failed to resolve argument reference")

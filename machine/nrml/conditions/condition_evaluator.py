@@ -1,8 +1,8 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
-from .comparison_evaluator import ComparisonEvaluator
 from ..evaluation_result import EvaluationResult
+from .comparison_evaluator import ComparisonEvaluator
 
 
 class ConditionEvaluator:

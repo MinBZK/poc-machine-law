@@ -1,9 +1,9 @@
 from typing import Any
 
-from ..context import NrmlRuleContext
-from .argument_resolver import ArgumentResolver
 from ..conditions.condition_evaluator import ConditionEvaluator
-from ..evaluation_result import create_result, EvaluationResult, nested_result
+from ..context import NrmlRuleContext
+from ..evaluation_result import EvaluationResult, create_result, nested_result
+from .argument_resolver import ArgumentResolver
 
 
 class ConditionalExpressionEvaluator:
@@ -35,7 +35,7 @@ class ConditionalExpressionEvaluator:
 
         return create_result(
             success=expression_result.Success,
-            action=f"Processing conditional expression",
+            action="Processing conditional expression",
             value=expression_result.Value,
             source=self.__class__.__name__,
             sub_results=[condition_result, expression_result],

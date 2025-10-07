@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import Mock
-from machine.nrml.items.calculated_value_evaluator import CalculatedValueEvaluator
+
+import pytest
+
 from machine.nrml.context import NrmlRuleContext
 from machine.nrml.evaluation_result import create_result
+from machine.nrml.items.calculated_value_evaluator import CalculatedValueEvaluator
 
 
 class TestCalculatedValueEvaluator:

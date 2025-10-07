@@ -1,8 +1,8 @@
 from typing import Any
 
 from ..context import NrmlRuleContext
-from .conditional_expression_evaluator import ConditionalExpressionEvaluator
 from ..evaluation_result import EvaluationResult
+from .conditional_expression_evaluator import ConditionalExpressionEvaluator
 
 
 class ExpressionEvaluator:

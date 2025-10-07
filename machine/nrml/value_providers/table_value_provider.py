@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 
-from ..evaluation_result import create_result, EvaluationResult
+from ..evaluation_result import EvaluationResult, create_result
 from .source_reference import SourceReference
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ class TableValueProvider:
 
     def _compute_providable_values(self) -> set[str]:
         """Compute set of values that this provider can provide from source references"""
-        return {key.upper() for key in self._source_references.keys()}
+        return {key.upper() for key in self._source_references}
 
     def can_provide_value(self, name: str) -> bool:
         """Check if the provider can provide a value for the given name"""
@@ -46,13 +46,11 @@ class TableValueProvider:
         value_name_upper = value_name.upper()
         source_ref = self._source_references.get(value_name_upper)
 
-        path = list[str]
-
         if not source_ref:
             return create_result(
                 success=False,
                 error=f"No source reference found for '{value_name}'",
-                source=f"TableValueProvider",
+                source="TableValueProvider",
                 action="GET VALUE",
             )
 
@@ -62,7 +60,7 @@ class TableValueProvider:
             return create_result(
                 success=False,
                 error=f"Dataframe '{source_ref.table}' is empty or not found",
-                source=f"TableValueProvider",
+                source="TableValueProvider",
                 action="GET VALUE",
             )
 
@@ -78,7 +76,7 @@ class TableValueProvider:
                 return create_result(
                     success=False,
                     error=f"Parameter '{param_name}' not found in context",
-                    source=f"TableValueProvider",
+                    source="TableValueProvider",
                     action="GET_VALUE",
                 )
 
@@ -90,7 +88,7 @@ class TableValueProvider:
             return create_result(
                 success=False,
                 error=f"No rows found in table '{source_ref.table}' matching the filter criteria",
-                source=f"TableValueProvider",
+                source="TableValueProvider",
                 action="GET_VALUE",
             )
 
@@ -105,7 +103,7 @@ class TableValueProvider:
             return create_result(
                 success=False,
                 error=f"Field '{source_ref.field}' not found in table '{source_ref.table}'",
-                source=f"TableValueProvider",
+                source="TableValueProvider",
                 action="GET_VALUE",
             )
 
@@ -115,6 +113,6 @@ class TableValueProvider:
         return create_result(
             success=True,
             value=value,
-            source=f"TableValueProvider",
+            source="TableValueProvider",
             action=f"GET_VALUE: Found value for {value_name} in '{source_ref.table}.{column_name}'",
         )

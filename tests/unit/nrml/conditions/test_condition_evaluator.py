@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import Mock
+
+import pytest
+
 from machine.nrml.conditions.condition_evaluator import ConditionEvaluator
 from machine.nrml.context import NrmlRuleContext
 from machine.nrml.evaluation_result import create_result

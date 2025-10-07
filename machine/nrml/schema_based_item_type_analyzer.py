@@ -1,11 +1,9 @@
 import json
-import os
-from pathlib import Path
-from typing import Any, Dict, List, Set
 from enum import Enum
+from pathlib import Path
+from typing import Any
 
-import jsonschema
-from jsonschema import validate, ValidationError
+from jsonschema import ValidationError, validate
 
 
 class NrmlItemType(Enum):
@@ -44,17 +42,17 @@ class NrmlSchemaBasedItemTypeAnalyzer:
         self.schema = self._load_schema()
         self.item_type_schemas = self._extract_item_type_schemas()
 
-    def _load_schema(self) -> Dict[str, Any]:
+    def _load_schema(self) -> dict[str, Any]:
         """Load the JSON schema file"""
         try:
-            with open(self.schema_path, "r", encoding="utf-8") as f:
+            with open(self.schema_path, encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError(f"Schema file not found: {self.schema_path}")
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in schema file: {e}")
 
-    def _extract_item_type_schemas(self) -> Dict[str, Dict[str, Any]]:
+    def _extract_item_type_schemas(self) -> dict[str, dict[str, Any]]:
         """Extract individual item type schemas from the $defs section"""
         defs = self.schema.get("$defs", {})
         item_type_schemas = {}
@@ -76,7 +74,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
 
         return item_type_schemas
 
-    def _validate_against_schema(self, version: Dict[str, Any], item_type: NrmlItemType) -> bool:
+    def _validate_against_schema(self, version: dict[str, Any], item_type: NrmlItemType) -> bool:
         """Validate a version object against a specific item type schema"""
         if item_type not in self.item_type_schemas:
             return False
@@ -93,7 +91,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
             # Handle any other validation errors
             return False
 
-    def determine_item_type(self, item: Dict[str, Any]) -> NrmlItemType:
+    def determine_item_type(self, item: dict[str, Any]) -> NrmlItemType:
         """
         Determine the NRML item type using schema validation.
 
@@ -134,7 +132,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
         # Fallback to rule-based detection if schema validation fails
         return self._fallback_rule_based_detection(version)
 
-    def _fallback_rule_based_detection(self, version: Dict[str, Any]) -> NrmlItemType:
+    def _fallback_rule_based_detection(self, version: dict[str, Any]) -> NrmlItemType:
         """Fallback to rule-based detection if schema validation fails"""
         # Check for presence of key fields
         has_target = "target" in version
@@ -163,16 +161,16 @@ class NrmlSchemaBasedItemTypeAnalyzer:
 
         return NrmlItemType.UNKNOWN
 
-    def get_schema_info(self, item_type: NrmlItemType) -> Dict[str, Any]:
+    def get_schema_info(self, item_type: NrmlItemType) -> dict[str, Any]:
         """Get schema information for a specific item type"""
         return self.item_type_schemas.get(item_type, {})
 
-    def get_required_fields(self, item_type: NrmlItemType) -> List[str]:
+    def get_required_fields(self, item_type: NrmlItemType) -> list[str]:
         """Get required fields for a specific item type"""
         schema = self.item_type_schemas.get(item_type, {})
         return schema.get("required", [])
 
-    def get_allowed_fields(self, item_type: NrmlItemType) -> Set[str]:
+    def get_allowed_fields(self, item_type: NrmlItemType) -> set[str]:
         """Get all allowed fields for a specific item type"""
         schema = self.item_type_schemas.get(item_type, {})
         properties = schema.get("properties", {})
@@ -183,7 +181,7 @@ class NrmlSchemaBasedItemTypeAnalyzer:
 _default_analyzer = None
 
 
-def determine_item_type(item: Dict[str, Any]) -> NrmlItemType:
+def determine_item_type(item: dict[str, Any]) -> NrmlItemType:
     """
     Convenience function to determine item type using the default schema-based analyzer.
 

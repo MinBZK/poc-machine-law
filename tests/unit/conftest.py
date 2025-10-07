@@ -1,9 +1,10 @@
+from typing import Any
+
 import pytest
-from typing import Dict, Any
 
 
 @pytest.fixture
-def simple_text_fact() -> Dict[str, Any]:
+def simple_text_fact() -> dict[str, Any]:
     """Simple text parameter fact like the Nationaliteit example"""
     return {
         "3c8e2a5f-1b6d-4e9c-7f2d-a5c3b6e1d9f4": {
@@ -19,7 +20,7 @@ def simple_text_fact() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def enumeration_fact() -> Dict[str, Any]:
+def enumeration_fact() -> dict[str, Any]:
     """Enumeration fact with predefined values (should not be parameter)"""
     return {
         "8c3f1d6a-5b9e-4f2c-d7b1-e3a6f4c8d5b2": {
@@ -35,7 +36,7 @@ def enumeration_fact() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def expression_fact() -> Dict[str, Any]:
+def expression_fact() -> dict[str, Any]:
     """Fact with expression (should not be parameter)"""
     return {
         "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d": {
@@ -82,7 +83,7 @@ def expression_fact() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def target_fact() -> Dict[str, Any]:
+def target_fact() -> dict[str, Any]:
     """Fact that is used as target (should not be parameter)"""
     return {
         "f1e2d3c4-5b6a-7c8d-9e0f-1a2b3c4d5e6f": {
@@ -98,7 +99,7 @@ def target_fact() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def brp_nationaliteit_facts(simple_text_fact, enumeration_fact, expression_fact, target_fact) -> Dict[str, Any]:
+def brp_nationaliteit_facts(simple_text_fact, enumeration_fact, expression_fact, target_fact) -> dict[str, Any]:
     """Complete brp_nationaliteit facts structure"""
     facts = {}
     facts.update(simple_text_fact)

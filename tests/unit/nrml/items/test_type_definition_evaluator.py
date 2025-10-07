@@ -1,9 +1,10 @@
-import pytest
 from unittest.mock import Mock
-from datetime import datetime
-from machine.nrml.items.type_definition_evaluator import TypeDefinitionEvaluator
+
+import pytest
+
 from machine.nrml.context import NrmlRuleContext
 from machine.nrml.evaluation_result import create_result
+from machine.nrml.items.type_definition_evaluator import TypeDefinitionEvaluator
 
 
 class TestTypeDefinitionEvaluator:

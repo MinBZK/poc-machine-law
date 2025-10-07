@@ -1,4 +1,3 @@
-import pytest
 from machine.nrml.rules_engine import NrmlRulesEngine
 
 

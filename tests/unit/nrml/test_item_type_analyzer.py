@@ -1,5 +1,4 @@
-import pytest
-from machine.nrml.item_type_analyzer import determine_item_type, NrmlItemType
+from machine.nrml.item_type_analyzer import NrmlItemType, determine_item_type
 
 
 class TestItemTypeAnalyzer:

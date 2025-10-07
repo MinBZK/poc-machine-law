@@ -1,12 +1,13 @@
 import json
-import time
 import statistics
+import time
 from pathlib import Path
-from typing import List
 
 from machine.nrml.item_type_analyzer import determine_item_type as rule_based_analyzer
 from machine.nrml.schema_based_item_type_analyzer import (
     NrmlSchemaBasedItemTypeAnalyzer,
+)
+from machine.nrml.schema_based_item_type_analyzer import (
     determine_item_type as schema_based_analyzer,
 )
 
@@ -16,7 +17,7 @@ def load_test_data():
     project_root = Path(__file__).parent.parent.parent
     brp_path = project_root / "law" / "nrml" / "brp_nationaliteit.nrml.json"
 
-    with open(brp_path, "r") as f:
+    with open(brp_path) as f:
         data = json.load(f)
 
     # Extract all items for testing
@@ -28,7 +29,7 @@ def load_test_data():
     return items
 
 
-def measure_analyzer_performance(analyzer_func, items: List, iterations: int = 1000):
+def measure_analyzer_performance(analyzer_func, items: list, iterations: int = 1000):
     """Measure performance of an analyzer function"""
     times = []
 
@@ -94,7 +95,7 @@ def test_initialization_overhead():
 
     for _ in range(iterations):
         start_time = time.perf_counter()
-        analyzer = NrmlSchemaBasedItemTypeAnalyzer()
+        NrmlSchemaBasedItemTypeAnalyzer()
         end_time = time.perf_counter()
         init_times.append(end_time - start_time)
 

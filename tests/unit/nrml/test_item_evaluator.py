@@ -1,8 +1,10 @@
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
-from machine.nrml.item_evaluator import NrmlItemEvaluator
+
 from machine.nrml.context import NrmlRuleContext
 from machine.nrml.evaluation_result import create_result
+from machine.nrml.item_evaluator import NrmlItemEvaluator
 from machine.nrml.item_type_analyzer import NrmlItemType
 
 
@@ -95,7 +97,7 @@ class TestNrmlItemEvaluator:
         evaluator.evaluators[NrmlItemType.TYPE_DEFINITION].evaluate = Mock(return_value=mock_result)
 
         initial_path_length = len(context.path)
-        result = evaluator.evaluate_item("test_item", context)
+        evaluator.evaluate_item("test_item", context)
 
         # Path should be restored to original length
         assert len(context.path) == initial_path_length

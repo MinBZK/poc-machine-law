@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Union
+from typing import Any
 
 import pandas as pd
 from eventsourcing.system import SingleThreadedRunner, System
@@ -23,7 +23,7 @@ class EngineFactory:
     """Factory class for creating RulesEngine instances"""
 
     @staticmethod
-    def create_engine(spec: dict, service_provider: Any) -> Union[RulesEngine, NrmlRulesEngine]:
+    def create_engine(spec: dict, service_provider: Any) -> RulesEngine | NrmlRulesEngine:
         """Create a RulesEngine instance with the given specification and service provider"""
 
         # TODO: For now the existence of a schema means we are dealing with a JSON (NRML) file. Find a more direct way to determine this
