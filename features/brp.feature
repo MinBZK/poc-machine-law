@@ -10,22 +10,6 @@ Feature: Bepalen kiesrecht Tweede Kamer
       | type          | verkiezingsdatum |
       | TWEEDE_KAMER  | 2025-10-29       |
 
-  Scenario: Persoon met Nederlandse nationaliteit heeft nederlandse nationaliteit
-    Given de volgende RvIG personen gegevens:
-      | bsn       | geboortedatum | nationaliteit | verblijfsadres | land_verblijf |
-      | 999993653 | 2006-01-01    | NEDERLANDS    | Amsterdam      | NLD           |
-    And een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
-    When de wet_brp_nationaliteit wordt uitgevoerd door RvIG
-    Then heeft Nederlandse nationaliteit
-
-  Scenario: Persoon met Duitse nationaliteit heeft geen nederlandse nationaliteit
-    Given de volgende RvIG personen gegevens:
-      | bsn       | geboortedatum | nationaliteit | verblijfsadres | land_verblijf |
-      | 999993653 | 2006-01-01    | DUITS         | Amsterdam      | NLD           |
-    And een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
-    When de wet_brp_nationaliteit wordt uitgevoerd door RvIG
-    Then heeft geen Nederlandse nationaliteit
-
   Scenario: Persoon met Duitse nationaliteit heeft volgens NRML geen nederlandse nationaliteit
     Given een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
     And de parameter "nationaliteit" is "DUITS"

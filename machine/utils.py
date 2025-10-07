@@ -16,6 +16,7 @@ except ImportError:
     from yaml import Loader
 
 BASE_DIR = "law"
+NRML_BASE_DIR = "nrml-law"
 
 
 # Cache for parsed files
@@ -127,9 +128,12 @@ class RuleResolver:
 
     def _load_rules(self) -> None:
         """Load all rule specifications from the rules directory"""
-        # Use Path.rglob to find all .yaml, .yml, and .json files recursively
+        # Use Path.rglob to find all .yaml, .yml files from law directory
         yaml_files = list(self.rules_dir.rglob("*.yaml")) + list(self.rules_dir.rglob("*.yml"))
-        json_files = list(self.rules_dir.rglob("*.json"))
+
+        # Load JSON files from nrml-law directory
+        nrml_dir = Path(NRML_BASE_DIR)
+        json_files = list(nrml_dir.rglob("*.json")) if nrml_dir.exists() else []
 
         # Load YAML files
         for path in yaml_files:
