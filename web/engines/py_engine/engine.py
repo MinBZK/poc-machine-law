@@ -54,17 +54,12 @@ class PythonMachineService(EngineInterface):
     ) -> RuleResult:
         """
         Evaluate rules using the embedded Python machine.service library.
-
-        Note: Profile data is loaded at startup (see factory.py), so no need to load per request.
         """
 
         # Get the rule specification
         rule_spec = self.get_rule_spec(law, datetime.today().strftime("%Y-%m-%d"), service)
         if not rule_spec:
             raise HTTPException(status_code=400, detail="Invalid law specified")
-
-        # Profile data is already loaded at startup in factory.py
-        # All personas (including partners and children) are available in dataframes
 
         result = self.services.evaluate(
             service=service,
