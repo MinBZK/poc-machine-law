@@ -34,7 +34,7 @@ async def get_edit_form(
 ):
     """Return the edit form HTML"""
     # Get all 'value' query parameters (there might be multiple for arrays)
-    values = request.query_params.getlist('value')
+    values = request.query_params.getlist("value")
 
     # Parse value(s)
     if len(values) == 0:

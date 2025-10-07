@@ -85,7 +85,6 @@
         <!-- Check if this is an array of dicts change -->
         {% set is_old_list_of_dicts = claim.old_value is sequence and claim.old_value is not string and claim.old_value|length > 0 and claim.old_value[0] is mapping %}
         {% set is_new_list_of_dicts = claim.new_value is sequence and claim.new_value is not string and claim.new_value|length > 0 and claim.new_value[0] is mapping %}
-
         {% if is_old_list_of_dicts or is_new_list_of_dicts %}
             <!-- Array of dicts change - show simple change indicator -->
             <span class="text-gray-500 text-xs italic">(gewijzigd)</span>
