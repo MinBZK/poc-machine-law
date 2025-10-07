@@ -4,10 +4,10 @@ from typing import Any
 import pandas as pd
 from fastapi import HTTPException
 
+from machine.profile_loader import get_project_root, load_profiles_from_yaml
 from machine.service import Services
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
-from .services.profiles import get_all_profiles, get_business_data, get_profile_data
 
 
 class PythonMachineService(EngineInterface):
@@ -28,7 +28,8 @@ class PythonMachineService(EngineInterface):
         Returns:
             Dictionary containing profile data or None if not found
         """
-        return get_profile_data(bsn)
+        profiles = self.get_all_profiles()
+        return profiles.get(bsn)
 
     def get_all_profiles(self) -> dict[str, dict[str, Any]]:
         """
@@ -37,7 +38,9 @@ class PythonMachineService(EngineInterface):
         Returns:
             Dictionary mapping BSNs to profile data
         """
-        return get_all_profiles()
+        project_root = get_project_root()
+        profiles_path = project_root / "data" / "profiles.yaml"
+        return load_profiles_from_yaml(profiles_path)
 
     def evaluate(
         self,
@@ -51,6 +54,8 @@ class PythonMachineService(EngineInterface):
     ) -> RuleResult:
         """
         Evaluate rules using the embedded Python machine.service library.
+
+        Note: Profile data is loaded at startup (see factory.py), so no need to load per request.
         """
 
         # Get the rule specification
@@ -58,11 +63,8 @@ class PythonMachineService(EngineInterface):
         if not rule_spec:
             raise HTTPException(status_code=400, detail="Invalid law specified")
 
-        # Load profile/business data based on parameter type
-        if "BSN" in parameters:
-            self.set_profile_data(parameters["BSN"])
-        elif "KVK_NUMMER" in parameters:
-            self.set_business_data(parameters["KVK_NUMMER"])
+        # Profile data is already loaded at startup in factory.py
+        # All personas (including partners and children) are available in dataframes
 
         result = self.services.evaluate(
             service=service,
@@ -121,43 +123,8 @@ class PythonMachineService(EngineInterface):
         """
         return self.services.resolver.get_rule_spec(law, reference_date, service)
 
-    def set_profile_data(self, bsn: str) -> None:
-        """
-        Load profile data for a BSN into the machine service.
-
-        Args:
-            bsn: BSN identifier for the individual
-        """
-        # Get profile data for the BSN
-        profile_data = get_profile_data(bsn)
-        if not profile_data:
-            raise HTTPException(status_code=404, detail="Profile not found")
-
-        # Load source data into services
-        for service_name, tables in profile_data["sources"].items():
-            for table_name, data in tables.items():
-                df = pd.DataFrame(data)
-                self.set_source_dataframe(service_name, table_name, df)
-
-    def set_business_data(self, kvk_nummer: str) -> None:
-        """
-        Load business data for a KVK nummer into the machine service.
-
-        Args:
-            kvk_nummer: KVK nummer identifier for the business
-        """
-        # Get business data for the KVK nummer
-        business_data = get_business_data(kvk_nummer)
-        if not business_data:
-            raise HTTPException(status_code=404, detail="Business not found")
-
-        # Load source data into services
-        for service_name, tables in business_data["sources"].items():
-            for table_name, data in tables.items():
-                df = pd.DataFrame(data)
-                self.set_source_dataframe(service_name, table_name, df)
-
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
+        """Set a source dataframe for a service and table."""
         self.services.set_source_dataframe(service, table, df)
 
 
