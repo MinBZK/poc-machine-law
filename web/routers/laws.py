@@ -103,7 +103,9 @@ async def execute_law(
         )
 
     except Exception as e:
-        print(e)
+        import traceback
+        print(f"Error evaluating law {service}.{law}: {e}")
+        traceback.print_exc()
         return templates.TemplateResponse(
             get_tile_template(service, law),
             {
