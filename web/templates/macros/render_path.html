@@ -296,7 +296,7 @@
                                                                 <select x-model="item.{{ field.name }}"
                                                                         class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                                                     <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
-                                                                    {% if field.enum_values is defined %}
+                                                                    {% if field.enum_values is defined and field.enum_values is iterable and field.enum_values is not string %}
                                                                         {% for value in field.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
                                                                     {% elif field.enum is defined and field.enum is iterable and field.enum is not string %}
                                                                         {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}
@@ -306,7 +306,7 @@
                                                                 <select x-model="item.{{ field.name }}"
                                                                         class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                                                     <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
-                                                                    {% if field.enum_values is defined %}
+                                                                    {% if field.enum_values is defined and field.enum_values is iterable and field.enum_values is not string %}
                                                                         {% for value in field.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
                                                                     {% elif field.enum is defined and field.enum is iterable and field.enum is not string %}
                                                                         {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}

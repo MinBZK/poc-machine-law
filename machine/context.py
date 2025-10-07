@@ -490,8 +490,12 @@ class RuleContext:
                     # Gebruik resolve_value om de enum-referentie op te lossen
                     enum_value = self.resolve_value(field["enum"])
                     if enum_value is not None:
-                        field["enum_values"] = enum_value
-                        logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
+                        # Ensure enum_value is a list
+                        if isinstance(enum_value, (list, tuple)):
+                            field["enum_values"] = enum_value
+                            logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
+                        else:
+                            logger.warning(f"Enum reference {field['enum']} resolved to non-iterable type {type(enum_value).__name__}: {enum_value}. Skipping.")
 
         return type_spec_copy
 
