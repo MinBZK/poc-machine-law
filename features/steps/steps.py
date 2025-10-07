@@ -916,5 +916,3 @@ def step_impl(context, field, value):
         value, actual,
         f"Expected {field} to contain '{value}', but it contains {actual}"
     )
-
-
