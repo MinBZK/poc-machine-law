@@ -57,7 +57,7 @@
                                 <span class="flex-1">
                                     {% for key, val in item.items() %}
                                         {% if key not in ['bsn', 'kind_bsn'] %}
-                                            <span class="text-gray-700">{{ key|replace('_', ' ')|title }}:</span>
+                                            <span class="text-gray-700">{{ key|replace('_', ' ') |title }}:</span>
                                             <span class="font-medium">{{ val }}</span>
                                             {% if not loop.last %}<span class="text-gray-400 mx-1">|</span>{% endif %}
                                         {% endif %}
