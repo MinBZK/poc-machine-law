@@ -82,47 +82,56 @@
     </button>
     {% if (service, law, key) in claim_map %}
         {% set claim = claim_map[(service, law, key)] %}
-        <!-- Original value display -->
-        <span class="text-gray-500 text-xs">
-            {% if claim.old_value is boolean %}
-                {{ 'Ja' if claim.old_value else 'Nee' }}
-            {% elif claim.old_value is number %}
-                {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
-                    {{ (claim.old_value / 100) | format_currency }}
-                {% elif claim.old_value % 1 != 0 %}
-                    {{ '%.5f'|format(claim.old_value) }}
+        <!-- Check if this is an array of dicts change -->
+        {% set is_old_list_of_dicts = claim.old_value is sequence and claim.old_value is not string and claim.old_value|length > 0 and claim.old_value[0] is mapping %}
+        {% set is_new_list_of_dicts = claim.new_value is sequence and claim.new_value is not string and claim.new_value|length > 0 and claim.new_value[0] is mapping %}
+
+        {% if is_old_list_of_dicts or is_new_list_of_dicts %}
+            <!-- Array of dicts change - show simple change indicator -->
+            <span class="text-gray-500 text-xs italic">(gewijzigd)</span>
+        {% else %}
+            <!-- Original value display for non-array-of-dicts -->
+            <span class="text-gray-500 text-xs">
+                {% if claim.old_value is boolean %}
+                    {{ 'Ja' if claim.old_value else 'Nee' }}
+                {% elif claim.old_value is number %}
+                    {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                        {{ (claim.old_value / 100) | format_currency }}
+                    {% elif claim.old_value % 1 != 0 %}
+                        {{ '%.5f'|format(claim.old_value) }}
+                    {% else %}
+                        {{ claim.old_value }}
+                    {% endif %}
+                {% elif claim.old_value is mapping %}
+                    {{ claim.old_value|tojson }}
+                {% elif claim.old_value is sequence and claim.old_value is not string %}
+                    {{ claim.old_value|join(", ") }}
                 {% else %}
                     {{ claim.old_value }}
                 {% endif %}
-            {% elif claim.old_value is mapping %}
-                {{ claim.old_value|tojson }}
-            {% elif claim.old_value is sequence and claim.old_value is not string %}
-                {{ claim.old_value|join(", ") }}
-            {% else %}
-                {{ claim.old_value }}
-            {% endif %}
-        </span>
-        <span class="text-gray-500 text-xs">→</span>
-        <!-- New value display -->
-        <span class="text-gray-500 text-xs">
-            {% if claim.new_value is boolean %}
-                {{ 'Ja' if claim.new_value else 'Nee' }}
-            {% elif claim.new_value is number %}
-                {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
-                    {{ (claim.new_value / 100) | format_currency }}
-                {% elif claim.new_value % 1 != 0 %}
-                    {{ '%.5f'|format(claim.new_value) }}
+            </span>
+            <span class="text-gray-500 text-xs">→</span>
+            <!-- New value display for non-array-of-dicts -->
+            <span class="text-gray-500 text-xs">
+                {% if claim.new_value is boolean %}
+                    {{ 'Ja' if claim.new_value else 'Nee' }}
+                {% elif claim.new_value is number %}
+                    {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                        {{ (claim.new_value / 100) | format_currency }}
+                    {% elif claim.new_value % 1 != 0 %}
+                        {{ '%.5f'|format(claim.new_value) }}
+                    {% else %}
+                        {{ claim.new_value }}
+                    {% endif %}
+                {% elif claim.new_value is mapping %}
+                    {{ claim.new_value|tojson }}
+                {% elif claim.new_value is sequence and claim.new_value is not string %}
+                    {{ claim.new_value|join(", ") }}
                 {% else %}
                     {{ claim.new_value }}
                 {% endif %}
-            {% elif claim.new_value is mapping %}
-                {{ claim.new_value|tojson }}
-            {% elif claim.new_value is sequence and claim.new_value is not string %}
-                {{ claim.new_value|join(", ") }}
-            {% else %}
-                {{ claim.new_value }}
-            {% endif %}
-        </span>
+            </span>
+        {% endif %}
         {% if claim.status == "PENDING" %}
             <div class="ml-2 inline-flex items-center gap-1">
                 <div class="inline-flex gap-1 ml-2">
