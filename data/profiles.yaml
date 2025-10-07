@@ -1127,7 +1127,7 @@ profiles:
           zorg_type: BASIS
   '999993655':
     name: Sarah de Wit
-    description: Dakloze met briefadres, recht op bijstand met woonkostentoeslag
+    description: Dakloze met briefadres, gehuwd met Maria Pietersen, recht op bijstand met woonkostentoeslag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1141,15 +1141,15 @@ profiles:
           nationaliteit: NEDERLANDS
           age: 45
           has_dutch_nationality: true
-          has_partner: false
+          has_partner: true
           residence_address: De Regenboog Groep, 1, 1012NX Amsterdam
           has_fixed_address: false
-          household_size: 1
+          household_size: 2
         relaties:
         - bsn: '999993655'
-          partnerschap_type: GEEN
-          partner_bsn: null
-          has_partner: false
+          partnerschap_type: HUWELIJK
+          partner_bsn: '999993654'
+          has_partner: true
         verblijfplaats:
         - bsn: '999993655'
           straat: De Regenboog Groep
