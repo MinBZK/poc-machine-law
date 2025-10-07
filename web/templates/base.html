@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Burger.nl</title>
+        <title>RegelRecht Demo</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <script defer
@@ -31,24 +31,6 @@
             display: none !important;
         }
 
-        body::before {
-            content: "In ontwikkeling";
-            position: fixed;
-            width: 180px;
-            top: 30px;
-            right: -50px;
-            text-align: center;
-            font-size: 15px;
-            font-weight: 500;
-            padding: 5px 0;
-            background-color: #FACC15;
-            color: #000;
-            transform: rotate(45deg);
-            transform-origin: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
-            pointer-events: none;
-        }
 
         </style>
         <script>
@@ -99,6 +81,13 @@
     <body class="min-h-screen bg-gray-50"
           x-data="{ openWallet() { window.openWalletModal(); } }"
           x-on:open-wallet-modal.window="openWallet()">
+        <!-- Proof of Concept Ribbon -->
+        <a href="https://minbzk.github.io/regelrecht"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="fixed z-[10000] w-[180px] top-[30px] right-[-50px] text-center text-[15px] font-medium py-[5px] bg-[#FACC15] text-black transform rotate-45 origin-center shadow-md hover:bg-[#EAB308] transition-colors no-underline">
+            Proof of Concept
+        </a>
         <!-- Header -->
         <header class="bg-linear-to-br from-blue-600 to-blue-800 text-white"
                 x-data="{ mobileMenuOpen: false }">
@@ -129,7 +118,7 @@
                                     <path d="M6 20.05V20a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v.05" />
                                     </g>
                                 </svg>
-                                Burger.nl
+                                RegelRecht
                             </a>
                         </h1>
                         <!-- Desktop Navigation -->
@@ -840,16 +829,28 @@
             <div class="container mx-auto px-4 py-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h4 class="font-semibold text-gray-900 mb-4">Demo Implementatie</h4>
-                        <p class="text-gray-600">Deze demo laat zien hoe wetten als code werken</p>
+                        <h4 class="font-semibold text-gray-900 mb-4">RegelRecht</h4>
+                        <p class="text-gray-600">Een demonstratie van Nederlandse wetgeving als uitvoerbare code</p>
+                        <a href="https://minbzk.github.io/regelrecht"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="text-blue-600 hover:text-blue-800 text-sm flex items-center mt-2">
+                            Bezoek de RegelRecht website
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </a>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-gray-900 mb-4">Brongegevens</h4>
-                        <p class="text-gray-600">Gegevens in deze demo zijn fictief</p>
+                        <h4 class="font-semibold text-gray-900 mb-4">Disclaimer</h4>
+                        <p class="text-gray-600 text-sm">
+                            Dit is een proof of concept. Alle gegevens zijn fictief.
+                            Niet gebruiken voor daadwerkelijke besluitvorming.
+                        </p>
                     </div>
                 </div>
                 <div class="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-xs">
-                    © 2025 Burger.nl demo | <span class="cursor-pointer hover:underline">v1.0.0</span>
+                    © 2025 RegelRecht Demo | <span class="cursor-pointer hover:underline">v1.0.0</span>
                 </div>
             </div>
         </footer>
