@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	eh "github.com/looplab/eventhorizon"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 )
 
@@ -102,12 +102,12 @@ var _ eh.EventHandler = &EventIndexer{}
 
 // Logger is a simple event handler for logging all events.
 type EventIndexer struct {
-	logger logging.Logger
+	logger logger.Logger
 	events []model.Event
 	mutex  sync.RWMutex
 }
 
-func NewEventIndexer(logger logging.Logger) *EventIndexer {
+func NewEventIndexer(logger logger.Logger) *EventIndexer {
 	return &EventIndexer{
 		logger: logger,
 		events: make([]model.Event, 0),

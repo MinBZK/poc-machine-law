@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"sync"
 
-	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/engine"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 )
 
 // RuleService interface for executing business rules for a specific service
 type RuleService struct {
-	logger           logging.Logger
+	logger           logger.Logger
 	ServiceName      string
-	Services         contexter.ServiceProvider
+	Services         service.ServiceProvider
 	Resolver         *ruleresolver.RuleResolver
 	engines          map[string]map[string]*engine.RulesEngine
 	SourceDataFrames model.SourceDataFrame
@@ -24,8 +24,8 @@ type RuleService struct {
 }
 
 // New creates a new rule service instance
-func New(logger logging.Logger, serviceName string, services contexter.ServiceProvider) (*RuleService, error) {
-	logger.Warningf(context.Background(), "creating inmemory ruleservice: %s", serviceName)
+func New(logger logger.Logger, serviceName string, services service.ServiceProvider) (*RuleService, error) {
+	logger.Warningf("creating inmemory ruleservice: %s", serviceName)
 
 	resolver, err := ruleresolver.New()
 	if err != nil {
@@ -66,7 +66,7 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 		return nil, fmt.Errorf("rule spec service '%s' does not match service '%s'", spec.Service, rs.ServiceName)
 	}
 
-	ruleEngine := engine.NewRulesEngine(rs.logger, spec, rs.Services, referenceDate)
+	ruleEngine := engine.NewRulesEngine(spec, rs.Services, referenceDate)
 	rs.engines[law][referenceDate] = ruleEngine
 
 	return ruleEngine, nil

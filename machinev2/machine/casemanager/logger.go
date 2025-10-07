@@ -4,14 +4,14 @@ import (
 	"context"
 
 	eh "github.com/looplab/eventhorizon"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logging"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 )
 
 // LoggingMiddleware is a tiny command handle middleware for logging.
-func LoggingMiddleware(logger logging.Logger) func(h eh.CommandHandler) eh.CommandHandler {
+func LoggingMiddleware(logr logger.Logger) func(h eh.CommandHandler) eh.CommandHandler {
 	return func(h eh.CommandHandler) eh.CommandHandler {
 		return eh.CommandHandlerFunc(func(ctx context.Context, cmd eh.Command) error {
-			logger.Debug(ctx, "command handler", logging.NewField("commandType", cmd.CommandType()), logging.NewField("itemId", cmd.AggregateID()), logging.NewField("itemType", cmd.AggregateType()))
+			logr.Debug("command handler", logger.NewField("commandType", cmd.CommandType()), logger.NewField("itemId", cmd.AggregateID()), logger.NewField("itemType", cmd.AggregateType()))
 			return h.HandleCommand(ctx, cmd)
 		})
 	}
@@ -19,12 +19,12 @@ func LoggingMiddleware(logger logging.Logger) func(h eh.CommandHandler) eh.Comma
 
 // Logger is a simple event handler for logging all events.
 type Logger struct {
-	logger logging.Logger
+	logger logger.Logger
 }
 
-func NewLogger(logger logging.Logger) *Logger {
+func NewLogger(logger logger.Logger) *Logger {
 	return &Logger{
-		logger: logger,
+		logger: logger.WithName("casemanager"),
 	}
 }
 
@@ -35,6 +35,6 @@ func (l *Logger) HandlerType() eh.EventHandlerType {
 
 // HandleEvent implements the HandleEvent method of the EventHandler interface.
 func (l *Logger) HandleEvent(ctx context.Context, event eh.Event) error {
-	l.logger.Debug(ctx, "handle event", logging.NewField("eventType", event.EventType()), logging.NewField("itemId", event.AggregateID()), logging.NewField("itemType", event.AggregateType()), logging.NewField("event", event.Data()))
+	l.logger.Debug("handle event", logger.NewField("eventType", event.EventType()), logger.NewField("itemId", event.AggregateID()), logger.NewField("itemType", event.AggregateType()), logger.NewField("event", event.Data()))
 	return nil
 }

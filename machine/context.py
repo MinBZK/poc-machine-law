@@ -241,6 +241,25 @@ class RuleContext:
                     spec = self.property_specs[path]
                     source_ref = spec.get("source_reference", {})
                     if source_ref:
+                        # Check source overwrite data first
+                        if (
+                            source_ref.get("source_type") in self.overwrite_input
+                            and path in self.overwrite_input[source_ref["source_type"]]
+                        ):
+                            value = self.overwrite_input[source_ref["source_type"]][path]
+                            logger.debug(f"Resolving from SOURCE OVERRIDE: {value}")
+                            node.result = value
+                            node.resolve_type = "SOURCE_OVERRIDE"
+                            node.required = bool(spec.get("required", False))
+
+                            # Add type information to the node
+                            if "type" in spec:
+                                node.details["type"] = spec["type"]
+                            if "type_spec" in spec:
+                                resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
+                                node.details["type_spec"] = resolved_type_spec
+
+                            return value
                         df = None
                         table = None
                         if source_ref.get("source_type") == "laws":
