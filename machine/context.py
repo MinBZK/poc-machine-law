@@ -412,7 +412,9 @@ class RuleContext:
                 return str(v)
             return v
 
-        cache_key = f"{path}({','.join([f'{k}:{param_to_str(v)}' for k, v in sorted(parameters.items())])},{reference_date})"
+        cache_key = (
+            f"{path}({','.join([f'{k}:{param_to_str(v)}' for k, v in sorted(parameters.items())])},{reference_date})"
+        )
         if cache_key in self.values_cache:
             logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
             return self.values_cache[cache_key]

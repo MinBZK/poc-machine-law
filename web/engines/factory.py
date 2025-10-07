@@ -51,6 +51,7 @@ def _initialize_profiles(services_instance: Services) -> None:
 
         # Load the raw YAML to access globalServices
         import yaml
+
         with open(profiles_path, "r") as f:
             raw_data = yaml.safe_load(f)
 
@@ -117,9 +118,7 @@ def _initialize_profiles(services_instance: Services) -> None:
                     if table_name in rule_service.source_dataframes:
                         # Append to existing dataframe
                         existing_df = rule_service.source_dataframes[table_name]
-                        rule_service.source_dataframes[table_name] = pd.concat(
-                            [existing_df, df], ignore_index=True
-                        )
+                        rule_service.source_dataframes[table_name] = pd.concat([existing_df, df], ignore_index=True)
                         logger.debug(f"Appended {len(df)} rows to {service_name}.{table_name}")
                     else:
                         # Create new dataframe (this shouldn't happen if globals are loaded first)
