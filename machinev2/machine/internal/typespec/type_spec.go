@@ -8,6 +8,20 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 )
 
+// roundHalfToEven implements banker's rounding (round half to even)
+// to match Python's round() behavior.
+// Examples: 12.5 -> 12, 13.5 -> 14, 14.5 -> 14, 15.5 -> 16
+func roundHalfToEven(x float64) float64 {
+	t := math.Trunc(x)
+	if math.Abs(x-t) != 0.5 {
+		return math.Round(x)
+	}
+	if math.Mod(t, 2) == 0 {
+		return t
+	}
+	return t + math.Copysign(1, x)
+}
+
 // Enforce applies type specifications to a value
 func Enforce(ts model.TypeSpec, value any) any {
 	if value == nil {
@@ -52,18 +66,20 @@ func Enforce(ts model.TypeSpec, value any) any {
 	// Apply precision
 	if ts.Precision != nil {
 		if *ts.Precision == 0 {
-			return int(math.Round(floatVal))
+			// Use banker's rounding (round half to even) to match Python's behavior
+			// Python's round(12.5, 0) = 12.0, round(13.5, 0) = 14.0
+			return int(roundHalfToEven(floatVal))
 		}
 
 		factor := math.Pow(10, float64(*ts.Precision))
-		floatVal = math.Round(floatVal*factor) / factor
+		floatVal = roundHalfToEven(floatVal*factor) / factor
 	}
 
 	// Convert to int for cent units
 	if ts.Unit != nil {
 		switch *ts.Unit {
 		case "eurocent":
-			return int(math.Round(floatVal))
+			return int(roundHalfToEven(floatVal))
 		}
 	}
 

@@ -17,7 +17,7 @@
                 <div id="feature-loading-{{ name }}" class="htmx-indicator">
                     <div class="spinner w-6 h-6 border-2 border-t-2 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
                 </div>
-                <label class="font-medium">{{ name|title }}</label>
+                <label class="font-medium">{{ name.replace('_', ' ') |title }}</label>
             </div>
         {% endfor %}
     </div>

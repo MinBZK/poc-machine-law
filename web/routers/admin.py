@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 from uuid import UUID
 
+from eventsourcing.application import AggregateNotFoundError
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
@@ -23,6 +24,17 @@ from web.routers.laws import evaluate_law
 
 config_loader = ConfigLoader()
 llm_factory = LLMFactory()
+
+
+def get_person_name(bsn: str, services: EngineInterface) -> str:
+    """Get person name from BSN, fallback to BSN if name not found"""
+    try:
+        profile_data = services.get_profile_data(bsn)
+        if profile_data and "name" in profile_data:
+            return profile_data["name"]
+    except Exception:
+        pass
+    return bsn  # Fallback to BSN if name not found
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -90,7 +102,9 @@ def group_cases_by_status(cases):
 @router.get("/")
 async def admin_redirect(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Redirect to first available service"""
-    discoverable_laws = services.get_discoverable_service_laws()
+    discoverable_laws = services.get_discoverable_service_laws("CITIZEN") | services.get_discoverable_service_laws(
+        "BUSINESS"
+    )
     available_services = list(discoverable_laws.keys())
     return RedirectResponse(f"/admin/{available_services[0]}")
 
@@ -264,7 +278,9 @@ async def admin_dashboard(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
-    discoverable_laws = services.get_discoverable_service_laws()
+    discoverable_laws = services.get_discoverable_service_laws("CITIZEN") | services.get_discoverable_service_laws(
+        "BUSINESS"
+    )
     available_services = list(discoverable_laws.keys())
 
     # Get cases for selected service
@@ -272,6 +288,9 @@ async def admin_dashboard(
     service_cases = {}
     for law in service_laws:
         cases = case_manager.get_cases_by_law(service, law)
+        # Add person names to cases
+        for case in cases:
+            case.person_name = get_person_name(case.bsn, services)
         service_cases[law] = group_cases_by_status(cases)
 
     return templates.TemplateResponse(
@@ -292,6 +311,7 @@ async def move_case(
     case_id: str,
     new_status: str = Form(...),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
+    services: EngineInterface = Depends(get_machine_service),
 ):
     """Handle case movement between status lanes"""
     print(f"Moving case {case_id} to status {new_status}")  # Debug print
@@ -301,7 +321,10 @@ async def move_case(
         except KeyError:
             raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
 
-        case = case_manager.get_case_by_id(case_id)
+        try:
+            case = case_manager.get_case_by_id(case_id)
+        except AggregateNotFoundError:
+            raise HTTPException(status_code=404, detail="Case not found")
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
 
@@ -335,6 +358,9 @@ async def move_case(
 
         case_manager.save(case)
 
+        # Add person name to case
+        case.person_name = get_person_name(case.bsn, services)
+
         # Return just the updated card
         return templates.TemplateResponse(
             "admin/partials/case_card.html",
@@ -352,6 +378,7 @@ async def complete_review(
     decision: bool = Form(...),
     reason: str = Form(...),  # Note: changed from reasoning to match form
     case_manager: CaseManagerInterface = Depends(get_case_manager),
+    services: EngineInterface = Depends(get_machine_service),
 ):
     """Complete manual review of a case"""
     try:
@@ -359,6 +386,9 @@ async def complete_review(
 
         # Get the updated case
         updated_case = case_manager.get_case_by_id(case_id)
+
+        # Add person name to case
+        updated_case.person_name = get_person_name(updated_case.bsn, services)
 
         # Check if request is from case detail page
         is_detail_page = request.headers.get("HX-Current-URL", "").endswith(f"/cases/{case_id}")
@@ -400,7 +430,10 @@ async def view_case(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """View details of a specific case"""
-    case = case_manager.get_case_by_id(case_id)
+    try:
+        case = case_manager.get_case_by_id(case_id)
+    except AggregateNotFoundError:
+        raise HTTPException(status_code=404, detail="Case not found")
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
@@ -410,6 +443,7 @@ async def view_case(
     claims = claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
     claim_ids = {claim.id: claim for claim in claims}
     claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
+    person_name = get_person_name(case.bsn, machine_service)
     return templates.TemplateResponse(
         "admin/case_detail.html",
         {
@@ -418,6 +452,7 @@ async def view_case(
             "path": value_tree,
             "claim_map": claim_map,
             "claim_ids": claim_ids,
+            "person_name": person_name,
         },
     )
 

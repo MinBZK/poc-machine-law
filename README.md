@@ -9,6 +9,9 @@
 
 > Een proof-of-concept voor het uitvoeren van machine-leesbare specificaties van Nederlandse wet- en regelgeving.
 
+Deze PoC is onderdeel van het **[RegelRecht Ecosysteem](https://minbzk.github.io/regelrecht/)**.
+
+
 ## 💡 Motivatie
 
 Veel Nederlandse wetten zijn in essentie mechanische processen. Dit wordt duidelijk uit deze drie voorbeelden:
@@ -139,9 +142,9 @@ Vooralsnog zijn deze wetten geïmplementeerd in `machine law` (met behulp van ee
 
 ## 🚀 Aan de slag
 
-Clone deze repository:
+Clone deze repository inclusief submodules:
 ```bash
-git clone git@github.com:MinBZK/poc-machine-law.git
+git clone --recurse-submodules git@github.com:MinBZK/poc-machine-law.git
 cd poc-machine-law
 ```
 

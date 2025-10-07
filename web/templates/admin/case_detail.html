@@ -1,7 +1,6 @@
-{% extends "admin/base.html" %}
-{% from "admin/partials/event_detail.html" import render_event %}
-{% from "macros/logos.html" import org_logo %}
-{% from "macros/render_path.html" import render_path %}
+{% extends "admin/base.html" %} {% from "admin/partials/event_detail.html"
+import render_event %} {% from "macros/logos.html" import org_logo %} {% from
+"macros/render_path.html" import render_path %}
 {% block content %}
     <div class="min-h-screen bg-gray-50">
         {# Top navigation bar #}
@@ -13,13 +12,14 @@
         </div>
         <div class="p-6">
             <div class="bg-white shadow rounded-lg">
-                <!-- Basis informatie -->
+                <!-- Basisinformatie -->
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Basis Informatie</h2>
+                    <h2 class="text-lg font-semibold mb-4">Basisinformatie</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p class="text-sm text-gray-600">BSN</p>
-                            <p class="font-medium">{{ case.bsn }}</p>
+                            <p class="text-sm text-gray-600">Persoon</p>
+                            <p class="font-medium">{{ person_name }}</p>
+                            <p class="text-gray-500">BSN: {{ case.bsn }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Dienst</p>
@@ -34,17 +34,31 @@
                             <p class="font-medium">{{ case.rulespec_uuid }}</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Status</p>
-                            <p class="font-medium">{{ case.status }}</p>
+                            <p class="text-sm text-gray-600 mb-1">Status</p>
+                            {% if case.status == 'SUBMITTED' %}
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Ingediend</span>
+                            {% elif case.status == 'DECIDED' %}
+                                <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Besloten</span>
+                            {% elif case.status == 'IN_REVIEW' %}
+                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">In
+                                behandeling</span>
+                            {% elif case.status == 'OBJECTED' %}
+                                <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Onder bezwaar</span>
+                            {% else %}
+                                <span class="bg-gray-100 text-gray-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">{{
+                                case.status }}</span>
+                            {% endif %}
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Goedgekeurd</p>
+                            <p class="text-sm text-gray-600 mb-1">Goedgekeurd</p>
                             <p class="font-medium">
                                 {% if case.approved %}
-                                    Ja
-                                {% elif case.approved is sameas false %}
-                                    Nee{%
-                                    else %}Nog niet bepaald
+                                    <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Ja</span>{%
+                                    elif case.approved is sameas false %}
+                                    <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Nee</span>
+                                {% else %}
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1.5 inline-block rounded-full text-sm font-medium">Nog
+                                    niet bepaald</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -62,7 +76,8 @@
                                         Ja
                                     {% else %}
                                         Nee
-                                    {% endif %}
+                                    {% endif
+                                    %}
                                 </p>
                             </div>
                             {% if case.objection_status.not_possible_reason %}
@@ -123,221 +138,214 @@
                                     {% if case.appeal_status.direct_appeal %}
                                         Ja
                                     {% else %}
-                                        Nee
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Reden direct beroep</p>
-                                <p class="font-medium">{{ case.appeal_status.direct_appeal_reason }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Bevoegde rechtbank</p>
-                                <p class="font-medium">{{ case.appeal_status.competent_court }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Type rechter</p>
-                                <p class="font-medium">{{ case.appeal_status.court_type }}</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        <p class="text-gray-500">Beroepstatus wordt door de AWB bepaald als er een besluit op bezwaar is.</p>
-                    {% endif %}
-                </div>
-                <!-- Resultaten -->
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Resultaten</h2>
-                    <div class="grid grid-cols-2 gap-6">
-                        <!-- Geclaimde resultaten -->
-                        <div>
-                            <h3 class="text-md font-medium mb-2">Geclaimde Resultaten</h3>
-                            {% if case.claimed_result %}
-                                <div class="bg-gray-50 p-4 rounded-md">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        {% for key, value in case.claimed_result.items() %}
-                                            <div class="{% if value is mapping %}col-span-2{% endif %}">
-                                                <p class="text-sm text-gray-600">
-                                                    {{ key|replace('$', '') |title|replace('_', ' ')
-                                                    }}
-                                                </p>
-                                                {% if value is mapping %}
-                                                    <div class="mt-2 bg-white/75 p-4 rounded-md grid grid-cols-2 gap-4">
-                                                        {% for sub_key, sub_value in value.items() %}
-                                                            <div>
-                                                                <p class="text-sm text-gray-600">
-                                                                    {{ sub_key|replace('$',
-                                                                                                                                        '') |title|replace('_', ' ') }}
-                                                                </p>
-                                                                <p class="font-medium">{{ sub_value }}</p>
-                                                            </div>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% elif value is sequence and value is not string %}
-                                                    <div class="font-medium">
-                                                        <ul class="list-disc list-inside">
-                                                            {% for item in value %}<li>{{ item }}</li>{% endfor %}
-                                                        </ul>
-                                                    </div>
-                                                {% else %}
-                                                    <p class="font-medium">{{ value }}</p>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
+                                        Nee {%
+                                        endif %}
+                                    </p>
                                 </div>
-                            {% else %}
-                                <p class="text-gray-500">Geen geclaimde resultaten</p>
-                            {% endif %}
-                        </div>
-                        <!-- Geverifieerde resultaten -->
-                        <div>
-                            <h3 class="text-md font-medium mb-2">Geverifieerde Resultaten</h3>
-                            {% if case.verified_result %}
-                                <div class="bg-gray-50 p-4 rounded-md">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        {% for key, value in case.verified_result.items() %}
-                                            <div class="{% if value is mapping %}col-span-2{% endif %}">
-                                                <p class="text-sm text-gray-600">
-                                                    {{ key|replace('$', '') |title|replace('_', ' ')
-                                                    }}
-                                                </p>
-                                                {% if value is mapping %}
-                                                    <div class="mt-2 bg-white/75 p-4 rounded-md grid grid-cols-2 gap-4">
-                                                        {% for sub_key, sub_value in value.items() %}
-                                                            <div>
-                                                                <p class="text-sm text-gray-600">
-                                                                    {{ sub_key|replace('$',
-                                                                                                                                        '') |title|replace('_', ' ') }}
-                                                                </p>
-                                                                <p class="font-medium">{{ sub_value }}</p>
-                                                            </div>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% elif value is sequence and value is not string %}
-                                                    <div class="font-medium">
-                                                        <ul class="list-disc list-inside">
-                                                            {% for item in value %}<li>{{ item }}</li>{% endfor %}
-                                                        </ul>
-                                                    </div>
-                                                {% else %}
-                                                    <p class="font-medium">{{ value }}</p>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Reden direct beroep</p>
+                                    <p class="font-medium">{{ case.appeal_status.direct_appeal_reason }}</p>
                                 </div>
-                            {% else %}
-                                <p class="text-gray-500">Geen geverifieerde resultaten</p>
-                            {% endif %}
+                                <div>
+                                    <p class="text-sm text-gray-600">Bevoegde rechtbank</p>
+                                    <p class="font-medium">{{ case.appeal_status.competent_court }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Type rechter</p>
+                                    <p class="font-medium">{{ case.appeal_status.court_type }}</p>
+                                </div>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-500">
+                                Beroepstatus wordt door de AWB bepaald als er een besluit op bezwaar
+                                is.
+                            </p>
+                        {% endif %}
+                    </div>
+                    <!-- Resultaten -->
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold mb-4">Resultaten</h2>
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- Geclaimde resultaten -->
+                            <div>
+                                <h3 class="text-md font-medium mb-2">Geclaimde Resultaten</h3>
+                                {% if case.claimed_result %}
+                                    <div class="bg-gray-50 p-4 rounded-md">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            {% for key, value in case.claimed_result.items() %}
+                                                <div class="{% if value is mapping %}col-span-2{% endif %}">
+                                                    <p class="text-sm text-gray-600">{{ key|replace('$', '') |title|replace('_', ' ') }}</p>
+                                                    {% if value is mapping %}
+                                                        <div class="mt-2 bg-white/75 p-4 rounded-md grid grid-cols-2 gap-4">
+                                                            {% for sub_key, sub_value in value.items() %}
+                                                                <div>
+                                                                    <p class="text-sm text-gray-600">{{ sub_key|replace('$', '') |title|replace('_', ' ') }}</p>
+                                                                    <p class="font-medium">{{ sub_value }}</p>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% elif value is sequence and value is not string %}
+                                                        <div class="font-medium">
+                                                            <ul class="list-disc list-inside">
+                                                                {% for item in value %}<li>{{ item }}</li>{% endfor %}
+                                                            </ul>
+                                                        </div>
+                                                    {% else %}
+                                                        <p class="font-medium">{{ value }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <p class="text-gray-500">Geen geclaimde resultaten</p>
+                                {% endif %}
+                            </div>
+                            <!-- Geverifieerde resultaten -->
+                            <div>
+                                <h3 class="text-md font-medium mb-2">Geverifieerde Resultaten</h3>
+                                {% if case.verified_result %}
+                                    <div class="bg-gray-50 p-4 rounded-md">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            {% for key, value in case.verified_result.items() %}
+                                                <div class="{% if value is mapping %}col-span-2{% endif %}">
+                                                    <p class="text-sm text-gray-600">{{ key|replace('$', '') |title|replace('_', ' ') }}</p>
+                                                    {% if value is mapping %}
+                                                        <div class="mt-2 bg-white/75 p-4 rounded-md grid grid-cols-2 gap-4">
+                                                            {% for sub_key, sub_value in value.items() %}
+                                                                <div>
+                                                                    <p class="text-sm text-gray-600">{{ sub_key|replace('$', '') |title|replace('_', ' ') }}</p>
+                                                                    <p class="font-medium">{{ sub_value }}</p>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% elif value is sequence and value is not string %}
+                                                        <div class="font-medium">
+                                                            <ul class="list-disc list-inside">
+                                                                {% for item in value %}<li>{{ item }}</li>{% endfor %}
+                                                            </ul>
+                                                        </div>
+                                                    {% else %}
+                                                        <p class="font-medium">{{ value }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <p class="text-gray-500">Geen geverifieerde resultaten</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- Claims -->
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold mb-4">Claims</h2>
-                    {% if case.claim_ids %}
-                        <div class="space-y-4">
-                            {% for claim_id in case.claim_ids %}
-                                {% set claim = claim_ids[claim_id] %}
-                                <div class="bg-gray-50 p-4 rounded-md">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium">{{ claim.key|title|replace('_', ' ') }}</h3>
-                                            <p class="text-sm text-gray-600">{{ claim.reason }}</p>
-                                            <div class="mt-2">
-                                                <span class="text-sm">
-                                                    {% if claim.status == 'PENDING' %}
-                                                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">In behandeling</span>
-                                                    {% elif claim.status == 'APPROVED' %}
-                                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Goedgekeurd</span>
-                                                    {% elif claim.status == 'REJECTED' %}
-                                                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Afgewezen</span>
-                                                    {% endif %}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <a href="/admin/claims/{{ claim.id }}"
-                                           class="text-blue-600 hover:text-blue-800 text-sm">Details →</a>
-                                    </div>
-                                    <div class="mt-3 grid grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <p class="text-gray-600">Nieuwe waarde</p>
-                                            <p>{{ claim.new_value }}</p>
-                                        </div>
-                                        {% if claim.status == 'APPROVED' %}
+                    <!-- Claims -->
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold mb-4">Claims</h2>
+                        {% if case.claim_ids %}
+                            <div class="space-y-4">
+                                {% for claim_id in case.claim_ids %}
+                                    {% set claim = claim_ids[claim_id] %}
+                                    <div class="bg-gray-50 p-4 rounded-md">
+                                        <div class="flex justify-between items-start">
                                             <div>
-                                                <p class="text-gray-600">Geverifieerde waarde</p>
-                                                <p>{{ claim.verified_value }}</p>
+                                                <h3 class="font-medium">{{ claim.key|title|replace('_', ' ') }}</h3>
+                                                <p class="text-sm text-gray-600">{{ claim.reason }}</p>
+                                                <div class="mt-2">
+                                                    <span class="text-sm">
+                                                        {% if claim.status == 'PENDING' %}
+                                                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1.5 inline-block rounded-full text-xs">In
+                                                            behandeling</span>
+                                                        {% elif claim.status == 'APPROVED' %}
+                                                            <span class="bg-green-100 text-green-800 px-3 py-1.5 inline-block rounded-full text-xs">Goedgekeurd</span>
+                                                        {% elif claim.status == 'REJECTED' %}
+                                                            <span class="bg-red-100 text-red-800 px-3 py-1.5 inline-block rounded-full text-xs">Afgewezen</span>
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <a href="/admin/claims/{{ claim.id }}"
+                                               class="text-blue-600 hover:text-blue-800 text-sm">Details →</a>
+                                        </div>
+                                        <div class="mt-3 grid grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <p class="text-gray-600">Nieuwe waarde</p>
+                                                <p>{{ claim.new_value }}</p>
+                                            </div>
+                                            {% if claim.status == 'APPROVED' %}
+                                                <div>
+                                                    <p class="text-gray-600">Geverifieerde waarde</p>
+                                                    <p>{{ claim.verified_value }}</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% if claim.status == 'PENDING' %}
+                                            <div class="mt-4 flex justify-end gap-2">
+                                                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
+                                                        hx-get="/edit/approve-claim"
+                                                        hx-target="#edit-form-container"
+                                                        hx-vals='{ "claim_id": "{{ claim.id }}" }'>
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Goedkeuren
+                                                </button>
+                                                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
+                                                        hx-get="/edit/reject_claim_form"
+                                                        hx-target="#edit-form-container"
+                                                        hx-vals='{ "claim_id": "{{ claim.id }}" }'>
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    Afwijzen
+                                                </button>
                                             </div>
                                         {% endif %}
                                     </div>
-                                    {% if claim.status == 'PENDING' %}
-                                        <div class="mt-4 flex justify-end gap-2">
-                                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
-                                                    hx-get="/edit/approve-claim"
-                                                    hx-target="#edit-form-container"
-                                                    hx-vals='{ "claim_id": "{{ claim.id }}" }'>
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                Goedkeuren
-                                            </button>
-                                            <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer"
-                                                    hx-get="/edit/reject_claim_form"
-                                                    hx-target="#edit-form-container"
-                                                    hx-vals='{ "claim_id": "{{ claim.id }}" }'>
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                                Afwijzen
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-gray-500">Geen claims voor deze zaak</p>
+                        {% endif %}
+                    </div>
+                    <!-- Parameters -->
+                    <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
+                        <h2 class="text-lg font-semibold mb-6">Gebruikte gegevens</h2>
+                        {{ render_path(path, case.id|string, case.service, case.law, case.bsn,
+                                                claim_map, show_approve=True, claimant="CIVIL_SERVANT") }}
+                    </div>
+                    <!-- Gebeurtenissen -->
+                    <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
+                        <h2 class="text-lg font-semibold mb-6">Gebeurtenissen</h2>
+                        <div class="space-y-6">
+                            {% for event in case.events %}{{ render_event(event) }}{% endfor %}
                         </div>
-                    {% else %}
-                        <p class="text-gray-500">Geen claims voor deze zaak</p>
+                    </div>
+                    <!-- Beoordeling Formulier -->
+                    {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
+                        <div class="p-6" id="review-form-container">
+                            <h2 class="text-lg font-semibold mb-4">Beoordelingsacties</h2>
+                            <form hx-post="/admin/cases/{{ case.id }}/complete-review"
+                                  hx-target="#review-form-container"
+                                  class="space-y-4 max-w-lg">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Beslissing</label>
+                                    <select name="decision" class="w-full border rounded-md p-2">
+                                        <option value="true">Goedkeuren</option>
+                                        <option value="false">Afwijzen</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Reden</label>
+                                    <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
+                                </div>
+                                <button type="submit"
+                                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
+                                    Beoordeling indienen
+                                </button>
+                            </form>
+                        </div>
                     {% endif %}
                 </div>
-                <!-- Parameters -->
-                <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
-                    <h2 class="text-lg font-semibold mb-6">Gebruikte gegevens</h2>
-                    {{ render_path(path, case.id|string, case.service, case.law, case.bsn, claim_map, show_approve=True, claimant="CIVIL_SERVANT") }}
-                </div>
-                <!-- Gebeurtenissen -->
-                <div class="p-6 {% if case.status == 'IN_REVIEW' %}border-b border-gray-200{% endif %}">
-                    <h2 class="text-lg font-semibold mb-6">Gebeurtenissen</h2>
-                    <div class="space-y-6">
-                        {% for event in case.events %}{{ render_event(event) }}{% endfor %}
-                    </div>
-                </div>
-                <!-- Beoordeling Formulier -->
-                {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
-                    <div class="p-6" id="review-form-container">
-                        <h2 class="text-lg font-semibold mb-4">Beoordelingsacties</h2>
-                        <form hx-post="/admin/cases/{{ case.id }}/complete-review"
-                              hx-target="#review-form-container"
-                              class="space-y-4 max-w-lg">
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Beslissing</label>
-                                <select name="decision" class="w-full border rounded-md p-2">
-                                    <option value="true">Goedkeuren</option>
-                                    <option value="false">Afwijzen</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Reden</label>
-                                <textarea name="reason" class="w-full border rounded-md p-2" rows="3" required></textarea>
-                            </div>
-                            <button type="submit"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
-                                Beoordeling indienen
-                            </button>
-                        </form>
-                    </div>
-                {% endif %}
             </div>
         </div>
-    </div>
-{% endblock %}
+    {% endblock %}
