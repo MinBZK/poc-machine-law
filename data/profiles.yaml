@@ -1080,7 +1080,7 @@ profiles:
         relaties:
         - bsn: '999993654'
           partnerschap_type: HUWELIJK
-          partner_bsn: '999993655'
+          partner_bsn: '999993670'
           has_partner: true
         verblijfplaats:
         - bsn: '999993654'
@@ -1127,7 +1127,7 @@ profiles:
           zorg_type: BASIS
   '999993655':
     name: Sarah de Wit
-    description: Dakloze met briefadres, gehuwd met Maria Pietersen, recht op bijstand met woonkostentoeslag
+    description: Dakloze met briefadres, recht op bijstand met woonkostentoeslag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1141,15 +1141,15 @@ profiles:
           nationaliteit: NEDERLANDS
           age: 45
           has_dutch_nationality: true
-          has_partner: true
+          has_partner: false
           residence_address: De Regenboog Groep, 1, 1012NX Amsterdam
           has_fixed_address: false
-          household_size: 2
+          household_size: 1
         relaties:
         - bsn: '999993655'
-          partnerschap_type: HUWELIJK
-          partner_bsn: '999993654'
-          has_partner: true
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
         verblijfplaats:
         - bsn: '999993655'
           straat: De Regenboog Groep
@@ -2126,3 +2126,67 @@ profiles:
         - bsn: '200000007'
           bedrag: 0
           land: GEEN
+  '999993670':
+    name: Jan Pietersen
+    description: Partner van Maria Pietersen, nog geen AOW-leeftijd
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '999993670'
+          geboortedatum: '1960-03-20'
+          verblijfsadres: Amsterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 65
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Kalverstraat, 1, 1012NX Amsterdam
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '999993670'
+          partnerschap_type: HUWELIJK
+          partner_bsn: '999993654'
+          has_partner: true
+        verblijfplaats:
+        - bsn: '999993670'
+          straat: Kalverstraat
+          huisnummer: '1'
+          postcode: 1012NX
+          woonplaats: Amsterdam
+          type: WOONADRES
+      BELASTINGDIENST:
+        box1:
+        - bsn: '999993670'
+          loon_uit_dienstbetrekking: 0
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '999993670'
+          reguliere_voordelen: 0
+          vervreemdingsvoordelen: 0
+        box3:
+        - bsn: '999993670'
+          spaargeld: 0
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '999993670'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '999993670'
+          persoonsgebonden_aftrek: 0
+      RVZ:
+        verzekeringen:
+        - bsn: '999993670'
+          polis_status: ACTIEF
+          verdrag_status: GEEN
+          zorg_type: BASIS
