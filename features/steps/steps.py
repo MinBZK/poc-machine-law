@@ -99,21 +99,36 @@ def step_impl(context, law, service):
 def step_impl(context, law, service):
     if not hasattr(context, "test_data"):
         context.test_data = {}
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
 
     # Process the table to get the input data
     for row in context.table:
-        key = row.headings[0]
-        value = row[key]
-        # Special handling for JSON-like values
-        if value.startswith('[') or value.startswith('{'):
-            import json
-            try:
-                value = json.loads(value.replace("'", '"'))
-            except json.JSONDecodeError:
-                pass
-        context.test_data[key] = value
-        # Also add to parameters for direct parameter access
-        context.parameters[key] = value
+        for key, value in row.items():
+            # Parse boolean values
+            if value.lower() == "true":
+                parsed_value = True
+            elif value.lower() == "false":
+                parsed_value = False
+            # Try to parse as number
+            elif value.isdigit():
+                parsed_value = int(value)
+            # Special handling for JSON-like values
+            elif value.startswith('[') or value.startswith('{'):
+                import json
+                try:
+                    parsed_value = json.loads(value.replace("'", '"'))
+                except json.JSONDecodeError:
+                    parsed_value = value
+            else:
+                try:
+                    parsed_value = float(value)
+                except ValueError:
+                    parsed_value = value
+
+            context.test_data[key] = parsed_value
+            # Also add to parameters for direct parameter access
+            context.parameters[key] = parsed_value
 
     evaluate_law(context, service, law)
 
@@ -903,32 +918,3 @@ def step_impl(context, field, value):
     )
 
 
-@when('het {law} wordt uitgevoerd door {service} met parameters')
-def step_impl(context, law, service):
-    if not hasattr(context, "parameters"):
-        context.parameters = {}
-    if not hasattr(context, "test_data"):
-        context.test_data = {}
-
-    # Process the table to get parameters
-    if context.table:
-        for row in context.table:
-            for key, value in row.items():
-                # Parse boolean values
-                if value.lower() == "true":
-                    parsed_value = True
-                elif value.lower() == "false":
-                    parsed_value = False
-                # Try to parse as number
-                elif value.isdigit():
-                    parsed_value = int(value)
-                else:
-                    try:
-                        parsed_value = float(value)
-                    except ValueError:
-                        parsed_value = value
-
-                context.parameters[key] = parsed_value
-                context.test_data[key] = parsed_value
-
-    evaluate_law(context, service, law)
