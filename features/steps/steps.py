@@ -856,3 +856,79 @@ def step_impl(context, maanden):
         actual, expected,
         f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
     )
+
+
+# Generic step definitions for field equality checks
+@then('is het veld "{field}" gelijk aan "{value}"')
+def step_impl(context, field, value):
+    actual = context.result.output.get(field)
+    # Parse the expected value
+    if value.lower() == "true":
+        expected = True
+    elif value.lower() == "false":
+        expected = False
+    elif value.isdigit():
+        expected = int(value)
+    else:
+        try:
+            expected = float(value)
+        except ValueError:
+            expected = value
+
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected {field} to be {expected}, but was {actual}"
+    )
+
+
+@then('is het veld "{field}" een lege lijst')
+def step_impl(context, field):
+    actual = context.result.output.get(field)
+    assertions.assertEqual(
+        actual, [],
+        f"Expected {field} to be an empty list, but was {actual}"
+    )
+
+
+@then('bevat het veld "{field}" de waarde "{value}"')
+def step_impl(context, field, value):
+    actual = context.result.output.get(field)
+    assertions.assertIsInstance(
+        actual, list,
+        f"Expected {field} to be a list, but was {type(actual)}"
+    )
+    assertions.assertIn(
+        value, actual,
+        f"Expected {field} to contain '{value}', but it contains {actual}"
+    )
+
+
+@when('het {law} wordt uitgevoerd door {service} met parameters')
+def step_impl(context, law, service):
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+    if not hasattr(context, "test_data"):
+        context.test_data = {}
+
+    # Process the table to get parameters
+    if context.table:
+        for row in context.table:
+            for key, value in row.items():
+                # Parse boolean values
+                if value.lower() == "true":
+                    parsed_value = True
+                elif value.lower() == "false":
+                    parsed_value = False
+                # Try to parse as number
+                elif value.isdigit():
+                    parsed_value = int(value)
+                else:
+                    try:
+                        parsed_value = float(value)
+                    except ValueError:
+                        parsed_value = value
+
+                context.parameters[key] = parsed_value
+                context.test_data[key] = parsed_value
+
+    evaluate_law(context, service, law)
