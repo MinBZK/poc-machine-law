@@ -66,6 +66,13 @@ profiles:
           partnerschap_type: GEEN
           partner_bsn: null
           has_partner: false
+          kinderen:
+          - bsn: '200000001'
+            geboortedatum: '2020-01-01'
+            naam: Kind 1
+          - bsn: '200000002'
+            geboortedatum: '2022-01-01'
+            naam: Kind 2
         verblijfplaats:
         - bsn: '100000001'
           straat: Meeuwenlaan
