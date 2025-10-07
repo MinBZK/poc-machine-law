@@ -47,7 +47,28 @@
                     {% if not loop.last %},{% endif %}
                 {% endfor %}
             {% elif display_value is sequence and display_value is not string %}
-                {{ display_value|join(", ") }}
+                {# Check if this is a list of dictionaries for better formatting #}
+                {% set is_list_of_dicts = display_value|length > 0 and display_value[0] is mapping %}
+                {% if is_list_of_dicts %}
+                    <div class="mt-1 space-y-1">
+                        {% for item in display_value %}
+                            <div class="flex items-start gap-2 text-sm">
+                                <span class="text-gray-400 mt-0.5">•</span>
+                                <span class="flex-1">
+                                    {% for key, val in item.items() %}
+                                        {% if key not in ['bsn', 'kind_bsn'] %}
+                                            <span class="text-gray-700">{{ key|replace('_', ' ')|title }}:</span>
+                                            <span class="font-medium">{{ val }}</span>
+                                            {% if not loop.last %}<span class="text-gray-400 mx-1">|</span>{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ display_value|join(", ") }}
+                {% endif %}
             {% else %}
                 {{ display_value }}
             {% endif %}
