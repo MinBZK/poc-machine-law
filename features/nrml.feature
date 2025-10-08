@@ -42,6 +42,3 @@ Feature: Bepalen kiesrecht Tweede Kamer
     And een gevraagde uitvoer "aantal_jonge_kinderen"
     When de kinderbijslag_nrml wordt uitgevoerd door NRML
     Then heeft output aantal_jonge_kinderen met waarde 99
-
-
-

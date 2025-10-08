@@ -219,20 +219,14 @@ class TestNrmlRulesEngineIntegration:
             spec = json.load(f)
 
         # Test data: parent with 3 children of different ages
-        children_data = [
-            {"age": 8},
-            {"age": 11},
-            {"age": 15}
-        ]
+        children_data = [{"age": 8}, {"age": 11}, {"age": 15}]
 
         aanvrager_data = [{}]
 
         # Create engine and evaluate
         engine = NrmlRulesEngine(spec)
         result = engine.evaluate(
-            parameters={"kinderen": children_data,
-                        "aanvrager": aanvrager_data},
-            requested_output="young_children_count"
+            parameters={"kinderen": children_data, "aanvrager": aanvrager_data}, requested_output="young_children_count"
         )
 
         # Verify result - check that the count is correct
