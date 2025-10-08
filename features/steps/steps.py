@@ -112,6 +112,8 @@ def step_impl(context, law, service):
             except json.JSONDecodeError:
                 pass
         context.test_data[key] = value
+        # Also add to parameters for direct parameter access
+        context.parameters[key] = value
 
     evaluate_law(context, service, law)
 
@@ -807,4 +809,52 @@ def step_impl(context):
     assertions.assertLess(
         inkomen_afbouw, 50000,  # Less than €500 afbouw
         f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw/100:.2f}"
+    )
+
+
+# LAA (Landelijke Aanpak Adreskwaliteit) step definitions
+
+
+@then("genereert wet_brp/laa een signaal")
+def step_impl(context):
+    assertions.assertTrue(
+        context.result.output.get("genereer_signaal", False),
+        "Expected LAA to generate a signal, but it did not"
+    )
+
+
+@then("genereert wet_brp/laa geen signaal")
+def step_impl(context):
+    assertions.assertFalse(
+        context.result.output.get("genereer_signaal", True),
+        "Expected LAA not to generate a signal, but it did"
+    )
+
+
+@then('is het signaal_type "{signaal_type}"')
+def step_impl(context, signaal_type):
+    actual = context.result.output.get("signaal_type")
+    assertions.assertEqual(
+        actual, signaal_type,
+        f"Expected signaal_type to be '{signaal_type}', but was '{actual}'"
+    )
+
+
+@then('is de reactietermijn_weken "{weken}"')
+def step_impl(context, weken):
+    actual = context.result.output.get("reactietermijn_weken")
+    expected = int(weken)
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected reactietermijn_weken to be {expected}, but was {actual}"
+    )
+
+
+@then('is de onderzoekstermijn_maanden "{maanden}"')
+def step_impl(context, maanden):
+    actual = context.result.output.get("onderzoekstermijn_maanden")
+    expected = int(maanden)
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
     )
