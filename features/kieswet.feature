@@ -14,6 +14,7 @@ Feature: Bepalen kiesrecht Tweede Kamer
     Given de volgende RvIG personen gegevens:
       | bsn       | geboortedatum | nationaliteit | verblijfsadres | land_verblijf |
       | 999993653 | 2006-01-01    | NEDERLANDS    | Amsterdam      | NLD           |
+    And een gevraagde uitvoer "heeft_stemrecht"
     When de kieswet wordt uitgevoerd door KIESRAAD
     Then heeft de persoon stemrecht
 
