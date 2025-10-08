@@ -6,9 +6,6 @@ Feature: Bepalen kiesrecht Tweede Kamer
   Background:
     Given de datum is "2025-03-15"
     And een persoon met BSN "999993653"
-    And de volgende KIESRAAD verkiezingen gegevens:
-      | type          | verkiezingsdatum |
-      | TWEEDE_KAMER  | 2025-10-29       |
 
   Scenario: Persoon met Duitse nationaliteit heeft volgens NRML geen nederlandse nationaliteit
     Given een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
@@ -37,3 +34,14 @@ Feature: Bepalen kiesrecht Tweede Kamer
     And een gevraagde uitvoer "heeft_nederlandse_nationaliteit"
     When de brp_nationaliteit_nrml wordt uitgevoerd door NRML
     Then heeft output heeft_nederlandse_nationaliteit met waarde True
+
+  Scenario: Persoon met jonge kinderen heeft volgens NRML jonge kinderen
+    Given de volgende NRML personen gegevens:
+      | bsn       | geboortedatum | nationaliteit | verblijfsadres | land_verblijf |
+      | 999993653 | 2006-01-01    | NEDERLANDS    | Amsterdam      | NLD           |
+    And een gevraagde uitvoer "aantal_jonge_kinderen"
+    When de kinderbijslag_nrml wordt uitgevoerd door NRML
+    Then heeft output aantal_jonge_kinderen met waarde 99
+
+
+

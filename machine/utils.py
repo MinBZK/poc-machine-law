@@ -92,7 +92,19 @@ class RuleSpec:
                 break
 
         # Parse the date or use a default
-        valid_from = datetime.strptime(valid_from_str, "%Y-%m-%d") if valid_from_str else datetime(2020, 1, 1)
+        if valid_from_str:
+            try:
+                # Try parsing as full date first
+                valid_from = datetime.strptime(valid_from_str, "%Y-%m-%d")
+            except ValueError:
+                # If that fails, try parsing as year only
+                try:
+                    valid_from = datetime.strptime(valid_from_str, "%Y")
+                except ValueError:
+                    # If both fail, use default
+                    valid_from = datetime(2020, 1, 1)
+        else:
+            valid_from = datetime(2020, 1, 1)
 
         return cls(
             path=path,

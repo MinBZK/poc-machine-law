@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 from machine.nrml.rules_engine import NrmlRulesEngine
 
 
@@ -206,4 +209,37 @@ class TestNrmlRulesEngineIntegration:
         assert "result" in result["output"]
         output = result["output"]["result"]
         assert output["value"] == -1
+        assert output["process"].Success is True
+
+    def test_count_expression(self):
+        """Test aggregation expression that counts children based on age condition"""
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_count_expression.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
+
+        # Test data: parent with 3 children of different ages
+        children_data = [
+            {"age": 8},
+            {"age": 11},
+            {"age": 15}
+        ]
+
+        aanvrager_data = [{}]
+
+        # Create engine and evaluate
+        engine = NrmlRulesEngine(spec)
+        result = engine.evaluate(
+            parameters={"kinderen": children_data,
+                        "aanvrager": aanvrager_data},
+            requested_output="young_children_count"
+        )
+
+        # Verify result - check that the count is correct
+        assert "output" in result
+        assert "young_children_count" in result["output"]
+        output = result["output"]["young_children_count"]
+
+        # Should count 1 child with age <= 10 (only the 8-year-old)
+        assert output["value"] == 1
         assert output["process"].Success is True

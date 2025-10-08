@@ -2,6 +2,7 @@ from typing import Any
 
 from ..context import NrmlRuleContext
 from ..evaluation_result import EvaluationResult
+from .aggregation_expression_evaluator import AggregationExpressionEvaluator
 from .conditional_expression_evaluator import ConditionalExpressionEvaluator
 
 
@@ -9,8 +10,10 @@ class ExpressionEvaluator:
     """Evaluator for NRML expressions"""
 
     def __init__(self):
-        """Initialize evaluator with internal state"""
-        self.conditional_expression_evaluator = ConditionalExpressionEvaluator()
+        self.handlers = {
+            "conditional": ConditionalExpressionEvaluator(),
+            "aggregation": AggregationExpressionEvaluator(),
+        }
 
     def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult:
         """
@@ -25,10 +28,9 @@ class ExpressionEvaluator:
         """
         expr_type = expression.get("type")
 
-        # Schema-based expression type mapping
-        if expr_type == "conditional":
-            return self.conditional_expression_evaluator.evaluate(expression, context)
-        elif expr_type in ["arithmetic", "aggregation", "distribution", "function"]:
+        # Look up handler by expression type
+        handler = self.handlers.get(expr_type)
+        if handler is None:
             raise NotImplementedError(f"Expression type '{expr_type}' not yet implemented")
-        else:
-            raise ValueError(f"Unsupported expression type: {expr_type}")
+
+        return handler.evaluate(expression, context)

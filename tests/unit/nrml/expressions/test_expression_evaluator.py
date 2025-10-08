@@ -24,18 +24,18 @@ class TestExpressionEvaluator:
         """Test evaluating a conditional expression"""
         # Mock the conditional expression evaluator
         mock_result = create_result(success=True, value=True, source="MockEvaluator")
-        evaluator.conditional_expression_evaluator.evaluate = Mock(return_value=mock_result)
+        evaluator.handlers["conditional"].evaluate = Mock(return_value=mock_result)
 
         expression = {"type": "conditional", "condition": {}}
         result = evaluator.evaluate(expression, context)
 
         assert result.Success is True
         assert result.Value is True
-        evaluator.conditional_expression_evaluator.evaluate.assert_called_once_with(expression, context)
+        evaluator.handlers["conditional"].evaluate.assert_called_once_with(expression, context)
 
     def test_evaluate_not_implemented_expression_types(self, evaluator, context):
         """Test that unsupported expression types raise NotImplementedError"""
-        expression_types = ["arithmetic", "aggregation", "distribution", "function"]
+        expression_types = ["arithmetic", "distribution", "function"]
 
         for expr_type in expression_types:
             expression = {"type": expr_type}
@@ -43,15 +43,15 @@ class TestExpressionEvaluator:
                 evaluator.evaluate(expression, context)
 
     def test_evaluate_unsupported_expression_type(self, evaluator, context):
-        """Test that unknown expression types raise ValueError"""
+        """Test that unknown expression types raise NotImplementedError"""
         expression = {"type": "unknown_type"}
 
-        with pytest.raises(ValueError, match="Unsupported expression type: unknown_type"):
+        with pytest.raises(NotImplementedError, match="Expression type 'unknown_type' not yet implemented"):
             evaluator.evaluate(expression, context)
 
     def test_evaluate_missing_type(self, evaluator, context):
         """Test evaluating expression without type field"""
         expression = {}
 
-        with pytest.raises(ValueError, match="Unsupported expression type: None"):
+        with pytest.raises(NotImplementedError, match="Expression type 'None' not yet implemented"):
             evaluator.evaluate(expression, context)

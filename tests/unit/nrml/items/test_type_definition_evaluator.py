@@ -107,28 +107,28 @@ class TestTypeDefinitionEvaluator:
         assert result.Success is False
         assert "no input value found" in result.Error
 
-    def test_try_resolve_from_definition_with_value(self, evaluator):
+    def test_try_resolve_from_definition_with_value(self, evaluator, context):
         """Test _try_resolve_from_definition with value field"""
-        active_version = {"value": "test_value"}
-        result = evaluator._try_resolve_from_definition("item_key", {}, active_version)
+        item = {"versions": [{"validFrom": "2020-01-01", "value": "test_value"}]}
+        result = evaluator._try_resolve_from_definition("item_key", item, context)
 
         assert result is not None
         assert result.Success is True
         assert result.Value == "test_value"
 
-    def test_try_resolve_from_definition_with_values(self, evaluator):
+    def test_try_resolve_from_definition_with_values(self, evaluator, context):
         """Test _try_resolve_from_definition with values field"""
-        active_version = {"values": ["val1", "val2"]}
-        result = evaluator._try_resolve_from_definition("item_key", {}, active_version)
+        item = {"versions": [{"validFrom": "2020-01-01", "values": ["val1", "val2"]}]}
+        result = evaluator._try_resolve_from_definition("item_key", item, context)
 
         assert result is not None
         assert result.Success is True
         assert result.Value == ["val1", "val2"]
 
-    def test_try_resolve_from_definition_no_value(self, evaluator):
+    def test_try_resolve_from_definition_no_value(self, evaluator, context):
         """Test _try_resolve_from_definition without value or values"""
-        active_version = {"type": "Text"}
-        result = evaluator._try_resolve_from_definition("item_key", {}, active_version)
+        item = {"versions": [{"validFrom": "2020-01-01", "type": "Text"}]}
+        result = evaluator._try_resolve_from_definition("item_key", item, context)
 
         assert result is None
 

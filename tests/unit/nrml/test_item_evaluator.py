@@ -73,18 +73,18 @@ class TestNrmlItemEvaluator:
         assert result.Value == "cached_value"
 
     def test_evaluate_item_not_implemented_type(self, evaluator, context):
-        """Test evaluating an item with unimplemented type"""
+        """Test evaluating a relation definition with invalid arguments"""
         item = {
             "versions": [
                 {
-                    "arguments": [],  # This makes it a RELATION_DEFINITION
+                    "arguments": [],  # This makes it a RELATION_DEFINITION but with invalid argument count
                     "description": {"nl": "Relation item"},
                 }
             ]
         }
         context.items["relation_item"] = item
 
-        with pytest.raises(NotImplementedError, match="Evaluator not implemented for item type"):
+        with pytest.raises(ValueError, match="must have exactly 2 arguments"):
             evaluator.evaluate_item("relation_item", context)
 
     def test_evaluate_item_adds_to_path(self, evaluator, context):

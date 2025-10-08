@@ -57,7 +57,7 @@ class TestComparisonEvaluator:
         result = evaluator.evaluate(expression, context)
 
         assert result.Success is False
-        assert "'in' operator expects 2 arguments" in result.Error
+        assert "Comparison operator 'in' expects 2 arguments" in result.Error
 
     def test_evaluate_in_comparison_resolution_failure(self, evaluator, context):
         """Test 'in' comparison when argument resolution fails"""
@@ -95,7 +95,7 @@ class TestComparisonEvaluator:
 
     def test_evaluate_unsupported_operator(self, evaluator, context):
         """Test that unsupported operators raise ValueError"""
-        expression = {"operator": "equals", "arguments": []}
+        expression = {"operator": "equals", "arguments": [{"value": "a"}, {"value": "b"}]}
 
         with pytest.raises(ValueError, match="Unsupported comparison operator: equals"):
             evaluator.evaluate(expression, context)

@@ -1,20 +1,30 @@
+from collections.abc import Callable
 from typing import Any
 
 from ..context import NrmlRuleContext
 from ..evaluation_result import EvaluationResult, create_result, nested_result
 from ..item_helper import NrmlItemHelper
+from ..item_type_analyzer import NrmlItemType
 
 
 class TypeDefinitionEvaluator:
     """Evaluator for type definition items"""
 
+    ITEM_TYPE = NrmlItemType.TYPE_DEFINITION
+
     def __init__(self):
-        """Initialize stateless evaluator"""
+        """Initialize evaluator with resolvers"""
+        self.resolvers: list[Callable[[str, dict[str, Any], NrmlRuleContext], EvaluationResult | None]] = [
+            self._try_resolve_from_definition,
+            self._try_resolve_from_target_source,
+            self._try_resolve_from_input_source,
+        ]
 
     def _try_resolve_from_definition(
-        self, item_key: str, item: dict[str, Any], active_version: dict[str, Any]
+        self, item_key: str, item: dict[str, Any], context: NrmlRuleContext
     ) -> EvaluationResult | None:
         """Try to resolve value from item definition"""
+        active_version = NrmlItemHelper.get_active_version(item, context.calculation_date)
         if "value" in active_version or "values" in active_version:
             value = active_version.get("value", active_version.get("values"))
             return create_result(
@@ -72,19 +82,10 @@ class TypeDefinitionEvaluator:
 
     def evaluate(self, item_key: str, item: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult:
         """Evaluate a type definition item"""
-        active_version = NrmlItemHelper.get_active_version(item, context.calculation_date)
-
-        result = self._try_resolve_from_definition(item_key, item, active_version)
-        if result:
-            return result
-
-        result = self._try_resolve_from_target_source(item_key, item, context)
-        if result:
-            return result
-
-        result = self._try_resolve_from_input_source(item_key, item, context)
-        if result:
-            return result
+        for resolver in self.resolvers:
+            result = resolver(item_key, item, context)
+            if result:
+                return result
 
         return create_result(
             success=False,

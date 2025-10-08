@@ -3,10 +3,13 @@ from typing import Any
 from ..context import NrmlRuleContext
 from ..evaluation_result import EvaluationResult, create_result
 from ..expressions.expression_evaluator import ExpressionEvaluator
+from ..item_type_analyzer import NrmlItemType
 
 
 class CalculatedValueEvaluator:
     """Evaluator for calculated value items"""
+
+    ITEM_TYPE = NrmlItemType.CALCULATED_VALUE
 
     def __init__(self):
         """Initialize with expression evaluator"""

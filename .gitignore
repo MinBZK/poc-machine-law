@@ -28,3 +28,7 @@ machinev2/backend/backend
 __debug_bin*
 
 .claude
+
+# Submodule symlinks
+law/
+schema/
