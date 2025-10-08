@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
@@ -9,7 +10,6 @@ from starlette.middleware.sessions import SessionMiddleware
 sys.path.append(str(Path(__file__).parent.parent))
 
 from web.dependencies import (
-    FORMATTED_DATE,
     STATIC_DIR,
     get_case_manager,
     get_claim_manager,
@@ -125,13 +125,13 @@ async def root(
             "request": request,
             "profile": profile,
             "bsn": bsn,
-            "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
             "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
             "accepted_claims": accepted_claims,
+            "now": datetime.now(),
         },
     )
 

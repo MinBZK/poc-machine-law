@@ -101,7 +101,12 @@
             </p>
         </div>
         <div class="flex items-center space-x-2">
-            <span class="text-sm text-gray-600">Datum: {{ formatted_date }}</span>
+            <span class="text-sm text-gray-600">Datum:
+              <input id="date-input"
+                class="bg-white px-2 py-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                type="date"
+                value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
+            </span>
         </div>
     </div>
 </section>
@@ -528,6 +533,17 @@
     </div>
 </section>
 <script>
+  // Date selector handling
+  const dateInput = document.getElementById('date-input');
+  if (dateInput) {
+    dateInput.addEventListener('change', function () {
+      const selectedDate = this.value;
+      const url = new URL(window.location.href);
+      url.searchParams.set('date', selectedDate);
+      window.location.href = url.toString();
+    });
+  }
+
   // Toast notification functions
   function showToast(message, type = "success") {
     const toastContainer = document.getElementById("toast-container");
