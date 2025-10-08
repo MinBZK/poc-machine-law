@@ -39,7 +39,7 @@ func TestFeatures(t *testing.T) {
 		Options: &godog.Options{
 			Format: "pretty", // pretty, progress, cucumber, events, junit
 			// ShowStepDefinitions: false,
-			Paths:    []string{"."},
+			Paths:    []string{"../submodules/regelrecht-laws/laws"},
 			TestingT: t, // Testing instance that will run subtests.
 		},
 	}
