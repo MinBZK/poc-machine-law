@@ -4,12 +4,56 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 from machine.events.claim.aggregate import Claim
 from machine.logging_config import IndentLogger
 
 logger = IndentLogger(logging.getLogger("service"))
+
+
+def clean_nan_value(value: Any, expected_type: str | None = None) -> Any:
+    """
+    Clean NaN values from pandas dataframes, converting them to appropriate defaults.
+
+    Args:
+        value: The value to clean (could be NaN, None, or a valid value)
+        expected_type: Optional type hint ('int', 'bool', 'str', 'list')
+
+    Returns:
+        Cleaned value with NaN converted to appropriate default
+    """
+    # If it's a list or dict, recursively clean nested values first
+    if isinstance(value, list):
+        return [clean_nan_value(v, expected_type) for v in value]
+    elif isinstance(value, dict):
+        return {k: clean_nan_value(v, expected_type) for k, v in value.items()}
+
+    # Check if value is NaN (pandas float NaN or numpy NaN) - only for scalars
+    try:
+        is_nan = pd.isna(value)
+        # Handle case where pd.isna returns an array (shouldn't happen after list check, but be safe)
+        if isinstance(is_nan, pd.Series | np.ndarray):
+            # If it's an array, we can't check it in boolean context, just return the value
+            return value
+        if is_nan:
+            if expected_type == "int" or expected_type == "eurocent":
+                return 0
+            elif expected_type == "bool":
+                return False
+            elif expected_type == "str":
+                return ""
+            elif expected_type == "list":
+                return []
+            else:
+                # For unknown types, return None instead of NaN
+                return None
+    except (TypeError, ValueError):
+        # If pd.isna fails for some reason, just return the value
+        pass
+
+    return value
 
 
 @dataclass
@@ -24,6 +68,9 @@ class TypeSpec:
 
     def enforce(self, value: Any) -> Any:
         """Enforce type specifications on a value"""
+        # Clean NaN values first
+        value = clean_nan_value(value, self.unit or self.type)
+
         if value is None:
             return value
 
@@ -358,8 +405,16 @@ class RuleContext:
         if "temporal" in spec and "reference" in spec["temporal"]:
             reference_date = self.resolve_value(spec["temporal"]["reference"])
 
-        # Check cache
-        cache_key = f"{path}({','.join([f'{k}:{v}' for k, v in sorted(parameters.items())])},{reference_date})"
+        # Check cache - convert list values to strings for cache key
+        def param_to_str(v):
+            """Convert parameter value to string for cache key, handling lists and dicts"""
+            if isinstance(v, list | dict):
+                return str(v)
+            return v
+
+        cache_key = (
+            f"{path}({','.join([f'{k}:{param_to_str(v)}' for k, v in sorted(parameters.items())])},{reference_date})"
+        )
         if cache_key in self.values_cache:
             logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
             return self.values_cache[cache_key]
@@ -435,8 +490,14 @@ class RuleContext:
                     # Gebruik resolve_value om de enum-referentie op te lossen
                     enum_value = self.resolve_value(field["enum"])
                     if enum_value is not None:
-                        field["enum_values"] = enum_value
-                        logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
+                        # Ensure enum_value is a list
+                        if isinstance(enum_value, (list, tuple)):
+                            field["enum_values"] = enum_value
+                            logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
+                        else:
+                            logger.warning(
+                                f"Enum reference {field['enum']} resolved to non-iterable type {type(enum_value).__name__}: {enum_value}. Skipping."
+                            )
 
         return type_spec_copy
 
@@ -473,6 +534,25 @@ class RuleContext:
             return None
         if len(result) == 0:
             return None
+
+        # Clean NaN values from the result
+        result = clean_nan_value(result)
+
+        # Check if result became None after cleaning
+        if result is None:
+            return None
+
+        # Smart deduplication: if all values are identical (e.g., global data duplicated per profile),
+        # deduplicate to a single value
+        if (
+            isinstance(result, list)
+            and len(result) > 1
+            and all(isinstance(v, str | int | float | bool | type(None)) for v in result)
+            and len(set(str(v) for v in result)) == 1
+        ):
+            # All values are identical, return just one
+            return result[0]
+
         if len(result) == 1:
             return result[0]
         return result

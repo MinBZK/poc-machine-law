@@ -223,7 +223,7 @@ De web interface is geconfigureerd om standaard de Go engine te gebruiken (zie `
 
 ```bash
 cd machinev2/backend
-APP_BACKEND_LISTEN_ADDRESS=:8081 APP_INPUT_FILE=./cmd/serve_input.yaml APP_DEBUG=false go run . serve
+APP_BACKEND_LISTEN_ADDRESS=:8081 APP_INPUT_FILE=../../data/profiles.yaml APP_DEBUG=false go run . serve
 ```
 
 De Go server is vervolgens beschikbaar op port 8081. Als je de Python engine wilt gebruiken in plaats van de Go engine, pas dan `web/config/config.yaml` aan door de `default: true` regel te verplaatsen naar de Python engine.

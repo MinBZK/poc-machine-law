@@ -25,7 +25,6 @@ async def get_edit_form(
     case_id: str,
     service: str,
     key: str,
-    value: str,
     law: str,
     bsn: str,
     show_approve: bool = False,
@@ -34,10 +33,26 @@ async def get_edit_form(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Return the edit form HTML"""
-    try:
-        parsed_value = json.loads(value)
-    except json.JSONDecodeError:
-        parsed_value = value
+    # Get all 'value' query parameters (there might be multiple for arrays)
+    values = request.query_params.getlist("value")
+
+    # Parse value(s)
+    if len(values) == 0:
+        parsed_value = None
+    elif len(values) == 1:
+        # Single value - try JSON parsing
+        try:
+            parsed_value = json.loads(values[0])
+        except json.JSONDecodeError:
+            parsed_value = values[0]
+    else:
+        # Multiple values - parse each as JSON and combine into array
+        parsed_value = []
+        for v in values:
+            try:
+                parsed_value.append(json.loads(v))
+            except json.JSONDecodeError:
+                parsed_value.append(v)
 
     # Parse details if present
     parsed_details = None
@@ -139,6 +154,13 @@ async def update_value(
         # Try parsing as JSON first (handles booleans)
         if old_value.lower() in ("true", "false"):
             parsed_old_value = old_value.lower() == "true"
+        # Try parsing as JSON array or object
+        elif old_value.startswith(("[", "{")):
+            try:
+                parsed_old_value = json.loads(old_value)
+            except json.JSONDecodeError:
+                # If JSON parsing fails, keep original string
+                pass
         # Try parsing as number
         elif old_value.replace(".", "", 1).isdigit() or (
             old_value.startswith("-") and old_value[1:].replace(".", "", 1).isdigit()
