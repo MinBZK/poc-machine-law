@@ -4,7 +4,8 @@ from typing import Any
 
 import httpx
 import pandas as pd
-from config_loader import ServiceRoutingConfig
+
+from web.config_loader import ServiceRoutingConfig
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
 from .machine_client.law_as_code_client import Client

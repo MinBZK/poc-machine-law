@@ -1,9 +1,74 @@
-{% extends "partials/tiles/base_tile.html" %}
-{% block tile_content %}
-    {% include "partials/tiles/law/kieswet/KIESRAAD/computation.html" %}
-{% endblock %}
-{% block actions %}
-    <p class="text-sm text-gray-600 text-center">
-        <a href="https://www.kiesraad.nl/actueel/verkiezingen">Meer informatie over de verkiezingen</a>
-    </p>
-{% endblock %}
+{% from "macros/logos.html" import org_logo %}
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     x-data="{ showExplanation: false }"
+     @close-explanation.window="showExplanation = false"
+     id="tile-{{ law|replace('/', '-') }}">
+    <div class="p-6 flex flex-col h-full">
+        {% if error %}
+            <div class="flex-grow space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
+                    {% if current_case %}
+                        <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                    {% endif %}
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
+                    </div>
+                </div>
+                <div class="p-2">{{ org_logo(service) }}</div>
+            </div>
+        {% elif missing_required %}
+            <div class="flex-grow space-y-6">
+                <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
+                        {% if current_case %}
+                            <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center">
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens.</h4>
+                    </div>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h4 class="font-medium text-gray-900 mb-2">Gegevens aanleveren</h4>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Om te weten of u stemrecht heeft zijn extra gegevens nodig. Die kunt u hier aanleveren.
+                    </p>
+                    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+                            hx-target="#shared-application-panel"
+                            hx-swap="innerHTML"
+                            class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
+                        Gegevens aanleveren
+                    </button>
+                </div>
+            </div>
+        {% else %}
+            <!-- For Kieswet, always show the result (STEMRECHT or GEEN stemrecht) -->
+            <!-- This is not a benefit you can apply for - it's a yes/no determination -->
+            <div class="flex-grow space-y-6">
+                <!-- Header -->
+                <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
+                        {% if current_case %}
+                            <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                </div>
+                <!-- Main Content - Always show voting rights result -->
+                <div class="space-y-6">{% include "partials/tiles/law/kieswet/KIESRAAD/computation.html" %}</div>
+            </div>
+            <!-- Actions Section -->
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                <p class="text-sm text-gray-600 text-center">
+                    <a href="https://www.kiesraad.nl/actueel/verkiezingen">Meer informatie over de verkiezingen</a>
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>

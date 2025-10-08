@@ -47,7 +47,28 @@
                     {% if not loop.last %},{% endif %}
                 {% endfor %}
             {% elif display_value is sequence and display_value is not string %}
-                {{ display_value|join(", ") }}
+                {# Check if this is a list of dictionaries for better formatting #}
+                {% set is_list_of_dicts = display_value|length > 0 and display_value[0] is mapping %}
+                {% if is_list_of_dicts %}
+                    <div class="mt-1 space-y-1">
+                        {% for item in display_value %}
+                            <div class="flex items-start gap-2 text-sm">
+                                <span class="text-gray-400 mt-0.5">•</span>
+                                <span class="flex-1">
+                                    {% for key, val in item.items() %}
+                                        {% if key not in ['bsn', 'kind_bsn'] %}
+                                            <span class="text-gray-700">{{ key|replace('_', ' ') |title }}:</span>
+                                            <span class="font-medium">{{ val }}</span>
+                                            {% if not loop.last %}<span class="text-gray-400 mx-1">|</span>{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ display_value|join(", ") }}
+                {% endif %}
             {% else %}
                 {{ display_value }}
             {% endif %}
@@ -61,47 +82,55 @@
     </button>
     {% if (service, law, key) in claim_map %}
         {% set claim = claim_map[(service, law, key)] %}
-        <!-- Original value display -->
-        <span class="text-gray-500 text-xs">
-            {% if claim.old_value is boolean %}
-                {{ 'Ja' if claim.old_value else 'Nee' }}
-            {% elif claim.old_value is number %}
-                {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
-                    {{ (claim.old_value / 100) | format_currency }}
-                {% elif claim.old_value % 1 != 0 %}
-                    {{ '%.5f'|format(claim.old_value) }}
+        <!-- Check if this is an array of dicts change -->
+        {% set is_old_list_of_dicts = claim.old_value is sequence and claim.old_value is not string and claim.old_value|length > 0 and claim.old_value[0] is mapping %}
+        {% set is_new_list_of_dicts = claim.new_value is sequence and claim.new_value is not string and claim.new_value|length > 0 and claim.new_value[0] is mapping %}
+        {% if is_old_list_of_dicts or is_new_list_of_dicts %}
+            <!-- Array of dicts change - show simple change indicator -->
+            <span class="text-gray-500 text-xs italic">(gewijzigd)</span>
+        {% else %}
+            <!-- Original value display for non-array-of-dicts -->
+            <span class="text-gray-500 text-xs">
+                {% if claim.old_value is boolean %}
+                    {{ 'Ja' if claim.old_value else 'Nee' }}
+                {% elif claim.old_value is number %}
+                    {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                        {{ (claim.old_value / 100) | format_currency }}
+                    {% elif claim.old_value % 1 != 0 %}
+                        {{ '%.5f'|format(claim.old_value) }}
+                    {% else %}
+                        {{ claim.old_value }}
+                    {% endif %}
+                {% elif claim.old_value is mapping %}
+                    {{ claim.old_value|tojson }}
+                {% elif claim.old_value is sequence and claim.old_value is not string %}
+                    {{ claim.old_value|join(", ") }}
                 {% else %}
                     {{ claim.old_value }}
                 {% endif %}
-            {% elif claim.old_value is mapping %}
-                {{ claim.old_value|tojson }}
-            {% elif claim.old_value is sequence and claim.old_value is not string %}
-                {{ claim.old_value|join(", ") }}
-            {% else %}
-                {{ claim.old_value }}
-            {% endif %}
-        </span>
-        <span class="text-gray-500 text-xs">→</span>
-        <!-- New value display -->
-        <span class="text-gray-500 text-xs">
-            {% if claim.new_value is boolean %}
-                {{ 'Ja' if claim.new_value else 'Nee' }}
-            {% elif claim.new_value is number %}
-                {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
-                    {{ (claim.new_value / 100) | format_currency }}
-                {% elif claim.new_value % 1 != 0 %}
-                    {{ '%.5f'|format(claim.new_value) }}
+            </span>
+            <span class="text-gray-500 text-xs">→</span>
+            <!-- New value display for non-array-of-dicts -->
+            <span class="text-gray-500 text-xs">
+                {% if claim.new_value is boolean %}
+                    {{ 'Ja' if claim.new_value else 'Nee' }}
+                {% elif claim.new_value is number %}
+                    {% if node.details and node.details.type == 'amount' and node.details.type_spec and node.details.type_spec.unit == 'eurocent' %}
+                        {{ (claim.new_value / 100) | format_currency }}
+                    {% elif claim.new_value % 1 != 0 %}
+                        {{ '%.5f'|format(claim.new_value) }}
+                    {% else %}
+                        {{ claim.new_value }}
+                    {% endif %}
+                {% elif claim.new_value is mapping %}
+                    {{ claim.new_value|tojson }}
+                {% elif claim.new_value is sequence and claim.new_value is not string %}
+                    {{ claim.new_value|join(", ") }}
                 {% else %}
                     {{ claim.new_value }}
                 {% endif %}
-            {% elif claim.new_value is mapping %}
-                {{ claim.new_value|tojson }}
-            {% elif claim.new_value is sequence and claim.new_value is not string %}
-                {{ claim.new_value|join(", ") }}
-            {% else %}
-                {{ claim.new_value }}
-            {% endif %}
-        </span>
+            </span>
+        {% endif %}
         {% if claim.status == "PENDING" %}
             <div class="ml-2 inline-flex items-center gap-1">
                 <div class="inline-flex gap-1 ml-2">
@@ -296,7 +325,7 @@
                                                                 <select x-model="item.{{ field.name }}"
                                                                         class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                                                     <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
-                                                                    {% if field.enum_values is defined %}
+                                                                    {% if field.enum_values is defined and field.enum_values is iterable and field.enum_values is not string %}
                                                                         {% for value in field.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
                                                                     {% elif field.enum is defined and field.enum is iterable and field.enum is not string %}
                                                                         {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}
@@ -306,7 +335,7 @@
                                                                 <select x-model="item.{{ field.name }}"
                                                                         class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                                                     <option value="">Selecteer {{ field.name|title|replace('_', ' ') }}</option>
-                                                                    {% if field.enum_values is defined %}
+                                                                    {% if field.enum_values is defined and field.enum_values is iterable and field.enum_values is not string %}
                                                                         {% for value in field.enum_values %}<option value="{{ value }}">{{ value }}</option>{% endfor %}
                                                                     {% elif field.enum is defined and field.enum is iterable and field.enum is not string %}
                                                                         {% for enum_value in field.enum %}<option value="{{ enum_value }}">{{ enum_value }}</option>{% endfor %}

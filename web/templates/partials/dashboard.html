@@ -1,4 +1,56 @@
 <!-- templates/partials/dashboard.html -->
+<!-- Dismissable RegelRecht Disclaimer Banner -->
+<div x-data="{ showBanner: localStorage.getItem('regelrecht-banner-dismissed') !== 'true' }"
+     x-show="showBanner"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0 transform -translate-y-4"
+     x-transition:enter-end="opacity-100 transform translate-y-0"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="mb-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm"
+     style="display: none"
+     x-cloak>
+    <div class="p-5">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900">RegelRecht Proof of Concept</h3>
+                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Demo
+                    </span>
+                </div>
+                <div class="text-sm text-gray-700 space-y-2">
+                    <p>
+                        Dit is een technische demonstratie van hoe Nederlandse wetgeving als uitvoerbare code werkt.
+                        Alle gegevens zijn fictief en uitsluitend voor demonstratiedoeleinden.
+                    </p>
+                    <p class="text-xs text-gray-600">Deze demo is niet geschikt voor productie of daadwerkelijke besluitvorming.</p>
+                </div>
+                <div class="mt-3">
+                    <a href="https://minbzk.github.io/regelrecht"
+                       target="_blank"
+                       class="inline-flex items-center text-sm font-medium text-yellow-700 hover:text-yellow-900">
+                        Meer informatie over RegelRecht
+                        <svg class="ml-1 w-4 h-4"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <button @click="showBanner = false; localStorage.setItem('regelrecht-banner-dismissed', 'true')"
+                    class="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-600 focus:outline-none rounded-lg p-1 transition-colors cursor-pointer"
+                    aria-label="Sluit banner">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
 <!-- Toast Notification -->
 <div id="toast-container"
      class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 hidden">
@@ -277,8 +329,9 @@
         {% endfor %}
     </div>
 </section>
-<!-- Wijziging doorgeven Wizard -->
-<style>
+{% if change_wizard_enabled %}
+    <!-- Wijziging doorgeven Wizard -->
+    <style>
   .wizard-type-btn {
     display: flex;
     cursor: pointer;
@@ -353,94 +406,94 @@
     background-color: #ef4444;
     color: white;
   }
-</style>
-<section class="mb-8 bg-white rounded-lg shadow">
-    <div class="p-6">
-        <h3 class="font-semibold text-lg mb-4">Wijziging doorgeven</h3>
-        <p class="text-gray-600 mb-6">Geef hier wijzigingen door. Velden die niet gewijzigd zijn, kunt u leeg laten.</p>
-        <div id="wizard-container">
-            <!-- Step 0: Select type -->
-            <div id="step-0" class="wizard-step">
-                <h4 class="mb-2 block font-medium">Type wijziging</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <button type="button" class="wizard-type-btn" data-type="inkomen">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-8 w-8 text-blue-600"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <ellipse cx="12" cy="6" rx="7" ry="3" stroke-width="2" stroke="currentColor" fill="none" />
-                            <path stroke-width="2" stroke="currentColor" fill="none" d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
-                            <path stroke-width="2" stroke="currentColor" fill="none" d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6" />
-                        </svg>
-                        <span class="font-medium">Inkomen</span>
-                    </button>
-                    <button type="button" class="wizard-type-btn" data-type="woonadres">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-8 w-8 text-green-600"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
-                        <span class="font-medium">Woonadres</span>
-                    </button>
-                    <button type="button" class="wizard-type-btn" data-type="huurprijs">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-8 w-8 text-yellow-600"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2" stroke="currentColor" fill="none" />
-                            <path stroke-width="2" stroke="currentColor" fill="none" d="M9 8h6M9 12h6M9 16h2" />
-                        </svg>
-                        <span class="font-medium">Huurprijs</span>
-                    </button>
-                    <button type="button" class="wizard-type-btn" data-type="huishouden">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-8 w-8 text-pink-600"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span class="font-medium">Gezin of huishouden</span>
-                    </button>
-                </div>
-            </div>
-            <!-- Wizard steps will be dynamically generated here -->
-            <div id="wizard-steps" class="hidden">
-                <form id="wizard-form" class="space-y-6">
-                    <div id="step-content" class="space-y-3"></div>
-                    <div id="step-navigation" class="flex justify-between">
-                        <button type="button"
-                                id="prev-btn"
-                                class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
-                            Terug
+    </style>
+    <section class="mb-8 bg-white rounded-lg shadow">
+        <div class="p-6">
+            <h3 class="font-semibold text-lg mb-4">Wijziging doorgeven</h3>
+            <p class="text-gray-600 mb-6">Geef hier wijzigingen door. Velden die niet gewijzigd zijn, kunt u leeg laten.</p>
+            <div id="wizard-container">
+                <!-- Step 0: Select type -->
+                <div id="step-0" class="wizard-step">
+                    <h4 class="mb-2 block font-medium">Type wijziging</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" class="wizard-type-btn" data-type="inkomen">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-8 w-8 text-blue-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <ellipse cx="12" cy="6" rx="7" ry="3" stroke-width="2" stroke="currentColor" fill="none" />
+                                <path stroke-width="2" stroke="currentColor" fill="none" d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
+                                <path stroke-width="2" stroke="currentColor" fill="none" d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6" />
+                            </svg>
+                            <span class="font-medium">Inkomen</span>
                         </button>
-                        <button type="button"
-                                id="next-btn"
-                                class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
-                            Volgende
+                        <button type="button" class="wizard-type-btn" data-type="woonadres">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-8 w-8 text-green-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span class="font-medium">Woonadres</span>
                         </button>
-                        <button type="submit"
-                                id="submit-btn"
-                                class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none hidden">
-                            Wijziging doorgeven
+                        <button type="button" class="wizard-type-btn" data-type="huurprijs">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-8 w-8 text-yellow-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2" stroke="currentColor" fill="none" />
+                                <path stroke-width="2" stroke="currentColor" fill="none" d="M9 8h6M9 12h6M9 16h2" />
+                            </svg>
+                            <span class="font-medium">Huurprijs</span>
+                        </button>
+                        <button type="button" class="wizard-type-btn" data-type="huishouden">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-8 w-8 text-pink-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span class="font-medium">Gezin of huishouden</span>
                         </button>
                     </div>
-                </form>
+                </div>
+                <!-- Wizard steps will be dynamically generated here -->
+                <div id="wizard-steps" class="hidden">
+                    <form id="wizard-form" class="space-y-6">
+                        <div id="step-content" class="space-y-3"></div>
+                        <div id="step-navigation" class="flex justify-between">
+                            <button type="button"
+                                    id="prev-btn"
+                                    class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
+                                Terug
+                            </button>
+                            <button type="button"
+                                    id="next-btn"
+                                    class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
+                                Volgende
+                            </button>
+                            <button type="submit"
+                                    id="submit-btn"
+                                    class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none hidden">
+                                Wijziging doorgeven
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+{% endif %}
 <!-- Info Section -->
 <section class="mt-12 grid md:grid-cols-2 gap-8">
     <div class="bg-blue-50 rounded-lg p-6">
         <h3 class="font-semibold text-lg mb-4">Over deze demo</h3>
         <p class="text-gray-600">
-            Deze demo laat zien hoe wetten als code werken. De berekeningen zijn
-            gebaseerd op echte wetteksten, omgezet naar computercode. De getoonde
+            Deze demo laat zien hoe wetten als code werken. De getoonde
             profielen zijn voorbeelden uit de testscenarios.
         </p>
     </div>

@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -29,8 +29,22 @@ jobs:
         run: |
           uv sync
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales
+          sudo locale-gen nl_NL.UTF-8
+          sudo update-locale LANG=nl_NL.UTF-8
+
+      - name: Install Playwright browsers
+        run: |
+          uv run playwright install --with-deps chromium
+
       - name: Run tests
-        run: ./script/test-behaviour
+        run: ./script/test-behaviour --tags="~@ui"
+        env:
+          LANG: nl_NL.UTF-8
+          LC_ALL: nl_NL.UTF-8
 
   go-test-features:
     name: Run Go Features
@@ -42,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -67,7 +81,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
