@@ -103,7 +103,7 @@
         ns.push({
           id: lawID,
           type: 'law',
-          data: { label: data.name }, // Algorithm name
+          data: { label: `${data.service} — ${data.name}` }, // Algorithm name
           position: { x: i++ * 400, y: 0 },
           width: 340,
           height:
@@ -129,6 +129,7 @@
           expandParent: true,
           class: 'property-group',
           draggable: false,
+          selectable: false,
         });
 
         let j = 0;
@@ -143,6 +144,7 @@
             parentId: sourcesID,
             expandParent: true,
             draggable: false,
+            selectable: false,
           });
         }
 
@@ -160,6 +162,7 @@
           expandParent: true,
           class: 'property-group',
           draggable: false,
+          selectable: false,
         });
 
         j = 0;
@@ -212,6 +215,7 @@
           expandParent: true,
           class: 'property-group',
           draggable: false,
+          selectable: false,
         });
 
         j = 0;
@@ -347,16 +351,16 @@
   @reference "tailwindcss/theme";
 
   :global(.property-group) {
-    @apply bg-blue-100;
+    @apply bg-blue-100 cursor-grab;
   }
 
   :global(.svelte-flow) {
-    --xy-edge-stroke: #0084d1; /* var(--color-sky-600); */
-    --xy-edge-stroke-selected: #0084d1; /* var(--color-sky-600); */
+    --xy-edge-stroke: #00a6f4; /* var(--color-sky-500); */
+    --xy-edge-stroke-selected: #00a6f4; /* var(--color-sky-500); */
   }
 
   :global(.svelte-flow__arrowhead polyline) {
-    @apply !fill-sky-600 !stroke-sky-600;
+    @apply !fill-sky-500 !stroke-sky-500;
   }
 
   :global(.svelte-flow__edge.selected) {
