@@ -126,9 +126,9 @@
           width: 150,
           height: (data.properties.sources?.length || 0) * 50 + 50,
           parentId: lawID,
-          extent: 'parent',
           expandParent: true,
           class: 'property-group',
+          draggable: false,
         });
 
         let j = 0;
@@ -141,8 +141,8 @@
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
             parentId: sourcesID,
-            extent: 'parent',
             expandParent: true,
+            draggable: false,
           });
         }
 
@@ -157,9 +157,9 @@
           width: 150,
           height: (data.properties.input?.length || 0) * 50 + 50,
           parentId: lawID,
-          extent: 'parent',
           expandParent: true,
           class: 'property-group',
+          draggable: false,
         });
 
         j = 0;
@@ -192,7 +192,7 @@
                 markerEnd: {
                   type: MarkerType.ArrowClosed,
                 },
-                zIndex: 1,
+                zIndex: 2, // Above the subnodes, but below the sub-subnodes
               });
             }
           }
@@ -209,9 +209,9 @@
           width: 150,
           height: (data.properties.output?.length || 0) * 50 + 50,
           parentId: lawID,
-          extent: 'parent',
           expandParent: true,
           class: 'property-group',
+          draggable: false,
         });
 
         j = 0;
