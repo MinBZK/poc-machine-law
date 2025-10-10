@@ -179,6 +179,8 @@
             parentId: inputsID,
             extent: 'parent',
             expandParent: true,
+            draggable: false,
+            selectable: false,
           });
 
           // If the input has a service reference, show it with an edge
@@ -194,6 +196,8 @@
                 type: 'bezier',
                 markerEnd: {
                   type: MarkerType.ArrowClosed,
+                  width: 20,
+                  height: 20,
                 },
                 zIndex: 2, // Above the subnodes, but below the sub-subnodes
               });
@@ -230,6 +234,8 @@
             parentId: outputsID,
             extent: 'parent',
             expandParent: true,
+            draggable: false,
+            selectable: false,
           });
         }
       }
@@ -351,7 +357,16 @@
   @reference "tailwindcss/theme";
 
   :global(.property-group) {
-    @apply bg-blue-100 cursor-grab;
+    @apply bg-blue-100;
+  }
+
+  :global(
+    .property-group,
+    .svelte-flow__node-input,
+    .svelte-flow__node-source,
+    .svelte-flow__node-output
+  ) {
+    @apply cursor-grab;
   }
 
   :global(.svelte-flow) {
