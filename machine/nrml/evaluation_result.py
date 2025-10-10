@@ -11,7 +11,7 @@ class EvaluationResult:
     Node: Any = None
     Value: Any = None
     Error: str | None = None
-    SubResults: list["EvaluationResult"] = field(default_factory=list)
+    Dependencies: list["EvaluationResult"] = field(default_factory=list)
     Action: str | None = None
 
 
@@ -33,7 +33,7 @@ def nested_result(
         node=node,
         action=action,
         error=None if child_result.Success else error,
-        sub_results=[child_result],
+        dependencies=[child_result],
     )
 
 
@@ -42,11 +42,11 @@ def create_result(
     value: Any = None,
     error: str | None = None,
     node: Any = None,
-    sub_results: list[EvaluationResult] | None = None,
+    dependencies: list[EvaluationResult] | None = None,
     source: str | None = None,
     action: str | None = None,
 ) -> EvaluationResult:
     """Create evaluation results with all properties"""
     return EvaluationResult(
-        Success=success, Value=value, Error=error, Node=node, SubResults=sub_results or [], Source=source, Action=action
+        Success=success, Value=value, Error=error, Node=node, Dependencies=dependencies or [], Source=source, Action=action
     )

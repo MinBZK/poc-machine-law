@@ -3,6 +3,7 @@ from typing import Any
 from ..context import NrmlRuleContext
 from ..evaluation_result import EvaluationResult
 from .aggregation_expression_evaluator import AggregationExpressionEvaluator
+from .arithmetic_expression_evaluator import ArithmeticExpressionEvaluator
 from .conditional_expression_evaluator import ConditionalExpressionEvaluator
 
 
@@ -13,6 +14,7 @@ class ExpressionEvaluator:
         self.handlers = {
             "conditional": ConditionalExpressionEvaluator(),
             "aggregation": AggregationExpressionEvaluator(),
+            "arithmetic": ArithmeticExpressionEvaluator(),
         }
 
     def evaluate(self, expression: dict[str, Any], context: NrmlRuleContext) -> EvaluationResult:

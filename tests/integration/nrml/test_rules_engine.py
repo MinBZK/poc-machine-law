@@ -243,3 +243,50 @@ class TestNrmlRulesEngineIntegration:
         # Should count 1 child with age <= 10 (only the 8-year-old)
         assert output["value"] == 1
         assert output["process"].Success is True
+
+    def test_count_with_arithmetic_multiplication(self):
+        """Test arithmetic expression that multiplies count result with a constant value"""
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_count_with_arithmetic_multiplication.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
+
+        # Test data: parent with 3 children of different ages
+        children_data = [{"age": 8}, {"age": 9}, {"age": 15}]
+
+        aanvrager_data = [{}]
+
+        # Create engine and evaluate
+        engine = NrmlRulesEngine(spec)
+        result = engine.evaluate(
+            parameters={"kinderen": children_data, "aanvrager": aanvrager_data}, requested_output="total_benefit"
+        )
+
+        # Verify result - should be count (2) * benefit_per_child (250.50) = 501.00
+        assert "output" in result
+        assert "total_benefit" in result["output"]
+        output = result["output"]["total_benefit"]
+
+        # 2 children with age <= 10 multiplied by 250.50 euro per child = 501.00
+        assert output["value"] == 501.00
+        assert output["process"].Success is True
+
+    def test_nested_arithmetic_expression(self):
+        """Test nested arithmetic expression: 2*5+10-min(4,6)/max(1,2) = 18"""
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_nested_arithmetic_expression.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
+
+        # Create engine and evaluate
+        engine = NrmlRulesEngine(spec)
+        result = engine.evaluate(parameters={}, requested_output="result")
+
+        # Verify result - should be 2*5+10-min(4,6)/max(1,2) = 10+10-4/2 = 20-2 = 18
+        assert "output" in result
+        assert "result" in result["output"]
+        output = result["output"]["result"]
+
+        # Expected: 2*5+10-min(4,6)/max(1,2) = 18
+        assert output["value"] == 18
+        assert output["process"].Success is True

@@ -36,7 +36,7 @@ class TestConditionalExpressionEvaluator:
 
         assert result.Success is True
         assert result.Value == "then_value"
-        assert len(result.SubResults) == 2
+        assert len(result.Dependencies) == 2
         evaluator.argument_resolver.resolve_argument.assert_called_once()
 
     def test_evaluate_conditional_with_false_condition_and_else_clause(self, evaluator, context):
@@ -92,7 +92,7 @@ class TestConditionalExpressionEvaluator:
 
         assert result.Success is False
         assert "Failed to evaluate condition" in result.Error
-        assert len(result.SubResults) == 1
+        assert len(result.Dependencies) == 1
 
     def test_evaluate_conditional_with_missing_condition(self, evaluator, context):
         """Test conditional expression without a condition field"""

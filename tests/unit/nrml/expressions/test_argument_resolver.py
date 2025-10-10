@@ -39,8 +39,8 @@ class TestArgumentResolver:
         assert result.Value == expected_value
         assert result.Source == "ArgumentResolver"
         assert result.Action == f"Resolving argument $ref {ref_value}"
-        assert len(result.SubResults) == 1
-        assert result.SubResults[0] == mock_result
+        assert len(result.Dependencies) == 1
+        assert result.Dependencies[0] == mock_result
         context.item_evaluator.evaluate_item.assert_called_once_with(ref_value, context)
 
     def test_resolve_argument_with_ref_failure(self, resolver, context):
@@ -58,8 +58,8 @@ class TestArgumentResolver:
         assert result.Success is False
         assert result.Value is None
         assert result.Source == "ArgumentResolver"
-        assert len(result.SubResults) == 1
-        assert result.SubResults[0] == mock_result
+        assert len(result.Dependencies) == 1
+        assert result.Dependencies[0] == mock_result
         context.item_evaluator.evaluate_item.assert_called_once_with(ref_value, context)
 
     def test_resolve_argument_with_value(self, resolver, context):
@@ -77,7 +77,7 @@ class TestArgumentResolver:
         assert result.Source == "ArgumentResolver"
         assert result.Node == argument
         assert result.Action == "Resolved from argument value"
-        assert len(result.SubResults) == 0
+        assert len(result.Dependencies) == 0
 
     def test_resolve_argument_with_string_value(self, resolver, context):
         """Test resolving an argument with string value"""

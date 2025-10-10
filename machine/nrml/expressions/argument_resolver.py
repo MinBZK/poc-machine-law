@@ -17,27 +17,26 @@ class ArgumentResolver:
         """Resolve an argument which may contain references"""
 
         # Handle array arguments (paths like [{"$ref": "#/facts/child"}, {"$ref": "#/facts/child/items/age"}])
-        if isinstance(argument, list):
-            if aggregation_context is not None:
-                # Extract $ref values from each dict in the list to use as keys
-                keys = [item.get("$ref") for item in argument if isinstance(item, dict) and "$ref" in item]
+        if isinstance(argument, list) and aggregation_context is not None:
+            # Extract $ref values from each dict in the list to use as keys
+            keys = [item.get("$ref") for item in argument if isinstance(item, dict) and "$ref" in item]
 
-                if keys:
-                    value = aggregation_context.resolve_value(*keys)
-                    return create_result(
-                        success=True,
-                        value=value,
-                        source=self.__class__.__name__,
-                        node=argument,
-                        action=f"Resolved path {keys} from aggregation context",
-                    )
-                else:
-                    return create_result(
-                        success=False,
-                        error="No $ref values found in list argument",
-                        source=self.__class__.__name__,
-                        node=argument,
-                    )
+            if keys:
+                value = aggregation_context.resolve_value(*keys)
+                return create_result(
+                    success=True,
+                    value=value,
+                    source=self.__class__.__name__,
+                    node=argument,
+                    action=f"Resolved path {keys} from aggregation context",
+                )
+            else:
+                return create_result(
+                    success=False,
+                    error="No $ref values found in list argument",
+                    source=self.__class__.__name__,
+                    node=argument,
+                )
 
         if isinstance(argument, dict):
             if "$ref" in argument:
@@ -71,6 +70,20 @@ class ArgumentResolver:
                     source=self.__class__.__name__,
                     node=argument,
                     action="Resolved from argument value",
+                )
+
+            # Check if this is a nested expression (has "type" field)
+            if "type" in argument:
+                # Import here to avoid circular dependency
+                from .expression_evaluator import ExpressionEvaluator
+
+                expression_evaluator = ExpressionEvaluator()
+                result = expression_evaluator.evaluate(argument, context)
+                return nested_result(
+                    source=self.__class__.__name__,
+                    node=argument,
+                    action=f"Resolving nested expression of type '{argument.get('type')}'",
+                    child_result=result,
                 )
 
         raise ValueError("Failed to resolve argument reference")

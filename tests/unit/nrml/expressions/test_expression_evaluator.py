@@ -35,7 +35,7 @@ class TestExpressionEvaluator:
 
     def test_evaluate_not_implemented_expression_types(self, evaluator, context):
         """Test that unsupported expression types raise NotImplementedError"""
-        expression_types = ["arithmetic", "distribution", "function"]
+        expression_types = ["distribution", "function"]
 
         for expr_type in expression_types:
             expression = {"type": expr_type}

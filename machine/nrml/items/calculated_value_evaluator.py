@@ -45,7 +45,7 @@ class CalculatedValueEvaluator:
                 success=True,
                 value=expression_result.Value,
                 source=self.__class__.__name__,
-                sub_results=[expression_result],
+                dependencies=[expression_result],
                 node=item,
                 action=f"Determining Calculated value for item {item_key}",
             )

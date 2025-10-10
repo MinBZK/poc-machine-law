@@ -28,7 +28,7 @@ class ConditionalExpressionEvaluator:
                 success=False,
                 error="Failed to evaluate condition",
                 source=self.__class__.__name__,
-                sub_results=[condition_result],
+                dependencies=[condition_result],
             )
 
         expression_result = self.resolve_expression_result(condition_result, context, expression)
@@ -38,7 +38,7 @@ class ConditionalExpressionEvaluator:
             action="Processing conditional expression",
             value=expression_result.Value,
             source=self.__class__.__name__,
-            sub_results=[condition_result, expression_result],
+            dependencies=[condition_result, expression_result],
             node=expression,
         )
 

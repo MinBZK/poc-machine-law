@@ -32,7 +32,7 @@ class TestCalculatedValueEvaluator:
 
         assert result.Success is True
         assert result.Value == 42
-        assert len(result.SubResults) == 1
+        assert len(result.Dependencies) == 1
         assert result.Action == "Determining Calculated value for item test_item"
 
     def test_evaluate_no_versions(self, evaluator, context):

@@ -25,17 +25,10 @@ class AggregationExpressionEvaluator:
         if not expr_list:
             raise ValueError("Aggregation expression missing expression list")
 
-        condition = expression.get("condition")
-        default_value = expression.get("default", {}).get("value", 0)
+        if len(expr_list) != 1:
+            raise ValueError("More then one argument as expression is not implemented")
 
-        # Resolve the collection reference
-        if not expr_list:
-            return create_result(
-                success=True,
-                value=default_value,
-                source=self.__class__.__name__,
-                action="Empty expression list, returning default",
-            )
+        condition = expression.get("condition")
 
         # Get the first expression item (typically a $ref to a collection)
         collection_ref = expr_list[0]
@@ -46,7 +39,7 @@ class AggregationExpressionEvaluator:
                 success=False,
                 error="Failed to resolve collection reference",
                 source=self.__class__.__name__,
-                sub_results=[collection_result],
+                dependencies=[collection_result],
             )
 
         # Get the collection value (should be a list or iterable)
@@ -57,31 +50,53 @@ class AggregationExpressionEvaluator:
 
         # Apply the aggregation function
         if function == "count":
-            count = self._count_with_condition(collection, condition, context)
-            return create_result(
-                success=True,
-                value=count,
-                source=self.__class__.__name__,
-                action=f"Counted {count} items matching condition",
-                node=expression,
-            )
+            return self._count_with_condition(collection, condition, context, collection_result)
         else:
             raise NotImplementedError(f"Aggregation function '{function}' not yet implemented")
 
     def _count_with_condition(
-        self, collection: list[Any], condition: dict[str, Any] | None, context: NrmlRuleContext
-    ) -> int:
+        self,
+        collection: list[Any],
+        condition: dict[str, Any] | None,
+        context: NrmlRuleContext,
+        collection_result: EvaluationResult,
+    ) -> EvaluationResult:
         """Count items in collection that match the condition"""
         if not condition:
+            count = len(collection)
             # No condition, just return the count
-            return len(collection)
+            return create_result(
+                success=True,
+                value=count,
+                source=self.__class__.__name__,
+                action=f"No condition to evaluate, aggregation contains {count} items matching condition",
+                dependencies=[collection_result],
+            )
 
+        # Start with collection_result as the first entry
+        dependencies = [collection_result]
         count = 0
         for item in collection:
             # Wrap the item in an AggregationContext and evaluate the condition
             agg_context = AggregationContext(active_item=item)
             condition_result = self.condition_evaluator.evaluate(condition, context, agg_context)
+            dependencies.append(condition_result)
+            if not condition_result.Success:
+                return create_result(
+                    success=False,
+                    value=count,
+                    source=self.__class__.__name__,
+                    action="Failed to evaluate condition",
+                    dependencies=dependencies,
+                )
+
             if condition_result.Success and condition_result.Value:
                 count += 1
 
-        return count
+        return create_result(
+            success=True,
+            value=count,
+            source=self.__class__.__name__,
+            action=f"Counted {count} items matching condition",
+            dependencies=dependencies,
+        )

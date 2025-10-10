@@ -34,7 +34,7 @@ class TestComparisonEvaluator:
 
         assert result.Success is True
         assert result.Value is True
-        assert len(result.SubResults) == 2
+        assert len(result.Dependencies) == 2
 
     def test_evaluate_in_comparison_not_found(self, evaluator, context):
         """Test 'in' comparison when value is not in collection"""

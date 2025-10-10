@@ -249,5 +249,5 @@ class NrmlRulesEngine:
             if evaluation.Error is not None:
                 logger.debug(f"ERROR: {evaluation.Error}")
             logger.debug(f"RESULT: {evaluation.Value}")
-            for child in evaluation.SubResults:
+            for child in evaluation.Dependencies:
                 self.print_process(child)
