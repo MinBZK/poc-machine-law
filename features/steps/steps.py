@@ -812,7 +812,9 @@ def step_impl(context):
     )
 
 
-# LAA-specific step definitions
+# LAA (Landelijke Aanpak Adreskwaliteit) step definitions
+
+
 @then("genereert wet_brp/laa een signaal")
 def step_impl(context):
     assertions.assertTrue(

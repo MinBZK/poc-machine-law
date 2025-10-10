@@ -3,4 +3,4 @@ set -e
 
 # Run behavior tests with Behave
 # Pass all arguments to behave (e.g., --tags="~@ui")
-uv run behave features "$@"
+uv run behave submodules/regelrecht-laws/laws "$@"
