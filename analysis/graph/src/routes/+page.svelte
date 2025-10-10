@@ -351,12 +351,12 @@
   }
 
   :global(.svelte-flow) {
-    --xy-edge-stroke: #0284c7; /* var(--color-blue-600); */
-    --xy-edge-stroke-selected: #0284c7; /* var(--color-blue-600); */
+    --xy-edge-stroke: #0084d1; /* var(--color-sky-600); */
+    --xy-edge-stroke-selected: #0084d1; /* var(--color-sky-600); */
   }
 
   :global(.svelte-flow__arrowhead polyline) {
-    @apply fill-blue-600 stroke-blue-600;
+    @apply !fill-sky-600 !stroke-sky-600;
   }
 
   :global(.svelte-flow__edge.selected) {
