@@ -52,8 +52,8 @@
       const ns: Node[] = [];
       const es: Edge[] = [];
 
-      // Initialize a map of service names to their UUIDs
-      const serviceToUUIDsMap = new Map<string, string[]>();
+      // Initialize a map of (service, output_field) to their UUIDs
+      const serviceOutputToUUIDsMap = new Map<string, string[]>();
 
       laws = await Promise.all(
         filePaths.map(async (filePath) => {
@@ -66,12 +66,15 @@
           // Parse the YAML content
           const law = yaml.parse(fileContent) as Law;
 
-          // Populate the map with the service names and their corresponding UUIDs
-          const current = serviceToUUIDsMap.get(law.service);
-          if (current) {
-            serviceToUUIDsMap.set(law.service, [...current, law.uuid]);
-          } else {
-            serviceToUUIDsMap.set(law.service, [law.uuid]);
+          // Populate the map with the service+output combinations and their corresponding UUIDs
+          for (const output of law.properties.output || []) {
+            const key = `${law.service}:${output.name}`;
+            const current = serviceOutputToUUIDsMap.get(key);
+            if (current) {
+              serviceOutputToUUIDsMap.set(key, [...current, law.uuid]);
+            } else {
+              serviceOutputToUUIDsMap.set(key, [law.uuid]);
+            }
           }
 
           return law;
@@ -82,20 +85,23 @@
       laws.sort((a, b) => {
         return (
           (
-            a.properties.input?.filter((input) =>
-              serviceToUUIDsMap.has(input.service_reference?.service as string),
-            ) || []
+            a.properties.input?.filter((input) => {
+              const ref = input.service_reference;
+              return ref && serviceOutputToUUIDsMap.has(`${ref.service}:${ref.field}`);
+            }) || []
           ).length -
           (
-            b.properties.input?.filter((input) =>
-              serviceToUUIDsMap.has(input.service_reference?.service as string),
-            ) || []
+            b.properties.input?.filter((input) => {
+              const ref = input.service_reference;
+              return ref && serviceOutputToUUIDsMap.has(`${ref.service}:${ref.field}`);
+            }) || []
           ).length
         );
       });
 
       selectedLaws = laws.map((law) => law.uuid); // Initialize selected laws with all laws
 
+      // First pass: create all nodes
       for (const data of laws) {
         const lawID = data.uuid;
 
@@ -180,32 +186,6 @@
             draggable: false,
             selectable: false,
           });
-
-          // If the input has a service reference, show it with an edge
-          const ref = input.service_reference;
-          if (ref) {
-            for (const uuid of serviceToUUIDsMap.get(ref.service) || []) {
-              const target = `${uuid}-output-${ref.field}`;
-              // Check if target node exists. TODO: remove/improve, since most of the outputs will be added below?
-              if (ns.some((n) => n.id === target)) {
-                es.push({
-                  id: `${inputID}-${target}`,
-                  source: inputID,
-                  target: target,
-                  data: { refersToService: ref.service },
-                  type: 'bezier',
-                  markerEnd: {
-                    type: MarkerType.ArrowClosed,
-                    width: 20,
-                    height: 40,
-                  },
-                  zIndex: 2,
-                });
-              } else {
-                console.warn(`Edge target node does not exist: ${target}`);
-              }
-            }
-          }
         }
 
         // Output
@@ -239,6 +219,35 @@
             draggable: false,
             selectable: false,
           });
+        }
+      }
+
+      // Second pass: create all edges now that all nodes exist
+      for (const data of laws) {
+        for (const input of data.properties.input || []) {
+          const inputID = `${data.uuid}-input-${input.name}`;
+          const ref = input.service_reference;
+
+          if (ref) {
+            const key = `${ref.service}:${ref.field}`;
+            for (const uuid of serviceOutputToUUIDsMap.get(key) || []) {
+              const target = `${uuid}-output-${ref.field}`;
+
+              es.push({
+                id: `${inputID}-${target}`,
+                source: inputID,
+                target: target,
+                data: { refersToService: ref.service },
+                type: 'bezier',
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                  width: 20,
+                  height: 40,
+                },
+                zIndex: 2,
+              });
+            }
+          }
         }
       }
 
@@ -407,29 +416,8 @@
 
       // Remove from selectedLaws
       selectedLaws = selectedLaws.filter((uuid) => uuid !== lawUuid);
-
-      // If no laws are visible anymore, show all laws
-      if (selectedLaws.length === 0) {
-        selectedLaws = laws.map((law) => law.uuid);
-
-        nodes = nodes.map((n) => ({
-          ...n,
-          hidden: false,
-        }));
-
-        edges = edges.map((e) => ({
-          ...e,
-          hidden: false,
-        }));
-      }
     }
   }
-
-  $effect(() => {
-    if (nodes) {
-      console.log('Nodes count:', nodes.length);
-    }
-  });
 
   // Handle changes to selectedLaws
   $effect(() => {
@@ -437,29 +425,42 @@
     if (selectedLaws) {
     }
 
-    // Hide nodes that are not selected and not connected to any selected law
-    nodes = untrack(() => nodes).map((node) => ({
-      ...node,
-      hidden:
-        !selectedLaws.includes(node.id.substring(0, 36)) &&
-        !untrack(() => edges).some(
-          (edge) =>
-            (edge.source.startsWith(node.id.substring(0, 36)) &&
-              selectedLaws.includes(edge.target.substring(0, 36))) ||
-            (edge.target.startsWith(node.id.substring(0, 36)) &&
-              selectedLaws.includes(edge.source.substring(0, 36))),
-        ),
-    }));
+    // If no laws are selected, show all nodes and edges. IMPROVE: optimize this by updating selectedLaws, but avoiding infinite loop
+    if (selectedLaws.length === 0) {
+      nodes = untrack(() => nodes).map((n) => ({
+        ...n,
+        hidden: false,
+      }));
 
-    // Hide edges that are not connected to any selected law
-    edges = untrack(() => edges).map((edge) => {
-      return {
-        ...edge,
+      edges = untrack(() => edges).map((e) => ({
+        ...e,
+        hidden: false,
+      }));
+    } else {
+      // Hide nodes that are not selected and not connected to any selected law
+      nodes = untrack(() => nodes).map((node) => ({
+        ...node,
         hidden:
-          !selectedLaws.includes(edge.source.substring(0, 36)) &&
-          !selectedLaws.includes(edge.target.substring(0, 36)),
-      };
-    });
+          !selectedLaws.includes(node.id.substring(0, 36)) &&
+          !untrack(() => edges).some(
+            (edge) =>
+              (edge.source.startsWith(node.id.substring(0, 36)) &&
+                selectedLaws.includes(edge.target.substring(0, 36))) ||
+              (edge.target.startsWith(node.id.substring(0, 36)) &&
+                selectedLaws.includes(edge.source.substring(0, 36))),
+          ),
+      }));
+
+      // Hide edges that are not connected to any selected law
+      edges = untrack(() => edges).map((edge) => {
+        return {
+          ...edge,
+          hidden:
+            !selectedLaws.includes(edge.source.substring(0, 36)) &&
+            !selectedLaws.includes(edge.target.substring(0, 36)),
+        };
+      });
+    }
   });
 </script>
 
