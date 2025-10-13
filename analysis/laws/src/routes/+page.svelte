@@ -22,7 +22,7 @@
 </script>
 
 <svelte:head>
-  <title>Law inspector — Burger.nl</title>
+  <title>Law inspector — RegelRecht</title>
 </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8">
