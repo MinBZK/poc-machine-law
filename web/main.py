@@ -17,8 +17,13 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
-from web.feature_flags import is_change_wizard_enabled, is_chat_enabled, is_wallet_enabled
-from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
+from web.feature_flags import (
+    is_change_wizard_enabled,
+    is_chat_enabled,
+    is_total_income_widget_enabled,
+    is_wallet_enabled,
+)
+from web.routers import admin, chat, dashboard, edit, importer, laws, mcp, simulation, wallet
 
 app = FastAPI(title="RegelRecht")
 
@@ -39,6 +44,7 @@ if STATIC_DIR.exists():
 # Include routers
 app.include_router(laws.router)
 app.include_router(admin.router)
+app.include_router(dashboard.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
 app.include_router(importer.router)
@@ -131,6 +137,7 @@ async def root(
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
+            "total_income_widget_enabled": is_total_income_widget_enabled(),
             "accepted_claims": accepted_claims,
         },
     )
