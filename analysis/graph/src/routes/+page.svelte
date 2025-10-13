@@ -46,7 +46,7 @@
 
   function getServiceColorIndex(service: string): number {
     if (!serviceToColorIndex.has(service)) {
-      serviceToColorIndex.set(service, nextColorIndex % 10);
+      serviceToColorIndex.set(service, nextColorIndex % 7); // Limit to 7 colors (0-6)
       nextColorIndex++;
     }
     return serviceToColorIndex.get(service)!;
@@ -596,7 +596,8 @@
   :global(.root) {
     @apply rounded-md border border-black p-2;
   }
-
+  
+  /* Node colors, based on https://www.chartjs.org/docs/latest/general/colors.html. See also https://d3js.org/d3-scale-chromatic/categorical#categorical-schemes */
   :global(.service-0.root) {
     @apply bg-blue-50 border-blue-800;
   }
@@ -606,19 +607,19 @@
   }
 
   :global(.service-1.root) {
-    @apply bg-green-50 border-green-800;
+    @apply bg-pink-50 border-pink-800;
   }
 
   :global(.service-1.property-group) {
-    @apply bg-green-100 border-green-800;
+    @apply bg-pink-100 border-pink-800;
   }
 
   :global(.service-2.root) {
-    @apply bg-purple-50 border-purple-800;
+    @apply bg-emerald-50 border-emerald-800;
   }
 
   :global(.service-2.property-group) {
-    @apply bg-purple-100 border-purple-800;
+    @apply bg-emerald-100 border-emerald-800;
   }
 
   :global(.service-3.root) {
@@ -630,51 +631,27 @@
   }
 
   :global(.service-4.root) {
-    @apply bg-pink-50 border-pink-800;
+    @apply bg-purple-50 border-purple-800;
   }
 
   :global(.service-4.property-group) {
-    @apply bg-pink-100 border-pink-800;
+    @apply bg-purple-100 border-purple-800;
   }
 
   :global(.service-5.root) {
-    @apply bg-cyan-50 border-cyan-800;
+    @apply bg-yellow-50 border-yellow-800;
   }
 
   :global(.service-5.property-group) {
-    @apply bg-cyan-100 border-cyan-800;
+    @apply bg-yellow-100 border-yellow-800;
   }
 
   :global(.service-6.root) {
-    @apply bg-orange-50 border-orange-800;
+    @apply bg-slate-50 border-slate-800;
   }
 
   :global(.service-6.property-group) {
-    @apply bg-orange-100 border-orange-800;
-  }
-
-  :global(.service-7.root) {
-    @apply bg-teal-50 border-teal-800;
-  }
-
-  :global(.service-7.property-group) {
-    @apply bg-teal-100 border-teal-800;
-  }
-
-  :global(.service-8.root) {
-    @apply bg-rose-50 border-rose-800;
-  }
-
-  :global(.service-8.property-group) {
-    @apply bg-rose-100 border-rose-800;
-  }
-
-  :global(.service-9.root) {
-    @apply bg-indigo-50 border-indigo-800;
-  }
-
-  :global(.service-9.property-group) {
-    @apply bg-indigo-100 border-indigo-800;
+    @apply bg-slate-100 border-slate-800;
   }
 
   .service-0 {
@@ -682,11 +659,11 @@
   }
 
   .service-1 {
-    @apply bg-green-100 text-green-800;
+    @apply bg-pink-100 text-pink-800;
   }
 
   .service-2 {
-    @apply bg-purple-100 text-purple-800;
+    @apply bg-emerald-100 text-emerald-800;
   }
 
   .service-3 {
@@ -694,27 +671,15 @@
   }
 
   .service-4 {
-    @apply bg-pink-100 text-pink-800;
+    @apply bg-purple-100 text-purple-800;
   }
 
   .service-5 {
-    @apply bg-cyan-100 text-cyan-800;
+    @apply bg-yellow-100 text-yellow-800;
   }
 
   .service-6 {
-    @apply bg-orange-100 text-orange-800;
-  }
-
-  .service-7 {
-    @apply bg-teal-100 text-teal-800;
-  }
-
-  .service-8 {
-    @apply bg-rose-100 text-rose-800;
-  }
-
-  .service-9 {
-    @apply bg-indigo-100 text-indigo-800;
+    @apply bg-slate-100 text-slate-800;
   }
 
   :global(

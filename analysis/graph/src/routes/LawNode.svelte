@@ -8,7 +8,7 @@
 
 <button
   type="button"
-  class="close float-right cursor-pointer rounded-md bg-slate-600 p-1 text-white"
+  class="close float-right cursor-pointer rounded-md bg-gray-950/65 p-1 text-white"
   aria-label="Close"
 >
   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
