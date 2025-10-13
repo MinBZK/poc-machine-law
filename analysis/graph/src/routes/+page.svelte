@@ -324,17 +324,33 @@
         return bConnections - aConnections;
       });
 
-      const clusterWidth = Math.ceil(Math.sqrt(cluster.length));
+      // Count visible nodes in this cluster
+      const visibleNodesInCluster = cluster.filter((nodeId) => {
+        const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
+        return nodeIndex !== -1 && !nodes[nodeIndex].hidden;
+      }).length;
+
+      // Skip empty clusters
+      if (visibleNodesInCluster === 0) {
+        continue;
+      }
+
+      const clusterWidth = Math.ceil(Math.sqrt(visibleNodesInCluster));
       const rowHeights: number[] = [];
+      let visibleNodeCount = 0;
+      let maxCol = 0;
 
       // Calculate positions with dynamic row heights
       for (let i = 0; i < cluster.length; i++) {
         const nodeId = cluster[i];
         const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
 
-        if (nodeIndex !== -1) {
-          const col = i % clusterWidth;
-          const row = Math.floor(i / clusterWidth);
+        if (nodeIndex !== -1 && !nodes[nodeIndex].hidden) {
+          const col = visibleNodeCount % clusterWidth;
+          const row = Math.floor(visibleNodeCount / clusterWidth);
+
+          // Track the maximum column used
+          maxCol = Math.max(maxCol, col);
 
           // Calculate Y position based on previous rows
           let yPos = 0;
@@ -344,7 +360,7 @@
 
           nodes[nodeIndex] = {
             ...nodes[nodeIndex],
-            position: { // Fully specify position for reactivity
+            position: {
               x: clusterX + col * nodeSpacing,
               y: yPos,
             },
@@ -357,10 +373,14 @@
           } else {
             rowHeights[row] = Math.max(rowHeights[row], nodeHeight);
           }
+
+          visibleNodeCount++;
         }
       }
 
-      clusterX += clusterWidth * nodeSpacing + clusterSpacing;
+      // Advance clusterX based on actual width used (maxCol + 1)
+      // Note: nodeSpacing already includes buffer, so we don't add clusterSpacing
+      clusterX += (maxCol + 1) * nodeSpacing;
     }
 
     nodes = [...nodes]; // Force update for reactivity
