@@ -18,7 +18,7 @@ from web.dependencies import (
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.feature_flags import is_change_wizard_enabled, is_chat_enabled, is_wallet_enabled
-from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
+from web.routers import admin, chat, dashboard, edit, importer, laws, mcp, simulation, wallet
 
 app = FastAPI(title="Burger.nl")
 
@@ -39,6 +39,7 @@ if STATIC_DIR.exists():
 # Include routers
 app.include_router(laws.router)
 app.include_router(admin.router)
+app.include_router(dashboard.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
 app.include_router(importer.router)
