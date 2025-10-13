@@ -596,7 +596,7 @@
   :global(.root) {
     @apply rounded-md border border-black p-2;
   }
-  
+
   /* Node colors, based on https://www.chartjs.org/docs/latest/general/colors.html. See also https://d3js.org/d3-scale-chromatic/categorical#categorical-schemes */
   :global(.service-0.root) {
     @apply bg-blue-50 border-blue-800;
