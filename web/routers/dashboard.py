@@ -42,7 +42,7 @@ LAW_MAPPING = {
         "display_name": "WW-uitkering",
     },
     "wet_op_het_kindgebonden_budget": {
-        "field": "hoogte_kindgebonden_budget",
+        "field": "kindgebonden_budget_jaar",
         "per_month": False,  # Yearly amount
         "type": "benefit",
         "display_name": "Kindgebonden budget",
