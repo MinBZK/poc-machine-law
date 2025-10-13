@@ -30,13 +30,13 @@ LAW_MAPPING = {
         "display_name": "Bijstand",
     },
     "algemene_ouderdomswet": {
-        "field": "pensioen_bedrag",
+        "field": "pensioenbedrag",
         "per_month": True,  # Monthly amount
         "type": "benefit",
         "display_name": "AOW-pensioen",
     },
     "werkloosheidswet": {
-        "field": "uitkeringsbedrag",
+        "field": "ww_uitkering_per_maand",
         "per_month": True,  # Monthly amount
         "type": "benefit",
         "display_name": "WW-uitkering",
@@ -48,10 +48,11 @@ LAW_MAPPING = {
         "display_name": "Kindgebonden budget",
     },
     "wet_kinderopvang": {
-        "field": "hoogte_kinderopvangtoeslag",
-        "per_month": True,  # Monthly amount
+        "field": "jaarbedrag",
+        "per_month": False,  # Yearly amount
         "type": "benefit",
         "display_name": "Kinderopvangtoeslag",
+        "condition_field": "is_gerechtigd",  # Only count if this is True
     },
     "wet_inkomstenbelasting": {
         "field": "totale_belastingschuld",
