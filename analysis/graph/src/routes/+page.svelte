@@ -9,59 +9,13 @@
     Background,
     BackgroundVariant,
     MiniMap,
-    Position,
     type Node,
     type Edge,
   } from '@xyflow/svelte';
   import LawNode from './LawNode.svelte';
-  import ELK, { type ElkExtendedEdge } from 'elkjs/lib/elk.bundled.js';
 
   // Import the styles for Svelte Flow to work
   import '@xyflow/svelte/dist/style.css';
-
-  const elk = new ELK();
-
-  const elkOptions = {
-    'elk.algorithm': 'org.eclipse.elk.force',
-    'elk.spacing.nodeNode': '40', // spacing between top-level nodes
-    'elk.direction': 'RIGHT'
-    // 'elk.layered.spacing.nodeNodeBetweenLayers': '20', // vertical spacing between layers
-  };
-
-  function getLayoutedElements(
-    nodes: Node[],
-    edges: ElkExtendedEdge[],
-    options: { [key: string]: string } = {},
-  ) {
-    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
-    const graph = {
-      id: 'root',
-      layoutOptions: options,
-      children: nodes.map((node) => ({
-        ...node,
-        targetPosition: Position.Left,
-        sourcePosition: Position.Right,
-
-        // Use fallback values for width and height for ELK when layouting
-        width: node.width ?? 150, // Ensure width is set
-        height: node.height ?? 50, // Ensure height is set
-      })),
-      edges: edges,
-    };
-
-    return elk
-      .layout(graph)
-      .then((layoutedGraph) => ({
-        nodes: layoutedGraph.children?.map((node) => ({
-          ...node,
-          // Svelte Flow expects a position property on the node instead of `x` and `y` fields
-          position: { x: node.x || 0, y: node.y || 0 },
-        })),
-
-        edges: layoutedGraph.edges,
-      }))
-      .catch(console.error);
-  }
 
   type Law = {
     uuid: string;
@@ -78,7 +32,7 @@
   let filePaths: string[] = [];
 
   let nodes = $state.raw<Node[]>([]);
-  let edges = $state.raw<(Edge & ElkExtendedEdge)[]>([]);
+  let edges = $state.raw<Edge[]>([]);
 
   const nodeTypes: any = {
     law: LawNode,
@@ -96,7 +50,7 @@
       let i = 0;
 
       const ns: Node[] = [];
-      const es: (Edge & ElkExtendedEdge)[] = [];
+      const es: Edge[] = [];
 
       // Initialize a map of service names to their UUIDs
       const serviceToUUIDsMap = new Map<string, string[]>();
@@ -159,7 +113,6 @@
               (data.properties.output?.length || 0) * 50,
             ) + 120,
           class: 'root',
-          // layoutOptions: { 'elk.algorithm': 'org.eclipse.elk.fixed' }, // Use fixed positions inside the root nodes
         });
 
         // Sources
@@ -238,9 +191,7 @@
                 es.push({
                   id: `${inputID}-${target}`,
                   source: inputID,
-                  sources: [inputID],
                   target: target,
-                  targets: [target],
                   data: { refersToService: ref.service },
                   type: 'bezier',
                   markerEnd: {
@@ -291,6 +242,109 @@
         }
       }
 
+      // Calculate positions for root nodes based on connections. Note: ELK layouting with e.g. a force layout does not work well for this use case, since the sub-nodes have to be positioned relative to their parent nodes
+      const rootNodes = ns.filter((n) => n.class === 'root');
+      const connectionGraph = new Map<string, Set<string>>();
+
+      // Build connection graph between root nodes
+      for (const edge of es) {
+        const sourceRoot = edge.source.substring(0, 36);
+        const targetRoot = edge.target.substring(0, 36);
+
+        if (sourceRoot !== targetRoot) {
+          if (!connectionGraph.has(sourceRoot)) {
+            connectionGraph.set(sourceRoot, new Set());
+          }
+          if (!connectionGraph.has(targetRoot)) {
+            connectionGraph.set(targetRoot, new Set());
+          }
+          connectionGraph.get(sourceRoot)!.add(targetRoot);
+          connectionGraph.get(targetRoot)!.add(sourceRoot);
+        }
+      }
+
+      // Group nodes using a simple clustering approach
+      const positioned = new Set<string>();
+      const clusters: string[][] = [];
+
+      for (const rootNode of rootNodes) {
+        if (!positioned.has(rootNode.id)) {
+          const cluster: string[] = [rootNode.id];
+          positioned.add(rootNode.id);
+
+          // Add connected nodes to the same cluster
+          const toVisit = [rootNode.id];
+          const visited = new Set<string>([rootNode.id]);
+
+          while (toVisit.length > 0) {
+            const current = toVisit.shift()!;
+            const connections = connectionGraph.get(current) || new Set();
+
+            for (const connected of connections) {
+              if (!visited.has(connected)) {
+                visited.add(connected);
+                if (!positioned.has(connected)) {
+                  cluster.push(connected);
+                  positioned.add(connected);
+                  toVisit.push(connected);
+                }
+              }
+            }
+          }
+
+          clusters.push(cluster);
+        }
+      }
+
+      // Position clusters
+      let clusterX = 0;
+      const clusterSpacing = 100;
+      const nodeSpacing = 420;
+
+      for (const cluster of clusters) {
+        // Sort cluster by connection count (most connected first)
+        cluster.sort((a, b) => {
+          const aConnections = connectionGraph.get(a)?.size || 0;
+          const bConnections = connectionGraph.get(b)?.size || 0;
+          return bConnections - aConnections;
+        });
+
+        const clusterWidth = Math.ceil(Math.sqrt(cluster.length));
+        const rowHeights: number[] = [];
+
+        // Calculate positions with dynamic row heights
+        for (let i = 0; i < cluster.length; i++) {
+          const nodeId = cluster[i];
+          const nodeIndex = ns.findIndex((n) => n.id === nodeId);
+
+          if (nodeIndex !== -1) {
+            const col = i % clusterWidth;
+            const row = Math.floor(i / clusterWidth);
+
+            // Calculate Y position based on previous rows
+            let yPos = 0;
+            for (let r = 0; r < row; r++) {
+              yPos += rowHeights[r] + clusterSpacing;
+            }
+
+            ns[nodeIndex].position = {
+              x: clusterX + col * nodeSpacing,
+              y: yPos,
+            };
+
+            // Track the maximum height in this row
+            const nodeHeight = ns[nodeIndex].height || 0;
+            if (!rowHeights[row]) {
+              rowHeights[row] = nodeHeight;
+            } else {
+              rowHeights[row] = Math.max(rowHeights[row], nodeHeight);
+            }
+          }
+        }
+
+        clusterX += clusterWidth * nodeSpacing + clusterSpacing;
+      }
+
       // Add the nodes to the graph
       nodes = ns;
 
@@ -299,20 +353,6 @@
     } catch (error) {
       console.error('Error reading file', error);
     }
-
-    getLayoutedElements(nodes, edges, elkOptions).then((res) => {
-      if (!res) {
-        return;
-      }
-
-      const { nodes: layoutedNodes, edges: layoutedEdges } = res;
-      if (!layoutedNodes || !layoutedEdges) {
-        return;
-      }
-
-      nodes = layoutedNodes;
-      edges = layoutedEdges;
-    });
   })();
 
   function handleNodeClick({ node, event }: any) {
@@ -378,7 +418,7 @@
       <label class="group inline-flex items-start">
         <input
           bind:group={selectedLaws}
-          class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           type="checkbox"
           value={law.uuid}
         />
@@ -389,7 +429,7 @@
             onclick={() => {
               selectedLaws = [law.uuid];
             }}
-            class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
+            class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
             >alleen</button
           ></span
         >

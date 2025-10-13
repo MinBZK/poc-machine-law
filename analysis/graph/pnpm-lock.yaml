@@ -11,9 +11,6 @@ importers:
       '@xyflow/svelte':
         specifier: ^1.3.1
         version: 1.3.1(svelte@5.39.11)
-      elkjs:
-        specifier: ^0.11.0
-        version: 0.11.0
       yaml:
         specifier: ^2.8.1
         version: 2.8.1
@@ -873,9 +870,6 @@ packages:
 
   electron-to-chromium@1.5.109:
     resolution: {integrity: sha512-AidaH9JETVRr9DIPGfp1kAarm/W6hRJTPuCnkF+2MqhF4KaAgRIcBc8nvjk+YMXZhwfISof/7WG29eS4iGxQLQ==}
-
-  elkjs@0.11.0:
-    resolution: {integrity: sha512-u4J8h9mwEDaYMqo0RYJpqNMFDoMK7f+pu4GjcV+N8jIC7TRdORgzkfSjTJemhqONFfH6fBI3wpysgWbhgVWIXw==}
 
   enhanced-resolve@5.18.3:
     resolution: {integrity: sha512-d4lC8xfavMeBjzGr2vECC3fsGXziXZQyJxD868h2M/mBI3PwAuODxAkLkq5HYuvrPYcUtiLzsTo8U3PgX3Ocww==}
@@ -2292,8 +2286,6 @@ snapshots:
   devalue@5.3.2: {}
 
   electron-to-chromium@1.5.109: {}
-
-  elkjs@0.11.0: {}
 
   enhanced-resolve@5.18.3:
     dependencies:
