@@ -517,7 +517,7 @@
 </script>
 
 <svelte:head>
-  <title>Dependency graph — Burger.nl</title>
+  <title>Dependency graph — RegelRecht</title>
 </svelte:head>
 
 <div class="float-right h-screen w-80 overflow-y-auto px-6 pb-4 text-sm">
