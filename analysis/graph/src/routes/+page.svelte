@@ -9,13 +9,59 @@
     Background,
     BackgroundVariant,
     MiniMap,
+    Position,
     type Node,
     type Edge,
   } from '@xyflow/svelte';
   import LawNode from './LawNode.svelte';
+  import ELK, { type ElkExtendedEdge } from 'elkjs/lib/elk.bundled.js';
 
   // Import the styles for Svelte Flow to work
   import '@xyflow/svelte/dist/style.css';
+
+  const elk = new ELK();
+
+  const elkOptions = {
+    'elk.algorithm': 'org.eclipse.elk.force',
+    'elk.spacing.nodeNode': '40', // spacing between top-level nodes
+    'elk.direction': 'RIGHT'
+    // 'elk.layered.spacing.nodeNodeBetweenLayers': '20', // vertical spacing between layers
+  };
+
+  function getLayoutedElements(
+    nodes: Node[],
+    edges: ElkExtendedEdge[],
+    options: { [key: string]: string } = {},
+  ) {
+    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
+    const graph = {
+      id: 'root',
+      layoutOptions: options,
+      children: nodes.map((node) => ({
+        ...node,
+        targetPosition: Position.Left,
+        sourcePosition: Position.Right,
+
+        // Use fallback values for width and height for ELK when layouting
+        width: node.width ?? 150, // Ensure width is set
+        height: node.height ?? 50, // Ensure height is set
+      })),
+      edges: edges,
+    };
+
+    return elk
+      .layout(graph)
+      .then((layoutedGraph) => ({
+        nodes: layoutedGraph.children?.map((node) => ({
+          ...node,
+          // Svelte Flow expects a position property on the node instead of `x` and `y` fields
+          position: { x: node.x || 0, y: node.y || 0 },
+        })),
+
+        edges: layoutedGraph.edges,
+      }))
+      .catch(console.error);
+  }
 
   type Law = {
     uuid: string;
@@ -32,7 +78,7 @@
   let filePaths: string[] = [];
 
   let nodes = $state.raw<Node[]>([]);
-  let edges = $state.raw<Edge[]>([]);
+  let edges = $state.raw<(Edge & ElkExtendedEdge)[]>([]);
 
   const nodeTypes: any = {
     law: LawNode,
@@ -44,13 +90,13 @@
   (async () => {
     try {
       // Fetch the available laws from the backend
-      const response = await fetch('/laws/list');
+      const response = await fetch('temp.json');
       filePaths = await response.json();
 
       let i = 0;
 
       const ns: Node[] = [];
-      const es: Edge[] = [];
+      const es: (Edge & ElkExtendedEdge)[] = [];
 
       // Initialize a map of service names to their UUIDs
       const serviceToUUIDsMap = new Map<string, string[]>();
@@ -113,6 +159,7 @@
               (data.properties.output?.length || 0) * 50,
             ) + 120,
           class: 'root',
+          // layoutOptions: { 'elk.algorithm': 'org.eclipse.elk.fixed' }, // Use fixed positions inside the root nodes
         });
 
         // Sources
@@ -126,7 +173,6 @@
           width: 150,
           height: (data.properties.sources?.length || 0) * 50 + 50,
           parentId: lawID,
-          expandParent: true,
           class: 'property-group',
           draggable: false,
           selectable: false,
@@ -141,8 +187,8 @@
             data: { label: source.name },
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
+            height: 40,
             parentId: sourcesID,
-            expandParent: true,
             draggable: false,
             selectable: false,
           });
@@ -159,7 +205,6 @@
           width: 150,
           height: (data.properties.input?.length || 0) * 50 + 50,
           parentId: lawID,
-          expandParent: true,
           class: 'property-group',
           draggable: false,
           selectable: false,
@@ -168,7 +213,7 @@
         j = 0;
 
         for (const input of data.properties.input || []) {
-          const inputID = `${data.uuid}-input-${input.name};`;
+          const inputID = `${data.uuid}-input-${input.name}`;
 
           ns.push({
             id: inputID,
@@ -176,9 +221,9 @@
             data: { label: input.name },
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
+            height: 40,
             parentId: inputsID,
             extent: 'parent',
-            expandParent: true,
             draggable: false,
             selectable: false,
           });
@@ -188,19 +233,26 @@
           if (ref) {
             for (const uuid of serviceToUUIDsMap.get(ref.service) || []) {
               const target = `${uuid}-output-${ref.field}`;
-              es.push({
-                id: `${inputID}-${target}`,
-                source: inputID,
-                target: target,
-                data: { refersToService: ref.service },
-                type: 'bezier',
-                markerEnd: {
-                  type: MarkerType.ArrowClosed,
-                  width: 20,
-                  height: 20,
-                },
-                zIndex: 2, // Above the subnodes, but below the sub-subnodes
-              });
+              // Check if target node exists. TODO: remove/improve, since most of the outputs will be added below?
+              if (ns.some((n) => n.id === target)) {
+                es.push({
+                  id: `${inputID}-${target}`,
+                  source: inputID,
+                  sources: [inputID],
+                  target: target,
+                  targets: [target],
+                  data: { refersToService: ref.service },
+                  type: 'bezier',
+                  markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    width: 20,
+                    height: 40,
+                  },
+                  zIndex: 2,
+                });
+              } else {
+                console.warn(`Edge target node does not exist: ${target}`);
+              }
             }
           }
         }
@@ -216,7 +268,6 @@
           width: 150,
           height: (data.properties.output?.length || 0) * 50 + 50,
           parentId: lawID,
-          expandParent: true,
           class: 'property-group',
           draggable: false,
           selectable: false,
@@ -231,9 +282,9 @@
             data: { label: output.name },
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
+            height: 40,
             parentId: outputsID,
             extent: 'parent',
-            expandParent: true,
             draggable: false,
             selectable: false,
           });
@@ -248,6 +299,20 @@
     } catch (error) {
       console.error('Error reading file', error);
     }
+
+    getLayoutedElements(nodes, edges, elkOptions).then((res) => {
+      if (!res) {
+        return;
+      }
+
+      const { nodes: layoutedNodes, edges: layoutedEdges } = res;
+      if (!layoutedNodes || !layoutedEdges) {
+        return;
+      }
+
+      nodes = layoutedNodes;
+      edges = layoutedEdges;
+    });
   })();
 
   function handleNodeClick({ node, event }: any) {
