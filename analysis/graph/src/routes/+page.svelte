@@ -242,122 +242,135 @@
         }
       }
 
-      // Calculate positions for root nodes based on connections. Note: ELK layouting with e.g. a force layout does not work well for this use case, since the sub-nodes have to be positioned relative to their parent nodes
-      const rootNodes = ns.filter((n) => n.class === 'root');
-      const connectionGraph = new Map<string, Set<string>>();
-
-      // Build connection graph between root nodes
-      for (const edge of es) {
-        const sourceRoot = edge.source.substring(0, 36);
-        const targetRoot = edge.target.substring(0, 36);
-
-        if (sourceRoot !== targetRoot) {
-          if (!connectionGraph.has(sourceRoot)) {
-            connectionGraph.set(sourceRoot, new Set());
-          }
-          if (!connectionGraph.has(targetRoot)) {
-            connectionGraph.set(targetRoot, new Set());
-          }
-          connectionGraph.get(sourceRoot)!.add(targetRoot);
-          connectionGraph.get(targetRoot)!.add(sourceRoot);
-        }
-      }
-
-      // Group nodes using a simple clustering approach
-      const positioned = new Set<string>();
-      const clusters: string[][] = [];
-
-      for (const rootNode of rootNodes) {
-        if (!positioned.has(rootNode.id)) {
-          const cluster: string[] = [rootNode.id];
-          positioned.add(rootNode.id);
-
-          // Add connected nodes to the same cluster
-          const toVisit = [rootNode.id];
-          const visited = new Set<string>([rootNode.id]);
-
-          while (toVisit.length > 0) {
-            const current = toVisit.shift()!;
-            const connections = connectionGraph.get(current) || new Set();
-
-            for (const connected of connections) {
-              if (!visited.has(connected)) {
-                visited.add(connected);
-                if (!positioned.has(connected)) {
-                  cluster.push(connected);
-                  positioned.add(connected);
-                  toVisit.push(connected);
-                }
-              }
-            }
-          }
-
-          clusters.push(cluster);
-        }
-      }
-
-      // Position clusters
-      let clusterX = 0;
-      const clusterSpacing = 100;
-      const nodeSpacing = 420;
-
-      for (const cluster of clusters) {
-        // Sort cluster by connection count (most connected first)
-        cluster.sort((a, b) => {
-          const aConnections = connectionGraph.get(a)?.size || 0;
-          const bConnections = connectionGraph.get(b)?.size || 0;
-          return bConnections - aConnections;
-        });
-
-        const clusterWidth = Math.ceil(Math.sqrt(cluster.length));
-        const rowHeights: number[] = [];
-
-        // Calculate positions with dynamic row heights
-        for (let i = 0; i < cluster.length; i++) {
-          const nodeId = cluster[i];
-          const nodeIndex = ns.findIndex((n) => n.id === nodeId);
-
-          if (nodeIndex !== -1) {
-            const col = i % clusterWidth;
-            const row = Math.floor(i / clusterWidth);
-
-            // Calculate Y position based on previous rows
-            let yPos = 0;
-            for (let r = 0; r < row; r++) {
-              yPos += rowHeights[r] + clusterSpacing;
-            }
-
-            ns[nodeIndex].position = {
-              x: clusterX + col * nodeSpacing,
-              y: yPos,
-            };
-
-            // Track the maximum height in this row
-            const nodeHeight = ns[nodeIndex].height || 0;
-            if (!rowHeights[row]) {
-              rowHeights[row] = nodeHeight;
-            } else {
-              rowHeights[row] = Math.max(rowHeights[row], nodeHeight);
-            }
-          }
-        }
-
-        clusterX += clusterWidth * nodeSpacing + clusterSpacing;
-      }
-
       // Add the nodes to the graph
       nodes = ns;
 
       // Add the edges to the graph
       edges = es;
+
+      // Calculate initial positions
+      calculatePositions();
     } catch (error) {
       console.error('Error reading file', error);
     }
   })();
 
+  // Calculate positions for root nodes based on connections
+  function calculatePositions() {
+    // Filter for root nodes that are not hidden
+    const rootNodes = nodes.filter((n) => n.class === 'root' && !n.hidden);
+    const connectionGraph = new Map<string, Set<string>>();
+
+    // Build connection graph between root nodes
+    for (const edge of edges) {
+      const sourceRoot = edge.source.substring(0, 36);
+      const targetRoot = edge.target.substring(0, 36);
+
+      if (sourceRoot !== targetRoot) {
+        if (!connectionGraph.has(sourceRoot)) {
+          connectionGraph.set(sourceRoot, new Set());
+        }
+        if (!connectionGraph.has(targetRoot)) {
+          connectionGraph.set(targetRoot, new Set());
+        }
+        connectionGraph.get(sourceRoot)!.add(targetRoot);
+        connectionGraph.get(targetRoot)!.add(sourceRoot);
+      }
+    }
+
+    // Group nodes using a simple clustering approach
+    const positioned = new Set<string>();
+    const clusters: string[][] = [];
+
+    for (const rootNode of rootNodes) {
+      if (!positioned.has(rootNode.id)) {
+        const cluster: string[] = [rootNode.id];
+        positioned.add(rootNode.id);
+
+        // Add connected nodes to the same cluster
+        const toVisit = [rootNode.id];
+        const visited = new Set<string>([rootNode.id]);
+
+        while (toVisit.length > 0) {
+          const current = toVisit.shift()!;
+          const connections = connectionGraph.get(current) || new Set();
+
+          for (const connected of connections) {
+            if (!visited.has(connected)) {
+              visited.add(connected);
+              if (!positioned.has(connected)) {
+                cluster.push(connected);
+                positioned.add(connected);
+                toVisit.push(connected);
+              }
+            }
+          }
+        }
+
+        clusters.push(cluster);
+      }
+    }
+
+    // Position clusters
+    let clusterX = 0;
+    const clusterSpacing = 100;
+    const nodeSpacing = 420;
+
+    for (const cluster of clusters) {
+      // Sort cluster by connection count (most connected first)
+      cluster.sort((a, b) => {
+        const aConnections = connectionGraph.get(a)?.size || 0;
+        const bConnections = connectionGraph.get(b)?.size || 0;
+        return bConnections - aConnections;
+      });
+
+      const clusterWidth = Math.ceil(Math.sqrt(cluster.length));
+      const rowHeights: number[] = [];
+
+      // Calculate positions with dynamic row heights
+      for (let i = 0; i < cluster.length; i++) {
+        const nodeId = cluster[i];
+        const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
+
+        if (nodeIndex !== -1) {
+          const col = i % clusterWidth;
+          const row = Math.floor(i / clusterWidth);
+
+          // Calculate Y position based on previous rows
+          let yPos = 0;
+          for (let r = 0; r < row; r++) {
+            yPos += rowHeights[r] + clusterSpacing;
+          }
+
+          nodes[nodeIndex] = {
+            ...nodes[nodeIndex],
+            position: { // Fully specify position for reactivity
+              x: clusterX + col * nodeSpacing,
+              y: yPos,
+            },
+          };
+
+          // Track the maximum height in this row
+          const nodeHeight = nodes[nodeIndex].height || 0;
+          if (!rowHeights[row]) {
+            rowHeights[row] = nodeHeight;
+          } else {
+            rowHeights[row] = Math.max(rowHeights[row], nodeHeight);
+          }
+        }
+      }
+
+      clusterX += clusterWidth * nodeSpacing + clusterSpacing;
+    }
+
+    nodes = [...nodes]; // Force update for reactivity
+  }
+
   function handleNodeClick({ node, event }: any) {
     // If the click is on a button.close, set the node and connected edges as hidden (using ID prefix matching)
     if ((event.target as HTMLElement).closest('.close')) {
+      const lawUuid = node.id.substring(0, 36);
+
       nodes = nodes.map((n) => {
         if (n.id.startsWith(node.id)) {
           return { ...n, hidden: true };
@@ -371,8 +384,32 @@
         }
         return e;
       });
+
+      // Remove from selectedLaws
+      selectedLaws = selectedLaws.filter((uuid) => uuid !== lawUuid);
+
+      // If no laws are visible anymore, show all laws
+      if (selectedLaws.length === 0) {
+        selectedLaws = laws.map((law) => law.uuid);
+
+        nodes = nodes.map((n) => ({
+          ...n,
+          hidden: false,
+        }));
+
+        edges = edges.map((e) => ({
+          ...e,
+          hidden: false,
+        }));
+      }
     }
   }
+
+  $effect(() => {
+    if (nodes) {
+      console.log('Nodes count:', nodes.length);
+    }
+  });
 
   // Handle changes to selectedLaws
   $effect(() => {
@@ -412,6 +449,13 @@
 
 <div class="float-right h-screen w-80 overflow-y-auto px-6 py-4 text-sm">
   <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
+
+  <button
+    type="button"
+    onclick={calculatePositions}
+    class="mb-3 inline-block cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
+    >Her-positioneer</button
+  >
 
   {#each laws as law}
     <div class="mb-1.5">
