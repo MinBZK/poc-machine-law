@@ -24,11 +24,3 @@
 </button>
 
 <div class="text-center">{data.label}</div>
-
-<style lang="postcss">
-  @reference "tailwindcss/theme";
-
-  :global(.root) {
-    @apply rounded-md border border-black bg-blue-50 p-2;
-  }
-</style>

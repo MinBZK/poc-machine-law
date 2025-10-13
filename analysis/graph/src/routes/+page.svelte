@@ -40,6 +40,18 @@
     law: LawNode,
   };
 
+  // Map service names to color indices (0-9)
+  const serviceToColorIndex = new Map<string, number>();
+  let nextColorIndex = 0;
+
+  function getServiceColorIndex(service: string): number {
+    if (!serviceToColorIndex.has(service)) {
+      serviceToColorIndex.set(service, nextColorIndex % 10);
+      nextColorIndex++;
+    }
+    return serviceToColorIndex.get(service)!;
+  }
+
   let laws = $state<Law[]>([]);
   let selectedLaws = $state<string[]>([]); // Contains the law UUIDs. This will hold the selected laws from the checkboxes
 
@@ -124,6 +136,7 @@
         const lawID = data.uuid;
 
         // Add parent nodes
+        const colorIndex = getServiceColorIndex(data.service);
         ns.push({
           id: lawID,
           type: 'law',
@@ -136,7 +149,7 @@
                 70,
               (data.properties.output?.length || 0) * 50,
             ) + 120,
-          class: 'root',
+          class: `root service-${colorIndex}`,
         });
 
         // Sources
@@ -150,7 +163,7 @@
           width: 150,
           height: (data.properties.sources?.length || 0) * 50 + 50,
           parentId: lawID,
-          class: 'property-group',
+          class: `property-group service-${colorIndex}`,
           draggable: false,
           selectable: false,
         });
@@ -183,7 +196,7 @@
           width: 150,
           height: (data.properties.input?.length || 0) * 50 + 50,
           parentId: lawID,
-          class: 'property-group',
+          class: `property-group service-${colorIndex}`,
           draggable: false,
           selectable: false,
         });
@@ -219,7 +232,7 @@
           width: 150,
           height: (data.properties.output?.length || 0) * 50 + 50,
           parentId: lawID,
-          class: 'property-group',
+          class: `property-group service-${colorIndex}`,
           draggable: false,
           selectable: false,
         });
@@ -288,7 +301,7 @@
   // Calculate positions for root nodes based on connections
   function calculatePositions() {
     // Filter for root nodes that are not hidden
-    const rootNodes = nodes.filter((n) => n.class === 'root' && !n.hidden);
+    const rootNodes = nodes.filter((n) => n.class?.includes('root') && !n.hidden);
 
     // Build dependency graph: node -> nodes that depend on it
     const dependencyGraph = new Map<string, Set<string>>();
@@ -510,7 +523,9 @@
         acc[law.service].push(law);
         return acc;
       }, {} as Record<string, Law[]>)) as [service, serviceLaws]}
-    <h2 class="mt-4 mb-2 text-sm font-semibold text-gray-700 first:mt-0">{service}</h2>
+    <h2 class="service-{getServiceColorIndex(service)} mt-4 mb-2 text-sm font-semibold first:mt-0">
+      {service}
+    </h2>
     {#each serviceLaws as law}
       <div class="mb-1.5">
         <label class="group inline-flex items-start">
@@ -560,8 +575,128 @@
 <style lang="postcss">
   @reference "tailwindcss/theme";
 
-  :global(.property-group) {
+  :global(.root) {
+    @apply rounded-md border border-black p-2;
+  }
+
+  :global(.service-0.root) {
+    @apply bg-blue-50;
+  }
+
+  :global(.service-0.property-group) {
     @apply bg-blue-100;
+  }
+
+  :global(.service-1.root) {
+    @apply bg-green-50;
+  }
+
+  :global(.service-1.property-group) {
+    @apply bg-green-100;
+  }
+
+  :global(.service-2.root) {
+    @apply bg-purple-50;
+  }
+
+  :global(.service-2.property-group) {
+    @apply bg-purple-100;
+  }
+
+  :global(.service-3.root) {
+    @apply bg-amber-50;
+  }
+
+  :global(.service-3.property-group) {
+    @apply bg-amber-100;
+  }
+
+  :global(.service-4.root) {
+    @apply bg-pink-50;
+  }
+
+  :global(.service-4.property-group) {
+    @apply bg-pink-100;
+  }
+
+  :global(.service-5.root) {
+    @apply bg-cyan-50;
+  }
+
+  :global(.service-5.property-group) {
+    @apply bg-cyan-100;
+  }
+
+  :global(.service-6.root) {
+    @apply bg-orange-50;
+  }
+
+  :global(.service-6.property-group) {
+    @apply bg-orange-100;
+  }
+
+  :global(.service-7.root) {
+    @apply bg-teal-50;
+  }
+
+  :global(.service-7.property-group) {
+    @apply bg-teal-100;
+  }
+
+  :global(.service-8.root) {
+    @apply bg-rose-50;
+  }
+
+  :global(.service-8.property-group) {
+    @apply bg-rose-100;
+  }
+
+  :global(.service-9.root) {
+    @apply bg-indigo-50;
+  }
+
+  :global(.service-9.property-group) {
+    @apply bg-indigo-100;
+  }
+
+  .service-0 {
+    @apply text-blue-700;
+  }
+
+  .service-1 {
+    @apply text-green-700;
+  }
+
+  .service-2 {
+    @apply text-purple-700;
+  }
+
+  .service-3 {
+    @apply text-amber-700;
+  }
+
+  .service-4 {
+    @apply text-pink-700;
+  }
+
+  .service-5 {
+    @apply text-cyan-700;
+  }
+
+  .service-6 {
+    @apply text-orange-700;
+  }
+
+  .service-7 {
+    @apply text-teal-700;
+  }
+
+  .service-8 {
+    @apply text-rose-700;
+  }
+
+  .service-9 {
+    @apply text-indigo-700;
   }
 
   :global(
