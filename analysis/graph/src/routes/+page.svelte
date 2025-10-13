@@ -398,6 +398,9 @@
     const layerSpacing = 100;
     const maxNodesPerColumn = 4;
 
+    // Track the maximum column index used per layer to avoid overlaps
+    const maxColumnPerLayer = new Map<number, number>();
+
     for (let l = 0; l < layers.length; l++) {
       const layer = layers[l];
 
@@ -420,7 +423,13 @@
           nodesInCurrentColumn = 0;
         }
 
-        const x = l * nodeSpacing + columnIndex * nodeSpacing;
+        // Calculate x position: add up all columns from previous layers plus current column
+        let xOffset = 0;
+        for (let prevLayer = 0; prevLayer < l; prevLayer++) {
+          const maxCol = maxColumnPerLayer.get(prevLayer) || 0;
+          xOffset += (maxCol + 1) * nodeSpacing;
+        }
+        const x = xOffset + columnIndex * nodeSpacing;
 
         nodes[nodeIndex] = {
           ...nodes[nodeIndex],
@@ -430,6 +439,9 @@
         y += (nodes[nodeIndex].height || 0) + layerSpacing;
         nodesInCurrentColumn++;
       }
+
+      // Track the maximum column index used in this layer
+      maxColumnPerLayer.set(l, columnIndex);
     }
 
     nodes = [...nodes]; // Force update for reactivity
