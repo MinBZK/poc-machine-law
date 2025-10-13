@@ -523,19 +523,25 @@
 <div class="float-right h-screen w-80 overflow-y-auto px-6 py-4 text-sm">
   <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
 
-  <button
-    type="button"
-    onclick={calculatePositions}
-    class="mb-3 inline-block cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
-    >Her-positioneer</button
-  >
+  <p class="mb-2">
+    <button
+      type="button"
+      onclick={calculatePositions}
+      class="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
+      >Her-positioneer</button
+    >
+  </p>
 
   {#each Object.entries(laws.reduce((acc, law) => {
         if (!acc[law.service]) acc[law.service] = [];
         acc[law.service].push(law);
         return acc;
       }, {} as Record<string, Law[]>)) as [service, serviceLaws]}
-    <h2 class="service-{getServiceColorIndex(service)} mt-4 mb-2 text-sm font-semibold first:mt-0">
+    <h2
+      class="service-{getServiceColorIndex(
+        service,
+      )} mb-2 mt-4 inline-block rounded-md px-2 py-1 text-sm font-semibold first:mt-0"
+    >
       {service}
     </h2>
     {#each serviceLaws as law}
@@ -543,7 +549,7 @@
         <label class="group inline-flex items-start">
           <input
             bind:group={selectedLaws}
-            class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             type="checkbox"
             value={law.uuid}
           />
@@ -554,7 +560,7 @@
               onclick={() => {
                 selectedLaws = [law.uuid];
               }}
-              class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
+              class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
               >alleen</button
             ></span
           >
@@ -580,7 +586,7 @@
   >
     <Controls showLock={false} />
     <Background variant={BackgroundVariant.Dots} />
-    <MiniMap zoomable pannable />
+    <MiniMap zoomable pannable nodeColor={(n) => n.class?.includes('root') && !n.hidden ? '#ccc' : 'transparent'} />
   </SvelteFlow>
 </div>
 
@@ -592,123 +598,123 @@
   }
 
   :global(.service-0.root) {
-    @apply bg-blue-50;
+    @apply bg-blue-50 border-blue-800;
   }
 
   :global(.service-0.property-group) {
-    @apply bg-blue-100;
+    @apply bg-blue-100 border-blue-800;
   }
 
   :global(.service-1.root) {
-    @apply bg-green-50;
+    @apply bg-green-50 border-green-800;
   }
 
   :global(.service-1.property-group) {
-    @apply bg-green-100;
+    @apply bg-green-100 border-green-800;
   }
 
   :global(.service-2.root) {
-    @apply bg-purple-50;
+    @apply bg-purple-50 border-purple-800;
   }
 
   :global(.service-2.property-group) {
-    @apply bg-purple-100;
+    @apply bg-purple-100 border-purple-800;
   }
 
   :global(.service-3.root) {
-    @apply bg-amber-50;
+    @apply bg-amber-50 border-amber-800;
   }
 
   :global(.service-3.property-group) {
-    @apply bg-amber-100;
+    @apply bg-amber-100 border-amber-800;
   }
 
   :global(.service-4.root) {
-    @apply bg-pink-50;
+    @apply bg-pink-50 border-pink-800;
   }
 
   :global(.service-4.property-group) {
-    @apply bg-pink-100;
+    @apply bg-pink-100 border-pink-800;
   }
 
   :global(.service-5.root) {
-    @apply bg-cyan-50;
+    @apply bg-cyan-50 border-cyan-800;
   }
 
   :global(.service-5.property-group) {
-    @apply bg-cyan-100;
+    @apply bg-cyan-100 border-cyan-800;
   }
 
   :global(.service-6.root) {
-    @apply bg-orange-50;
+    @apply bg-orange-50 border-orange-800;
   }
 
   :global(.service-6.property-group) {
-    @apply bg-orange-100;
+    @apply bg-orange-100 border-orange-800;
   }
 
   :global(.service-7.root) {
-    @apply bg-teal-50;
+    @apply bg-teal-50 border-teal-800;
   }
 
   :global(.service-7.property-group) {
-    @apply bg-teal-100;
+    @apply bg-teal-100 border-teal-800;
   }
 
   :global(.service-8.root) {
-    @apply bg-rose-50;
+    @apply bg-rose-50 border-rose-800;
   }
 
   :global(.service-8.property-group) {
-    @apply bg-rose-100;
+    @apply bg-rose-100 border-rose-800;
   }
 
   :global(.service-9.root) {
-    @apply bg-indigo-50;
+    @apply bg-indigo-50 border-indigo-800;
   }
 
   :global(.service-9.property-group) {
-    @apply bg-indigo-100;
+    @apply bg-indigo-100 border-indigo-800;
   }
 
   .service-0 {
-    @apply text-blue-700;
+    @apply bg-blue-100 text-blue-800;
   }
 
   .service-1 {
-    @apply text-green-700;
+    @apply bg-green-100 text-green-800;
   }
 
   .service-2 {
-    @apply text-purple-700;
+    @apply bg-purple-100 text-purple-800;
   }
 
   .service-3 {
-    @apply text-amber-700;
+    @apply bg-amber-100 text-amber-800;
   }
 
   .service-4 {
-    @apply text-pink-700;
+    @apply bg-pink-100 text-pink-800;
   }
 
   .service-5 {
-    @apply text-cyan-700;
+    @apply bg-cyan-100 text-cyan-800;
   }
 
   .service-6 {
-    @apply text-orange-700;
+    @apply bg-orange-100 text-orange-800;
   }
 
   .service-7 {
-    @apply text-teal-700;
+    @apply bg-teal-100 text-teal-800;
   }
 
   .service-8 {
-    @apply text-rose-700;
+    @apply bg-rose-100 text-rose-800;
   }
 
   .service-9 {
-    @apply text-indigo-700;
+    @apply bg-indigo-100 text-indigo-800;
   }
 
   :global(
@@ -717,7 +723,7 @@
     .svelte-flow__node-source,
     .svelte-flow__node-output
   ) {
-    @apply cursor-grab;
+    @apply cursor-grab overflow-hidden text-ellipsis;
   }
 
   :global(.svelte-flow) {
