@@ -289,128 +289,134 @@
   function calculatePositions() {
     // Filter for root nodes that are not hidden
     const rootNodes = nodes.filter((n) => n.class === 'root' && !n.hidden);
-    const connectionGraph = new Map<string, Set<string>>();
 
-    // Build connection graph between root nodes
+    // Build dependency graph: node -> nodes that depend on it
+    const dependencyGraph = new Map<string, Set<string>>();
+    const incomingCount = new Map<string, number>();
+
+    // Initialize all nodes
+    for (const node of rootNodes) {
+      dependencyGraph.set(node.id, new Set());
+      incomingCount.set(node.id, 0);
+    }
+
+    // Build the graph based on edges (source outputs -> target inputs)
     for (const edge of edges) {
       const sourceRoot = edge.source.substring(0, 36);
       const targetRoot = edge.target.substring(0, 36);
 
       if (sourceRoot !== targetRoot) {
-        if (!connectionGraph.has(sourceRoot)) {
-          connectionGraph.set(sourceRoot, new Set());
+        // Target depends on source, so target should be left of source (reversed)
+        if (!dependencyGraph.has(sourceRoot)) {
+          dependencyGraph.set(sourceRoot, new Set());
+          incomingCount.set(sourceRoot, 0);
         }
-        if (!connectionGraph.has(targetRoot)) {
-          connectionGraph.set(targetRoot, new Set());
+        if (!dependencyGraph.has(targetRoot)) {
+          dependencyGraph.set(targetRoot, new Set());
+          incomingCount.set(targetRoot, 0);
         }
-        connectionGraph.get(sourceRoot)!.add(targetRoot);
-        connectionGraph.get(targetRoot)!.add(sourceRoot);
+
+        // Only add if not already present (reversed: target -> source)
+        if (!dependencyGraph.get(targetRoot)!.has(sourceRoot)) {
+          dependencyGraph.get(targetRoot)!.add(sourceRoot);
+          incomingCount.set(sourceRoot, (incomingCount.get(sourceRoot) || 0) + 1);
+        }
       }
     }
 
-    // Group nodes using a simple clustering approach
-    const positioned = new Set<string>();
-    const clusters: string[][] = [];
+    // Topological sort with layering
+    const layers: string[][] = [];
+    const nodeLayer = new Map<string, number>();
+    const processed = new Set<string>();
 
-    for (const rootNode of rootNodes) {
-      if (!positioned.has(rootNode.id)) {
-        const cluster: string[] = [rootNode.id];
-        positioned.add(rootNode.id);
+    // Start with nodes that have no dependencies
+    let currentLayer = rootNodes
+      .map((n) => n.id)
+      .filter((id) => (incomingCount.get(id) || 0) === 0);
 
-        // Add connected nodes to the same cluster
-        const toVisit = [rootNode.id];
-        const visited = new Set<string>([rootNode.id]);
+    let layerIndex = 0;
 
-        while (toVisit.length > 0) {
-          const current = toVisit.shift()!;
-          const connections = connectionGraph.get(current) || new Set();
+    while (currentLayer.length > 0) {
+      layers.push(currentLayer);
 
-          for (const connected of connections) {
-            if (!visited.has(connected)) {
-              visited.add(connected);
-              if (!positioned.has(connected)) {
-                cluster.push(connected);
-                positioned.add(connected);
-                toVisit.push(connected);
+      for (const nodeId of currentLayer) {
+        nodeLayer.set(nodeId, layerIndex);
+        processed.add(nodeId);
+      }
+
+      // Find next layer: nodes whose dependencies are all processed
+      const nextLayer = new Set<string>();
+      for (const nodeId of currentLayer) {
+        const dependents = dependencyGraph.get(nodeId) || new Set();
+        for (const dependent of dependents) {
+          if (processed.has(dependent)) continue;
+
+          // Check if all dependencies of this dependent are processed (reversed)
+          let allDepsProcessed = true;
+          for (const edge of edges) {
+            const sourceRoot = edge.source.substring(0, 36);
+            const targetRoot = edge.target.substring(0, 36);
+            if (sourceRoot === dependent && targetRoot !== sourceRoot) {
+              if (!processed.has(targetRoot)) {
+                allDepsProcessed = false;
+                break;
               }
             }
           }
-        }
 
-        clusters.push(cluster);
+          if (allDepsProcessed) {
+            nextLayer.add(dependent);
+          }
+        }
       }
+
+      currentLayer = Array.from(nextLayer);
+      layerIndex++;
     }
 
-    // Position clusters
-    let clusterX = 0;
-    const clusterSpacing = 100;
+    // Add any remaining nodes (cycles or disconnected) to the last layer
+    const unprocessed = rootNodes.map((n) => n.id).filter((id) => !processed.has(id));
+    if (unprocessed.length > 0) {
+      layers.push(unprocessed);
+    }
+
+    // Position nodes
     const nodeSpacing = 420;
+    const layerSpacing = 100;
+    const maxNodesPerColumn = 4;
 
-    for (const cluster of clusters) {
-      // Sort cluster by connection count (most connected first)
-      cluster.sort((a, b) => {
-        const aConnections = connectionGraph.get(a)?.size || 0;
-        const bConnections = connectionGraph.get(b)?.size || 0;
-        return bConnections - aConnections;
-      });
+    for (let l = 0; l < layers.length; l++) {
+      const layer = layers[l];
 
-      // Count visible nodes in this cluster
-      const visibleNodesInCluster = cluster.filter((nodeId) => {
-        const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
-        return nodeIndex !== -1 && !nodes[nodeIndex].hidden;
-      }).length;
+      let visibleNodes = layer
+        .map((nodeId) => ({
+          nodeId,
+          nodeIndex: nodes.findIndex((n) => n.id === nodeId),
+        }))
+        .filter(({ nodeIndex }) => nodeIndex !== -1 && !nodes[nodeIndex].hidden);
 
-      // Skip empty clusters
-      if (visibleNodesInCluster === 0) {
-        continue;
-      }
+      let columnIndex = 0;
+      let y = 0;
+      let nodesInCurrentColumn = 0;
 
-      const clusterWidth = Math.ceil(Math.sqrt(visibleNodesInCluster));
-      const rowHeights: number[] = [];
-      let visibleNodeCount = 0;
-      let maxCol = 0;
-
-      // Calculate positions with dynamic row heights
-      for (let i = 0; i < cluster.length; i++) {
-        const nodeId = cluster[i];
-        const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
-
-        if (nodeIndex !== -1 && !nodes[nodeIndex].hidden) {
-          const col = visibleNodeCount % clusterWidth;
-          const row = Math.floor(visibleNodeCount / clusterWidth);
-
-          // Track the maximum column used
-          maxCol = Math.max(maxCol, col);
-
-          // Calculate Y position based on previous rows
-          let yPos = 0;
-          for (let r = 0; r < row; r++) {
-            yPos += rowHeights[r] + clusterSpacing;
-          }
-
-          nodes[nodeIndex] = {
-            ...nodes[nodeIndex],
-            position: {
-              x: clusterX + col * nodeSpacing,
-              y: yPos,
-            },
-          };
-
-          // Track the maximum height in this row
-          const nodeHeight = nodes[nodeIndex].height || 0;
-          if (!rowHeights[row]) {
-            rowHeights[row] = nodeHeight;
-          } else {
-            rowHeights[row] = Math.max(rowHeights[row], nodeHeight);
-          }
-
-          visibleNodeCount++;
+      for (const { nodeId, nodeIndex } of visibleNodes) {
+        if (nodesInCurrentColumn >= maxNodesPerColumn) {
+          // Move to next column
+          columnIndex++;
+          y = 0;
+          nodesInCurrentColumn = 0;
         }
-      }
 
-      // Advance clusterX based on actual width used (maxCol + 1)
-      // Note: nodeSpacing already includes buffer, so we don't add clusterSpacing
-      clusterX += (maxCol + 1) * nodeSpacing;
+        const x = l * nodeSpacing + columnIndex * nodeSpacing;
+
+        nodes[nodeIndex] = {
+          ...nodes[nodeIndex],
+          position: { x, y },
+        };
+
+        y += (nodes[nodeIndex].height || 0) + layerSpacing;
+        nodesInCurrentColumn++;
+      }
     }
 
     nodes = [...nodes]; // Force update for reactivity
@@ -504,13 +510,13 @@
         acc[law.service].push(law);
         return acc;
       }, {} as Record<string, Law[]>)) as [service, serviceLaws]}
-    <h2 class="mb-2 mt-4 text-sm font-semibold text-gray-700 first:mt-0">{service}</h2>
+    <h2 class="mt-4 mb-2 text-sm font-semibold text-gray-700 first:mt-0">{service}</h2>
     {#each serviceLaws as law}
       <div class="mb-1.5">
         <label class="group inline-flex items-start">
           <input
             bind:group={selectedLaws}
-            class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             type="checkbox"
             value={law.uuid}
           />
@@ -521,7 +527,7 @@
               onclick={() => {
                 selectedLaws = [law.uuid];
               }}
-              class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
+              class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
               >alleen</button
             ></span
           >
