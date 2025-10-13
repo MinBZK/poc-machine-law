@@ -11,6 +11,7 @@
     MiniMap,
     type Node,
     type Edge,
+    Position,
   } from '@xyflow/svelte';
   import LawNode from './LawNode.svelte';
 
@@ -21,6 +22,7 @@
     uuid: string;
     name: string;
     service: string;
+    valid_from: string;
     properties: {
       sources?: { name: string }[];
       input?: { name: string; service_reference?: { service: string; field: string } }[];
@@ -55,7 +57,7 @@
       // Initialize a map of (service, output_field) to their UUIDs
       const serviceOutputToUUIDsMap = new Map<string, string[]>();
 
-      laws = await Promise.all(
+      let allLaws = await Promise.all(
         filePaths.map(async (filePath) => {
           // Read the file content
           // @ts-expect-error ts(2345) // Seems like a bug in the type definitions of `resolve`
@@ -66,20 +68,36 @@
           // Parse the YAML content
           const law = yaml.parse(fileContent) as Law;
 
-          // Populate the map with the service+output combinations and their corresponding UUIDs
-          for (const output of law.properties.output || []) {
-            const key = `${law.service}:${output.name}`;
-            const current = serviceOutputToUUIDsMap.get(key);
-            if (current) {
-              serviceOutputToUUIDsMap.set(key, [...current, law.uuid]);
-            } else {
-              serviceOutputToUUIDsMap.set(key, [law.uuid]);
-            }
-          }
-
           return law;
         }),
       );
+
+      // Filter to keep only the latest version of each law (by service and name)
+      const lawMap = new Map<string, Law>();
+      for (const law of allLaws) {
+        const key = `${law.service}:${law.name}`;
+        const existing = lawMap.get(key);
+
+        // Keep the law with the latest valid_from date (using string comparison)
+        if (!existing || law.valid_from > existing.valid_from) {
+          lawMap.set(key, law);
+        }
+      }
+
+      laws = Array.from(lawMap.values());
+
+      // Populate the map with the service+output combinations and their corresponding UUIDs
+      for (const law of laws) {
+        for (const output of law.properties.output || []) {
+          const key = `${law.service}:${output.name}`;
+          const current = serviceOutputToUUIDsMap.get(key);
+          if (current) {
+            serviceOutputToUUIDsMap.set(key, [...current, law.uuid]);
+          } else {
+            serviceOutputToUUIDsMap.set(key, [law.uuid]);
+          }
+        }
+      }
 
       // Sort the laws (topological sort)
       laws.sort((a, b) => {
@@ -143,6 +161,7 @@
           ns.push({
             id: `${data.uuid}-source-${source.name}`,
             type: 'input',
+            sourcePosition: Position.Left,
             data: { label: source.name },
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
@@ -177,6 +196,7 @@
           ns.push({
             id: inputID,
             type: 'input',
+            sourcePosition: Position.Left,
             data: { label: input.name },
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
@@ -210,6 +230,7 @@
           ns.push({
             id: `${data.uuid}-output-${output.name}`,
             type: 'output',
+            targetPosition: Position.Right,
             data: { label: output.name },
             position: { x: 10, y: (j++ + 1) * 50 },
             width: 130,
@@ -478,28 +499,35 @@
     >Her-positioneer</button
   >
 
-  {#each laws as law}
-    <div class="mb-1.5">
-      <label class="group inline-flex items-start">
-        <input
-          bind:group={selectedLaws}
-          class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          type="checkbox"
-          value={law.uuid}
-        />
-        <span
-          >{law.name} <span class="text-xs text-gray-600">({law.service})</span>
-          <button
-            type="button"
-            onclick={() => {
-              selectedLaws = [law.uuid];
-            }}
-            class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
-            >alleen</button
-          ></span
-        >
-      </label>
-    </div>
+  {#each Object.entries(laws.reduce((acc, law) => {
+        if (!acc[law.service]) acc[law.service] = [];
+        acc[law.service].push(law);
+        return acc;
+      }, {} as Record<string, Law[]>)) as [service, serviceLaws]}
+    <h2 class="mb-2 mt-4 text-sm font-semibold text-gray-700 first:mt-0">{service}</h2>
+    {#each serviceLaws as law}
+      <div class="mb-1.5">
+        <label class="group inline-flex items-start">
+          <input
+            bind:group={selectedLaws}
+            class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            type="checkbox"
+            value={law.uuid}
+          />
+          <span
+            >{law.name}
+            <button
+              type="button"
+              onclick={() => {
+                selectedLaws = [law.uuid];
+              }}
+              class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
+              >alleen</button
+            ></span
+          >
+        </label>
+      </div>
+    {/each}
   {/each}
 </div>
 
