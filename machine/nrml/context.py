@@ -24,10 +24,12 @@ class NrmlRuleContext:
     items: dict[str, dict[str, Any]] = field(default_factory=dict)
     target_references: dict[str, str] = field(default_factory=dict)  # Maps target_ref -> item_id
     inputs: dict[str, str] = field(default_factory=dict)  # Maps target.$ref -> source
+    includes: dict[str, dict[str, Any]] = field(default_factory=dict)  # Maps target.$ref -> include config
     item_evaluator: Any = None  # Forward reference to avoid circular imports
     evaluation_results: dict[str, EvaluationResult] = field(default_factory=dict)
     language: str = "nl"
     value_providers: list[Any] = field(default_factory=list)
+    service_provider: Any = None  # Service provider for evaluating includes
 
     def get_value_provider_for(self, name: str) -> Any | None:
         """Get the first value provider that can provide a value for the given name"""
@@ -43,12 +45,14 @@ class NrmlRuleContext:
         parameters: dict[str, Any],
         target_references: dict[str, str],
         inputs: dict[str, str],
+        includes: dict[str, dict[str, Any]] = None,
         sources: dict[str, pd.DataFrame] = None,
         overwrite_input: dict[str, Any] = None,
         calculation_date: str = None,
         claims: dict[str, Claim] = None,
         approved: bool = True,
         table_value_providers: list[Any] = None,
+        service_provider: Any = None,
     ) -> "NrmlRuleContext":
         """Create NrmlRuleContext from NRML rules engine"""
 
@@ -62,7 +66,9 @@ class NrmlRuleContext:
             items=nrml_engine.items,
             target_references=target_references,
             inputs=inputs,
+            includes=includes or {},
             value_providers=table_value_providers or [],
+            service_provider=service_provider,
         )
 
         # Create and store the item evaluator in context
@@ -102,3 +108,7 @@ class NrmlRuleContext:
     def get_input_source(self, target_ref: str) -> str | None:
         """Get the input source for the given target reference"""
         return self.inputs.get(target_ref)
+
+    def get_include_for_target(self, target_ref: str) -> dict[str, Any] | None:
+        """Get the include configuration for the given target reference"""
+        return self.includes.get(target_ref)

@@ -69,6 +69,9 @@ class NrmlRulesEngine:
         Find the $ref reference that is specifically in a 'target' node.
         Returns immediately when target is found since there should be 0 or 1 targets per item.
 
+        For target arrays with multiple refs, returns the LAST reference, which is the
+        actual target (earlier refs specify context like object type).
+
         Args:
             obj: The object to search
 
@@ -78,10 +81,10 @@ class NrmlRulesEngine:
         if isinstance(obj, dict):
             for key, value in obj.items():
                 if key == "target":
-                    # Found the target node, extract the reference from it and return immediately
+                    # Found the target node, extract all references from it
                     references = NrmlRulesEngine._find_references_recursive(value)
-                    # Return the first (and should be only) reference found
-                    return next(iter(references)) if references else None
+                    # Return the last reference (actual target), not the first (context)
+                    return list(references)[-1] if references else None
                 elif isinstance(value, dict | list):
                     # Continue searching in nested structures
                     target_ref = NrmlRulesEngine._find_target_references(value)
@@ -179,6 +182,32 @@ class NrmlRulesEngine:
 
         return outputs_mapping
 
+    @staticmethod
+    def _extract_includes_mapping(includes: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+        """Extract includes mapping from target.$ref to include configuration
+
+        Args:
+            includes: List of include configurations with law, output, and target
+
+        Returns:
+            Mapping from target.$ref to include configuration
+        """
+        includes_mapping = {}
+
+        if not includes:
+            return includes_mapping
+
+        for include_item in includes:
+            target = include_item.get("target", {})
+            target_ref = target.get("$ref")
+            if target_ref:
+                includes_mapping[target_ref] = {
+                    "law": include_item.get("law"),
+                    "output": include_item.get("output"),
+                }
+
+        return includes_mapping
+
     def evaluate(
         self,
         parameters: dict[str, Any] | None = None,
@@ -218,7 +247,9 @@ class NrmlRulesEngine:
             approved=approved,
             target_references=self._get_all_target_references(self.items),
             inputs=self._extract_inputs_mapping(self.inputs),
+            includes=self._extract_includes_mapping(self.spec.get("includes", [])),
             table_value_providers=[TableValueProvider(sources)],
+            service_provider=self.service_provider,
         )
 
         output_values = {}

@@ -4,6 +4,7 @@ from .evaluation_result import EvaluationResult
 from .item_helper import NrmlItemHelper
 from .item_type_analyzer import determine_item_type
 from .items.calculated_value_evaluator import CalculatedValueEvaluator
+from .items.conditional_characteristic_evaluator import ConditionalCharacteristicEvaluator
 from .items.relation_definition_evaluator import RelationDefinitionEvaluator
 from .items.type_definition_evaluator import TypeDefinitionEvaluator
 
@@ -17,6 +18,7 @@ class NrmlItemEvaluator:
             TypeDefinitionEvaluator.ITEM_TYPE: TypeDefinitionEvaluator(),
             CalculatedValueEvaluator.ITEM_TYPE: CalculatedValueEvaluator(),
             RelationDefinitionEvaluator.ITEM_TYPE: RelationDefinitionEvaluator(),
+            ConditionalCharacteristicEvaluator.ITEM_TYPE: ConditionalCharacteristicEvaluator(),
         }
 
     def evaluate_item(self, item_key: str, context: NrmlRuleContext) -> EvaluationResult:

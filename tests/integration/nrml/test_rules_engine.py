@@ -5,29 +5,14 @@ from machine.nrml.rules_engine import NrmlRulesEngine
 
 
 class TestNrmlRulesEngineIntegration:
-    """Integration tests for NrmlRulesEngine using inline NRML specifications"""
+    """Integration tests for NrmlRulesEngine using NRML fixture specifications"""
 
     def test_simple_evaluation(self):
         """Simple test to verify basic engine evaluation works with a value definition"""
-        # Define inline NRML spec with a simple value
-        spec = {
-            "version": "3.0",
-            "language": "nl",
-            "metadata": {"description": "test_simple"},
-            "inputs": {},
-            "outputs": {"my_value": {"source": {"$ref": "#/facts/constants/items/test-value"}}},
-            "facts": {
-                "constants": {
-                    "name": {"nl": "Constanten"},
-                    "items": {
-                        "test-value": {
-                            "name": {"nl": "Test waarde"},
-                            "versions": [{"validFrom": "2020-01-01", "type": "number", "value": 42}],
-                        }
-                    },
-                }
-            },
-        }
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_simple_evaluation.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
 
         # Create engine and evaluate
         engine = NrmlRulesEngine(spec)
@@ -42,25 +27,10 @@ class TestNrmlRulesEngineIntegration:
 
     def test_input_parameter_passthrough(self):
         """Test that input parameter is passed through and returned as output"""
-        # Define inline NRML spec that takes an input and returns it
-        spec = {
-            "version": "3.0",
-            "language": "nl",
-            "metadata": {"description": "test_passthrough"},
-            "inputs": {"my_input": {"target": {"$ref": "#/facts/data/items/input-value"}}},
-            "outputs": {"my_output": {"source": {"$ref": "#/facts/data/items/input-value"}}},
-            "facts": {
-                "data": {
-                    "name": {"nl": "Data"},
-                    "items": {
-                        "input-value": {
-                            "name": {"nl": "Input waarde"},
-                            "versions": [{"validFrom": "2020-01-01", "type": "text"}],
-                        }
-                    },
-                }
-            },
-        }
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_input_parameter_passthrough.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
 
         # Create engine and evaluate
         engine = NrmlRulesEngine(spec)
@@ -75,61 +45,10 @@ class TestNrmlRulesEngineIntegration:
 
     def test_conditional_expression(self):
         """Test conditional expression that returns 42 if true, -1 if false"""
-        # Define inline NRML spec with conditional expression using item reference
-        spec = {
-            "version": "3.0",
-            "language": "nl",
-            "metadata": {"description": "test_conditional"},
-            "inputs": {},
-            "outputs": {"result": {"source": {"$ref": "#/facts/result/items/result-value"}}},
-            "facts": {
-                "data": {
-                    "name": {"nl": "Data"},
-                    "items": {
-                        "check-value": {
-                            "name": {"nl": "Controle waarde"},
-                            "versions": [{"validFrom": "2020-01-01", "type": "boolean", "value": True}],
-                        }
-                    },
-                },
-                "calculated": {
-                    "name": {"nl": "Berekend"},
-                    "items": {
-                        "conditional-calc": {
-                            "name": {"nl": "Conditionele berekening"},
-                            "versions": [
-                                {
-                                    "validFrom": "2020-01-01",
-                                    "target": [{"$ref": "#/facts/result/items/result-value"}],
-                                    "expression": {
-                                        "type": "conditional",
-                                        "condition": {
-                                            "type": "comparison",
-                                            "operator": "in",
-                                            "arguments": [
-                                                {"$ref": "#/facts/data/items/check-value"},
-                                                {"value": [True]},
-                                            ],
-                                        },
-                                        "then": {"value": 42},
-                                        "else": {"value": -1},
-                                    },
-                                }
-                            ],
-                        }
-                    },
-                },
-                "result": {
-                    "name": {"nl": "Resultaat"},
-                    "items": {
-                        "result-value": {
-                            "name": {"nl": "Resultaat waarde"},
-                            "versions": [{"validFrom": "2020-01-01", "type": "number"}],
-                        }
-                    },
-                },
-            },
-        }
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_conditional_expression.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
 
         # Create engine and evaluate - condition is true, should return 42
         engine = NrmlRulesEngine(spec)
@@ -144,61 +63,10 @@ class TestNrmlRulesEngineIntegration:
 
     def test_conditional_expression_false(self):
         """Test conditional expression that evaluates to false returns -1"""
-        # Define inline NRML spec with conditional expression using item reference
-        spec = {
-            "version": "3.0",
-            "language": "nl",
-            "metadata": {"description": "test_conditional_false"},
-            "inputs": {},
-            "outputs": {"result": {"source": {"$ref": "#/facts/result/items/result-value"}}},
-            "facts": {
-                "data": {
-                    "name": {"nl": "Data"},
-                    "items": {
-                        "check-value": {
-                            "name": {"nl": "Controle waarde"},
-                            "versions": [{"validFrom": "2020-01-01", "type": "boolean", "value": False}],
-                        }
-                    },
-                },
-                "calculated": {
-                    "name": {"nl": "Berekend"},
-                    "items": {
-                        "conditional-calc": {
-                            "name": {"nl": "Conditionele berekening"},
-                            "versions": [
-                                {
-                                    "validFrom": "2020-01-01",
-                                    "target": [{"$ref": "#/facts/result/items/result-value"}],
-                                    "expression": {
-                                        "type": "conditional",
-                                        "condition": {
-                                            "type": "comparison",
-                                            "operator": "in",
-                                            "arguments": [
-                                                {"$ref": "#/facts/data/items/check-value"},
-                                                {"value": [True]},
-                                            ],
-                                        },
-                                        "then": {"value": 42},
-                                        "else": {"value": -1},
-                                    },
-                                }
-                            ],
-                        }
-                    },
-                },
-                "result": {
-                    "name": {"nl": "Resultaat"},
-                    "items": {
-                        "result-value": {
-                            "name": {"nl": "Resultaat waarde"},
-                            "versions": [{"validFrom": "2020-01-01", "type": "number"}],
-                        }
-                    },
-                },
-            },
-        }
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_conditional_expression_false.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
 
         # Create engine and evaluate - condition is false, should return -1
         engine = NrmlRulesEngine(spec)
@@ -289,4 +157,32 @@ class TestNrmlRulesEngineIntegration:
 
         # Expected: 2*5+10-min(4,6)/max(1,2) = 18
         assert output["value"] == 18
+        assert output["process"].Success is True
+
+    def test_count_with_characteristic(self):
+        """Test counting using conditional characteristic with exists condition"""
+        # Load NRML spec from fixture file
+        fixture_path = Path(__file__).parent / "fixtures" / "test_count_with_characteristic.json"
+        with open(fixture_path) as f:
+            spec = json.load(f)
+
+        # Test data: parent with 3 children of different ages
+        children_data = [{"age": 8}, {"age": 9}, {"age": 15}]
+        aanvrager_data = [{}]
+
+        # Create engine and evaluate
+        engine = NrmlRulesEngine(spec)
+        result = engine.evaluate(
+            parameters={"kinderen": children_data, "aanvrager": aanvrager_data}, requested_output="total_benefit"
+        )
+
+        # Verify result - should be count (2) * benefit_per_child (250.50) = 501.00
+        # The "jong kind" characteristic is assigned to children with age <= 10
+        # Then the count uses an exists condition to check for this characteristic
+        assert "output" in result
+        assert "total_benefit" in result["output"]
+        output = result["output"]["total_benefit"]
+
+        # 2 children with "jong kind" characteristic multiplied by 250.50 euro per child = 501.00
+        assert output["value"] == 501.00
         assert output["process"].Success is True

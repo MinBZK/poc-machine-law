@@ -4,6 +4,7 @@ from ..aggregation_context import AggregationContext
 from ..context import NrmlRuleContext
 from ..evaluation_result import EvaluationResult
 from .comparison_evaluator import ComparisonEvaluator
+from .exists_condition_evaluator import ExistsConditionEvaluator
 
 
 class ConditionEvaluator:
@@ -12,6 +13,7 @@ class ConditionEvaluator:
     def __init__(self):
         self.handlers = {
             "comparison": ComparisonEvaluator(),
+            "exists": ExistsConditionEvaluator(),
         }
 
     def evaluate(

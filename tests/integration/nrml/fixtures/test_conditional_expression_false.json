@@ -1,0 +1,99 @@
+{
+  "version": "3.0",
+  "language": "nl",
+  "metadata": {
+    "description": "test_conditional_false"
+  },
+  "inputs": {},
+  "outputs": {
+    "result": {
+      "source": {
+        "$ref": "#/facts/result/items/result-value"
+      }
+    }
+  },
+  "facts": {
+    "data": {
+      "name": {
+        "nl": "Data"
+      },
+      "items": {
+        "check-value": {
+          "name": {
+            "nl": "Controle waarde"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "type": "boolean",
+              "value": false
+            }
+          ]
+        }
+      }
+    },
+    "calculated": {
+      "name": {
+        "nl": "Berekend"
+      },
+      "items": {
+        "conditional-calc": {
+          "name": {
+            "nl": "Conditionele berekening"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "target": [
+                {
+                  "$ref": "#/facts/result/items/result-value"
+                }
+              ],
+              "expression": {
+                "type": "conditional",
+                "condition": {
+                  "type": "comparison",
+                  "operator": "in",
+                  "arguments": [
+                    {
+                      "$ref": "#/facts/data/items/check-value"
+                    },
+                    {
+                      "value": [
+                        true
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "value": 42
+                },
+                "else": {
+                  "value": -1
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "result": {
+      "name": {
+        "nl": "Resultaat"
+      },
+      "items": {
+        "result-value": {
+          "name": {
+            "nl": "Resultaat waarde"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "type": "number"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

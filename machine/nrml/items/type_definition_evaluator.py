@@ -14,7 +14,9 @@ class TypeDefinitionEvaluator:
 
     def __init__(self):
         """Initialize evaluator with resolvers"""
+        #TODO: maybe we want to prevent double providers with a value? Or exclude providers based on config?
         self.resolvers: list[Callable[[str, dict[str, Any], NrmlRuleContext], EvaluationResult | None]] = [
+            self._try_resolve_from_include,
             self._try_resolve_from_definition,
             self._try_resolve_from_target_source,
             self._try_resolve_from_input_source,
@@ -49,6 +51,90 @@ class TypeDefinitionEvaluator:
                 node=item,
                 action=f"Item {item_key} is target of {source_item}",
             )
+        return None
+
+    def _try_resolve_from_include(
+        self, item_key: str, item: dict[str, Any], context: NrmlRuleContext
+    ) -> EvaluationResult | None:
+        """Try to resolve value from include (external law evaluation)"""
+        include_config = context.get_include_for_target(item_key)
+        if include_config:
+            # Extract law name and output from include configuration
+            law = include_config.get("law")
+            output = include_config.get("output")
+
+            if not law or not output:
+                return create_result(
+                    success=False,
+                    error=f"Include configuration missing 'law' or 'output' for {item_key}",
+                    source=self.__class__.__name__,
+                    node=item,
+                )
+
+            # Evaluate the included law through the service provider
+            if not context.service_provider:
+                return create_result(
+                    success=False,
+                    error=f"No service provider available to evaluate include '{law}'",
+                    source=self.__class__.__name__,
+                    node=item,
+                )
+
+            try:
+                # Get the NRML service from the service provider
+                # service_provider can be either an object with a 'services' attribute or the services object itself
+                if hasattr(context.service_provider, "services"):
+                    nrml_service = context.service_provider.services.get("NRML")
+                elif hasattr(context.service_provider, "NRML"):
+                    nrml_service = context.service_provider.NRML
+                else:
+                    return create_result(
+                        success=False,
+                        error="NRML service not available in service provider",
+                        source=self.__class__.__name__,
+                        node=item,
+                    )
+
+                if not nrml_service:
+                    return create_result(
+                        success=False,
+                        error="NRML service not available",
+                        source=self.__class__.__name__,
+                        node=item,
+                    )
+
+                # Evaluate the included law
+                result = nrml_service.evaluate(
+                    law=law,
+                    reference_date=context.calculation_date,
+                    parameters={},
+                    requested_output=output,
+                )
+
+                # Extract the output value
+                value = result.output.get(output)
+                if value is None:
+                    return create_result(
+                        success=False,
+                        error=f"Output '{output}' not found in included law '{law}'",
+                        source=self.__class__.__name__,
+                        node=item,
+                    )
+
+                return create_result(
+                    success=True,
+                    value=value,
+                    source=self.__class__.__name__,
+                    node=item,
+                    action=f"Item {item_key} resolved from INCLUDE (law={law}, output={output})",
+                )
+            except Exception as e:
+                return create_result(
+                    success=False,
+                    error=f"Failed to evaluate include '{law}': {str(e)}",
+                    source=self.__class__.__name__,
+                    node=item,
+                )
         return None
 
     def _try_resolve_from_input_source(

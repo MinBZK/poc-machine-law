@@ -1,0 +1,37 @@
+{
+  "$schema": "https://example.com/toka-corrected-schema.json",
+  "version": "3.0",
+  "language": "nl",
+  "metadata": {
+    "description": "test_simple"
+  },
+  "inputs": {},
+  "outputs": {
+    "my_value": {
+      "source": {
+        "$ref": "#/facts/constants/items/test-value"
+      }
+    }
+  },
+  "facts": {
+    "constants": {
+      "name": {
+        "nl": "Constanten"
+      },
+      "items": {
+        "test-value": {
+          "name": {
+            "nl": "Test waarde"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "type": "number",
+              "value": 42
+            }
+          ]
+        }
+      }
+    }
+  }
+}
