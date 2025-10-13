@@ -25,7 +25,7 @@ from web.feature_flags import (
 )
 from web.routers import admin, chat, dashboard, edit, importer, laws, mcp, simulation, wallet
 
-app = FastAPI(title="Burger.nl")
+app = FastAPI(title="RegelRecht")
 
 # Add session middleware with a secure secret key and max age of 7 days
 # In production, this should be stored securely and not in the code
