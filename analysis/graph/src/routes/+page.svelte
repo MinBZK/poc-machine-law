@@ -58,7 +58,7 @@
   (async () => {
     try {
       // Fetch the available laws from the backend
-      const response = await fetch('temp.json');
+      const response = await fetch('/laws/list');
       filePaths = await response.json();
 
       let i = 0;
@@ -520,17 +520,17 @@
   <title>Dependency graph — Burger.nl</title>
 </svelte:head>
 
-<div class="float-right h-screen w-80 overflow-y-auto px-6 py-4 text-sm">
+<div class="float-right h-screen w-80 overflow-y-auto px-6 pb-4 text-sm">
+  <div class="sticky top-0 bg-white pt-6 pb-2">
   <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
 
-  <p class="mb-2">
     <button
       type="button"
       onclick={calculatePositions}
       class="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
       >Her-positioneer</button
     >
-  </p>
+  </div>
 
   {#each Object.entries(laws.reduce((acc, law) => {
         if (!acc[law.service]) acc[law.service] = [];
