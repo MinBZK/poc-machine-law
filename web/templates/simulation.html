@@ -18,18 +18,45 @@
                 </button>
             </div>
             <form id="simulation-form" class="space-y-4">
-                <!-- Preset Scenarios - At the top for quick access -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="p-4">
-                        <h2 class="text-base font-medium text-gray-900 mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-500"
+                <!-- POPULATIEBEHEER BLOCK -->
+                <div class="bg-white shadow-lg rounded-lg border-2 border-green-200">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 border-b border-green-200">
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-green-600"
                                  fill="none"
                                  stroke="currentColor"
                                  viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
-                            Snel Starten
+                            Populatiebeheer
                         </h2>
+                        <p class="text-sm text-gray-600 mt-1 ml-8">Definieer de demografische samenstelling van de populatie</p>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <!-- Scenarios - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="toggleSection('scenarios-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-indigo-500"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Scenarios
+                                </h3>
+                                <svg id="scenarios-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="scenarios-section" class="hidden">
+                                <div class="px-4 pb-4">
                         <div class="space-y-2">
                             <button type="button"
                                     onclick="loadPreset('current')"
@@ -116,57 +143,35 @@
                                 </div>
                             </button>
                         </div>
-                    </div>
-                </div>
-                <!-- Population Management - New Section -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="p-4">
-                        <h2 class="text-base font-medium text-gray-900 mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-green-500"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                            Populatiebeheer
-                        </h2>
-                        <p class="text-sm text-gray-500 mb-3">Maak een populatie of gebruik een bestaande voor vergelijkbare simulaties</p>
-                        <div class="space-y-3">
-                            <button type="button"
-                                    onclick="createPopulation()"
-                                    class="w-full inline-flex items-center justify-center px-4 py-2 border border-green-600 text-sm font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer">
-                                <svg class="mr-2 -ml-1 h-5 w-5"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                                Nieuwe Populatie Aanmaken
-                            </button>
-                            <div id="population-selector" class="hidden">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Gebruik bestaande populatie</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opgeslagen Populaties -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-gray-900 mb-3">Opgeslagen Populaties</h3>
+                            <p class="text-xs text-gray-500 mb-3">Hergebruik een bestaande populatie voor consistente vergelijkingen</p>
+                            <div id="population-selector" class="hidden space-y-2">
                                 <select id="population-select"
-                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2">
+                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm">
                                     <option value="">-- Selecteer populatie --</option>
                                 </select>
-                                <div id="selected-population-info" class="hidden p-3 bg-gray-50 rounded-md text-sm">
-                                    <div class="font-medium text-gray-900 mb-1">Populatie Details:</div>
-                                    <div id="population-details" class="text-gray-600 space-y-1"></div>
+                                <div id="selected-population-info" class="hidden p-3 bg-white rounded-md text-sm border border-gray-200">
+                                    <div class="font-medium text-gray-900 mb-2">Populatie Details:</div>
+                                    <div id="population-details" class="text-gray-600 space-y-1 text-xs"></div>
                                     <button type="button"
                                             onclick="deleteSelectedPopulation()"
-                                            class="mt-2 text-xs text-red-600 hover:text-red-700 cursor-pointer">
-                                        Verwijder deze populatie
+                                            class="mt-3 text-xs text-red-600 hover:text-red-700 font-medium cursor-pointer">
+                                        🗑️ Verwijder deze populatie
                                     </button>
                                 </div>
                             </div>
                             <div id="population-list" class="space-y-2"></div>
                         </div>
-                    </div>
-                </div>
-                <!-- Basic Settings - Always visible -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="p-4">
-                        <h2 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h2>
+
+                        <!-- Basic Settings -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4">
+                            <h3 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h3>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal personen</label>
@@ -190,23 +195,23 @@
                                 <p class="mt-1 text-sm text-gray-500">Datum voor wetsevaluatie</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!-- Demographics - Collapsible -->
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <button type="button"
-                            onclick="toggleSection('demographics-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h2 class="text-base font-medium text-gray-900">Demografie</h2>
-                        <svg id="demographics-section-chevron"
-                             class="w-5 h-5 text-gray-500 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="demographics-section" class="px-4 pb-4 hidden">
+                        </div>
+
+                        <!-- Demographics - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="toggleSection('demographics-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900">Demografie</h3>
+                                <svg id="demographics-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="demographics-section" class="px-4 pb-4 hidden">
                         <!-- Age Distribution -->
                         <h3 class="text-sm font-medium text-gray-700 mb-2 mt-3">Leeftijdsverdeling</h3>
                         <div class="space-y-3">
@@ -393,23 +398,56 @@
                                 </div>
                             </div>
                         </div>
+                            </div>
+                        </div>
+
+                        <!-- Create Population Button -->
+                        <div class="mt-4 pt-4 border-t border-green-200">
+                            <button type="button"
+                                    onclick="createPopulation()"
+                                    class="w-full inline-flex items-center justify-center px-6 py-3 border-2 border-green-600 text-base font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md cursor-pointer transition-all">
+                                <svg class="mr-2 -ml-1 h-5 w-5"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Nieuwe Populatie Aanmaken
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <!-- Law Parameters - Collapsible -->
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <button type="button"
-                            onclick="toggleSection('law-parameters-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h2 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h2>
-                        <svg id="law-parameters-section-chevron"
-                             class="w-5 h-5 text-gray-500 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="law-parameters-section" class="px-4 pb-4 hidden space-y-3">
+
+                <!-- WETGEVING BLOCK -->
+                <div class="bg-white shadow-lg rounded-lg border-2 border-blue-200">
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b border-blue-200">
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-blue-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Wetgeving
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1 ml-8">Pas de parameters van wetten en regelingen aan</p>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <!-- Law Parameters - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="toggleSection('law-parameters-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h3>
+                                <svg id="law-parameters-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="law-parameters-section" class="px-4 pb-4 hidden space-y-3">
                         <!-- Zorgtoeslag Parameters -->
                         <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                             <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
@@ -694,23 +732,24 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!-- Eigen Configuraties - Collapsible -->
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <button type="button"
-                            onclick="toggleSection('config-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h2 class="text-base font-medium text-gray-900">Eigen Configuraties</h2>
-                        <svg id="config-section-chevron"
-                             class="w-5 h-5 text-gray-500 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="config-section" class="px-4 pb-4 hidden">
+                            </div>
+                        </div>
+
+                        <!-- Eigen Configuraties - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="toggleSection('config-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900">Eigen Configuraties</h3>
+                                <svg id="config-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="config-section" class="px-4 pb-4 hidden">
                         <p class="text-sm text-gray-600 mb-3 mt-3">
                             Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.
                         </p>
@@ -743,6 +782,8 @@
                         <div class="mt-4">
                             <div id="saved-configs" class="space-y-2 max-h-40 overflow-y-auto">
                                 <!-- Saved configurations will be displayed here -->
+                            </div>
+                        </div>
                             </div>
                         </div>
                     </div>
