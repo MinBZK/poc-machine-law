@@ -5,6 +5,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
+from simulate import LawSimulator
 from web.dependencies import templates
 from web.law_parameters import get_default_law_parameters
 
@@ -59,14 +60,111 @@ async def simulation_page(request: Request):
     )
 
 
-@router.post("/run")
-async def run_simulation(request: Request):
-    """Run the simulation with the provided parameters"""
+@router.post("/population/create")
+async def create_population(request: Request):
+    """Create a new population and save it"""
     try:
         import subprocess
 
         # Parse request body
         body = await request.json()
+        body["operation"] = "create_population"  # Add operation type
+
+        # Run population creation in subprocess
+        result = subprocess.run(
+            ["uv", "run", "python", "run_simulation.py"],
+            input=json.dumps(body),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        if result.returncode != 0:
+            raise Exception(f"Population creation failed: {result.stderr}")
+
+        # Parse the result
+        if not result.stdout.strip():
+            raise Exception("No output from population creation")
+
+        population_data = json.loads(result.stdout)
+
+        return JSONResponse(population_data)
+
+    except Exception as e:
+        import traceback
+
+        error_details = traceback.format_exc()
+        print(f"Population creation error: {error_details}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+
+
+@router.get("/population/list")
+async def list_populations():
+    """List all saved populations"""
+    try:
+        populations = LawSimulator.list_populations()
+        return JSONResponse({"status": "success", "populations": populations})
+    except Exception as e:
+        import traceback
+
+        error_details = traceback.format_exc()
+        print(f"List populations error: {error_details}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+
+
+@router.get("/population/{population_id}")
+async def get_population(population_id: str):
+    """Get details about a specific population"""
+    try:
+        # Load metadata
+        from pathlib import Path
+
+        metadata_file = Path("data/populations") / f"{population_id}.meta.json"
+        if not metadata_file.exists():
+            raise HTTPException(status_code=404, detail="Population not found")
+
+        with open(metadata_file) as f:
+            metadata = json.load(f)
+
+        return JSONResponse({"status": "success", "population": metadata})
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+
+        error_details = traceback.format_exc()
+        print(f"Get population error: {error_details}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+
+
+@router.delete("/population/{population_id}")
+async def delete_population(population_id: str):
+    """Delete a saved population"""
+    try:
+        deleted = LawSimulator.delete_population(population_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Population not found")
+
+        return JSONResponse({"status": "success", "message": f"Population {population_id} deleted"})
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+
+        error_details = traceback.format_exc()
+        print(f"Delete population error: {error_details}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+
+
+@router.post("/run")
+async def run_simulation(request: Request):
+    """Run the simulation with the provided parameters (optionally with existing population)"""
+    try:
+        import subprocess
+
+        # Parse request body
+        body = await request.json()
+        body["operation"] = "run_simulation"  # Add operation type (default)
 
         # Run simulation in subprocess to avoid class registration conflicts
         result = subprocess.run(

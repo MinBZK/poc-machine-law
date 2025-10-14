@@ -118,6 +118,51 @@
                         </div>
                     </div>
                 </div>
+                <!-- Population Management - New Section -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="p-4">
+                        <h2 class="text-base font-medium text-gray-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-500"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            Populatiebeheer
+                        </h2>
+                        <p class="text-sm text-gray-500 mb-3">Maak een populatie of gebruik een bestaande voor vergelijkbare simulaties</p>
+                        <div class="space-y-3">
+                            <button type="button"
+                                    onclick="createPopulation()"
+                                    class="w-full inline-flex items-center justify-center px-4 py-2 border border-green-600 text-sm font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer">
+                                <svg class="mr-2 -ml-1 h-5 w-5"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Nieuwe Populatie Aanmaken
+                            </button>
+                            <div id="population-selector" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Gebruik bestaande populatie</label>
+                                <select id="population-select"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2">
+                                    <option value="">-- Selecteer populatie --</option>
+                                </select>
+                                <div id="selected-population-info" class="hidden p-3 bg-gray-50 rounded-md text-sm">
+                                    <div class="font-medium text-gray-900 mb-1">Populatie Details:</div>
+                                    <div id="population-details" class="text-gray-600 space-y-1"></div>
+                                    <button type="button"
+                                            onclick="deleteSelectedPopulation()"
+                                            class="mt-2 text-xs text-red-600 hover:text-red-700 cursor-pointer">
+                                        Verwijder deze populatie
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="population-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Basic Settings - Always visible -->
                 <div class="bg-white shadow rounded-lg">
                     <div class="p-4">
@@ -1564,6 +1609,7 @@ async function runSimulation() {
     const data = {
         num_people: parseInt(formData.get('num_people')),
         simulation_date: formData.get('simulation_date'),
+        population_id: selectedPopulationId,  // Add selected population ID if any
         age_distribution: {
             age_18_30: parseInt(formData.get('age_18_30')),
             age_30_45: parseInt(formData.get('age_30_45')),
@@ -1703,6 +1749,146 @@ async function runSimulation() {
         alert('Er is een fout opgetreden bij het uitvoeren van de simulatie.');
         document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
         closeTab(simulationId);
+    }
+}
+
+// Population Management Functions
+let selectedPopulationId = null;
+
+async function createPopulation() {
+    // Gather form data for population parameters
+    const formData = new FormData(document.getElementById('simulation-form'));
+    const data = {
+        operation: 'create_population',
+        num_people: parseInt(formData.get('num_people')),
+        simulation_date: formData.get('simulation_date'),
+        age_distribution: {
+            age_18_30: parseInt(formData.get('age_18_30')),
+            age_30_45: parseInt(formData.get('age_30_45')),
+            age_45_67: parseInt(formData.get('age_45_67')),
+            age_67_85: parseInt(formData.get('age_67_85')),
+            age_85_plus: parseInt(formData.get('age_85_plus'))
+        },
+        income_distribution: {
+            income_low_pct: parseInt(formData.get('income_low_pct')),
+            income_middle_pct: parseInt(formData.get('income_middle_pct')),
+            income_high_pct: parseInt(formData.get('income_high_pct'))
+        },
+        economic_params: {
+            zero_income_prob: parseInt(formData.get('zero_income_prob')),
+            rent_percentage: parseInt(formData.get('rent_percentage')),
+            student_percentage_young: parseInt(formData.get('student_percentage_young'))
+        }
+    };
+
+    try {
+        const response = await fetch('/simulation/population/create', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            alert(`Populatie aangemaakt! ID: ${result.population_id.substring(0, 8)}...\n` +
+                  `Aantal personen: ${result.num_people}\n` +
+                  `Gem. leeftijd: ${result.demographics.avg_age.toFixed(1)} jaar\n` +
+                  `Huurders: ${result.demographics.renters_pct.toFixed(1)}%`);
+            // Refresh population list
+            await loadPopulations();
+        } else {
+            alert(`Fout bij aanmaken populatie: ${result.message}`);
+        }
+    } catch (error) {
+        alert(`Fout bij aanmaken populatie: ${error.message}`);
+    }
+}
+
+async function loadPopulations() {
+    try {
+        const response = await fetch('/simulation/population/list');
+        const result = await response.json();
+
+        if (result.status === 'success' && result.populations.length > 0) {
+            // Show population selector
+            document.getElementById('population-selector').classList.remove('hidden');
+
+            // Update select dropdown
+            const select = document.getElementById('population-select');
+            select.innerHTML = '<option value="">-- Selecteer populatie --</option>';
+
+            result.populations.forEach(pop => {
+                const option = document.createElement('option');
+                option.value = pop.population_id;
+                const date = new Date(pop.created_at).toLocaleString('nl-NL');
+                option.textContent = `${pop.num_people} personen - ${date}`;
+                select.appendChild(option);
+            });
+
+            // Add change event listener
+            select.onchange = () => showPopulationDetails(select.value);
+        }
+    } catch (error) {
+        console.error('Error loading populations:', error);
+    }
+}
+
+function showPopulationDetails(populationId) {
+    if (!populationId) {
+        document.getElementById('selected-population-info').classList.add('hidden');
+        selectedPopulationId = null;
+        return;
+    }
+
+    selectedPopulationId = populationId;
+
+    fetch(`/simulation/population/${populationId}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                const pop = result.population;
+                const details = document.getElementById('population-details');
+                const date = new Date(pop.created_at).toLocaleDateString('nl-NL');
+
+                details.innerHTML = `
+                    <div>📊 ${pop.num_people} personen</div>
+                    <div>📅 Aangemaakt: ${date}</div>
+                    <div>👤 Gem. leeftijd: ${pop.demographics.avg_age.toFixed(1)} jaar</div>
+                    <div>🏘️ Huurders: ${pop.demographics.renters_pct.toFixed(1)}%</div>
+                    <div>👫 Met partners: ${pop.demographics.with_partners_pct.toFixed(1)}%</div>
+                    <div>🎓 Studenten: ${pop.demographics.students_pct.toFixed(1)}%</div>
+                `;
+
+                document.getElementById('selected-population-info').classList.remove('hidden');
+            }
+        })
+        .catch(error => console.error('Error loading population details:', error));
+}
+
+async function deleteSelectedPopulation() {
+    if (!selectedPopulationId) return;
+
+    if (!confirm('Weet je zeker dat je deze populatie wilt verwijderen?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/simulation/population/${selectedPopulationId}`, {
+            method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            alert('Populatie verwijderd');
+            selectedPopulationId = null;
+            await loadPopulations();
+        } else {
+            alert(`Fout bij verwijderen: ${result.message}`);
+        }
+    } catch (error) {
+        alert(`Fout bij verwijderen: ${error.message}`);
     }
 }
 
@@ -2890,6 +3076,7 @@ function renderDisposableIncomeBreakdowns(breakdowns) {
 document.addEventListener('DOMContentLoaded', function() {
     validateAgeDistribution();
     updateIncomeDistribution();
+    loadPopulations();  // Load saved populations on page load
 });
         </script>
     {% endblock %}
