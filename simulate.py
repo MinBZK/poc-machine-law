@@ -380,7 +380,16 @@ class LawSimulator:
 
         return pairs
 
-    def setup_test_data(self, pairs):
+    def setup_test_data(self, pairs, random_seed=None):
+        # Set random seed if provided (for reproducibility with loaded populations)
+        if random_seed is not None:
+            # Convert string seed to integer if needed (e.g., UUID strings)
+            if isinstance(random_seed, str):
+                # Convert UUID string to integer using hash
+                random_seed = int(uuid.UUID(random_seed).int % (2**32))
+            random.seed(random_seed)
+            np.random.seed(random_seed)
+
         # Flatten pairs into list of people with partner references
         people = []
         for person, partner in pairs:
@@ -408,7 +417,8 @@ class LawSimulator:
                     "age": p["age"],
                     "has_dutch_nationality": p["has_dutch_nationality"],
                     "has_partner": p["has_partner"],
-                    "residence_address": f"Teststraat {random.randint(1, 999)}, {random.randint(1000, 9999)}AB Amsterdam",
+                    "residence_address": p.get("residence_address")
+                    or f"Teststraat {random.randint(1, 999)}, {random.randint(1000, 9999)}AB Amsterdam",
                     "has_fixed_address": True,
                     "household_size": 1 + (1 if p["has_partner"] else 0) + len(p.get("children_data", [])),
                 }
@@ -431,11 +441,11 @@ class LawSimulator:
             ("RvIG", "verblijfplaats"): [
                 {
                     "bsn": p["bsn"],
-                    "straat": "Kalverstraat" if random.random() < 0.7 else "Teststraat",
-                    "huisnummer": str(random.randint(1, 999)),
-                    "postcode": f"{random.randint(1000, 9999)}AB",
+                    "straat": p.get("straat") or ("Kalverstraat" if random.random() < 0.7 else "Teststraat"),
+                    "huisnummer": p.get("huisnummer") or str(random.randint(1, 999)),
+                    "postcode": p.get("postcode") or f"{random.randint(1000, 9999)}AB",
                     "woonplaats": "Amsterdam",
-                    "type": "WOONADRES" if random.random() < 0.95 else "BRIEFADRES",
+                    "type": p.get("address_type") or ("WOONADRES" if random.random() < 0.95 else "BRIEFADRES"),
                 }
                 for p in people
             ],
@@ -1144,6 +1154,19 @@ class LawSimulator:
             file=sys.stderr,
         )
 
+        # Store generated random values back into people for reproducibility
+        for p in people:
+            rvig_person = next((x for x in sources[("RvIG", "personen")] if x["bsn"] == p["bsn"]), None)
+            if rvig_person:
+                p["residence_address"] = rvig_person["residence_address"]
+
+            rvig_address = next((x for x in sources[("RvIG", "verblijfplaats")] if x["bsn"] == p["bsn"]), None)
+            if rvig_address:
+                p["straat"] = rvig_address["straat"]
+                p["huisnummer"] = rvig_address["huisnummer"]
+                p["postcode"] = rvig_address["postcode"]
+                p["address_type"] = rvig_address["type"]
+
         return people
 
     def simulate_person(self, person) -> None:
@@ -1388,7 +1411,8 @@ class LawSimulator:
             people = self.load_population(population_id)
             # Re-setup data sources with loaded population
             # Note: Don't reinitialize Services to avoid registration conflicts
-            self.setup_test_data_from_people(people)
+            # Use population_id as random seed for reproducibility
+            self.setup_test_data_from_people(people, random_seed=population_id)
         else:
             # Create new population
             _, people = self.create_population(num_people, save=False)
@@ -1411,7 +1435,7 @@ class LawSimulator:
         else:
             raise ValueError("Simulation failed to generate valid results")
 
-    def setup_test_data_from_people(self, people):
+    def setup_test_data_from_people(self, people, random_seed=None):
         """Setup test data from pre-existing people list (for loaded populations)."""
         # Convert the people list into pairs format expected by setup_test_data
         # This is a bit of a hack but maintains compatibility
@@ -1433,8 +1457,8 @@ class LawSimulator:
 
             pairs.append((person, partner))
 
-        # Now call the original setup_test_data
-        return self.setup_test_data(pairs)
+        # Now call the original setup_test_data with the random seed
+        return self.setup_test_data(pairs, random_seed=random_seed)
 
     def calculate_law_breakdowns(self, df, law_name, eligible_col, amount_col):
         """Calculate breakdowns by various demographics for a specific law."""
