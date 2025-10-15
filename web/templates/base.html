@@ -7,6 +7,7 @@
         <title>RegelRecht Demo</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script type="module" src="../../nl-wallet-files/nl-wallet-web.iife.js"></script>
         <script defer
                 src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
         <style>
@@ -34,6 +35,17 @@
 
         </style>
         <script>
+        function attach_wallet_handlers() {
+            const wallet_button = document.getElementsByTagName("nl-wallet-button").item(0);
+            if (wallet_button) {
+                console.log('attaching nl-wallet-button handlers');
+                wallet_button.addEventListener("success", wallet_done, false);
+                wallet_button.addEventListener("failed", wallet_done, false);
+            } else {
+                console.log('no nl-wallet-button found');
+            }
+        }
+
         // Define global functions BEFORE Alpine.js loads
         window.openWalletModal = function () {
             console.log('Global openWalletModal called');
@@ -65,6 +77,37 @@
                     }
                 }, 100);
             }
+        };
+
+        window.wallet_done = (e) => {
+            if (!(e.detail && e.detail.length > 1)) {
+                console.warn("missing event details")
+                return;
+            }
+
+            const session_token = e.detail[0];
+            const session_type = e.detail[1];
+
+            if (session_type !== "cross_device") {
+                return;
+            }
+
+            fetch('/wallet/attributes', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ session_token: session_token })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Wallet attributes received:', data.attributes);
+                } else {
+                    console.error('Wallet error:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Failed to fetch wallet attributes:', error);
+            });
         };
         </script>
         <link rel="icon"

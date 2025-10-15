@@ -97,6 +97,13 @@ app.mount(
         html=True,
     ),
 )
+app.mount(
+    "/nl-wallet-files",
+    StaticFiles(
+        directory="nl-wallet-files",
+        html=True,
+    ),
+)
 
 
 @app.get("/")
