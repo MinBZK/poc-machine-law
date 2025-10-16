@@ -235,6 +235,7 @@ class RuleContext:
                     return self.local[path]
 
                 # Check definitions
+                logger.debug(f"Checking definitions for path '{path}'. Available definitions: {list(self.definitions.keys())}")
                 if path in self.definitions:
                     definition_value = self.definitions[path]
                     # If definition contains both 'value' and 'legal_basis', extract only the value
@@ -318,6 +319,7 @@ class RuleContext:
                             df = pd.DataFrame(events)
                         elif self.sources and "table" in source_ref:
                             table = source_ref.get("table")
+                            logger.debug(f"Looking for table '{table}' in sources. Available keys: {list(self.sources.keys())}")
                             if table in self.sources:
                                 df = self.sources[table]
 
@@ -502,15 +504,35 @@ class RuleContext:
         return type_spec_copy
 
     def _resolve_from_source(self, source_ref, table, df):
+        logger.debug(f"_resolve_from_source called with table={table}, df shape={df.shape if df is not None else 'None'}")
         if "select_on" in source_ref:
             for select_on in source_ref["select_on"]:
                 value = self.resolve_value(select_on["value"])
+                col_name = select_on["name"]
+
+                # Skip filtering if value is None (optional parameter not provided)
+                if value is None:
+                    logger.debug(f"Skipping filter on {col_name} (value is None)")
+                    continue
+
+                # Convert value to match the DataFrame column dtype
+                if col_name in df.columns:
+                    col_dtype = df[col_name].dtype
+                    # Convert string to int if column is numeric
+                    if pd.api.types.is_numeric_dtype(col_dtype) and isinstance(value, str):
+                        try:
+                            value = int(value)
+                        except (ValueError, TypeError):
+                            pass
+                    # Convert int to string if column is object/string
+                    elif pd.api.types.is_object_dtype(col_dtype) and isinstance(value, int | float):
+                        value = str(value)
 
                 if isinstance(value, dict) and "operation" in value and value["operation"] == "IN":
                     allowed_values = self.resolve_value(value["values"])
-                    df = df[df[select_on["name"]].isin(allowed_values)]
+                    df = df[df[col_name].isin(allowed_values)]
                 else:
-                    df = df[df[select_on["name"]] == value]
+                    df = df[df[col_name] == value]
 
         # Get specified fields
         fields = source_ref.get("fields", [])
@@ -524,9 +546,11 @@ class RuleContext:
             result = df[existing_fields].to_dict("records")
         elif field:
             if field not in df.columns:
-                logger.warning(f"Field {field} not found in source for table {table}")
-                return None
-            result = df[field].tolist()
+                # Field doesn't exist - return the entire record as a dict instead
+                logger.debug(f"Field {field} not found in source for table {table}, returning entire record")
+                result = df.to_dict("records")
+            else:
+                result = df[field].tolist()
         else:
             result = df.to_dict("records")
 

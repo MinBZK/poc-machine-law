@@ -23,6 +23,7 @@ class RulesEngine:
         self.property_specs = self._build_property_specs(spec.get("properties", {}))
         self.output_specs = self._build_output_specs(spec.get("properties", {}))
         self.definitions = spec.get("properties", {}).get("definitions", {})
+        logger.debug(f"Loaded definitions: {self.definitions}")
         self.service_provider = service_provider
 
     @staticmethod
@@ -305,7 +306,7 @@ class RulesEngine:
                     name="Check ALL conditions"
                     if "all" in req
                     else "Check OR conditions"
-                    if "or" in req
+                    if "or" in req or "any" in req
                     else "Test condition",
                     result=None,
                 )
@@ -320,13 +321,15 @@ class RulesEngine:
                             logger.debug("False value found in an ALL, no need to compute the rest, breaking.")
                             break
                     result = all(results)
-                elif "or" in req:
+                elif "or" in req or "any" in req:
+                    # Support both 'or' and 'any' for logical OR
+                    sub_requirements = req.get("or") or req.get("any")
                     results = []
-                    for r in req["or"]:
+                    for r in sub_requirements:
                         result = self._evaluate_requirements([r], context)
                         results.append(result)
                         if bool(result):
-                            logger.debug("True value found in an OR, no need to compute the rest, breaking.")
+                            logger.debug("True value found in an OR/ANY, no need to compute the rest, breaking.")
                             break
                     result = any(results)
                 else:
@@ -429,6 +432,9 @@ class RulesEngine:
         "LESS_THAN": operator.lt,
         "GREATER_OR_EQUAL": operator.ge,
         "LESS_OR_EQUAL": operator.le,
+        # Support alternate naming conventions
+        "GREATER_THAN_OR_EQUAL": operator.ge,
+        "LESS_THAN_OR_EQUAL": operator.le,
     }
 
     AGGREGATE_OPS = {
@@ -636,7 +642,8 @@ class RulesEngine:
         elif op_type in ["IN", "NOT_IN"]:
             with logger.indent_block(op_type):
                 subject = self._evaluate_value(operation["subject"], context)
-                allowed_values = self._evaluate_value(operation.get("values", []), context)
+                # Support both 'values' (array literal) and 'value' (reference to definition)
+                allowed_values = self._evaluate_value(operation.get("values") or operation.get("value", []), context)
 
                 result = subject in (
                     allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
@@ -658,6 +665,25 @@ class RulesEngine:
             result = subject is None
             node.details["subject_value"] = subject
             logger.debug(f"IS_NULL result: {result}")
+
+        elif op_type == "EXISTS" or op_type == "NOT_NULL":
+            subject = self._evaluate_value(operation["subject"], context)
+            result = subject is not None
+            node.details["subject_value"] = subject
+            logger.debug(f"{op_type} result: {result}")
+
+        elif op_type == "CONTAINS":
+            # CONTAINS is like IN but with the value being checked for membership in the subject
+            # $SCOPE CONTAINS '*' means: does the list $SCOPE contain '*'?
+            with logger.indent_block("CONTAINS"):
+                subject = self._evaluate_value(operation["subject"], context)
+                value = self._evaluate_value(operation["value"], context)
+
+                # Check if value is in subject (subject should be a list/array)
+                result = value in (subject if isinstance(subject, list | dict | set) else [subject])
+
+            node.details.update({"subject_value": subject, "contains_value": value})
+            logger.debug(f"Result {value} in {subject}: {result}")
 
         elif op_type == "AND":
             with logger.indent_block("AND"):

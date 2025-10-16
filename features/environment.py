@@ -90,6 +90,11 @@ def before_scenario(context, scenario) -> None:
     context.parameters = {}
     context.result = None
 
+    # Clear source dataframes to prevent data pollution between scenarios
+    if hasattr(context, 'services') and context.services:
+        for service_name, service in context.services.services.items():
+            service.source_dataframes.clear()
+
 
 def after_scenario(context, scenario) -> None:
     clear_topic_cache()

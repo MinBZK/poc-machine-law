@@ -113,10 +113,20 @@ class RuleService:
             RuleResult containing outputs and metadata
         """
         engine = self._get_engine(law, reference_date)
+
+        # Gather sources from all services for cross-service lookups
+        all_sources = {}
+        if self.services and hasattr(self.services, 'services'):
+            for service_name, service in self.services.services.items():
+                all_sources.update(service.source_dataframes)
+        else:
+            # Fallback to just this service's sources
+            all_sources = self.source_dataframes
+
         result = engine.evaluate(
             parameters=parameters,
             overwrite_input=overwrite_input,
-            sources=self.source_dataframes,
+            sources=all_sources,
             calculation_date=reference_date,
             requested_output=requested_output,
             approved=approved,

@@ -12,6 +12,10 @@ assertions = TestCase()
 
 def parse_value(value: str) -> Any:
     """Parse string value to appropriate type"""
+    # Handle empty strings as None
+    if value == "" or value is None:
+        return None
+
     # Try to parse as JSON
     try:
         return json.loads(value)
@@ -35,13 +39,27 @@ def step_impl(context, service, table):
     # Convert table to DataFrame
     data = []
     for row in context.table:
-        processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer"} else parse_value(v)
-            for k, v in row.items()
-        }
+        processed_row = {}
+        for k, v in row.items():
+            # Keep certain fields as strings
+            if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "rsin", "volmachtgever_rsin"}:
+                processed_row[k] = v
+            # Convert empty strings to None for date and numeric fields
+            elif k in {"einddatum", "ingangsdatum", "herroepingsdatum", "einddatum_functie"}:
+                processed_row[k] = None if v == "" else parse_value(v)
+            else:
+                processed_row[k] = parse_value(v)
         data.append(processed_row)
 
-    df = pd.DataFrame(data)
+    new_df = pd.DataFrame(data)
+
+    # Append to existing DataFrame if it exists, otherwise create new
+    existing_df = context.services.services[service].source_dataframes.get(table)
+    if existing_df is not None:
+        # Append the new data to existing
+        df = pd.concat([existing_df, new_df], ignore_index=True)
+    else:
+        df = new_df
 
     # Set the DataFrame in services
     context.services.set_source_dataframe(service, table, df)
@@ -101,19 +119,38 @@ def step_impl(context, law, service):
         context.test_data = {}
 
     # Process the table to get the input data
-    for row in context.table:
-        key = row.headings[0]
-        value = row[key]
-        # Special handling for JSON-like values
-        if value.startswith('[') or value.startswith('{'):
-            import json
-            try:
-                value = json.loads(value.replace("'", '"'))
-            except json.JSONDecodeError:
-                pass
-        context.test_data[key] = value
-        # Also add to parameters for direct parameter access
-        context.parameters[key] = value
+    # Support two formats:
+    # 1. Single column with key-value pairs (one row per parameter)
+    # 2. Multi-column with all parameters in one row
+    if len(context.table.headings) == 1:
+        # Format 1: Single column (like existing tests)
+        for row in context.table:
+            key = row.headings[0]
+            value = row[key]
+            # Special handling for JSON-like values
+            if value.startswith('[') or value.startswith('{'):
+                import json
+                try:
+                    value = json.loads(value.replace("'", '"'))
+                except json.JSONDecodeError:
+                    pass
+            context.test_data[key] = value
+            context.parameters[key] = value
+    else:
+        # Format 2: Multi-column (all parameters in first data row)
+        if len(context.table.rows) > 0:
+            row = context.table.rows[0]
+            for heading in context.table.headings:
+                value = row[heading]
+                # Special handling for JSON-like values
+                if value.startswith('[') or value.startswith('{'):
+                    import json
+                    try:
+                        value = json.loads(value.replace("'", '"'))
+                    except json.JSONDecodeError:
+                        pass
+                context.test_data[heading] = value
+                context.parameters[heading] = value
 
     evaluate_law(context, service, law)
 
@@ -152,6 +189,65 @@ def step_impl(context):
     assertions.assertFalse(
         context.result.requirements_met,
         "Expected requirements to not be met, but they were",
+    )
+
+
+@then("is {field:w} true")
+def step_impl(context, field):
+    """Check that an output field is true"""
+    if field not in context.result.output:
+        raise ValueError(f"Field '{field}' not found in output. Available fields: {list(context.result.output.keys())}")
+
+    actual_value = context.result.output[field]
+    assertions.assertEqual(
+        actual_value,
+        True,
+        f"Expected {field} to be true, but was {actual_value}",
+    )
+
+
+@then("is {field:w} false")
+def step_impl(context, field):
+    """Check that an output field is false"""
+    if field not in context.result.output:
+        raise ValueError(f"Field '{field}' not found in output. Available fields: {list(context.result.output.keys())}")
+
+    actual_value = context.result.output[field]
+    assertions.assertEqual(
+        actual_value,
+        False,
+        f"Expected {field} to be false, but was {actual_value}",
+    )
+
+
+@then('is {field:w} "{value}"')
+def step_impl(context, field, value):
+    """Check that an output field matches a string value"""
+    if field not in context.result.output:
+        raise ValueError(f"Field '{field}' not found in output. Available fields: {list(context.result.output.keys())}")
+
+    actual_value = context.result.output[field]
+    assertions.assertEqual(
+        actual_value,
+        value,
+        f"Expected {field} to be '{value}', but was '{actual_value}'",
+    )
+
+
+@then('bevat {field:w} "{value}"')
+def step_impl(context, field, value):
+    """Check that an array field contains a specific value"""
+    if field not in context.result.output:
+        raise ValueError(f"Field '{field}' not found in output. Available fields: {list(context.result.output.keys())}")
+
+    actual_value = context.result.output[field]
+    if not isinstance(actual_value, list):
+        raise ValueError(f"Field '{field}' is not a list, it is: {type(actual_value).__name__}")
+
+    assertions.assertIn(
+        value,
+        actual_value,
+        f"Expected {field} to contain '{value}', but it was {actual_value}",
     )
 
 
