@@ -209,8 +209,13 @@ def step_impl(context, field):
 @then("is {field:w} false")
 def step_impl(context, field):
     """Check that an output field is false"""
+    # If requirements weren't met, output will be empty - treat missing field as false
     if field not in context.result.output:
-        raise ValueError(f"Field '{field}' not found in output. Available fields: {list(context.result.output.keys())}")
+        if not context.result.requirements_met:
+            # Requirements failed, so field not existing is equivalent to false
+            return
+        else:
+            raise ValueError(f"Field '{field}' not found in output but requirements were met. Available fields: {list(context.result.output.keys())}")
 
     actual_value = context.result.output[field]
     assertions.assertEqual(
