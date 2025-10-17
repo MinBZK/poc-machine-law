@@ -112,17 +112,21 @@ class AuthorizationService:
 
         # Always include SELF role
         actor_profile = self._get_profile(actor_bsn)
+        # Fallback to BSN if no profile found
+        actor_name = f"BSN {actor_bsn}"
         if actor_profile:
-            roles.append(
-                Role(
-                    type="SELF",
-                    id=actor_bsn,
-                    name=actor_profile.get("naam", f"BSN {actor_bsn}"),
-                    legal_ground="Zelf",
-                    legal_basis=None,
-                    scope=None,
-                )
+            actor_name = actor_profile.get("naam") or actor_profile.get("name") or actor_name
+
+        roles.append(
+            Role(
+                type="SELF",
+                id=actor_bsn,
+                name=actor_name,
+                legal_ground="Zelf",
+                legal_basis=None,
+                scope=None,
             )
+        )
 
         # Check person-based authorizations
         person_laws = self._discover_authorization_laws("PERSON")
