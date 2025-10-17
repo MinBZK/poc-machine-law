@@ -1,12 +1,17 @@
+import logging
 import urllib.parse
 from typing import Any
 from uuid import UUID
 
 import httpx
 
+from web.config_loader import ServiceRoutingConfig
+
 from ..case_manager_interface import CaseManagerInterface
 from ..models import Case, CaseObjectionStatus, CaseStatus, Event
 from .machine_client.law_as_code_client import Client
+
+logger = logging.getLogger(__name__)
 from .machine_client.law_as_code_client.api.case import (
     case_based_on_bsn_service_law,
     case_get,
@@ -34,11 +39,33 @@ from .machine_client.law_as_code_client.types import UNSET, Unset
 class CaseManager(CaseManagerInterface):
     """
     Implementation of CaseManagerInterface that uses HTTP calls to the Go backend service.
+    Supports service-based routing when enabled in configuration.
     """
 
-    def __init__(self, base_url: str = "http://localhost:8081/v0"):
+    def __init__(
+        self, base_url: str = "http://localhost:8081/v0", service_routing_config: ServiceRoutingConfig | None = None
+    ):
         self.base_url = base_url
         self.client = httpx.AsyncClient(base_url=self.base_url)
+        self.service_routing_enabled = False
+        self.service_routes = {}
+        self._service_routing_config = service_routing_config
+
+        if service_routing_config and service_routing_config.enabled:
+            self.service_routing_enabled = True
+            self.service_routes = service_routing_config.services
+
+    def _get_base_url_for_service(self, service: str) -> str:
+        """
+        Get the appropriate base URL for a service.
+        If service routing is enabled and service has a specific route, use that.
+        Otherwise, use the default base URL.
+        """
+        if self.service_routing_enabled and service in self.service_routes:
+            url = self.service_routes[service].domain
+            return url
+
+        return self.base_url
 
     def get_case(self, bsn: str, service: str, law: str) -> Case | None:
         """
@@ -53,8 +80,9 @@ class CaseManager(CaseManagerInterface):
             Dictionary containing case data if found, None otherwise
         """
 
-        # Instantiate the API client
-        client = Client(base_url=self.base_url)
+        # Instantiate the API client with service-specific base URL
+        service_base_url = self._get_base_url_for_service(service)
+        client = Client(base_url=service_base_url)
 
         with client as client:
             service = urllib.parse.quote_plus(service)
@@ -73,6 +101,7 @@ class CaseManager(CaseManagerInterface):
 
     def get_case_by_id(self, id: UUID) -> Case:
         # Instantiate the API client
+        logger.debug(f"[CaseManager] get_case_by_id using base_url: {self.base_url}")
         client = Client(base_url=self.base_url)
 
         with client as client:
@@ -95,8 +124,9 @@ class CaseManager(CaseManagerInterface):
             Dictionary containing case data if found, None otherwise
         """
 
-        # Instantiate the API client
-        client = Client(base_url=self.base_url)
+        # Instantiate the API client with service-specific base URL
+        service_base_url = self._get_base_url_for_service(service)
+        client = Client(base_url=service_base_url)
 
         with client as client:
             service = urllib.parse.quote_plus(service)
@@ -107,7 +137,30 @@ class CaseManager(CaseManagerInterface):
             return to_cases(response.parsed.data)
 
     def get_cases_by_bsn(self, bsn: str) -> list[Case]:
-        # Instantiate the API client
+        # When service routing is enabled and configured to query all services
+        service_routing_config = getattr(self, "_service_routing_config", None)
+        query_all = (
+            service_routing_config and service_routing_config.query_all_for_cases if service_routing_config else False
+        )
+
+        if self.service_routing_enabled and self.service_routes and query_all:
+            all_cases = []
+
+            for service_name, service_config in self.service_routes.items():
+                try:
+                    client = Client(base_url=service_config.domain)
+                    with client as client:
+                        response = case_list_based_on_bsn.sync_detailed(client=client, bsn=bsn)
+                        cases = to_cases(response.parsed.data)
+                        all_cases.extend(cases)
+                except Exception as e:
+                    logger.error(f"[CaseManager] Error querying {service_name}: {e}")
+                    # Continue with other services even if one fails
+                    continue
+
+            return all_cases
+
+        # Default behavior: query single base_url
         client = Client(base_url=self.base_url)
 
         with client as client:
@@ -124,8 +177,9 @@ class CaseManager(CaseManagerInterface):
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
     ) -> UUID:
-        # Instantiate the API client
-        client = Client(base_url=self.base_url)
+        # Instantiate the API client with service-specific base URL
+        service_base_url = self._get_base_url_for_service(service)
+        client = Client(base_url=service_base_url)
 
         data = CaseSubmit(
             bsn=bsn,

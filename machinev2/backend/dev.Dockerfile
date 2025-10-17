@@ -30,7 +30,7 @@ COPY ./machinev2/backend/ .
 WORKDIR /build
 
 ### Copy necessary files into correct folder
-COPY ./law ./law
+COPY ./submodules/regelrecht-laws/laws ./law
 COPY ./services ./services
 COPY ./machinev2/backend/cmd/serve_input.yaml ./cmd/
 

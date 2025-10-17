@@ -442,6 +442,7 @@ func (re *RulesEngine) Evaluate(
 
 	// Create context
 	ruleCtx := contexter.NewRuleContext(
+		re.ServiceName,
 		re.Definitions,
 		re.ServiceProvider,
 		parameters,

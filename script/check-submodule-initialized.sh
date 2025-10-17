@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 if [ ! -f submodules/regelrecht-laws/.git ]; then
