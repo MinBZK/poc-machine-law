@@ -111,6 +111,12 @@ async def root(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
+    # Check if BSN has changed - if so, clear acting_as to reset to "Zichzelf"
+    previous_bsn = request.session.get("bsn")
+    if previous_bsn and previous_bsn != bsn:
+        # User switched DigiD profile - clear role selection
+        request.session.pop("acting_as", None)
+
     # Store actor BSN in session for role management
     request.session["bsn"] = bsn
 
