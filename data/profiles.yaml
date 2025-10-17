@@ -127,23 +127,25 @@ globalServices:
       einddatum: null
       beperkingen: null
   ALGEMEEN: &id007
-    volmachten:
+    volmacht_register:
     # Merijn heeft volmacht van zijn ouders voor hun financiële zaken
     - gevolmachtigde_bsn: '100000001'
-      volmachtgever_bsn: '300000002'
-      target_type: 'PERSON'
-      type_volmacht: 'FINANCIEEL'
-      geldig_vanaf: '2022-06-01'
-      geldig_tot: null
-      beperkingen: ['hypotheek', 'verkoop_onroerend_goed']
+      volmachtgever_id: '300000002'
+      type_volmacht: 'BIJZONDER'
+      scope: ['financiele_zaken']
+      ingangsdatum: '2022-06-01'
+      einddatum: null
+      herroepen: false
+      herroepingsdatum: null
     # Merijn heeft bedrijfsvolmacht voor een partner bedrijf
     - gevolmachtigde_bsn: '100000001'
-      volmachtgever_rsin: '004567890'
-      target_type: 'ORGANIZATION'
-      type_volmacht: 'BEDRIJFSHANDELINGEN'
-      geldig_vanaf: '2021-09-01'
-      geldig_tot: '2026-09-01'
-      beperkingen: ['contracten_tot_50000']
+      volmachtgever_id: '004567890'
+      type_volmacht: 'BIJZONDER'
+      scope: ['bedrijfshandelingen']
+      ingangsdatum: '2021-09-01'
+      einddatum: '2026-09-01'
+      herroepen: false
+      herroepingsdatum: null
   KVK: &id006
     functionarissen:
     # Merijn is bestuurder van Thuiszorg BV
