@@ -108,6 +108,9 @@ async def root(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
+    # Store BSN in session for role management
+    request.session["bsn"] = bsn
+
     profile = services.get_profile_data(bsn)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")

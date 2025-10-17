@@ -139,4 +139,62 @@ TOOL_SCHEMAS = {
         },
         ["output_field"],
     ),
+    "get_available_roles": {
+        "name": "get_available_roles",
+        "description": "Get all roles (authorizations) that a person can assume - acting as themselves, on behalf of others (via ouderlijk gezag, curatele, volmacht), or for organizations (via KVK registration)",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "actor_bsn": {
+                    "type": "string",
+                    "description": "BSN of the person whose available roles to check",
+                    "examples": ["100000001", "300000001"],
+                },
+                "reference_date": {
+                    "type": "string",
+                    "description": "Reference date (YYYY-MM-DD) - defaults to today",
+                    "format": "date",
+                    "examples": ["2024-01-01", "2025-10-17"],
+                },
+            },
+            "required": ["actor_bsn"],
+        },
+    },
+    "select_role": {
+        "name": "select_role",
+        "description": "Select a role to act as - switches context for subsequent law executions. After selecting a role, all law evaluations will be performed on behalf of the target person/organization.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "actor_bsn": {
+                    "type": "string",
+                    "description": "BSN of the person selecting the role",
+                    "examples": ["100000001", "300000001"],
+                },
+                "target_type": {
+                    "type": "string",
+                    "description": "Type of target to act on behalf of",
+                    "enum": ["PERSON", "ORGANIZATION", "SELF"],
+                    "examples": ["PERSON", "ORGANIZATION", "SELF"],
+                },
+                "target_id": {
+                    "type": "string",
+                    "description": "BSN (if PERSON) or RSIN (if ORGANIZATION) to act on behalf of. Not needed if target_type is SELF.",
+                    "examples": ["100000001", "001234567"],
+                },
+                "action": {
+                    "type": "string",
+                    "description": "Optional: specific action/scope to verify (e.g., 'financial' for bewindvoering)",
+                    "examples": ["financial", "medical", "belasting_aangifte"],
+                },
+                "reference_date": {
+                    "type": "string",
+                    "description": "Reference date (YYYY-MM-DD) - defaults to today",
+                    "format": "date",
+                    "examples": ["2024-01-01", "2025-10-17"],
+                },
+            },
+            "required": ["actor_bsn", "target_type"],
+        },
+    },
 }

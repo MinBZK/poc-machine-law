@@ -61,6 +61,8 @@ async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextCon
         "execute_law": lambda: _handle_execute_law(arguments),
         "check_eligibility": lambda: _handle_check_eligibility(arguments),
         "calculate_benefit_amount": lambda: _handle_calculate_benefit_amount(arguments),
+        "get_available_roles": lambda: _handle_get_available_roles(arguments),
+        "select_role": lambda: _handle_select_role(arguments),
     }
 
     handler = handlers.get(name)
@@ -105,6 +107,70 @@ async def _handle_calculate_benefit_amount(args: dict[str, Any]) -> dict[str, An
         reference_date=args.get("reference_date"),
     )
     return format_benefit_response(amount, args)
+
+
+async def _handle_get_available_roles(args: dict[str, Any]) -> dict[str, Any]:
+    """Handle getting available roles for an actor"""
+    from machine.authorization import AuthorizationService
+
+    auth_service = AuthorizationService(law_engine.services)
+    roles = auth_service.get_available_roles(
+        actor_bsn=args["actor_bsn"], reference_date=args.get("reference_date")
+    )
+
+    return {
+        "actor_bsn": args["actor_bsn"],
+        "roles": [
+            {
+                "type": role.type,
+                "id": role.id,
+                "name": role.name,
+                "legal_ground": role.legal_ground,
+                "legal_basis": role.legal_basis,
+                "scope": role.scope,
+                "restrictions": role.restrictions,
+            }
+            for role in roles
+        ],
+    }
+
+
+async def _handle_select_role(args: dict[str, Any]) -> dict[str, Any]:
+    """Handle selecting a role"""
+    from machine.authorization import AuthorizationService
+
+    auth_service = AuthorizationService(law_engine.services)
+
+    # Handle SELF selection
+    if args["target_type"] == "SELF":
+        return {
+            "status": "ok",
+            "message": "Acting as self",
+            "acting_as": None,
+        }
+
+    # Verify authorization
+    is_authorized, legal_ground = auth_service.verify_authorization(
+        actor_bsn=args["actor_bsn"],
+        target_type=args["target_type"],
+        target_id=args["target_id"],
+        action=args.get("action"),
+        reference_date=args.get("reference_date"),
+    )
+
+    if not is_authorized:
+        return {"error": f"Not authorized to act on behalf of {args['target_type']} {args['target_id']}"}
+
+    return {
+        "status": "ok",
+        "message": f"Now acting as {args['target_type']} {args['target_id']}",
+        "acting_as": {
+            "type": args["target_type"],
+            "id": args["target_id"],
+            "legal_ground": legal_ground,
+            "action": args.get("action"),
+        },
+    }
 
 
 # =============================================================================

@@ -39,6 +39,56 @@ globalServices:
     - gemeente: Arnhem
       arrondissement: GELDERLAND
       rechtbank: RECHTBANK_GELDERLAND
+  RvIG: &id004
+    brp_relaties:
+    - bsn_ouder: '100000001'
+      bsn_kind: '200000001'
+      is_ouder: true
+    - bsn_ouder: '100000001'
+      bsn_kind: '200000002'
+      is_ouder: true
+    brp_personen:
+    - bsn: '200000001'
+      geboortedatum: '2020-01-01'
+      leeftijd: 5
+      naam: Kind 1
+    - bsn: '200000002'
+      geboortedatum: '2022-01-01'
+      leeftijd: 3
+      naam: Kind 2
+    brp_gezagsrelaties:
+    - bsn_ouder: '100000001'
+      bsn_kind: '200000001'
+      heeft_gezag: true
+      gezag_ontzegd: false
+    - bsn_ouder: '100000001'
+      bsn_kind: '200000002'
+      heeft_gezag: true
+      gezag_ontzegd: false
+  RECHTSPRAAK: &id005
+    curatele_register:
+    - bsn_ouder: '100000001'
+      bsn_kind: '200000001'
+      ontzetting_ouderlijk_gezag: false
+    - bsn_ouder: '100000001'
+      bsn_kind: '200000002'
+      ontzetting_ouderlijk_gezag: false
+  KVK: &id006
+    functionarissen:
+    - bsn: '100000001'
+      rsin: '001234567'
+      naam_bedrijf: 'Thuiszorg Merijn BV'
+      functie: 'BESTUURDER'
+      bevoegdheid: 'ZELFSTANDIG'
+      status: 'ACTIEF'
+      ingangsdatum: '2020-01-01'
+      einddatum: null
+    bedrijven:
+    - kvk_nummer: '12345678'
+      rsin: '001234567'
+      naam: 'Thuiszorg Merijn BV'
+      rechtsvorm: 'BV'
+      status: 'ACTIEF'
 profiles:
   '100000001':
     name: Merijn van der Meer
