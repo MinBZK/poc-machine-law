@@ -36,10 +36,36 @@ def evaluate_law(
     machine_service: EngineInterface,
     approved: bool = True,
     claim_manager: ClaimManagerInterface | None = None,
+    acting_as: dict[str, Any] | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
-    """Evaluate a law for a given BSN"""
+    """
+    Evaluate a law for a given BSN
 
-    parameters = {"BSN": bsn}
+    Args:
+        bsn: The BSN to evaluate for (will be overridden if acting_as is provided)
+        law: The law to evaluate
+        service: The service providing the law
+        machine_service: The engine interface
+        approved: Whether to use approved claims
+        claim_manager: Optional claim manager for pending changes
+        acting_as: Optional dict with role information when acting on behalf of someone
+                   Format: {"type": "PERSON"|"ORGANIZATION", "id": str, "legal_ground": str}
+
+    Returns:
+        Tuple of (law, result, parameters)
+    """
+
+    # If acting as someone else, use their ID for evaluation
+    if acting_as:
+        target_id = acting_as["id"]
+        if acting_as["type"] == "PERSON":
+            parameters = {"BSN": target_id}
+        else:  # ORGANIZATION
+            parameters = {"RSIN": target_id}
+        # Note: The audit trail should capture both actor (bsn) and subject (target_id)
+    else:
+        parameters = {"BSN": bsn}
+
     overwrite_input = None
 
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
@@ -98,8 +124,10 @@ async def execute_law(
     """Execute a law and render its result"""
     try:
         law = unquote(law)
+        # Get acting_as context from session
+        acting_as = request.session.get("acting_as")
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager
+            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager, acting_as=acting_as
         )
 
     except Exception as e:

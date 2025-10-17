@@ -23,7 +23,7 @@ from web.feature_flags import (
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
-from web.routers import admin, authorization, chat, dashboard, edit, importer, laws, mcp, simulation, wallet
+from web.routers import admin, chat, dashboard, edit, importer, laws, mcp, session, simulation, wallet
 
 app = FastAPI(title="RegelRecht")
 
@@ -44,12 +44,12 @@ if STATIC_DIR.exists():
 # Include routers
 app.include_router(laws.router)
 app.include_router(admin.router)
-app.include_router(authorization.router)
 app.include_router(dashboard.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
 app.include_router(importer.router)
 app.include_router(mcp.router)
+app.include_router(session.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 

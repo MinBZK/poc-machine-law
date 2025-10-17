@@ -1,0 +1,881 @@
+# ===== AUTHORIZATION TEST PROFILES =====
+# Test data voor machtigingen & vertegenwoordiging implementatie
+# Bevat: Families (ouderlijk gezag), Curatele, Bewindvoering, Mentorschap, Volmacht, Bedrijven (KVK)
+
+# ===== FAMILIES (Ouderlijk Gezag) =====
+families:
+  - family_id: FAM001
+    description: "Normaal gezin met twee minderjarige kinderen"
+    members:
+      - bsn: "100000001"
+        naam: "Jan Jansen"
+        geboortedatum: "1985-03-15"
+        leeftijd: 40
+      - bsn: "100000002"
+        naam: "Maria Jansen"
+        geboortedatum: "1987-06-20"
+        leeftijd: 38
+      - bsn: "100000003"
+        naam: "Piet Jansen"
+        geboortedatum: "2015-09-10"
+        leeftijd: 10
+      - bsn: "100000004"
+        naam: "Anna Jansen"
+        geboortedatum: "2007-12-05"
+        leeftijd: 17
+    relations:
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000001"
+        kind_bsn: "100000003"
+        heeft_gezag: true
+        gezag_ontzegd: false
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000002"
+        kind_bsn: "100000003"
+        heeft_gezag: true
+        gezag_ontzegd: false
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000001"
+        kind_bsn: "100000004"
+        heeft_gezag: true
+        gezag_ontzegd: false
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000002"
+        kind_bsn: "100000004"
+        heeft_gezag: true
+        gezag_ontzegd: false
+
+  - family_id: FAM002
+    description: "Gescheiden ouders, moeder heeft gezag, vader niet"
+    members:
+      - bsn: "100000011"
+        naam: "Kees de Vries"
+        geboortedatum: "1980-07-22"
+        leeftijd: 45
+      - bsn: "100000012"
+        naam: "Sophie de Vries"
+        geboortedatum: "1982-11-30"
+        leeftijd: 43
+      - bsn: "100000013"
+        naam: "Emma de Vries"
+        geboortedatum: "2012-05-18"
+        leeftijd: 13
+    relations:
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000011"
+        kind_bsn: "100000013"
+        heeft_gezag: false  # Vader heeft geen gezag na scheiding
+        gezag_ontzegd: false
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000012"
+        kind_bsn: "100000013"
+        heeft_gezag: true  # Moeder heeft gezag
+        gezag_ontzegd: false
+
+  - family_id: FAM003
+    description: "Ouder met ontzet ouderlijk gezag door rechter"
+    members:
+      - bsn: "100000021"
+        naam: "Peter Bakker"
+        geboortedatum: "1975-02-14"
+        leeftijd: 50
+      - bsn: "100000022"
+        naam: "Linda Bakker"
+        geboortedatum: "1976-08-20"
+        leeftijd: 49
+      - bsn: "100000023"
+        naam: "Lisa Bakker"
+        geboortedatum: "2010-08-25"
+        leeftijd: 15
+    relations:
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000021"
+        kind_bsn: "100000023"
+        heeft_gezag: false
+        gezag_ontzegd: true  # Rechter heeft gezag ontzegd
+        ontzetting_datum: "2020-06-15"
+        rechtbank: "Rechtbank Amsterdam"
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000022"
+        kind_bsn: "100000023"
+        heeft_gezag: true
+        gezag_ontzegd: false
+
+  - family_id: FAM004
+    description: "Kind net 18 geworden (meerderjarig)"
+    members:
+      - bsn: "100000031"
+        naam: "Hans Smit"
+        geboortedatum: "1978-03-10"
+        leeftijd: 47
+      - bsn: "100000032"
+        naam: "Eva Smit"
+        geboortedatum: "1980-09-15"
+        leeftijd: 45
+      - bsn: "100000033"
+        naam: "Tom Smit"
+        geboortedatum: "2007-10-16"  # Exact 18 jaar geleden
+        leeftijd: 18
+    relations:
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000031"
+        kind_bsn: "100000033"
+        heeft_gezag: false  # Eindigt bij 18 jaar
+        gezag_ontzegd: false
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000032"
+        kind_bsn: "100000033"
+        heeft_gezag: false  # Eindigt bij 18 jaar
+        gezag_ontzegd: false
+
+  - family_id: FAM005
+    description: "Stiefouder met gezamenlijk gezag"
+    members:
+      - bsn: "100000041"
+        naam: "Robert van Dam"
+        geboortedatum: "1983-05-12"
+        leeftijd: 42
+      - bsn: "100000042"
+        naam: "Petra van Dam"
+        geboortedatum: "1985-08-22"
+        leeftijd: 40
+      - bsn: "100000043"
+        naam: "Julia van Dam"
+        geboortedatum: "2013-03-15"
+        leeftijd: 12
+    relations:
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000042"
+        kind_bsn: "100000043"
+        heeft_gezag: true  # Biologische moeder
+        gezag_ontzegd: false
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000041"
+        kind_bsn: "100000043"
+        heeft_gezag: true  # Stiefouder met gezamenlijk gezag
+        gezag_ontzegd: false
+        notities: "Gezamenlijk gezag toegekend via rechter"
+
+  - family_id: FAM006
+    description: "Opa/oma zonder voogdij (geen gezag)"
+    members:
+      - bsn: "100000051"
+        naam: "Henk Groot"
+        geboortedatum: "1955-02-10"
+        leeftijd: 70
+      - bsn: "100000052"
+        naam: "Annie Groot"
+        geboortedatum: "1957-07-20"
+        leeftijd: 68
+      - bsn: "100000053"
+        naam: "Tim Groot"
+        geboortedatum: "2014-11-05"
+        leeftijd: 10
+    relations:
+      - type: familie
+        relatie: "grootouder"
+        persoon1_bsn: "100000051"
+        persoon2_bsn: "100000053"
+      - type: familie
+        relatie: "grootouder"
+        persoon1_bsn: "100000052"
+        persoon2_bsn: "100000053"
+      # Geen ouderlijk gezag - grootouders hebben geen gezag zonder voogdij
+
+  - family_id: FAM007
+    description: "Voogd na adoptie"
+    members:
+      - bsn: "100000061"
+        naam: "Mark en Jolanda Visser"
+        geboortedatum: "1982-06-15"
+        leeftijd: 43
+      - bsn: "100000062"
+        naam: "Jolanda Visser"
+        geboortedatum: "1984-09-10"
+        leeftijd: 41
+      - bsn: "100000063"
+        naam: "Noah Visser"
+        geboortedatum: "2016-04-20"
+        leeftijd: 9
+    relations:
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000061"
+        kind_bsn: "100000063"
+        heeft_gezag: true
+        gezag_ontzegd: false
+        notities: "Voogdij via adoptie"
+      - type: ouderlijk_gezag
+        ouder_bsn: "100000062"
+        kind_bsn: "100000063"
+        heeft_gezag: true
+        gezag_ontzegd: false
+        notities: "Voogdij via adoptie"
+
+# ===== CURATELE CASES =====
+curatele_cases:
+  - case_id: CUR001
+    description: "Volledige curatele"
+    curator_bsn: "200000001"
+    curator_naam: "Mr. A. Advocaat"
+    curandus_bsn: "200000002"
+    curandus_naam: "B. Betrokkene"
+    curandus_geboortedatum: "1975-03-10"
+    type_curatele: "VOLLEDIG"
+    ingangsdatum: "2023-01-15"
+    einddatum: null
+    rechtbank: "Rechtbank Amsterdam"
+    beperkingen: []
+    grondslag: "BW 1:378"
+
+  - case_id: CUR002
+    description: "Beperkte curatele (alleen financieel)"
+    curator_bsn: "200000011"
+    curator_naam: "Mr. C. Curator"
+    curandus_bsn: "200000012"
+    curandus_naam: "D. Derde"
+    curandus_geboortedatum: "1980-05-20"
+    type_curatele: "BEPERKT"
+    ingangsdatum: "2024-03-01"
+    einddatum: null
+    rechtbank: "Rechtbank Rotterdam"
+    beperkingen: ["financieel"]  # Alleen financieel, niet medisch
+    grondslag: "BW 1:381"
+
+  - case_id: CUR003
+    description: "Beperkte curatele (financieel en medisch)"
+    curator_bsn: "200000013"
+    curator_naam: "Mr. E. Expert"
+    curandus_bsn: "200000014"
+    curandus_naam: "F. Fractal"
+    curandus_geboortedatum: "1970-12-12"
+    type_curatele: "BEPERKT"
+    ingangsdatum: "2023-06-01"
+    einddatum: null
+    rechtbank: "Rechtbank Utrecht"
+    beperkingen: ["financieel", "medisch"]
+    grondslag: "BW 1:381"
+
+  - case_id: CUR004
+    description: "Tijdelijke curatele (verlopen)"
+    curator_bsn: "200000021"
+    curator_naam: "Mr. G. Geldman"
+    curandus_bsn: "200000022"
+    curandus_naam: "H. Herstel"
+    curandus_geboortedatum: "1985-08-15"
+    type_curatele: "VOLLEDIG"
+    ingangsdatum: "2022-01-01"
+    einddatum: "2024-01-01"  # Verlopen
+    rechtbank: "Rechtbank Den Haag"
+    beperkingen: []
+    grondslag: "BW 1:378"
+
+  - case_id: CUR005
+    description: "Co-curatoren (gezamenlijk bevoegd)"
+    curator_bsn: "200000031"
+    curator_naam: "Mr. I. Inkomen"
+    co_curator_bsn: "200000032"
+    co_curator_naam: "Mr. J. Jurist"
+    curandus_bsn: "200000033"
+    curandus_naam: "K. Kwetsbaar"
+    curandus_geboortedatum: "1968-11-25"
+    type_curatele: "VOLLEDIG"
+    ingangsdatum: "2023-09-01"
+    einddatum: null
+    rechtbank: "Rechtbank Arnhem"
+    beperkingen: []
+    grondslag: "BW 1:378"
+    notities: "Gezamenlijke curatele, beide curatoren moeten instemmen"
+
+  - case_id: CUR006
+    description: "Tijdelijke curatele (nog actief)"
+    curator_bsn: "200000041"
+    curator_naam: "Mr. L. Lawyer"
+    curandus_bsn: "200000042"
+    curandus_naam: "M. Middel"
+    curandus_geboortedatum: "1990-04-30"
+    type_curatele: "VOLLEDIG"
+    ingangsdatum: "2024-01-01"
+    einddatum: "2026-01-01"  # Nog niet verlopen
+    rechtbank: "Rechtbank Groningen"
+    beperkingen: []
+    grondslag: "BW 1:378"
+
+# ===== BEWINDVOERING CASES =====
+bewindvoering_cases:
+  - case_id: BEW001
+    description: "Beschermingsbewind (volledig)"
+    bewindvoerder_bsn: "210000001"
+    bewindvoerder_naam: "Bewindvoerder Stichting Amsterdam"
+    rechthebbende_bsn: "210000002"
+    rechthebbende_naam: "G. Geldgebrek"
+    rechthebbende_geboortedatum: "1978-06-12"
+    type_bewind: "VOLLEDIG_BEWIND"
+    ingangsdatum: "2023-06-01"
+    einddatum: null
+    rechtbank: "Rechtbank Utrecht"
+    grondslag: "BW 1:431"
+
+  - case_id: BEW002
+    description: "Beperkt bewind (specifieke zaken)"
+    bewindvoerder_bsn: "210000011"
+    bewindvoerder_naam: "N. Notaris BV"
+    rechthebbende_bsn: "210000012"
+    rechthebbende_naam: "O. Overspend"
+    rechthebbende_geboortedatum: "1982-09-20"
+    type_bewind: "BEPERKT_BEWIND"
+    ingangsdatum: "2024-02-01"
+    einddatum: null
+    rechtbank: "Rechtbank Amsterdam"
+    grondslag: "BW 1:431"
+    beperkingen: ["onroerend_goed", "grote_uitgaven"]
+
+  - case_id: BEW003
+    description: "Bewindvoering (beëindigd)"
+    bewindvoerder_bsn: "210000021"
+    bewindvoerder_naam: "P. Professioneel"
+    rechthebbende_bsn: "210000022"
+    rechthebbende_naam: "Q. Quit"
+    rechthebbende_geboortedatum: "1975-11-05"
+    type_bewind: "VOLLEDIG_BEWIND"
+    ingangsdatum: "2021-01-01"
+    einddatum: "2023-12-31"  # Beëindigd
+    rechtbank: "Rechtbank Rotterdam"
+    grondslag: "BW 1:431"
+
+  - case_id: BEW004
+    description: "Beschermingsbewind (actief, voor belastingaangifte)"
+    bewindvoerder_bsn: "210000031"
+    bewindvoerder_naam: "R. Regelaar"
+    rechthebbende_bsn: "210000032"
+    rechthebbende_naam: "S. Schulden"
+    rechthebbende_geboortedatum: "1988-03-18"
+    type_bewind: "VOLLEDIG_BEWIND"
+    ingangsdatum: "2023-08-01"
+    einddatum: null
+    rechtbank: "Rechtbank Den Haag"
+    grondslag: "BW 1:431"
+
+# ===== MENTORSCHAP CASES =====
+mentorschap_cases:
+  - case_id: MEN001
+    description: "Mentorschap voor persoonlijke aangelegenheden (volledig)"
+    mentor_bsn: "220000001"
+    mentor_naam: "H. Helper"
+    betrokkene_bsn: "220000002"
+    betrokkene_naam: "I. Incapabel"
+    betrokkene_geboortedatum: "1972-07-22"
+    ingangsdatum: "2024-01-01"
+    einddatum: null
+    rechtbank: "Rechtbank Arnhem"
+    bevoegdheden: ["medisch", "zorg", "wonen"]
+    grondslag: "BW 1:450"
+
+  - case_id: MEN002
+    description: "Mentorschap (alleen medisch)"
+    mentor_bsn: "220000011"
+    mentor_naam: "T. Toewijding"
+    betrokkene_bsn: "220000012"
+    betrokkene_naam: "U. Uniek"
+    betrokkene_geboortedatum: "1980-12-10"
+    ingangsdatum: "2023-09-01"
+    einddatum: null
+    rechtbank: "Rechtbank Maastricht"
+    bevoegdheden: ["medisch"]
+    grondslag: "BW 1:450"
+
+  - case_id: MEN003
+    description: "Mentorschap (medisch en zorg)"
+    mentor_bsn: "220000021"
+    mentor_naam: "V. Verzorger"
+    betrokkene_bsn: "220000022"
+    betrokkene_naam: "W. Wilskracht"
+    betrokkene_geboortedatum: "1976-04-15"
+    ingangsdatum: "2024-03-01"
+    einddatum: null
+    rechtbank: "Rechtbank Groningen"
+    bevoegdheden: ["medisch", "zorg"]
+    grondslag: "BW 1:450"
+
+  - case_id: MEN004
+    description: "Mentorschap (beëindigd)"
+    mentor_bsn: "220000031"
+    mentor_naam: "X. Ex-mentor"
+    betrokkene_bsn: "220000032"
+    betrokkene_naam: "Y. Yellend"
+    betrokkene_geboortedatum: "1983-09-20"
+    ingangsdatum: "2022-01-01"
+    einddatum: "2024-06-30"  # Beëindigd
+    rechtbank: "Rechtbank Utrecht"
+    bevoegdheden: ["medisch", "zorg", "wonen"]
+    grondslag: "BW 1:450"
+
+  - case_id: MEN005
+    description: "Mentorschap (alleen wonen en zorg, niet medisch)"
+    mentor_bsn: "220000041"
+    mentor_naam: "Z. Zorgzaam"
+    betrokkene_bsn: "220000042"
+    betrokkene_naam: "A. Anders"
+    betrokkene_geboortedatum: "1985-02-28"
+    ingangsdatum: "2024-05-01"
+    einddatum: null
+    rechtbank: "Rechtbank Amsterdam"
+    bevoegdheden: ["wonen", "zorg"]
+    grondslag: "BW 1:450"
+    notities: "Geen medische bevoegdheid, alleen wonen en zorg"
+
+# ===== VOLMACHT CASES =====
+volmacht_cases:
+  - case_id: VOL001
+    description: "Algemene volmacht (alle handelingen)"
+    gevolmachtigde_bsn: "230000001"
+    gevolmachtigde_naam: "J. Jurist"
+    volmachtgever_bsn: "230000002"
+    volmachtgever_naam: "K. Klant"
+    volmachtgever_geboortedatum: "1965-08-10"
+    type_volmacht: "ALGEMEEN"
+    scope: ["*"]  # Alle handelingen
+    ingangsdatum: "2024-01-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Amsterdam"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL002
+    description: "Bijzondere volmacht (alleen belastingaangifte)"
+    gevolmachtigde_bsn: "230000011"
+    gevolmachtigde_naam: "L. Accountant"
+    volmachtgever_bsn: "230000012"
+    volmachtgever_naam: "M. Meneer"
+    volmachtgever_geboortedatum: "1972-11-20"
+    type_volmacht: "BIJZONDER"
+    scope: ["belasting_aangifte", "belasting_bezwaar"]
+    ingangsdatum: "2023-01-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Rotterdam"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL003
+    description: "Herroepen volmacht"
+    gevolmachtigde_bsn: "230000021"
+    gevolmachtigde_naam: "N. Notaris"
+    volmachtgever_bsn: "230000022"
+    volmachtgever_naam: "O. Opdrachtgever"
+    volmachtgever_geboortedatum: "1968-03-15"
+    type_volmacht: "ALGEMEEN"
+    scope: ["*"]
+    ingangsdatum: "2022-01-01"
+    einddatum: null
+    herroepen: true
+    herroepingsdatum: "2024-06-01"
+    notaris: "Notariskantoor Utrecht"
+    grondslag: "BW 3:61"
+
+  - case_id: VOL004
+    description: "Procuratie (bedrijfsvolmacht)"
+    gevolmachtigde_bsn: "230000031"
+    gevolmachtigde_naam: "P. Procuratiehouder"
+    volmachtgever_rsin: "001234567"
+    volmachtgever_naam: "Jansen BV"
+    type_volmacht: "PROCURATIE"
+    scope: ["contracten_tekenen", "bankzaken", "rechtszaken"]
+    ingangsdatum: "2023-06-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Amsterdam"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL005
+    description: "Volmacht voor bankzaken"
+    gevolmachtigde_bsn: "230000041"
+    gevolmachtigde_naam: "Q. Quinn"
+    volmachtgever_bsn: "230000042"
+    volmachtgever_naam: "R. Rijk"
+    volmachtgever_geboortedatum: "1955-09-25"
+    type_volmacht: "BIJZONDER"
+    scope: ["bankzaken"]
+    ingangsdatum: "2024-02-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Den Haag"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL006
+    description: "Partner met volmacht voor financiële zaken"
+    gevolmachtigde_bsn: "230000051"
+    gevolmachtigde_naam: "S. Spouse"
+    volmachtgever_bsn: "230000052"
+    volmachtgever_naam: "T. Together"
+    volmachtgever_geboortedatum: "1978-06-12"
+    type_volmacht: "BIJZONDER"
+    scope: ["bankzaken", "belasting_aangifte", "verzekeringen"]
+    ingangsdatum: "2023-08-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Arnhem"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL007
+    description: "Accountant met volmacht (bijv. voor belastingzaken)"
+    gevolmachtigde_bsn: "230000061"
+    gevolmachtigde_naam: "U. Accountant BV"
+    volmachtgever_bsn: "230000062"
+    volmachtgever_naam: "V. Vastgoed"
+    volmachtgever_geboortedatum: "1970-12-08"
+    type_volmacht: "BIJZONDER"
+    scope: ["belasting_aangifte", "belasting_bezwaar", "financiele_administratie"]
+    ingangsdatum: "2022-01-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Groningen"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL008
+    description: "Ex-accountant (volmacht herroepen)"
+    gevolmachtigde_bsn: "230000071"
+    gevolmachtigde_naam: "W. Was-accountant"
+    volmachtgever_bsn: "230000072"
+    volmachtgever_naam: "X. Ex-client"
+    volmachtgever_geboortedatum: "1973-05-20"
+    type_volmacht: "BIJZONDER"
+    scope: ["belasting_aangifte"]
+    ingangsdatum: "2020-01-01"
+    einddatum: null
+    herroepen: true
+    herroepingsdatum: "2024-01-15"
+    notaris: "Notariskantoor Maastricht"
+    grondslag: "BW 3:61"
+
+  - case_id: VOL009
+    description: "Tijdelijke volmacht (verlopen)"
+    gevolmachtigde_bsn: "230000081"
+    gevolmachtigde_naam: "Y. Yellend"
+    volmachtgever_bsn: "230000082"
+    volmachtgever_naam: "Z. Zorgzaam"
+    volmachtgever_geboortedatum: "1980-08-30"
+    type_volmacht: "BIJZONDER"
+    scope: ["onroerend_goed_verkoop"]
+    ingangsdatum: "2023-01-01"
+    einddatum: "2023-12-31"  # Verlopen
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Utrecht"
+    grondslag: "BW 3:60"
+
+  - case_id: VOL010
+    description: "Volmacht aan ouder van meerderjarig kind (met beperking)"
+    gevolmachtigde_bsn: "230000091"
+    gevolmachtigde_naam: "A. Ouder"
+    volmachtgever_bsn: "230000092"
+    volmachtgever_naam: "B. Beperkt"
+    volmachtgever_geboortedatum: "2005-04-15"
+    type_volmacht: "BIJZONDER"
+    scope: ["bankzaken", "administratie"]
+    ingangsdatum: "2024-01-01"
+    einddatum: null
+    herroepen: false
+    herroepingsdatum: null
+    notaris: "Notariskantoor Amsterdam"
+    grondslag: "BW 3:60"
+    notities: "Meerderjarig kind met beperking geeft ouder volmacht"
+
+# ===== BEDRIJVEN (KVK) =====
+bedrijven:
+  - kvk_nummer: "12345678"
+    rsin: "001234567"
+    naam: "Jansen BV"
+    rechtsvorm: "BV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2015-01-15"
+    vestigingsplaats: "Amsterdam"
+    functionarissen:
+      - bsn: "100000001"  # Jan Jansen (uit FAM001)
+        naam: "Jan Jansen"
+        functie: "BESTUURDER"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2020-01-01"
+        einddatum: null
+
+  - kvk_nummer: "23456789"
+    rsin: "002345678"
+    naam: "De Vries VOF"
+    rechtsvorm: "VOF"
+    status: "ACTIEF"
+    oprichtingsdatum: "2019-06-01"
+    vestigingsplaats: "Rotterdam"
+    functionarissen:
+      - bsn: "100000011"  # Kees de Vries (uit FAM002)
+        naam: "Kees de Vries"
+        functie: "VENNOOT"
+        bevoegdheid: "GEZAMENLIJK"
+        status: "ACTIEF"
+        ingangsdatum: "2019-06-01"
+        einddatum: null
+      - bsn: "300000001"
+        naam: "Piet Partner"
+        functie: "VENNOOT"
+        bevoegdheid: "GEZAMENLIJK"
+        status: "ACTIEF"
+        ingangsdatum: "2019-06-01"
+        einddatum: null
+
+  - kvk_nummer: "34567890"
+    rsin: "003456789"
+    naam: "Stichting Hulp"
+    rechtsvorm: "STICHTING"
+    status: "ACTIEF"
+    oprichtingsdatum: "2018-01-01"
+    vestigingsplaats: "Utrecht"
+    functionarissen:
+      - bsn: "200000001"  # Mr. A. Advocaat (ook curator in CUR001)
+        naam: "Mr. A. Advocaat"
+        functie: "BESTUURDER"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2018-01-01"
+        einddatum: null
+
+  - kvk_nummer: "45678901"
+    rsin: "004567890"
+    naam: "Ex-Bedrijf BV"
+    rechtsvorm: "BV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2020-01-01"
+    vestigingsplaats: "Den Haag"
+    functionarissen:
+      - bsn: "300000011"
+        naam: "Q. Quit"
+        functie: "BESTUURDER"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "BEËINDIGD"
+        ingangsdatum: "2020-01-01"
+        einddatum: "2023-12-31"  # Niet meer actief
+      - bsn: "300000012"
+        naam: "R. Replace"
+        functie: "BESTUURDER"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2024-01-01"
+        einddatum: null
+
+  - kvk_nummer: "56789012"
+    rsin: "005678901"
+    naam: "Commissaris Testen NV"
+    rechtsvorm: "NV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2021-01-01"
+    vestigingsplaats: "Amsterdam"
+    functionarissen:
+      - bsn: "300000021"
+        naam: "S. Supervisor"
+        functie: "COMMISSARIS"  # Toezicht, geen vertegenwoordiging
+        bevoegdheid: "GEEN"
+        status: "ACTIEF"
+        ingangsdatum: "2021-01-01"
+        einddatum: null
+      - bsn: "300000022"
+        naam: "T. Topman"
+        functie: "DIRECTEUR"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2021-01-01"
+        einddatum: null
+
+  - kvk_nummer: "67890123"
+    rsin: "006789012"
+    naam: "Maatschap Medisch"
+    rechtsvorm: "MAATSCHAP"
+    status: "ACTIEF"
+    oprichtingsdatum: "2017-03-15"
+    vestigingsplaats: "Groningen"
+    functionarissen:
+      - bsn: "300000031"
+        naam: "U. Uzelf"
+        functie: "ZAAKVOERDER"
+        bevoegdheid: "GEZAMENLIJK"
+        status: "ACTIEF"
+        ingangsdatum: "2017-03-15"
+        einddatum: null
+      - bsn: "300000032"
+        naam: "V. Vennoot"
+        functie: "ZAAKVOERDER"
+        bevoegdheid: "GEZAMENLIJK"
+        status: "ACTIEF"
+        ingangsdatum: "2017-03-15"
+        einddatum: null
+
+  - kvk_nummer: "78901234"
+    rsin: "007890123"
+    naam: "CV Investeren"
+    rechtsvorm: "CV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2020-09-01"
+    vestigingsplaats: "Arnhem"
+    functionarissen:
+      - bsn: "300000041"
+        naam: "W. Werkend"
+        functie: "BEHEREND_VENNOOT"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2020-09-01"
+        einddatum: null
+      - bsn: "300000042"
+        naam: "X. Xtra"
+        functie: "STILLE_VENNOOT"
+        bevoegdheid: "GEEN"  # Stille vennoot heeft geen vertegenwoordigingsbevoegdheid
+        status: "ACTIEF"
+        ingangsdatum: "2020-09-01"
+        einddatum: null
+
+  - kvk_nummer: "89012345"
+    rsin: "008901234"
+    naam: "Eenmanszaak Bakker"
+    rechtsvorm: "EENMANSZAAK"
+    status: "ACTIEF"
+    oprichtingsdatum: "2022-05-01"
+    vestigingsplaats: "Maastricht"
+    functionarissen:
+      - bsn: "300000051"
+        naam: "Y. Yellend"
+        functie: "EIGENAAR"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2022-05-01"
+        einddatum: null
+
+  - kvk_nummer: "90123456"
+    rsin: "009012345"
+    naam: "BV Meerdere Bestuurders"
+    rechtsvorm: "BV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2019-01-01"
+    vestigingsplaats: "Utrecht"
+    functionarissen:
+      - bsn: "300000061"
+        naam: "Z. Zelfstandig"
+        functie: "BESTUURDER"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2019-01-01"
+        einddatum: null
+      - bsn: "300000062"
+        naam: "A. Anders"
+        functie: "BESTUURDER"
+        bevoegdheid: "GEZAMENLIJK"
+        status: "ACTIEF"
+        ingangsdatum: "2020-01-01"
+        einddatum: null
+      - bsn: "300000063"
+        naam: "B. Beperkt"
+        functie: "BESTUURDER"
+        bevoegdheid: "BEPERKT"
+        status: "ACTIEF"
+        ingangsdatum: "2021-01-01"
+        einddatum: null
+        notities: "Beperkte bevoegdheid: alleen voor dagelijkse zaken"
+
+  - kvk_nummer: "01234567"
+    rsin: "000123456"
+    naam: "Aandeelhouder Test BV"
+    rechtsvorm: "BV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2020-03-01"
+    vestigingsplaats: "Amsterdam"
+    functionarissen:
+      - bsn: "300000071"
+        naam: "C. CEO"
+        functie: "BESTUURDER"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2020-03-01"
+        einddatum: null
+      - bsn: "300000072"
+        naam: "D. Dividend"
+        functie: "AANDEELHOUDER"
+        bevoegdheid: "GEEN"  # Aandeelhouder zonder bestuursfunctie heeft geen vertegenwoordigingsbevoegdheid
+        status: "ACTIEF"
+        ingangsdatum: "2020-03-01"
+        einddatum: null
+        aandelen_percentage: 75
+
+  - kvk_nummer: "11223344"
+    rsin: "001122334"
+    naam: "NV Met Procuratie"
+    rechtsvorm: "NV"
+    status: "ACTIEF"
+    oprichtingsdatum: "2018-06-01"
+    vestigingsplaats: "Rotterdam"
+    functionarissen:
+      - bsn: "300000081"
+        naam: "E. Executive"
+        functie: "DIRECTEUR"
+        bevoegdheid: "ZELFSTANDIG"
+        status: "ACTIEF"
+        ingangsdatum: "2018-06-01"
+        einddatum: null
+      - bsn: "230000031"  # P. Procuratiehouder (uit VOL004)
+        naam: "P. Procuratiehouder"
+        functie: "PROCURATIEHOUDER"
+        bevoegdheid: "BEPERKT"
+        status: "ACTIEF"
+        ingangsdatum: "2023-06-01"
+        einddatum: null
+        notities: "Heeft procuratie, kan namens bedrijf handelen binnen bepaalde grenzen"
+
+# ===== COMPLEX SCENARIOS (voor edge case testing) =====
+complex_scenarios:
+  - scenario_id: COMPLEX001
+    description: "Persoon is zowel ouder als curator (voor verschillende personen)"
+    persoon_bsn: "100000001"  # Jan Jansen
+    rollen:
+      - rol: "ouder"
+        target_bsn: "100000003"  # Piet Jansen
+        grondslag: "ouderlijk_gezag"
+      - rol: "bestuurder"
+        target_rsin: "001234567"  # Jansen BV
+        grondslag: "kvk_vertegenwoordiging"
+    notities: "Kan optreden voor kind via ouderlijk gezag EN voor BV via bestuursfunctie"
+
+  - scenario_id: COMPLEX002
+    description: "Persoon met bewindvoering EN mentorschap (door verschillende personen)"
+    betrokkene_bsn: "240000001"
+    betrokkene_naam: "Combinatie Persoon"
+    bewindvoerder_bsn: "210000001"  # Voor financiële zaken
+    mentor_bsn: "220000001"  # Voor persoonlijke zaken
+    notities: "Samen dekken bewindvoerder en mentor volledige vertegenwoordiging (zoals curatele)"
+
+  - scenario_id: COMPLEX003
+    description: "Ouder met ontzet gezag die later curator wordt van ander persoon"
+    persoon_bsn: "100000021"  # Peter Bakker
+    rollen:
+      - rol: "ex_ouder_ontzet_gezag"
+        target_bsn: "100000023"  # Lisa Bakker
+        status: "niet_bevoegd"
+      - rol: "curator"
+        target_bsn: "240000002"  # Andere persoon
+        status: "bevoegd"
+    notities: "Gezag ontzet voor eigen kind, maar wel curator voor andere persoon"
+
+  - scenario_id: COMPLEX004
+    description: "Meerderjarig kind met volmacht van ouder (omgekeerde relatie)"
+    ouder_bsn: "100000031"  # Hans Smit
+    kind_bsn: "100000033"  # Tom Smit (18+)
+    volmacht_richting: "kind_naar_ouder"
+    notities: "Na meerderjarigheid geen ouderlijk gezag meer, maar kan volmacht geven"
+
+  - scenario_id: COMPLEX005
+    description: "Bewindvoerder die ook bestuurder is van stichting"
+    persoon_bsn: "200000001"  # Mr. A. Advocaat
+    rollen:
+      - rol: "curator"
+        target_bsn: "200000002"  # B. Betrokkene
+      - rol: "bestuurder"
+        target_rsin: "003456789"  # Stichting Hulp
+    notities: "Kan professioneel curator zijn én bestuurder van stichting"
