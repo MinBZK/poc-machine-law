@@ -202,7 +202,8 @@ async def root(
         {
             "request": request,
             "profile": profile,
-            "bsn": display_bsn or bsn,
+            "bsn": display_bsn or bsn,  # BSN of the person whose data is shown
+            "actor_bsn": bsn,  # BSN of the logged-in user (for DigiD profile selector)
             "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
             "discoverable_service_laws": discoverable_laws,

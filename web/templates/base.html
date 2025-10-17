@@ -148,7 +148,7 @@
                     <div class="hidden lg:flex items-center space-x-2">
                         <!-- Desktop User Switcher -->
                         <div class="relative"
-                             x-data="{ profileSelectorOpen: false, selectedProfile: '{{ bsn }}' }">
+                             x-data="{ profileSelectorOpen: false, selectedProfile: '{{ actor_bsn }}' }">
                             <!-- DigiD Indicator with integrated logo -->
                             <div class="flex items-center space-x-2 bg-white text-gray-900 px-4 py-2 rounded w-[350px] cursor-pointer border border-gray-300 hover:border-blue-500"
                                  @click="profileSelectorOpen = !profileSelectorOpen">
@@ -158,11 +158,11 @@
                                 </div>
                                 <div class="flex-grow truncate">
                                     <div class="font-semibold">
-                                        {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer
+                                        {{ all_profiles[actor_bsn].name if actor_bsn in all_profiles else "Selecteer
                                         profiel" }}
                                     </div>
                                     <div class="text-xs text-gray-500 truncate">
-                                        {{ all_profiles[bsn].description if bsn in
+                                        {{ all_profiles[actor_bsn].description if actor_bsn in
                                         all_profiles else "" }}
                                     </div>
                                 </div>
@@ -186,7 +186,7 @@
                                 </div>
                                 {% for bsn_key, profile_data in all_profiles.items() %}
                                     <a href="/?bsn={{ bsn_key }}"
-                                       class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if bsn == bsn_key %}bg-blue-50{% endif %}">
+                                       class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if actor_bsn == bsn_key %}bg-blue-50{% endif %}">
                                         <div class="flex-shrink-0">
                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                  class="h-8 w-8 text-gray-400"
