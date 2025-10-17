@@ -124,13 +124,6 @@
             <!-- Role name: Show "Zichzelf" for SELF, name for others -->
             <span class="tracking-wide" x-text="(!currentRole || currentRole.type === 'SELF') ? 'Zichzelf' : currentRole.name"></span>
 
-            <!-- Warning badge if acting on behalf -->
-            <template x-if="currentRole && currentRole.type !== 'SELF'">
-                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-600 text-white">
-                    Namens
-                </span>
-            </template>
-
             <!-- Dropdown arrow -->
             <svg class="w-4 h-4 transition-transform duration-200 text-gray-400" :class="showRoleMenu ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
