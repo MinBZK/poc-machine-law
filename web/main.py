@@ -108,36 +108,64 @@ async def root(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
-    # Store BSN in session for role management
+    # Store actor BSN in session for role management
     request.session["bsn"] = bsn
 
-    profile = services.get_profile_data(bsn)
+    # Determine which profile to show based on acting_as role
+    acting_as = request.session.get("acting_as")
+    if acting_as and acting_as.get("type") == "PERSON":
+        # Acting as another person - show their profile
+        display_bsn = acting_as["id"]
+        profile = services.get_profile_data(display_bsn)
+    elif acting_as and acting_as.get("type") == "ORGANIZATION":
+        # Acting as organization - create organization profile
+        # TODO: Get organization data properly
+        display_bsn = None
+        profile = {
+            "naam": acting_as["name"],
+            "rsin": acting_as["id"],
+            "type": "ORGANIZATION",
+        }
+    else:
+        # Acting as self
+        display_bsn = bsn
+        profile = services.get_profile_data(bsn)
+
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
-    # Get accepted cases for this BSN
-    all_cases = case_manager.get_cases_by_bsn(bsn)
-    accepted_cases = [case for case in all_cases if case.status.value == "DECIDED" and case.approved is True]
-
-    # Build accepted_claims: {key: new_value} for claims belonging to accepted cases only
+    # Get accepted cases for the display BSN (or skip for organizations)
+    accepted_cases = []
     accepted_claims = {}
-    for case in accepted_cases:
-        claims = claim_manager.get_claim_by_bsn_service_law(
-            bsn, case.service, case.law, approved=False
-        )  # IMPROVE: use approved=True?
-        if claims:
-            for key, claim in claims.items():
-                accepted_claims[key] = claim.new_value
+    if display_bsn:
+        all_cases = case_manager.get_cases_by_bsn(display_bsn)
+        accepted_cases = [case for case in all_cases if case.status.value == "DECIDED" and case.approved is True]
+
+        # Build accepted_claims: {key: new_value} for claims belonging to accepted cases only
+        for case in accepted_cases:
+            claims = claim_manager.get_claim_by_bsn_service_law(
+                display_bsn, case.service, case.law, approved=False
+            )  # IMPROVE: use approved=True?
+            if claims:
+                for key, claim in claims.items():
+                    accepted_claims[key] = claim.new_value
+
+    # Get discoverable laws based on acting_as context
+    if display_bsn:
+        discoverable_laws = services.get_sorted_discoverable_service_laws(display_bsn)
+    else:
+        # For organizations, we'll need business laws - placeholder for now
+        discoverable_laws = services.get_sorted_discoverable_service_laws(bsn)
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "profile": profile,
-            "bsn": bsn,
+            "bsn": display_bsn or bsn,
             "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
-            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
+            "discoverable_service_laws": discoverable_laws,
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
