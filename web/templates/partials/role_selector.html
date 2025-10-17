@@ -94,15 +94,15 @@
      class="relative">
 
     <!-- Current Role Display -->
-    <div class="flex items-center gap-3 bg-white px-4 py-3 rounded-xl border border-gray-200 shadow-sm">
-        <span class="text-base font-medium text-gray-700">Handelend als:</span>
+    <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-white">Handelend als:</span>
 
         <button @click="showRoleMenu = !showRoleMenu"
                 :disabled="loading"
-                class="inline-flex items-center gap-2.5 px-4 py-2 text-base font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                class="inline-flex items-center gap-2.5 px-4 py-2 text-base font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-700 bg-white"
                 :class="currentRole && currentRole.type !== 'SELF'
-                    ? 'bg-blue-50 text-blue-900 hover:bg-blue-100 ring-1 ring-blue-200'
-                    : 'bg-gray-50 text-gray-900 hover:bg-gray-100 ring-1 ring-gray-200'">
+                    ? 'text-blue-900 hover:bg-blue-50'
+                    : 'text-gray-900 hover:bg-gray-50'">
 
             <!-- Icon based on role type -->
             <template x-if="!currentRole || currentRole.type === 'SELF'">
@@ -121,8 +121,8 @@
                 </svg>
             </template>
 
-            <!-- Role name with better typography -->
-            <span class="tracking-wide" x-text="currentRole ? currentRole.name : 'Zichzelf'"></span>
+            <!-- Role name: Show "Zichzelf" for SELF, name for others -->
+            <span class="tracking-wide" x-text="(!currentRole || currentRole.type === 'SELF') ? 'Zichzelf' : currentRole.name"></span>
 
             <!-- Warning badge if acting on behalf -->
             <template x-if="currentRole && currentRole.type !== 'SELF'">
@@ -183,7 +183,7 @@
 
                             <!-- Role info -->
                             <div class="flex-1 min-w-0">
-                                <div class="font-semibold text-base mb-0.5" x-text="role.name"></div>
+                                <div class="font-semibold text-base mb-0.5" x-text="role.type === 'SELF' ? 'Zichzelf' : role.name"></div>
                                 <template x-if="role.type !== 'SELF'">
                                     <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
                                         <!-- Legal ground badge -->
