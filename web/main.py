@@ -1,3 +1,4 @@
+import logging
 import sys
 from pathlib import Path
 
@@ -24,6 +25,8 @@ from web.feature_flags import (
     is_wallet_enabled,
 )
 from web.routers import admin, chat, dashboard, edit, importer, laws, mcp, session, simulation, wallet
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="RegelRecht")
 
@@ -118,12 +121,27 @@ async def root(
         display_bsn = acting_as["id"]
         profile = services.get_profile_data(display_bsn)
     elif acting_as and acting_as.get("type") == "ORGANIZATION":
-        # Acting as organization - create organization profile
-        # TODO: Get organization data properly
+        # Acting as organization - create organization profile with identifiers
         display_bsn = None
+        rsin = acting_as["id"]
+
+        # Get organization data from KVK services to find KVK_NUMMER
+        org_data = None
+        try:
+            kvk_service = services.services.get("KVK") if hasattr(services, "services") else None
+            if kvk_service:
+                # Look in bedrijven table
+                bedrijven = kvk_service.get("bedrijven", [])
+                org_data = next((b for b in bedrijven if b.get("rsin") == rsin), None)
+        except Exception as e:
+            logger.warning(f"Could not fetch organization data: {e}")
+
         profile = {
-            "naam": acting_as["name"],
-            "rsin": acting_as["id"],
+            "naam": org_data.get("naam") if org_data else acting_as["name"],
+            "rsin": rsin,
+            "kvk_nummer": org_data.get("kvk_nummer") if org_data else None,
+            "rechtsvorm": org_data.get("rechtsvorm") if org_data else None,
+            "status": org_data.get("status") if org_data else None,
             "type": "ORGANIZATION",
         }
     else:
@@ -152,10 +170,11 @@ async def root(
 
     # Get discoverable laws based on acting_as context
     if display_bsn:
+        # Person context - show citizen laws sorted by impact
         discoverable_laws = services.get_sorted_discoverable_service_laws(display_bsn)
     else:
-        # For organizations, we'll need business laws - placeholder for now
-        discoverable_laws = services.get_sorted_discoverable_service_laws(bsn)
+        # Organization context - show business laws (unsorted for now)
+        discoverable_laws = services.get_discoverable_service_laws(discoverable_by="BUSINESS")
 
     return templates.TemplateResponse(
         "index.html",
