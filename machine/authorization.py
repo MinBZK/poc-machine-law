@@ -319,22 +319,42 @@ class AuthorizationService:
 
     def _get_all_organizations(self) -> dict[str, dict[str, Any]]:
         """Get all organizations (from KVK data)"""
-        # TODO: Need to add get_all_organizations() to EngineInterface
-        # For now, extract from sources or return empty
-        try:
-            # Try to get from RuleService if available
-            if hasattr(self.engine, 'services') and 'KVK' in self.engine.services:
-                kvk_service = self.engine.services['KVK']
-                if hasattr(kvk_service, 'source_dataframes') and 'bedrijven' in kvk_service.source_dataframes:
-                    df = kvk_service.source_dataframes['bedrijven']
-                    # Convert DataFrame to dict keyed by RSIN
-                    orgs = {}
-                    for _, row in df.iterrows():
-                        rsin = row.get('rsin')
-                        if rsin:
-                            orgs[rsin] = row.to_dict()
-                    return orgs
-        except Exception as e:
-            logger.debug(f"Could not load organizations: {e}")
+        orgs = {}
 
-        return {}
+        try:
+            # Access KVK service - services is a dict on Services object
+            if hasattr(self.engine, 'services'):
+                services_dict = self.engine.services
+                kvk_service = services_dict.get('KVK') if isinstance(services_dict, dict) else None
+
+                if kvk_service and hasattr(kvk_service, 'source_dataframes'):
+                    # Try bedrijven table first
+                    if 'bedrijven' in kvk_service.source_dataframes:
+                        df = kvk_service.source_dataframes['bedrijven']
+                        for _, row in df.iterrows():
+                            rsin = row.get('rsin')
+                            if rsin:
+                                orgs[rsin] = {
+                                    'rsin': rsin,
+                                    'naam': row.get('naam', f'RSIN {rsin}'),
+                                    'rechtsvorm': row.get('rechtsvorm'),
+                                    'status': row.get('status'),
+                                }
+
+                    # If no bedrijven table, try to extract from functionarissen
+                    elif 'functionarissen' in kvk_service.source_dataframes:
+                        df = kvk_service.source_dataframes['functionarissen']
+                        for _, row in df.iterrows():
+                            rsin = row.get('rsin')
+                            if rsin and rsin not in orgs:
+                                orgs[rsin] = {
+                                    'rsin': rsin,
+                                    'naam': row.get('naam_bedrijf', f'RSIN {rsin}'),
+                                }
+
+            logger.debug(f"Found {len(orgs)} organizations from KVK data")
+
+        except Exception as e:
+            logger.warning(f"Could not load organizations: {e}")
+
+        return orgs

@@ -41,40 +41,112 @@ globalServices:
       rechtbank: RECHTBANK_GELDERLAND
   RvIG: &id004
     brp_relaties:
+    # Merijn's kinderen
     - bsn_ouder: '100000001'
       bsn_kind: '200000001'
       is_ouder: true
     - bsn_ouder: '100000001'
       bsn_kind: '200000002'
+      is_ouder: true
+    # Linda's kinderen
+    - bsn_ouder: '100000002'
+      bsn_kind: '200000003'
+      is_ouder: true
+    - bsn_ouder: '100000002'
+      bsn_kind: '200000004'
       is_ouder: true
     brp_personen:
     - bsn: '200000001'
       geboortedatum: '2020-01-01'
       leeftijd: 5
-      naam: Kind 1
+      naam: Emma van der Meer
     - bsn: '200000002'
       geboortedatum: '2022-01-01'
       leeftijd: 3
-      naam: Kind 2
+      naam: Lucas van der Meer
+    # Oudere onder curatele (dementie)
+    - bsn: '300000001'
+      geboortedatum: '1945-03-20'
+      leeftijd: 80
+      naam: Jan Bakker
+    # Ouder van Merijn (volmacht)
+    - bsn: '300000002'
+      geboortedatum: '1955-11-10'
+      leeftijd: 69
+      naam: Maria van der Meer
+    # Linda's kinderen
+    - bsn: '200000003'
+      geboortedatum: '2018-08-15'
+      leeftijd: 7
+      naam: Sophie Fieltlep
+    - bsn: '200000004'
+      geboortedatum: '2021-04-22'
+      leeftijd: 4
+      naam: Tim Fieltlep
     brp_gezagsrelaties:
+    # Merijn's gezag
     - bsn_ouder: '100000001'
       bsn_kind: '200000001'
       heeft_gezag: true
       gezag_ontzegd: false
     - bsn_ouder: '100000001'
       bsn_kind: '200000002'
+      heeft_gezag: true
+      gezag_ontzegd: false
+    # Linda's gezag
+    - bsn_ouder: '100000002'
+      bsn_kind: '200000003'
+      heeft_gezag: true
+      gezag_ontzegd: false
+    - bsn_ouder: '100000002'
+      bsn_kind: '200000004'
       heeft_gezag: true
       gezag_ontzegd: false
   RECHTSPRAAK: &id005
     curatele_register:
+    # Ouderlijk gezag records - Merijn
     - bsn_ouder: '100000001'
       bsn_kind: '200000001'
       ontzetting_ouderlijk_gezag: false
     - bsn_ouder: '100000001'
       bsn_kind: '200000002'
       ontzetting_ouderlijk_gezag: false
+    # Ouderlijk gezag records - Linda
+    - bsn_ouder: '100000002'
+      bsn_kind: '200000003'
+      ontzetting_ouderlijk_gezag: false
+    - bsn_ouder: '100000002'
+      bsn_kind: '200000004'
+      ontzetting_ouderlijk_gezag: false
+    # Merijn is curator voor een oudere met dementie
+    - curator_bsn: '100000001'
+      curandus_bsn: '300000001'
+      uitspraak_bestaat: true
+      type_curatele: 'VOLLEDIG'
+      ingangsdatum: '2023-01-15'
+      einddatum: null
+      beperkingen: null
+  ALGEMEEN: &id007
+    volmachten:
+    # Merijn heeft volmacht van zijn ouders voor hun financiële zaken
+    - gevolmachtigde_bsn: '100000001'
+      volmachtgever_bsn: '300000002'
+      target_type: 'PERSON'
+      type_volmacht: 'FINANCIEEL'
+      geldig_vanaf: '2022-06-01'
+      geldig_tot: null
+      beperkingen: ['hypotheek', 'verkoop_onroerend_goed']
+    # Merijn heeft bedrijfsvolmacht voor een partner bedrijf
+    - gevolmachtigde_bsn: '100000001'
+      volmachtgever_rsin: '004567890'
+      target_type: 'ORGANIZATION'
+      type_volmacht: 'BEDRIJFSHANDELINGEN'
+      geldig_vanaf: '2021-09-01'
+      geldig_tot: '2026-09-01'
+      beperkingen: ['contracten_tot_50000']
   KVK: &id006
     functionarissen:
+    # Merijn is bestuurder van Thuiszorg BV
     - bsn: '100000001'
       rsin: '001234567'
       naam_bedrijf: 'Thuiszorg Merijn BV'
@@ -83,11 +155,52 @@ globalServices:
       status: 'ACTIEF'
       ingangsdatum: '2020-01-01'
       einddatum: null
+    # Merijn is ook directeur van een holding
+    - bsn: '100000001'
+      rsin: '002345678'
+      naam_bedrijf: 'Merijn Holding BV'
+      functie: 'DIRECTEUR'
+      bevoegdheid: 'GEZAMENLIJK'
+      status: 'ACTIEF'
+      ingangsdatum: '2018-06-15'
+      einddatum: null
+    # Merijn is vennoot in een VOF
+    - bsn: '100000001'
+      rsin: '003456789'
+      naam_bedrijf: 'Zorgadvies Partners VOF'
+      functie: 'VENNOOT'
+      bevoegdheid: 'ZELFSTANDIG'
+      status: 'ACTIEF'
+      ingangsdatum: '2019-03-01'
+      einddatum: null
     bedrijven:
     - kvk_nummer: '12345678'
       rsin: '001234567'
       naam: 'Thuiszorg Merijn BV'
       rechtsvorm: 'BV'
+      status: 'ACTIEF'
+    - kvk_nummer: '23456789'
+      rsin: '002345678'
+      naam: 'Merijn Holding BV'
+      rechtsvorm: 'BV'
+      status: 'ACTIEF'
+    - kvk_nummer: '34567890'
+      rsin: '003456789'
+      naam: 'Zorgadvies Partners VOF'
+      rechtsvorm: 'VOF'
+      status: 'ACTIEF'
+    inschrijvingen:
+    - rsin: '001234567'
+      kvk_nummer: '12345678'
+      rechtsvorm: 'BV'
+      status: 'ACTIEF'
+    - rsin: '002345678'
+      kvk_nummer: '23456789'
+      rechtsvorm: 'BV'
+      status: 'ACTIEF'
+    - rsin: '003456789'
+      kvk_nummer: '34567890'
+      rechtsvorm: 'VOF'
       status: 'ACTIEF'
 profiles:
   '100000001':
