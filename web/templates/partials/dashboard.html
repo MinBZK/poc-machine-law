@@ -123,10 +123,13 @@
     <div class="p-6">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
+                <h3 class="font-semibold text-lg">{{ profile.naam if profile.get('type') == 'ORGANIZATION' else profile.name }}</h3>
                 <div class="text-sm text-gray-600 mt-1">
-                    BSN: {{ bsn }} | Geboortedatum: {{
-                    profile.sources.RvIG.personen[0].geboortedatum|format_date }}
+                    {% if profile.get('type') == 'ORGANIZATION' %}
+                        RSIN: {{ profile.rsin }} | KVK: {{ profile.kvk_nummer }}{% if profile.rechtsvorm %} | Rechtsvorm: {{ profile.rechtsvorm }}{% endif %}
+                    {% else %}
+                        BSN: {{ bsn }} | Geboortedatum: {{ profile.sources.RvIG.personen[0].geboortedatum|format_date }}
+                    {% endif %}
                 </div>
             </div>
             <button class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
@@ -143,10 +146,45 @@
         <!-- Uitklapbare sectie -->
         <div id="profile-details" class="hidden">
             <div class="border-t pt-4 mt-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Persoonsgegevens -->
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
+                {% if profile.get('type') == 'ORGANIZATION' %}
+                    <!-- Organization details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Organisatiegegevens</h4>
+                            <dl class="space-y-2">
+                                <div>
+                                    <dt class="text-sm text-gray-600">Naam</dt>
+                                    <dd>{{ profile.naam }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm text-gray-600">RSIN</dt>
+                                    <dd>{{ profile.rsin }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm text-gray-600">KVK Nummer</dt>
+                                    <dd>{{ profile.kvk_nummer or 'Niet beschikbaar' }}</dd>
+                                </div>
+                                {% if profile.rechtsvorm %}
+                                <div>
+                                    <dt class="text-sm text-gray-600">Rechtsvorm</dt>
+                                    <dd>{{ profile.rechtsvorm }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if profile.status %}
+                                <div>
+                                    <dt class="text-sm text-gray-600">Status</dt>
+                                    <dd>{{ profile.status }}</dd>
+                                </div>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Person details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Persoonsgegevens -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
                         <dl class="space-y-2">
                             <div>
                                 <dt class="text-sm text-gray-600">Nationaliteit</dt>
@@ -326,6 +364,7 @@
                         </div>
                     {% endif %}
                 </div>
+                {% endif %} {# End person/organization check #}
             </div>
         </div>
     </div>

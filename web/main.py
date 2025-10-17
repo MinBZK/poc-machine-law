@@ -128,13 +128,28 @@ async def root(
         # Get organization data from KVK services to find KVK_NUMMER
         org_data = None
         try:
-            kvk_service = services.services.get("KVK") if hasattr(services, "services") else None
-            if kvk_service:
-                # Look in bedrijven table
-                bedrijven = kvk_service.get("bedrijven", [])
-                org_data = next((b for b in bedrijven if b.get("rsin") == rsin), None)
+            # Access KVK service - handle both raw dict and Services object
+            kvk_service = None
+            if hasattr(services, "services"):
+                services_obj = services.services
+                # Check if it's a Services object with nested services dict
+                if hasattr(services_obj, "services") and isinstance(services_obj.services, dict):
+                    kvk_service = services_obj.services.get("KVK")
+                # Or if it's already a dict
+                elif isinstance(services_obj, dict):
+                    kvk_service = services_obj.get("KVK")
+
+            if kvk_service and hasattr(kvk_service, "source_dataframes"):
+                # Access bedrijven dataframe
+                if "bedrijven" in kvk_service.source_dataframes:
+                    df = kvk_service.source_dataframes["bedrijven"]
+                    # Find organization by RSIN
+                    matching_rows = df[df["rsin"] == rsin]
+                    if not matching_rows.empty:
+                        org_row = matching_rows.iloc[0]
+                        org_data = org_row.to_dict()
         except Exception as e:
-            logger.warning(f"Could not fetch organization data: {e}")
+            logger.warning(f"Could not fetch organization data: {e}", exc_info=True)
 
         profile = {
             "naam": org_data.get("naam") if org_data else acting_as["name"],
@@ -174,7 +189,13 @@ async def root(
         discoverable_laws = services.get_sorted_discoverable_service_laws(display_bsn)
     else:
         # Organization context - show business laws (unsorted for now)
-        discoverable_laws = services.get_discoverable_service_laws(discoverable_by="BUSINESS")
+        business_laws_dict = services.get_discoverable_service_laws(discoverable_by="BUSINESS")
+        # Flatten dict format {service: [laws]} to list format [{service: ..., law: ...}]
+        discoverable_laws = [
+            {"service": service, "law": law}
+            for service in business_laws_dict
+            for law in business_laws_dict[service]
+        ]
 
     return templates.TemplateResponse(
         "index.html",
