@@ -47,7 +47,7 @@ type RuleContext struct {
 
 // NewRuleContext creates a new rule context
 func NewRuleContext(
-	definitions map[string]any, serviceProvider service.ServiceProvider,
+	service string, definitions map[string]any, serviceProvider service.ServiceProvider,
 	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
 	sources model.SourceDataFrame,
 	overwriteInput map[string]map[string]any, calculationDate string,
@@ -70,7 +70,7 @@ func NewRuleContext(
 		definitionresolver.New(definitions),
 		parameterresolver.New(parameters),
 		outputresolver,
-		overwriteresolver.New(propertySpecs, overwriteInput),
+		overwriteresolver.New(service, propertySpecs, overwriteInput),
 		sourceresolver.New(rc, serviceProvider, sources, propertySpecs),
 		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, calculationDate, approved),
 	}

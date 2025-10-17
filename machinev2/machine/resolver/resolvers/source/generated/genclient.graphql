@@ -1,13 +1,13 @@
 # Write your query or mutation here
-query ClaimAttributesByObjectID($bsn: ID!, $claimTypeName: String!) {
+query ClaimAttributesByObjectID($objectID: ID!, $time: DateTime!) {
   ClaimAttributesByObjectID(
-    claimTypeName: $claimTypeName
-    objectID: $bsn
+    claimTypeName: "Bsn"
+    objectID: $objectID
     dimensionData: {
       startType: "Annotation/ValidFrom"
       endType: "Annotation/ValidUntil"
       registrationTime: "2100-01-01T00:00:00Z"
-      secondaryTime: "2022-02-05T12:00:00Z"
+      secondaryTime: $time
     }
   ) {
     name
