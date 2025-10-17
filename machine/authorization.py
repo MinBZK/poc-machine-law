@@ -244,10 +244,18 @@ class AuthorizationService:
                 scope = result.output.get(law_config.get("scope_field"))
                 restrictions = result.output.get("beperkingen", [])
 
+                # Get name from brp_personen or target_profile
+                name = target_profile.get("naam") or target_profile.get("name")
+                if not name:
+                    # Try to get from RvIG brp_personen
+                    name = self._get_person_name(target_bsn)
+                if not name:
+                    name = f"BSN {target_bsn}"
+
                 return Role(
                     type="PERSON",
                     id=target_bsn,
-                    name=target_profile.get("naam", f"BSN {target_bsn}"),
+                    name=name,
                     legal_ground=law_config["name"],
                     legal_basis=law_config["legal_basis"],
                     scope=scope,
@@ -317,40 +325,74 @@ class AuthorizationService:
         """Get all citizen profiles"""
         return self.engine.get_all_profiles()
 
+    def _get_person_name(self, bsn: str) -> str | None:
+        """Get person name from RvIG brp_personen table"""
+        try:
+            # Access RvIG service for brp_personen
+            if hasattr(self.engine, 'services'):
+                services_obj = self.engine.services
+
+                # Get RvIG service (handle both raw and wrapped)
+                rvig_service = None
+                if isinstance(services_obj, dict):
+                    rvig_service = services_obj.get('RvIG')
+                elif hasattr(services_obj, 'services') and isinstance(services_obj.services, dict):
+                    rvig_service = services_obj.services.get('RvIG')
+
+                if rvig_service and hasattr(rvig_service, 'source_dataframes'):
+                    if 'brp_personen' in rvig_service.source_dataframes:
+                        df = rvig_service.source_dataframes['brp_personen']
+                        # Find person by BSN
+                        matches = df[df['bsn'] == bsn]
+                        if not matches.empty:
+                            return matches.iloc[0].get('naam')
+        except Exception as e:
+            logger.debug(f"Could not get name for BSN {bsn}: {e}")
+
+        return None
+
     def _get_all_organizations(self) -> dict[str, dict[str, Any]]:
         """Get all organizations (from KVK data)"""
         orgs = {}
 
         try:
-            # Access KVK service - services is a dict on Services object
+            # Access KVK service - handle both raw Services and wrapped PythonMachineService
+            kvk_service = None
+
             if hasattr(self.engine, 'services'):
-                services_dict = self.engine.services
-                kvk_service = services_dict.get('KVK') if isinstance(services_dict, dict) else None
+                services_obj = self.engine.services
 
-                if kvk_service and hasattr(kvk_service, 'source_dataframes'):
-                    # Try bedrijven table first
-                    if 'bedrijven' in kvk_service.source_dataframes:
-                        df = kvk_service.source_dataframes['bedrijven']
-                        for _, row in df.iterrows():
-                            rsin = row.get('rsin')
-                            if rsin:
-                                orgs[rsin] = {
-                                    'rsin': rsin,
-                                    'naam': row.get('naam', f'RSIN {rsin}'),
-                                    'rechtsvorm': row.get('rechtsvorm'),
-                                    'status': row.get('status'),
-                                }
+                # Case 1: services is a dict (raw Services.services)
+                if isinstance(services_obj, dict):
+                    kvk_service = services_obj.get('KVK')
+                # Case 2: services is a Services object (PythonMachineService.services)
+                elif hasattr(services_obj, 'services') and isinstance(services_obj.services, dict):
+                    kvk_service = services_obj.services.get('KVK')
 
-                    # If no bedrijven table, try to extract from functionarissen
-                    elif 'functionarissen' in kvk_service.source_dataframes:
-                        df = kvk_service.source_dataframes['functionarissen']
-                        for _, row in df.iterrows():
-                            rsin = row.get('rsin')
-                            if rsin and rsin not in orgs:
-                                orgs[rsin] = {
-                                    'rsin': rsin,
-                                    'naam': row.get('naam_bedrijf', f'RSIN {rsin}'),
-                                }
+            if kvk_service and hasattr(kvk_service, 'source_dataframes'):
+                # Try bedrijven table first
+                if 'bedrijven' in kvk_service.source_dataframes:
+                    df = kvk_service.source_dataframes['bedrijven']
+                    for _, row in df.iterrows():
+                        rsin = row.get('rsin')
+                        if rsin:
+                            orgs[rsin] = {
+                                'rsin': rsin,
+                                'naam': row.get('naam', f'RSIN {rsin}'),
+                                'rechtsvorm': row.get('rechtsvorm'),
+                                'status': row.get('status'),
+                            }
+
+                # If no bedrijven table, try to extract from functionarissen
+                elif 'functionarissen' in kvk_service.source_dataframes:
+                    df = kvk_service.source_dataframes['functionarissen']
+                    for _, row in df.iterrows():
+                        rsin = row.get('rsin')
+                        if rsin and rsin not in orgs:
+                            orgs[rsin] = {
+                                'rsin': rsin,
+                                'naam': row.get('naam_bedrijf', f'RSIN {rsin}'),
+                            }
 
             logger.debug(f"Found {len(orgs)} organizations from KVK data")
 
