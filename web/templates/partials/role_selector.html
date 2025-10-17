@@ -99,10 +99,10 @@
 
         <button @click="showRoleMenu = !showRoleMenu"
                 :disabled="loading"
-                class="inline-flex items-center gap-2.5 px-4 py-2 text-base font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-700 bg-white"
+                class="inline-flex items-center gap-2.5 px-4 py-2 text-base font-semibold rounded border border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-700 bg-white w-[350px] cursor-pointer hover:border-blue-500"
                 :class="currentRole && currentRole.type !== 'SELF'
-                    ? 'text-blue-900 hover:bg-blue-50'
-                    : 'text-gray-900 hover:bg-gray-50'">
+                    ? 'text-blue-900'
+                    : 'text-gray-900'">
 
             <!-- Icon based on role type -->
             <template x-if="!currentRole || currentRole.type === 'SELF'">
