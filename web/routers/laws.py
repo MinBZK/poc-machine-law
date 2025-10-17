@@ -61,7 +61,10 @@ def evaluate_law(
         if acting_as["type"] == "PERSON":
             parameters = {"BSN": target_id}
         else:  # ORGANIZATION
+            # For organizations, pass both RSIN and KVK_NUMMER if available
             parameters = {"RSIN": target_id}
+            if "kvk_nummer" in acting_as and acting_as["kvk_nummer"]:
+                parameters["KVK_NUMMER"] = acting_as["kvk_nummer"]
         # Note: The audit trail should capture both actor (bsn) and subject (target_id)
     else:
         parameters = {"BSN": bsn}
@@ -393,8 +396,9 @@ async def application_panel(
     """Get the application panel with tabs"""
     try:
         law = unquote(law)
+        acting_as = request.session.get("acting_as")
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, acting_as=acting_as
         )
 
         value_tree = machine_service.extract_value_tree(result.path)

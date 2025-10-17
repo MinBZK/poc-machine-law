@@ -115,19 +115,57 @@ async def select_role(
             detail=f"Not authorized to act on behalf of {role.target_type} {role.target_id}",
         )
 
-    # Get target name from available roles (which already has the correct names)
-    available_roles = auth_service.get_available_roles(actor_bsn, reference_date=TODAY)
-    target_role = next((r for r in available_roles if r.id == role.target_id), None)
-    target_name = target_role.name if target_role else f"{role.target_type} {role.target_id}"
+    # Get target name based on type
+    if role.target_type == "PERSON":
+        # For persons, try to get from available roles or profile
+        available_roles = auth_service.get_available_roles(actor_bsn, reference_date=TODAY)
+        target_role = next((r for r in available_roles if r.id == role.target_id), None)
+        target_name = target_role.name if target_role else machine_service.get_profile_data(role.target_id).get("naam", f"BSN {role.target_id}")
+    elif role.target_type == "ORGANIZATION":
+        # For organizations, get name and KVK_NUMMER from KVK data
+        target_name = f"RSIN {role.target_id}"  # default
+        kvk_nummer = None
+        try:
+            # Access KVK service - handle both raw dict and Services object
+            kvk_service = None
+            if hasattr(machine_service, "services"):
+                services_obj = machine_service.services
+                # Check if it's a Services object with nested services dict
+                if hasattr(services_obj, "services") and isinstance(services_obj.services, dict):
+                    kvk_service = services_obj.services.get("KVK")
+                # Or if it's already a dict
+                elif isinstance(services_obj, dict):
+                    kvk_service = services_obj.get("KVK")
+
+            if kvk_service and hasattr(kvk_service, "source_dataframes"):
+                # Access bedrijven dataframe
+                if "bedrijven" in kvk_service.source_dataframes:
+                    df = kvk_service.source_dataframes["bedrijven"]
+                    # Find organization by RSIN
+                    matching_rows = df[df["rsin"] == role.target_id]
+                    if not matching_rows.empty:
+                        org_row = matching_rows.iloc[0]
+                        target_name = org_row.get("naam", target_name)
+                        kvk_nummer = org_row.get("kvk_nummer")
+        except Exception as e:
+            logger.warning(f"Could not fetch organization data: {e}", exc_info=True)
+    else:
+        target_name = f"{role.target_type} {role.target_id}"
 
     # Store in session
-    request.session["acting_as"] = {
+    acting_as_data = {
         "type": role.target_type,
         "id": role.target_id,
         "name": target_name,
         "legal_ground": legal_ground,
         "action": role.action,
     }
+
+    # For organizations, also store KVK_NUMMER if available
+    if role.target_type == "ORGANIZATION" and kvk_nummer:
+        acting_as_data["kvk_nummer"] = kvk_nummer
+
+    request.session["acting_as"] = acting_as_data
 
     return {
         "status": "ok",
