@@ -5,9 +5,10 @@ This module provides the core authorization logic for determining which roles
 a person can assume (acting as themselves, as another person, or as an organization).
 
 Architecture:
-- YAML files contain ONLY real Dutch laws
+- YAML files contain ONLY real Dutch laws (including discovery metadata)
 - This Python service provides orchestration/convenience layer
 - All authorization checks call individual law implementations
+- Laws are discovered dynamically via discovery metadata in YAML
 """
 
 import logging
@@ -15,6 +16,7 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from .service import Services
+from .utils import RuleResolver
 
 logger = logging.getLogger(__name__)
 
@@ -52,65 +54,6 @@ class Role:
     restrictions: list[str] | None = None
 
 
-# Configuration: Which laws check which authorization types
-AUTHORIZATION_LAWS = {
-    "person": [
-        {
-            "service": "RvIG",
-            "law": "burgerlijk_wetboek/ouderlijk_gezag",
-            "name": "Ouderlijk gezag",
-            "legal_basis": "BW 1:245",
-            "actor_param": "BSN_OUDER",
-            "target_param": "BSN_KIND",
-            "output_field": "mag_vertegenwoordigen",
-            "scope_field": "vertegenwoordigings_grondslag",
-        },
-        {
-            "service": "RECHTSPRAAK",
-            "law": "burgerlijk_wetboek/curatele",
-            "name": "Curatele",
-            "legal_basis": "BW 1:378",
-            "actor_param": "BSN_CURATOR",
-            "target_param": "BSN_CURANDUS",
-            "output_field": "mag_vertegenwoordigen",
-            "scope_field": "type_curatele",
-        },
-        {
-            "service": "ALGEMEEN",
-            "law": "burgerlijk_wetboek/volmacht",
-            "name": "Volmacht",
-            "legal_basis": "BW 3:60",
-            "actor_param": "BSN_GEVOLMACHTIGDE",
-            "target_param": "BSN_VOLMACHTGEVER",
-            "output_field": "mag_vertegenwoordigen",
-            "scope_field": "type_volmacht",
-        },
-    ],
-    "organization": [
-        {
-            "service": "KVK",
-            "law": "handelsregisterwet/vertegenwoordiging",
-            "name": "KVK Vertegenwoordiging",
-            "legal_basis": "Handelsregisterwet Art. 10",
-            "actor_param": "BSN_PERSOON",
-            "target_param": "RSIN",
-            "output_field": "mag_vertegenwoordigen",
-            "scope_field": "functie",
-        },
-        {
-            "service": "ALGEMEEN",
-            "law": "burgerlijk_wetboek/volmacht",
-            "name": "Bedrijfsvolmacht",
-            "legal_basis": "BW 3:60",
-            "actor_param": "BSN_GEVOLMACHTIGDE",
-            "target_param": "RSIN_VOLMACHTGEVER",
-            "output_field": "mag_vertegenwoordigen",
-            "scope_field": "type_volmacht",
-        },
-    ],
-}
-
-
 class AuthorizationService:
     """Service for checking authorization and determining available roles"""
 
@@ -122,6 +65,35 @@ class AuthorizationService:
             engine: The engine instance (Services or EngineInterface) for evaluating laws and accessing data
         """
         self.engine = engine
+        self.resolver = RuleResolver()
+        # Cache discovered laws to avoid repeated filesystem scans
+        self._authorization_laws_cache: dict[str, list[dict[str, Any]]] = {}
+
+    def _discover_authorization_laws(self, target_type: str) -> list[dict[str, Any]]:
+        """
+        Discover authorization laws from YAML discovery metadata
+
+        Args:
+            target_type: Type of target ("PERSON" or "ORGANIZATION")
+
+        Returns:
+            List of law configurations with discovery metadata
+        """
+        # Check cache first
+        cache_key = target_type.lower()
+        if cache_key in self._authorization_laws_cache:
+            return self._authorization_laws_cache[cache_key]
+
+        # Discover laws with purpose="authorization" and matching target_type
+        laws = self.resolver.get_laws_by_discovery(
+            purpose="authorization",
+            target_type=target_type.upper()
+        )
+
+        # Cache the result
+        self._authorization_laws_cache[cache_key] = laws
+
+        return laws
 
     def get_available_roles(
         self, actor_bsn: str, reference_date: str | None = None
@@ -153,12 +125,13 @@ class AuthorizationService:
             )
 
         # Check person-based authorizations
+        person_laws = self._discover_authorization_laws("PERSON")
         all_profiles = self._get_all_profiles()
         for target_bsn, target_profile in all_profiles.items():
             if target_bsn == actor_bsn:
                 continue  # Skip self
 
-            for law_config in AUTHORIZATION_LAWS["person"]:
+            for law_config in person_laws:
                 role = self._check_person_authorization(
                     actor_bsn, target_bsn, target_profile, law_config, reference_date
                 )
@@ -166,9 +139,10 @@ class AuthorizationService:
                     roles.append(role)
 
         # Check organization-based authorizations
+        org_laws = self._discover_authorization_laws("ORGANIZATION")
         all_organizations = self._get_all_organizations()
         for rsin, org_data in all_organizations.items():
-            for law_config in AUTHORIZATION_LAWS["organization"]:
+            for law_config in org_laws:
                 role = self._check_organization_authorization(
                     actor_bsn, rsin, org_data, law_config, reference_date
                 )
@@ -202,8 +176,8 @@ class AuthorizationService:
         if target_type == "PERSON" and target_id == actor_bsn:
             return (True, "Zelf")
 
-        # Check relevant laws
-        laws = AUTHORIZATION_LAWS.get(target_type.lower(), [])
+        # Discover relevant authorization laws
+        laws = self._discover_authorization_laws(target_type)
 
         for law_config in laws:
             try:

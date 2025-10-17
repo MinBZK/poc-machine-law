@@ -102,6 +102,46 @@ class RuleResolver:
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
         return self.discoverable_laws_by_service[discoverable_by]
 
+    def get_laws_by_discovery(self, purpose: str, target_type: str | None = None) -> list[dict[str, Any]]:
+        """
+        Get all laws that match discovery criteria
+
+        Args:
+            purpose: Discovery purpose (e.g., "authorization")
+            target_type: Optional target type filter (e.g., "PERSON", "ORGANIZATION")
+
+        Returns:
+            List of dicts with discovery metadata and law identifiers
+        """
+        matching_laws = []
+
+        for rule in self.rules:
+            spec = load_yaml_cached(rule.path)
+            discovery = spec.get('discovery', {})
+
+            # Check if law has discovery metadata matching criteria
+            if discovery.get('purpose') == purpose:
+                if target_type is None or discovery.get('target_type') == target_type:
+                    # Extract legal basis reference
+                    legal_basis_ref = spec.get('legal_basis', {})
+                    legal_basis_str = legal_basis_ref.get('article', '')
+                    if legal_basis_ref.get('law'):
+                        legal_basis_str = f"{legal_basis_ref.get('law')} Art. {legal_basis_str}"
+
+                    matching_laws.append({
+                        'service': rule.service,
+                        'law': rule.law,
+                        'name': discovery.get('display_name', rule.name),
+                        'legal_basis': legal_basis_str or rule.name,
+                        'actor_param': discovery.get('actor_param'),
+                        'target_param': discovery.get('target_param'),
+                        'output_field': discovery.get('authorization_field', 'mag_vertegenwoordigen'),
+                        'scope_field': 'vertegenwoordigings_grondslag',  # Standard field
+                        'discovery': discovery,
+                    })
+
+        return matching_laws
+
     def find_rule(self, law: str, reference_date: str, service: str | None = None) -> RuleSpec | None:
         """Find the applicable rule for a given law and reference date"""
         # Check if we have a cached result
