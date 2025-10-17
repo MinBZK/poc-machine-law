@@ -115,13 +115,10 @@ async def select_role(
             detail=f"Not authorized to act on behalf of {role.target_type} {role.target_id}",
         )
 
-    # Get target name
-    if role.target_type == "PERSON":
-        target_profile = machine_service.get_profile_data(role.target_id)
-        target_name = target_profile.get("naam", f"BSN {role.target_id}") if target_profile else f"BSN {role.target_id}"
-    else:
-        # TODO: Get organization name
-        target_name = f"RSIN {role.target_id}"
+    # Get target name from available roles (which already has the correct names)
+    available_roles = auth_service.get_available_roles(actor_bsn, reference_date=TODAY)
+    target_role = next((r for r in available_roles if r.id == role.target_id), None)
+    target_name = target_role.name if target_role else f"{role.target_type} {role.target_id}"
 
     # Store in session
     request.session["acting_as"] = {
