@@ -165,8 +165,14 @@ class MachineFactory:
         if engine_type == MachineType.INTERNAL:
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
+            logger.info(f"[MachineFactory] Creating PythonMachineService for engine: {engine_id}")
             return PythonMachineService(services)
         elif engine_type == MachineType.HTTP:
+            logger.info(
+                f"[MachineFactory] Creating HTTPMachineService for engine: {engine_id}, domain: {engine.domain}"
+            )
+            if engine.service_routing:
+                logger.info(f"[MachineFactory] Service routing config: enabled={engine.service_routing.enabled}")
             return HTTPMachineService(base_url=engine.domain, service_routing_config=engine.service_routing)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")
@@ -198,9 +204,15 @@ class CaseManagerFactory:
         if engine_type == MachineType.INTERNAL:
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
+            logger.info(f"[CaseManagerFactory] Creating PythonCaseManager for engine: {engine_id}")
             return PythonCaseManager(services)
         elif engine_type == MachineType.HTTP:
-            return HTTPCaseManager(base_url=engine.domain)
+            logger.info(
+                f"[CaseManagerFactory] Creating HTTPCaseManager for engine: {engine_id}, domain: {engine.domain}"
+            )
+            if engine.service_routing:
+                logger.info(f"[CaseManagerFactory] Service routing config: enabled={engine.service_routing.enabled}")
+            return HTTPCaseManager(base_url=engine.domain, service_routing_config=engine.service_routing)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")
 
@@ -231,8 +243,14 @@ class ClaimManagerFactory:
         if engine_type == MachineType.INTERNAL:
             if services is None:
                 raise ValueError("Services instance is required for internal Python implementation")
+            logger.info(f"[ClaimManagerFactory] Creating PythonClaimManager for engine: {engine_id}")
             return PythonClaimManager(services)
         elif engine_type == MachineType.HTTP:
-            return HTTPClaimManager(base_url=engine.domain)
+            logger.info(
+                f"[ClaimManagerFactory] Creating HTTPClaimManager for engine: {engine_id}, domain: {engine.domain}"
+            )
+            if engine.service_routing:
+                logger.info(f"[ClaimManagerFactory] Service routing config: enabled={engine.service_routing.enabled}")
+            return HTTPClaimManager(base_url=engine.domain, service_routing_config=engine.service_routing)
         else:
             raise ValueError(f"Unknown machine type: {engine_type}")

@@ -4,3 +4,7 @@ schema: schema.graphql
 operations:
   - genclient.graphql
 generated: generated.go
+
+bindings:
+  DateTime:
+    type: time.Time

@@ -12,6 +12,10 @@ engines:
     service_routing:
       enabled: false
       # When enabled, routes requests to different services based on service name
+      # Optional: Control whether to query all services for methods without service parameter
+      # query_all_for_cases: true    # Query all services for get_cases_by_bsn (default: true)
+      # query_all_for_claims: true   # Query all services for get_claims_by_bsn (default: true)
+      # query_all_for_profiles: false # Query all services for get_all_profiles (default: false, uses default URL)
       # services:
       #   TOESLAGEN:
       #     domain: http://localhost:8082/v0

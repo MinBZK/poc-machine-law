@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import Any
@@ -9,6 +10,8 @@ from web.config_loader import ServiceRoutingConfig
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
 from .machine_client.law_as_code_client import Client
+
+logger = logging.getLogger(__name__)
 from .machine_client.law_as_code_client.api.data_frames import set_source_data_frame
 from .machine_client.law_as_code_client.api.law import evaluate, rule_spec_get, service_laws_discoverable_list
 from .machine_client.law_as_code_client.api.profile import profile_get, profile_list
@@ -43,8 +46,10 @@ class MachineService(EngineInterface):
         self.client = httpx.AsyncClient(base_url=self.base_url)
         self.service_routing_enabled = False
         self.service_routes = {}
+        self._service_routing_config = service_routing_config
 
         if service_routing_config and service_routing_config.enabled:
+            self.service_routing_enabled = True
             self.service_routes = service_routing_config.services
 
     def _get_base_url_for_service(self, service: str) -> str:
@@ -54,7 +59,9 @@ class MachineService(EngineInterface):
         Otherwise, use the default base URL.
         """
         if self.service_routing_enabled and service in self.service_routes:
-            return self.service_routes[service].get("domain", self.base_url)
+            url = self.service_routes[service].domain
+            return url
+
         return self.base_url
 
     def get_rule_spec(self, law: str, reference_date: str, service: str) -> dict[str, Any]:
@@ -72,17 +79,26 @@ class MachineService(EngineInterface):
 
         # Instantiate the API client with service-specific base URL
         service_base_url = self._get_base_url_for_service(service)
+
         client = Client(base_url=service_base_url)
 
         reference_date = datetime.strptime(reference_date, "%Y-%m-%d").date()
 
-        with client as client:
-            response = rule_spec_get.sync_detailed(
-                client=client, service=service, law=law, reference_date=reference_date
-            )
-            content = response.parsed
+        try:
+            with client as client:
+                response = rule_spec_get.sync_detailed(
+                    client=client, service=service, law=law, reference_date=reference_date
+                )
 
-            return content.data.to_dict()
+                if response.status_code < 200 or response.status_code >= 300:
+                    logger.error(f"[MachineService] Non-2xx status code: {response.status_code}")
+
+                content = response.parsed
+                return content.data.to_dict()
+        except Exception as e:
+            logger.error(f"[MachineService] EXCEPTION in get_rule_spec(): {type(e).__name__}: {e}", exc_info=True)
+            logger.error(f"[MachineService] Request was to: {service_base_url} with service={service}, law={law}")
+            raise
 
     def evaluate(
         self,
@@ -100,6 +116,7 @@ class MachineService(EngineInterface):
 
         # Instantiate the API client with service-specific base URL
         service_base_url = self._get_base_url_for_service(service)
+
         client = Client(base_url=service_base_url)
 
         data = Evaluate(
@@ -119,6 +136,7 @@ class MachineService(EngineInterface):
 
         with client as client:
             response = evaluate.sync_detailed(client=client, body=body)
+
             return to_rule_result(response.parsed.data)
 
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
@@ -129,14 +147,37 @@ class MachineService(EngineInterface):
         """
         from web.feature_flags import FeatureFlags
 
-        # Instantiate the API client (uses default base URL for discovery)
+        result = defaultdict(set)
+
+        # When service routing is enabled, query all configured services
+        if self.service_routing_enabled and self.service_routes:
+            for service_name, service_config in self.service_routes.items():
+                client = Client(base_url=service_config.domain)
+                with client as client:
+                    response = service_laws_discoverable_list.sync_detailed(
+                        client=client, discoverable_by=discoverable_by
+                    )
+                    content = response.parsed
+
+                    for item in content.data:
+                        for law in item.laws:
+                            # Check if the law is enabled in feature flags
+                            # If flag doesn't exist, law is enabled by default
+                            if FeatureFlags.is_law_enabled(item.name, law.name):
+                                result[item.name].add(law.name)
+
+                    logger.debug(f"[MachineService] Found {len(content.data)} services with laws from {service_name}")
+
+            logger.debug(f"[MachineService] Total discoverable services: {len(result)}")
+            return result
+
+        # Default behavior: query single base_url
         client = Client(base_url=self.base_url)
 
         with client as client:
             response = service_laws_discoverable_list.sync_detailed(client=client, discoverable_by=discoverable_by)
             content = response.parsed
 
-            result = defaultdict(set)
             for item in content.data:
                 for law in item.laws:
                     # Check if the law is enabled in feature flags
@@ -147,7 +188,37 @@ class MachineService(EngineInterface):
             return result
 
     def get_all_profiles(self) -> dict[str, dict[str, Any]]:
-        # Instantiate the API client (uses default base URL for profiles)
+        # When service routing is enabled and configured to query all services
+        service_routing_config = getattr(self, "_service_routing_config", None)
+        query_all = (
+            service_routing_config and service_routing_config.query_all_for_profiles
+            if service_routing_config
+            else False
+        )
+
+        if self.service_routing_enabled and self.service_routes and query_all:
+            result = {}
+
+            for service_name, service_config in self.service_routes.items():
+                logger.debug(
+                    f"[MachineService] Querying profiles from service: {service_name} at {service_config.domain}"
+                )
+                client = Client(base_url=service_config.domain)
+                with client as client:
+                    response = profile_list.sync_detailed(client=client)
+                    content = response.parsed
+
+                    for item in content.data:
+                        # Use BSN as key - will overwrite if same profile exists in multiple services
+                        result[item.bsn] = profile_transform(item)
+
+                    logger.debug(f"[MachineService] Found {len(content.data)} profiles from {service_name}")
+
+            logger.debug(f"[MachineService] Total unique profiles found: {len(result)}")
+            return result
+
+        # Default behavior: query single base_url
+        logger.debug(f"[MachineService] get_all_profiles using base_url: {self.base_url}")
         client = Client(base_url=self.base_url)
 
         with client as client:
@@ -161,7 +232,8 @@ class MachineService(EngineInterface):
             return result
 
     def get_profile_data(self, bsn: str) -> dict[str, Any] | None:
-        # Instantiate the API client (uses default base URL for profiles)
+        # Always use default base_url for profile data (profiles are centralized)
+        # Service routing does not apply to individual profile lookups
         client = Client(base_url=self.base_url)
 
         with client as client:

@@ -10,12 +10,14 @@ import (
 var _ resolver.Resolver = &PropertySpecOverwriteResolver{}
 
 type PropertySpecOverwriteResolver struct {
+	service        string
 	propertySpec   map[string]ruleresolver.Field
 	overwriteInput map[string]map[string]any
 }
 
-func New(propertySpec map[string]ruleresolver.Field, overwriteInput map[string]map[string]any) *PropertySpecOverwriteResolver {
+func New(service string, propertySpec map[string]ruleresolver.Field, overwriteInput map[string]map[string]any) *PropertySpecOverwriteResolver {
 	return &PropertySpecOverwriteResolver{
+		service:        service,
 		propertySpec:   propertySpec,
 		overwriteInput: overwriteInput,
 	}
@@ -28,17 +30,25 @@ func (l *PropertySpecOverwriteResolver) Resolve(ctx context.Context, key string)
 		return nil, false
 	}
 
-	var serviceRef *ruleresolver.ServiceReference
 	if spec.Input != nil {
-		serviceRef = &spec.Input.ServiceReference
+		return l.resolveServiceReference(spec.Input.ServiceReference)
 	} else if spec.Source != nil {
-		serviceRef = spec.Source.ServiceReference
+		if spec.Source.ServiceReference != nil {
+			return l.resolveServiceReference(*spec.Source.ServiceReference)
+		} else if spec.Source.SourceReference != nil {
+			return l.resolveSourceReference(*spec.Source.SourceReference)
+		}
 	}
 
-	if serviceRef == nil {
-		return nil, false
-	}
+	return nil, false
+}
 
+// ResolveType implements Resolver.
+func (l *PropertySpecOverwriteResolver) ResolveType() string {
+	return "OVERWRITE"
+}
+
+func (l *PropertySpecOverwriteResolver) resolveServiceReference(serviceRef ruleresolver.ServiceReference) (*resolver.Resolved, bool) {
 	if serviceRef.Service == "" || serviceRef.Field == "" || l.overwriteInput == nil {
 		return nil, false
 	}
@@ -56,7 +66,27 @@ func (l *PropertySpecOverwriteResolver) Resolve(ctx context.Context, key string)
 	return &resolver.Resolved{Value: value}, true
 }
 
-// ResolveType implements Resolver.
-func (l *PropertySpecOverwriteResolver) ResolveType() string {
-	return "OVERWRITE"
+func (l *PropertySpecOverwriteResolver) resolveSourceReference(sourceRef ruleresolver.SourceReference) (*resolver.Resolved, bool) {
+	input, ok := l.overwriteInput[l.service]
+	if !ok {
+		return nil, false
+	}
+
+	if sourceRef.Field != nil {
+		if value, ok := input[*sourceRef.Field]; ok {
+			return &resolver.Resolved{Value: value}, true
+		}
+
+	}
+
+	if sourceRef.Fields != nil {
+		for _, field := range *sourceRef.Fields {
+			if value, ok := input[field]; ok {
+				return &resolver.Resolved{Value: value}, true
+			}
+
+		}
+	}
+
+	return nil, false
 }

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
@@ -19,16 +21,12 @@ import (
 
 type ubbResolver struct {
 	propertySpec map[string]ruleresolver.Field
-	endpoint     string
 	client       graphql.Client
 }
 
 func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field) *ubbResolver {
-
-	endpoint = "http://belastingdienst-ace-svc/gql/grp/v0"
-
 	return &ubbResolver{
-		client:       graphql.NewClient(endpoint, http.DefaultClient),
+		client:       graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
 		propertySpec: propertySpec,
 	}
 
@@ -47,24 +45,15 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 
 	f := c.propertySpec[key]
 
-	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), pascalCase(table))
+	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("claim attributes object id: %w", err)
 	}
 
-	for _, value := range resp.ClaimAttributesByObjectID.Subvalues {
-		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table+strings.ReplaceAll(field, "_", ""))) {
-			v := value.Values[0]
-
-			return typespec.Enforce(model.TypeSpec(*f.Source.TypeSpec), v.Value), nil
-		}
-	}
-
-	return nil, nil
+	return solver(logr, table, field, resp.GetClaimAttributesByObjectID().Subvalues, f)
 }
 
 func pascalCase(s string) string {
-
 	// Remove all characters that are not alphanumeric or spaces or underscores
 	s = regexp.MustCompile("[^a-zA-Z0-9_ ]+").ReplaceAllString(s, "")
 
@@ -83,4 +72,83 @@ func pascalCase(s string) string {
 	}
 
 	return s
+}
+
+func solver(
+	logr logger.Logger,
+	table, field string,
+	values []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult,
+	f ruleresolver.Field,
+) (any, error) {
+
+	for _, value := range values {
+		// logr.Debug("VALUE", logger.NewField("value", value))
+
+		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(field)) ||
+			strings.EqualFold(pascalCase(field), strings.ToLower(value.Name)) {
+			return solveField(logr, value, f)
+		}
+
+		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) {
+			return solver(logr, table, field, conv(value.Values), f)
+		}
+	}
+
+	return nil, nil
+}
+
+func conv(
+	values []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResultValues,
+) []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult {
+	v := make([]machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult, 0, len(values))
+
+	for idx := range values {
+		v = append(v, machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult{
+			Values: []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResultValues{
+				{
+					Key:   values[idx].Key,
+					Value: values[idx].Value,
+				},
+			},
+		})
+	}
+
+	return v
+}
+
+func solveField(
+	logr logger.Logger,
+	value machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult,
+	f ruleresolver.Field,
+) (any, error) {
+	logr.Debug("Solve field", logger.NewField("value", value))
+	v := value.Values[0]
+
+	var x any = v.Value
+
+	logr.Debug("Solve field", logger.NewField("key", v.Key))
+	switch v.Key {
+	case "date":
+		t, err := strconv.Atoi(v.Value)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse date: %w", err)
+		}
+
+		x = time.Unix(int64(t), 0)
+	case "eurocent", "amountEurocent":
+		t, err := strconv.Atoi(v.Value)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse eurocent: %w", err)
+		}
+
+		x = t
+	default:
+		logr.Warning("unknown key", logger.NewField("key", v.Key))
+	}
+
+	if f.Source != nil && f.Source.TypeSpec != nil {
+		return typespec.Enforce(model.TypeSpec(*f.Source.TypeSpec), x), nil
+	}
+
+	return x, nil
 }

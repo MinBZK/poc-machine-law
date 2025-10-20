@@ -1,8 +1,11 @@
 import itertools
+import json
 import logging
 import random
 import sys
+import uuid
 from datetime import date, datetime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -13,6 +16,9 @@ from machine.service import Services
 # Create a logger for this module
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
+
+# Directory for storing populations
+POPULATIONS_DIR = Path("data/populations")
 
 
 class LawSimulator:
@@ -58,6 +64,107 @@ class LawSimulator:
             "medium": (700, 850),  # Upper social/lower private
             "high": (850, 1200),  # Private sector (some eligible for huurtoeslag)
         }
+
+    @staticmethod
+    def save_population(population_id: str, people: list, params: dict) -> None:
+        """Save a population to disk for reuse."""
+        POPULATIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Convert dates to ISO format for JSON serialization
+        serializable_people = []
+        for person in people:
+            person_copy = person.copy()
+            person_copy["birth_date"] = person["birth_date"].isoformat()
+            # Convert children data
+            if "children_data" in person_copy:
+                for child in person_copy["children_data"]:
+                    child["birth_date"] = child["birth_date"].isoformat()
+            serializable_people.append(person_copy)
+
+        # Save population data
+        population_file = POPULATIONS_DIR / f"{population_id}.json"
+        with open(population_file, "w") as f:
+            json.dump(serializable_people, f, indent=2)
+
+        # Save metadata
+        metadata = {
+            "population_id": population_id,
+            "created_at": datetime.now().isoformat(),
+            "num_people": len(people),
+            "params": params,
+            "demographics": {
+                "avg_age": sum(p["age"] for p in people) / len(people),
+                "with_partners_pct": sum(1 for p in people if p["has_partner"]) / len(people) * 100,
+                "students_pct": sum(1 for p in people if p["is_student"]) / len(people) * 100,
+                "renters_pct": sum(1 for p in people if p["housing_type"] == "rent") / len(people) * 100,
+                "with_children_pct": sum(1 for p in people if p["has_children"]) / len(people) * 100,
+            },
+        }
+
+        metadata_file = POPULATIONS_DIR / f"{population_id}.meta.json"
+        with open(metadata_file, "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        logger.info(f"Saved population {population_id} with {len(people)} people")
+
+    @staticmethod
+    def load_population(population_id: str) -> list:
+        """Load a previously saved population from disk."""
+        population_file = POPULATIONS_DIR / f"{population_id}.json"
+
+        if not population_file.exists():
+            raise FileNotFoundError(f"Population {population_id} not found")
+
+        with open(population_file) as f:
+            people_data = json.load(f)
+
+        # Convert ISO format strings back to date objects
+        for person in people_data:
+            person["birth_date"] = date.fromisoformat(person["birth_date"])
+            # Convert children data
+            if "children_data" in person:
+                for child in person["children_data"]:
+                    child["birth_date"] = date.fromisoformat(child["birth_date"])
+
+        logger.info(f"Loaded population {population_id} with {len(people_data)} people")
+        return people_data
+
+    @staticmethod
+    def list_populations() -> list[dict]:
+        """List all saved populations with their metadata."""
+        if not POPULATIONS_DIR.exists():
+            return []
+
+        populations = []
+        for meta_file in POPULATIONS_DIR.glob("*.meta.json"):
+            try:
+                with open(meta_file) as f:
+                    metadata = json.load(f)
+                populations.append(metadata)
+            except Exception as e:
+                logger.error(f"Error reading metadata file {meta_file}: {e}")
+
+        # Sort by creation date, newest first
+        populations.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        return populations
+
+    @staticmethod
+    def delete_population(population_id: str) -> bool:
+        """Delete a saved population and its metadata."""
+        population_file = POPULATIONS_DIR / f"{population_id}.json"
+        metadata_file = POPULATIONS_DIR / f"{population_id}.meta.json"
+
+        deleted = False
+        if population_file.exists():
+            population_file.unlink()
+            deleted = True
+        if metadata_file.exists():
+            metadata_file.unlink()
+            deleted = True
+
+        if deleted:
+            logger.info(f"Deleted population {population_id}")
+        return deleted
 
     def generate_bsn(self):
         while True:
@@ -273,7 +380,16 @@ class LawSimulator:
 
         return pairs
 
-    def setup_test_data(self, pairs):
+    def setup_test_data(self, pairs, random_seed=None):
+        # Set random seed if provided (for reproducibility with loaded populations)
+        if random_seed is not None:
+            # Convert string seed to integer if needed (e.g., UUID strings)
+            if isinstance(random_seed, str):
+                # Convert UUID string to integer using hash
+                random_seed = int(uuid.UUID(random_seed).int % (2**32))
+            random.seed(random_seed)
+            np.random.seed(random_seed)
+
         # Flatten pairs into list of people with partner references
         people = []
         for person, partner in pairs:
@@ -301,7 +417,8 @@ class LawSimulator:
                     "age": p["age"],
                     "has_dutch_nationality": p["has_dutch_nationality"],
                     "has_partner": p["has_partner"],
-                    "residence_address": f"Teststraat {random.randint(1, 999)}, {random.randint(1000, 9999)}AB Amsterdam",
+                    "residence_address": p.get("residence_address")
+                    or f"Teststraat {random.randint(1, 999)}, {random.randint(1000, 9999)}AB Amsterdam",
                     "has_fixed_address": True,
                     "household_size": 1 + (1 if p["has_partner"] else 0) + len(p.get("children_data", [])),
                 }
@@ -324,11 +441,11 @@ class LawSimulator:
             ("RvIG", "verblijfplaats"): [
                 {
                     "bsn": p["bsn"],
-                    "straat": "Kalverstraat" if random.random() < 0.7 else "Teststraat",
-                    "huisnummer": str(random.randint(1, 999)),
-                    "postcode": f"{random.randint(1000, 9999)}AB",
+                    "straat": p.get("straat") or ("Kalverstraat" if random.random() < 0.7 else "Teststraat"),
+                    "huisnummer": p.get("huisnummer") or str(random.randint(1, 999)),
+                    "postcode": p.get("postcode") or f"{random.randint(1000, 9999)}AB",
                     "woonplaats": "Amsterdam",
-                    "type": "WOONADRES" if random.random() < 0.95 else "BRIEFADRES",
+                    "type": p.get("address_type") or ("WOONADRES" if random.random() < 0.95 else "BRIEFADRES"),
                 }
                 for p in people
             ],
@@ -1037,6 +1154,19 @@ class LawSimulator:
             file=sys.stderr,
         )
 
+        # Store generated random values back into people for reproducibility
+        for p in people:
+            rvig_person = next((x for x in sources[("RvIG", "personen")] if x["bsn"] == p["bsn"]), None)
+            if rvig_person:
+                p["residence_address"] = rvig_person["residence_address"]
+
+            rvig_address = next((x for x in sources[("RvIG", "verblijfplaats")] if x["bsn"] == p["bsn"]), None)
+            if rvig_address:
+                p["straat"] = rvig_address["straat"]
+                p["huisnummer"] = rvig_address["huisnummer"]
+                p["postcode"] = rvig_address["postcode"]
+                p["address_type"] = rvig_address["type"]
+
         return people
 
     def simulate_person(self, person) -> None:
@@ -1249,7 +1379,8 @@ class LawSimulator:
 
         return overrides
 
-    def run_simulation(self, num_people=1000):
+    def create_population(self, num_people=1000, save=True, population_params=None):
+        """Create a new population and optionally save it."""
         import sys
 
         print(f"Generating {num_people} people with realistic demographics...", file=sys.stderr)
@@ -1257,6 +1388,35 @@ class LawSimulator:
 
         print("Setting up test data sources...", file=sys.stderr)
         people = self.setup_test_data(pairs)
+
+        if save:
+            population_id = str(uuid.uuid4())
+            params = population_params or {
+                "num_people": num_people,
+                "simulation_date": self.simulation_date,
+            }
+            self.save_population(population_id, people, params)
+            print(f"Saved population as {population_id}", file=sys.stderr)
+            return population_id, people
+        else:
+            return None, people
+
+    def run_simulation(self, num_people=1000, population_id=None):
+        """Run simulation with either a new or existing population."""
+        import sys
+
+        # Use existing population if provided
+        if population_id:
+            print(f"Loading existing population {population_id}...", file=sys.stderr)
+            people = self.load_population(population_id)
+            # Re-setup data sources with loaded population
+            # Note: Don't reinitialize Services to avoid registration conflicts
+            # Use population_id as random seed for reproducibility
+            self.setup_test_data_from_people(people, random_seed=population_id)
+        else:
+            # Create new population
+            _, people = self.create_population(num_people, save=False)
+
         total_people = len(people)
 
         print(f"Simulating laws for {total_people} people...", file=sys.stderr)
@@ -1274,6 +1434,31 @@ class LawSimulator:
             return results_df
         else:
             raise ValueError("Simulation failed to generate valid results")
+
+    def setup_test_data_from_people(self, people, random_seed=None):
+        """Setup test data from pre-existing people list (for loaded populations)."""
+        # Convert the people list into pairs format expected by setup_test_data
+        # This is a bit of a hack but maintains compatibility
+        pairs = []
+        processed_bsns = set()
+
+        for person in people:
+            if person["bsn"] in processed_bsns:
+                continue
+
+            processed_bsns.add(person["bsn"])
+
+            # Find partner if exists
+            partner = None
+            if person.get("partner_bsn"):
+                partner = next((p for p in people if p["bsn"] == person["partner_bsn"]), None)
+                if partner:
+                    processed_bsns.add(partner["bsn"])
+
+            pairs.append((person, partner))
+
+        # Now call the original setup_test_data with the random seed
+        return self.setup_test_data(pairs, random_seed=random_seed)
 
     def calculate_law_breakdowns(self, df, law_name, eligible_col, amount_col):
         """Calculate breakdowns by various demographics for a specific law."""

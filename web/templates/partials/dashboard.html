@@ -105,6 +105,19 @@
         </div>
     </div>
 </section>
+<!-- Total Income Widget -->
+{% if total_income_widget_enabled %}
+    <div hx-get="/dashboard/total-net-income?bsn={{ bsn }}"
+         hx-trigger="load"
+         hx-swap="outerHTML">
+        <div class="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-100 overflow-hidden">
+            <div class="p-8 text-center">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p class="mt-4 text-gray-600">Berekenen van totaal inkomen...</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
 <!-- templates/partials/dashboard.html -->
 <section class="mb-8 bg-white rounded-lg shadow">
     <div class="p-6">

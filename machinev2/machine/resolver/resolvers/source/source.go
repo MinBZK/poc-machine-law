@@ -269,16 +269,33 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReferenceTable(ctx context
 		return nil, fmt.Errorf("zero filters active")
 	}
 
-	resolved, ok := l.externalClaimResolver.Resolve(ctx, key, sourceRef.Table, *sourceRef.Field, filters)
-	if !ok {
-		return nil, fmt.Errorf("external claim did not resolve")
+	if sourceRef.Field != nil {
+		resolved, ok := l.externalClaimResolver.Resolve(ctx, key, sourceRef.Table, *sourceRef.Field, filters)
+		if !ok {
+			return nil, fmt.Errorf("external claim did not resolve")
+		}
+
+		return dataframe.New([]map[string]any{
+			{
+				*sourceRef.Field: resolved.Value,
+			},
+		}), nil
+	} else if sourceRef.Fields != nil {
+		data := make([]map[string]any, 1)
+
+		for _, field := range *sourceRef.Fields {
+			resolved, ok := l.externalClaimResolver.Resolve(ctx, key, sourceRef.Table, field, filters)
+			if !ok {
+				return nil, fmt.Errorf("external claim did not resolve")
+			}
+
+			data[0][field] = resolved.Value
+		}
+
+		return dataframe.New(data), nil
 	}
 
-	return dataframe.New([]map[string]any{
-		{
-			*sourceRef.Field: resolved.Value,
-		},
-	}), nil
+	return nil, fmt.Errorf("could not resolve to nil field")
 }
 
 func (l *PropertySpecSourceResolver) filter(ctx context.Context, sourceRef ruleresolver.SourceReference, df model.DataFrame) (model.DataFrame, error) {

@@ -4,6 +4,7 @@ package machine
 
 import (
 	"context"
+	"time"
 
 	"github.com/Khan/genqlient/graphql"
 )
@@ -128,20 +129,20 @@ func (v *ClaimAttributesByObjectIDResponse) GetClaimAttributesByObjectID() Claim
 
 // __ClaimAttributesByObjectIDInput is used internally by genqlient
 type __ClaimAttributesByObjectIDInput struct {
-	Bsn           string `json:"bsn"`
-	ClaimTypeName string `json:"claimTypeName"`
+	ObjectID string    `json:"objectID"`
+	Time     time.Time `json:"time"`
 }
 
-// GetBsn returns __ClaimAttributesByObjectIDInput.Bsn, and is useful for accessing the field via an interface.
-func (v *__ClaimAttributesByObjectIDInput) GetBsn() string { return v.Bsn }
+// GetObjectID returns __ClaimAttributesByObjectIDInput.ObjectID, and is useful for accessing the field via an interface.
+func (v *__ClaimAttributesByObjectIDInput) GetObjectID() string { return v.ObjectID }
 
-// GetClaimTypeName returns __ClaimAttributesByObjectIDInput.ClaimTypeName, and is useful for accessing the field via an interface.
-func (v *__ClaimAttributesByObjectIDInput) GetClaimTypeName() string { return v.ClaimTypeName }
+// GetTime returns __ClaimAttributesByObjectIDInput.Time, and is useful for accessing the field via an interface.
+func (v *__ClaimAttributesByObjectIDInput) GetTime() time.Time { return v.Time }
 
 // The query executed by ClaimAttributesByObjectID.
 const ClaimAttributesByObjectID_Operation = `
-query ClaimAttributesByObjectID ($bsn: ID!, $claimTypeName: String!) {
-	ClaimAttributesByObjectID(claimTypeName: $claimTypeName, objectID: $bsn, dimensionData: {startType:"Annotation/ValidFrom",endType:"Annotation/ValidUntil",registrationTime:"2100-01-01T00:00:00Z",secondaryTime:"2022-02-05T12:00:00Z"}) {
+query ClaimAttributesByObjectID ($objectID: ID!, $time: DateTime!) {
+	ClaimAttributesByObjectID(claimTypeName: "Bsn", objectID: $objectID, dimensionData: {startType:"Annotation/ValidFrom",endType:"Annotation/ValidUntil",registrationTime:"2100-01-01T00:00:00Z",secondaryTime:$time}) {
 		name
 		values {
 			key
@@ -169,15 +170,15 @@ query ClaimAttributesByObjectID ($bsn: ID!, $claimTypeName: String!) {
 func ClaimAttributesByObjectID(
 	ctx_ context.Context,
 	client_ graphql.Client,
-	bsn string,
-	claimTypeName string,
+	objectID string,
+	time time.Time,
 ) (data_ *ClaimAttributesByObjectIDResponse, err_ error) {
 	req_ := &graphql.Request{
 		OpName: "ClaimAttributesByObjectID",
 		Query:  ClaimAttributesByObjectID_Operation,
 		Variables: &__ClaimAttributesByObjectIDInput{
-			Bsn:           bsn,
-			ClaimTypeName: claimTypeName,
+			ObjectID: objectID,
+			Time:     time,
 		},
 	}
 
