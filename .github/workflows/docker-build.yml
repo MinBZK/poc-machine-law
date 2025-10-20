@@ -7,6 +7,8 @@ permissions:
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -30,15 +32,22 @@ jobs:
         run: |
           echo "github_repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
 
+      - name: Prepare tag
+        id: prep
+        run: |
+          # Replace slashes with hyphens in ref_name to make valid Docker tags
+          TAG=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
       - name: Build and Push Image with Kaniko
         uses: int128/kaniko-action@v1
         with:
           push: true
-          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}:${{ github.sha }}-${{ steps.prep.outputs.tag }}-${{ github.run_id }}
 
       - name: Build and Push Go Backend Image with Kaniko
         uses: int128/kaniko-action@v1
         with:
           file: ./machinev2/backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/machinev2/backend:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
+          tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/machinev2/backend:${{ github.sha }}-${{ steps.prep.outputs.tag }}-${{ github.run_id }}
