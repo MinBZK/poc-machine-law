@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	machine "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/source/generated"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
@@ -40,8 +40,6 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 		WithField("table", table).
 		WithField("field", field).
 		WithField("filters", filters)
-
-	logr.Debug("ubb resolve")
 
 	f := c.propertySpec[key]
 
@@ -121,12 +119,10 @@ func solveField(
 	value machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult,
 	f ruleresolver.Field,
 ) (any, error) {
-	logr.Debug("Solve field", logger.NewField("value", value))
 	v := value.Values[0]
 
 	var x any = v.Value
 
-	logr.Debug("Solve field", logger.NewField("key", v.Key))
 	switch v.Key {
 	case "date":
 		t, err := strconv.Atoi(v.Value)

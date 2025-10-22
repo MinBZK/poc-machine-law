@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
 	contexter "github.com/minbzk/poc-machine-law/machinev2/machine/internal/context"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/utils"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
@@ -30,6 +32,8 @@ type RulesEngine struct {
 	OutputSpecs     map[string]model.TypeSpec
 	Definitions     map[string]any
 	ServiceProvider service.ServiceProvider
+	CaseManager     casemanager.CaseManager
+	ClaimManager    claimmanager.ClaimManager
 	referenceDate   time.Time
 }
 
@@ -37,6 +41,8 @@ type RulesEngine struct {
 func NewRulesEngine(
 	spec ruleresolver.RuleSpec,
 	serviceProvider service.ServiceProvider,
+	caseManager casemanager.CaseManager,
+	claimManager claimmanager.ClaimManager,
 	referenceDate string,
 ) *RulesEngine {
 	t, err := time.Parse("2006-01-02", referenceDate)
@@ -47,6 +53,8 @@ func NewRulesEngine(
 	return &RulesEngine{
 		Spec:            spec,
 		ServiceProvider: serviceProvider,
+		CaseManager:     caseManager,
+		ClaimManager:    claimManager,
 		ServiceName:     spec.Service,
 		Law:             spec.Law,
 		Requirements:    spec.Requirements,
@@ -390,7 +398,7 @@ func getRequiredActions(requestedOutput string, actions []ruleresolver.Action) (
 func (re *RulesEngine) Evaluate(
 	ctx context.Context,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	sources model.SourceDataFrame,
 	calculationDate string,
 	requestedOutput string,
@@ -415,8 +423,7 @@ func (re *RulesEngine) Evaluate(
 	// Handle claims
 	var claims map[string]model.Claim
 	if bsn, ok := parameters["BSN"].(string); ok {
-		claimManager := re.ServiceProvider.GetClaimManager()
-		claimsList, err := claimManager.GetClaimsByBSN(bsn, approved, true)
+		claimsList, err := re.ClaimManager.GetClaimsByBSN(ctx, bsn, approved, true)
 		if err != nil {
 			logr.WithIndent().Warningf("Failed to get claims for BSN %s: %v", bsn, err)
 		}
@@ -441,10 +448,10 @@ func (re *RulesEngine) Evaluate(
 	ctx = tracker.WithTracker(ctx, tracker.New())
 
 	// Create context
-	ruleCtx := contexter.NewRuleContext(
-		re.ServiceName,
+	ruleCtx, err := contexter.NewRuleContext(
 		re.Definitions,
 		re.ServiceProvider,
+		re.CaseManager,
 		parameters,
 		re.PropertySpecs,
 		sources,
@@ -453,6 +460,10 @@ func (re *RulesEngine) Evaluate(
 		claims,
 		approved,
 	)
+
+	if err != nil {
+		return model.EvaluateResult{}, fmt.Errorf("new rule context: %w", err)
+	}
 
 	// Check requirements
 	requirementsNode := &model.PathNode{
@@ -464,13 +475,13 @@ func (re *RulesEngine) Evaluate(
 	p.Add(requirementsNode)
 
 	var requirementsMet bool
-	err := logr.IndentBlock(ctx, "", func(ctx context.Context) error {
+
+	if err := logr.IndentBlock(ctx, "", func(ctx context.Context) error {
 		var err error
 		requirementsMet, err = re.evaluateRequirements(ctx, re.Requirements, ruleCtx)
 		requirementsNode.Result = requirementsMet
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		return model.EvaluateResult{}, err
 	}
 
@@ -524,7 +535,7 @@ func (re *RulesEngine) evaluateAction(
 	ctx context.Context,
 	action ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 ) (model.EvaluateActionResult, string, error) {
 	logr := logger.FromContext(ctx)
 
@@ -553,12 +564,10 @@ func (re *RulesEngine) evaluateAction(
 
 		// Check if we should use overwrite value
 		if overwriteInput != nil {
-			if serviceMap, ok := overwriteInput[re.ServiceName]; ok {
-				if val, ok := serviceMap[action.Output]; ok {
-					logr.WithIndent().Debugf("Resolving value %s/%s from OVERWRITE %v",
-						re.ServiceName, action.Output, val)
-					result = val
-				}
+			if val, ok := overwriteInput[action.Output]; ok {
+				logr.WithIndent().Debugf("Resolving value %s/%s from OVERWRITE %v",
+					re.ServiceName, action.Output, val)
+				result = val
 			}
 		}
 

@@ -7,7 +7,7 @@ import (
 
 // ResetEngine implements Servicer.
 func (service *Service) ResetEngine(ctx context.Context) error {
-	service.logger.Debug("resetting engine")
+	service.logger.DebugContext(ctx, "resetting engine")
 	if err := service.service.Reset(ctx); err != nil {
 		return fmt.Errorf("reset: %w", err)
 	}
@@ -16,7 +16,7 @@ func (service *Service) ResetEngine(ctx context.Context) error {
 		return fmt.Errorf("set input: %w", err)
 	}
 
-	service.logger.Debug("engine reset done")
+	service.logger.DebugContext(ctx, "engine reset done")
 
 	return nil
 }

@@ -8,9 +8,10 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver"
 	claimresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/claim"
@@ -47,11 +48,11 @@ type RuleContext struct {
 
 // NewRuleContext creates a new rule context
 func NewRuleContext(
-	service string, definitions map[string]any, serviceProvider service.ServiceProvider,
+	definitions map[string]any, serviceProvider service.ServiceProvider, caseManager casemanager.CaseManager,
 	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
 	sources model.SourceDataFrame,
-	overwriteInput map[string]map[string]any, calculationDate string,
-	claims map[string]model.Claim, approved bool) *RuleContext {
+	overwriteInput map[string]any, calculationDate string,
+	claims map[string]model.Claim, approved bool) (*RuleContext, error) {
 
 	localresolver := local.NewLocalResolver()
 	outputresolver := output.NewOutputsResolver()
@@ -64,18 +65,23 @@ func NewRuleContext(
 		OutputsResolver: outputresolver,
 	}
 
+	source, err := sourceresolver.New(rc, serviceProvider, caseManager, sources, propertySpecs)
+	if err != nil {
+		return nil, fmt.Errorf("sourceresolver new: %w", err)
+	}
+
 	rc.Resolvers = []resolver.Resolver{
-		claimresolver.New(claims, propertySpecs),
+		claimresolver.New(claims),
 		localresolver,
 		definitionresolver.New(definitions),
 		parameterresolver.New(parameters),
 		outputresolver,
-		overwriteresolver.New(service, propertySpecs, overwriteInput),
-		sourceresolver.New(rc, serviceProvider, sources, propertySpecs),
+		overwriteresolver.New(propertySpecs, overwriteInput),
+		source,
 		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, calculationDate, approved),
 	}
 
-	return rc
+	return rc, nil
 }
 
 func (rc *RuleContext) ResolveAction(ctx context.Context, action ruleresolver.Action) (any, error) {
@@ -237,11 +243,28 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		return currentValue, nil
 	}
 
+	// Handle property specs
+	if spec, exists := rc.propertySpecs[strPath]; exists {
+		// Handle required fields
+		node.Required = false
+		if spec.GetBase().Required != nil {
+			node.Required = *spec.GetBase().Required
+		}
+
+		// Add type information
+		if spec.GetBase().Type != "" {
+			node.Details["type"] = spec.GetBase().Type
+		}
+
+		if spec.GetBase().TypeSpec != nil {
+			node.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
+		}
+	}
+
 	for _, resolve := range rc.Resolvers {
 		if resolved, ok := resolve.Resolve(ctx, strPath); ok {
 			node.Result = resolved.Value
 			node.ResolveType = resolve.ResolveType()
-			node.Details = resolved.Details.ToMap()
 
 			if resolved.MissingRequired != nil {
 				rc.MissingRequired = rc.MissingRequired || *resolved.MissingRequired
@@ -253,26 +276,8 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		}
 	}
 
-	// Handle property specs
-	if spec, exists := rc.propertySpecs[strPath]; exists {
-		// Handle required fields
-		node.Required = false
-		if spec.GetBase().Required != nil {
-			node.Required = *spec.GetBase().Required
-		}
-
-		if node.Required {
-			rc.MissingRequired = true
-		}
-
-		// Add type information
-		if spec.GetBase().Type != "" {
-			node.Details["type"] = spec.GetBase().Type
-		}
-
-		if spec.GetBase().TypeSpec != nil {
-			node.Details["type_spec"] = spec.GetBase().TypeSpec.ToMap()
-		}
+	if node.Required {
+		rc.MissingRequired = true
 	}
 
 	logger.Warningf("Could not resolve value for %s", strPath)

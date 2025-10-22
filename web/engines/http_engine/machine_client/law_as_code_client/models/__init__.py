@@ -73,14 +73,10 @@ from .error import Error
 from .evaluate import Evaluate
 from .evaluate_body import EvaluateBody
 from .evaluate_input import EvaluateInput
-from .evaluate_input_additional_property import EvaluateInputAdditionalProperty
 from .evaluate_parameters import EvaluateParameters
 from .evaluate_response_201 import EvaluateResponse201
 from .evaluate_response_400 import EvaluateResponse400
 from .evaluate_response_500 import EvaluateResponse500
-from .evaluate_response_schema import EvaluateResponseSchema
-from .evaluate_response_schema_input import EvaluateResponseSchemaInput
-from .evaluate_response_schema_output import EvaluateResponseSchemaOutput
 from .event import Event
 from .event_list_based_on_case_id_response_200 import EventListBasedOnCaseIDResponse200
 from .event_list_based_on_case_id_response_400 import EventListBasedOnCaseIDResponse400
@@ -111,6 +107,9 @@ from .reference import Reference
 from .requirement import Requirement
 from .reset_engine_response_400 import ResetEngineResponse400
 from .reset_engine_response_500 import ResetEngineResponse500
+from .response_evaluate_schema import ResponseEvaluateSchema
+from .response_evaluate_schema_input import ResponseEvaluateSchemaInput
+from .response_evaluate_schema_output import ResponseEvaluateSchemaOutput
 from .rule_spec import RuleSpec
 from .rule_spec_get_response_200 import RuleSpecGetResponse200
 from .rule_spec_get_response_400 import RuleSpecGetResponse400
@@ -208,14 +207,10 @@ __all__ = (
     "Evaluate",
     "EvaluateBody",
     "EvaluateInput",
-    "EvaluateInputAdditionalProperty",
     "EvaluateParameters",
     "EvaluateResponse201",
     "EvaluateResponse400",
     "EvaluateResponse500",
-    "EvaluateResponseSchema",
-    "EvaluateResponseSchemaInput",
-    "EvaluateResponseSchemaOutput",
     "Event",
     "EventListBasedOnCaseIDResponse200",
     "EventListBasedOnCaseIDResponse400",
@@ -246,6 +241,9 @@ __all__ = (
     "Requirement",
     "ResetEngineResponse400",
     "ResetEngineResponse500",
+    "ResponseEvaluateSchema",
+    "ResponseEvaluateSchemaInput",
+    "ResponseEvaluateSchemaOutput",
     "RuleSpec",
     "RuleSpecGetResponse200",
     "RuleSpecGetResponse400",

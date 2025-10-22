@@ -6,29 +6,29 @@ from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 if TYPE_CHECKING:
-    from ..models.evaluate_response_schema_input import EvaluateResponseSchemaInput
-    from ..models.evaluate_response_schema_output import EvaluateResponseSchemaOutput
     from ..models.path_node import PathNode
+    from ..models.response_evaluate_schema_input import ResponseEvaluateSchemaInput
+    from ..models.response_evaluate_schema_output import ResponseEvaluateSchemaOutput
 
 
-T = TypeVar("T", bound="EvaluateResponseSchema")
+T = TypeVar("T", bound="ResponseEvaluateSchema")
 
 
 @_attrs_define
-class EvaluateResponseSchema:
+class ResponseEvaluateSchema:
     """Evaluate response
 
     Attributes:
-        output (EvaluateResponseSchemaOutput):
-        input_ (EvaluateResponseSchemaInput):
+        output (ResponseEvaluateSchemaOutput):
+        input_ (ResponseEvaluateSchemaInput):
         requirements_met (bool): Will be true when all requirements where met
         rulespec_id (UUID): Identifier of the rulespec
         missing_required (bool): Will be true when a required value is missing
         path (PathNode): path node
     """
 
-    output: "EvaluateResponseSchemaOutput"
-    input_: "EvaluateResponseSchemaInput"
+    output: "ResponseEvaluateSchemaOutput"
+    input_: "ResponseEvaluateSchemaInput"
     requirements_met: bool
     rulespec_id: UUID
     missing_required: bool
@@ -65,14 +65,14 @@ class EvaluateResponseSchema:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.evaluate_response_schema_input import EvaluateResponseSchemaInput
-        from ..models.evaluate_response_schema_output import EvaluateResponseSchemaOutput
         from ..models.path_node import PathNode
+        from ..models.response_evaluate_schema_input import ResponseEvaluateSchemaInput
+        from ..models.response_evaluate_schema_output import ResponseEvaluateSchemaOutput
 
         d = dict(src_dict)
-        output = EvaluateResponseSchemaOutput.from_dict(d.pop("output"))
+        output = ResponseEvaluateSchemaOutput.from_dict(d.pop("output"))
 
-        input_ = EvaluateResponseSchemaInput.from_dict(d.pop("input"))
+        input_ = ResponseEvaluateSchemaInput.from_dict(d.pop("input"))
 
         requirements_met = d.pop("requirementsMet")
 
@@ -82,7 +82,7 @@ class EvaluateResponseSchema:
 
         path = PathNode.from_dict(d.pop("path"))
 
-        evaluate_response_schema = cls(
+        response_evaluate_schema = cls(
             output=output,
             input_=input_,
             requirements_met=requirements_met,
@@ -91,8 +91,8 @@ class EvaluateResponseSchema:
             path=path,
         )
 
-        evaluate_response_schema.additional_properties = d
-        return evaluate_response_schema
+        response_evaluate_schema.additional_properties = d
+        return response_evaluate_schema
 
     @property
     def additional_keys(self) -> list[str]:

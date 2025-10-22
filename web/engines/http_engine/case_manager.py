@@ -276,12 +276,16 @@ def to_case(case) -> Case:
         status=CaseStatus(case.status),
         approved=get_value(case.approved),
         objection_status=to_objection_status(case.objection_status),
-        appeal_status=case.appeal_status,
+        appeal_status=to_appeal_status(case.appeal_status),
     )
 
 
 def to_cases(cases: list[Any]) -> list[Case]:
     return [to_case(item) for item in cases]
+
+
+def to_appeal_status(appeal) -> dict[str, Any]:
+    return appeal.to_dict()
 
 
 def to_objection_status(objection) -> CaseObjectionStatus:

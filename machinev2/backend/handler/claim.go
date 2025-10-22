@@ -12,7 +12,10 @@ import (
 )
 
 // ClaimListBasedOnBSN implements api.StrictServerInterface.
-func (handler *Handler) ClaimListBasedOnBSN(ctx context.Context, request api.ClaimListBasedOnBSNRequestObject) (api.ClaimListBasedOnBSNResponseObject, error) {
+func (handler *Handler) ClaimListBasedOnBSN(
+	ctx context.Context,
+	request api.ClaimListBasedOnBSNRequestObject,
+) (api.ClaimListBasedOnBSNResponseObject, error) {
 	filter := service.ClaimListFilter{
 		OnlyApproved:    request.Params.Approved,
 		IncludeRejected: request.Params.IncludeRejected,
@@ -22,7 +25,7 @@ func (handler *Handler) ClaimListBasedOnBSN(ctx context.Context, request api.Cla
 	if err != nil {
 		return api.ClaimListBasedOnBSN400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("claim list based on bsn: %w", err)),
-		}, nil
+		}, err
 	}
 
 	return api.ClaimListBasedOnBSN200JSONResponse{
@@ -59,15 +62,15 @@ func (handler *Handler) ClaimListBasedOnBSNServiceLaw(ctx context.Context, reque
 	}, err
 }
 
-// ApproveClaim implements api.StrictServerInterface.
+// ClaimApprove implements api.StrictServerInterface.
 func (handler *Handler) ClaimApprove(ctx context.Context, request api.ClaimApproveRequestObject) (api.ClaimApproveResponseObject, error) {
-	err := handler.servicer.ClaimApprove(ctx, model.ClaimApprove{
+	claim := model.ClaimApprove{
 		ID:            request.ClaimId,
 		VerifiedBy:    request.Body.Data.VerifiedBy,
 		VerifiedValue: request.Body.Data.VerifiedValue,
-	})
+	}
 
-	if err != nil {
+	if err := handler.servicer.ClaimApprove(ctx, claim); err != nil {
 		if errors.Is(err, model.ErrClaimNotFound) {
 			return api.ClaimApprove404JSONResponse{}, nil
 		}
@@ -78,32 +81,33 @@ func (handler *Handler) ClaimApprove(ctx context.Context, request api.ClaimAppro
 	}
 
 	return api.ClaimApprove200JSONResponse{
-		ClaimApproveResponseJSONResponse: api.ClaimApproveResponseJSONResponse{
+		ResponseClaimApproveJSONResponse: api.ResponseClaimApproveJSONResponse{
 			Data: request.ClaimId,
 		},
 	}, nil
 }
 
-// RejectClaim implements api.StrictServerInterface.
+// ClaimReject implements api.StrictServerInterface.
 func (handler *Handler) ClaimReject(ctx context.Context, request api.ClaimRejectRequestObject) (api.ClaimRejectResponseObject, error) {
-	err := handler.servicer.ClaimReject(ctx, model.ClaimReject{
+	claim := model.ClaimReject{
 		ID:              request.ClaimId,
 		RejectedBy:      request.Body.Data.RejectedBy,
 		RejectionReason: request.Body.Data.RejectionReason,
-	})
+	}
 
-	if err != nil {
+	if err := handler.servicer.ClaimReject(ctx, claim); err != nil {
 		if errors.Is(err, model.ErrClaimNotFound) {
 			return api.ClaimReject404JSONResponse{}, nil
 		}
 
+		handler.logger.ErrorContext(ctx, "claim reject", "err", err)
 		return api.ClaimReject400JSONResponse{
-			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("claim approve: %w", err)),
+			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("claim reject: %w", err)),
 		}, nil
 	}
 
 	return api.ClaimReject200JSONResponse{
-		ClaimRejectResponseJSONResponse: api.ClaimRejectResponseJSONResponse{
+		ResponseClaimRejectJSONResponse: api.ResponseClaimRejectJSONResponse{
 			Data: request.ClaimId,
 		},
 	}, nil
@@ -111,7 +115,12 @@ func (handler *Handler) ClaimReject(ctx context.Context, request api.ClaimReject
 
 // SubmitClaim implements api.StrictServerInterface.
 func (handler *Handler) ClaimSubmit(ctx context.Context, request api.ClaimSubmitRequestObject) (api.ClaimSubmitResponseObject, error) {
-	caseID, err := handler.servicer.ClaimSubmit(ctx, model.ClaimSubmit{
+	var oldValue *any
+	if request.Body.Data.OldValue != nil {
+		oldValue = &request.Body.Data.OldValue
+	}
+
+	claim := model.ClaimSubmit{
 		BSN:          request.Body.Data.Bsn,
 		CaseID:       request.Body.Data.CaseId,
 		Claimant:     request.Body.Data.Claimant,
@@ -120,19 +129,21 @@ func (handler *Handler) ClaimSubmit(ctx context.Context, request api.ClaimSubmit
 		Law:          request.Body.Data.Law,
 		Service:      request.Body.Data.Service,
 		NewValue:     request.Body.Data.NewValue,
-		OldValue:     request.Body.Data.OldValue,
+		OldValue:     oldValue,
 		Reason:       request.Body.Data.Reason,
 		AutoApprove:  request.Body.Data.AutoApprove,
-	})
+	}
 
+	caseID, err := handler.servicer.ClaimSubmit(ctx, claim)
 	if err != nil {
+		handler.logger.ErrorContext(ctx, "claim submit", "err", err)
 		return api.ClaimSubmit400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("claim approve: %w", err)),
 		}, nil
 	}
 
 	return api.ClaimSubmit201JSONResponse{
-		ClaimSubmitResponseJSONResponse: api.ClaimSubmitResponseJSONResponse{
+		ResponseClaimSubmitJSONResponse: api.ResponseClaimSubmitJSONResponse{
 			Data: caseID,
 		},
 	}, nil

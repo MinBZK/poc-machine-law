@@ -499,7 +499,7 @@ class RuleContext:
                     enum_value = self.resolve_value(field["enum"])
                     if enum_value is not None:
                         # Ensure enum_value is a list
-                        if isinstance(enum_value, (list, tuple)):
+                        if isinstance(enum_value, list | tuple):
                             field["enum_values"] = enum_value
                             logger.debug(f"Resolved enum reference {field['enum']} to {field['enum_values']}")
                         else:

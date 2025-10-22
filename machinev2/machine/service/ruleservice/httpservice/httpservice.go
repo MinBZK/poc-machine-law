@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/oapi-codegen/runtime/types"
 
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
@@ -62,7 +62,7 @@ func (h *HTTPService) Evaluate(
 	law string,
 	referenceDate string,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {

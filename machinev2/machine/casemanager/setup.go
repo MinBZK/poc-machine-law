@@ -13,7 +13,7 @@ import (
 	"github.com/looplab/eventhorizon/commandhandler/aggregate"
 	"github.com/looplab/eventhorizon/commandhandler/bus"
 	"github.com/looplab/eventhorizon/eventhandler/projector"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 )
 
 var registerSync sync.Once

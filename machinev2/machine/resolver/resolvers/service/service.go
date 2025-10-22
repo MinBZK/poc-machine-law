@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
@@ -27,7 +27,7 @@ type PropertySpecServiceResolver struct {
 	rc              resolver.RuleContexter
 	sp              service.ServiceProvider
 	parameters      map[string]any
-	overwriteInput  map[string]map[string]any
+	overwriteInput  map[string]any
 	cache           sync.Map
 	calculationDate string
 	approved        bool
@@ -38,7 +38,7 @@ func New(
 	sp service.ServiceProvider,
 	propertySpec map[string]ruleresolver.Field,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	calculationDate string,
 	approved bool,
 ) *PropertySpecServiceResolver {
@@ -80,27 +80,10 @@ func (l *PropertySpecServiceResolver) Resolve(ctx context.Context, key string) (
 	logger.FromContext(ctx).WithName("resolver").
 		Debugf("Result for $%s from %s field %s: %v", key, serviceRef.Service, serviceRef.Field, value)
 
-	required := false
-	if spec.GetBase().Required != nil {
-		required = *spec.GetBase().Required
-	}
-
-	resolved := &resolver.Resolved{
+	return &resolver.Resolved{
 		Value:           value,
-		Required:        required,
 		MissingRequired: &missingRequired,
-	}
-
-	// Add type information to the node
-	if spec.GetBase().Type != "" {
-		resolved.Details.Type = spec.GetBase().Type
-	}
-
-	if spec.GetBase().TypeSpec != nil {
-		resolved.Details.TypeSpec = spec.GetBase().TypeSpec.ToMap()
-	}
-
-	return resolved, true
+	}, true
 
 }
 

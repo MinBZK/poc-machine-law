@@ -4,7 +4,7 @@ import (
 	"context"
 
 	eh "github.com/looplab/eventhorizon"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 )
 
 var _ eh.EventHandler = &Executor{}

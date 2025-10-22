@@ -8,21 +8,7 @@ import (
 
 type Resolved struct {
 	Value           any
-	Required        bool
 	MissingRequired *bool
-	Details         Details
-}
-
-type Details struct {
-	Type     string
-	TypeSpec map[string]any
-}
-
-func (d Details) ToMap() map[string]any {
-	return map[string]any{
-		"type":      d.Type,
-		"type_spec": d.TypeSpec,
-	}
 }
 
 type Resolver interface {

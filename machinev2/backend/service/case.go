@@ -11,7 +11,7 @@ import (
 
 // CaseListBasedOnBSN implements Servicer.
 func (service *Service) CaseListBasedOnBSN(ctx context.Context, bsn string) ([]model.Case, error) {
-	records, err := service.service.CaseManager.GetCasesByBSN(ctx, bsn)
+	records, err := service.casemanager.GetCasesByBSN(ctx, bsn)
 	if err != nil {
 		return nil, fmt.Errorf("get case by bsn: %w", err)
 	}
@@ -20,7 +20,7 @@ func (service *Service) CaseListBasedOnBSN(ctx context.Context, bsn string) ([]m
 }
 
 func (service *Service) CaseGetBasedOnBSNServiceLaw(ctx context.Context, bsn, svc, law string) (model.Case, error) {
-	record, err := service.service.CaseManager.GetCase(ctx, bsn, svc, law)
+	record, err := service.casemanager.GetCase(ctx, bsn, svc, law)
 	if err != nil {
 		return model.Case{}, fmt.Errorf("get case by bsn: %w", err)
 	}
@@ -33,7 +33,7 @@ func (service *Service) CaseGetBasedOnBSNServiceLaw(ctx context.Context, bsn, sv
 }
 
 func (service *Service) CaseListBasedOnServiceLaw(ctx context.Context, svc, law string) ([]model.Case, error) {
-	records, err := service.service.CaseManager.GetCasesByLaw(ctx, svc, law)
+	records, err := service.casemanager.GetCasesByLaw(ctx, svc, law)
 	if err != nil {
 		return nil, fmt.Errorf("get case by bsn: %w", err)
 	}
@@ -47,7 +47,7 @@ func (service *Service) CaseListBasedOnServiceLaw(ctx context.Context, svc, law 
 
 // CaseGet implements Servicer.
 func (service *Service) CaseGet(ctx context.Context, caseID uuid.UUID) (model.Case, error) {
-	record, err := service.service.CaseManager.GetCaseByID(ctx, caseID)
+	record, err := service.casemanager.GetCaseByID(ctx, caseID)
 	if err != nil {
 		return model.Case{}, fmt.Errorf("get case by id: %w", err)
 	}
@@ -57,7 +57,7 @@ func (service *Service) CaseGet(ctx context.Context, caseID uuid.UUID) (model.Ca
 
 // CaseSubmit implements Servicer.
 func (service *Service) CaseSubmit(ctx context.Context, case_ model.CaseSubmit) (uuid.UUID, error) {
-	caseID, err := service.service.CaseManager.SubmitCase(
+	caseID, err := service.casemanager.SubmitCase(
 		ctx,
 		case_.BSN,
 		case_.Service,
@@ -75,7 +75,7 @@ func (service *Service) CaseSubmit(ctx context.Context, case_ model.CaseSubmit) 
 }
 
 func (service *Service) CaseReview(ctx context.Context, case_ model.CaseReview) (uuid.UUID, error) {
-	err := service.service.CaseManager.CompleteManualReview(ctx, case_.CaseID, case_.VerifierID, case_.Approved, case_.Reason, nil)
+	err := service.casemanager.CompleteManualReview(ctx, case_.CaseID, case_.VerifierID, case_.Approved, case_.Reason, nil)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("complete manual review: %w", err)
 	}
@@ -84,7 +84,7 @@ func (service *Service) CaseReview(ctx context.Context, case_ model.CaseReview) 
 }
 
 func (service *Service) CaseObject(ctx context.Context, case_ model.CaseObject) (uuid.UUID, error) {
-	err := service.service.CaseManager.ObjectCase(ctx, case_.CaseID, case_.Reason)
+	err := service.casemanager.ObjectCase(ctx, case_.CaseID, case_.Reason)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("object case: %w", err)
 	}

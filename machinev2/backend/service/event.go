@@ -10,14 +10,14 @@ import (
 
 // EventList implements Servicer.
 func (service *Service) EventList(ctx context.Context) ([]model.Event, error) {
-	events := service.service.CaseManager.GetEvents(nil)
+	events := service.casemanager.GetEvents(nil)
 
 	return ToEvents(events), nil
 }
 
 // CaseEventList implements Servicer.
 func (service *Service) CaseEventList(ctx context.Context, caseID uuid.UUID) ([]model.Event, error) {
-	events := service.service.CaseManager.GetEventsByUUID(caseID)
+	events := service.casemanager.GetEventsByUUID(caseID)
 
 	return ToEvents(events), nil
 }
