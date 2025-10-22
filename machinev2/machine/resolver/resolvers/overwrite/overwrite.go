@@ -12,12 +12,11 @@ var _ resolver.Resolver = &PropertySpecOverwriteResolver{}
 type PropertySpecOverwriteResolver struct {
 	service        string
 	propertySpec   map[string]ruleresolver.Field
-	overwriteInput map[string]map[string]any
+	overwriteInput map[string]any
 }
 
-func New(service string, propertySpec map[string]ruleresolver.Field, overwriteInput map[string]map[string]any) *PropertySpecOverwriteResolver {
+func New(propertySpec map[string]ruleresolver.Field, overwriteInput map[string]any) *PropertySpecOverwriteResolver {
 	return &PropertySpecOverwriteResolver{
-		service:        service,
 		propertySpec:   propertySpec,
 		overwriteInput: overwriteInput,
 	}
@@ -49,16 +48,11 @@ func (l *PropertySpecOverwriteResolver) ResolveType() string {
 }
 
 func (l *PropertySpecOverwriteResolver) resolveServiceReference(serviceRef ruleresolver.ServiceReference) (*resolver.Resolved, bool) {
-	if serviceRef.Service == "" || serviceRef.Field == "" || l.overwriteInput == nil {
+	if serviceRef.Field == "" || l.overwriteInput == nil {
 		return nil, false
 	}
 
-	serviceOverwrites, ok := l.overwriteInput[serviceRef.Service]
-	if !ok {
-		return nil, false
-	}
-
-	value, ok := serviceOverwrites[serviceRef.Field]
+	value, ok := l.overwriteInput[serviceRef.Field]
 	if !ok {
 		return nil, false
 	}
@@ -67,13 +61,8 @@ func (l *PropertySpecOverwriteResolver) resolveServiceReference(serviceRef ruler
 }
 
 func (l *PropertySpecOverwriteResolver) resolveSourceReference(sourceRef ruleresolver.SourceReference) (*resolver.Resolved, bool) {
-	input, ok := l.overwriteInput[l.service]
-	if !ok {
-		return nil, false
-	}
-
 	if sourceRef.Field != nil {
-		if value, ok := input[*sourceRef.Field]; ok {
+		if value, ok := l.overwriteInput[*sourceRef.Field]; ok {
 			return &resolver.Resolved{Value: value}, true
 		}
 
@@ -81,7 +70,7 @@ func (l *PropertySpecOverwriteResolver) resolveSourceReference(sourceRef ruleres
 
 	if sourceRef.Fields != nil {
 		for _, field := range *sourceRef.Fields {
-			if value, ok := input[field]; ok {
+			if value, ok := l.overwriteInput[field]; ok {
 				return &resolver.Resolved{Value: value}, true
 			}
 

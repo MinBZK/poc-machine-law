@@ -12,7 +12,7 @@ import (
 )
 
 type RuleServicer interface {
-	Evaluate(ctx context.Context, law string, referenceDate string, parameters map[string]any, overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
+	Evaluate(ctx context.Context, law string, referenceDate string, parameters map[string]any, overwriteInput map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
 	SetSourceDataFrame(ctx context.Context, table string, df model.DataFrame) error
 	Reset(ctx context.Context) error
 }

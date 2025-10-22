@@ -5,7 +5,7 @@ from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 if TYPE_CHECKING:
-    from ..models.evaluate_response_schema import EvaluateResponseSchema
+    from ..models.response_evaluate_schema import ResponseEvaluateSchema
 
 
 T = TypeVar("T", bound="EvaluateResponse201")
@@ -15,10 +15,10 @@ T = TypeVar("T", bound="EvaluateResponse201")
 class EvaluateResponse201:
     """
     Attributes:
-        data (EvaluateResponseSchema): Evaluate response
+        data (ResponseEvaluateSchema): Evaluate response
     """
 
-    data: "EvaluateResponseSchema"
+    data: "ResponseEvaluateSchema"
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -36,10 +36,10 @@ class EvaluateResponse201:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.evaluate_response_schema import EvaluateResponseSchema
+        from ..models.response_evaluate_schema import ResponseEvaluateSchema
 
         d = dict(src_dict)
-        data = EvaluateResponseSchema.from_dict(d.pop("data"))
+        data = ResponseEvaluateSchema.from_dict(d.pop("data"))
 
         evaluate_response_201 = cls(
             data=data,

@@ -11,7 +11,7 @@ import (
 // ServiceProvider interface defines what a service provider needs to implement
 type ServiceProvider interface {
 	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
-		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
+		overwriteInput map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
 	GetRuleResolver() *ruleresolver.RuleResolver
 	GetServiceResolver() *serviceresolver.ServiceResolver
 	GetCaseManager() CaseManagerAccessor

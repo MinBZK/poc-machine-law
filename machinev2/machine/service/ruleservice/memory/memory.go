@@ -83,7 +83,7 @@ func (rs *RuleService) Evaluate(
 	law string,
 	referenceDate string,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {

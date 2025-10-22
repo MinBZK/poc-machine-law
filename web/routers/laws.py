@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from typing import Any
 from urllib.parse import unquote
@@ -13,6 +14,8 @@ from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInter
 from web.feature_flags import is_wallet_enabled
 
 router = APIRouter(prefix="/laws", tags=["laws"])
+
+logger = logging.getLogger(__name__)
 
 
 def get_tile_template(service: str, law: str) -> str:
@@ -38,6 +41,8 @@ def evaluate_law(
     claim_manager: ClaimManagerInterface | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
     """Evaluate a law for a given BSN"""
+
+    logger.warn(f"evalute law {service} {law} for {bsn}")
 
     parameters = {"BSN": bsn}
     overwrite_input = None
@@ -96,6 +101,9 @@ async def execute_law(
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Execute a law and render its result"""
+
+    logger.warn(f"[LAWS] execute {service} {law}")
+
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
@@ -103,7 +111,7 @@ async def execute_law(
         )
 
     except Exception as e:
-        print(e)
+        logger.error(f"[LAWS] EXCEPTION in execute_law(): {type(e).__name__}: {e}", exc_info=True)
         return templates.TemplateResponse(
             get_tile_template(service, law),
             {
@@ -124,6 +132,8 @@ async def execute_law(
     template_path = get_tile_template(service, law)
 
     rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+    logger.warn(f"[LAWS] result {result}")
 
     return templates.TemplateResponse(
         template_path,

@@ -35,7 +35,7 @@ lint:
 	find . -maxdepth 3 -type d -exec sh -c "cd \"{}\"/ && if [ -f go.mod ]; then golangci-lint run; fi;" \;
 
 generate:
-	openapi-python-client generate --path machinev2/api/openapi.yaml --output-path web/machine_client --overwrite
+	openapi-python-client generate --path machinev2/api/openapi.yaml --output-path web/engines/http_engine/machine_client --overwrite
 	@if [ -z "$(GENERATE_DIRS)" ]; then \
 		echo "No directories found in go.work"; \
 		exit 1; \

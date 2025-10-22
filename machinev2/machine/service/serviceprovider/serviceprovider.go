@@ -209,7 +209,7 @@ func (s *Services) Evaluate(
 	law string,
 	parameters map[string]any,
 	referenceDate string,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
@@ -264,7 +264,7 @@ func (s *Services) evaluate(
 	law string,
 	parameters map[string]any,
 	referenceDate string,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {

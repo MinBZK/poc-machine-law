@@ -4,11 +4,11 @@ from typing import Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-T = TypeVar("T", bound="EvaluateResponseSchemaOutput")
+T = TypeVar("T", bound="ResponseEvaluateSchemaOutput")
 
 
 @_attrs_define
-class EvaluateResponseSchemaOutput:
+class ResponseEvaluateSchemaOutput:
     """ """
 
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -22,10 +22,10 @@ class EvaluateResponseSchemaOutput:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        evaluate_response_schema_output = cls()
+        response_evaluate_schema_output = cls()
 
-        evaluate_response_schema_output.additional_properties = d
-        return evaluate_response_schema_output
+        response_evaluate_schema_output.additional_properties = d
+        return response_evaluate_schema_output
 
     @property
     def additional_keys(self) -> list[str]:

@@ -326,8 +326,8 @@ type Evaluate struct {
 	Approved *bool `json:"approved,omitempty"`
 
 	// Date Can be used to overwrite the date used by the service
-	Date  *openapi_types.Date                `json:"date,omitempty"`
-	Input *map[string]map[string]interface{} `json:"input,omitempty"`
+	Date  *openapi_types.Date     `json:"date,omitempty"`
+	Input *map[string]interface{} `json:"input,omitempty"`
 
 	// Law Specify the law that needs to be executed
 	Law string `json:"law"`

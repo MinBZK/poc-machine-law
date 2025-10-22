@@ -27,7 +27,7 @@ type PropertySpecServiceResolver struct {
 	rc              resolver.RuleContexter
 	sp              service.ServiceProvider
 	parameters      map[string]any
-	overwriteInput  map[string]map[string]any
+	overwriteInput  map[string]any
 	cache           sync.Map
 	calculationDate string
 	approved        bool
@@ -38,7 +38,7 @@ func New(
 	sp service.ServiceProvider,
 	propertySpec map[string]ruleresolver.Field,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	calculationDate string,
 	approved bool,
 ) *PropertySpecServiceResolver {

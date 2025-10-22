@@ -59,6 +59,7 @@ COPY ./explain /app/explain
 COPY ./web /app/web
 COPY ./submodules/regelrecht-laws/script /app/script
 COPY ./data /app/data
+COPY ./*.py /app
 
 WORKDIR /app/web
 

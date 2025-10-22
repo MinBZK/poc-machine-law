@@ -78,7 +78,7 @@ func (handler *Handler) ClaimApprove(ctx context.Context, request api.ClaimAppro
 	}
 
 	return api.ClaimApprove200JSONResponse{
-		ClaimApproveResponseJSONResponse: api.ClaimApproveResponseJSONResponse{
+		ResponseClaimApproveJSONResponse: api.ResponseClaimApproveJSONResponse{
 			Data: request.ClaimId,
 		},
 	}, nil
@@ -103,7 +103,7 @@ func (handler *Handler) ClaimReject(ctx context.Context, request api.ClaimReject
 	}
 
 	return api.ClaimReject200JSONResponse{
-		ClaimRejectResponseJSONResponse: api.ClaimRejectResponseJSONResponse{
+		ResponseClaimRejectJSONResponse: api.ResponseClaimRejectJSONResponse{
 			Data: request.ClaimId,
 		},
 	}, nil
@@ -111,6 +111,11 @@ func (handler *Handler) ClaimReject(ctx context.Context, request api.ClaimReject
 
 // SubmitClaim implements api.StrictServerInterface.
 func (handler *Handler) ClaimSubmit(ctx context.Context, request api.ClaimSubmitRequestObject) (api.ClaimSubmitResponseObject, error) {
+	var oldValue *any
+	if request.Body.Data.OldValue != nil {
+		oldValue = &request.Body.Data.OldValue
+	}
+
 	caseID, err := handler.servicer.ClaimSubmit(ctx, model.ClaimSubmit{
 		BSN:          request.Body.Data.Bsn,
 		CaseID:       request.Body.Data.CaseId,
@@ -120,7 +125,7 @@ func (handler *Handler) ClaimSubmit(ctx context.Context, request api.ClaimSubmit
 		Law:          request.Body.Data.Law,
 		Service:      request.Body.Data.Service,
 		NewValue:     request.Body.Data.NewValue,
-		OldValue:     request.Body.Data.OldValue,
+		OldValue:     oldValue,
 		Reason:       request.Body.Data.Reason,
 		AutoApprove:  request.Body.Data.AutoApprove,
 	})
@@ -132,7 +137,7 @@ func (handler *Handler) ClaimSubmit(ctx context.Context, request api.ClaimSubmit
 	}
 
 	return api.ClaimSubmit201JSONResponse{
-		ClaimSubmitResponseJSONResponse: api.ClaimSubmitResponseJSONResponse{
+		ResponseClaimSubmitJSONResponse: api.ResponseClaimSubmitJSONResponse{
 			Data: caseID,
 		},
 	}, nil

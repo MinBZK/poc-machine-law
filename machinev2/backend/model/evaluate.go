@@ -12,7 +12,7 @@ type Evaluate struct {
 
 	// Date Can be used to overwrite the date used by the service
 	Date  *time.Time
-	Input *map[string]map[string]any
+	Input *map[string]any
 
 	// Law Specify the law that needs to be executed
 	Law string

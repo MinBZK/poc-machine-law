@@ -390,7 +390,7 @@ func getRequiredActions(requestedOutput string, actions []ruleresolver.Action) (
 func (re *RulesEngine) Evaluate(
 	ctx context.Context,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	sources model.SourceDataFrame,
 	calculationDate string,
 	requestedOutput string,
@@ -442,7 +442,6 @@ func (re *RulesEngine) Evaluate(
 
 	// Create context
 	ruleCtx := contexter.NewRuleContext(
-		re.ServiceName,
 		re.Definitions,
 		re.ServiceProvider,
 		parameters,
@@ -524,7 +523,7 @@ func (re *RulesEngine) evaluateAction(
 	ctx context.Context,
 	action ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 ) (model.EvaluateActionResult, string, error) {
 	logr := logger.FromContext(ctx)
 
@@ -553,12 +552,10 @@ func (re *RulesEngine) evaluateAction(
 
 		// Check if we should use overwrite value
 		if overwriteInput != nil {
-			if serviceMap, ok := overwriteInput[re.ServiceName]; ok {
-				if val, ok := serviceMap[action.Output]; ok {
-					logr.WithIndent().Debugf("Resolving value %s/%s from OVERWRITE %v",
-						re.ServiceName, action.Output, val)
-					result = val
-				}
+			if val, ok := overwriteInput[action.Output]; ok {
+				logr.WithIndent().Debugf("Resolving value %s/%s from OVERWRITE %v",
+					re.ServiceName, action.Output, val)
+				result = val
 			}
 		}
 

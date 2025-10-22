@@ -30,7 +30,7 @@ func (handler *Handler) CaseBasedOnBSNServiceLaw(ctx context.Context, request ap
 	}
 
 	return api.CaseBasedOnBSNServiceLaw200JSONResponse{
-		CaseResponseJSONResponse: api.CaseResponseJSONResponse{
+		ResponseCaseJSONResponse: api.ResponseCaseJSONResponse{
 			Data: adapter.FromCase(case_),
 		},
 	}, nil
@@ -46,7 +46,7 @@ func (handler *Handler) CaseListBasedOnServiceLaw(ctx context.Context, request a
 	}
 
 	return api.CaseListBasedOnServiceLaw200JSONResponse{
-		CaseListResponseJSONResponse: api.CaseListResponseJSONResponse{
+		ResponseCaseListJSONResponse: api.ResponseCaseListJSONResponse{
 			Data: adapter.FromCases(cases),
 		},
 	}, nil
@@ -62,7 +62,7 @@ func (handler *Handler) CaseListBasedOnBSN(ctx context.Context, request api.Case
 	}
 
 	return api.CaseListBasedOnBSN200JSONResponse{
-		CaseListResponseJSONResponse: api.CaseListResponseJSONResponse{
+		ResponseCaseListJSONResponse: api.ResponseCaseListJSONResponse{
 			Data: adapter.FromCases(cases),
 		},
 	}, nil
@@ -76,7 +76,7 @@ func (handler *Handler) CaseSubmit(ctx context.Context, request api.CaseSubmitRe
 	}
 
 	return api.CaseSubmit201JSONResponse{
-		CaseSubmitResponseJSONResponse: api.CaseSubmitResponseJSONResponse{
+		ResponseCaseSubmitJSONResponse: api.ResponseCaseSubmitJSONResponse{
 			Data: caseID,
 		},
 	}, nil
@@ -100,7 +100,7 @@ func (handler *Handler) CaseGet(ctx context.Context, request api.CaseGetRequestO
 	}
 
 	return api.CaseGet200JSONResponse{
-		CaseResponseJSONResponse: api.CaseResponseJSONResponse{
+		ResponseCaseJSONResponse: api.ResponseCaseJSONResponse{
 			Data: adapter.FromCase(case_),
 		},
 	}, nil
@@ -130,7 +130,7 @@ func (handler *Handler) CaseReview(ctx context.Context, request api.CaseReviewRe
 	}
 
 	return api.CaseReview200JSONResponse{
-		CaseReviewResponseJSONResponse: api.CaseReviewResponseJSONResponse{
+		ResponseCaseReviewJSONResponse: api.ResponseCaseReviewJSONResponse{
 			Data: caseID,
 		},
 	}, nil
@@ -158,7 +158,7 @@ func (handler *Handler) CaseObject(ctx context.Context, request api.CaseObjectRe
 	}
 
 	return api.CaseObject200JSONResponse{
-		CaseObjectResponseJSONResponse: api.CaseObjectResponseJSONResponse{
+		ResponseCaseObjectJSONResponse: api.ResponseCaseObjectJSONResponse{
 			Data: caseID,
 		},
 	}, nil

@@ -34,8 +34,8 @@ func (handler *Handler) Evaluate(ctx context.Context, request api.EvaluateReques
 	}
 
 	return api.Evaluate201JSONResponse{
-		EvaluateResponseJSONResponse: api.EvaluateResponseJSONResponse{
-			Data: api.EvaluateResponseSchema{
+		ResponseEvaluateJSONResponse: api.ResponseEvaluateJSONResponse{
+			Data: api.ResponseEvaluateSchema{
 				Input:           result.Input,
 				MissingRequired: result.MissingRequired,
 				Output:          result.Output,
