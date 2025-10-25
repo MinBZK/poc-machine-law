@@ -152,6 +152,7 @@ class MachineService(EngineInterface):
         # When service routing is enabled, query all configured services
         if self.service_routing_enabled and self.service_routes:
             for service_name, service_config in self.service_routes.items():
+                logger.debug(f"[MachineService] Requesting {service_config.domain} from {service_name}")
                 client = Client(base_url=service_config.domain)
                 with client as client:
                     response = service_laws_discoverable_list.sync_detailed(
