@@ -2,7 +2,6 @@
 
 ![Screenshot](static/img/screenshot.png)
 
-
 ## Developing
 
 Install the dependencies once with `pnpm install`. Then, start a development server:
@@ -12,7 +11,6 @@ pnpm dev
 ```
 
 (However, this will be broken due to the Python backend not serving from the same domain.)
-
 
 ## Building
 
@@ -24,7 +22,6 @@ docker run --rm -p8000:8000 poc-machine-law
 ```
 
 The graph is then available under http://localhost:8000/analysis/graph/
-
 
 ## Building (alternatively)
 

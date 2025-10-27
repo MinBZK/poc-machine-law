@@ -54,6 +54,7 @@
 
   let laws = $state<Law[]>([]);
   let selectedLaws = $state<string[]>([]); // Contains the law UUIDs. This will hold the selected laws from the checkboxes
+  let selectedRootNode = $state<string | null>(null); // Track currently selected root node for edge highlighting
 
   (async () => {
     try {
@@ -150,6 +151,7 @@
               (data.properties.output?.length || 0) * 50,
             ) + 120,
           class: `root service-${colorIndex}`,
+          selectable: false,
         });
 
         // Sources
@@ -447,6 +449,33 @@
     nodes = [...nodes]; // Force update for reactivity
   }
 
+  function updateEdgeHighlighting(rootNodeId: string | null) {
+    edges = edges.map((edge) => {
+      // Remove existing inbound/outbound classes
+      let edgeClass = typeof edge.class === 'string' ? edge.class : '';
+      edgeClass = edgeClass.replace(/\b(inbound|outbound)\b/g, '').trim();
+
+      if (rootNodeId) {
+        const sourceRootId = edge.source.substring(0, 36);
+        const targetRootId = edge.target.substring(0, 36);
+
+        // Check if this edge is connected to the selected root node
+        if (sourceRootId === rootNodeId) {
+          // Incoming edge to selected root node
+          edgeClass = edgeClass ? `${edgeClass} inbound` : 'inbound';
+        } else if (targetRootId === rootNodeId) {
+          // Outgoing edge from selected root node
+          edgeClass = edgeClass ? `${edgeClass} outbound` : 'outbound';
+        }
+      }
+
+      return {
+        ...edge,
+        class: edgeClass || undefined,
+      };
+    });
+  }
+
   function handleNodeClick({ node, event }: any) {
     // If the click is on a button.close, set the node and connected edges as hidden (using ID prefix matching)
     if ((event.target as HTMLElement).closest('.close')) {
@@ -468,6 +497,25 @@
 
       // Remove from selectedLaws
       selectedLaws = selectedLaws.filter((uuid) => uuid !== lawUuid);
+
+      // Clear selection if this was the selected root node
+      if (selectedRootNode === lawUuid) {
+        selectedRootNode = null;
+        updateEdgeHighlighting(null);
+      }
+    } else if (node.class?.includes('root')) {
+      // Handle root node selection for edge highlighting
+      const rootNodeId = node.id;
+
+      if (selectedRootNode === rootNodeId) {
+        // Deselect if clicking the same root node
+        selectedRootNode = null;
+        updateEdgeHighlighting(null);
+      } else {
+        // Select new root node
+        selectedRootNode = rootNodeId;
+        updateEdgeHighlighting(rootNodeId);
+      }
     }
   }
 
@@ -522,7 +570,7 @@
 
 <div class="float-right h-screen w-80 overflow-y-auto px-6 pb-4 text-sm">
   <div class="sticky top-0 bg-white pt-6 pb-2">
-  <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
+    <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
 
     <button
       type="button"
@@ -540,7 +588,7 @@
     <h2
       class="service-{getServiceColorIndex(
         service,
-      )} mb-2 mt-4 inline-block rounded-md px-2 py-1 text-sm font-semibold first:mt-0"
+      )} mt-4 mb-2 inline-block rounded-md px-2 py-1 text-sm font-semibold first:mt-0"
     >
       {service}
     </h2>
@@ -549,7 +597,7 @@
         <label class="group inline-flex items-start">
           <input
             bind:group={selectedLaws}
-            class="form-checkbox mr-1.5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="form-checkbox mt-0.5 mr-1.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             type="checkbox"
             value={law.uuid}
           />
@@ -560,7 +608,7 @@
               onclick={() => {
                 selectedLaws = [law.uuid];
               }}
-              class="invisible cursor-pointer font-semibold text-blue-700 hover:text-blue-800 group-hover:visible"
+              class="invisible cursor-pointer font-semibold text-blue-700 group-hover:visible hover:text-blue-800"
               >alleen</button
             ></span
           >
@@ -586,7 +634,11 @@
   >
     <Controls showLock={false} />
     <Background variant={BackgroundVariant.Dots} />
-    <MiniMap zoomable pannable nodeColor={(n) => n.class?.includes('root') && !n.hidden ? '#ccc' : 'transparent'} />
+    <MiniMap
+      zoomable
+      pannable
+      nodeColor={(n) => (n.class?.includes('root') && !n.hidden ? '#ccc' : 'transparent')}
+    />
   </SvelteFlow>
 </div>
 
@@ -599,59 +651,59 @@
 
   /* Node colors, based on https://www.chartjs.org/docs/latest/general/colors.html. See also https://d3js.org/d3-scale-chromatic/categorical#categorical-schemes */
   :global(.service-0.root) {
-    @apply bg-blue-50 border-blue-800;
+    @apply border-blue-800 bg-blue-50;
   }
 
   :global(.service-0.property-group) {
-    @apply bg-blue-100 border-blue-800;
+    @apply border-blue-800 bg-blue-100;
   }
 
   :global(.service-1.root) {
-    @apply bg-pink-50 border-pink-800;
+    @apply border-pink-800 bg-pink-50;
   }
 
   :global(.service-1.property-group) {
-    @apply bg-pink-100 border-pink-800;
+    @apply border-pink-800 bg-pink-100;
   }
 
   :global(.service-2.root) {
-    @apply bg-emerald-50 border-emerald-800;
+    @apply border-emerald-800 bg-emerald-50;
   }
 
   :global(.service-2.property-group) {
-    @apply bg-emerald-100 border-emerald-800;
+    @apply border-emerald-800 bg-emerald-100;
   }
 
   :global(.service-3.root) {
-    @apply bg-amber-50 border-amber-800;
+    @apply border-amber-800 bg-amber-50;
   }
 
   :global(.service-3.property-group) {
-    @apply bg-amber-100 border-amber-800;
+    @apply border-amber-800 bg-amber-100;
   }
 
   :global(.service-4.root) {
-    @apply bg-purple-50 border-purple-800;
+    @apply border-purple-800 bg-purple-50;
   }
 
   :global(.service-4.property-group) {
-    @apply bg-purple-100 border-purple-800;
+    @apply border-purple-800 bg-purple-100;
   }
 
   :global(.service-5.root) {
-    @apply bg-yellow-50 border-yellow-800;
+    @apply border-yellow-800 bg-yellow-50;
   }
 
   :global(.service-5.property-group) {
-    @apply bg-yellow-100 border-yellow-800;
+    @apply border-yellow-800 bg-yellow-100;
   }
 
   :global(.service-6.root) {
-    @apply bg-slate-50 border-slate-800;
+    @apply border-slate-800 bg-slate-50;
   }
 
   :global(.service-6.property-group) {
-    @apply bg-slate-100 border-slate-800;
+    @apply border-slate-800 bg-slate-100;
   }
 
   .service-0 {
@@ -702,5 +754,23 @@
 
   :global(.svelte-flow__edge.selected) {
     --xy-edge-stroke-width-default: 2.5;
+  }
+
+  /* Edge highlighting styles */
+  :global(.svelte-flow__edge.inbound) {
+    --xy-edge-stroke: #ef4444; /* red-500 for incoming edges */
+    --xy-edge-stroke-width-default: 2.5;
+  }
+
+  :global(.svelte-flow__edge.outbound) {
+    --xy-edge-stroke: #22c55e; /* green-500 for outgoing edges */
+    --xy-edge-stroke-width-default: 2.5;
+  }
+
+  :global(
+    .svelte-flow__edge.inbound path:first-child,
+    .svelte-flow__edge.outbound path:first-child
+  ) {
+    marker-end: none; /* Remove the end markers, since these are difficult to colorize without adding extra markers */
   }
 </style>
