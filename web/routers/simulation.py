@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 from simulate import LawSimulator
 from web.dependencies import templates
-from web.law_parameters import get_default_law_parameters
+from web.law_parameters import get_auto_discovered_parameters, get_default_law_parameters_subprocess
 
 # Store simulation progress and results
 simulation_progress = {}
@@ -19,8 +19,9 @@ router = APIRouter(prefix="/simulation", tags=["simulation"])
 @router.get("/")
 async def simulation_page(request: Request):
     """Render the simulation configuration page"""
-    # Get law parameters from YAML files
-    law_params = get_default_law_parameters()
+    # Get default values via subprocess (avoids Services initialization conflicts)
+    # This will have all auto-discovered parameters with their default values
+    law_params = get_default_law_parameters_subprocess()
 
     # Default parameters for the simulation
     default_params = {

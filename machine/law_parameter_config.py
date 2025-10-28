@@ -278,8 +278,11 @@ def discover_law_parameters_with_services(law_name: str, service: str, services:
             ui_param_name = prop_name.lower()
 
             # Infer transformations from type spec
-            type_spec = None
-            if prop_name in output_specs:
+            # First check if type_spec is directly in prop_spec (for INPUT properties)
+            type_spec = prop_spec.get("type_spec")
+
+            # If not, check output_specs (for OUTPUT properties)
+            if not type_spec and prop_name in output_specs:
                 spec = output_specs[prop_name]
                 type_spec = {
                     "unit": spec.unit,
