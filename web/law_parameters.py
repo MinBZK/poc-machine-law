@@ -113,26 +113,26 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
 
             # BOX1_TARIEF1 is decimal (0.3693), convert to percentage (36.93)
             tarief1 = definitions.get("BOX1_TARIEF1", 0.3693)
-            parameters["inkomstenbelasting"]["tarief_schijf1"] = round(tarief1 * 100, 2)
+            parameters["inkomstenbelasting"]["box1_tarief1"] = round(tarief1 * 100, 2)
 
             # BOX1_TARIEF2 is decimal (0.4953), convert to percentage (49.53)
             tarief2 = definitions.get("BOX1_TARIEF2", 0.4953)
-            parameters["inkomstenbelasting"]["tarief_schijf2"] = round(tarief2 * 100, 2)
+            parameters["inkomstenbelasting"]["box1_tarief2"] = round(tarief2 * 100, 2)
 
             # BOX1_SCHIJF1_GRENS is eurocents (7457300), convert to euros (74573)
             grens1 = definitions.get("BOX1_SCHIJF1_GRENS", 7457300)
-            parameters["inkomstenbelasting"]["grens_schijf1"] = round(grens1 / 100)
+            parameters["inkomstenbelasting"]["box1_schijf1_grens"] = round(grens1 / 100)
 
             # ALGEMENE_HEFFINGSKORTING_MAX is eurocents (310400), convert to euros (3104)
             heffingskorting = definitions.get("ALGEMENE_HEFFINGSKORTING_MAX", 310400)
-            parameters["inkomstenbelasting"]["algemene_heffingskorting"] = round(heffingskorting / 100)
+            parameters["inkomstenbelasting"]["algemene_heffingskorting_max"] = round(heffingskorting / 100)
         except Exception as e:
             logger.warning(f"Error loading inkomstenbelasting parameters: {e}")
-            # Fallback to actual YAML values (not the incorrect hardcoded ones!)
-            parameters["inkomstenbelasting"]["tarief_schijf1"] = 36.93
-            parameters["inkomstenbelasting"]["tarief_schijf2"] = 49.53
-            parameters["inkomstenbelasting"]["grens_schijf1"] = 74573
-            parameters["inkomstenbelasting"]["algemene_heffingskorting"] = 3104
+            # Fallback to actual YAML values
+            parameters["inkomstenbelasting"]["box1_tarief1"] = 36.93
+            parameters["inkomstenbelasting"]["box1_tarief2"] = 49.53
+            parameters["inkomstenbelasting"]["box1_schijf1_grens"] = 74573
+            parameters["inkomstenbelasting"]["algemene_heffingskorting_max"] = 3104
 
         # Kieswet
         try:

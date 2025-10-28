@@ -239,12 +239,9 @@ def discover_law_parameters_with_services(law_name: str, service: str, services:
         if not isinstance(actual_value, (int, float)):
             continue
 
-        # Create UI-friendly parameter name (lowercase, remove BOX1_ prefix, etc.)
+        # Create UI-friendly parameter name (just lowercase to preserve semantic prefixes)
+        # We keep prefixes like box1_, box2_, norm_, etc. to prevent collisions
         ui_param_name = def_name.lower()
-        # Remove common prefixes
-        for prefix in ["box1_", "box2_", "box3_", "norm_", "max_", "min_"]:
-            if ui_param_name.startswith(prefix):
-                ui_param_name = ui_param_name[len(prefix):]
 
         # Try to find matching output spec for type information
         type_spec = None

@@ -658,42 +658,42 @@
                                     </h3>
                                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div>
-                                            <label for="ib_tarief_schijf1"
+                                            <label for="ib_box1_tarief1"
                                                    class="block text-sm font-medium text-gray-700">
                                                 Tarief schijf 1 (%)
                                             </label>
                                             <input type="number"
-                                                   name="ib_tarief_schijf1"
-                                                   id="ib_tarief_schijf1"
-                                                   value="{{ '%.2f'|format(law_params.inkomstenbelasting.tarief_schijf1) }}"
+                                                   name="ib_box1_tarief1"
+                                                   id="ib_box1_tarief1"
+                                                   value="{{ '%.2f'|format(law_params.inkomstenbelasting.box1_tarief1) }}"
                                                    min="0"
                                                    max="50"
                                                    step="0.01"
                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         </div>
                                         <div>
-                                            <label for="ib_tarief_schijf2"
+                                            <label for="ib_box1_tarief2"
                                                    class="block text-sm font-medium text-gray-700">
                                                 Tarief schijf 2 (%)
                                             </label>
                                             <input type="number"
-                                                   name="ib_tarief_schijf2"
-                                                   id="ib_tarief_schijf2"
-                                                   value="{{ '%.2f'|format(law_params.inkomstenbelasting.tarief_schijf2) }}"
+                                                   name="ib_box1_tarief2"
+                                                   id="ib_box1_tarief2"
+                                                   value="{{ '%.2f'|format(law_params.inkomstenbelasting.box1_tarief2) }}"
                                                    min="0"
                                                    max="60"
                                                    step="0.01"
                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         </div>
                                         <div>
-                                            <label for="ib_grens_schijf1"
+                                            <label for="ib_box1_schijf1_grens"
                                                    class="block text-sm font-medium text-gray-700">
                                                 Grens schijf 1 (€)
                                             </label>
                                             <input type="number"
-                                                   name="ib_grens_schijf1"
-                                                   id="ib_grens_schijf1"
-                                                   value="{{ '%d'|format(law_params.inkomstenbelasting.grens_schijf1) }}"
+                                                   name="ib_box1_schijf1_grens"
+                                                   id="ib_box1_schijf1_grens"
+                                                   value="{{ '%d'|format(law_params.inkomstenbelasting.box1_schijf1_grens) }}"
                                                    min="50000"
                                                    max="100000"
                                                    step="100"
@@ -1700,9 +1700,9 @@ async function runSimulation() {
                 norm_gehuwd: parseFloat(formData.get('bijstand_norm_gehuwd'))
             },
             inkomstenbelasting: {
-                tarief_schijf1: parseFloat(formData.get('ib_tarief_schijf1')),
-                tarief_schijf2: parseFloat(formData.get('ib_tarief_schijf2')),
-                grens_schijf1: parseFloat(formData.get('ib_grens_schijf1')),
+                box1_tarief1: parseFloat(formData.get('ib_box1_tarief1')),
+                box1_tarief2: parseFloat(formData.get('ib_box1_tarief2')),
+                box1_schijf1_grens: parseFloat(formData.get('ib_box1_schijf1_grens')),
                 algemene_heffingskorting: parseFloat(formData.get('ib_algemene_heffingskorting'))
             },
             kies: {
@@ -2798,9 +2798,9 @@ function getParamDisplayName(param) {
         'basisbedrag': 'Basisbedrag',
         'norm_alleenstaand': 'Norm alleenstaand',
         'norm_gehuwd': 'Norm gehuwd/samenwonend',
-        'tarief_schijf1': 'Tarief schijf 1',
-        'tarief_schijf2': 'Tarief schijf 2',
-        'grens_schijf1': 'Grens schijf 1',
+        'box1_tarief1': 'Tarief schijf 1',
+        'box1_tarief2': 'Tarief schijf 2',
+        'box1_schijf1_grens': 'Grens schijf 1',
         'algemene_heffingskorting': 'Algemene heffingskorting',
         'min_leeftijd': 'Minimale leeftijd'
     };
