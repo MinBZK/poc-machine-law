@@ -310,12 +310,16 @@ def discover_law_parameters(law_name: str, service: str, simulation_date: str = 
         return None
 
 
-def auto_populate_registry(simulation_date: str = "2025-01-01") -> None:
+def auto_populate_registry(simulation_date: str = "2025-01-01", discoverable_by: str = "CITIZEN") -> None:
     """
-    Automatically populate the registry by discovering parameters from all available laws.
+    Automatically populate the registry by discovering parameters from discoverable laws.
 
-    This function discovers laws from the RuleResolver and attempts to auto-discover
-    their parameters. No hardcoded law lists required!
+    This function discovers citizen-discoverable laws from the RuleResolver and attempts
+    to auto-discover their parameters. No hardcoded law lists required!
+
+    Args:
+        simulation_date: Date to use for loading law versions
+        discoverable_by: Filter to laws discoverable by this actor (default: "CITIZEN")
     """
     # Create Services instance once to avoid eventsourcing registration conflicts
     try:
@@ -324,9 +328,9 @@ def auto_populate_registry(simulation_date: str = "2025-01-01") -> None:
         logger.error(f"Failed to initialize Services for auto-discovery: {e}")
         return
 
-    # Discover all available laws from the resolver
+    # Discover citizen-discoverable laws from the resolver
     resolver = RuleResolver()
-    service_laws = resolver.get_service_laws()
+    service_laws = resolver.get_discoverable_service_laws(discoverable_by)
 
     # Iterate through all services and their laws
     for service_name, laws in service_laws.items():
