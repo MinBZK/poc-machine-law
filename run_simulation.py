@@ -117,8 +117,6 @@ if __name__ == "__main__":
         result = create_population(params) if operation == "create_population" else run_simulation(params)
         print(json.dumps(result))
     except Exception as e:
-        import traceback
-
         # Log full error server-side for debugging
         logger.error("Simulation error: %s", str(e), exc_info=True)
 
