@@ -73,12 +73,18 @@ _LAW_CONFIGS: dict[str, LawConfig] = {}
 _REGISTRY_INITIALIZED: bool = False
 
 
-def _ensure_registry_initialized() -> None:
-    """Lazily initialize the registry on first access."""
+def _ensure_registry_initialized(services: Services | None = None) -> None:
+    """
+    Lazily initialize the registry on first access.
+
+    Args:
+        services: Optional Services instance to use for auto-discovery.
+                  If not provided, a new instance will be created.
+    """
     global _REGISTRY_INITIALIZED
     if not _REGISTRY_INITIALIZED:
         try:
-            auto_populate_registry()
+            auto_populate_registry(services=services)
             logger.info(f"Auto-populated law parameter registry with {len(_LAW_CONFIGS)} laws")
             _REGISTRY_INITIALIZED = True
         except Exception as e:
@@ -327,7 +333,11 @@ def discover_law_parameters(law_name: str, service: str, simulation_date: str = 
         return None
 
 
-def auto_populate_registry(simulation_date: str = "2025-01-01", discoverable_by: str = "CITIZEN") -> None:
+def auto_populate_registry(
+    simulation_date: str = "2025-01-01",
+    discoverable_by: str = "CITIZEN",
+    services: Services | None = None
+) -> None:
     """
     Automatically populate the registry by discovering parameters from discoverable laws.
 
@@ -337,13 +347,15 @@ def auto_populate_registry(simulation_date: str = "2025-01-01", discoverable_by:
     Args:
         simulation_date: Date to use for loading law versions
         discoverable_by: Filter to laws discoverable by this actor (default: "CITIZEN")
+        services: Optional Services instance to reuse (avoids eventsourcing registration conflicts)
     """
-    # Create Services instance once to avoid eventsourcing registration conflicts
-    try:
-        services = Services(simulation_date)
-    except Exception as e:
-        logger.error(f"Failed to initialize Services for auto-discovery: {e}")
-        return
+    # Use provided Services instance or create a new one
+    if services is None:
+        try:
+            services = Services(simulation_date)
+        except Exception as e:
+            logger.error(f"Failed to initialize Services for auto-discovery: {e}")
+            return
 
     # Discover citizen-discoverable laws from the resolver
     resolver = RuleResolver()

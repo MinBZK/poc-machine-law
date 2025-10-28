@@ -1412,36 +1412,39 @@ async function runSimulation() {
             rent_percentage: parseInt(formData.get('rent_percentage')),
             student_percentage_young: parseInt(formData.get('student_percentage_young'))
         },
-        law_parameters: {
-            zorgtoeslag: {
-                standaardpremie: parseFloat(formData.get('zorgtoeslag_standaardpremie'))
-            },
-            huurtoeslag: {
-                max_huur: parseFloat(formData.get('huurtoeslag_max_huur')),
-                basishuur: parseFloat(formData.get('huurtoeslag_basishuur'))
-            },
-            kinderopvang: {
-                max_uurprijs: parseFloat(formData.get('kinderopvang_uurprijs')),
-                max_uren: parseInt(formData.get('kinderopvang_max_uren'))
-            },
-            aow: {
-                pensioenleeftijd: parseFloat(formData.get('aow_pensioenleeftijd')),
-                basisbedrag: parseFloat(formData.get('aow_basisbedrag'))
-            },
-            bijstand: {
-                norm_alleenstaand: parseFloat(formData.get('bijstand_norm_alleenstaand')),
-                norm_gehuwd: parseFloat(formData.get('bijstand_norm_gehuwd'))
-            },
-            inkomstenbelasting: {
-                box1_tarief1: parseFloat(formData.get('ib_box1_tarief1')),
-                box1_tarief2: parseFloat(formData.get('ib_box1_tarief2')),
-                box1_schijf1_grens: parseFloat(formData.get('ib_box1_schijf1_grens')),
-                algemene_heffingskorting_max: parseFloat(formData.get('ib_algemene_heffingskorting_max'))
-            },
-            kies: {
-                min_leeftijd: parseInt(formData.get('kies_min_leeftijd'))
-            }
-        }
+        law_parameters: (() => {
+            // Dynamically collect ALL law parameters from the form
+            const lawParams = {};
+
+            // Get all input fields from the law parameters section
+            const lawInputs = document.querySelectorAll('#law-parameters-section input[type="number"]');
+
+            lawInputs.forEach(input => {
+                const name = input.name;
+                if (!name) return;
+
+                // Parse field name format: {law_name}_{param_name}
+                const parts = name.split('_');
+                if (parts.length < 2) return;
+
+                const lawName = parts[0];
+                const paramName = parts.slice(1).join('_');
+                const value = parseFloat(input.value);
+
+                // Skip if value is NaN or null
+                if (isNaN(value)) return;
+
+                // Initialize law object if it doesn't exist
+                if (!lawParams[lawName]) {
+                    lawParams[lawName] = {};
+                }
+
+                // Add parameter to law object
+                lawParams[lawName][paramName] = value;
+            });
+
+            return lawParams;
+        })()
     };
 
     // Create tab for this simulation
@@ -1531,7 +1534,9 @@ async function runSimulation() {
 
     } catch (error) {
         console.error('Error running simulation:', error);
-        alert('Er is een fout opgetreden bij het uitvoeren van de simulatie.');
+        console.error('Error stack:', error.stack);
+        console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        alert(`Er is een fout opgetreden bij het uitvoeren van de simulatie:\n\n${error.message}\n\nCheck de browser console voor meer details (F12).`);
         document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
         closeTab(simulationId);
     }
@@ -1781,23 +1786,23 @@ function displayResults(data, simulationId) {
             <h3 class="text-sm font-medium text-gray-700 mt-6 mb-2">Wetten & Regelingen</h3>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslag', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslagwet', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslag')}Zorgtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslagwet')}Zorgtoeslag</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.zorgtoeslag.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.zorgtoeslag.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.zorgtoeslagwet.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.zorgtoeslagwet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslag-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslagwet-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="zorgtoeslag-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="zorgtoeslagwet-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.zorgtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslag.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.zorgtoeslagwet.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslagwet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -1825,13 +1830,13 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdoms', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdomswet', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdoms')}AOW</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdomswet')}AOW</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.algemeneouderdoms.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.algemeneouderdoms.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.algemeneouderdomswet.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.algemeneouderdomswet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="aow-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1841,7 +1846,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="aow-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.algemeneouderdoms.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdoms.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.algemeneouderdomswet.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdomswet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -2078,7 +2083,7 @@ function copyResultsAsMarkdown(simulationId) {
     markdown += `| Wet | In aanmerking | Gem. bedrag |\n`;
     markdown += `|-----|---------------|-------------|\n`;
 
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang'];
     laws.forEach(law => {
         const lawData = data.summary.laws[law];
         markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
@@ -2111,10 +2116,10 @@ function copyResultsAsMarkdown(simulationId) {
 
 function getLawIcon(lawName) {
     const icons = {
-        'zorgtoeslag': '<svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        'zorgtoeslagwet': '<svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
         'huurtoeslag': '<svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
         'kinderopvang': '<svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
-        'algemeneouderdoms': '<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        'algemeneouderdomswet': '<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
         'bijstand': '<svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
         'voting_rights': '<svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>',
         'income_tax': '<svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>'
@@ -2219,7 +2224,7 @@ function exportComparison(format) {
 
     // Laws
     csv += '\nWETTEN & REGELINGEN\n';
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang', 'voting_rights'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'voting_rights'];
     laws.forEach(law => {
         const lawName = getLawDisplayName(law);
         csv += createCSVRow(`${lawName} - In aanmerking (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
@@ -2358,7 +2363,7 @@ function renderComparisonContent(simulations) {
 }
 
 function renderComparisonRows(baseline, comparisons) {
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang', 'voting_rights'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'voting_rights'];
     let html = '';
 
     // Demographics
@@ -2509,9 +2514,9 @@ function formatValue(value, format) {
 
 function getLawDisplayName(law) {
     const names = {
-        'zorgtoeslag': 'Zorgtoeslag',
+        'zorgtoeslagwet': 'Zorgtoeslag',
         'huurtoeslag': 'Huurtoeslag',
-        'algemeneouderdoms': 'AOW',
+        'algemeneouderdomswet': 'AOW',
         'bijstand': 'Bijstand',
         'kinderopvang': 'Kinderopvangtoeslag',
         'voting_rights': 'Kiesrecht',
@@ -2604,7 +2609,7 @@ function renderComparisonCharts(baseline, comparisons) {
 
     // Prepare data for charts
     const eligibilityData = [];
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang'];
 
     laws.forEach(law => {
         eligibilityData.push({

@@ -108,16 +108,12 @@ if __name__ == "__main__":
     # Determine operation: create_population or run_simulation
     operation = params.get("operation", "run_simulation")
 
-    # Suppress stderr output to avoid progress bar being treated as error
-    with open(os.devnull, "w") as devnull:
-        old_stderr = sys.stderr
-        sys.stderr = devnull
-        try:
-            result = create_population(params) if operation == "create_population" else run_simulation(params)
-            print(json.dumps(result))
-        except Exception as e:
-            error_result = {"status": "error", "message": str(e)}
-            print(json.dumps(error_result))
-            sys.exit(1)
-        finally:
-            sys.stderr = old_stderr
+    # Don't suppress stderr temporarily to see debug logs
+    try:
+        result = create_population(params) if operation == "create_population" else run_simulation(params)
+        print(json.dumps(result))
+    except Exception as e:
+        import traceback
+        error_result = {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
+        print(json.dumps(error_result), file=sys.stderr)
+        sys.exit(1)

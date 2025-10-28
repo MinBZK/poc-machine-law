@@ -11,7 +11,12 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
-from machine.law_parameter_config import create_overrides, derive_ui_name_from_law_name, find_law_config_by_technical_name
+from machine.law_parameter_config import (
+    _ensure_registry_initialized,
+    create_overrides,
+    derive_ui_name_from_law_name,
+    find_law_config_by_technical_name,
+)
 from machine.service import Services
 
 # Create a logger for this module
@@ -26,9 +31,21 @@ class LawSimulator:
     def __init__(self, simulation_date="2025-03-01", law_parameters=None) -> None:
         self.simulation_date = simulation_date
         self.services = Services(simulation_date)
+
+        # Initialize the law parameter registry with our Services instance
+        # This prevents eventsourcing conflicts in subprocess contexts
+        _ensure_registry_initialized(services=self.services)
+
         self.results = []
         self.used_bsns = set()  # Track used BSNs
         self.law_parameters = law_parameters or {}
+
+        # DEBUG: Log received law parameters
+        if self.law_parameters:
+            logger.info(f"Received law_parameters with keys: {list(self.law_parameters.keys())}")
+            for law_name, params in self.law_parameters.items():
+                if params:
+                    logger.info(f"  {law_name}: {len(params)} parameters")
 
         # CBS demographic data for more realistic simulation
         self.age_distribution = {
@@ -1389,12 +1406,19 @@ class LawSimulator:
         # Find law config by technical name
         config = find_law_config_by_technical_name(law_name)
         if not config:
+            logger.debug(f"No config found for technical law name: {law_name}")
             return {}, {}
 
         # Check if we have UI parameters for this law
         ui_law_name = config.ui_name
+        logger.debug(f"Looking for UI law name '{ui_law_name}' (from technical name '{law_name}') in law_parameters")
+        logger.debug(f"Available law_parameters keys: {list(self.law_parameters.keys())}")
+
         if ui_law_name not in self.law_parameters:
+            logger.debug(f"No parameters found for UI law name: {ui_law_name}")
             return {}, {}
+
+        logger.info(f"Found {len(self.law_parameters[ui_law_name])} parameters for {ui_law_name}")
 
         # Create overrides using registry
         overwrite_input, overwrite_definitions = create_overrides(ui_law_name, self.law_parameters[ui_law_name])

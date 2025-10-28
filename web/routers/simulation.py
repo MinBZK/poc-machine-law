@@ -16,12 +16,52 @@ simulation_results = {}
 router = APIRouter(prefix="/simulation", tags=["simulation"])
 
 
+@router.get("/debug/law-params")
+async def debug_law_params():
+    """Debug endpoint to see raw law parameters"""
+    try:
+        law_params = get_default_law_parameters_subprocess()
+        return JSONResponse({
+            "status": "success",
+            "law_count": len(law_params),
+            "law_keys": list(law_params.keys()),
+            "sample_data": {
+                k: {
+                    "param_count": len(v),
+                    "params_with_values": {pk: pv for pk, pv in list(v.items())[:5] if pv is not None}
+                }
+                for k, v in list(law_params.items())[:3]
+            },
+            "full_data": law_params
+        })
+    except Exception as e:
+        import traceback
+        return JSONResponse({
+            "status": "error",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }, status_code=500)
+
+
 @router.get("/")
 async def simulation_page(request: Request):
     """Render the simulation configuration page"""
     # Get default values via subprocess (avoids Services initialization conflicts)
     # This will have all auto-discovered parameters with their default values
     law_params = get_default_law_parameters_subprocess()
+
+    # Debug: log what we're passing to template
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Law params keys: {list(law_params.keys())}")
+    if law_params:
+        first_law = list(law_params.keys())[0]
+        logger.info(f"First law: {first_law}, param count: {len(law_params[first_law])}")
+        # Show a sample parameter with value
+        for param_name, param_value in law_params[first_law].items():
+            if param_value is not None:
+                logger.info(f"  Sample: {param_name} = {param_value}")
+                break
 
     # Default parameters for the simulation
     default_params = {
