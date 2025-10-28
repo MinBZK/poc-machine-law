@@ -1,0 +1,404 @@
+"""
+Law parameter configuration registry for mapping UI parameters to engine overrides.
+
+This module automatically discovers law parameters from YAML files and builds
+transformation mappings based on type specifications. It supports both input overrides
+(for properties with service_reference) and definition overrides (for constants).
+"""
+
+import logging
+from typing import Any, Callable, Literal
+
+from machine.service import Services
+from machine.utils import RuleResolver
+
+logger = logging.getLogger(__name__)
+
+
+class ParameterMapping:
+    """Configuration for mapping a UI parameter to an engine override"""
+
+    def __init__(
+        self,
+        ui_param_name: str,
+        engine_field_name: str,
+        override_type: Literal["input", "definition"],
+        service_name: str | None = None,
+        transform_to_engine: Callable[[Any], Any] | None = None,
+        transform_from_engine: Callable[[Any], Any] | None = None,
+    ):
+        """
+        Initialize parameter mapping.
+
+        Args:
+            ui_param_name: Name of parameter in UI (e.g., "standaardpremie")
+            engine_field_name: Name in engine/YAML (e.g., "STANDAARDPREMIE_2025" or "standaardpremie")
+            override_type: Whether this is an "input" or "definition" override
+            service_name: Service name for input overrides (e.g., "VWS")
+            transform_to_engine: Function to convert UI value to engine format
+            transform_from_engine: Function to convert engine value to UI format
+        """
+        self.ui_param_name = ui_param_name
+        self.engine_field_name = engine_field_name
+        self.override_type = override_type
+        self.service_name = service_name
+        self.transform_to_engine = transform_to_engine or (lambda x: x)
+        self.transform_from_engine = transform_from_engine or (lambda x: x)
+
+
+class LawConfig:
+    """Configuration for a law's parameters"""
+
+    def __init__(self, ui_name: str, law_name: str, service: str):
+        """
+        Initialize law configuration.
+
+        Args:
+            ui_name: UI name (e.g., "inkomstenbelasting")
+            law_name: Technical law name (e.g., "wet_inkomstenbelasting")
+            service: Service that evaluates this law (e.g., "BELASTINGDIENST")
+        """
+        self.ui_name = ui_name
+        self.law_name = law_name
+        self.service = service
+        self.parameters: dict[str, ParameterMapping] = {}
+
+    def add_parameter(self, mapping: ParameterMapping) -> None:
+        """Add a parameter mapping to this law"""
+        self.parameters[mapping.ui_param_name] = mapping
+
+
+# Global law configuration registry
+_LAW_CONFIGS: dict[str, LawConfig] = {}
+
+
+def register_law(ui_name: str, law_name: str, service: str) -> LawConfig:
+    """Register a law and return its configuration for adding parameters"""
+    config = LawConfig(ui_name, law_name, service)
+    _LAW_CONFIGS[ui_name] = config
+    return config
+
+
+def get_law_config(ui_name: str) -> LawConfig | None:
+    """Get law configuration by UI name"""
+    return _LAW_CONFIGS.get(ui_name)
+
+
+def get_all_law_configs() -> dict[str, LawConfig]:
+    """Get all law configurations"""
+    return _LAW_CONFIGS
+
+
+def find_law_config_by_technical_name(law_name: str) -> LawConfig | None:
+    """Find law configuration by technical law name"""
+    for config in _LAW_CONFIGS.values():
+        if config.law_name == law_name:
+            return config
+    return None
+
+
+# ==============================================================================
+# AUTOMATIC PARAMETER DISCOVERY
+# ==============================================================================
+
+# UI-friendly name mappings (technical_law_name -> ui_name)
+# Most laws use a shortened name, this maps them
+UI_NAME_MAPPINGS = {
+    "zorgtoeslagwet": "zorgtoeslag",
+    "wet_inkomstenbelasting": "inkomstenbelasting",
+    "wet_op_de_huurtoeslag": "huurtoeslag",
+    "wet_kinderopvang": "kinderopvangtoeslag",
+    "algemene_ouderdomswet": "aow",
+    "participatiewet/bijstand": "bijstand",
+    "kieswet": "kiesrecht",
+}
+
+
+def infer_transformation_from_type_spec(param_name: str, value: Any, type_spec: dict | None = None) -> tuple[Callable, Callable]:
+    """
+    Infer transformation functions from parameter type specification.
+
+    Returns:
+        Tuple of (transform_to_engine, transform_from_engine)
+    """
+    # Default: no transformation
+    to_engine = lambda x: x
+    from_engine = lambda x: x
+
+    if type_spec:
+        unit = type_spec.get("unit")
+
+        # Handle eurocent conversions
+        if unit == "eurocent":
+            # Check if this is a monthly value based on naming conventions
+            if "standaardpremie" in param_name.lower() or "premie" in param_name.lower():
+                # Monthly euros → yearly eurocents
+                to_engine = lambda x: int(x * 12 * 100)
+                from_engine = lambda x: round(x / 100 / 12, 2)
+            else:
+                # Regular euros → eurocents
+                to_engine = lambda x: int(x * 100)
+                from_engine = lambda x: round(x / 100)
+
+        # Handle percentage/decimal conversions
+        elif unit == "percentage":
+            # Percentage (36.93) → decimal (0.3693)
+            to_engine = lambda x: x / 100
+            from_engine = lambda x: round(x * 100, 2)
+
+    # Fallback: infer from value type and magnitude
+    elif isinstance(value, (int, float)):
+        # If value is between 0 and 1, likely a decimal percentage
+        if 0 < value < 1:
+            to_engine = lambda x: x / 100
+            from_engine = lambda x: round(x * 100, 2)
+        # If value is very large (> 1000), might be in eurocents
+        elif value > 10000:
+            to_engine = lambda x: int(x * 100)
+            from_engine = lambda x: round(x / 100)
+
+    return to_engine, from_engine
+
+
+def discover_law_parameters_with_services(law_name: str, service: str, services: Services) -> LawConfig | None:
+    """
+    Automatically discover parameters from a law's YAML definition using a shared Services instance.
+
+    Args:
+        law_name: Technical law name (e.g., "wet_inkomstenbelasting")
+        service: Service that evaluates this law (e.g., "BELASTINGDIENST")
+        services: Shared Services instance to avoid re-initialization
+
+    Returns:
+        LawConfig with auto-discovered parameters
+    """
+    # Get UI-friendly name
+    ui_name = UI_NAME_MAPPINGS.get(law_name, law_name.replace("wet_", "").replace("_", ""))
+
+    # Create law config
+    config = LawConfig(ui_name, law_name, service)
+
+    # Load the law spec to get definitions
+    engine = services.services[service]._get_engine(law_name, services.root_reference_date)
+
+    # Discover definitions that could be overridden
+    definitions = engine.definitions or {}
+    output_specs = engine.output_specs or {}
+
+    for def_name, def_value in definitions.items():
+        # Extract actual value if it's a dict with 'value' key
+        actual_value = def_value.get("value") if isinstance(def_value, dict) else def_value
+
+        # Skip if not a numeric value
+        if not isinstance(actual_value, (int, float)):
+            continue
+
+        # Create UI-friendly parameter name (lowercase, remove BOX1_ prefix, etc.)
+        ui_param_name = def_name.lower()
+        # Remove common prefixes
+        for prefix in ["box1_", "box2_", "box3_", "norm_", "max_", "min_"]:
+            if ui_param_name.startswith(prefix):
+                ui_param_name = ui_param_name[len(prefix):]
+
+        # Try to find matching output spec for type information
+        type_spec = None
+        for output_name, spec in output_specs.items():
+            if output_name.upper() == def_name or def_name in output_name.upper():
+                type_spec = {
+                    "unit": spec.unit,
+                    "type": spec.type,
+                    "precision": spec.precision
+                }
+                break
+
+        # Infer transformations
+        to_engine, from_engine = infer_transformation_from_type_spec(ui_param_name, actual_value, type_spec)
+
+        # Create parameter mapping
+        mapping = ParameterMapping(
+            ui_param_name=ui_param_name,
+            engine_field_name=def_name,
+            override_type="definition",
+            transform_to_engine=to_engine,
+            transform_from_engine=from_engine,
+        )
+
+        config.add_parameter(mapping)
+        logger.debug(f"Discovered parameter {law_name}.{ui_param_name} -> {def_name}")
+
+    # Also check for input properties with service_reference
+    for prop_name, prop_spec in engine.property_specs.items():
+        if "service_reference" in prop_spec:
+            service_ref = prop_spec["service_reference"]
+
+            # Create UI-friendly name
+            ui_param_name = prop_name.lower()
+
+            # Infer transformations from type spec
+            type_spec = None
+            if prop_name in output_specs:
+                spec = output_specs[prop_name]
+                type_spec = {
+                    "unit": spec.unit,
+                    "type": spec.type,
+                    "precision": spec.precision
+                }
+
+            to_engine, from_engine = infer_transformation_from_type_spec(ui_param_name, 0, type_spec)
+
+            mapping = ParameterMapping(
+                ui_param_name=ui_param_name,
+                engine_field_name=service_ref.get("field", prop_name),
+                override_type="input",
+                service_name=service_ref.get("service"),
+                transform_to_engine=to_engine,
+                transform_from_engine=from_engine,
+            )
+
+            config.add_parameter(mapping)
+            logger.debug(f"Discovered input parameter {law_name}.{ui_param_name} -> {service_ref}")
+
+    logger.info(f"Auto-discovered {len(config.parameters)} parameters for {law_name}")
+    return config
+
+
+def discover_law_parameters(law_name: str, service: str, simulation_date: str = "2025-01-01") -> LawConfig | None:
+    """
+    Automatically discover parameters from a law's YAML definition.
+
+    This is a convenience wrapper that creates a Services instance.
+    For bulk discovery, use auto_populate_registry() instead to reuse a single Services instance.
+
+    Args:
+        law_name: Technical law name (e.g., "wet_inkomstenbelasting")
+        service: Service that evaluates this law (e.g., "BELASTINGDIENST")
+        simulation_date: Date to use for loading law version
+
+    Returns:
+        LawConfig with auto-discovered parameters
+    """
+    try:
+        services = Services(simulation_date)
+        return discover_law_parameters_with_services(law_name, service, services)
+    except Exception as e:
+        logger.warning(f"Could not auto-discover parameters for {law_name}: {e}")
+        return None
+
+
+def auto_populate_registry(simulation_date: str = "2025-01-01") -> None:
+    """
+    Automatically populate the registry by discovering parameters from all known laws.
+    """
+    # Laws to discover (technical_name, service)
+    laws_to_discover = [
+        ("zorgtoeslagwet", "TOESLAGEN"),
+        ("wet_inkomstenbelasting", "BELASTINGDIENST"),
+        ("wet_op_de_huurtoeslag", "TOESLAGEN"),
+        ("wet_kinderopvang", "TOESLAGEN"),
+        ("algemene_ouderdomswet", "SVB"),
+        ("participatiewet/bijstand", "GEMEENTE_AMSTERDAM"),
+        ("kieswet", "KIESRAAD"),
+    ]
+
+    # Create Services instance once to avoid eventsourcing registration conflicts
+    try:
+        services = Services(simulation_date)
+    except Exception as e:
+        logger.error(f"Failed to initialize Services for auto-discovery: {e}")
+        return
+
+    for law_name, service in laws_to_discover:
+        try:
+            config = discover_law_parameters_with_services(law_name, service, services)
+            if config:
+                _LAW_CONFIGS[config.ui_name] = config
+        except Exception as e:
+            logger.warning(f"Could not auto-discover parameters for {law_name}: {e}")
+
+
+# ==============================================================================
+# REGISTRY INITIALIZATION
+# ==============================================================================
+
+# Automatically populate the registry on module import
+# This discovers all parameters from YAML files and creates mappings
+try:
+    auto_populate_registry()
+    logger.info(f"Auto-populated law parameter registry with {len(_LAW_CONFIGS)} laws")
+except Exception as e:
+    logger.error(f"Failed to auto-populate law parameter registry: {e}")
+    # Fall back to manual registration if auto-discovery fails
+
+
+# ==============================================================================
+# MANUAL REGISTRATION (Fallback/Override)
+# ==============================================================================
+# If auto-discovery fails or you need to override specific parameters,
+# you can manually register them here:
+#
+# Example:
+# zorgtoeslag = register_law("zorgtoeslag", "zorgtoeslagwet", "TOESLAGEN")
+# zorgtoeslag.add_parameter(
+#     ParameterMapping(
+#         ui_param_name="standaardpremie",
+#         engine_field_name="standaardpremie",
+#         override_type="input",
+#         service_name="VWS",
+#         transform_to_engine=lambda monthly_euros: int(monthly_euros * 12 * 100),
+#         transform_from_engine=lambda yearly_cents: round(yearly_cents / 100 / 12, 2),
+#     )
+# )
+
+
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
+
+
+def create_overrides(ui_law_name: str, ui_parameters: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """
+    Create override dictionaries from UI parameters.
+
+    Args:
+        ui_law_name: UI name of the law (e.g., "inkomstenbelasting")
+        ui_parameters: Dict of UI parameter names to values
+
+    Returns:
+        Tuple of (overwrite_input, overwrite_definitions)
+        - overwrite_input: Dict for input properties {service: {field: value}}
+        - overwrite_definitions: Dict for definition constants {field: value}
+    """
+    config = get_law_config(ui_law_name)
+    if not config:
+        return {}, {}
+
+    overwrite_input: dict[str, dict[str, Any]] = {}
+    overwrite_definitions: dict[str, Any] = {}
+
+    for param_name, value in ui_parameters.items():
+        if value is None:
+            continue
+
+        mapping = config.parameters.get(param_name)
+        if not mapping:
+            continue
+
+        # Transform value to engine format
+        try:
+            transformed = mapping.transform_to_engine(value)
+        except Exception as e:
+            import logging
+
+            logging.warning(f"Transform failed for {ui_law_name}.{param_name}: {e}")
+            continue
+
+        # Add to appropriate override dict
+        if mapping.override_type == "input":
+            if mapping.service_name:
+                if mapping.service_name not in overwrite_input:
+                    overwrite_input[mapping.service_name] = {}
+                overwrite_input[mapping.service_name][mapping.engine_field_name] = transformed
+        elif mapping.override_type == "definition":
+            overwrite_definitions[mapping.engine_field_name] = transformed
+
+    return overwrite_input, overwrite_definitions

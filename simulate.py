@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
+from machine.law_parameter_config import create_overrides, find_law_config_by_technical_name
 from machine.service import Services
 
 # Create a logger for this module
@@ -1198,13 +1199,14 @@ class LawSimulator:
         # Evaluate all relevant laws
         try:
             # 1. Zorgtoeslag (healthcare subsidy)
-            zorgtoeslag_overrides = self._create_law_overrides("zorgtoeslagwet")
+            zorgtoeslag_input, zorgtoeslag_defs = self._create_law_overrides("zorgtoeslagwet")
             zorgtoeslag = self.services.evaluate(
                 "TOESLAGEN",
                 "zorgtoeslagwet",
                 {"BSN": person["bsn"]},
                 self.simulation_date,
-                overwrite_input=zorgtoeslag_overrides,
+                overwrite_input=zorgtoeslag_input,
+                overwrite_definitions=zorgtoeslag_defs,
             )
 
             # Also evaluate 2024 version for comparison if simulating in 2025
@@ -1216,7 +1218,8 @@ class LawSimulator:
                         "zorgtoeslagwet",
                         {"BSN": person["bsn"]},
                         "2024-12-31",
-                        overwrite_input=zorgtoeslag_overrides,
+                        overwrite_input=zorgtoeslag_input,
+                        overwrite_definitions=zorgtoeslag_defs,
                     )
                 except Exception:
                     pass
@@ -1226,13 +1229,14 @@ class LawSimulator:
 
             # 3. Huurtoeslag (rent subsidy)
             try:
-                huurtoeslag_overrides = self._create_law_overrides("wet_op_de_huurtoeslag")
+                huurtoeslag_input, huurtoeslag_defs = self._create_law_overrides("wet_op_de_huurtoeslag")
                 huurtoeslag = self.services.evaluate(
                     "TOESLAGEN",
                     "wet_op_de_huurtoeslag",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=huurtoeslag_overrides,
+                    overwrite_input=huurtoeslag_input,
+                    overwrite_definitions=huurtoeslag_defs,
                 )
             except Exception as e:
                 logger.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
@@ -1240,13 +1244,14 @@ class LawSimulator:
 
             # 4. Bijstand (social assistance)
             try:
-                bijstand_overrides = self._create_law_overrides("participatiewet/bijstand")
+                bijstand_input, bijstand_defs = self._create_law_overrides("participatiewet/bijstand")
                 bijstand = self.services.evaluate(
                     "GEMEENTE_AMSTERDAM",
                     "participatiewet/bijstand",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=bijstand_overrides,
+                    overwrite_input=bijstand_input,
+                    overwrite_definitions=bijstand_defs,
                 )
             except Exception:
                 bijstand = None
@@ -1256,32 +1261,39 @@ class LawSimulator:
             kinderopvangtoeslag = None
             if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
                 try:
-                    kinderopvang_overrides = self._create_law_overrides("wet_kinderopvang")
+                    kinderopvang_input, kinderopvang_defs = self._create_law_overrides("wet_kinderopvang")
                     kinderopvangtoeslag = self.services.evaluate(
                         "TOESLAGEN",
                         "wet_kinderopvang",
                         {"BSN": person["bsn"]},
                         self.simulation_date,
-                        overwrite_input=kinderopvang_overrides,
+                        overwrite_input=kinderopvang_input,
+                        overwrite_definitions=kinderopvang_defs,
                     )
                 except Exception as e:
                     logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
                     kinderopvangtoeslag = None
 
             # 6. Kiesrecht (voting rights)
-            kiesrecht_overrides = self._create_law_overrides("kieswet")
+            kiesrecht_input, kiesrecht_defs = self._create_law_overrides("kieswet")
             kiesrecht = self.services.evaluate(
-                "KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date, overwrite_input=kiesrecht_overrides
+                "KIESRAAD",
+                "kieswet",
+                {"BSN": person["bsn"]},
+                self.simulation_date,
+                overwrite_input=kiesrecht_input,
+                overwrite_definitions=kiesrecht_defs,
             )
 
             # 7. Inkomstenbelasting (income tax)
-            inkomstenbelasting_overrides = self._create_law_overrides("wet_inkomstenbelasting")
+            ib_overwrite_input, ib_overwrite_definitions = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
                 "BELASTINGDIENST",
                 "wet_inkomstenbelasting",
                 {"BSN": person["bsn"]},
                 self.simulation_date,
-                overwrite_input=inkomstenbelasting_overrides,
+                overwrite_input=ib_overwrite_input,
+                overwrite_definitions=ib_overwrite_definitions,
             )
         except Exception:
             return None
@@ -1360,24 +1372,40 @@ class LawSimulator:
         self.results.append(result)
 
     def _create_law_overrides(self, law_name):
-        """Create overwrite_input dict for a specific law based on UI parameters."""
-        overrides = {}
+        """
+        Create override dicts for a specific law based on UI parameters.
 
-        if law_name == "zorgtoeslagwet" and "zorgtoeslag" in self.law_parameters:
-            params = self.law_parameters["zorgtoeslag"]
-            if "standaardpremie" in params and params["standaardpremie"] is not None:
-                # Convert monthly to yearly (in eurocents)
-                yearly_premium = int(params["standaardpremie"] * 12 * 100)
-                overrides["VWS"] = {"standaardpremie": yearly_premium}
+        Uses the law_parameter_config registry to map UI parameters to engine overrides.
+        This eliminates hardcoded law-specific logic.
 
-        # Note: Most other law parameters are in the 'definitions' section of YAML files,
-        # which cannot be overridden through the overwrite_input mechanism.
-        # These would require extending the system to support definition overrides.
+        Args:
+            law_name: Technical law name (e.g., "wet_inkomstenbelasting")
 
-        # For now, we can only override input parameters, not definition constants.
-        # Future enhancement: Add support for overriding law definitions.
+        Returns:
+            Tuple of (overwrite_input, overwrite_definitions):
+            - overwrite_input: Dict for input overrides {service: {field: value}}
+            - overwrite_definitions: Dict for definition overrides {field: value}
+        """
+        # Find law config by technical name
+        config = find_law_config_by_technical_name(law_name)
+        if not config:
+            return {}, {}
 
-        return overrides
+        # Check if we have UI parameters for this law
+        ui_law_name = config.ui_name
+        if ui_law_name not in self.law_parameters:
+            return {}, {}
+
+        # Create overrides using registry
+        overwrite_input, overwrite_definitions = create_overrides(ui_law_name, self.law_parameters[ui_law_name])
+
+        # Log info about definition overrides if present
+        if overwrite_definitions:
+            logger.info(
+                f"Applying definition overrides for {law_name}: " f"{list(overwrite_definitions.keys())}"
+            )
+
+        return overwrite_input, overwrite_definitions
 
     def create_population(self, num_people=1000, save=True, population_params=None):
         """Create a new population and optionally save it."""

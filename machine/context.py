@@ -132,6 +132,7 @@ class RuleContext:
     values_cache: dict[str, Any] = field(default_factory=dict)
     path: list[PathNode] = field(default_factory=list)
     overwrite_input: dict[str, Any] = field(default_factory=dict)
+    overwrite_definitions: dict[str, Any] = field(default_factory=dict)
     outputs: dict[str, Any] = field(default_factory=dict)
     calculation_date: str | None = None
     resolved_paths: dict[str, Any] = field(default_factory=dict)
@@ -233,6 +234,13 @@ class RuleContext:
                     node.result = self.local[path]
                     node.resolve_type = "LOCAL"
                     return self.local[path]
+
+                # Check overwrite_definitions BEFORE regular definitions
+                if path in self.overwrite_definitions:
+                    logger.debug(f"Resolving from OVERRIDE DEFINITION: {self.overwrite_definitions[path]}")
+                    node.result = self.overwrite_definitions[path]
+                    node.resolve_type = "OVERRIDE_DEFINITION"
+                    return self.overwrite_definitions[path]
 
                 # Check definitions
                 if path in self.definitions:
