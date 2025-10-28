@@ -101,19 +101,28 @@ def run_simulation(params: dict):
 
 
 if __name__ == "__main__":
+    import logging
+
+    # Set up logging
+    logging.basicConfig(level=logging.ERROR)
+    logger = logging.getLogger(__name__)
+
     # Read parameters from stdin
     params = json.loads(sys.stdin.read())
 
     # Determine operation: create_population or run_simulation
     operation = params.get("operation", "run_simulation")
 
-    # Don't suppress stderr temporarily to see debug logs
     try:
         result = create_population(params) if operation == "create_population" else run_simulation(params)
         print(json.dumps(result))
     except Exception as e:
         import traceback
 
-        error_result = {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
+        # Log full error server-side for debugging
+        logger.error("Simulation error: %s", str(e), exc_info=True)
+
+        # Return generic error to client without exposing internal details
+        error_result = {"status": "error", "message": "An internal error occurred during simulation"}
         print(json.dumps(error_result), file=sys.stderr)
         sys.exit(1)

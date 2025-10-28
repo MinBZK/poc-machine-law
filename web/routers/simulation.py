@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 from datetime import datetime
 
@@ -8,6 +9,8 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from simulate import LawSimulator
 from web.dependencies import templates
 from web.law_parameters import get_default_law_parameters_subprocess
+
+logger = logging.getLogger(__name__)
 
 # Store simulation progress and results
 simulation_progress = {}
@@ -37,11 +40,9 @@ async def debug_law_params():
             }
         )
     except Exception as e:
-        import traceback
-
-        return JSONResponse(
-            {"status": "error", "message": str(e), "traceback": traceback.format_exc()}, status_code=500
-        )
+        # Log error server-side for debugging
+        logger.error("Error in debug_law_params: %s", str(e), exc_info=True)
+        return JSONResponse({"status": "error", "message": "An internal error occurred"}, status_code=500)
 
 
 @router.get("/")
@@ -52,9 +53,6 @@ async def simulation_page(request: Request):
     law_params = get_default_law_parameters_subprocess()
 
     # Debug: log what we're passing to template
-    import logging
-
-    logger = logging.getLogger(__name__)
     logger.info(f"Law params keys: {list(law_params.keys())}")
     if law_params:
         first_law = list(law_params.keys())[0]
@@ -134,11 +132,9 @@ async def create_population(request: Request):
         return JSONResponse(population_data)
 
     except Exception as e:
-        import traceback
-
-        error_details = traceback.format_exc()
-        print(f"Population creation error: {error_details}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+        # Log error server-side for debugging
+        logger.error("Population creation error: %s", str(e), exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error", "message": "An internal error occurred"})
 
 
 @router.get("/population/list")
@@ -148,11 +144,9 @@ async def list_populations():
         populations = LawSimulator.list_populations()
         return JSONResponse({"status": "success", "populations": populations})
     except Exception as e:
-        import traceback
-
-        error_details = traceback.format_exc()
-        print(f"List populations error: {error_details}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+        # Log error server-side for debugging
+        logger.error("List populations error: %s", str(e), exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error", "message": "An internal error occurred"})
 
 
 @router.get("/population/{population_id}")
@@ -173,11 +167,9 @@ async def get_population(population_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
-
-        error_details = traceback.format_exc()
-        print(f"Get population error: {error_details}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+        # Log error server-side for debugging
+        logger.error("Get population error: %s", str(e), exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error", "message": "An internal error occurred"})
 
 
 @router.delete("/population/{population_id}")
@@ -192,11 +184,9 @@ async def delete_population(population_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
-
-        error_details = traceback.format_exc()
-        print(f"Delete population error: {error_details}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+        # Log error server-side for debugging
+        logger.error("Delete population error: %s", str(e), exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error", "message": "An internal error occurred"})
 
 
 @router.post("/run")
@@ -239,11 +229,9 @@ async def run_simulation(request: Request):
         return JSONResponse(simulation_data)
 
     except Exception as e:
-        import traceback
-
-        error_details = traceback.format_exc()
-        print(f"Simulation error: {error_details}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e), "details": error_details})
+        # Log error server-side for debugging
+        logger.error("Simulation error: %s", str(e), exc_info=True)
+        return JSONResponse(status_code=500, content={"status": "error", "message": "An internal error occurred"})
 
 
 @router.get("/results/{session_id}")
