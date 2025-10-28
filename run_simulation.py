@@ -2,7 +2,6 @@
 """Standalone simulation runner to avoid class registration conflicts."""
 
 import json
-import os
 import sys
 from datetime import datetime
 
@@ -114,6 +113,7 @@ if __name__ == "__main__":
         print(json.dumps(result))
     except Exception as e:
         import traceback
+
         error_result = {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
         print(json.dumps(error_result), file=sys.stderr)
         sys.exit(1)

@@ -7,7 +7,8 @@ transformation mappings based on type specifications. It supports both input ove
 """
 
 import logging
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import Any, Literal
 
 from machine.service import Services
 from machine.utils import RuleResolver
@@ -151,9 +152,9 @@ def derive_ui_name_from_law_name(law_name: str) -> str:
 
     # Remove common prefixes in order of specificity
     if law_name.startswith("wet_op_de_"):
-        law_name = law_name[len("wet_op_de_"):]
+        law_name = law_name[len("wet_op_de_") :]
     elif law_name.startswith("wet_"):
-        law_name = law_name[len("wet_"):]
+        law_name = law_name[len("wet_") :]
 
     # Clean up underscores (but keep "wet" in the name!)
     law_name = law_name.strip("_")
@@ -162,7 +163,9 @@ def derive_ui_name_from_law_name(law_name: str) -> str:
     return law_name
 
 
-def infer_transformation_from_type_spec(param_name: str, value: Any, type_spec: dict | None = None) -> tuple[Callable, Callable]:
+def infer_transformation_from_type_spec(
+    param_name: str, value: Any, type_spec: dict | None = None
+) -> tuple[Callable, Callable]:
     """
     Infer transformation functions from parameter type specification.
 
@@ -249,11 +252,7 @@ def discover_law_parameters_with_services(law_name: str, service: str, services:
         type_spec = None
         for output_name, spec in output_specs.items():
             if output_name.upper() == def_name or def_name in output_name.upper():
-                type_spec = {
-                    "unit": spec.unit,
-                    "type": spec.type,
-                    "precision": spec.precision
-                }
+                type_spec = {"unit": spec.unit, "type": spec.type, "precision": spec.precision}
                 break
 
         # Infer transformations
@@ -286,11 +285,7 @@ def discover_law_parameters_with_services(law_name: str, service: str, services:
             # If not, check output_specs (for OUTPUT properties)
             if not type_spec and prop_name in output_specs:
                 spec = output_specs[prop_name]
-                type_spec = {
-                    "unit": spec.unit,
-                    "type": spec.type,
-                    "precision": spec.precision
-                }
+                type_spec = {"unit": spec.unit, "type": spec.type, "precision": spec.precision}
 
             to_engine, from_engine = infer_transformation_from_type_spec(ui_param_name, 0, type_spec)
 
@@ -334,9 +329,7 @@ def discover_law_parameters(law_name: str, service: str, simulation_date: str = 
 
 
 def auto_populate_registry(
-    simulation_date: str = "2025-01-01",
-    discoverable_by: str = "CITIZEN",
-    services: Services | None = None
+    simulation_date: str = "2025-01-01", discoverable_by: str = "CITIZEN", services: Services | None = None
 ) -> None:
     """
     Automatically populate the registry by discovering parameters from discoverable laws.
@@ -406,7 +399,9 @@ def auto_populate_registry(
 # ==============================================================================
 
 
-def create_overrides(ui_law_name: str, ui_parameters: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+def create_overrides(
+    ui_law_name: str, ui_parameters: dict[str, Any]
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """
     Create override dictionaries from UI parameters.
 
@@ -438,9 +433,7 @@ def create_overrides(ui_law_name: str, ui_parameters: dict[str, Any]) -> tuple[d
         try:
             transformed = mapping.transform_to_engine(value)
         except Exception as e:
-            import logging
-
-            logging.warning(f"Transform failed for {ui_law_name}.{param_name}: {e}")
+            logger.warning(f"Transform failed for {ui_law_name}.{param_name}: {e}")
             continue
 
         # Add to appropriate override dict

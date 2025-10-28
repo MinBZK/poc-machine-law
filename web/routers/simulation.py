@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 from simulate import LawSimulator
 from web.dependencies import templates
-from web.law_parameters import get_auto_discovered_parameters, get_default_law_parameters_subprocess
+from web.law_parameters import get_default_law_parameters_subprocess
 
 # Store simulation progress and results
 simulation_progress = {}
@@ -21,26 +21,27 @@ async def debug_law_params():
     """Debug endpoint to see raw law parameters"""
     try:
         law_params = get_default_law_parameters_subprocess()
-        return JSONResponse({
-            "status": "success",
-            "law_count": len(law_params),
-            "law_keys": list(law_params.keys()),
-            "sample_data": {
-                k: {
-                    "param_count": len(v),
-                    "params_with_values": {pk: pv for pk, pv in list(v.items())[:5] if pv is not None}
-                }
-                for k, v in list(law_params.items())[:3]
-            },
-            "full_data": law_params
-        })
+        return JSONResponse(
+            {
+                "status": "success",
+                "law_count": len(law_params),
+                "law_keys": list(law_params.keys()),
+                "sample_data": {
+                    k: {
+                        "param_count": len(v),
+                        "params_with_values": {pk: pv for pk, pv in list(v.items())[:5] if pv is not None},
+                    }
+                    for k, v in list(law_params.items())[:3]
+                },
+                "full_data": law_params,
+            }
+        )
     except Exception as e:
         import traceback
-        return JSONResponse({
-            "status": "error",
-            "message": str(e),
-            "traceback": traceback.format_exc()
-        }, status_code=500)
+
+        return JSONResponse(
+            {"status": "error", "message": str(e), "traceback": traceback.format_exc()}, status_code=500
+        )
 
 
 @router.get("/")
@@ -52,6 +53,7 @@ async def simulation_page(request: Request):
 
     # Debug: log what we're passing to template
     import logging
+
     logger = logging.getLogger(__name__)
     logger.info(f"Law params keys: {list(law_params.keys())}")
     if law_params:

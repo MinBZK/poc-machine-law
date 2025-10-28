@@ -35,7 +35,9 @@ def get_auto_discovered_parameters() -> dict[str, dict[str, Any]]:
             if law_params:
                 parameters[ui_name] = law_params
 
-        logger.info(f"Auto-discovered {sum(len(p) for p in parameters.values())} parameters across {len(parameters)} laws")
+        logger.info(
+            f"Auto-discovered {sum(len(p) for p in parameters.values())} parameters across {len(parameters)} laws"
+        )
         return parameters
 
     except Exception as e:
@@ -59,8 +61,8 @@ def get_default_law_parameters_subprocess(simulation_date: str = "2025-01-01") -
     Raises:
         RuntimeError: If subprocess fails or returns an error
     """
-    import subprocess
     import json
+    import subprocess
 
     # Create a simple Python script to run in subprocess
     script = f"""
@@ -190,7 +192,9 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
 
                                             if ref_service and ref_law and ref_service in services.services:
                                                 # Load the referenced law's engine
-                                                ref_engine = services.services[ref_service]._get_engine(ref_law, simulation_date)
+                                                ref_engine = services.services[ref_service]._get_engine(
+                                                    ref_law, simulation_date
+                                                )
 
                                                 # Try to get value from definitions (try exact matches first, then fuzzy)
                                                 raw_value = ref_engine.definitions.get(ref_field)
@@ -212,10 +216,16 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
 
                                                 if raw_value is not None:
                                                     # Transform to UI format
-                                                    parameters[ui_name][param_name] = mapping.transform_from_engine(raw_value)
-                                                    logger.debug(f"Resolved {ui_name}.{param_name} from {ref_service}.{ref_law}.{ref_field} = {raw_value}")
+                                                    parameters[ui_name][param_name] = mapping.transform_from_engine(
+                                                        raw_value
+                                                    )
+                                                    logger.debug(
+                                                        f"Resolved {ui_name}.{param_name} from {ref_service}.{ref_law}.{ref_field} = {raw_value}"
+                                                    )
                                                 else:
-                                                    logger.debug(f"No value found for {ui_name}.{param_name} in {ref_service}.{ref_law}")
+                                                    logger.debug(
+                                                        f"No value found for {ui_name}.{param_name} in {ref_service}.{ref_law}"
+                                                    )
                                                     parameters[ui_name][param_name] = None
                                             else:
                                                 logger.debug(f"Service reference incomplete for {ui_name}.{param_name}")
@@ -224,7 +234,9 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
                                             logger.debug(f"No service_reference in spec for {ui_name}.{param_name}")
                                             parameters[ui_name][param_name] = None
                                     except Exception as e:
-                                        logger.debug(f"Could not resolve service reference for {ui_name}.{param_name}: {e}")
+                                        logger.debug(
+                                            f"Could not resolve service reference for {ui_name}.{param_name}: {e}"
+                                        )
                                         parameters[ui_name][param_name] = None
                                 else:
                                     # Input parameter without service_name
@@ -237,7 +249,9 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
                 except Exception as e:
                     logger.debug(f"Could not discover parameters for {service_name}.{law_name}: {e}")
 
-        logger.info(f"Extracted default values for {sum(len(p) for p in parameters.values())} parameters across {len(parameters)} laws")
+        logger.info(
+            f"Extracted default values for {sum(len(p) for p in parameters.values())} parameters across {len(parameters)} laws"
+        )
         return parameters
 
     except Exception as e:
@@ -318,9 +332,7 @@ def get_default_law_parameters_old(simulation_date: str = "2025-01-01") -> dict[
 
         # Bijstand
         try:
-            engine = services.services["GEMEENTE_AMSTERDAM"]._get_engine(
-                "participatiewet/bijstand", simulation_date
-            )
+            engine = services.services["GEMEENTE_AMSTERDAM"]._get_engine("participatiewet/bijstand", simulation_date)
             definitions = engine.definitions
             # Extract norms (in eurocents yearly, convert to euros monthly)
             norm_alleenstaand = definitions.get("NORM_ALLEENSTAAND", {})

@@ -118,7 +118,7 @@ class RuleService:
 
         # Gather sources from all services for cross-service lookups
         all_sources = {}
-        if self.services and hasattr(self.services, 'services'):
+        if self.services and hasattr(self.services, "services"):
             for service_name, service in self.services.services.items():
                 all_sources.update(service.source_dataframes)
         else:

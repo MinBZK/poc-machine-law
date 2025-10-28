@@ -1425,9 +1425,7 @@ class LawSimulator:
 
         # Log info about definition overrides if present
         if overwrite_definitions:
-            logger.info(
-                f"Applying definition overrides for {law_name}: " f"{list(overwrite_definitions.keys())}"
-            )
+            logger.info(f"Applying definition overrides for {law_name}: {list(overwrite_definitions.keys())}")
 
         return overwrite_input, overwrite_definitions
 

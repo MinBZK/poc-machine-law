@@ -96,12 +96,12 @@ def main():
     if override_avg_tax < default_avg_tax * 0.8:  # Should be at least 20% less
         print("\n✅ SUCCESS: Parameter overrides are working correctly!")
         print(f"   Lowering tax rate from ~37% to 10% reduced average tax by {tax_decrease_pct:.1f}%")
-        print(f"   Override tax is {(override_avg_tax/default_avg_tax*100):.1f}% of default tax")
+        print(f"   Override tax is {(override_avg_tax / default_avg_tax * 100):.1f}% of default tax")
         return 0
     else:
         print(
             f"\n❌ FAILURE: Parameter override did not have expected effect"
-            f"\n   Expected override tax to be <80% of default, but got {(override_avg_tax/default_avg_tax*100):.1f}%"
+            f"\n   Expected override tax to be <80% of default, but got {(override_avg_tax / default_avg_tax * 100):.1f}%"
         )
         return 1
 
