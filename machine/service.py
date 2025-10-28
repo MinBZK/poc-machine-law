@@ -96,6 +96,7 @@ class RuleService:
         reference_date: str,
         parameters: dict[str, Any],
         overwrite_input: dict[str, Any] | None = None,
+        overwrite_definitions: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
     ) -> RuleResult:
@@ -107,6 +108,7 @@ class RuleService:
             reference_date: Reference date for rule version (YYYY-MM-DD)
             parameters: Context data for service provider
             overwrite_input: Optional overrides for input values
+            overwrite_definitions: Optional overrides for definition constants
             requested_output: Optional specific output field to calculate
 
         Returns:
@@ -126,6 +128,7 @@ class RuleService:
         result = engine.evaluate(
             parameters=parameters,
             overwrite_input=overwrite_input,
+            overwrite_definitions=overwrite_definitions,
             sources=all_sources,
             calculation_date=reference_date,
             requested_output=requested_output,
@@ -374,6 +377,7 @@ class Services:
         parameters: dict[str, Any],
         reference_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
+        overwrite_definitions: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
     ) -> RuleResult:
@@ -387,6 +391,7 @@ class Services:
                 reference_date=reference_date,
                 parameters=parameters,
                 overwrite_input=overwrite_input,
+                overwrite_definitions=overwrite_definitions,
                 requested_output=requested_output,
                 approved=approved,
             )
