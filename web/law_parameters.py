@@ -24,11 +24,11 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
     parameters = {
         "zorgtoeslag": {},
         "huurtoeslag": {},
-        "kinderopvangtoeslag": {},
-        "aow": {},
+        "kinderopvang": {},
+        "algemeneouderdoms": {},
         "bijstand": {},
         "inkomstenbelasting": {},
-        "kiesrecht": {},
+        "kies": {},
     }
 
     try:
@@ -62,29 +62,29 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
             parameters["huurtoeslag"]["max_huur"] = 879
             parameters["huurtoeslag"]["basishuur"] = 200
 
-        # Kinderopvangtoeslag
+        # Kinderopvang
         try:
             engine = services.services["TOESLAGEN"]._get_engine("wet_kinderopvang", simulation_date)
             definitions = engine.definitions
             # TODO: Extract actual definitions when they exist in YAML
-            parameters["kinderopvangtoeslag"]["uurprijs"] = 9.27
-            parameters["kinderopvangtoeslag"]["max_uren"] = 230
+            parameters["kinderopvang"]["uurprijs"] = 9.27
+            parameters["kinderopvang"]["max_uren"] = 230
         except Exception as e:
-            logger.warning(f"Error loading kinderopvangtoeslag parameters: {e}")
-            parameters["kinderopvangtoeslag"]["uurprijs"] = 9.27
-            parameters["kinderopvangtoeslag"]["max_uren"] = 230
+            logger.warning(f"Error loading kinderopvang parameters: {e}")
+            parameters["kinderopvang"]["uurprijs"] = 9.27
+            parameters["kinderopvang"]["max_uren"] = 230
 
-        # AOW
+        # Algemene Ouderdomswet
         try:
             engine = services.services["SVB"]._get_engine("algemene_ouderdomswet", simulation_date)
             definitions = engine.definitions
             # TODO: Extract actual definitions when they exist in YAML
-            parameters["aow"]["pensioenleeftijd"] = 67
-            parameters["aow"]["basisbedrag"] = 1461
+            parameters["algemeneouderdoms"]["pensioenleeftijd"] = 67
+            parameters["algemeneouderdoms"]["basisbedrag"] = 1461
         except Exception as e:
-            logger.warning(f"Error loading aow parameters: {e}")
-            parameters["aow"]["pensioenleeftijd"] = 67
-            parameters["aow"]["basisbedrag"] = 1461
+            logger.warning(f"Error loading algemeneouderdoms parameters: {e}")
+            parameters["algemeneouderdoms"]["pensioenleeftijd"] = 67
+            parameters["algemeneouderdoms"]["basisbedrag"] = 1461
 
         # Bijstand
         try:
@@ -134,15 +134,15 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
             parameters["inkomstenbelasting"]["grens_schijf1"] = 74573
             parameters["inkomstenbelasting"]["algemene_heffingskorting"] = 3104
 
-        # Kiesrecht
+        # Kieswet
         try:
             engine = services.services["KIESRAAD"]._get_engine("kieswet", simulation_date)
             definitions = engine.definitions
             # TODO: Extract actual definition when it exists in YAML
-            parameters["kiesrecht"]["min_leeftijd"] = 18
+            parameters["kies"]["min_leeftijd"] = 18
         except Exception as e:
-            logger.warning(f"Error loading kiesrecht parameters: {e}")
-            parameters["kiesrecht"]["min_leeftijd"] = 18
+            logger.warning(f"Error loading kies parameters: {e}")
+            parameters["kies"]["min_leeftijd"] = 18
 
     except Exception as e:
         logger.error(f"Error initializing Services: {e}")
@@ -150,8 +150,8 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
         return {
             "zorgtoeslag": {"standaardpremie": 176},
             "huurtoeslag": {"max_huur": 879, "basishuur": 200},
-            "kinderopvangtoeslag": {"uurprijs": 9.27, "max_uren": 230},
-            "aow": {"pensioenleeftijd": 67, "basisbedrag": 1461},
+            "kinderopvang": {"uurprijs": 9.27, "max_uren": 230},
+            "algemeneouderdoms": {"pensioenleeftijd": 67, "basisbedrag": 1461},
             "bijstand": {"norm_alleenstaand": 1210, "norm_gehuwd": 1729},
             "inkomstenbelasting": {
                 "tarief_schijf1": 36.93,
@@ -159,7 +159,7 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
                 "grens_schijf1": 74573,
                 "algemene_heffingskorting": 3104,
             },
-            "kiesrecht": {"min_leeftijd": 18},
+            "kies": {"min_leeftijd": 18},
         }
 
     return parameters

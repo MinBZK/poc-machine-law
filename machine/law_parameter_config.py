@@ -101,17 +101,42 @@ def find_law_config_by_technical_name(law_name: str) -> LawConfig | None:
 # AUTOMATIC PARAMETER DISCOVERY
 # ==============================================================================
 
-# UI-friendly name mappings (technical_law_name -> ui_name)
-# Most laws use a shortened name, this maps them
-UI_NAME_MAPPINGS = {
-    "zorgtoeslagwet": "zorgtoeslag",
-    "wet_inkomstenbelasting": "inkomstenbelasting",
-    "wet_op_de_huurtoeslag": "huurtoeslag",
-    "wet_kinderopvang": "kinderopvangtoeslag",
-    "algemene_ouderdomswet": "aow",
-    "participatiewet/bijstand": "bijstand",
-    "kieswet": "kiesrecht",
-}
+
+def derive_ui_name_from_law_name(law_name: str) -> str:
+    """
+    Automatically derive a UI-friendly name from a technical law name.
+
+    Args:
+        law_name: Technical law name (e.g., "wet_inkomstenbelasting", "participatiewet/bijstand")
+
+    Returns:
+        UI-friendly name derived using generic rules
+
+    Examples:
+        - "wet_inkomstenbelasting" → "inkomstenbelasting"
+        - "participatiewet/bijstand" → "bijstand"
+        - "wet_op_de_huurtoeslag" → "huurtoeslag"
+        - "zorgtoeslagwet" → "zorgtoeslag"
+    """
+    # If it's a path, take the last component
+    if "/" in law_name:
+        law_name = law_name.split("/")[-1]
+
+    # Remove common prefixes in order of specificity
+    if law_name.startswith("wet_op_de_"):
+        law_name = law_name[len("wet_op_de_"):]
+    elif law_name.startswith("wet_"):
+        law_name = law_name[len("wet_"):]
+
+    # Remove "wet" suffix if present
+    if law_name.endswith("wet"):
+        law_name = law_name[:-len("wet")]
+
+    # Clean up underscores
+    law_name = law_name.strip("_")
+    law_name = law_name.replace("_", "")
+
+    return law_name
 
 
 def infer_transformation_from_type_spec(param_name: str, value: Any, type_spec: dict | None = None) -> tuple[Callable, Callable]:
@@ -172,8 +197,8 @@ def discover_law_parameters_with_services(law_name: str, service: str, services:
     Returns:
         LawConfig with auto-discovered parameters
     """
-    # Get UI-friendly name
-    ui_name = UI_NAME_MAPPINGS.get(law_name, law_name.replace("wet_", "").replace("_", ""))
+    # Derive UI-friendly name automatically
+    ui_name = derive_ui_name_from_law_name(law_name)
 
     # Create law config
     config = LawConfig(ui_name, law_name, service)
@@ -287,19 +312,11 @@ def discover_law_parameters(law_name: str, service: str, simulation_date: str = 
 
 def auto_populate_registry(simulation_date: str = "2025-01-01") -> None:
     """
-    Automatically populate the registry by discovering parameters from all known laws.
-    """
-    # Laws to discover (technical_name, service)
-    laws_to_discover = [
-        ("zorgtoeslagwet", "TOESLAGEN"),
-        ("wet_inkomstenbelasting", "BELASTINGDIENST"),
-        ("wet_op_de_huurtoeslag", "TOESLAGEN"),
-        ("wet_kinderopvang", "TOESLAGEN"),
-        ("algemene_ouderdomswet", "SVB"),
-        ("participatiewet/bijstand", "GEMEENTE_AMSTERDAM"),
-        ("kieswet", "KIESRAAD"),
-    ]
+    Automatically populate the registry by discovering parameters from all available laws.
 
+    This function discovers laws from the RuleResolver and attempts to auto-discover
+    their parameters. No hardcoded law lists required!
+    """
     # Create Services instance once to avoid eventsourcing registration conflicts
     try:
         services = Services(simulation_date)
@@ -307,13 +324,21 @@ def auto_populate_registry(simulation_date: str = "2025-01-01") -> None:
         logger.error(f"Failed to initialize Services for auto-discovery: {e}")
         return
 
-    for law_name, service in laws_to_discover:
-        try:
-            config = discover_law_parameters_with_services(law_name, service, services)
-            if config:
-                _LAW_CONFIGS[config.ui_name] = config
-        except Exception as e:
-            logger.warning(f"Could not auto-discover parameters for {law_name}: {e}")
+    # Discover all available laws from the resolver
+    resolver = RuleResolver()
+    service_laws = resolver.get_service_laws()
+
+    # Iterate through all services and their laws
+    for service_name, laws in service_laws.items():
+        for law_name in laws:
+            try:
+                config = discover_law_parameters_with_services(law_name, service_name, services)
+                if config and config.parameters:
+                    # Only register if we found parameters
+                    _LAW_CONFIGS[config.ui_name] = config
+                    logger.debug(f"Registered {law_name} as {config.ui_name} with {len(config.parameters)} parameters")
+            except Exception as e:
+                logger.debug(f"Could not auto-discover parameters for {service_name}.{law_name}: {e}")
 
 
 # ==============================================================================
