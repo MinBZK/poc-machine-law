@@ -149,11 +149,7 @@ def derive_ui_name_from_law_name(law_name: str) -> str:
     elif law_name.startswith("wet_"):
         law_name = law_name[len("wet_"):]
 
-    # Remove "wet" suffix if present
-    if law_name.endswith("wet"):
-        law_name = law_name[:-len("wet")]
-
-    # Clean up underscores
+    # Clean up underscores (but keep "wet" in the name!)
     law_name = law_name.strip("_")
     law_name = law_name.replace("_", "")
 
