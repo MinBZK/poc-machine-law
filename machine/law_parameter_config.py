@@ -70,6 +70,20 @@ class LawConfig:
 
 # Global law configuration registry
 _LAW_CONFIGS: dict[str, LawConfig] = {}
+_REGISTRY_INITIALIZED: bool = False
+
+
+def _ensure_registry_initialized() -> None:
+    """Lazily initialize the registry on first access."""
+    global _REGISTRY_INITIALIZED
+    if not _REGISTRY_INITIALIZED:
+        try:
+            auto_populate_registry()
+            logger.info(f"Auto-populated law parameter registry with {len(_LAW_CONFIGS)} laws")
+            _REGISTRY_INITIALIZED = True
+        except Exception as e:
+            logger.error(f"Failed to auto-populate law parameter registry: {e}")
+            # Continue with empty registry if auto-discovery fails
 
 
 def register_law(ui_name: str, law_name: str, service: str) -> LawConfig:
@@ -81,16 +95,19 @@ def register_law(ui_name: str, law_name: str, service: str) -> LawConfig:
 
 def get_law_config(ui_name: str) -> LawConfig | None:
     """Get law configuration by UI name"""
+    _ensure_registry_initialized()
     return _LAW_CONFIGS.get(ui_name)
 
 
 def get_all_law_configs() -> dict[str, LawConfig]:
     """Get all law configurations"""
+    _ensure_registry_initialized()
     return _LAW_CONFIGS
 
 
 def find_law_config_by_technical_name(law_name: str) -> LawConfig | None:
     """Find law configuration by technical law name"""
+    _ensure_registry_initialized()
     for config in _LAW_CONFIGS.values():
         if config.law_name == law_name:
             return config
@@ -349,15 +366,8 @@ def auto_populate_registry(simulation_date: str = "2025-01-01", discoverable_by:
 # REGISTRY INITIALIZATION
 # ==============================================================================
 
-# Automatically populate the registry on module import
-# This discovers all parameters from YAML files and creates mappings
-try:
-    auto_populate_registry()
-    logger.info(f"Auto-populated law parameter registry with {len(_LAW_CONFIGS)} laws")
-except Exception as e:
-    logger.error(f"Failed to auto-populate law parameter registry: {e}")
-    # Fall back to manual registration if auto-discovery fails
-
+# Registry is now lazily initialized on first access via _ensure_registry_initialized()
+# This avoids eventsourcing registration conflicts in subprocesses
 
 # ==============================================================================
 # MANUAL REGISTRATION (Fallback/Override)
