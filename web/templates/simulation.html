@@ -539,7 +539,7 @@
                                             <input type="number"
                                                    name="kinderopvang_uurprijs"
                                                    id="kinderopvang_uurprijs"
-                                                   value="{{ '%.2f'|format(law_params.kinderopvangtoeslag.uurprijs) }}"
+                                                   value="{{ '%.2f'|format(law_params.kinderopvang.uurprijs) }}"
                                                    min="0"
                                                    max="20"
                                                    step="0.01"
@@ -553,7 +553,7 @@
                                             <input type="number"
                                                    name="kinderopvang_max_uren"
                                                    id="kinderopvang_max_uren"
-                                                   value="{{ '%d'|format(law_params.kinderopvangtoeslag.max_uren) }}"
+                                                   value="{{ '%d'|format(law_params.kinderopvang.max_uren) }}"
                                                    min="0"
                                                    max="300"
                                                    step="10"
@@ -582,7 +582,7 @@
                                             <input type="number"
                                                    name="aow_pensioenleeftijd"
                                                    id="aow_pensioenleeftijd"
-                                                   value="{{ '%.2f'|format(law_params.aow.pensioenleeftijd) }}"
+                                                   value="{{ '%.2f'|format(law_params.algemeneouderdoms.pensioenleeftijd) }}"
                                                    min="65"
                                                    max="70"
                                                    step="0.25"
@@ -593,7 +593,7 @@
                                             <input type="number"
                                                    name="aow_basisbedrag"
                                                    id="aow_basisbedrag"
-                                                   value="{{ '%.2f'|format(law_params.aow.basisbedrag) }}"
+                                                   value="{{ '%.2f'|format(law_params.algemeneouderdoms.basisbedrag) }}"
                                                    min="1000"
                                                    max="2000"
                                                    step="10"
@@ -729,14 +729,14 @@
                                     </h3>
                                     <div class="grid grid-cols-1 gap-3">
                                         <div>
-                                            <label for="kiesrecht_min_leeftijd"
+                                            <label for="kies_min_leeftijd"
                                                    class="block text-sm font-medium text-gray-700">
                                                 Minimale stemleeftijd
                                             </label>
                                             <input type="number"
-                                                   name="kiesrecht_min_leeftijd"
-                                                   id="kiesrecht_min_leeftijd"
-                                                   value="{{ law_params.kiesrecht.min_leeftijd }}"
+                                                   name="kies_min_leeftijd"
+                                                   id="kies_min_leeftijd"
+                                                   value="{{ law_params.kies.min_leeftijd }}"
                                                    min="16"
                                                    max="21"
                                                    step="1"
@@ -1687,7 +1687,7 @@ async function runSimulation() {
                 max_huur: parseFloat(formData.get('huurtoeslag_max_huur')),
                 basishuur: parseFloat(formData.get('huurtoeslag_basishuur'))
             },
-            kinderopvangtoeslag: {
+            kinderopvang: {
                 max_uurprijs: parseFloat(formData.get('kinderopvang_uurprijs')),
                 max_uren: parseInt(formData.get('kinderopvang_max_uren'))
             },
@@ -1705,8 +1705,8 @@ async function runSimulation() {
                 grens_schijf1: parseFloat(formData.get('ib_grens_schijf1')),
                 algemene_heffingskorting: parseFloat(formData.get('ib_algemene_heffingskorting'))
             },
-            kiesrecht: {
-                min_leeftijd: parseInt(formData.get('kiesrecht_min_leeftijd'))
+            kies: {
+                min_leeftijd: parseInt(formData.get('kies_min_leeftijd'))
             }
         }
     };
@@ -2092,13 +2092,13 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('aow', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdoms', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('aow')}AOW</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdoms')}AOW</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.aow.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.aow.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.algemeneouderdoms.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.algemeneouderdoms.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="aow-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2108,7 +2108,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="aow-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.aow.breakdowns ? renderLawBreakdowns(data.summary.laws.aow.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.algemeneouderdoms.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdoms.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -2136,23 +2136,23 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvangtoeslag', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvang', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('kinderopvangtoeslag')}Kinderopvangtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('kinderopvang')}Kinderopvangtoeslag</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.kinderopvangtoeslag.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.kinderopvangtoeslag.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.kinderopvang.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.kinderopvang.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvangtoeslag-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvang-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="kinderopvangtoeslag-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="kinderopvang-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.kinderopvangtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvangtoeslag.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.kinderopvang.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvang.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -2345,7 +2345,7 @@ function copyResultsAsMarkdown(simulationId) {
     markdown += `| Wet | In aanmerking | Gem. bedrag |\n`;
     markdown += `|-----|---------------|-------------|\n`;
 
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag'];
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang'];
     laws.forEach(law => {
         const lawData = data.summary.laws[law];
         markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
@@ -2380,8 +2380,8 @@ function getLawIcon(lawName) {
     const icons = {
         'zorgtoeslag': '<svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
         'huurtoeslag': '<svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
-        'kinderopvangtoeslag': '<svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
-        'aow': '<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        'kinderopvang': '<svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
+        'algemeneouderdoms': '<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
         'bijstand': '<svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
         'voting_rights': '<svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>',
         'income_tax': '<svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>'
@@ -2486,7 +2486,7 @@ function exportComparison(format) {
 
     // Laws
     csv += '\nWETTEN & REGELINGEN\n';
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag', 'voting_rights'];
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang', 'voting_rights'];
     laws.forEach(law => {
         const lawName = getLawDisplayName(law);
         csv += createCSVRow(`${lawName} - In aanmerking (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
@@ -2625,7 +2625,7 @@ function renderComparisonContent(simulations) {
 }
 
 function renderComparisonRows(baseline, comparisons) {
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag', 'voting_rights'];
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang', 'voting_rights'];
     let html = '';
 
     // Demographics
@@ -2778,9 +2778,9 @@ function getLawDisplayName(law) {
     const names = {
         'zorgtoeslag': 'Zorgtoeslag',
         'huurtoeslag': 'Huurtoeslag',
-        'aow': 'AOW',
+        'algemeneouderdoms': 'AOW',
         'bijstand': 'Bijstand',
-        'kinderopvangtoeslag': 'Kinderopvangtoeslag',
+        'kinderopvang': 'Kinderopvangtoeslag',
         'voting_rights': 'Kiesrecht',
         'inkomstenbelasting': 'Inkomstenbelasting'
     };
@@ -2871,7 +2871,7 @@ function renderComparisonCharts(baseline, comparisons) {
 
     // Prepare data for charts
     const eligibilityData = [];
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag'];
+    const laws = ['zorgtoeslag', 'huurtoeslag', 'algemeneouderdoms', 'bijstand', 'kinderopvang'];
 
     laws.forEach(law => {
         eligibilityData.push({
