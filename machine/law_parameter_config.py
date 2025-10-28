@@ -82,7 +82,11 @@ def _ensure_registry_initialized() -> None:
             logger.info(f"Auto-populated law parameter registry with {len(_LAW_CONFIGS)} laws")
             _REGISTRY_INITIALIZED = True
         except Exception as e:
-            logger.error(f"Failed to auto-populate law parameter registry: {e}")
+            logger.warning(f"Failed to auto-populate law parameter registry: {e}")
+            # Mark as initialized even if it failed to avoid repeated attempts
+            # This is especially important in subprocess contexts where Services
+            # initialization may conflict with parent process
+            _REGISTRY_INITIALIZED = True
             # Continue with empty registry if auto-discovery fails
 
 
