@@ -146,7 +146,7 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
 
     except Exception as e:
         logger.error(f"Error initializing Services: {e}")
-        # Return fallback defaults
+        # Return fallback defaults with updated parameter names
         return {
             "zorgtoeslag": {"standaardpremie": 176},
             "huurtoeslag": {"max_huur": 879, "basishuur": 200},
@@ -154,10 +154,10 @@ def get_default_law_parameters(simulation_date: str = "2025-01-01") -> dict[str,
             "algemeneouderdoms": {"pensioenleeftijd": 67, "basisbedrag": 1461},
             "bijstand": {"norm_alleenstaand": 1210, "norm_gehuwd": 1729},
             "inkomstenbelasting": {
-                "tarief_schijf1": 36.93,
-                "tarief_schijf2": 49.53,
-                "grens_schijf1": 74573,
-                "algemene_heffingskorting": 3104,
+                "box1_tarief1": 36.93,
+                "box1_tarief2": 49.53,
+                "box1_schijf1_grens": 74573,
+                "algemene_heffingskorting_max": 3104,
             },
             "kies": {"min_leeftijd": 18},
         }
