@@ -700,14 +700,14 @@
                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         </div>
                                         <div>
-                                            <label for="ib_algemene_heffingskorting"
+                                            <label for="ib_algemene_heffingskorting_max"
                                                    class="block text-sm font-medium text-gray-700">
                                                 Algemene heffingskorting max (€)
                                             </label>
                                             <input type="number"
-                                                   name="ib_algemene_heffingskorting"
-                                                   id="ib_algemene_heffingskorting"
-                                                   value="{{ '%d'|format(law_params.inkomstenbelasting.algemene_heffingskorting) }}"
+                                                   name="ib_algemene_heffingskorting_max"
+                                                   id="ib_algemene_heffingskorting_max"
+                                                   value="{{ '%d'|format(law_params.inkomstenbelasting.algemene_heffingskorting_max) }}"
                                                    min="2000"
                                                    max="5000"
                                                    step="10"
@@ -1703,7 +1703,7 @@ async function runSimulation() {
                 box1_tarief1: parseFloat(formData.get('ib_box1_tarief1')),
                 box1_tarief2: parseFloat(formData.get('ib_box1_tarief2')),
                 box1_schijf1_grens: parseFloat(formData.get('ib_box1_schijf1_grens')),
-                algemene_heffingskorting: parseFloat(formData.get('ib_algemene_heffingskorting'))
+                algemene_heffingskorting_max: parseFloat(formData.get('ib_algemene_heffingskorting_max'))
             },
             kies: {
                 min_leeftijd: parseInt(formData.get('kies_min_leeftijd'))
@@ -2801,7 +2801,7 @@ function getParamDisplayName(param) {
         'box1_tarief1': 'Tarief schijf 1',
         'box1_tarief2': 'Tarief schijf 2',
         'box1_schijf1_grens': 'Grens schijf 1',
-        'algemene_heffingskorting': 'Algemene heffingskorting',
+        'algemene_heffingskorting_max': 'Algemene heffingskorting',
         'min_leeftijd': 'Minimale leeftijd'
     };
     return names[param] || param;
