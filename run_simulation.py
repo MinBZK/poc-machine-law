@@ -2,7 +2,6 @@
 """Standalone simulation runner to avoid class registration conflicts."""
 
 import json
-import os
 import sys
 from datetime import datetime
 
@@ -102,22 +101,26 @@ def run_simulation(params: dict):
 
 
 if __name__ == "__main__":
+    import logging
+
+    # Set up logging
+    logging.basicConfig(level=logging.ERROR)
+    logger = logging.getLogger(__name__)
+
     # Read parameters from stdin
     params = json.loads(sys.stdin.read())
 
     # Determine operation: create_population or run_simulation
     operation = params.get("operation", "run_simulation")
 
-    # Suppress stderr output to avoid progress bar being treated as error
-    with open(os.devnull, "w") as devnull:
-        old_stderr = sys.stderr
-        sys.stderr = devnull
-        try:
-            result = create_population(params) if operation == "create_population" else run_simulation(params)
-            print(json.dumps(result))
-        except Exception as e:
-            error_result = {"status": "error", "message": str(e)}
-            print(json.dumps(error_result))
-            sys.exit(1)
-        finally:
-            sys.stderr = old_stderr
+    try:
+        result = create_population(params) if operation == "create_population" else run_simulation(params)
+        print(json.dumps(result))
+    except Exception as e:
+        # Log full error server-side for debugging
+        logger.error("Simulation error: %s", str(e), exc_info=True)
+
+        # Return generic error to client without exposing internal details
+        error_result = {"status": "error", "message": "An internal error occurred during simulation"}
+        print(json.dumps(error_result), file=sys.stderr)
+        sys.exit(1)

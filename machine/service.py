@@ -96,6 +96,7 @@ class RuleService:
         reference_date: str,
         parameters: dict[str, Any],
         overwrite_input: dict[str, Any] | None = None,
+        overwrite_definitions: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
     ) -> RuleResult:
@@ -107,16 +108,28 @@ class RuleService:
             reference_date: Reference date for rule version (YYYY-MM-DD)
             parameters: Context data for service provider
             overwrite_input: Optional overrides for input values
+            overwrite_definitions: Optional overrides for definition constants
             requested_output: Optional specific output field to calculate
 
         Returns:
             RuleResult containing outputs and metadata
         """
         engine = self._get_engine(law, reference_date)
+
+        # Gather sources from all services for cross-service lookups
+        all_sources = {}
+        if self.services and hasattr(self.services, "services"):
+            for service_name, service in self.services.services.items():
+                all_sources.update(service.source_dataframes)
+        else:
+            # Fallback to just this service's sources
+            all_sources = self.source_dataframes
+
         result = engine.evaluate(
             parameters=parameters,
             overwrite_input=overwrite_input,
-            sources=self.source_dataframes,
+            overwrite_definitions=overwrite_definitions,
+            sources=all_sources,
             calculation_date=reference_date,
             requested_output=requested_output,
             approved=approved,
@@ -364,6 +377,7 @@ class Services:
         parameters: dict[str, Any],
         reference_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
+        overwrite_definitions: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
     ) -> RuleResult:
@@ -377,6 +391,7 @@ class Services:
                 reference_date=reference_date,
                 parameters=parameters,
                 overwrite_input=overwrite_input,
+                overwrite_definitions=overwrite_definitions,
                 requested_output=requested_output,
                 approved=approved,
             )
