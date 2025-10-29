@@ -42,8 +42,11 @@ def step_impl(context, service, table):
         processed_row = {}
         for k, v in row.items():
             # Keep certain fields as strings
-            if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "rsin", "volmachtgever_rsin"}:
+            if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "rsin", "volmachtgever_rsin", "mentor_bsn", "betrokkene_bsn", "bewindvoerder_bsn", "rechthebbende_bsn"}:
                 processed_row[k] = v
+            # Convert comma-separated strings to arrays
+            elif k == "bevoegdheden":
+                processed_row[k] = [item.strip() for item in v.split(",")] if "," in v else [v]
             # Convert empty strings to None for date and numeric fields
             elif k in {"einddatum", "ingangsdatum", "herroepingsdatum", "einddatum_functie"}:
                 processed_row[k] = None if v == "" else parse_value(v)
