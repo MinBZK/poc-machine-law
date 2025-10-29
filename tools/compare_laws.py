@@ -38,9 +38,7 @@ class LawSetComparator:
         self.set_b_pattern = set_b_pattern
 
         # Detect if we're in single-file comparison mode
-        self.single_file_mode = (
-            self._is_single_file(set_a_pattern) and self._is_single_file(set_b_pattern)
-        )
+        self.single_file_mode = self._is_single_file(set_a_pattern) and self._is_single_file(set_b_pattern)
 
         # Find all matching files
         self.files_a = self._find_law_files(set_a_pattern)
@@ -194,9 +192,7 @@ class LawSetComparator:
                 report.append("### Definition Changes")
                 for def_name, change in result["definition_changes"].items():
                     legal_ref = self._format_legal_ref(change.get("legal_basis"))
-                    report.append(
-                        f"- **{def_name}**: {change['from']} → {change['to']}{legal_ref}"
-                    )
+                    report.append(f"- **{def_name}**: {change['from']} → {change['to']}{legal_ref}")
                 report.append("")
 
             # Input changes with legal basis
