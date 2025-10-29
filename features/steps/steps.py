@@ -858,3 +858,38 @@ def step_impl(context, maanden):
         actual, expected,
         f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
     )
+
+
+# Generic step definitions for any boolean output field
+@then('is het {field_name} "{value}"')
+def step_impl(context, field_name, value):
+    actual = context.result.output.get(field_name)
+
+    # Convert string value to appropriate type
+    if value.lower() in ["true", "false"]:
+        expected = value.lower() == "true"
+        assertions.assertEqual(
+            actual, expected,
+            f"Expected {field_name} to be {expected}, but was {actual}"
+        )
+    elif value.isdigit():
+        expected = int(value)
+        assertions.assertEqual(
+            actual, expected,
+            f"Expected {field_name} to be {expected}, but was {actual}"
+        )
+    else:
+        # String comparison
+        assertions.assertEqual(
+            actual, value,
+            f"Expected {field_name} to be '{value}', but was '{actual}'"
+        )
+
+
+@then('is de {field_name} "{value}"')
+def step_impl(context, field_name, value):
+    actual = context.result.output.get(field_name)
+    assertions.assertEqual(
+        actual, value,
+        f"Expected {field_name} to be '{value}', but was '{actual}'"
+    )
