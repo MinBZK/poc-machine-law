@@ -151,14 +151,16 @@ def derive_ui_name_from_law_name(law_name: str) -> str:
         law_name = law_name.split("/")[-1]
 
     # Remove common prefixes in order of specificity
-    if law_name.startswith("wet_op_de_"):
+    if law_name.startswith("wet_op_het_"):
+        law_name = law_name[len("wet_op_het_") :]
+    elif law_name.startswith("wet_op_de_"):
         law_name = law_name[len("wet_op_de_") :]
     elif law_name.startswith("wet_"):
         law_name = law_name[len("wet_") :]
 
-    # Clean up underscores (but keep "wet" in the name!)
+    # Clean up underscores - replace with spaces for readability
     law_name = law_name.strip("_")
-    law_name = law_name.replace("_", "")
+    law_name = law_name.replace("_", " ")
 
     return law_name
 
