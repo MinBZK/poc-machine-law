@@ -1830,7 +1830,7 @@ class LawSimulator:
                 "median_annual": float(results_df["income"].median()),
             },
             "laws": {
-                derive_ui_name_from_law_name("zorgtoeslagwet"): {
+                "zorgtoeslagwet": {
                     "eligible_pct": float(results_df["zorgtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["zorgtoeslag_eligible"]]["zorgtoeslag_amount"].mean())
                     if any(results_df["zorgtoeslag_eligible"])
@@ -1839,7 +1839,7 @@ class LawSimulator:
                         results_df, "zorgtoeslag", "zorgtoeslag_eligible", "zorgtoeslag_amount"
                     ),
                 },
-                derive_ui_name_from_law_name("wet_op_de_huurtoeslag"): {
+                "huurtoeslag": {
                     "eligible_pct": float(results_df["huurtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["huurtoeslag_eligible"]]["huurtoeslag_amount"].mean())
                     if any(results_df["huurtoeslag_eligible"])
@@ -1848,14 +1848,14 @@ class LawSimulator:
                         results_df, "huurtoeslag", "huurtoeslag_eligible", "huurtoeslag_amount"
                     ),
                 },
-                derive_ui_name_from_law_name("algemene_ouderdomswet"): {
+                "algemeneouderdomswet": {
                     "eligible_pct": float(results_df["aow_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["aow_eligible"]]["aow_amount"].mean())
                     if any(results_df["aow_eligible"])
                     else 0,
                     "breakdowns": self.calculate_law_breakdowns(results_df, "aow", "aow_eligible", "aow_amount"),
                 },
-                derive_ui_name_from_law_name("participatiewet/bijstand"): {
+                "bijstand": {
                     "eligible_pct": float(results_df["bijstand_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["bijstand_eligible"]]["bijstand_amount"].mean())
                     if any(results_df["bijstand_eligible"])
@@ -1864,7 +1864,7 @@ class LawSimulator:
                         results_df, "bijstand", "bijstand_eligible", "bijstand_amount"
                     ),
                 },
-                derive_ui_name_from_law_name("wet_kinderopvang"): {
+                "kinderopvang": {
                     "eligible_pct": float(results_df["kinderopvangtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(
                         results_df[results_df["kinderopvangtoeslag_eligible"]]["kinderopvangtoeslag_amount"].mean()
@@ -1881,7 +1881,7 @@ class LawSimulator:
                         results_df, "voting_rights", "voting_rights", "voting_rights"
                     ),
                 },
-                derive_ui_name_from_law_name("wet_inkomstenbelasting"): {
+                "inkomstenbelasting": {
                     "avg_tax": float(results_df["tax_due"].mean()),
                     "avg_tax_rate": float((results_df["tax_due"] / results_df["income"]).mean() * 100),
                     "avg_tax_credits": float(results_df["tax_credits"].mean()),
