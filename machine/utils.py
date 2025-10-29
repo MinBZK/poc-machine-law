@@ -1,6 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -50,6 +50,19 @@ class RuleSpec:
         """Create RuleSpec from a YAML file path"""
         data = load_yaml_cached(path)
 
+        # Parse valid_from field - handle datetime, date, or string
+        valid_from_raw = data.get("valid_from")
+        if isinstance(valid_from_raw, datetime):
+            valid_from = valid_from_raw
+        elif isinstance(valid_from_raw, date):
+            valid_from = datetime.combine(valid_from_raw, datetime.min.time())
+        elif isinstance(valid_from_raw, str):
+            # Parse string date in YYYY-MM-DD format
+            parsed_date = datetime.strptime(valid_from_raw, "%Y-%m-%d").date()
+            valid_from = datetime.combine(parsed_date, datetime.min.time())
+        else:
+            raise ValueError(f"Invalid valid_from type: {type(valid_from_raw)} in {path}")
+
         return cls(
             path=path,
             decision_type=data.get("decision_type", ""),
@@ -59,9 +72,7 @@ class RuleSpec:
             name=data.get("name", ""),
             law=data.get("law", ""),
             discoverable=data.get("discoverable", ""),
-            valid_from=data.get("valid_from")
-            if isinstance(data.get("valid_from"), datetime)
-            else datetime.combine(data.get("valid_from"), datetime.min.time()),
+            valid_from=valid_from,
             service=data.get("service", ""),
             properties=data.get("properties", {}),
         )
