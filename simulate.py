@@ -14,7 +14,6 @@ from tqdm.auto import tqdm
 from machine.law_parameter_config import (
     _ensure_registry_initialized,
     create_overrides,
-    derive_ui_name_from_law_name,
     find_law_config_by_technical_name,
 )
 from machine.service import Services
