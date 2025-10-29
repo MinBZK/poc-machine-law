@@ -11,6 +11,12 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
+from machine.law_parameter_config import (
+    _ensure_registry_initialized,
+    create_overrides,
+    derive_ui_name_from_law_name,
+    find_law_config_by_technical_name,
+)
 from machine.service import Services
 
 # Create a logger for this module
@@ -25,9 +31,21 @@ class LawSimulator:
     def __init__(self, simulation_date="2025-03-01", law_parameters=None) -> None:
         self.simulation_date = simulation_date
         self.services = Services(simulation_date)
+
+        # Initialize the law parameter registry with our Services instance
+        # This prevents eventsourcing conflicts in subprocess contexts
+        _ensure_registry_initialized(services=self.services)
+
         self.results = []
         self.used_bsns = set()  # Track used BSNs
         self.law_parameters = law_parameters or {}
+
+        # DEBUG: Log received law parameters
+        if self.law_parameters:
+            logger.info(f"Received law_parameters with keys: {list(self.law_parameters.keys())}")
+            for law_name, params in self.law_parameters.items():
+                if params:
+                    logger.info(f"  {law_name}: {len(params)} parameters")
 
         # CBS demographic data for more realistic simulation
         self.age_distribution = {
@@ -1198,13 +1216,14 @@ class LawSimulator:
         # Evaluate all relevant laws
         try:
             # 1. Zorgtoeslag (healthcare subsidy)
-            zorgtoeslag_overrides = self._create_law_overrides("zorgtoeslagwet")
+            zorgtoeslag_input, zorgtoeslag_defs = self._create_law_overrides("zorgtoeslagwet")
             zorgtoeslag = self.services.evaluate(
                 "TOESLAGEN",
                 "zorgtoeslagwet",
                 {"BSN": person["bsn"]},
                 self.simulation_date,
-                overwrite_input=zorgtoeslag_overrides,
+                overwrite_input=zorgtoeslag_input,
+                overwrite_definitions=zorgtoeslag_defs,
             )
 
             # Also evaluate 2024 version for comparison if simulating in 2025
@@ -1216,7 +1235,8 @@ class LawSimulator:
                         "zorgtoeslagwet",
                         {"BSN": person["bsn"]},
                         "2024-12-31",
-                        overwrite_input=zorgtoeslag_overrides,
+                        overwrite_input=zorgtoeslag_input,
+                        overwrite_definitions=zorgtoeslag_defs,
                     )
                 except Exception:
                     pass
@@ -1226,13 +1246,14 @@ class LawSimulator:
 
             # 3. Huurtoeslag (rent subsidy)
             try:
-                huurtoeslag_overrides = self._create_law_overrides("wet_op_de_huurtoeslag")
+                huurtoeslag_input, huurtoeslag_defs = self._create_law_overrides("wet_op_de_huurtoeslag")
                 huurtoeslag = self.services.evaluate(
                     "TOESLAGEN",
                     "wet_op_de_huurtoeslag",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=huurtoeslag_overrides,
+                    overwrite_input=huurtoeslag_input,
+                    overwrite_definitions=huurtoeslag_defs,
                 )
             except Exception as e:
                 logger.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
@@ -1240,13 +1261,14 @@ class LawSimulator:
 
             # 4. Bijstand (social assistance)
             try:
-                bijstand_overrides = self._create_law_overrides("participatiewet/bijstand")
+                bijstand_input, bijstand_defs = self._create_law_overrides("participatiewet/bijstand")
                 bijstand = self.services.evaluate(
                     "GEMEENTE_AMSTERDAM",
                     "participatiewet/bijstand",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=bijstand_overrides,
+                    overwrite_input=bijstand_input,
+                    overwrite_definitions=bijstand_defs,
                 )
             except Exception:
                 bijstand = None
@@ -1256,32 +1278,39 @@ class LawSimulator:
             kinderopvangtoeslag = None
             if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
                 try:
-                    kinderopvang_overrides = self._create_law_overrides("wet_kinderopvang")
+                    kinderopvang_input, kinderopvang_defs = self._create_law_overrides("wet_kinderopvang")
                     kinderopvangtoeslag = self.services.evaluate(
                         "TOESLAGEN",
                         "wet_kinderopvang",
                         {"BSN": person["bsn"]},
                         self.simulation_date,
-                        overwrite_input=kinderopvang_overrides,
+                        overwrite_input=kinderopvang_input,
+                        overwrite_definitions=kinderopvang_defs,
                     )
                 except Exception as e:
                     logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
                     kinderopvangtoeslag = None
 
             # 6. Kiesrecht (voting rights)
-            kiesrecht_overrides = self._create_law_overrides("kieswet")
+            kiesrecht_input, kiesrecht_defs = self._create_law_overrides("kieswet")
             kiesrecht = self.services.evaluate(
-                "KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date, overwrite_input=kiesrecht_overrides
+                "KIESRAAD",
+                "kieswet",
+                {"BSN": person["bsn"]},
+                self.simulation_date,
+                overwrite_input=kiesrecht_input,
+                overwrite_definitions=kiesrecht_defs,
             )
 
             # 7. Inkomstenbelasting (income tax)
-            inkomstenbelasting_overrides = self._create_law_overrides("wet_inkomstenbelasting")
+            ib_overwrite_input, ib_overwrite_definitions = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
                 "BELASTINGDIENST",
                 "wet_inkomstenbelasting",
                 {"BSN": person["bsn"]},
                 self.simulation_date,
-                overwrite_input=inkomstenbelasting_overrides,
+                overwrite_input=ib_overwrite_input,
+                overwrite_definitions=ib_overwrite_definitions,
             )
         except Exception:
             return None
@@ -1360,24 +1389,45 @@ class LawSimulator:
         self.results.append(result)
 
     def _create_law_overrides(self, law_name):
-        """Create overwrite_input dict for a specific law based on UI parameters."""
-        overrides = {}
+        """
+        Create override dicts for a specific law based on UI parameters.
 
-        if law_name == "zorgtoeslagwet" and "zorgtoeslag" in self.law_parameters:
-            params = self.law_parameters["zorgtoeslag"]
-            if "standaardpremie" in params and params["standaardpremie"] is not None:
-                # Convert monthly to yearly (in eurocents)
-                yearly_premium = int(params["standaardpremie"] * 12 * 100)
-                overrides["VWS"] = {"standaardpremie": yearly_premium}
+        Uses the law_parameter_config registry to map UI parameters to engine overrides.
+        This eliminates hardcoded law-specific logic.
 
-        # Note: Most other law parameters are in the 'definitions' section of YAML files,
-        # which cannot be overridden through the overwrite_input mechanism.
-        # These would require extending the system to support definition overrides.
+        Args:
+            law_name: Technical law name (e.g., "wet_inkomstenbelasting")
 
-        # For now, we can only override input parameters, not definition constants.
-        # Future enhancement: Add support for overriding law definitions.
+        Returns:
+            Tuple of (overwrite_input, overwrite_definitions):
+            - overwrite_input: Dict for input overrides {service: {field: value}}
+            - overwrite_definitions: Dict for definition overrides {field: value}
+        """
+        # Find law config by technical name
+        config = find_law_config_by_technical_name(law_name)
+        if not config:
+            logger.debug(f"No config found for technical law name: {law_name}")
+            return {}, {}
 
-        return overrides
+        # Check if we have UI parameters for this law
+        ui_law_name = config.ui_name
+        logger.debug(f"Looking for UI law name '{ui_law_name}' (from technical name '{law_name}') in law_parameters")
+        logger.debug(f"Available law_parameters keys: {list(self.law_parameters.keys())}")
+
+        if ui_law_name not in self.law_parameters:
+            logger.debug(f"No parameters found for UI law name: {ui_law_name}")
+            return {}, {}
+
+        logger.info(f"Found {len(self.law_parameters[ui_law_name])} parameters for {ui_law_name}")
+
+        # Create overrides using registry
+        overwrite_input, overwrite_definitions = create_overrides(ui_law_name, self.law_parameters[ui_law_name])
+
+        # Log info about definition overrides if present
+        if overwrite_definitions:
+            logger.info(f"Applying definition overrides for {law_name}: {list(overwrite_definitions.keys())}")
+
+        return overwrite_input, overwrite_definitions
 
     def create_population(self, num_people=1000, save=True, population_params=None):
         """Create a new population and optionally save it."""
@@ -1780,7 +1830,7 @@ class LawSimulator:
                 "median_annual": float(results_df["income"].median()),
             },
             "laws": {
-                "zorgtoeslag": {
+                derive_ui_name_from_law_name("zorgtoeslagwet"): {
                     "eligible_pct": float(results_df["zorgtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["zorgtoeslag_eligible"]]["zorgtoeslag_amount"].mean())
                     if any(results_df["zorgtoeslag_eligible"])
@@ -1789,7 +1839,7 @@ class LawSimulator:
                         results_df, "zorgtoeslag", "zorgtoeslag_eligible", "zorgtoeslag_amount"
                     ),
                 },
-                "huurtoeslag": {
+                derive_ui_name_from_law_name("wet_op_de_huurtoeslag"): {
                     "eligible_pct": float(results_df["huurtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["huurtoeslag_eligible"]]["huurtoeslag_amount"].mean())
                     if any(results_df["huurtoeslag_eligible"])
@@ -1798,14 +1848,14 @@ class LawSimulator:
                         results_df, "huurtoeslag", "huurtoeslag_eligible", "huurtoeslag_amount"
                     ),
                 },
-                "aow": {
+                derive_ui_name_from_law_name("algemene_ouderdomswet"): {
                     "eligible_pct": float(results_df["aow_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["aow_eligible"]]["aow_amount"].mean())
                     if any(results_df["aow_eligible"])
                     else 0,
                     "breakdowns": self.calculate_law_breakdowns(results_df, "aow", "aow_eligible", "aow_amount"),
                 },
-                "bijstand": {
+                derive_ui_name_from_law_name("participatiewet/bijstand"): {
                     "eligible_pct": float(results_df["bijstand_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["bijstand_eligible"]]["bijstand_amount"].mean())
                     if any(results_df["bijstand_eligible"])
@@ -1814,7 +1864,7 @@ class LawSimulator:
                         results_df, "bijstand", "bijstand_eligible", "bijstand_amount"
                     ),
                 },
-                "kinderopvangtoeslag": {
+                derive_ui_name_from_law_name("wet_kinderopvang"): {
                     "eligible_pct": float(results_df["kinderopvangtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(
                         results_df[results_df["kinderopvangtoeslag_eligible"]]["kinderopvangtoeslag_amount"].mean()
@@ -1831,7 +1881,7 @@ class LawSimulator:
                         results_df, "voting_rights", "voting_rights", "voting_rights"
                     ),
                 },
-                "inkomstenbelasting": {
+                derive_ui_name_from_law_name("wet_inkomstenbelasting"): {
                     "avg_tax": float(results_df["tax_due"].mean()),
                     "avg_tax_rate": float((results_df["tax_due"] / results_df["income"]).mean() * 100),
                     "avg_tax_credits": float(results_df["tax_credits"].mean()),
