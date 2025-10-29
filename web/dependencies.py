@@ -89,6 +89,11 @@ def get_engine_id() -> str:
 def setup_jinja_env(directory: str) -> Jinja2Templates:
     templates = Jinja2Templates(directory=directory)
 
+    # Add global context processor for feature flags
+    from web.feature_flags import is_acting_on_behalf_enabled
+
+    templates.env.globals["is_acting_on_behalf_enabled"] = is_acting_on_behalf_enabled
+
     def format_date(date_str: str) -> str:
         if not date_str:
             return ""

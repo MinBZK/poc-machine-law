@@ -223,8 +223,10 @@
                             </div>
                         </div>
 
-                        <!-- Role Selector -->
-                        {% include "partials/role_selector.html" %}
+                        <!-- Role Selector (only show if feature flag is enabled) -->
+                        {% if is_acting_on_behalf_enabled() %}
+                            {% include "partials/role_selector.html" %}
+                        {% endif %}
 
                         <!-- Desktop Kebab Menu (vertical ellipsis) -->
                         <!-- Dropdown Menu Wrapper for Homepage -->

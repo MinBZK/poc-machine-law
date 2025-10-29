@@ -22,6 +22,7 @@ class FeatureFlags:
         "CHAT": True,  # Chat feature is enabled by default
         "CHANGE_WIZARD": False,  # Change wizard is disabled by default
         "TOTAL_INCOME_WIDGET": False,  # Total income dashboard widget is disabled by default
+        "ACTING_ON_BEHALF": False,  # Handelen namens (acting on behalf of) is disabled by default
     }
 
     @classmethod
@@ -154,3 +155,8 @@ def is_change_wizard_enabled() -> bool:
 def is_total_income_widget_enabled() -> bool:
     """Check if the total income widget is enabled."""
     return FeatureFlags.is_enabled("TOTAL_INCOME_WIDGET")
+
+
+def is_acting_on_behalf_enabled() -> bool:
+    """Check if the acting on behalf (handelen namens) feature is enabled."""
+    return FeatureFlags.is_enabled("ACTING_ON_BEHALF")
