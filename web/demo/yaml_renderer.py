@@ -1,7 +1,6 @@
 """YAML rendering and parsing utilities for demo mode."""
 
 import html
-import re
 from pathlib import Path
 from typing import Any
 
@@ -162,7 +161,7 @@ def format_yaml_value(value: Any) -> str:
     """
     if isinstance(value, bool):
         return "true" if value else "false"
-    elif isinstance(value, (int, float)):
+    elif isinstance(value, int | float):
         return str(value)
     elif isinstance(value, str):
         # Handle multi-line strings
@@ -243,19 +242,14 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
             if k in ("_link", "_law_path"):
                 continue
 
-            is_collapsible = isinstance(v, (dict, list))
+            is_collapsible = isinstance(v, dict | list)
 
             # Build current path for demo mode
             current_path = f"{parent_path}.{k}" if parent_path else k
 
             # Determine collapsed state (demo mode or default)
             demo_expand = should_expand_in_demo_mode(_current_law_path, current_path) if _current_law_path else None
-            if demo_expand is not None:
-                # Use demo mode configuration
-                default_collapsed = not demo_expand
-            else:
-                # Use default collapse logic
-                default_collapsed = should_collapse_by_default(k)
+            default_collapsed = not demo_expand if demo_expand is not None else should_collapse_by_default(k)
 
             collapsed_class = "collapsed" if default_collapsed else ""
 
@@ -312,10 +306,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
                     if test_subject and test_value is not None:
                         # Include the value to distinguish between different tests on same subject
                         # Convert boolean to lowercase string for consistency
-                        if isinstance(test_value, bool):
-                            value_str = str(test_value).lower()
-                        else:
-                            value_str = str(test_value)
+                        value_str = str(test_value).lower() if isinstance(test_value, bool) else str(test_value)
                         test_label = f"{test_subject}={value_str}"
                     elif test_subject:
                         test_label = test_subject

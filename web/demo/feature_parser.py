@@ -69,7 +69,7 @@ def parse_feature_file(feature_path: Path) -> dict[str, Any]:
             continue
 
         # Scenario or Scenario Outline
-        if stripped.startswith("Scenario:") or stripped.startswith("Scenario Outline:"):
+        if stripped.startswith(("Scenario:", "Scenario Outline:")):
             # Save previous scenario if exists
             if current_scenario:
                 result["scenarios"].append(current_scenario)
@@ -182,10 +182,7 @@ def discover_feature_files(base_dirs: list[Path]) -> dict[str, list[dict[str, An
                 relative_path = feature_file.relative_to(base_dir)
                 parent = relative_path.parent
 
-                if str(parent) == ".":
-                    group = "Root Features"
-                else:
-                    group = str(parent)
+                group = "Root Features" if str(parent) == "." else str(parent)
 
                 feature_info = {
                     "path": str(feature_file),

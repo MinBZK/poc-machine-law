@@ -47,7 +47,7 @@ def render_feature_to_html(parsed_feature: dict[str, Any]) -> str:
     # Feature header
     if parsed_feature.get("feature"):
         feature = parsed_feature["feature"]
-        html_parts.append(f'<div class="gherkin-feature">')
+        html_parts.append('<div class="gherkin-feature">')
         html_parts.append(f'  <span class="gherkin-keyword">{translate_keyword("Feature:")}</span>')
         html_parts.append(f'  <span class="gherkin-name">{html.escape(feature["name"])}</span>')
 

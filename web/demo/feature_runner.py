@@ -1,8 +1,6 @@
 """Feature file runner for demo mode."""
 
-import io
 import subprocess
-import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -101,10 +99,7 @@ def run_feature_file(feature_path: Path) -> dict[str, Any]:
             total_skipped = sum(1 for s in scenarios if s["status"] == "skipped")
 
         # Overall status
-        if result.returncode == 0:
-            overall_status = "passed"
-        else:
-            overall_status = "failed"
+        overall_status = "passed" if result.returncode == 0 else "failed"
 
         return {
             "status": overall_status,

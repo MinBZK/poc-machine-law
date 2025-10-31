@@ -1,17 +1,15 @@
 """Demo mode router for presenting law files and running features."""
 
 import asyncio
-import json
 import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
-from web.demo.feature_runner import run_feature_file
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
 from web.dependencies import templates
 
@@ -101,7 +99,7 @@ async def _run_behave_async(run_id: str, feature_path: str, line_number: int | N
 
         try:
             await asyncio.wait_for(read_output(), timeout=timeout_seconds)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             # Kill process on timeout
             process.kill()
             await process.wait()
