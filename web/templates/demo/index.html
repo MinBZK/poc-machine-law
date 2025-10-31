@@ -1,14 +1,14 @@
 {% extends "demo/base.html" %}
 
-{% block title %}Machine Law Demo - Laws{% endblock %}
+{% block title %}Machine Law Demo - Wetten{% endblock %}
 
 {% block content %}
 <div class="demo-layout">
     <!-- Sidebar with law list -->
     <aside class="demo-sidebar">
         <div class="sidebar-header">
-            <h2>Available Laws</h2>
-            <input type="text" id="law-search" class="law-search" placeholder="Search laws...">
+            <h2>Beschikbare Wetten</h2>
+            <input type="text" id="law-search" class="law-search" placeholder="Zoek wetten...">
         </div>
         <div class="law-list" id="law-list">
             {% for directory, laws in grouped_laws.items() %}
@@ -40,30 +40,30 @@
     <!-- Main content area -->
     <main class="demo-content">
         <div class="welcome-message">
-            <h2>Welcome to Machine Law Demo Mode</h2>
-            <p>Select a law from the sidebar to view its machine-executable specification.</p>
+            <h2>Welkom bij Machine Law Demo Mode</h2>
+            <p>Selecteer een wet uit de zijbalk om de machine-uitvoerbare specificatie te bekijken.</p>
 
             <div class="demo-features">
                 <div class="feature-card">
-                    <h3>📄 YAML Law Files</h3>
-                    <p>Browse and explore machine-readable law specifications with collapsible sections.</p>
+                    <h3>📄 YAML Wetten Bestanden</h3>
+                    <p>Bekijk en verken machine-leesbare wet specificaties met inklapbare secties.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>🔗 Cross-References</h3>
-                    <p>Navigate between laws using automatic link detection for service references.</p>
+                    <h3>🔗 Kruisverwijzingen</h3>
+                    <p>Navigeer tussen wetten met automatische link detectie voor service referenties.</p>
                 </div>
                 <div class="feature-card">
                     <h3>🧪 Feature Tests</h3>
-                    <p>Run Gherkin feature tests to verify law implementations.</p>
+                    <p>Voer Gherkin feature tests uit om wet implementaties te verifiëren.</p>
                 </div>
             </div>
 
             <div class="quick-start">
-                <h3>Quick Start</h3>
+                <h3>Snel Beginnen</h3>
                 <ul>
-                    <li>Click on <strong>Zorgtoeslag</strong> in the sidebar to see the healthcare subsidy law</li>
-                    <li>Use the search box to quickly find specific laws</li>
-                    <li>Navigate to the <a href="/demo/features">Features</a> tab to run tests</li>
+                    <li>Klik op <strong>Zorgtoeslag</strong> in de zijbalk om de zorgtoeslag wet te bekijken</li>
+                    <li>Gebruik het zoekveld om snel specifieke wetten te vinden</li>
+                    <li>Navigeer naar de <a href="/demo/features">Features</a> tab om tests uit te voeren</li>
                 </ul>
             </div>
         </div>

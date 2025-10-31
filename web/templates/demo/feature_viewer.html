@@ -1,229 +1,232 @@
 {% extends "demo/base.html" %}
 
-{% block title %}Feature Tests - Machine Law Demo{% endblock %}
+{% block title %}{{ feature_data.feature.name }} - Machine Law Demo{% endblock %}
 
 {% block content %}
-<div class="demo-layout">
-    <!-- Sidebar with law list for navigation -->
+<div class="demo-layout three-panel">
+    <!-- Sidebar with feature list -->
     <aside class="demo-sidebar">
         <div class="sidebar-header">
-            <h2>Navigation</h2>
+            <h2>Feature Files</h2>
+            <input type="text" id="feature-search" class="law-search" placeholder="Zoek features...">
         </div>
-        <div class="law-list">
-            <a href="/demo" class="law-item">
-                <div class="law-item-header">
-                    <span class="law-name">← Back to Laws</span>
+        <div class="law-list" id="feature-list">
+            {% for directory, features in grouped_features.items() %}
+            <div class="law-directory">
+                <div class="directory-header" onclick="toggleDirectory(this)">
+                    <span class="directory-icon">▼</span>
+                    <span class="directory-name">{{ directory }}</span>
+                    <span class="directory-count">({{ features|length }})</span>
                 </div>
-            </a>
+                <div class="directory-laws">
+                    {% for feature in features %}
+                    <a href="/demo/feature/{{ feature.path }}"
+                       class="law-item {% if feature.path in feature_path %}active{% endif %}">
+                        <div class="law-item-header">
+                            <span class="law-name">{{ feature.name }}</span>
+                            <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </aside>
 
-    <!-- Main content area with feature list -->
-    <main class="demo-content">
+    <!-- Main content area with Gherkin viewer -->
+    <main class="demo-content feature-content">
         <div class="feature-viewer">
-            <h1>Feature Tests</h1>
-            <p class="subtitle">Run Gherkin feature tests to verify law implementations</p>
+            <!-- Toolbar -->
+            <div class="feature-toolbar">
+                <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
+                <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
+                <span class="scenario-status" id="scenario-status"></span>
+            </div>
 
-            <!-- Law-specific features -->
-            <section class="feature-section">
-                <h2>Law-Specific Features</h2>
-                <div class="feature-list">
-                    {% if law_features %}
-                        {% for feature in law_features %}
-                        <div class="feature-item">
-                            <div class="feature-header">
-                                <h3>{{ feature.name }}</h3>
-                                <span class="feature-path">{{ feature.path }}</span>
-                            </div>
-                            <button class="btn btn-primary"
-                                    onclick="runFeature('{{ feature.full_path }}', this)">
-                                Run Feature
-                            </button>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="no-features">No law-specific features found.</p>
-                    {% endif %}
-                </div>
-            </section>
-
-            <!-- Standalone features -->
-            <section class="feature-section">
-                <h2>Standalone Features</h2>
-                <div class="feature-list">
-                    {% if standalone_features %}
-                        {% for feature in standalone_features %}
-                        <div class="feature-item">
-                            <div class="feature-header">
-                                <h3>{{ feature.name }}</h3>
-                                <span class="feature-path">{{ feature.path }}</span>
-                            </div>
-                            <button class="btn btn-primary"
-                                    onclick="runFeature('{{ feature.full_path }}', this)">
-                                Run Feature
-                            </button>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="no-features">No standalone features found.</p>
-                    {% endif %}
-                </div>
-            </section>
-        </div>
-
-        <!-- Results modal -->
-        <div id="results-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Feature Test Results</h2>
-                    <button class="modal-close" onclick="closeResultsModal()">&times;</button>
-                </div>
-                <div class="modal-body" id="results-body">
-                    <!-- Results will be injected here -->
-                </div>
+            <!-- Gherkin content -->
+            <div class="gherkin-wrapper">
+                {{ feature_html | safe }}
             </div>
         </div>
     </main>
+
+    <!-- Output panel -->
+    <aside class="output-panel">
+        <div class="output-header">
+            <h3>Test Output</h3>
+            <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
+        </div>
+        <div class="output-content" id="output-content">
+            <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
+        </div>
+    </aside>
 </div>
 
 <script>
-let currentFeaturePath = null;
+// Store current feature path and run ID
+let currentFeaturePath = '{{ feature_path }}';
+let currentRunId = null;
+let pollInterval = null;
 
-async function runFeature(featurePath, button) {
-    currentFeaturePath = featurePath;
+// Toggle scenario collapsed/expanded
+function toggleScenario(element) {
+    const scenario = element.closest('.gherkin-scenario');
+    if (!scenario) return;
 
-    // Update button state
-    const originalText = button.textContent;
-    button.textContent = 'Running...';
-    button.disabled = true;
+    scenario.classList.toggle('collapsed');
+    const icon = element.querySelector('.collapse-icon');
+    if (icon) {
+        icon.textContent = scenario.classList.contains('collapsed') ? '▶' : '▼';
+    }
+}
+
+// Expand all scenarios
+function expandAllScenarios() {
+    document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+        scenario.classList.remove('collapsed');
+        const icon = scenario.querySelector('.collapse-icon');
+        if (icon) icon.textContent = '▼';
+    });
+}
+
+// Collapse all scenarios
+function collapseAllScenarios() {
+    document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+        scenario.classList.add('collapsed');
+        const icon = scenario.querySelector('.collapse-icon');
+        if (icon) icon.textContent = '▶';
+    });
+}
+
+// Run a single scenario
+async function runScenario(scenarioIndex) {
+    const outputContent = document.getElementById('output-content');
+    outputContent.innerHTML = '<div class="output-running">Running scenario...</div>';
+
+    try {
+        const response = await fetch('/demo/feature/run-scenario', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                feature_path: currentFeaturePath,
+                scenario_index: parseInt(scenarioIndex)
+            })
+        });
+
+        const data = await response.json();
+        currentRunId = data.run_id;
+
+        // Start polling for output
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollForOutput, 500);
+
+    } catch (error) {
+        outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
+    }
+}
+
+// Filter output to show only relevant parts
+function filterOutput(output) {
+    if (!output) return '';
+
+    const lines = output.split('\n');
+    let startIndex = -1;
+
+    // Find the first line that contains a step definition (e.g., "steps.py:50")
+    // This marks the start of actual test execution
+    for (let i = 0; i < lines.length; i++) {
+        // Look for lines that contain the pattern: .py: followed by a number
+        // This matches lines like: "Given de datum is... # steps.py:50"
+        if (/\.py:\d+/.test(lines[i])) {
+            console.log('Found start line at index', i, ':', lines[i]);
+            startIndex = i;
+            break;
+        }
+    }
+
+    // If we found the marker, return from that point
+    if (startIndex >= 0) {
+        const filtered = lines.slice(startIndex).join('\n');
+        console.log('Filtered output from line', startIndex, 'length:', filtered.length);
+        return filtered;
+    }
+
+    // Otherwise return the full output
+    console.log('No filter marker found, returning full output');
+    return output;
+}
+
+// Poll for test output
+async function pollForOutput() {
+    if (!currentRunId) return;
+
+    try {
+        const response = await fetch(`/demo/feature/run-status/${currentRunId}`);
+        const data = await response.json();
+
+        const outputContent = document.getElementById('output-content');
+        const filteredOutput = filterOutput(data.output);
+        outputContent.innerHTML = `<pre class="output-text">${filteredOutput}</pre>`;
+
+        // Auto-scroll to bottom
+        outputContent.scrollTop = outputContent.scrollHeight;
+
+        // Update status
+        const statusEl = document.getElementById('scenario-status');
+        if (data.status === 'completed') {
+            statusEl.textContent = '✅ Passed';
+            statusEl.className = 'scenario-status passed';
+            clearInterval(pollInterval);
+        } else if (data.status === 'failed') {
+            statusEl.textContent = '❌ Failed';
+            statusEl.className = 'scenario-status failed';
+            clearInterval(pollInterval);
+        } else {
+            statusEl.textContent = '⏳ Running...';
+            statusEl.className = 'scenario-status running';
+        }
+
+    } catch (error) {
+        console.error('Error polling output:', error);
+        clearInterval(pollInterval);
+    }
+}
+
+// Run all scenarios
+async function runAllScenarios() {
+    const outputContent = document.getElementById('output-content');
+    outputContent.innerHTML = '<div class="output-running">Running all scenarios...</div>';
 
     try {
         const response = await fetch('/demo/run-feature', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                feature_path: featurePath
+                feature_path: currentFeaturePath
             })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const data = await response.json();
+        currentRunId = data.run_id;
 
-        const results = await response.json();
-        displayResults(results);
+        // Start polling for output
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollForOutput, 500);
+
     } catch (error) {
-        console.error('Error running feature:', error);
-        alert('Error running feature: ' + error.message);
-    } finally {
-        // Reset button state
-        button.textContent = originalText;
-        button.disabled = false;
+        outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
     }
 }
 
-function displayResults(results) {
-    const modal = document.getElementById('results-modal');
-    const body = document.getElementById('results-body');
-
-    // Build HTML for results
-    let html = `
-        <div class="results-summary ${results.status}">
-            <div class="summary-header">
-                <h3>Status: <span class="status-badge ${results.status}">${results.status.toUpperCase()}</span></h3>
-                <p>Execution time: ${results.execution_time}s</p>
-            </div>
-            <div class="summary-stats">
-                <span class="stat passed">✓ ${results.summary.passed} passed</span>
-                <span class="stat failed">✗ ${results.summary.failed} failed</span>
-                <span class="stat skipped">○ ${results.summary.skipped} skipped</span>
-            </div>
-        </div>
-    `;
-
-    // Display scenarios
-    if (results.scenarios && results.scenarios.length > 0) {
-        html += '<div class="scenarios">';
-        results.scenarios.forEach((scenario, idx) => {
-            html += `
-                <div class="scenario ${scenario.status}">
-                    <div class="scenario-header" onclick="toggleScenario(${idx})">
-                        <span class="collapse-icon">▶</span>
-                        <h4>${scenario.name}</h4>
-                        <span class="status-badge ${scenario.status}">${scenario.status}</span>
-                    </div>
-                    <div class="scenario-steps collapsed" id="scenario-${idx}">
-            `;
-
-            scenario.steps.forEach(step => {
-                const statusIcon = step.status === 'passed' ? '✓' : step.status === 'failed' ? '✗' : '○';
-                html += `
-                    <div class="step ${step.status}">
-                        <span class="step-icon">${statusIcon}</span>
-                        <span class="step-keyword">${step.keyword}</span>
-                        <span class="step-name">${step.name}</span>
-                `;
-
-                if (step.error_message) {
-                    html += `<pre class="error-message">${step.error_message}</pre>`;
-                }
-
-                html += '</div>';
-            });
-
-            html += '</div></div>';
-        });
-        html += '</div>';
-    }
-
-    // Display stderr if present
-    if (results.stderr) {
-        html += `
-            <div class="results-output">
-                <h4>Error Output:</h4>
-                <pre class="output-text">${results.stderr}</pre>
-            </div>
-        `;
-    }
-
-    // Display stdout if present (for plain text output)
-    if (results.stdout) {
-        html += `
-            <div class="results-output">
-                <h4>Output:</h4>
-                <pre class="output-text">${results.stdout}</pre>
-            </div>
-        `;
-    }
-
-    body.innerHTML = html;
-    modal.style.display = 'flex';
-}
-
-function toggleScenario(idx) {
-    const steps = document.getElementById(`scenario-${idx}`);
-    const icon = steps.previousElementSibling.querySelector('.collapse-icon');
-
-    if (steps.classList.contains('collapsed')) {
-        steps.classList.remove('collapsed');
-        icon.textContent = '▼';
-    } else {
-        steps.classList.add('collapsed');
-        icon.textContent = '▶';
-    }
-}
-
-function closeResultsModal() {
-    document.getElementById('results-modal').style.display = 'none';
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('results-modal');
-    if (event.target === modal) {
-        closeResultsModal();
+// Clear output
+function clearOutput() {
+    document.getElementById('output-content').innerHTML =
+        '<div class="output-placeholder">Run a scenario to see output here...</div>';
+    document.getElementById('scenario-status').textContent = '';
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
     }
 }
 </script>
