@@ -1,0 +1,230 @@
+{% extends "demo/base.html" %}
+
+{% block title %}Feature Tests - Machine Law Demo{% endblock %}
+
+{% block content %}
+<div class="demo-layout">
+    <!-- Sidebar with law list for navigation -->
+    <aside class="demo-sidebar">
+        <div class="sidebar-header">
+            <h2>Navigation</h2>
+        </div>
+        <div class="law-list">
+            <a href="/demo" class="law-item">
+                <div class="law-item-header">
+                    <span class="law-name">← Back to Laws</span>
+                </div>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main content area with feature list -->
+    <main class="demo-content">
+        <div class="feature-viewer">
+            <h1>Feature Tests</h1>
+            <p class="subtitle">Run Gherkin feature tests to verify law implementations</p>
+
+            <!-- Law-specific features -->
+            <section class="feature-section">
+                <h2>Law-Specific Features</h2>
+                <div class="feature-list">
+                    {% if law_features %}
+                        {% for feature in law_features %}
+                        <div class="feature-item">
+                            <div class="feature-header">
+                                <h3>{{ feature.name }}</h3>
+                                <span class="feature-path">{{ feature.path }}</span>
+                            </div>
+                            <button class="btn btn-primary"
+                                    onclick="runFeature('{{ feature.full_path }}', this)">
+                                Run Feature
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-features">No law-specific features found.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Standalone features -->
+            <section class="feature-section">
+                <h2>Standalone Features</h2>
+                <div class="feature-list">
+                    {% if standalone_features %}
+                        {% for feature in standalone_features %}
+                        <div class="feature-item">
+                            <div class="feature-header">
+                                <h3>{{ feature.name }}</h3>
+                                <span class="feature-path">{{ feature.path }}</span>
+                            </div>
+                            <button class="btn btn-primary"
+                                    onclick="runFeature('{{ feature.full_path }}', this)">
+                                Run Feature
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-features">No standalone features found.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+
+        <!-- Results modal -->
+        <div id="results-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Feature Test Results</h2>
+                    <button class="modal-close" onclick="closeResultsModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="results-body">
+                    <!-- Results will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+let currentFeaturePath = null;
+
+async function runFeature(featurePath, button) {
+    currentFeaturePath = featurePath;
+
+    // Update button state
+    const originalText = button.textContent;
+    button.textContent = 'Running...';
+    button.disabled = true;
+
+    try {
+        const response = await fetch('/demo/run-feature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                feature_path: featurePath
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const results = await response.json();
+        displayResults(results);
+    } catch (error) {
+        console.error('Error running feature:', error);
+        alert('Error running feature: ' + error.message);
+    } finally {
+        // Reset button state
+        button.textContent = originalText;
+        button.disabled = false;
+    }
+}
+
+function displayResults(results) {
+    const modal = document.getElementById('results-modal');
+    const body = document.getElementById('results-body');
+
+    // Build HTML for results
+    let html = `
+        <div class="results-summary ${results.status}">
+            <div class="summary-header">
+                <h3>Status: <span class="status-badge ${results.status}">${results.status.toUpperCase()}</span></h3>
+                <p>Execution time: ${results.execution_time}s</p>
+            </div>
+            <div class="summary-stats">
+                <span class="stat passed">✓ ${results.summary.passed} passed</span>
+                <span class="stat failed">✗ ${results.summary.failed} failed</span>
+                <span class="stat skipped">○ ${results.summary.skipped} skipped</span>
+            </div>
+        </div>
+    `;
+
+    // Display scenarios
+    if (results.scenarios && results.scenarios.length > 0) {
+        html += '<div class="scenarios">';
+        results.scenarios.forEach((scenario, idx) => {
+            html += `
+                <div class="scenario ${scenario.status}">
+                    <div class="scenario-header" onclick="toggleScenario(${idx})">
+                        <span class="collapse-icon">▶</span>
+                        <h4>${scenario.name}</h4>
+                        <span class="status-badge ${scenario.status}">${scenario.status}</span>
+                    </div>
+                    <div class="scenario-steps collapsed" id="scenario-${idx}">
+            `;
+
+            scenario.steps.forEach(step => {
+                const statusIcon = step.status === 'passed' ? '✓' : step.status === 'failed' ? '✗' : '○';
+                html += `
+                    <div class="step ${step.status}">
+                        <span class="step-icon">${statusIcon}</span>
+                        <span class="step-keyword">${step.keyword}</span>
+                        <span class="step-name">${step.name}</span>
+                `;
+
+                if (step.error_message) {
+                    html += `<pre class="error-message">${step.error_message}</pre>`;
+                }
+
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+        });
+        html += '</div>';
+    }
+
+    // Display stderr if present
+    if (results.stderr) {
+        html += `
+            <div class="results-output">
+                <h4>Error Output:</h4>
+                <pre class="output-text">${results.stderr}</pre>
+            </div>
+        `;
+    }
+
+    // Display stdout if present (for plain text output)
+    if (results.stdout) {
+        html += `
+            <div class="results-output">
+                <h4>Output:</h4>
+                <pre class="output-text">${results.stdout}</pre>
+            </div>
+        `;
+    }
+
+    body.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function toggleScenario(idx) {
+    const steps = document.getElementById(`scenario-${idx}`);
+    const icon = steps.previousElementSibling.querySelector('.collapse-icon');
+
+    if (steps.classList.contains('collapsed')) {
+        steps.classList.remove('collapsed');
+        icon.textContent = '▼';
+    } else {
+        steps.classList.add('collapsed');
+        icon.textContent = '▶';
+    }
+}
+
+function closeResultsModal() {
+    document.getElementById('results-modal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('results-modal');
+    if (event.target === modal) {
+        closeResultsModal();
+    }
+}
+</script>
+{% endblock %}

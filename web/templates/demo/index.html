@@ -1,0 +1,92 @@
+{% extends "demo/base.html" %}
+
+{% block title %}Machine Law Demo - Laws{% endblock %}
+
+{% block content %}
+<div class="demo-layout">
+    <!-- Sidebar with law list -->
+    <aside class="demo-sidebar">
+        <div class="sidebar-header">
+            <h2>Available Laws</h2>
+            <input type="text" id="law-search" class="law-search" placeholder="Search laws...">
+        </div>
+        <div class="law-list" id="law-list">
+            {% for directory, laws in grouped_laws.items() %}
+            <div class="law-directory">
+                <div class="directory-header" onclick="toggleDirectory(this)">
+                    <span class="directory-icon">▼</span>
+                    <span class="directory-name">{{ directory or "Root" }}</span>
+                    <span class="directory-count">({{ laws|length }})</span>
+                </div>
+                <div class="directory-laws">
+                    {% for law in laws %}
+                    <a href="/demo/law/{{ law.path }}" class="law-item" data-law="{{ law.law }}" data-service="{{ law.service }}">
+                        <div class="law-item-header">
+                            <span class="law-name">{{ law.name }}</span>
+                            <span class="law-service">{{ law.service }}</span>
+                        </div>
+                        <div class="law-item-meta">
+                            <span class="law-id">{{ law.law }}</span>
+                            <span class="law-date">{{ law.valid_from }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <!-- Main content area -->
+    <main class="demo-content">
+        <div class="welcome-message">
+            <h2>Welcome to Machine Law Demo Mode</h2>
+            <p>Select a law from the sidebar to view its machine-executable specification.</p>
+
+            <div class="demo-features">
+                <div class="feature-card">
+                    <h3>📄 YAML Law Files</h3>
+                    <p>Browse and explore machine-readable law specifications with collapsible sections.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔗 Cross-References</h3>
+                    <p>Navigate between laws using automatic link detection for service references.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🧪 Feature Tests</h3>
+                    <p>Run Gherkin feature tests to verify law implementations.</p>
+                </div>
+            </div>
+
+            <div class="quick-start">
+                <h3>Quick Start</h3>
+                <ul>
+                    <li>Click on <strong>Zorgtoeslag</strong> in the sidebar to see the healthcare subsidy law</li>
+                    <li>Use the search box to quickly find specific laws</li>
+                    <li>Navigate to the <a href="/demo/features">Features</a> tab to run tests</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+// Simple law search functionality
+document.getElementById('law-search').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const lawItems = document.querySelectorAll('.law-item');
+
+    lawItems.forEach(item => {
+        const lawName = item.querySelector('.law-name').textContent.toLowerCase();
+        const lawId = item.querySelector('.law-id').textContent.toLowerCase();
+        const service = item.querySelector('.law-service').textContent.toLowerCase();
+
+        if (lawName.includes(searchTerm) || lawId.includes(searchTerm) || service.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}
