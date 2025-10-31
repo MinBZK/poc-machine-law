@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Machine Law Demo{% endblock %}</title>
     <link rel="stylesheet" href="/static/css/demo.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -18,7 +24,9 @@
             <nav class="demo-nav">
                 <a href="/demo" class="nav-link {% if active_tab == 'laws' %}active{% endif %}">Laws</a>
                 <a href="/demo/features" class="nav-link {% if active_tab == 'features' %}active{% endif %}">Features</a>
-                <a href="/" class="nav-link">Exit Demo</a>
+                <a href="/analysis/graph/" class="nav-link">Graphs</a>
+                <a href="/simulation" class="nav-link">Simulation</a>
+                <a href="/" class="nav-link">Burger.nl</a>
             </nav>
         </header>
 
