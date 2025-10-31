@@ -207,7 +207,7 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 	// Find the most recent valid rule before the reference date
 	var validRules []RuleSpec
 	for _, rule := range lawRules {
-		if !rule.ValidFrom.After(refDate) {
+		if !rule.ValidFrom.Time.After(refDate) {
 			validRules = append(validRules, rule)
 		}
 	}
@@ -219,7 +219,7 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 	// Return the most recently valid rule
 	result := validRules[0]
 	for _, rule := range validRules[1:] {
-		if rule.ValidFrom.After(result.ValidFrom) {
+		if rule.ValidFrom.Time.After(result.ValidFrom.Time) {
 			result = rule
 		}
 	}

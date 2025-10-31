@@ -9,6 +9,43 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// FlexibleTime is a custom type that can unmarshal both date-only and datetime strings
+type FlexibleTime struct {
+	time.Time
+}
+
+// UnmarshalYAML implements custom unmarshaling for FlexibleTime
+func (ft *FlexibleTime) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// First try to unmarshal as a standard time.Time (handles unquoted dates)
+	var t time.Time
+	if err := unmarshal(&t); err == nil {
+		ft.Time = t
+		return nil
+	}
+
+	// If that fails, try to unmarshal as a string
+	var s string
+	if err := unmarshal(&s); err != nil {
+		return err
+	}
+
+	// Try to parse as date-only format (YYYY-MM-DD)
+	t, err := time.Parse("2006-01-02", s)
+	if err == nil {
+		ft.Time = t
+		return nil
+	}
+
+	// Try to parse as RFC3339 datetime
+	t, err = time.Parse(time.RFC3339, s)
+	if err == nil {
+		ft.Time = t
+		return nil
+	}
+
+	return fmt.Errorf("cannot parse time: %s", s)
+}
+
 // ServiceDefinition represents the root Dutch Government Service Definition
 type RuleSpec struct {
 	UUID           uuid.UUID     `yaml:"uuid"`
@@ -18,7 +55,7 @@ type RuleSpec struct {
 	LegalCharacter *string       `yaml:"legal_character,omitempty"`
 	DecisionType   *string       `yaml:"decision_type,omitempty"`
 	Discoverable   *string       `yaml:"discoverable,omitempty"`
-	ValidFrom      time.Time     `yaml:"valid_from"`
+	ValidFrom      FlexibleTime  `yaml:"valid_from"`
 	Service        string        `yaml:"service"`
 	Description    string        `yaml:"description"`
 	References     []Reference   `yaml:"references,omitempty"`
