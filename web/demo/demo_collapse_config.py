@@ -17,7 +17,6 @@ DEMO_COLLAPSE_CONFIG = {
             "properties.output.hoogte_toeslag",
             "properties.input.IS_VERZEKERDE",
             "properties.input.IS_VERZEKERDE.service_reference",
-            "requirements",
             "requirements.Item 1",
             "requirements.Item 1.all",
             "requirements.Item 1.all.$LEEFTIJD",
