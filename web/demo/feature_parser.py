@@ -95,11 +95,13 @@ def parse_feature_file(feature_path: Path) -> dict[str, Any]:
             step_match = re.match(r"^(Given|When|Then|And|But)\s+(.+)", stripped)
             if step_match:
                 keyword, text = step_match.groups()
-                current_steps.append({
-                    "keyword": keyword,
-                    "text": text,
-                    "line_number": i + 1,
-                })
+                current_steps.append(
+                    {
+                        "keyword": keyword,
+                        "text": text,
+                        "line_number": i + 1,
+                    }
+                )
                 continue
 
             # Table rows

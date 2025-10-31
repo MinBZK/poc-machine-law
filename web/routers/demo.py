@@ -33,17 +33,18 @@ def filter_behave_output(output: str) -> str:
         return ""
 
     import re
+
     lines = output.split("\n")
     filtered_lines = []
 
     for line in lines:
         # Skip HTTP connection logs
-        if "Starting new HTTP connection" in line or 'http://localhost' in line:
+        if "Starting new HTTP connection" in line or "http://localhost" in line:
             continue
 
         # Check if line starts with whitespace followed by DEBUG or WARNING
         # Pattern: optional whitespace, then DEBUG or WARNING
-        match = re.match(r'^(\s*)(DEBUG|WARNING)\s', line)
+        match = re.match(r"^(\s*)(DEBUG|WARNING)\s", line)
         if match:
             # Remove the whitespace + DEBUG/WARNING prefix, keep everything else including ║
             prefix_end = match.end()

@@ -1,76 +1,80 @@
 {% extends "demo/base.html" %}
-
 {% block title %}Machine Law Demo - Wetten{% endblock %}
-
 {% block content %}
-<div class="demo-layout">
-    <!-- Sidebar with law list -->
-    <aside class="demo-sidebar">
-        <div class="sidebar-header">
-            <h2>Beschikbare Wetten</h2>
-            <input type="text" id="law-search" class="law-search" placeholder="Zoek wetten...">
-        </div>
-        <div class="law-list" id="law-list">
-            {% for directory, laws in grouped_laws.items() %}
-            <div class="law-directory">
-                <div class="directory-header" onclick="toggleDirectory(this)">
-                    <span class="directory-icon">▼</span>
-                    <span class="directory-name">{{ directory or "Root" }}</span>
-                    <span class="directory-count">({{ laws|length }})</span>
-                </div>
-                <div class="directory-laws">
-                    {% for law in laws %}
-                    <a href="/demo/law/{{ law.path }}" class="law-item" data-law="{{ law.law }}" data-service="{{ law.service }}">
-                        <div class="law-item-header">
-                            <span class="law-name">{{ law.name }}</span>
-                            <span class="law-service">{{ law.service }}</span>
+    <div class="demo-layout">
+        <!-- Sidebar with law list -->
+        <aside class="demo-sidebar">
+            <div class="sidebar-header">
+                <h2>Beschikbare Wetten</h2>
+                <input type="text"
+                       id="law-search"
+                       class="law-search"
+                       placeholder="Zoek wetten...">
+            </div>
+            <div class="law-list" id="law-list">
+                {% for directory, laws in grouped_laws.items() %}
+                    <div class="law-directory">
+                        <div class="directory-header" onclick="toggleDirectory(this)">
+                            <span class="directory-icon">▼</span>
+                            <span class="directory-name">{{ directory or "Root" }}</span>
+                            <span class="directory-count">({{ laws|length }})</span>
                         </div>
-                        <div class="law-item-meta">
-                            <span class="law-id">{{ law.law }}</span>
-                            <span class="law-date">{{ law.valid_from }}</span>
+                        <div class="directory-laws">
+                            {% for law in laws %}
+                                <a href="/demo/law/{{ law.path }}"
+                                   class="law-item"
+                                   data-law="{{ law.law }}"
+                                   data-service="{{ law.service }}">
+                                    <div class="law-item-header">
+                                        <span class="law-name">{{ law.name }}</span>
+                                        <span class="law-service">{{ law.service }}</span>
+                                    </div>
+                                    <div class="law-item-meta">
+                                        <span class="law-id">{{ law.law }}</span>
+                                        <span class="law-date">{{ law.valid_from }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
                         </div>
-                    </a>
-                    {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </aside>
+        <!-- Main content area -->
+        <main class="demo-content">
+            <div class="welcome-message">
+                <h2>Welkom bij Machine Law Demo Mode</h2>
+                <p>Selecteer een wet uit de zijbalk om de machine-uitvoerbare specificatie te bekijken.</p>
+                <div class="demo-features">
+                    <div class="feature-card">
+                        <h3>📄 YAML Wetten Bestanden</h3>
+                        <p>Bekijk en verken machine-leesbare wet specificaties met inklapbare secties.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔗 Kruisverwijzingen</h3>
+                        <p>Navigeer tussen wetten met automatische link detectie voor service referenties.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🧪 Feature Tests</h3>
+                        <p>Voer Gherkin feature tests uit om wet implementaties te verifiëren.</p>
+                    </div>
+                </div>
+                <div class="quick-start">
+                    <h3>Snel Beginnen</h3>
+                    <ul>
+                        <li>
+                            Klik op <strong>Zorgtoeslag</strong> in de zijbalk om de zorgtoeslag wet te bekijken
+                        </li>
+                        <li>Gebruik het zoekveld om snel specifieke wetten te vinden</li>
+                        <li>
+                            Navigeer naar de <a href="/demo/features">Features</a> tab om tests uit te voeren
+                        </li>
+                    </ul>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </aside>
-
-    <!-- Main content area -->
-    <main class="demo-content">
-        <div class="welcome-message">
-            <h2>Welkom bij Machine Law Demo Mode</h2>
-            <p>Selecteer een wet uit de zijbalk om de machine-uitvoerbare specificatie te bekijken.</p>
-
-            <div class="demo-features">
-                <div class="feature-card">
-                    <h3>📄 YAML Wetten Bestanden</h3>
-                    <p>Bekijk en verken machine-leesbare wet specificaties met inklapbare secties.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🔗 Kruisverwijzingen</h3>
-                    <p>Navigeer tussen wetten met automatische link detectie voor service referenties.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🧪 Feature Tests</h3>
-                    <p>Voer Gherkin feature tests uit om wet implementaties te verifiëren.</p>
-                </div>
-            </div>
-
-            <div class="quick-start">
-                <h3>Snel Beginnen</h3>
-                <ul>
-                    <li>Klik op <strong>Zorgtoeslag</strong> in de zijbalk om de zorgtoeslag wet te bekijken</li>
-                    <li>Gebruik het zoekveld om snel specifieke wetten te vinden</li>
-                    <li>Navigeer naar de <a href="/demo/features">Features</a> tab om tests uit te voeren</li>
-                </ul>
-            </div>
-        </div>
-    </main>
-</div>
-
-<script>
+        </main>
+    </div>
+    <script>
 // Simple law search functionality
 document.getElementById('law-search').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -88,5 +92,5 @@ document.getElementById('law-search').addEventListener('input', function(e) {
         }
     });
 });
-</script>
+    </script>
 {% endblock %}

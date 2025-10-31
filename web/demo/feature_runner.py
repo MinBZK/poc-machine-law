@@ -63,13 +63,15 @@ def run_feature_file(feature_path: Path) -> dict[str, Any]:
                 steps = []
                 for step in element.get("steps", []):
                     step_status = step.get("result", {}).get("status", "undefined")
-                    steps.append({
-                        "keyword": step.get("keyword", ""),
-                        "name": step.get("name", ""),
-                        "status": step_status,
-                        "duration": step.get("result", {}).get("duration", 0),
-                        "error_message": step.get("result", {}).get("error_message"),
-                    })
+                    steps.append(
+                        {
+                            "keyword": step.get("keyword", ""),
+                            "name": step.get("name", ""),
+                            "status": step_status,
+                            "duration": step.get("result", {}).get("duration", 0),
+                            "error_message": step.get("result", {}).get("error_message"),
+                        }
+                    )
 
                 # Determine scenario status
                 scenario_status = "passed"
@@ -82,12 +84,14 @@ def run_feature_file(feature_path: Path) -> dict[str, Any]:
                 else:
                     total_passed += 1
 
-                scenarios.append({
-                    "name": element.get("name", ""),
-                    "type": element.get("type", "scenario"),
-                    "status": scenario_status,
-                    "steps": steps,
-                })
+                scenarios.append(
+                    {
+                        "name": element.get("name", ""),
+                        "type": element.get("type", "scenario"),
+                        "status": scenario_status,
+                        "steps": steps,
+                    }
+                )
 
         # If we couldn't parse JSON, try to parse plain text output
         if not scenarios and result.stdout:
@@ -153,12 +157,14 @@ def _parse_plain_text_output(output: str) -> list[dict[str, Any]]:
         # Detect scenario start
         if line.startswith("Scenario:"):
             if current_scenario:
-                scenarios.append({
-                    "name": current_scenario,
-                    "type": "scenario",
-                    "status": "passed",  # Default, will be updated
-                    "steps": current_steps,
-                })
+                scenarios.append(
+                    {
+                        "name": current_scenario,
+                        "type": "scenario",
+                        "status": "passed",  # Default, will be updated
+                        "steps": current_steps,
+                    }
+                )
             current_scenario = line.replace("Scenario:", "").strip()
             current_steps = []
 
@@ -168,22 +174,26 @@ def _parse_plain_text_output(output: str) -> list[dict[str, Any]]:
             for keyword in ["Given", "When", "Then", "And", "But"]:
                 if line.startswith(keyword):
                     step_name = line[len(keyword) :].strip()
-                    current_steps.append({
-                        "keyword": keyword,
-                        "name": step_name,
-                        "status": "passed",
-                        "duration": 0,
-                        "error_message": None,
-                    })
+                    current_steps.append(
+                        {
+                            "keyword": keyword,
+                            "name": step_name,
+                            "status": "passed",
+                            "duration": 0,
+                            "error_message": None,
+                        }
+                    )
                     break
 
     # Add last scenario
     if current_scenario:
-        scenarios.append({
-            "name": current_scenario,
-            "type": "scenario",
-            "status": "passed",
-            "steps": current_steps,
-        })
+        scenarios.append(
+            {
+                "name": current_scenario,
+                "type": "scenario",
+                "status": "passed",
+                "steps": current_steps,
+            }
+        )
 
     return scenarios

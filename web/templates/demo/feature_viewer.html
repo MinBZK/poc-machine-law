@@ -1,69 +1,64 @@
 {% extends "demo/base.html" %}
-
 {% block title %}{{ feature_data.feature.name }} - Machine Law Demo{% endblock %}
-
 {% block content %}
-<div class="demo-layout three-panel">
-    <!-- Sidebar with feature list -->
-    <aside class="demo-sidebar">
-        <div class="sidebar-header">
-            <h2>Feature Files</h2>
-            <input type="text" id="feature-search" class="law-search" placeholder="Zoek features...">
-        </div>
-        <div class="law-list" id="feature-list">
-            {% for directory, features in grouped_features.items() %}
-            <div class="law-directory">
-                <div class="directory-header" onclick="toggleDirectory(this)">
-                    <span class="directory-icon">▼</span>
-                    <span class="directory-name">{{ directory }}</span>
-                    <span class="directory-count">({{ features|length }})</span>
-                </div>
-                <div class="directory-laws">
-                    {% for feature in features %}
-                    <a href="/demo/feature/{{ feature.path }}"
-                       class="law-item {% if feature.path in feature_path %}active{% endif %}">
-                        <div class="law-item-header">
-                            <span class="law-name">{{ feature.name }}</span>
-                            <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+    <div class="demo-layout three-panel">
+        <!-- Sidebar with feature list -->
+        <aside class="demo-sidebar">
+            <div class="sidebar-header">
+                <h2>Feature Files</h2>
+                <input type="text"
+                       id="feature-search"
+                       class="law-search"
+                       placeholder="Zoek features...">
+            </div>
+            <div class="law-list" id="feature-list">
+                {% for directory, features in grouped_features.items() %}
+                    <div class="law-directory">
+                        <div class="directory-header" onclick="toggleDirectory(this)">
+                            <span class="directory-icon">▼</span>
+                            <span class="directory-name">{{ directory }}</span>
+                            <span class="directory-count">({{ features|length }})</span>
                         </div>
-                    </a>
-                    {% endfor %}
+                        <div class="directory-laws">
+                            {% for feature in features %}
+                                <a href="/demo/feature/{{ feature.path }}"
+                                   class="law-item {% if feature.path in feature_path %}active{% endif %}">
+                                    <div class="law-item-header">
+                                        <span class="law-name">{{ feature.name }}</span>
+                                        <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </aside>
+        <!-- Main content area with Gherkin viewer -->
+        <main class="demo-content feature-content">
+            <div class="feature-viewer">
+                <!-- Toolbar -->
+                <div class="feature-toolbar">
+                    <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
+                    <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
+                    <span class="scenario-status" id="scenario-status"></span>
                 </div>
+                <!-- Gherkin content -->
+                <div class="gherkin-wrapper">{{ feature_html | safe }}</div>
             </div>
-            {% endfor %}
-        </div>
-    </aside>
-
-    <!-- Main content area with Gherkin viewer -->
-    <main class="demo-content feature-content">
-        <div class="feature-viewer">
-            <!-- Toolbar -->
-            <div class="feature-toolbar">
-                <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
-                <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
-                <span class="scenario-status" id="scenario-status"></span>
+        </main>
+        <!-- Output panel -->
+        <aside class="output-panel">
+            <div class="output-header">
+                <h3>Test Output</h3>
+                <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
             </div>
-
-            <!-- Gherkin content -->
-            <div class="gherkin-wrapper">
-                {{ feature_html | safe }}
+            <div class="output-content" id="output-content">
+                <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
             </div>
-        </div>
-    </main>
-
-    <!-- Output panel -->
-    <aside class="output-panel">
-        <div class="output-header">
-            <h3>Test Output</h3>
-            <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
-        </div>
-        <div class="output-content" id="output-content">
-            <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
-        </div>
-    </aside>
-</div>
-
-<script>
+        </aside>
+    </div>
+    <script>
 // Store current feature path and run ID
 let currentFeaturePath = '{{ feature_path }}';
 let currentRunId = null;
@@ -229,5 +224,5 @@ function clearOutput() {
         pollInterval = null;
     }
 }
-</script>
+    </script>
 {% endblock %}

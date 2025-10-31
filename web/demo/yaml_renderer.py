@@ -274,7 +274,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
                 link_info = v["_link"]
                 html_parts.append(
                     f'    <a href="/demo/law/{html.escape(link_info["target"])}" class="cross-law-link">'
-                    f'→ Go to {html.escape(link_info["display"])}</a>'
+                    f"→ Go to {html.escape(link_info['display'])}</a>"
                 )
 
             if not is_collapsible:
@@ -326,7 +326,22 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
                 has_else = "else" in item
 
                 # Try to get a meaningful label, including law field for references
-                label = item.get("name", item.get("output", item.get("field", item.get("subject", item.get("law", test_label or item.get("operation", "else" if has_else else f"Item {idx + 1}"))))))
+                label = item.get(
+                    "name",
+                    item.get(
+                        "output",
+                        item.get(
+                            "field",
+                            item.get(
+                                "subject",
+                                item.get(
+                                    "law",
+                                    test_label or item.get("operation", "else" if has_else else f"Item {idx + 1}"),
+                                ),
+                            ),
+                        ),
+                    ),
+                )
 
                 # Build path for this array item
                 item_path = f"{parent_path}.{label}" if parent_path else str(label)
@@ -340,16 +355,18 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
 
                 collapsed_class = "collapsed" if default_collapsed else ""
 
-                html_parts.append(f'  <div class="yaml-array-item yaml-section {collapsed_class}" data-key="{html.escape(str(label))}">')
+                html_parts.append(
+                    f'  <div class="yaml-array-item yaml-section {collapsed_class}" data-key="{html.escape(str(label))}">'
+                )
                 html_parts.append('    <div class="yaml-key-line" onclick="toggleSection(this)">')
                 html_parts.append('      <span class="collapse-icon">▶</span>')
                 html_parts.append('      <span class="array-bullet">-</span>')
                 html_parts.append(f'      <span class="yaml-key">{html.escape(str(label))}</span>')
-                html_parts.append('    </div>')
+                html_parts.append("    </div>")
                 html_parts.append('    <div class="yaml-value-content">')
                 html_parts.append(f"      {render_yaml_to_html(item, level + 1, key=None, parent_path=item_path)}")
-                html_parts.append('    </div>')
-                html_parts.append('  </div>')
+                html_parts.append("    </div>")
+                html_parts.append("  </div>")
             else:
                 # Non-dict items: render as before (not collapsible)
                 html_parts.append('  <div class="yaml-array-item">')

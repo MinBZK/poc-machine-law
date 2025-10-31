@@ -55,10 +55,10 @@ def render_feature_to_html(parsed_feature: dict[str, Any]) -> str:
         if feature.get("description"):
             html_parts.append('  <div class="gherkin-description">')
             for line in feature["description"]:
-                html_parts.append(f'    <div>{html.escape(line)}</div>')
-            html_parts.append('  </div>')
+                html_parts.append(f"    <div>{html.escape(line)}</div>")
+            html_parts.append("  </div>")
 
-        html_parts.append('</div>')
+        html_parts.append("</div>")
 
     # Background
     if parsed_feature.get("background"):
@@ -70,8 +70,8 @@ def render_feature_to_html(parsed_feature: dict[str, Any]) -> str:
         for step in background["steps"]:
             html_parts.append(render_step(step))
 
-        html_parts.append('  </div>')
-        html_parts.append('</div>')
+        html_parts.append("  </div>")
+        html_parts.append("</div>")
 
     # Filter and render scenarios
     scenarios = parsed_feature.get("scenarios", [])
@@ -88,10 +88,10 @@ def render_feature_to_html(parsed_feature: dict[str, Any]) -> str:
     filtered_count = len(scenarios) - len(runnable_scenarios)
     if filtered_count > 0:
         html_parts.append('<div class="gherkin-filtered-notice">')
-        html_parts.append(f'  <em>Let op: {filtered_count} scenario(s) verborgen (vereisen browser/UI setup)</em>')
-        html_parts.append('</div>')
+        html_parts.append(f"  <em>Let op: {filtered_count} scenario(s) verborgen (vereisen browser/UI setup)</em>")
+        html_parts.append("</div>")
 
-    html_parts.append('</div>')
+    html_parts.append("</div>")
     return "\n".join(html_parts)
 
 
@@ -109,17 +109,19 @@ def render_scenario(scenario: dict[str, Any], index: int) -> str:
     html_parts.append('    <span class="collapse-icon">▶</span>')
     html_parts.append(f'    <span class="gherkin-keyword">{translated_type}</span>')
     html_parts.append(f'    <span class="gherkin-name">{html.escape(scenario["name"])}</span>')
-    html_parts.append(f'    <button class="btn-run" onclick="event.stopPropagation(); runScenario(\'{index}\')">Uitvoeren ▶</button>')
-    html_parts.append('  </div>')
+    html_parts.append(
+        f'    <button class="btn-run" onclick="event.stopPropagation(); runScenario(\'{index}\')">Uitvoeren ▶</button>'
+    )
+    html_parts.append("  </div>")
 
     # Scenario content (collapsible)
     html_parts.append('  <div class="gherkin-scenario-content">')
     html_parts.append('    <div class="gherkin-steps">')
 
     for step in scenario.get("steps", []):
-        html_parts.append('      ' + render_step(step))
+        html_parts.append("      " + render_step(step))
 
-    html_parts.append('    </div>')
+    html_parts.append("    </div>")
 
     # Examples for Scenario Outline
     if scenario.get("examples"):
@@ -128,12 +130,12 @@ def render_scenario(scenario: dict[str, Any], index: int) -> str:
         html_parts.append(f'      <span class="gherkin-keyword">{translate_keyword("Examples:")}</span>')
 
         if examples.get("table"):
-            html_parts.append('      ' + render_table(examples["table"]))
+            html_parts.append("      " + render_table(examples["table"]))
 
-        html_parts.append('    </div>')
+        html_parts.append("    </div>")
 
-    html_parts.append('  </div>')
-    html_parts.append('</div>')
+    html_parts.append("  </div>")
+    html_parts.append("</div>")
 
     return "\n".join(html_parts)
 
@@ -149,9 +151,9 @@ def render_step(step: dict[str, Any]) -> str:
 
     # Table (for data tables in steps)
     if step.get("table"):
-        html_parts.append('  ' + render_table(step["table"]))
+        html_parts.append("  " + render_table(step["table"]))
 
-    html_parts.append('</div>')
+    html_parts.append("</div>")
 
     return "\n".join(html_parts)
 
@@ -164,23 +166,23 @@ def render_table(table_data: list[list[str]]) -> str:
 
     # First row is header
     if table_data:
-        html_parts.append('  <thead>')
-        html_parts.append('    <tr>')
+        html_parts.append("  <thead>")
+        html_parts.append("    <tr>")
         for cell in table_data[0]:
-            html_parts.append(f'      <th>{html.escape(cell)}</th>')
-        html_parts.append('    </tr>')
-        html_parts.append('  </thead>')
+            html_parts.append(f"      <th>{html.escape(cell)}</th>")
+        html_parts.append("    </tr>")
+        html_parts.append("  </thead>")
 
     # Remaining rows are data
     if len(table_data) > 1:
-        html_parts.append('  <tbody>')
+        html_parts.append("  <tbody>")
         for row in table_data[1:]:
-            html_parts.append('    <tr>')
+            html_parts.append("    <tr>")
             for cell in row:
-                html_parts.append(f'      <td>{html.escape(cell)}</td>')
-            html_parts.append('    </tr>')
-        html_parts.append('  </tbody>')
+                html_parts.append(f"      <td>{html.escape(cell)}</td>")
+            html_parts.append("    </tr>")
+        html_parts.append("  </tbody>")
 
-    html_parts.append('</table>')
+    html_parts.append("</table>")
 
     return "\n".join(html_parts)
