@@ -1,0 +1,44 @@
+{% extends "demo/base.html" %}
+{% block title %}Feature Files - Machine Law Demo{% endblock %}
+{% block content %}
+    <div class="demo-layout">
+        <!-- Sidebar -->
+        <aside class="demo-sidebar">
+            <div class="sidebar-header">
+                <h2>Feature Files</h2>
+                <input type="text"
+                       id="feature-search"
+                       class="law-search"
+                       placeholder="Zoek features...">
+            </div>
+            <div class="law-list" id="feature-list">
+                {% for directory, features in grouped_features.items() %}
+                    <div class="law-directory">
+                        <div class="directory-header" onclick="toggleDirectory(this)">
+                            <span class="directory-icon">▼</span>
+                            <span class="directory-name">{{ directory }}</span>
+                            <span class="directory-count">({{ features|length }})</span>
+                        </div>
+                        <div class="directory-laws">
+                            {% for feature in features %}
+                                <a href="/demo/feature/{{ feature.path }}" class="law-item">
+                                    <div class="law-item-header">
+                                        <span class="law-name">{{ feature.name }}</span>
+                                        <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </aside>
+        <!-- Main content -->
+        <main class="demo-content">
+            <div class="feature-intro">
+                <h1>Feature Files</h1>
+                <p>Selecteer een feature bestand uit de zijbalk om scenario's te bekijken en uit te voeren.</p>
+            </div>
+        </main>
+    </div>
+{% endblock %}

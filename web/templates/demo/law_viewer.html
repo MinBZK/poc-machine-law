@@ -1,0 +1,89 @@
+{% extends "demo/base.html" %}
+{% block title %}{{ law_data.name }} - Machine Law Demo{% endblock %}
+{% block content %}
+    <div class="demo-layout">
+        <!-- Sidebar with law list -->
+        <aside class="demo-sidebar">
+            <div class="sidebar-header">
+                <h2>Beschikbare Wetten</h2>
+                <input type="text"
+                       id="law-search"
+                       class="law-search"
+                       placeholder="Zoek wetten...">
+            </div>
+            <div class="law-list" id="law-list">
+                {% for directory, laws in grouped_laws.items() %}
+                    <div class="law-directory">
+                        <div class="directory-header" onclick="toggleDirectory(this)">
+                            <span class="directory-icon">▼</span>
+                            <span class="directory-name">{{ directory or "Root" }}</span>
+                            <span class="directory-count">({{ laws|length }})</span>
+                        </div>
+                        <div class="directory-laws">
+                            {% for law in laws %}
+                                <a href="/demo/law/{{ law.path }}"
+                                   class="law-item {% if law.path == law_path %}active{% endif %}"
+                                   data-law="{{ law.law }}"
+                                   data-service="{{ law.service }}">
+                                    <div class="law-item-header">
+                                        <span class="law-name">{{ law.name }}</span>
+                                        <span class="law-service">{{ law.service }}</span>
+                                    </div>
+                                    <div class="law-item-meta">
+                                        <span class="law-id">{{ law.law }}</span>
+                                        <span class="law-date">{{ law.valid_from }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </aside>
+        <!-- Main content area with YAML viewer -->
+        <main class="demo-content">
+            <div class="law-viewer">
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <a href="/demo">Wetten</a>
+                    <span class="separator">/</span>
+                    <span class="current">{{ law_data.law }}</span>
+                </div>
+                <!-- Law header -->
+                <div class="law-header">
+                    <h1>{{ law_data.name }}</h1>
+                    <div class="law-meta">
+                        <span class="badge">{{ law_data.service }}</span>
+                        <span class="badge">{{ law_data.law }}</span>
+                        <span class="badge">Geldig vanaf: {{ law_data.valid_from }}</span>
+                    </div>
+                </div>
+                <!-- Toolbar -->
+                <div class="law-toolbar">
+                    <button class="btn btn-secondary" onclick="collapseAll()">Alles inklappen</button>
+                </div>
+                <!-- YAML content -->
+                <div class="yaml-content">{{ yaml_html | safe }}</div>
+            </div>
+        </main>
+    </div>
+    <script>
+// Law search functionality
+document.getElementById('law-search').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const lawItems = document.querySelectorAll('.law-item');
+
+    lawItems.forEach(item => {
+        const lawName = item.querySelector('.law-name').textContent.toLowerCase();
+        const lawId = item.querySelector('.law-id').textContent.toLowerCase();
+        const service = item.querySelector('.law-service').textContent.toLowerCase();
+
+        if (lawName.includes(searchTerm) || lawId.includes(searchTerm) || service.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+    </script>
+{% endblock %}

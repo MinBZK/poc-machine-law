@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% block title %}Machine Law Demo{% endblock %}
+        </title>
+        <link rel="stylesheet" href="/static/css/demo.css">
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
+        [x-cloak] {
+            display: none !important;
+        }
+        </style>
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body>
+        <div class="demo-container">
+            <!-- Header -->
+            <header class="demo-header">
+                <div class="demo-brand">
+                    <h1>RegelRecht Demo Mode</h1>
+                    <p class="demo-subtitle">Machine-uitvoerbaar Nederlands recht</p>
+                </div>
+                <nav class="demo-nav">
+                    <a href="/demo"
+                       class="nav-link {% if active_tab == 'laws' %}active{% endif %}">Wetten</a>
+                    <a href="/analysis/graph/" class="nav-link">Graaf analyse</a>
+                    <a href="/demo/features"
+                       class="nav-link {% if active_tab == 'features' %}active{% endif %}">Features</a>
+                    <a href="/simulation" class="nav-link">Simulatie</a>
+                    <a href="/" class="nav-link">Burger.nl</a>
+                </nav>
+            </header>
+            <!-- Main Content -->
+            <div class="demo-main">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <!-- JavaScript -->
+        <script src="/static/js/demo.js"></script>
+        {% block extra_scripts %}{% endblock %}
+    </body>
+</html>
