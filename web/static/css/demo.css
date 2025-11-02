@@ -1206,6 +1206,64 @@ body {
     font-size: 1rem;
 }
 
+/* Collapsible Sidebar */
+.sidebar-toggle {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.sidebar-toggle:hover {
+    background: var(--bg-secondary);
+}
+
+.demo-sidebar {
+    transition: width 0.3s ease, min-width 0.3s ease;
+    position: relative;
+}
+
+.demo-sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    border-right: none;
+}
+
+.demo-sidebar.collapsed .sidebar-header,
+.demo-sidebar.collapsed .law-list {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Show button when sidebar is collapsed */
+.sidebar-toggle-collapsed {
+    position: fixed;
+    left: var(--spacing-sm);
+    top: 60px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    transition: all 0.2s;
+}
+
+.sidebar-toggle-collapsed:hover {
+    background: var(--bg-tertiary);
+}
+
 /* Responsive Tab Bar */
 @media (max-width: 768px) {
     .tab {
