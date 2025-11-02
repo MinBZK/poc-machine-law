@@ -833,6 +833,12 @@ body {
     display: grid;
     grid-template-columns: 320px 1fr 800px;
     gap: 0;
+    transition: grid-template-columns 0.3s ease;
+}
+
+/* Adjust grid when sidebar is collapsed in three-panel layout */
+.demo-layout.three-panel:has(.demo-sidebar.collapsed) {
+    grid-template-columns: 0px 1fr 800px;
 }
 
 .demo-layout.three-panel .demo-sidebar {
