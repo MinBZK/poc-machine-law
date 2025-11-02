@@ -15,13 +15,6 @@
     </head>
     <body>
         <div class="workspace-container" x-data="workspaceData()" x-init="init()">
-            <!-- Header -->
-            <header class="demo-header">
-                <div class="demo-brand">
-                    <h1>RegelRecht Demo Mode</h1>
-                    <p class="demo-subtitle">Machine-uitvoerbaar Nederlands recht</p>
-                </div>
-            </header>
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
                 <div class="tab"
@@ -38,6 +31,11 @@
                      :class="{ 'active': activeTab === 'graph' }"
                      @click="switchTab('graph')">
                     <span class="tab-label">Graaf analyse</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'burger' }"
+                     @click="switchTab('burger')">
+                    <span class="tab-label">Burger.nl</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'zaaksysteem' }"
@@ -75,6 +73,15 @@
                             class="tab-iframe"
                             title="Graph Analysis"></iframe>
                 </div>
+                <!-- Burger.nl Tab (IFrame) -->
+                <div class="tab-content iframe-content"
+                     x-show="activeTab === 'burger'"
+                     x-cloak>
+                    <iframe src="/"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Burger.nl"></iframe>
+                </div>
                 <!-- Zaaksysteem Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'zaaksysteem'"
@@ -109,7 +116,7 @@
                 init() {
                     // Check URL hash first
                     const hash = window.location.hash.substring(1);
-                    const validTabs = ['laws', 'features', 'graph', 'zaaksysteem', 'simulatie'];
+                    const validTabs = ['laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'];
 
                     if (hash && validTabs.includes(hash)) {
                         this.activeTab = hash;
