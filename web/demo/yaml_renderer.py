@@ -1,5 +1,6 @@
 """YAML rendering and parsing utilities for demo mode."""
 
+import functools
 import html
 from pathlib import Path
 from typing import Any
@@ -12,17 +13,21 @@ from web.demo.demo_collapse_config import should_expand_in_demo_mode
 _current_law_path: str | None = None
 
 
-def discover_laws(law_dir: Path, grouped: bool = False) -> list[dict[str, Any]] | dict[str, list[dict[str, Any]]]:
+@functools.lru_cache(maxsize=4)
+def _discover_laws_cached(
+    law_dir_str: str, grouped: bool = False
+) -> list[dict[str, Any]] | dict[str, list[dict[str, Any]]]:
     """
-    Discover all law YAML files in the law directory.
+    Cached implementation of law discovery.
 
     Args:
-        law_dir: Base directory containing law files
+        law_dir_str: Base directory containing law files (as string for caching)
         grouped: If True, return laws grouped by directory
 
     Returns:
         List of law dicts, or dict of {directory: [laws]} if grouped=True
     """
+    law_dir = Path(law_dir_str)
     laws = []
 
     for yaml_file in sorted(law_dir.rglob("*.yaml")):
@@ -64,25 +69,39 @@ def discover_laws(law_dir: Path, grouped: bool = False) -> list[dict[str, Any]] 
     return dict(sorted(grouped_laws.items()))
 
 
-def parse_law_yaml(yaml_file: Path, law_dir: Path = None, law_path: str = None) -> dict[str, Any]:
+def discover_laws(law_dir: Path | str, grouped: bool = False) -> list[dict[str, Any]] | dict[str, list[dict[str, Any]]]:
     """
-    Parse a law YAML file and prepare it for rendering.
-
-    Detects service references for cross-law linking.
+    Discover all law YAML files in the law directory.
 
     Args:
-        yaml_file: Path to the YAML file
-        law_dir: Base directory for laws (default: Path("law"))
+        law_dir: Base directory containing law files (Path or str)
+        grouped: If True, return laws grouped by directory
+
+    Returns:
+        List of law dicts, or dict of {directory: [laws]} if grouped=True
+    """
+    # Normalize to string for consistent caching
+    law_dir_str = str(law_dir) if isinstance(law_dir, Path) else law_dir
+    return _discover_laws_cached(law_dir_str, grouped)
+
+
+@functools.lru_cache(maxsize=20)
+def _parse_law_yaml_cached(yaml_file_str: str, law_dir_str: str, law_path: str | None) -> dict[str, Any]:
+    """
+    Cached implementation of law YAML parsing.
+
+    Args:
+        yaml_file_str: Path to the YAML file (as string for caching)
+        law_dir_str: Base directory for laws (as string for caching)
         law_path: Relative path used for demo config (e.g., "zorgtoeslagwet/TOESLAGEN-2025-01-01")
     """
+    yaml_file = Path(yaml_file_str)
+
     with open(yaml_file) as f:
         data = yaml.safe_load(f)
 
-    # Discover all laws for cross-reference resolution
-    if law_dir is None:
-        law_dir = Path("law")
-
-    all_laws = discover_laws(law_dir)
+    # Discover all laws for cross-reference resolution (now cached!)
+    all_laws = discover_laws(law_dir_str)
 
     # Store law_path in data for demo mode configuration
     if law_path:
@@ -92,6 +111,23 @@ def parse_law_yaml(yaml_file: Path, law_dir: Path = None, law_path: str = None) 
     data = _detect_cross_references(data, all_laws=all_laws)
 
     return data
+
+
+def parse_law_yaml(yaml_file: Path | str, law_dir: Path | str = None, law_path: str = None) -> dict[str, Any]:
+    """
+    Parse a law YAML file and prepare it for rendering.
+
+    Detects service references for cross-law linking.
+
+    Args:
+        yaml_file: Path to the YAML file (Path or str)
+        law_dir: Base directory for laws (Path or str, default: "law")
+        law_path: Relative path used for demo config (e.g., "zorgtoeslagwet/TOESLAGEN-2025-01-01")
+    """
+    # Normalize to strings for consistent caching
+    yaml_file_str = str(yaml_file) if isinstance(yaml_file, Path) else yaml_file
+    law_dir_str = str(law_dir) if law_dir and isinstance(law_dir, Path) else (law_dir or "law")
+    return _parse_law_yaml_cached(yaml_file_str, law_dir_str, law_path)
 
 
 def _detect_cross_references(data: Any, path: str = "", all_laws: list[dict[str, Any]] = None) -> Any:

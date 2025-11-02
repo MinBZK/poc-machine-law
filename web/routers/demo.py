@@ -123,10 +123,140 @@ async def _run_behave_async(run_id: str, feature_path: str, line_number: int | N
             }
 
 
-@router.get("/", response_class=RedirectResponse)
-async def demo_index() -> RedirectResponse:
-    """Redirect to default law."""
-    return RedirectResponse(url="/demo/law/zorgtoeslagwet/TOESLAGEN-2025-01-01", status_code=302)
+@router.get("/", response_class=HTMLResponse)
+async def demo_index(request: Request) -> HTMLResponse:
+    """Show tabbed workspace interface."""
+    return templates.TemplateResponse(
+        "demo/workspace.html",
+        {
+            "request": request,
+        },
+    )
+
+
+@router.get("/workspace/laws", response_class=HTMLResponse)
+async def workspace_laws(request: Request) -> HTMLResponse:
+    """Get laws tab content (defaults to Zorgtoeslag law)."""
+    law_path = "zorgtoeslagwet/TOESLAGEN-2025-01-01"
+    yaml_file = LAW_DIR / f"{law_path}.yaml"
+
+    if not yaml_file.exists():
+        raise HTTPException(status_code=404, detail=f"Law file not found: {law_path}")
+
+    try:
+        law_data = parse_law_yaml(yaml_file, law_dir=LAW_DIR, law_path=law_path)
+        grouped_laws = discover_laws(LAW_DIR, grouped=True)
+        yaml_html = render_yaml_to_html(law_data)
+
+        return templates.TemplateResponse(
+            "demo/law_viewer_partial.html",
+            {
+                "request": request,
+                "law_path": law_path,
+                "law_data": law_data,
+                "grouped_laws": grouped_laws,
+                "yaml_html": yaml_html,
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing law file: {str(e)}")
+
+
+@router.get("/workspace/features", response_class=HTMLResponse)
+async def workspace_features(request: Request) -> HTMLResponse:
+    """Get features tab content (defaults to Zorgtoeslag feature)."""
+    feature_path = "submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature"
+    feature_file = Path(feature_path)
+
+    if not feature_file.exists():
+        raise HTTPException(status_code=404, detail=f"Feature file not found: {feature_path}")
+
+    try:
+        parsed_feature = parse_feature_file(feature_file)
+        feature_html = render_feature_to_html(parsed_feature)
+
+        base_dirs = [FEATURES_DIR]
+        if SUBMODULE_LAWS_DIR.exists():
+            base_dirs.append(SUBMODULE_LAWS_DIR)
+        grouped_features = discover_feature_files(base_dirs)
+
+        return templates.TemplateResponse(
+            "demo/feature_viewer_partial.html",
+            {
+                "request": request,
+                "feature_path": str(feature_file),
+                "feature_data": parsed_feature,
+                "feature_html": feature_html,
+                "grouped_features": grouped_features,
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing feature file: {str(e)}")
+
+
+@router.get("/workspace/law/{law_path:path}", response_class=HTMLResponse)
+async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
+    """Get specific law content for workspace tab."""
+    yaml_file = LAW_DIR / f"{law_path}.yaml"
+
+    if not yaml_file.exists():
+        raise HTTPException(status_code=404, detail=f"Law file not found: {law_path}")
+
+    try:
+        law_data = parse_law_yaml(yaml_file, law_dir=LAW_DIR, law_path=law_path)
+        grouped_laws = discover_laws(LAW_DIR, grouped=True)
+        yaml_html = render_yaml_to_html(law_data)
+
+        return templates.TemplateResponse(
+            "demo/law_viewer_partial.html",
+            {
+                "request": request,
+                "law_path": law_path,
+                "law_data": law_data,
+                "grouped_laws": grouped_laws,
+                "yaml_html": yaml_html,
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing law file: {str(e)}")
+
+
+@router.get("/workspace/feature/{feature_path:path}", response_class=HTMLResponse)
+async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse:
+    """Get specific feature content for workspace tab."""
+    # Try to find feature file
+    feature_file = None
+    if Path(feature_path).exists():
+        feature_file = Path(feature_path)
+    elif (FEATURES_DIR / feature_path).exists():
+        feature_file = FEATURES_DIR / feature_path
+    elif SUBMODULE_LAWS_DIR.exists() and (SUBMODULE_LAWS_DIR / feature_path).exists():
+        feature_file = SUBMODULE_LAWS_DIR / feature_path
+
+    if not feature_file or not feature_file.exists():
+        raise HTTPException(status_code=404, detail=f"Feature file not found: {feature_path}")
+
+    try:
+        parsed_feature = parse_feature_file(feature_file)
+        feature_html = render_feature_to_html(parsed_feature)
+
+        base_dirs = [FEATURES_DIR]
+        if SUBMODULE_LAWS_DIR.exists():
+            base_dirs.append(SUBMODULE_LAWS_DIR)
+        grouped_features = discover_feature_files(base_dirs)
+
+        return templates.TemplateResponse(
+            "demo/feature_viewer_partial.html",
+            {
+                "request": request,
+                "feature_path": str(feature_file),
+                "feature_data": parsed_feature,
+                "feature_html": feature_html,
+                "grouped_features": grouped_features,
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing feature file: {str(e)}")
 
 
 @router.get("/api/laws", response_class=JSONResponse)
