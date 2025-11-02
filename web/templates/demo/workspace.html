@@ -196,22 +196,25 @@
                 const filteredOutput = filterOutput(data.output);
                 outputContent.innerHTML = `<pre class="output-text">${filteredOutput}</pre>`;
 
-                // Auto-scroll to bottom
-                outputContent.scrollTop = outputContent.scrollHeight;
-
                 // Update status
                 const statusEl = document.getElementById('scenario-status');
                 if (data.status === 'completed') {
                     statusEl.textContent = '✅ Passed';
                     statusEl.className = 'scenario-status passed';
                     clearInterval(pollInterval);
+                    // Scroll to top when test completes
+                    outputContent.scrollTop = 0;
                 } else if (data.status === 'failed') {
                     statusEl.textContent = '❌ Failed';
                     statusEl.className = 'scenario-status failed';
                     clearInterval(pollInterval);
+                    // Scroll to top when test completes
+                    outputContent.scrollTop = 0;
                 } else {
                     statusEl.textContent = '⏳ Running...';
                     statusEl.className = 'scenario-status running';
+                    // Auto-scroll to bottom while running
+                    outputContent.scrollTop = outputContent.scrollHeight;
                 }
 
             } catch (error) {
