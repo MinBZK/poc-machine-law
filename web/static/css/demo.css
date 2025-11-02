@@ -831,14 +831,14 @@ body {
 /* Three-panel layout for feature viewer */
 .demo-layout.three-panel {
     display: grid;
-    grid-template-columns: 320px 1fr 800px;
+    grid-template-columns: 320px minmax(400px, 1fr) minmax(600px, 1.5fr);
     gap: 0;
     transition: grid-template-columns 0.3s ease;
 }
 
 /* Adjust grid when sidebar is collapsed in three-panel layout */
 .demo-layout.three-panel:has(.demo-sidebar.collapsed) {
-    grid-template-columns: 0px 1fr 800px;
+    grid-template-columns: 0px minmax(400px, 1fr) minmax(600px, 1.5fr);
 }
 
 .demo-layout.three-panel .demo-sidebar {
