@@ -1119,10 +1119,11 @@ body {
 
 /* Workspace Container */
 .workspace-container {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: var(--bg-secondary);
+    overflow: hidden;
 }
 
 /* Tab Bar (Browser-like) */
