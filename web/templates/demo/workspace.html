@@ -1,109 +1,103 @@
 <!DOCTYPE html>
 <html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RegelRecht Demo Mode - Workspace</title>
-    <link rel="stylesheet" href="/static/css/demo.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RegelRecht Demo Mode - Workspace</title>
+        <link rel="stylesheet" href="/static/css/demo.css">
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
         [x-cloak] {
             display: none !important;
         }
-    </style>
-</head>
-<body>
-    <div class="workspace-container" x-data="workspaceData()" x-init="init()">
-        <!-- Header -->
-        <header class="demo-header">
-            <div class="demo-brand">
-                <h1>RegelRecht Demo Mode</h1>
-                <p class="demo-subtitle">Machine-uitvoerbaar Nederlands recht</p>
+        </style>
+    </head>
+    <body>
+        <div class="workspace-container" x-data="workspaceData()" x-init="init()">
+            <!-- Header -->
+            <header class="demo-header">
+                <div class="demo-brand">
+                    <h1>RegelRecht Demo Mode</h1>
+                    <p class="demo-subtitle">Machine-uitvoerbaar Nederlands recht</p>
+                </div>
+            </header>
+            <!-- Tab Bar (Browser-like) -->
+            <div class="tab-bar">
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'laws' }"
+                     @click="switchTab('laws')">
+                    <span class="tab-label">Wetten</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'features' }"
+                     @click="switchTab('features')">
+                    <span class="tab-label">Features</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'graph' }"
+                     @click="switchTab('graph')">
+                    <span class="tab-label">Graaf analyse</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'zaaksysteem' }"
+                     @click="switchTab('zaaksysteem')">
+                    <span class="tab-label">Zaaksysteem</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'simulatie' }"
+                     @click="switchTab('simulatie')">
+                    <span class="tab-label">Simulatie</span>
+                </div>
             </div>
-        </header>
-
-        <!-- Tab Bar (Browser-like) -->
-        <div class="tab-bar">
-            <div class="tab"
-                 :class="{ 'active': activeTab === 'laws' }"
-                 @click="switchTab('laws')">
-                <span class="tab-label">Wetten</span>
-            </div>
-            <div class="tab"
-                 :class="{ 'active': activeTab === 'features' }"
-                 @click="switchTab('features')">
-                <span class="tab-label">Features</span>
-            </div>
-            <div class="tab"
-                 :class="{ 'active': activeTab === 'graph' }"
-                 @click="switchTab('graph')">
-                <span class="tab-label">Graaf analyse</span>
-            </div>
-            <div class="tab"
-                 :class="{ 'active': activeTab === 'zaaksysteem' }"
-                 @click="switchTab('zaaksysteem')">
-                <span class="tab-label">Zaaksysteem</span>
-            </div>
-            <div class="tab"
-                 :class="{ 'active': activeTab === 'simulatie' }"
-                 @click="switchTab('simulatie')">
-                <span class="tab-label">Simulatie</span>
-            </div>
-        </div>
-
-        <!-- Tab Content Container -->
-        <div class="tab-content-wrapper">
-            <!-- Laws Tab Content (Embedded) -->
-            <div class="tab-content"
-                 x-show="activeTab === 'laws'"
-                 x-cloak
-                 id="laws-content">
-                <div x-html="lawsContent"></div>
-            </div>
-
-            <!-- Features Tab Content (Embedded) -->
-            <div class="tab-content"
-                 x-show="activeTab === 'features'"
-                 x-cloak
-                 id="features-content">
-                <div x-html="featuresContent"></div>
-            </div>
-
-            <!-- Graph Analysis Tab (IFrame) -->
-            <div class="tab-content iframe-content"
-                 x-show="activeTab === 'graph'"
-                 x-cloak>
-                <iframe src="/analysis/graph/"
-                        frameborder="0"
-                        class="tab-iframe"
-                        title="Graph Analysis"></iframe>
-            </div>
-
-            <!-- Zaaksysteem Tab (IFrame) -->
-            <div class="tab-content iframe-content"
-                 x-show="activeTab === 'zaaksysteem'"
-                 x-cloak>
-                <iframe src="/admin/toeslagen"
-                        frameborder="0"
-                        class="tab-iframe"
-                        title="Zaaksysteem"></iframe>
-            </div>
-
-            <!-- Simulatie Tab (IFrame) -->
-            <div class="tab-content iframe-content"
-                 x-show="activeTab === 'simulatie'"
-                 x-cloak>
-                <iframe src="/simulation/"
-                        frameborder="0"
-                        class="tab-iframe"
-                        title="Simulatie"></iframe>
+            <!-- Tab Content Container -->
+            <div class="tab-content-wrapper">
+                <!-- Laws Tab Content (Embedded) -->
+                <div class="tab-content"
+                     x-show="activeTab === 'laws'"
+                     x-cloak
+                     id="laws-content">
+                    <div x-html="lawsContent"></div>
+                </div>
+                <!-- Features Tab Content (Embedded) -->
+                <div class="tab-content"
+                     x-show="activeTab === 'features'"
+                     x-cloak
+                     id="features-content">
+                    <div x-html="featuresContent"></div>
+                </div>
+                <!-- Graph Analysis Tab (IFrame) -->
+                <div class="tab-content iframe-content"
+                     x-show="activeTab === 'graph'"
+                     x-cloak>
+                    <iframe src="/analysis/graph/"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Graph Analysis"></iframe>
+                </div>
+                <!-- Zaaksysteem Tab (IFrame) -->
+                <div class="tab-content iframe-content"
+                     x-show="activeTab === 'zaaksysteem'"
+                     x-cloak>
+                    <iframe src="/admin/toeslagen"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Zaaksysteem"></iframe>
+                </div>
+                <!-- Simulatie Tab (IFrame) -->
+                <div class="tab-content iframe-content"
+                     x-show="activeTab === 'simulatie'"
+                     x-cloak>
+                    <iframe src="/simulation/"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Simulatie"></iframe>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- JavaScript -->
-    <script src="/static/js/demo.js"></script>
-    <script>
+        <!-- JavaScript -->
+        <script src="/static/js/demo.js"></script>
+        <script>
         function workspaceData() {
             return {
                 activeTab: 'laws',
@@ -222,6 +216,6 @@
                 }
             }
         }
-    </script>
-</body>
+        </script>
+    </body>
 </html>
