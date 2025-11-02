@@ -33,6 +33,11 @@
                     <span class="tab-label">Graaf analyse</span>
                 </div>
                 <div class="tab"
+                     :class="{ 'active': activeTab === 'simulatie' }"
+                     @click="switchTab('simulatie')">
+                    <span class="tab-label">Simulatie</span>
+                </div>
+                <div class="tab"
                      :class="{ 'active': activeTab === 'burger' }"
                      @click="switchTab('burger')">
                     <span class="tab-label">Burger.nl</span>
@@ -41,11 +46,6 @@
                      :class="{ 'active': activeTab === 'zaaksysteem' }"
                      @click="switchTab('zaaksysteem')">
                     <span class="tab-label">Zaaksysteem</span>
-                </div>
-                <div class="tab"
-                     :class="{ 'active': activeTab === 'simulatie' }"
-                     @click="switchTab('simulatie')">
-                    <span class="tab-label">Simulatie</span>
                 </div>
             </div>
             <!-- Tab Content Container -->
