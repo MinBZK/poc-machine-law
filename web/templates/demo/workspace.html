@@ -25,7 +25,7 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'features' }"
                      @click="switchTab('features')">
-                    <span class="tab-label">Features</span>
+                    <span class="tab-label">Scenarios</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'graph' }"
@@ -102,6 +102,159 @@
         <!-- JavaScript -->
         <script src="/static/js/demo.js"></script>
         <script>
+        // Global variables for feature testing (needed by feature_viewer_partial.html)
+        let currentFeaturePath = '';
+        let currentRunId = null;
+        let pollInterval = null;
+
+        // Global functions for feature scenarios (called by onclick handlers in rendered HTML)
+        function toggleScenario(element) {
+            const scenario = element.closest('.gherkin-scenario');
+            if (!scenario) return;
+
+            scenario.classList.toggle('collapsed');
+            const icon = element.querySelector('.collapse-icon');
+            if (icon) {
+                icon.textContent = scenario.classList.contains('collapsed') ? '▶' : '▼';
+            }
+        }
+
+        function expandAllScenarios() {
+            document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+                scenario.classList.remove('collapsed');
+                const icon = scenario.querySelector('.collapse-icon');
+                if (icon) icon.textContent = '▼';
+            });
+        }
+
+        function collapseAllScenarios() {
+            document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+                scenario.classList.add('collapsed');
+                const icon = scenario.querySelector('.collapse-icon');
+                if (icon) icon.textContent = '▶';
+            });
+        }
+
+        async function runScenario(scenarioIndex) {
+            const outputContent = document.getElementById('output-content');
+            outputContent.innerHTML = '<div class="output-running">Running scenario...</div>';
+
+            try {
+                const response = await fetch('/demo/feature/run-scenario', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        feature_path: currentFeaturePath,
+                        scenario_index: parseInt(scenarioIndex)
+                    })
+                });
+
+                const data = await response.json();
+                currentRunId = data.run_id;
+
+                // Start polling for output
+                if (pollInterval) clearInterval(pollInterval);
+                pollInterval = setInterval(pollForOutput, 500);
+
+            } catch (error) {
+                outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function filterOutput(output) {
+            if (!output) return '';
+
+            const lines = output.split('\n');
+            let startIndex = -1;
+
+            for (let i = 0; i < lines.length; i++) {
+                if (/\.py:\d+/.test(lines[i])) {
+                    console.log('Found start line at index', i, ':', lines[i]);
+                    startIndex = i;
+                    break;
+                }
+            }
+
+            if (startIndex >= 0) {
+                const filtered = lines.slice(startIndex).join('\n');
+                console.log('Filtered output from line', startIndex, 'length:', filtered.length);
+                return filtered;
+            }
+
+            console.log('No filter marker found, returning full output');
+            return output;
+        }
+
+        async function pollForOutput() {
+            if (!currentRunId) return;
+
+            try {
+                const response = await fetch(`/demo/feature/run-status/${currentRunId}`);
+                const data = await response.json();
+
+                const outputContent = document.getElementById('output-content');
+                const filteredOutput = filterOutput(data.output);
+                outputContent.innerHTML = `<pre class="output-text">${filteredOutput}</pre>`;
+
+                // Auto-scroll to bottom
+                outputContent.scrollTop = outputContent.scrollHeight;
+
+                // Update status
+                const statusEl = document.getElementById('scenario-status');
+                if (data.status === 'completed') {
+                    statusEl.textContent = '✅ Passed';
+                    statusEl.className = 'scenario-status passed';
+                    clearInterval(pollInterval);
+                } else if (data.status === 'failed') {
+                    statusEl.textContent = '❌ Failed';
+                    statusEl.className = 'scenario-status failed';
+                    clearInterval(pollInterval);
+                } else {
+                    statusEl.textContent = '⏳ Running...';
+                    statusEl.className = 'scenario-status running';
+                }
+
+            } catch (error) {
+                console.error('Error polling output:', error);
+                clearInterval(pollInterval);
+            }
+        }
+
+        async function runAllScenarios() {
+            const outputContent = document.getElementById('output-content');
+            outputContent.innerHTML = '<div class="output-running">Running all scenarios...</div>';
+
+            try {
+                const response = await fetch('/demo/run-feature', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        feature_path: currentFeaturePath
+                    })
+                });
+
+                const data = await response.json();
+                currentRunId = data.run_id;
+
+                // Start polling for output
+                if (pollInterval) clearInterval(pollInterval);
+                pollInterval = setInterval(pollForOutput, 500);
+
+            } catch (error) {
+                outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function clearOutput() {
+            document.getElementById('output-content').innerHTML =
+                '<div class="output-placeholder">Run a scenario to see output here...</div>';
+            document.getElementById('scenario-status').textContent = '';
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
         function workspaceData() {
             return {
                 activeTab: 'laws',
@@ -181,6 +334,18 @@
                                 const response = await fetch(fetchUrl);
                                 this.featuresContent = await response.text();
                                 this.featuresLoaded = true;
+
+                                // Extract feature path from URL for global variable
+                                if (url) {
+                                    // URL format: /demo/workspace/feature/{feature_path}
+                                    const match = url.match(/\/demo\/workspace\/feature\/(.+)/);
+                                    if (match) {
+                                        currentFeaturePath = match[1];
+                                    }
+                                } else {
+                                    // Default feature path
+                                    currentFeaturePath = 'submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature';
+                                }
 
                                 // After content loads, attach click handlers and init sidebar
                                 this.$nextTick(() => {
