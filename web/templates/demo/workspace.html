@@ -47,6 +47,13 @@
                      @click="switchTab('zaaksysteem')">
                     <span class="tab-label">Zaaksysteem</span>
                 </div>
+                <!-- Fullscreen Toggle Button -->
+                <button class="fullscreen-toggle"
+                        @click="toggleFullscreen()"
+                        :title="isFullscreen ? 'Volledig scherm verlaten (ESC)' : 'Volledig scherm'">
+                    <span x-show="!isFullscreen">⛶</span>
+                    <span x-show="isFullscreen">⤓</span>
+                </button>
             </div>
             <!-- Tab Content Container -->
             <div class="tab-content-wrapper">
@@ -265,6 +272,7 @@
                 featuresContent: '',
                 lawsLoaded: false,
                 featuresLoaded: false,
+                isFullscreen: false,
 
                 init() {
                     // Check URL hash first
@@ -292,6 +300,36 @@
                             this.loadTabContent(newHash);
                         }
                     });
+
+                    // Listen for fullscreen changes (e.g., ESC key)
+                    document.addEventListener('fullscreenchange', () => {
+                        this.isFullscreen = !!document.fullscreenElement;
+                    });
+                },
+
+                toggleFullscreen() {
+                    if (!document.fullscreenElement) {
+                        // Enter fullscreen
+                        const element = document.querySelector('.workspace-container');
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.webkitRequestFullscreen) {
+                            element.webkitRequestFullscreen(); // Safari
+                        } else if (element.msRequestFullscreen) {
+                            element.msRequestFullscreen(); // IE11
+                        }
+                        this.isFullscreen = true;
+                    } else {
+                        // Exit fullscreen
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen(); // Safari
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen(); // IE11
+                        }
+                        this.isFullscreen = false;
+                    }
                 },
 
                 switchTab(tab) {
