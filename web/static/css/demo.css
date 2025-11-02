@@ -1112,3 +1112,107 @@ body {
         height: 300px;
     }
 }
+
+/* ========================================
+   Workspace Tab System
+   ======================================== */
+
+/* Workspace Container */
+.workspace-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-secondary);
+}
+
+/* Tab Bar (Browser-like) */
+.tab-bar {
+    display: flex;
+    background-color: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 var(--spacing-sm);
+    gap: 2px;
+    overflow-x: auto;
+}
+
+.tab {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    text-align: center;
+    margin-top: 4px;
+    position: relative;
+}
+
+.tab:hover {
+    background-color: var(--bg-primary);
+}
+
+.tab.active {
+    background-color: var(--bg-primary);
+    border-bottom: 2px solid var(--bg-primary);
+    margin-bottom: -1px;
+    z-index: 1;
+}
+
+.tab-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.tab.active .tab-label {
+    color: var(--text-primary);
+}
+
+/* Tab Content Wrapper */
+.tab-content-wrapper {
+    flex: 1;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+    position: relative;
+}
+
+.tab-content {
+    height: 100%;
+    overflow: auto;
+}
+
+/* IFrame Content */
+.tab-content.iframe-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.tab-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* Error Message */
+.error-message {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--error-color);
+    font-size: 1rem;
+}
+
+/* Responsive Tab Bar */
+@media (max-width: 768px) {
+    .tab {
+        min-width: 90px;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .tab-label {
+        font-size: 0.75rem;
+    }
+}

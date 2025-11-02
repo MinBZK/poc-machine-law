@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegelRecht Demo Mode - Workspace</title>
+    <link rel="stylesheet" href="/static/css/demo.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="workspace-container" x-data="workspaceData()" x-init="init()">
+        <!-- Header -->
+        <header class="demo-header">
+            <div class="demo-brand">
+                <h1>RegelRecht Demo Mode</h1>
+                <p class="demo-subtitle">Machine-uitvoerbaar Nederlands recht</p>
+            </div>
+        </header>
+
+        <!-- Tab Bar (Browser-like) -->
+        <div class="tab-bar">
+            <div class="tab"
+                 :class="{ 'active': activeTab === 'laws' }"
+                 @click="switchTab('laws')">
+                <span class="tab-label">Wetten</span>
+            </div>
+            <div class="tab"
+                 :class="{ 'active': activeTab === 'features' }"
+                 @click="switchTab('features')">
+                <span class="tab-label">Features</span>
+            </div>
+            <div class="tab"
+                 :class="{ 'active': activeTab === 'graph' }"
+                 @click="switchTab('graph')">
+                <span class="tab-label">Graaf analyse</span>
+            </div>
+            <div class="tab"
+                 :class="{ 'active': activeTab === 'zaaksysteem' }"
+                 @click="switchTab('zaaksysteem')">
+                <span class="tab-label">Zaaksysteem</span>
+            </div>
+            <div class="tab"
+                 :class="{ 'active': activeTab === 'simulatie' }"
+                 @click="switchTab('simulatie')">
+                <span class="tab-label">Simulatie</span>
+            </div>
+        </div>
+
+        <!-- Tab Content Container -->
+        <div class="tab-content-wrapper">
+            <!-- Laws Tab Content (Embedded) -->
+            <div class="tab-content"
+                 x-show="activeTab === 'laws'"
+                 x-cloak
+                 id="laws-content">
+                <div x-html="lawsContent"></div>
+            </div>
+
+            <!-- Features Tab Content (Embedded) -->
+            <div class="tab-content"
+                 x-show="activeTab === 'features'"
+                 x-cloak
+                 id="features-content">
+                <div x-html="featuresContent"></div>
+            </div>
+
+            <!-- Graph Analysis Tab (IFrame) -->
+            <div class="tab-content iframe-content"
+                 x-show="activeTab === 'graph'"
+                 x-cloak>
+                <iframe src="/analysis/graph/"
+                        frameborder="0"
+                        class="tab-iframe"
+                        title="Graph Analysis"></iframe>
+            </div>
+
+            <!-- Zaaksysteem Tab (IFrame) -->
+            <div class="tab-content iframe-content"
+                 x-show="activeTab === 'zaaksysteem'"
+                 x-cloak>
+                <iframe src="/admin/toeslagen"
+                        frameborder="0"
+                        class="tab-iframe"
+                        title="Zaaksysteem"></iframe>
+            </div>
+
+            <!-- Simulatie Tab (IFrame) -->
+            <div class="tab-content iframe-content"
+                 x-show="activeTab === 'simulatie'"
+                 x-cloak>
+                <iframe src="/simulation"
+                        frameborder="0"
+                        class="tab-iframe"
+                        title="Simulatie"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/demo.js"></script>
+    <script>
+        function workspaceData() {
+            return {
+                activeTab: 'laws',
+                lawsContent: '',
+                featuresContent: '',
+                lawsLoaded: false,
+                featuresLoaded: false,
+
+                init() {
+                    // Check URL hash first
+                    const hash = window.location.hash.substring(1);
+                    const validTabs = ['laws', 'features', 'graph', 'zaaksysteem', 'simulatie'];
+
+                    if (hash && validTabs.includes(hash)) {
+                        this.activeTab = hash;
+                    } else {
+                        // Check localStorage
+                        const savedTab = localStorage.getItem('activeTab');
+                        if (savedTab && validTabs.includes(savedTab)) {
+                            this.activeTab = savedTab;
+                        }
+                    }
+
+                    // Load initial content for active tab
+                    this.loadTabContent(this.activeTab);
+
+                    // Listen for hash changes (browser back/forward)
+                    window.addEventListener('hashchange', () => {
+                        const newHash = window.location.hash.substring(1);
+                        if (newHash && validTabs.includes(newHash)) {
+                            this.activeTab = newHash;
+                            this.loadTabContent(newHash);
+                        }
+                    });
+                },
+
+                switchTab(tab) {
+                    this.activeTab = tab;
+
+                    // Update URL hash
+                    window.location.hash = tab;
+
+                    // Save to localStorage
+                    localStorage.setItem('activeTab', tab);
+
+                    // Load content if needed
+                    this.loadTabContent(tab);
+                },
+
+                async loadTabContent(tab, url = null) {
+                    // Load laws content
+                    if (tab === 'laws') {
+                        if (!this.lawsLoaded || url) {
+                            try {
+                                const fetchUrl = url || '/demo/workspace/laws';
+                                const response = await fetch(fetchUrl);
+                                this.lawsContent = await response.text();
+                                this.lawsLoaded = true;
+
+                                // After content loads, attach click handlers
+                                this.$nextTick(() => {
+                                    this.attachLawClickHandlers();
+                                });
+                            } catch (error) {
+                                console.error('Error loading laws content:', error);
+                                this.lawsContent = '<div class="error-message">Error loading laws content</div>';
+                            }
+                        }
+                    }
+
+                    // Load features content
+                    if (tab === 'features') {
+                        if (!this.featuresLoaded || url) {
+                            try {
+                                const fetchUrl = url || '/demo/workspace/features';
+                                const response = await fetch(fetchUrl);
+                                this.featuresContent = await response.text();
+                                this.featuresLoaded = true;
+
+                                // After content loads, attach click handlers
+                                this.$nextTick(() => {
+                                    this.attachFeatureClickHandlers();
+                                });
+                            } catch (error) {
+                                console.error('Error loading features content:', error);
+                                this.featuresContent = '<div class="error-message">Error loading features content</div>';
+                            }
+                        }
+                    }
+
+                    // IFrame-based tabs load on demand automatically via x-show
+                },
+
+                attachLawClickHandlers() {
+                    // Intercept law links to load within tab
+                    const lawLinks = document.querySelectorAll('#laws-content a[href^="/demo/law/"]');
+                    lawLinks.forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const href = link.getAttribute('href');
+                            this.loadTabContent('laws', href.replace('/demo/law/', '/demo/workspace/law/'));
+                        });
+                    });
+                },
+
+                attachFeatureClickHandlers() {
+                    // Intercept feature links to load within tab
+                    const featureLinks = document.querySelectorAll('#features-content a[href^="/demo/feature/"]');
+                    featureLinks.forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const href = link.getAttribute('href');
+                            this.loadTabContent('features', href.replace('/demo/feature/', '/demo/workspace/feature/'));
+                        });
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
