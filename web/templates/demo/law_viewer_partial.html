@@ -1,13 +1,10 @@
 <div class="demo-layout">
     <!-- Toggle button when sidebar is collapsed -->
     <button class="sidebar-toggle-collapsed"
-            id="laws-sidebar-toggle-collapsed"
-            onclick="toggleLawsSidebar()">☰</button>
+            id="laws-sidebar-toggle-collapsed">☰</button>
     <!-- Sidebar with law list -->
     <aside class="demo-sidebar collapsed" id="laws-sidebar">
-        <button class="sidebar-toggle"
-                onclick="toggleLawsSidebar()"
-                style="display: none">−</button>
+        <button class="sidebar-toggle" style="display: none">−</button>
         <div class="sidebar-header">
             <h2>Beschikbare Wetten</h2>
             <input type="text"
@@ -89,42 +86,4 @@ document.getElementById('law-search').addEventListener('input', function(e) {
         }
     });
 });
-
-// Sidebar toggle functionality
-function toggleLawsSidebar() {
-    const sidebar = document.getElementById('laws-sidebar');
-    const collapsedToggle = document.getElementById('laws-sidebar-toggle-collapsed');
-    const sidebarToggle = sidebar.querySelector('.sidebar-toggle');
-
-    sidebar.classList.toggle('collapsed');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-
-    // Show/hide the toggle buttons
-    collapsedToggle.style.display = isCollapsed ? 'block' : 'none';
-    sidebarToggle.style.display = isCollapsed ? 'none' : 'block';
-
-    // Save state to localStorage
-    localStorage.setItem('lawsSidebarCollapsed', isCollapsed);
-}
-
-// Initialize sidebar state from localStorage on load
-(function() {
-    const sidebar = document.getElementById('laws-sidebar');
-    const collapsedToggle = document.getElementById('laws-sidebar-toggle-collapsed');
-    const sidebarToggle = sidebar.querySelector('.sidebar-toggle');
-    const savedState = localStorage.getItem('lawsSidebarCollapsed');
-
-    // Default to collapsed (true) if no saved state
-    const isCollapsed = savedState === null ? true : savedState === 'true';
-
-    if (isCollapsed) {
-        sidebar.classList.add('collapsed');
-        collapsedToggle.style.display = 'block';
-        sidebarToggle.style.display = 'none';
-    } else {
-        sidebar.classList.remove('collapsed');
-        collapsedToggle.style.display = 'none';
-        sidebarToggle.style.display = 'block';
-    }
-})();
 </script>

@@ -161,9 +161,10 @@
                                 this.lawsContent = await response.text();
                                 this.lawsLoaded = true;
 
-                                // After content loads, attach click handlers
+                                // After content loads, attach click handlers and init sidebar
                                 this.$nextTick(() => {
                                     this.attachLawClickHandlers();
+                                    this.initLawsSidebar();
                                 });
                             } catch (error) {
                                 console.error('Error loading laws content:', error);
@@ -181,9 +182,10 @@
                                 this.featuresContent = await response.text();
                                 this.featuresLoaded = true;
 
-                                // After content loads, attach click handlers
+                                // After content loads, attach click handlers and init sidebar
                                 this.$nextTick(() => {
                                     this.attachFeatureClickHandlers();
+                                    this.initFeaturesSidebar();
                                 });
                             } catch (error) {
                                 console.error('Error loading features content:', error);
@@ -193,6 +195,94 @@
                     }
 
                     // IFrame-based tabs load on demand automatically via x-show
+                },
+
+                initLawsSidebar() {
+                    const sidebar = document.getElementById('laws-sidebar');
+                    const collapsedToggle = document.getElementById('laws-sidebar-toggle-collapsed');
+                    const sidebarToggle = sidebar?.querySelector('.sidebar-toggle');
+
+                    if (!sidebar || !collapsedToggle || !sidebarToggle) {
+                        console.warn('Laws sidebar elements not found');
+                        return;
+                    }
+
+                    const savedState = localStorage.getItem('lawsSidebarCollapsed');
+                    const isCollapsed = savedState === null ? true : savedState === 'true';
+
+                    if (isCollapsed) {
+                        sidebar.classList.add('collapsed');
+                        collapsedToggle.style.display = 'block';
+                        sidebarToggle.style.display = 'none';
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        collapsedToggle.style.display = 'none';
+                        sidebarToggle.style.display = 'block';
+                    }
+
+                    // Attach event listeners to toggle buttons
+                    collapsedToggle.onclick = () => this.toggleLawsSidebar();
+                    sidebarToggle.onclick = () => this.toggleLawsSidebar();
+                },
+
+                toggleLawsSidebar() {
+                    const sidebar = document.getElementById('laws-sidebar');
+                    const collapsedToggle = document.getElementById('laws-sidebar-toggle-collapsed');
+                    const sidebarToggle = sidebar?.querySelector('.sidebar-toggle');
+
+                    if (!sidebar || !collapsedToggle || !sidebarToggle) return;
+
+                    sidebar.classList.toggle('collapsed');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+
+                    collapsedToggle.style.display = isCollapsed ? 'block' : 'none';
+                    sidebarToggle.style.display = isCollapsed ? 'none' : 'block';
+
+                    localStorage.setItem('lawsSidebarCollapsed', isCollapsed);
+                },
+
+                initFeaturesSidebar() {
+                    const sidebar = document.getElementById('features-sidebar');
+                    const collapsedToggle = document.getElementById('features-sidebar-toggle-collapsed');
+                    const sidebarToggle = sidebar?.querySelector('.sidebar-toggle');
+
+                    if (!sidebar || !collapsedToggle || !sidebarToggle) {
+                        console.warn('Features sidebar elements not found');
+                        return;
+                    }
+
+                    const savedState = localStorage.getItem('featuresSidebarCollapsed');
+                    const isCollapsed = savedState === null ? true : savedState === 'true';
+
+                    if (isCollapsed) {
+                        sidebar.classList.add('collapsed');
+                        collapsedToggle.style.display = 'block';
+                        sidebarToggle.style.display = 'none';
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        collapsedToggle.style.display = 'none';
+                        sidebarToggle.style.display = 'block';
+                    }
+
+                    // Attach event listeners to toggle buttons
+                    collapsedToggle.onclick = () => this.toggleFeaturesSidebar();
+                    sidebarToggle.onclick = () => this.toggleFeaturesSidebar();
+                },
+
+                toggleFeaturesSidebar() {
+                    const sidebar = document.getElementById('features-sidebar');
+                    const collapsedToggle = document.getElementById('features-sidebar-toggle-collapsed');
+                    const sidebarToggle = sidebar?.querySelector('.sidebar-toggle');
+
+                    if (!sidebar || !collapsedToggle || !sidebarToggle) return;
+
+                    sidebar.classList.toggle('collapsed');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+
+                    collapsedToggle.style.display = isCollapsed ? 'block' : 'none';
+                    sidebarToggle.style.display = isCollapsed ? 'none' : 'block';
+
+                    localStorage.setItem('featuresSidebarCollapsed', isCollapsed);
                 },
 
                 attachLawClickHandlers() {

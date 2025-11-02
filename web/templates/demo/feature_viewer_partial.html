@@ -1,13 +1,10 @@
 <div class="demo-layout three-panel">
     <!-- Toggle button when sidebar is collapsed -->
     <button class="sidebar-toggle-collapsed"
-            id="features-sidebar-toggle-collapsed"
-            onclick="toggleFeaturesSidebar()">☰</button>
+            id="features-sidebar-toggle-collapsed">☰</button>
     <!-- Sidebar with feature list -->
     <aside class="demo-sidebar collapsed" id="features-sidebar">
-        <button class="sidebar-toggle"
-                onclick="toggleFeaturesSidebar()"
-                style="display: none">−</button>
+        <button class="sidebar-toggle" style="display: none">−</button>
         <div class="sidebar-header">
             <h2>Feature Files</h2>
             <input type="text"
@@ -228,42 +225,4 @@ function clearOutput() {
         pollInterval = null;
     }
 }
-
-// Sidebar toggle functionality
-function toggleFeaturesSidebar() {
-    const sidebar = document.getElementById('features-sidebar');
-    const collapsedToggle = document.getElementById('features-sidebar-toggle-collapsed');
-    const sidebarToggle = sidebar.querySelector('.sidebar-toggle');
-
-    sidebar.classList.toggle('collapsed');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-
-    // Show/hide the toggle buttons
-    collapsedToggle.style.display = isCollapsed ? 'block' : 'none';
-    sidebarToggle.style.display = isCollapsed ? 'none' : 'block';
-
-    // Save state to localStorage
-    localStorage.setItem('featuresSidebarCollapsed', isCollapsed);
-}
-
-// Initialize sidebar state from localStorage on load
-(function() {
-    const sidebar = document.getElementById('features-sidebar');
-    const collapsedToggle = document.getElementById('features-sidebar-toggle-collapsed');
-    const sidebarToggle = sidebar.querySelector('.sidebar-toggle');
-    const savedState = localStorage.getItem('featuresSidebarCollapsed');
-
-    // Default to collapsed (true) if no saved state
-    const isCollapsed = savedState === null ? true : savedState === 'true';
-
-    if (isCollapsed) {
-        sidebar.classList.add('collapsed');
-        collapsedToggle.style.display = 'block';
-        sidebarToggle.style.display = 'none';
-    } else {
-        sidebar.classList.remove('collapsed');
-        collapsedToggle.style.display = 'none';
-        sidebarToggle.style.display = 'block';
-    }
-})();
 </script>
