@@ -375,7 +375,17 @@
                     }
 
                     // Load initial content for active tab
-                    this.loadTabContent(this.activeTab);
+                    // If we have a saved active law tab and we're on the laws tab, load that law
+                    if (this.activeTab === 'laws' && this.activeLawTabId && this.openedLawTabs.length > 0) {
+                        const activeTab = this.openedLawTabs.find(t => t.id === this.activeLawTabId);
+                        if (activeTab) {
+                            this.loadTabContent('laws', `/demo/workspace/law/${activeTab.path}`);
+                        } else {
+                            this.loadTabContent(this.activeTab);
+                        }
+                    } else {
+                        this.loadTabContent(this.activeTab);
+                    }
 
                     // Listen for hash changes (browser back/forward)
                     window.addEventListener('hashchange', () => {
@@ -439,6 +449,53 @@
                                 const response = await fetch(fetchUrl);
                                 this.lawsContent = await response.text();
                                 this.lawsLoaded = true;
+
+                                // If loading a specific law (URL contains /law/), extract info and create/update tab
+                                if (url && url.includes('/demo/workspace/law/')) {
+                                    const lawPath = url.replace('/demo/workspace/law/', '');
+
+                                    // Wait for content to render, then extract law name from the page
+                                    this.$nextTick(() => {
+                                        // Try to extract law name from the rendered content
+                                        const lawNameEl = document.querySelector('#laws-content .law-header h1');
+                                        const lawName = lawNameEl ? lawNameEl.textContent.trim() : lawPath;
+
+                                        // Extract service and law ID if available
+                                        const badges = document.querySelectorAll('#laws-content .law-meta .badge');
+                                        let service = '';
+                                        let lawId = '';
+                                        badges.forEach(badge => {
+                                            const text = badge.textContent.trim();
+                                            if (text && !text.startsWith('Geldig vanaf:')) {
+                                                if (!service) {
+                                                    service = text;
+                                                } else if (!lawId) {
+                                                    lawId = text;
+                                                }
+                                            }
+                                        });
+
+                                        // Check if tab already exists
+                                        const existingTab = this.openedLawTabs.find(t => t.path === lawPath);
+                                        if (!existingTab) {
+                                            // Create new tab
+                                            const newTab = {
+                                                id: `law-tab-${this.nextLawTabId++}`,
+                                                path: lawPath,
+                                                name: lawName,
+                                                law: lawId,
+                                                service: service
+                                            };
+                                            this.openedLawTabs.push(newTab);
+                                            this.activeLawTabId = newTab.id;
+                                            this.saveLawTabsToStorage();
+                                        } else {
+                                            // Just activate existing tab
+                                            this.activeLawTabId = existingTab.id;
+                                            localStorage.setItem('activeLawTabId', existingTab.id);
+                                        }
+                                    });
+                                }
 
                                 // After content loads, attach click handlers and init sidebar
                                 this.$nextTick(() => {
