@@ -1921,6 +1921,24 @@ class LawSimulator:
                         results_df, "kinderopvangtoeslag", "kinderopvangtoeslag_eligible", "kinderopvangtoeslag_amount"
                     ),
                 },
+                "kindgebonden_budget": {
+                    "eligible_pct": float(results_df["kindgebonden_budget_eligible"].mean() * 100),
+                    "avg_amount": float(
+                        results_df[results_df["kindgebonden_budget_eligible"]]["kindgebonden_budget_amount"].mean()
+                    )
+                    if any(results_df["kindgebonden_budget_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "kindgebonden_budget", "kindgebonden_budget_eligible", "kindgebonden_budget_amount"
+                    ),
+                },
+                "ww": {
+                    "eligible_pct": float(results_df["ww_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["ww_eligible"]]["ww_amount"].mean())
+                    if any(results_df["ww_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(results_df, "ww", "ww_eligible", "ww_amount"),
+                },
                 "voting_rights": {
                     "eligible_pct": float(results_df["voting_rights"].mean() * 100),
                     "breakdowns": self.calculate_law_breakdowns(

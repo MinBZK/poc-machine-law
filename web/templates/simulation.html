@@ -1907,6 +1907,50 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kindgebonden_budget', this)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-medium flex items-center">${getLawIcon('kindgebonden_budget')}Kindgebonden budget</h4>
+                                <p class="text-sm text-gray-600">
+                                    In aanmerking: ${data.summary.laws.kindgebonden_budget.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.kindgebonden_budget.avg_amount.toFixed(2)}
+                                </p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kindgebonden_budget-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="kindgebonden_budget-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                        <div class="text-xs space-y-3">
+                            ${data.summary.laws.kindgebonden_budget.breakdowns ? renderLawBreakdowns(data.summary.laws.kindgebonden_budget.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded p-3">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('ww', this)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-medium flex items-center">${getLawIcon('ww')}WW-uitkering</h4>
+                                <p class="text-sm text-gray-600">
+                                    In aanmerking: ${data.summary.laws.ww.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.ww.avg_amount.toFixed(2)}
+                                </p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="ww-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="ww-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                        <div class="text-xs space-y-3">
+                            ${data.summary.laws.ww.breakdowns ? renderLawBreakdowns(data.summary.laws.ww.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded p-3">
                     <h4 class="font-medium flex items-center">${getLawIcon('voting_rights')}Kiesrecht</h4>
                     <p class="text-sm text-gray-600">
                         Stemgerechtigd: ${data.summary.laws.voting_rights.eligible_pct.toFixed(1)}%
@@ -2530,6 +2574,8 @@ function getLawDisplayName(law) {
         'algemeneouderdomswet': 'AOW',
         'bijstand': 'Bijstand',
         'kinderopvang': 'Kinderopvangtoeslag',
+        'kindgebonden_budget': 'Kindgebonden budget',
+        'ww': 'WW-uitkering',
         'voting_rights': 'Kiesrecht',
         'inkomstenbelasting': 'Inkomstenbelasting'
     };
