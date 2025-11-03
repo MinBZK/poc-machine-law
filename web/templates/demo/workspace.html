@@ -493,9 +493,12 @@
                                             this.activeLawTabId = newTab.id;
                                             this.saveLawTabsToStorage();
                                         } else {
-                                            // Just activate existing tab
+                                            // Update existing tab name with fresh data (in case it was old/incorrect)
+                                            existingTab.name = tabName;
+                                            existingTab.law = lawId;
+                                            existingTab.service = service;
                                             this.activeLawTabId = existingTab.id;
-                                            localStorage.setItem('activeLawTabId', existingTab.id);
+                                            this.saveLawTabsToStorage();
                                         }
                                     });
                                 }

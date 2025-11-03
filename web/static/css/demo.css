@@ -1265,7 +1265,7 @@ body {
     background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
     padding: 0 var(--spacing-sm);
-    padding-left: 48px; /* Space for hamburger menu button */
+    padding-left: 60px; /* Space for hamburger menu button */
     gap: var(--spacing-xs);
     align-items: center;
     min-height: 42px;
