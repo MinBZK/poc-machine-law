@@ -30,6 +30,16 @@
     };
   };
 
+  // Demo mode configuration
+  const DEMO_LAW_UUIDS = [
+    '60e71675-38bc-4297-87ac-0c145613e481', // Zorgtoeslag
+    'aba2b8fa-4b34-420f-883a-e78da326a8f4', // ZVW
+    '292c11ff-8318-4b7a-bb11-3ea545b04c8e', // Penitentiaire Beginselenwet
+  ];
+
+  // Check if demo mode is enabled via URL parameter
+  const isDemoMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demo') === 'true';
+
   // Define the paths to the YAML files
   let filePaths: string[] = [];
 
@@ -130,7 +140,14 @@
         );
       });
 
-      selectedLaws = laws.map((law) => law.uuid); // Initialize selected laws with all laws
+      // Initialize selected laws based on demo mode
+      if (isDemoMode) {
+        // Demo mode: pre-select only the 3 demo laws
+        selectedLaws = DEMO_LAW_UUIDS.filter(uuid => laws.some(law => law.uuid === uuid));
+      } else {
+        // Normal mode: select all laws
+        selectedLaws = laws.map((law) => law.uuid);
+      }
 
       // First pass: create all nodes
       for (const data of laws) {
