@@ -30,6 +30,16 @@
     };
   };
 
+  // Demo mode configuration
+  const DEMO_LAW_UUIDS = [
+    '60e71675-38bc-4297-87ac-0c145613e481', // Zorgtoeslag
+    'aba2b8fa-4b34-420f-883a-e78da326a8f4', // ZVW
+    '292c11ff-8318-4b7a-bb11-3ea545b04c8e', // Penitentiaire Beginselenwet
+  ];
+
+  // Check if demo mode is enabled via URL parameter
+  const isDemoMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demo') === 'true';
+
   // Define the paths to the YAML files
   let filePaths: string[] = [];
 
@@ -130,7 +140,14 @@
         );
       });
 
-      selectedLaws = laws.map((law) => law.uuid); // Initialize selected laws with all laws
+      // Initialize selected laws based on demo mode
+      if (isDemoMode) {
+        // Demo mode: pre-select only the 3 demo laws
+        selectedLaws = DEMO_LAW_UUIDS.filter(uuid => laws.some(law => law.uuid === uuid));
+      } else {
+        // Normal mode: select all laws
+        selectedLaws = laws.map((law) => law.uuid);
+      }
 
       // First pass: create all nodes
       for (const data of laws) {
@@ -572,12 +589,22 @@
   <div class="sticky top-0 bg-white pt-6 pb-2">
     <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
 
-    <button
-      type="button"
-      onclick={calculatePositions}
-      class="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
-      >Her-positioneer</button
-    >
+    <div class="flex gap-2">
+      <button
+        type="button"
+        onclick={calculatePositions}
+        class="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
+        >Her-positioneer</button
+      >
+      <button
+        type="button"
+        onclick={() => {
+          selectedLaws = laws.map((law) => law.uuid);
+        }}
+        class="cursor-pointer rounded-md border border-gray-600 bg-gray-600 px-3 py-1.5 text-white transition duration-200 hover:border-gray-700 hover:bg-gray-700"
+        >Selecteer alles</button
+      >
+    </div>
   </div>
 
   {#each Object.entries(laws.reduce((acc, law) => {
