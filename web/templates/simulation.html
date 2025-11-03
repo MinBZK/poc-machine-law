@@ -2425,11 +2425,17 @@ function renderComparisonRows(baseline, comparisons) {
     const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     let html = '';
 
-    // Demographics
+    // Demographics (collapsible accordion)
+    const demoId = 'demographics-accordion';
     html += `
-        <tr class="bg-gray-50">
+        <tr class="bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="toggleAccordion('${demoId}')">
             <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
-                Demografie
+                <div class="flex items-center">
+                    <svg id="${demoId}-icon" class="w-4 h-4 mr-2 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    Demografie
+                </div>
             </td>
         </tr>
     `;
@@ -2443,12 +2449,34 @@ function renderComparisonRows(baseline, comparisons) {
     ];
 
     demoMetrics.forEach(metric => {
-        html += renderMetricRow(
-            metric.label,
-            baseline.results.summary.demographics[metric.key],
-            comparisons.map(c => c.results.summary.demographics[metric.key]),
-            metric.format
-        );
+        html += `<tr id="${demoId}-content" class="hidden">`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">${metric.label}</td>`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${formatValue(baseline.results.summary.demographics[metric.key], metric.format)}</td>`;
+
+        comparisons.forEach(comp => {
+            const baseValue = baseline.results.summary.demographics[metric.key];
+            const value = comp.results.summary.demographics[metric.key];
+            const diff = value - baseValue;
+            const diffPct = baseValue !== 0 ? (diff / baseValue) * 100 : 0;
+            const diffColor = diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-500';
+
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${formatValue(value, metric.format)}</td>`;
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right ${diffColor}">`;
+
+            if (metric.format === 'percentage') {
+                html += `${diff > 0 ? '+' : ''}${diff.toFixed(1)}pp`;
+            } else if (metric.format === 'currency') {
+                html += `${diff > 0 ? '+' : ''}€${Math.abs(diff).toFixed(0)}`;
+                if (Math.abs(diffPct) >= 0.1) {
+                    html += ` (${diff > 0 ? '+' : ''}${diffPct.toFixed(1)}%)`;
+                }
+            } else {
+                html += `${diff > 0 ? '+' : ''}${diff.toFixed(metric.format === 'decimal' ? 1 : 0)}`;
+            }
+
+            html += `</td>`;
+        });
+        html += `</tr>`;
     });
 
     // Income
@@ -2480,23 +2508,62 @@ function renderComparisonRows(baseline, comparisons) {
         const lawData = baseline.results.summary.laws[law];
         const lawName = getLawDisplayName(law);
 
-        // Eligible percentage
-        html += renderMetricRow(
-            `${lawName} - In aanmerking (%)`,
-            lawData.eligible_pct,
-            comparisons.map(c => c.results.summary.laws[law].eligible_pct),
-            'percentage'
-        );
+        // Combined eligible percentage and average amount
+        html += `<tr>`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">${lawName}</td>`;
 
-        // Average amount (if applicable)
-        if (lawData.avg_amount !== undefined) {
-            html += renderMetricRow(
-                `${lawName} - Gem. bedrag`,
-                lawData.avg_amount,
-                comparisons.map(c => c.results.summary.laws[law].avg_amount),
-                'currency'
-            );
-        }
+        // Baseline value
+        const baseEligible = lawData.eligible_pct;
+        const baseAmount = lawData.avg_amount !== undefined ? lawData.avg_amount : null;
+        const baseDisplay = baseAmount !== null
+            ? `${baseEligible.toFixed(1)}% | €${baseAmount.toFixed(0)}`
+            : `${baseEligible.toFixed(1)}%`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${baseDisplay}</td>`;
+
+        // Comparison values
+        comparisons.forEach(comp => {
+            const compLawData = comp.results.summary.laws[law];
+            const compEligible = compLawData.eligible_pct;
+            const compAmount = compLawData.avg_amount !== undefined ? compLawData.avg_amount : null;
+
+            // Display combined value
+            const compDisplay = compAmount !== null
+                ? `${compEligible.toFixed(1)}% | €${compAmount.toFixed(0)}`
+                : `${compEligible.toFixed(1)}%`;
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${compDisplay}</td>`;
+
+            // Calculate and display combined difference
+            const eligibleDiff = compEligible - baseEligible;
+            const amountDiff = compAmount !== null && baseAmount !== null ? compAmount - baseAmount : null;
+
+            // Determine color based on both metrics (prioritize amount if available, otherwise eligible)
+            let diffColor = 'text-gray-500';
+            if (amountDiff !== null) {
+                diffColor = amountDiff > 0 ? 'text-green-600' : amountDiff < 0 ? 'text-red-600' : 'text-gray-500';
+            } else {
+                diffColor = eligibleDiff > 0 ? 'text-green-600' : eligibleDiff < 0 ? 'text-red-600' : 'text-gray-500';
+            }
+
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right ${diffColor}">`;
+
+            // Format difference display
+            let diffParts = [];
+            diffParts.push(`${eligibleDiff > 0 ? '+' : ''}${eligibleDiff.toFixed(1)}pp`);
+
+            if (amountDiff !== null && baseAmount !== null) {
+                const amountDiffPct = baseAmount !== 0 ? (amountDiff / baseAmount) * 100 : 0;
+                let amountStr = `${amountDiff > 0 ? '+' : ''}€${Math.abs(amountDiff).toFixed(0)}`;
+                if (Math.abs(amountDiffPct) >= 0.1) {
+                    amountStr += ` (${amountDiff > 0 ? '+' : ''}${amountDiffPct.toFixed(1)}%)`;
+                }
+                diffParts.push(amountStr);
+            }
+
+            html += diffParts.join(' | ');
+            html += `</td>`;
+        });
+
+        html += `</tr>`;
     });
 
     // Income tax
@@ -2921,6 +2988,21 @@ function renderDisposableIncomeBreakdowns(breakdowns) {
     }
 
     return html || '<p class="text-gray-500">Geen details beschikbaar</p>';
+}
+
+// Toggle accordion sections in comparison table
+function toggleAccordion(accordionId) {
+    const rows = document.querySelectorAll(`tr[id="${accordionId}-content"]`);
+    const icon = document.getElementById(`${accordionId}-icon`);
+
+    rows.forEach(row => {
+        row.classList.toggle('hidden');
+    });
+
+    // Rotate the chevron icon
+    if (icon) {
+        icon.classList.toggle('rotate-90');
+    }
 }
 
 // Initialize on page load
