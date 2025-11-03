@@ -671,11 +671,15 @@ class LawSimulator:
             ("UWV", "uwv_werkgegevens"): [
                 {
                     "bsn": p["bsn"],
-                    "gemiddeld_uren_per_week": float(random.randint(32, 40) if not p["is_student"] else random.randint(12, 24)),
+                    "gemiddeld_uren_per_week": float(
+                        random.randint(32, 40) if not p["is_student"] else random.randint(12, 24)
+                    ),
                     # Simulate some unemployment: 10% of non-students are currently unemployed (0 hours)
                     "huidige_uren_per_week": float(
-                        0 if not p["is_student"] and random.random() < 0.10
-                        else random.randint(32, 40) if not p["is_student"]
+                        0
+                        if not p["is_student"] and random.random() < 0.10
+                        else random.randint(32, 40)
+                        if not p["is_student"]
                         else random.randint(12, 24)
                     ),
                     # Most people (80%) meet the requirement of 26+ weeks out of 36
@@ -1397,6 +1401,7 @@ class LawSimulator:
                 )
             except Exception as e:
                 import traceback
+
                 logger.error(f"Error evaluating WW-uitkering for BSN {person['bsn']}: {e}")
                 logger.error(traceback.format_exc())
                 ww_uitkering = None
@@ -2235,7 +2240,12 @@ def main() -> None:
     print_law_statistics(results, "💼 WW-uitkering (Unemployment Benefits)", "ww_eligible", "ww_amount")
 
     # Kindgebonden budget
-    print_law_statistics(results, "👨‍👩‍👧 Kindgebonden Budget (Child Budget)", "kindgebonden_budget_eligible", "kindgebonden_budget_amount")
+    print_law_statistics(
+        results,
+        "👨‍👩‍👧 Kindgebonden Budget (Child Budget)",
+        "kindgebonden_budget_eligible",
+        "kindgebonden_budget_amount",
+    )
 
     # Kinderopvangtoeslag
     print_law_statistics(
