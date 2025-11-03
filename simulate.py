@@ -1396,7 +1396,9 @@ class LawSimulator:
                     overwrite_definitions=ww_defs,
                 )
             except Exception as e:
-                logger.debug(f"Error evaluating WW-uitkering for BSN {person['bsn']}: {e}")
+                import traceback
+                logger.error(f"Error evaluating WW-uitkering for BSN {person['bsn']}: {e}")
+                logger.error(traceback.format_exc())
                 ww_uitkering = None
 
             # 8. Kiesrecht (voting rights)
@@ -2228,6 +2230,12 @@ def main() -> None:
 
     # Bijstand
     print_law_statistics(results, "🤲 Bijstand (Social Assistance)", "bijstand_eligible", "bijstand_amount")
+
+    # WW-uitkering
+    print_law_statistics(results, "💼 WW-uitkering (Unemployment Benefits)", "ww_eligible", "ww_amount")
+
+    # Kindgebonden budget
+    print_law_statistics(results, "👨‍👩‍👧 Kindgebonden Budget (Child Budget)", "kindgebonden_budget_eligible", "kindgebonden_budget_amount")
 
     # Kinderopvangtoeslag
     print_law_statistics(
