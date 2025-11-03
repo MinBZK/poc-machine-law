@@ -400,6 +400,28 @@
                     document.addEventListener('fullscreenchange', () => {
                         this.isFullscreen = !!document.fullscreenElement;
                     });
+
+                    // Listen for Ctrl-R / Cmd-R to refresh only the active iframe
+                    document.addEventListener('keydown', (e) => {
+                        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                            e.preventDefault(); // Prevent full page refresh
+
+                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'];
+
+                            if (iframeTabs.includes(this.activeTab)) {
+                                // Find and reload the active iframe
+                                const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${this.activeTab}'"] iframe`);
+                                if (iframe) {
+                                    iframe.src = iframe.src; // Reload iframe
+                                    console.log(`Refreshed iframe: ${this.activeTab}`);
+                                }
+                            } else {
+                                // For embedded content tabs (laws, features), reload content
+                                this.loadTabContent(this.activeTab);
+                                console.log(`Refreshed content: ${this.activeTab}`);
+                            }
+                        }
+                    });
                 },
 
                 toggleFullscreen() {
