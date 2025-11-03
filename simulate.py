@@ -740,25 +740,13 @@ class LawSimulator:
                 }
                 for p in people
             ],
-            # SVB kinderbijslag data for kindgebonden budget
-            ("SVB", "ontvangt_kinderbijslag"): [
+            # SVB kinderbijslag data for kindgebonden budget (table structure)
+            ("SVB", "algemene_kinderbijslagwet"): [
                 {
-                    "bsn": p["bsn"],
-                    "value": p["has_children"],  # True if has children
-                }
-                for p in people
-            ],
-            ("SVB", "aantal_kinderen"): [
-                {
-                    "bsn": p["bsn"],
-                    "value": len(p.get("children_data", [])),
-                }
-                for p in people
-            ],
-            ("SVB", "kinderen_leeftijden"): [
-                {
-                    "bsn": p["bsn"],
-                    "value": [child["age"] for child in p.get("children_data", [])],
+                    "ouder_bsn": p["bsn"],
+                    "aantal_kinderen": len(p.get("children_data", [])),
+                    "kinderen_leeftijden": [child["age"] for child in p.get("children_data", [])],
+                    "ontvangt_kinderbijslag": p["has_children"],
                 }
                 for p in people
             ],
