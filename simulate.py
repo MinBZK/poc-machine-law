@@ -689,19 +689,19 @@ class LawSimulator:
                 }
                 for p in people
             ],
-            # UWV ziektewet data
-            ("UWV", "heeft_ziektewet_uitkering"): [
+            # UWV ziektewet data - table name must match feature test
+            ("UWV", "ziektewet"): [
                 {
                     "bsn": p["bsn"],
-                    "value": False,  # Very few people receive sickness benefits
+                    "heeft_ziektewet_uitkering": False,  # Very few people receive sickness benefits
                 }
                 for p in people
             ],
-            # UWV WIA data
-            ("UWV", "heeft_wia_uitkering"): [
+            # UWV WIA data - table name must match feature test
+            ("UWV", "WIA"): [
                 {
                     "bsn": p["bsn"],
-                    "value": False,  # Very few people receive disability benefits
+                    "heeft_wia_uitkering": False,  # Very few people receive disability benefits
                 }
                 for p in people
             ],
@@ -848,13 +848,6 @@ class LawSimulator:
                 {
                     "bsn": p["bsn"],
                     "type": "PERMANENT" if not p["has_dutch_nationality"] else "NEDERLANDS",
-                }
-                for p in people
-            ],
-            ("IND", "verblijfsvergunning_type"): [
-                {
-                    "bsn": p["bsn"],
-                    "value": "PERMANENT" if not p["has_dutch_nationality"] else "NEDERLANDS",
                 }
                 for p in people
             ],
