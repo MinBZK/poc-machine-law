@@ -750,6 +750,14 @@ class LawSimulator:
                 }
                 for p in people
             ],
+            # SVB pension age data for WW eligibility check
+            ("SVB", "pensioenleeftijd"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": 67,  # AOW retirement age in 2025
+                }
+                for p in people
+            ],
             # Healthcare insurance data
             ("RVZ", "verzekeringen"): [
                 {
