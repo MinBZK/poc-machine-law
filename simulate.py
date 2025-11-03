@@ -667,49 +667,25 @@ class LawSimulator:
                 }
                 for p in people
             ],
-            # UWV data for werkloosheidsuitkering (WW)
-            ("UWV", "gemiddeld_uren_per_week"): [
+            # UWV work data for werkloosheidsuitkering (WW) - table structure
+            ("UWV", "uwv_werkgegevens"): [
                 {
                     "bsn": p["bsn"],
-                    "value": random.randint(32, 40) if not p["is_student"] else random.randint(12, 24),
-                }
-                for p in people
-            ],
-            ("UWV", "huidige_uren_per_week"): [
-                {
-                    "bsn": p["bsn"],
+                    "gemiddeld_uren_per_week": float(random.randint(32, 40) if not p["is_student"] else random.randint(12, 24)),
                     # Simulate some unemployment: 10% of non-students are currently unemployed (0 hours)
-                    # Others work their regular hours or reduced hours
-                    "value": 0
-                    if not p["is_student"] and random.random() < 0.10
-                    else random.randint(32, 40)
-                    if not p["is_student"]
-                    else random.randint(12, 24),
-                }
-                for p in people
-            ],
-            ("UWV", "gewerkte_weken_36"): [
-                {
-                    "bsn": p["bsn"],
+                    "huidige_uren_per_week": float(
+                        0 if not p["is_student"] and random.random() < 0.10
+                        else random.randint(32, 40) if not p["is_student"]
+                        else random.randint(12, 24)
+                    ),
                     # Most people (80%) meet the requirement of 26+ weeks out of 36
-                    "value": random.randint(26, 36) if random.random() < 0.80 else random.randint(10, 25),
+                    "gewerkte_weken_36": random.randint(26, 36) if random.random() < 0.80 else random.randint(10, 25),
+                    "arbeidsverleden_jaren": int(p["work_years"]),
+                    "jaarloon": p["annual_income"],
                 }
                 for p in people
             ],
-            ("UWV", "arbeidsverleden_jaren"): [
-                {
-                    "bsn": p["bsn"],
-                    "value": int(p["work_years"]),
-                }
-                for p in people
-            ],
-            ("UWV", "jaarloon"): [
-                {
-                    "bsn": p["bsn"],
-                    "value": p["annual_income"],
-                }
-                for p in people
-            ],
+            # UWV ziektewet data
             ("UWV", "heeft_ziektewet_uitkering"): [
                 {
                     "bsn": p["bsn"],
@@ -717,6 +693,7 @@ class LawSimulator:
                 }
                 for p in people
             ],
+            # UWV WIA data
             ("UWV", "heeft_wia_uitkering"): [
                 {
                     "bsn": p["bsn"],
