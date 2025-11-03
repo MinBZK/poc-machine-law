@@ -55,6 +55,27 @@
                     <span x-show="isFullscreen">⤓</span>
                 </button>
             </div>
+            <!-- Second Row: Law Tabs (only visible when activeTab === 'laws') -->
+            <div class="law-tab-bar"
+                 x-show="activeTab === 'laws' && openedLawTabs.length > 0"
+                 x-cloak>
+                <div class="law-tabs-container">
+                    <template x-for="lawTab in openedLawTabs" :key="lawTab.id">
+                        <div class="law-tab"
+                             :class="{ 'active': activeLawTabId === lawTab.id }"
+                             @click="switchLawTab(lawTab.id)">
+                            <span class="law-tab-label" x-text="lawTab.name"></span>
+                            <button class="law-tab-close"
+                                    @click.stop="closeLawTab(lawTab.id)"
+                                    title="Close tab">×</button>
+                        </div>
+                    </template>
+                </div>
+                <button class="law-tabs-clear-all"
+                        @click="closeAllLawTabs()"
+                        x-show="openedLawTabs.length > 1"
+                        title="Close all law tabs">Clear All</button>
+            </div>
             <!-- Tab Content Container -->
             <div class="tab-content-wrapper">
                 <!-- Laws Tab Content (Embedded) -->
@@ -313,8 +334,32 @@
                 lawsLoaded: false,
                 featuresLoaded: false,
                 isFullscreen: false,
+                openedLawTabs: [],        // Array of {path: string, name: string, id: string}
+                activeLawTabId: null,     // Currently active law tab ID
+                nextLawTabId: 1,          // Auto-incrementing ID for law tabs
+                maxLawTabs: 10,           // Maximum number of law tabs
 
                 init() {
+                    // Load law tabs from localStorage
+                    const savedLawTabs = localStorage.getItem('openedLawTabs');
+                    if (savedLawTabs) {
+                        try {
+                            this.openedLawTabs = JSON.parse(savedLawTabs);
+                            const savedActiveLawTabId = localStorage.getItem('activeLawTabId');
+                            this.activeLawTabId = savedActiveLawTabId ||
+                                                   (this.openedLawTabs.length > 0 ? this.openedLawTabs[0].id : null);
+
+                            // Set nextLawTabId to highest existing ID + 1
+                            if (this.openedLawTabs.length > 0) {
+                                const maxId = Math.max(...this.openedLawTabs.map(t => parseInt(t.id.replace('law-tab-', ''))));
+                                this.nextLawTabId = maxId + 1;
+                            }
+                        } catch (e) {
+                            console.error('Error loading law tabs from localStorage:', e);
+                            this.openedLawTabs = [];
+                        }
+                    }
+
                     // Check URL hash first
                     const hash = window.location.hash.substring(1);
                     const validTabs = ['laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'];
@@ -330,7 +375,17 @@
                     }
 
                     // Load initial content for active tab
-                    this.loadTabContent(this.activeTab);
+                    // If we have a saved active law tab and we're on the laws tab, load that law
+                    if (this.activeTab === 'laws' && this.activeLawTabId && this.openedLawTabs.length > 0) {
+                        const activeTab = this.openedLawTabs.find(t => t.id === this.activeLawTabId);
+                        if (activeTab) {
+                            this.loadTabContent('laws', `/demo/workspace/law/${activeTab.path}`);
+                        } else {
+                            this.loadTabContent(this.activeTab);
+                        }
+                    } else {
+                        this.loadTabContent(this.activeTab);
+                    }
 
                     // Listen for hash changes (browser back/forward)
                     window.addEventListener('hashchange', () => {
@@ -392,8 +447,61 @@
                             try {
                                 const fetchUrl = url || '/demo/workspace/laws';
                                 const response = await fetch(fetchUrl);
+
+                                // Get the final URL after any redirects
+                                const finalUrl = new URL(response.url).pathname;
+
                                 this.lawsContent = await response.text();
                                 this.lawsLoaded = true;
+
+                                // If loading a specific law (final URL contains /law/), extract info and create/update tab
+                                if (finalUrl.includes('/demo/workspace/law/')) {
+                                    const lawPath = finalUrl.replace('/demo/workspace/law/', '');
+
+                                    // Wait for content to render, then extract law name from the page
+                                    this.$nextTick(() => {
+                                        // Extract service and law ID from badges
+                                        const badges = document.querySelectorAll('#laws-content .law-meta .badge');
+                                        let service = '';
+                                        let lawId = '';
+                                        badges.forEach(badge => {
+                                            const text = badge.textContent.trim();
+                                            if (text && !text.startsWith('Geldig vanaf:')) {
+                                                if (!service) {
+                                                    service = text;
+                                                } else if (!lawId) {
+                                                    lawId = text;
+                                                }
+                                            }
+                                        });
+
+                                        // Use law ID as tab name, fallback to lawPath if not found
+                                        const tabName = lawId || lawPath;
+
+                                        // Check if tab already exists
+                                        const existingTab = this.openedLawTabs.find(t => t.path === lawPath);
+                                        if (!existingTab) {
+                                            // Create new tab
+                                            const newTab = {
+                                                id: `law-tab-${this.nextLawTabId++}`,
+                                                path: lawPath,
+                                                name: tabName,
+                                                law: lawId,
+                                                service: service
+                                            };
+                                            this.openedLawTabs.push(newTab);
+                                            this.activeLawTabId = newTab.id;
+                                            this.saveLawTabsToStorage();
+                                        } else {
+                                            // Update existing tab name with fresh data (in case it was old/incorrect)
+                                            existingTab.name = tabName;
+                                            existingTab.law = lawId;
+                                            existingTab.service = service;
+                                            this.activeLawTabId = existingTab.id;
+                                            this.saveLawTabsToStorage();
+                                        }
+                                    });
+                                }
 
                                 // After content loads, attach click handlers and init sidebar
                                 this.$nextTick(() => {
@@ -531,14 +639,130 @@
                     localStorage.setItem('featuresSidebarCollapsed', isCollapsed);
                 },
 
+                openLawTab(lawPath, lawName, lawId, service) {
+                    // Check if law is already open
+                    const existingTab = this.openedLawTabs.find(tab => tab.path === lawPath);
+                    if (existingTab) {
+                        // Switch to existing tab
+                        this.switchLawTab(existingTab.id);
+                        return;
+                    }
+
+                    // Check max tabs limit
+                    if (this.openedLawTabs.length >= this.maxLawTabs) {
+                        alert(`Maximum of ${this.maxLawTabs} law tabs can be open at once. Please close some tabs first.`);
+                        return;
+                    }
+
+                    // Use law ID as tab name (e.g., "zorgtoeslagwet", "zvw"), fallback to lawName if not available
+                    const tabName = lawId || lawName;
+
+                    // Create new tab
+                    const newTab = {
+                        id: `law-tab-${this.nextLawTabId++}`,
+                        path: lawPath,
+                        name: tabName,
+                        law: lawId,
+                        service: service
+                    };
+
+                    this.openedLawTabs.push(newTab);
+                    this.activeLawTabId = newTab.id;
+
+                    // Save to localStorage
+                    this.saveLawTabsToStorage();
+
+                    // Load the law content
+                    this.loadTabContent('laws', `/demo/workspace/law/${lawPath}`);
+                },
+
+                switchLawTab(tabId) {
+                    const tab = this.openedLawTabs.find(t => t.id === tabId);
+                    if (!tab) return;
+
+                    this.activeLawTabId = tabId;
+                    localStorage.setItem('activeLawTabId', tabId);
+
+                    // Load the law content
+                    this.loadTabContent('laws', `/demo/workspace/law/${tab.path}`);
+                },
+
+                closeLawTab(tabId) {
+                    const tabIndex = this.openedLawTabs.findIndex(t => t.id === tabId);
+                    if (tabIndex === -1) return;
+
+                    // Remove the tab
+                    this.openedLawTabs.splice(tabIndex, 1);
+
+                    // If closing active tab, switch to another tab
+                    if (this.activeLawTabId === tabId) {
+                        if (this.openedLawTabs.length > 0) {
+                            // Switch to previous tab, or first tab if we closed the first one
+                            const newActiveIndex = Math.max(0, tabIndex - 1);
+                            this.switchLawTab(this.openedLawTabs[newActiveIndex].id);
+                        } else {
+                            // No tabs left, load default view
+                            this.activeLawTabId = null;
+                            this.loadTabContent('laws');
+                        }
+                    }
+
+                    // Save to localStorage
+                    this.saveLawTabsToStorage();
+                },
+
+                closeAllLawTabs() {
+                    if (!confirm('Close all law tabs?')) return;
+
+                    this.openedLawTabs = [];
+                    this.activeLawTabId = null;
+                    this.saveLawTabsToStorage();
+
+                    // Load default view
+                    this.loadTabContent('laws');
+                },
+
+                saveLawTabsToStorage() {
+                    localStorage.setItem('openedLawTabs', JSON.stringify(this.openedLawTabs));
+                    if (this.activeLawTabId) {
+                        localStorage.setItem('activeLawTabId', this.activeLawTabId);
+                    } else {
+                        localStorage.removeItem('activeLawTabId');
+                    }
+                },
+
                 attachLawClickHandlers() {
-                    // Intercept law links to load within tab
+                    // Intercept law links in sidebar
                     const lawLinks = document.querySelectorAll('#laws-content a[href^="/demo/law/"]');
                     lawLinks.forEach(link => {
                         link.addEventListener('click', (e) => {
                             e.preventDefault();
                             const href = link.getAttribute('href');
-                            this.loadTabContent('laws', href.replace('/demo/law/', '/demo/workspace/law/'));
+                            const lawPath = href.replace('/demo/law/', '');
+
+                            // Extract metadata from link element
+                            const lawName = link.querySelector('.law-name')?.textContent || lawPath;
+                            const lawId = link.getAttribute('data-law') || '';
+                            const service = link.getAttribute('data-service') || '';
+
+                            // Open in new law tab
+                            this.openLawTab(lawPath, lawName, lawId, service);
+                        });
+                    });
+
+                    // Also intercept cross-reference links within law content
+                    const crossRefLinks = document.querySelectorAll('#laws-content .cross-law-link');
+                    crossRefLinks.forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const href = link.getAttribute('href');
+                            const lawPath = href.replace('/demo/law/', '');
+
+                            // Extract name from link text or use path
+                            const lawName = link.textContent.replace('→ Go to ', '').trim() || lawPath;
+
+                            // Open in new law tab (without service/law metadata for cross-refs)
+                            this.openLawTab(lawPath, lawName, '', '');
                         });
                     });
                 },
