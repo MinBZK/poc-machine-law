@@ -447,8 +447,8 @@ class LawSimulator:
                     "bsn": p["bsn"],
                     "partnerschap_type": "HUWELIJK" if p["has_partner"] else "GEEN",
                     "partner_bsn": p["partner_bsn"],
-                    # Add children directly in the format expected by features
-                    "children": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
+                    # Add children directly in the format expected by features (Dutch field name!)
+                    "kinderen": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
                     if p.get("children_data")
                     else [],
                 }
@@ -463,6 +463,21 @@ class LawSimulator:
                     "postcode": p.get("postcode") or f"{random.randint(1000, 9999)}AB",
                     "woonplaats": "Amsterdam",
                     "type": p.get("address_type") or ("WOONADRES" if random.random() < 0.95 else "BRIEFADRES"),
+                }
+                for p in people
+            ],
+            # RvIG data for werkloosheidsuitkering (nationality and residence)
+            ("RvIG", "heeft_nederlandse_nationaliteit"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": p["has_dutch_nationality"],
+                }
+                for p in people
+            ],
+            ("RvIG", "woont_in_nederland"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": True,  # All simulated people live in Netherlands
                 }
                 for p in people
             ],
@@ -652,6 +667,44 @@ class LawSimulator:
                 }
                 for p in people
             ],
+            # UWV work data for werkloosheidsuitkering (WW) - table structure
+            ("UWV", "uwv_werkgegevens"): [
+                {
+                    "bsn": p["bsn"],
+                    "gemiddeld_uren_per_week": float(
+                        random.randint(32, 40) if not p["is_student"] else random.randint(12, 24)
+                    ),
+                    # Simulate some unemployment: 10% of non-students are currently unemployed (0 hours)
+                    "huidige_uren_per_week": float(
+                        0
+                        if not p["is_student"] and random.random() < 0.10
+                        else random.randint(32, 40)
+                        if not p["is_student"]
+                        else random.randint(12, 24)
+                    ),
+                    # Most people (80%) meet the requirement of 26+ weeks out of 36
+                    "gewerkte_weken_36": random.randint(26, 36) if random.random() < 0.80 else random.randint(10, 25),
+                    "arbeidsverleden_jaren": int(p["work_years"]),
+                    "jaarloon": p["annual_income"],
+                }
+                for p in people
+            ],
+            # UWV ziektewet data - table name must match feature test
+            ("UWV", "ziektewet"): [
+                {
+                    "bsn": p["bsn"],
+                    "heeft_ziektewet_uitkering": False,  # Very few people receive sickness benefits
+                }
+                for p in people
+            ],
+            # UWV WIA data - table name must match feature test
+            ("UWV", "WIA"): [
+                {
+                    "bsn": p["bsn"],
+                    "heeft_wia_uitkering": False,  # Very few people receive disability benefits
+                }
+                for p in people
+            ],
             # SVB insurance data
             ("SVB", "verzekerde_tijdvakken"): [
                 {
@@ -665,6 +718,24 @@ class LawSimulator:
                 {
                     "bsn": p["bsn"],
                     "leeftijd": 67 + random.randint(0, 3) / 10,  # 67.0-67.3
+                }
+                for p in people
+            ],
+            # SVB kinderbijslag data for kindgebonden budget (table structure)
+            ("SVB", "algemene_kinderbijslagwet"): [
+                {
+                    "ouder_bsn": p["bsn"],
+                    "aantal_kinderen": len(p.get("children_data", [])),
+                    "kinderen_leeftijden": [child["age"] for child in p.get("children_data", [])],
+                    "ontvangt_kinderbijslag": p["has_children"],
+                }
+                for p in people
+            ],
+            # SVB pension age data for WW eligibility check (table structure)
+            ("SVB", "algemene_ouderdomswet_gegevens"): [
+                {
+                    "bsn": p["bsn"],
+                    "pensioenleeftijd": 67,  # AOW retirement age in 2025
                 }
                 for p in people
             ],
@@ -1290,7 +1361,45 @@ class LawSimulator:
                     logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
                     kinderopvangtoeslag = None
 
-            # 6. Kiesrecht (voting rights)
+            # 6. Kindgebonden budget
+            kindgebonden_budget = None
+            if person["has_children"]:
+                try:
+                    kindgebonden_budget_input, kindgebonden_budget_defs = self._create_law_overrides(
+                        "wet_op_het_kindgebonden_budget"
+                    )
+                    kindgebonden_budget = self.services.evaluate(
+                        "TOESLAGEN",
+                        "wet_op_het_kindgebonden_budget",
+                        {"BSN": person["bsn"]},
+                        self.simulation_date,
+                        overwrite_input=kindgebonden_budget_input,
+                        overwrite_definitions=kindgebonden_budget_defs,
+                    )
+                except Exception as e:
+                    logger.debug(f"Error evaluating kindgebonden budget for BSN {person['bsn']}: {e}")
+                    kindgebonden_budget = None
+
+            # 7. WW-uitkering (unemployment benefit)
+            ww_uitkering = None
+            try:
+                ww_input, ww_defs = self._create_law_overrides("werkloosheidswet")
+                ww_uitkering = self.services.evaluate(
+                    "UWV",
+                    "werkloosheidswet",
+                    {"BSN": person["bsn"]},
+                    self.simulation_date,
+                    overwrite_input=ww_input,
+                    overwrite_definitions=ww_defs,
+                )
+            except Exception as e:
+                import traceback
+
+                logger.error(f"Error evaluating WW-uitkering for BSN {person['bsn']}: {e}")
+                logger.error(traceback.format_exc())
+                ww_uitkering = None
+
+            # 8. Kiesrecht (voting rights)
             kiesrecht_input, kiesrecht_defs = self._create_law_overrides("kieswet")
             kiesrecht = self.services.evaluate(
                 "KIESRAAD",
@@ -1301,7 +1410,7 @@ class LawSimulator:
                 overwrite_definitions=kiesrecht_defs,
             )
 
-            # 7. Inkomstenbelasting (income tax)
+            # 9. Inkomstenbelasting (income tax)
             ib_overwrite_input, ib_overwrite_definitions = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
                 "BELASTINGDIENST",
@@ -1341,6 +1450,14 @@ class LawSimulator:
                 "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("jaarbedrag", 0) / 100 / 12
                 if kinderopvangtoeslag
                 else 0,
+                # Kindgebonden budget
+                "kindgebonden_budget_eligible": kindgebonden_budget.requirements_met if kindgebonden_budget else False,
+                "kindgebonden_budget_amount": kindgebonden_budget.output.get("kindgebonden_budget_jaar", 0) / 100 / 12
+                if kindgebonden_budget
+                else 0,
+                # WW-uitkering
+                "ww_eligible": ww_uitkering.requirements_met if ww_uitkering else False,
+                "ww_amount": ww_uitkering.output.get("ww_uitkering_per_maand", 0) / 100 if ww_uitkering else 0,
                 # Kiesrecht
                 "voting_rights": kiesrecht.output.get("heeft_stemrecht", False),
                 # Belasting
@@ -1364,6 +1481,8 @@ class LawSimulator:
             + result["bijstand_amount"]
             + result["bijstand_housing"]
             + result["kinderopvangtoeslag_amount"]
+            + result["kindgebonden_budget_amount"]
+            + result["ww_amount"]
         )
 
         # Calculate housing costs (rent or mortgage)
@@ -1382,6 +1501,8 @@ class LawSimulator:
             "aow": result["aow_amount"],
             "bijstand": result["bijstand_amount"] + result["bijstand_housing"],
             "kinderopvangtoeslag": result["kinderopvangtoeslag_amount"],
+            "kindgebonden_budget": result["kindgebonden_budget_amount"],
+            "ww": result["ww_amount"],
             "housing_costs": housing_costs,
         }
 
@@ -1874,6 +1995,24 @@ class LawSimulator:
                         results_df, "kinderopvangtoeslag", "kinderopvangtoeslag_eligible", "kinderopvangtoeslag_amount"
                     ),
                 },
+                "kindgebonden_budget": {
+                    "eligible_pct": float(results_df["kindgebonden_budget_eligible"].mean() * 100),
+                    "avg_amount": float(
+                        results_df[results_df["kindgebonden_budget_eligible"]]["kindgebonden_budget_amount"].mean()
+                    )
+                    if any(results_df["kindgebonden_budget_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "kindgebonden_budget", "kindgebonden_budget_eligible", "kindgebonden_budget_amount"
+                    ),
+                },
+                "ww": {
+                    "eligible_pct": float(results_df["ww_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["ww_eligible"]]["ww_amount"].mean())
+                    if any(results_df["ww_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(results_df, "ww", "ww_eligible", "ww_amount"),
+                },
                 "voting_rights": {
                     "eligible_pct": float(results_df["voting_rights"].mean() * 100),
                     "breakdowns": self.calculate_law_breakdowns(
@@ -2089,6 +2228,17 @@ def main() -> None:
 
     # Bijstand
     print_law_statistics(results, "🤲 Bijstand (Social Assistance)", "bijstand_eligible", "bijstand_amount")
+
+    # WW-uitkering
+    print_law_statistics(results, "💼 WW-uitkering (Unemployment Benefits)", "ww_eligible", "ww_amount")
+
+    # Kindgebonden budget
+    print_law_statistics(
+        results,
+        "👨‍👩‍👧 Kindgebonden Budget (Child Budget)",
+        "kindgebonden_budget_eligible",
+        "kindgebonden_budget_amount",
+    )
 
     # Kinderopvangtoeslag
     print_law_statistics(
