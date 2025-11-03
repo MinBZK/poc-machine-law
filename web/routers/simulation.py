@@ -309,13 +309,19 @@ def calculate_summary_statistics(df) -> dict:
             "avg_tax_rate": float((df["tax_due"] / df["income"]).mean() * 100),
         },
         "laws": {
-            "zorgtoeslag": {
+            "zorgtoeslagwet": {
                 "eligible_pct": float(df["zorgtoeslag_eligible"].mean() * 100),
                 "avg_amount": float(df[df["zorgtoeslag_eligible"]]["zorgtoeslag_amount"].mean())
                 if any(df["zorgtoeslag_eligible"])
                 else 0,
             },
-            "aow": {
+            "huurtoeslag": {
+                "eligible_pct": float(df["huurtoeslag_eligible"].mean() * 100),
+                "avg_amount": float(df[df["huurtoeslag_eligible"]]["huurtoeslag_amount"].mean())
+                if any(df["huurtoeslag_eligible"])
+                else 0,
+            },
+            "algemeneouderdomswet": {
                 "eligible_pct": float(df["aow_eligible"].mean() * 100),
                 "avg_amount": float(df[df["aow_eligible"]]["aow_amount"].mean()) if any(df["aow_eligible"]) else 0,
             },
@@ -325,8 +331,27 @@ def calculate_summary_statistics(df) -> dict:
                 if any(df["bijstand_eligible"])
                 else 0,
             },
+            "kinderopvang": {
+                "eligible_pct": float(df["kinderopvangtoeslag_eligible"].mean() * 100),
+                "avg_amount": float(df[df["kinderopvangtoeslag_eligible"]]["kinderopvangtoeslag_amount"].mean())
+                if any(df["kinderopvangtoeslag_eligible"])
+                else 0,
+            },
+            "kindgebonden_budget": {
+                "eligible_pct": float(df["kindgebonden_budget_eligible"].mean() * 100),
+                "avg_amount": float(df[df["kindgebonden_budget_eligible"]]["kindgebonden_budget_amount"].mean())
+                if any(df["kindgebonden_budget_eligible"])
+                else 0,
+            },
+            "ww": {
+                "eligible_pct": float(df["ww_eligible"].mean() * 100),
+                "avg_amount": float(df[df["ww_eligible"]]["ww_amount"].mean()) if any(df["ww_eligible"]) else 0,
+            },
             "voting_rights": {
                 "eligible_pct": float(df["voting_rights"].mean() * 100),
+            },
+            "inkomstenbelasting": {
+                "avg_tax": float(df["tax_due"].mean()),
             },
         },
         "disposable_income": {
