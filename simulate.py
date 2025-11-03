@@ -466,6 +466,21 @@ class LawSimulator:
                 }
                 for p in people
             ],
+            # RvIG data for werkloosheidsuitkering (nationality and residence)
+            ("RvIG", "heeft_nederlandse_nationaliteit"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": p["has_dutch_nationality"],
+                }
+                for p in people
+            ],
+            ("RvIG", "woont_in_nederland"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": True,  # All simulated people live in Netherlands
+                }
+                for p in people
+            ],
             # Tax data
             ("BELASTINGDIENST", "box1"): [
                 {
@@ -652,6 +667,63 @@ class LawSimulator:
                 }
                 for p in people
             ],
+            # UWV data for werkloosheidsuitkering (WW)
+            ("UWV", "gemiddeld_uren_per_week"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": random.randint(32, 40) if not p["is_student"] else random.randint(12, 24),
+                }
+                for p in people
+            ],
+            ("UWV", "huidige_uren_per_week"): [
+                {
+                    "bsn": p["bsn"],
+                    # Simulate some unemployment: 10% of non-students are currently unemployed (0 hours)
+                    # Others work their regular hours or reduced hours
+                    "value": 0
+                    if not p["is_student"] and random.random() < 0.10
+                    else random.randint(32, 40)
+                    if not p["is_student"]
+                    else random.randint(12, 24),
+                }
+                for p in people
+            ],
+            ("UWV", "gewerkte_weken_36"): [
+                {
+                    "bsn": p["bsn"],
+                    # Most people (80%) meet the requirement of 26+ weeks out of 36
+                    "value": random.randint(26, 36) if random.random() < 0.80 else random.randint(10, 25),
+                }
+                for p in people
+            ],
+            ("UWV", "arbeidsverleden_jaren"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": int(p["work_years"]),
+                }
+                for p in people
+            ],
+            ("UWV", "jaarloon"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": p["annual_income"],
+                }
+                for p in people
+            ],
+            ("UWV", "heeft_ziektewet_uitkering"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": False,  # Very few people receive sickness benefits
+                }
+                for p in people
+            ],
+            ("UWV", "heeft_wia_uitkering"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": False,  # Very few people receive disability benefits
+                }
+                for p in people
+            ],
             # SVB insurance data
             ("SVB", "verzekerde_tijdvakken"): [
                 {
@@ -665,6 +737,28 @@ class LawSimulator:
                 {
                     "bsn": p["bsn"],
                     "leeftijd": 67 + random.randint(0, 3) / 10,  # 67.0-67.3
+                }
+                for p in people
+            ],
+            # SVB kinderbijslag data for kindgebonden budget
+            ("SVB", "ontvangt_kinderbijslag"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": p["has_children"],  # True if has children
+                }
+                for p in people
+            ],
+            ("SVB", "aantal_kinderen"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": len(p.get("children_data", [])),
+                }
+                for p in people
+            ],
+            ("SVB", "kinderen_leeftijden"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": [child["age"] for child in p.get("children_data", [])],
                 }
                 for p in people
             ],
@@ -777,6 +871,13 @@ class LawSimulator:
                 {
                     "bsn": p["bsn"],
                     "type": "PERMANENT" if not p["has_dutch_nationality"] else "NEDERLANDS",
+                }
+                for p in people
+            ],
+            ("IND", "verblijfsvergunning_type"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": "PERMANENT" if not p["has_dutch_nationality"] else "NEDERLANDS",
                 }
                 for p in people
             ],
