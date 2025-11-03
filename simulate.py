@@ -1290,7 +1290,42 @@ class LawSimulator:
                     logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
                     kinderopvangtoeslag = None
 
-            # 6. Kiesrecht (voting rights)
+            # 6. Kindgebonden budget
+            kindgebonden_budget = None
+            if person["has_children"]:
+                try:
+                    kindgebonden_budget_input, kindgebonden_budget_defs = self._create_law_overrides(
+                        "wet_op_het_kindgebonden_budget"
+                    )
+                    kindgebonden_budget = self.services.evaluate(
+                        "TOESLAGEN",
+                        "wet_op_het_kindgebonden_budget",
+                        {"BSN": person["bsn"]},
+                        self.simulation_date,
+                        overwrite_input=kindgebonden_budget_input,
+                        overwrite_definitions=kindgebonden_budget_defs,
+                    )
+                except Exception as e:
+                    logger.debug(f"Error evaluating kindgebonden budget for BSN {person['bsn']}: {e}")
+                    kindgebonden_budget = None
+
+            # 7. WW-uitkering (unemployment benefit)
+            ww_uitkering = None
+            try:
+                ww_input, ww_defs = self._create_law_overrides("werkloosheidswet")
+                ww_uitkering = self.services.evaluate(
+                    "UWV",
+                    "werkloosheidswet",
+                    {"BSN": person["bsn"]},
+                    self.simulation_date,
+                    overwrite_input=ww_input,
+                    overwrite_definitions=ww_defs,
+                )
+            except Exception as e:
+                logger.debug(f"Error evaluating WW-uitkering for BSN {person['bsn']}: {e}")
+                ww_uitkering = None
+
+            # 8. Kiesrecht (voting rights)
             kiesrecht_input, kiesrecht_defs = self._create_law_overrides("kieswet")
             kiesrecht = self.services.evaluate(
                 "KIESRAAD",
@@ -1301,7 +1336,7 @@ class LawSimulator:
                 overwrite_definitions=kiesrecht_defs,
             )
 
-            # 7. Inkomstenbelasting (income tax)
+            # 9. Inkomstenbelasting (income tax)
             ib_overwrite_input, ib_overwrite_definitions = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
                 "BELASTINGDIENST",
@@ -1341,6 +1376,14 @@ class LawSimulator:
                 "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("jaarbedrag", 0) / 100 / 12
                 if kinderopvangtoeslag
                 else 0,
+                # Kindgebonden budget
+                "kindgebonden_budget_eligible": kindgebonden_budget.requirements_met if kindgebonden_budget else False,
+                "kindgebonden_budget_amount": kindgebonden_budget.output.get("kindgebonden_budget_jaar", 0) / 100 / 12
+                if kindgebonden_budget
+                else 0,
+                # WW-uitkering
+                "ww_eligible": ww_uitkering.requirements_met if ww_uitkering else False,
+                "ww_amount": ww_uitkering.output.get("ww_uitkering_per_maand", 0) / 100 if ww_uitkering else 0,
                 # Kiesrecht
                 "voting_rights": kiesrecht.output.get("heeft_stemrecht", False),
                 # Belasting
@@ -1364,6 +1407,8 @@ class LawSimulator:
             + result["bijstand_amount"]
             + result["bijstand_housing"]
             + result["kinderopvangtoeslag_amount"]
+            + result["kindgebonden_budget_amount"]
+            + result["ww_amount"]
         )
 
         # Calculate housing costs (rent or mortgage)
@@ -1382,6 +1427,8 @@ class LawSimulator:
             "aow": result["aow_amount"],
             "bijstand": result["bijstand_amount"] + result["bijstand_housing"],
             "kinderopvangtoeslag": result["kinderopvangtoeslag_amount"],
+            "kindgebonden_budget": result["kindgebonden_budget_amount"],
+            "ww": result["ww_amount"],
             "housing_costs": housing_costs,
         }
 
