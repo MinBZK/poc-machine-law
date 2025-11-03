@@ -52,6 +52,7 @@ DEMO_COLLAPSE_CONFIG = {
             "properties",
             "properties.input",
             "properties.input.IS_GEDETINEERD",  # Specific input item
+            "properties.input.IS_GEDETINEERD.service_reference",
             "actions",
             "actions.is_verzekerde",  # Specific action (note: lowercase in YAML)
             "actions.is_verzekerde.values",  # values array
