@@ -422,6 +422,21 @@
                             }
                         }
                     });
+
+                    // Listen for postMessage from iframes when Ctrl-R is pressed inside them
+                    window.addEventListener('message', (e) => {
+                        if (e.origin === window.location.origin && e.data.type === 'refresh-iframe') {
+                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'];
+
+                            if (iframeTabs.includes(this.activeTab)) {
+                                const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${this.activeTab}'"] iframe`);
+                                if (iframe) {
+                                    iframe.src = iframe.src; // Reload iframe
+                                    console.log(`Refreshed iframe from inside: ${this.activeTab}`);
+                                }
+                            }
+                        }
+                    });
                 },
 
                 toggleFullscreen() {
