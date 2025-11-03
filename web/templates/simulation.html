@@ -2138,13 +2138,15 @@ function copyResultsAsMarkdown(simulationId) {
     markdown += `| Wet | In aanmerking | Gem. bedrag |\n`;
     markdown += `|-----|---------------|-------------|\n`;
 
-    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     laws.forEach(law => {
         const lawData = data.summary.laws[law];
-        markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
+        if (lawData.avg_amount !== undefined) {
+            markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
+        } else {
+            markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | - |\n`;
+        }
     });
-
-    markdown += `| Kiesrecht | ${data.summary.laws.voting_rights.eligible_pct.toFixed(1)}% | - |\n`;
     markdown += `| Inkomstenbelasting | - | €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}/maand |\n\n`;
 
     // Disposable income
@@ -2281,7 +2283,7 @@ function exportComparison(format) {
 
     // Laws
     csv += '\nWETTEN & REGELINGEN\n';
-    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'voting_rights'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     laws.forEach(law => {
         const lawName = getLawDisplayName(law);
         csv += createCSVRow(`${lawName} - In aanmerking (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
@@ -2420,7 +2422,7 @@ function renderComparisonContent(simulations) {
 }
 
 function renderComparisonRows(baseline, comparisons) {
-    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'voting_rights'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     let html = '';
 
     // Demographics
@@ -2668,7 +2670,7 @@ function renderComparisonCharts(baseline, comparisons) {
 
     // Prepare data for charts
     const eligibilityData = [];
-    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
 
     laws.forEach(law => {
         eligibilityData.push({
