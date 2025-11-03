@@ -136,30 +136,10 @@ async def demo_index(request: Request) -> HTMLResponse:
 
 @router.get("/workspace/laws", response_class=HTMLResponse)
 async def workspace_laws(request: Request) -> HTMLResponse:
-    """Get laws tab content (defaults to Zorgtoeslag law)."""
-    law_path = "zorgtoeslagwet/TOESLAGEN-2025-01-01"
-    yaml_file = LAW_DIR / f"{law_path}.yaml"
-
-    if not yaml_file.exists():
-        raise HTTPException(status_code=404, detail=f"Law file not found: {law_path}")
-
-    try:
-        law_data = parse_law_yaml(yaml_file, law_dir=LAW_DIR, law_path=law_path)
-        grouped_laws = discover_laws(LAW_DIR, grouped=True)
-        yaml_html = render_yaml_to_html(law_data)
-
-        return templates.TemplateResponse(
-            "demo/law_viewer_partial.html",
-            {
-                "request": request,
-                "law_path": law_path,
-                "law_data": law_data,
-                "grouped_laws": grouped_laws,
-                "yaml_html": yaml_html,
-            },
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error parsing law file: {str(e)}")
+    """Get laws tab content - redirects to default law."""
+    # Redirect to default law so tab gets created properly
+    default_law_path = "zorgtoeslagwet/TOESLAGEN-2025-01-01"
+    return RedirectResponse(url=f"/demo/workspace/law/{default_law_path}", status_code=307)
 
 
 @router.get("/workspace/features", response_class=HTMLResponse)
