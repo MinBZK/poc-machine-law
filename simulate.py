@@ -447,8 +447,8 @@ class LawSimulator:
                     "bsn": p["bsn"],
                     "partnerschap_type": "HUWELIJK" if p["has_partner"] else "GEEN",
                     "partner_bsn": p["partner_bsn"],
-                    # Add children directly in the format expected by features
-                    "children": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
+                    # Add children directly in the format expected by features (Dutch field name!)
+                    "kinderen": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
                     if p.get("children_data")
                     else [],
                 }
