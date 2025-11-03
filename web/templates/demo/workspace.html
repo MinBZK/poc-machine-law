@@ -192,6 +192,45 @@
             return output;
         }
 
+        function highlightTestOutput(text) {
+            if (!text) return '';
+
+            // Escape HTML first to prevent XSS
+            const escapeHtml = (str) => {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+
+            let highlighted = escapeHtml(text);
+
+            // Highlight tree drawing characters (must come first to avoid conflicts)
+            highlighted = highlighted.replace(/([║│├─]+)/g, '<span class="output-tree">$1</span>');
+
+            // Highlight service and law names (pattern: SERVICE: law_name)
+            highlighted = highlighted.replace(/\b([A-Z_]{2,})(:\s+)(\w+)/g,
+                '<span class="output-service">$1</span>$2<span class="output-law">$3</span>');
+
+            // Highlight variables (e.g., $LEEFTIJD, $BSN)
+            highlighted = highlighted.replace(/(\$[A-Z_]+)/g, '<span class="output-variable">$1</span>');
+
+            // Highlight dates (YYYY-MM-DD format)
+            highlighted = highlighted.replace(/(\d{4}-\d{2}-\d{2})/g, '<span class="output-value-date">$1</span>');
+
+            // Highlight numbers (standalone)
+            highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="output-value-number">$1</span>');
+
+            // Highlight operation keywords
+            highlighted = highlighted.replace(/\b(Evaluating|Resolving|Computing|Requirement met|NOT met|Could not resolve|Missing required|Cannot compute)\b/g,
+                '<span class="output-operation">$1</span>');
+
+            // Highlight requirement status
+            highlighted = highlighted.replace(/\b(requirements met)\b/gi, '<span class="output-requirement-met">$1</span>');
+            highlighted = highlighted.replace(/\b(requirements not met|NOT met)\b/gi, '<span class="output-requirement-not-met">$1</span>');
+
+            return highlighted;
+        }
+
         async function pollForOutput() {
             if (!currentRunId) return;
 
@@ -201,7 +240,8 @@
 
                 const outputContent = document.getElementById('output-content');
                 const filteredOutput = filterOutput(data.output);
-                outputContent.innerHTML = `<pre class="output-text">${filteredOutput}</pre>`;
+                const highlightedOutput = highlightTestOutput(filteredOutput);
+                outputContent.innerHTML = `<pre class="output-text">${highlightedOutput}</pre>`;
 
                 // Update status
                 const statusEl = document.getElementById('scenario-status');
