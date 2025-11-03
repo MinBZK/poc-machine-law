@@ -345,9 +345,7 @@ def calculate_summary_statistics(df) -> dict:
             },
             "ww": {
                 "eligible_pct": float(df["ww_eligible"].mean() * 100),
-                "avg_amount": float(df[df["ww_eligible"]]["ww_amount"].mean())
-                if any(df["ww_eligible"])
-                else 0,
+                "avg_amount": float(df[df["ww_eligible"]]["ww_amount"].mean()) if any(df["ww_eligible"]) else 0,
             },
             "voting_rights": {
                 "eligible_pct": float(df["voting_rights"].mean() * 100),
