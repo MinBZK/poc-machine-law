@@ -904,6 +904,49 @@ body {
     overflow-x: auto;
 }
 
+/* Test Output Syntax Highlighting */
+.output-service {
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.output-law {
+    color: #7c3aed;
+    font-weight: 500;
+}
+
+.output-tree {
+    color: #94a3b8;
+}
+
+.output-variable {
+    color: #0891b2;
+    font-weight: 500;
+}
+
+.output-operation {
+    color: #64748b;
+    font-style: italic;
+}
+
+.output-value-number {
+    color: #15803d;
+}
+
+.output-value-date {
+    color: #0d9488;
+}
+
+.output-requirement-met {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.output-requirement-not-met {
+    color: #ef4444;
+    font-weight: 600;
+}
+
 /* Gherkin Syntax Highlighting */
 .gherkin-content {
     background-color: var(--bg-primary);
