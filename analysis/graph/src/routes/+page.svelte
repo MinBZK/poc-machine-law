@@ -589,12 +589,22 @@
   <div class="sticky top-0 bg-white pt-6 pb-2">
     <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
 
-    <button
-      type="button"
-      onclick={calculatePositions}
-      class="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
-      >Her-positioneer</button
-    >
+    <div class="flex gap-2">
+      <button
+        type="button"
+        onclick={calculatePositions}
+        class="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3 py-1.5 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
+        >Her-positioneer</button
+      >
+      <button
+        type="button"
+        onclick={() => {
+          selectedLaws = laws.map((law) => law.uuid);
+        }}
+        class="cursor-pointer rounded-md border border-gray-600 bg-gray-600 px-3 py-1.5 text-white transition duration-200 hover:border-gray-700 hover:bg-gray-700"
+        >Selecteer alles</button
+      >
+    </div>
   </div>
 
   {#each Object.entries(laws.reduce((acc, law) => {
