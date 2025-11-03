@@ -460,11 +460,7 @@
 
                                     // Wait for content to render, then extract law name from the page
                                     this.$nextTick(() => {
-                                        // Try to extract law name from the rendered content
-                                        const lawNameEl = document.querySelector('#laws-content .law-header h1');
-                                        const lawName = lawNameEl ? lawNameEl.textContent.trim() : lawPath;
-
-                                        // Extract service and law ID if available
+                                        // Extract service and law ID from badges
                                         const badges = document.querySelectorAll('#laws-content .law-meta .badge');
                                         let service = '';
                                         let lawId = '';
@@ -479,6 +475,9 @@
                                             }
                                         });
 
+                                        // Use law ID as tab name, fallback to lawPath if not found
+                                        const tabName = lawId || lawPath;
+
                                         // Check if tab already exists
                                         const existingTab = this.openedLawTabs.find(t => t.path === lawPath);
                                         if (!existingTab) {
@@ -486,7 +485,7 @@
                                             const newTab = {
                                                 id: `law-tab-${this.nextLawTabId++}`,
                                                 path: lawPath,
-                                                name: lawName,
+                                                name: tabName,
                                                 law: lawId,
                                                 service: service
                                             };
@@ -652,11 +651,14 @@
                         return;
                     }
 
+                    // Use law ID as tab name (e.g., "zorgtoeslagwet", "zvw"), fallback to lawName if not available
+                    const tabName = lawId || lawName;
+
                     // Create new tab
                     const newTab = {
                         id: `law-tab-${this.nextLawTabId++}`,
                         path: lawPath,
-                        name: lawName,
+                        name: tabName,
                         law: lawId,
                         service: service
                     };
