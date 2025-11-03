@@ -447,12 +447,16 @@
                             try {
                                 const fetchUrl = url || '/demo/workspace/laws';
                                 const response = await fetch(fetchUrl);
+
+                                // Get the final URL after any redirects
+                                const finalUrl = new URL(response.url).pathname;
+
                                 this.lawsContent = await response.text();
                                 this.lawsLoaded = true;
 
-                                // If loading a specific law (URL contains /law/), extract info and create/update tab
-                                if (url && url.includes('/demo/workspace/law/')) {
-                                    const lawPath = url.replace('/demo/workspace/law/', '');
+                                // If loading a specific law (final URL contains /law/), extract info and create/update tab
+                                if (finalUrl.includes('/demo/workspace/law/')) {
+                                    const lawPath = finalUrl.replace('/demo/workspace/law/', '');
 
                                     // Wait for content to render, then extract law name from the page
                                     this.$nextTick(() => {
