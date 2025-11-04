@@ -1240,6 +1240,11 @@ body {
     background-color: var(--bg-primary);
 }
 
+.tab:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+}
+
 .tab.active {
     background-color: var(--bg-primary);
     border-bottom: 2px solid var(--bg-primary);
@@ -1292,6 +1297,11 @@ body {
     transform: translateY(0);
 }
 
+.menu-toggle:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 /* Menu Overlay - Full screen backdrop */
 .menu-overlay {
     position: fixed;
@@ -1338,6 +1348,11 @@ body {
     background-color: var(--bg-secondary);
 }
 
+.menu-item:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+}
+
 .menu-item-danger {
     color: #dc2626; /* red-600 */
 }
@@ -1365,7 +1380,7 @@ body {
     display: flex;
     background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
-    padding: 0 var(--spacing-sm);
+    padding: var(--spacing-sm);
     padding-left: 60px; /* Space for hamburger menu button */
     gap: var(--spacing-xs);
     align-items: center;
@@ -1403,6 +1418,11 @@ body {
     background-color: var(--bg-primary);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.law-tab:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .law-tab.active {
@@ -1446,6 +1466,11 @@ body {
 .law-tab-close:hover {
     background-color: rgba(0, 0, 0, 0.1);
     color: var(--text-primary);
+}
+
+.law-tab-close:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .law-tab.active .law-tab-close {
@@ -1502,6 +1527,7 @@ body {
     overflow: hidden;
     background-color: var(--bg-primary);
     position: relative;
+    margin-top: var(--spacing-xs);
 }
 
 .tab-content {

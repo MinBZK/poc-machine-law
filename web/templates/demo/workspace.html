@@ -72,7 +72,7 @@
                 <button class="law-tabs-clear-all"
                         @click="closeAllLawTabs()"
                         x-show="openedLawTabs.length > 1"
-                        title="Close all law tabs">Clear All</button>
+                        title="Alle wetten-tabs sluiten">Alles wissen</button>
             </div>
             <!-- Tab Content Container -->
             <div class="tab-content-wrapper">
@@ -201,7 +201,7 @@
 
         async function runScenario(scenarioIndex) {
             const outputContent = document.getElementById('output-content');
-            outputContent.innerHTML = '<div class="output-running">Running scenario...</div>';
+            outputContent.innerHTML = '<div class="output-running">Scenario wordt uitgevoerd...</div>';
 
             try {
                 const response = await fetch('/demo/feature/run-scenario', {
@@ -329,7 +329,7 @@
 
         async function runAllScenarios() {
             const outputContent = document.getElementById('output-content');
-            outputContent.innerHTML = '<div class="output-running">Running all scenarios...</div>';
+            outputContent.innerHTML = '<div class="output-running">Alle scenario\'s worden uitgevoerd...</div>';
 
             try {
                 const response = await fetch('/demo/run-feature', {
@@ -354,7 +354,7 @@
 
         function clearOutput() {
             document.getElementById('output-content').innerHTML =
-                '<div class="output-placeholder">Run a scenario to see output here...</div>';
+                '<div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>';
             document.getElementById('scenario-status').textContent = '';
             if (pollInterval) {
                 clearInterval(pollInterval);
