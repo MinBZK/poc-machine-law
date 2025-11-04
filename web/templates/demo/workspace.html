@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>RegelRecht Demo Mode - Workspace</title>
         <link rel="stylesheet" href="/static/css/demo.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script defer
                 src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
         <style>
@@ -47,13 +48,10 @@
                      @click="switchTab('zaaksysteem')">
                     <span class="tab-label">Zaaksysteem</span>
                 </div>
-                <!-- Fullscreen Toggle Button -->
-                <button class="fullscreen-toggle"
-                        @click="toggleFullscreen()"
-                        :title="isFullscreen ? 'Volledig scherm verlaten (ESC)' : 'Volledig scherm'">
-                    <span x-show="!isFullscreen">⛶</span>
-                    <span x-show="isFullscreen">⤓</span>
-                </button>
+                <!-- Hamburger Menu Button -->
+                <div class="demo-menu">
+                    <button class="menu-toggle" @click.stop="menuOpen = !menuOpen" title="Menu">⋮</button>
+                </div>
             </div>
             <!-- Second Row: Law Tabs (only visible when activeTab === 'laws') -->
             <div class="law-tab-bar"
@@ -74,7 +72,7 @@
                 <button class="law-tabs-clear-all"
                         @click="closeAllLawTabs()"
                         x-show="openedLawTabs.length > 1"
-                        title="Close all law tabs">Clear All</button>
+                        title="Alle wetten-tabs sluiten">Alles wissen</button>
             </div>
             <!-- Tab Content Container -->
             <div class="tab-content-wrapper">
@@ -126,6 +124,44 @@
                             title="Simulatie"></iframe>
                 </div>
             </div>
+            <!-- Menu Overlay (shown when menu is open) -->
+            <div x-show="menuOpen"
+                 x-cloak
+                 @click="menuOpen = false"
+                 class="menu-overlay"></div>
+            <!-- Menu Dropdown (fixed position, over iframes) -->
+            <div x-show="menuOpen"
+                 x-cloak
+                 @click.away="menuOpen = false"
+                 class="menu-dropdown-fixed">
+                <!-- Fullscreen Toggle -->
+                <button @click="toggleFullscreen(); menuOpen = false" class="menu-item">
+                    <span x-show="!isFullscreen">⛶ Volledig scherm</span>
+                    <span x-show="isFullscreen">⤓ Volledig scherm verlaten</span>
+                </button>
+                <!-- Dark Mode Toggle -->
+                <button @click="toggleTheme(); menuOpen = false" class="menu-item">
+                    <span x-show="theme === 'light'">🌙 Donkere modus</span>
+                    <span x-show="theme === 'dark'">☀️ Lichte modus</span>
+                </button>
+                <!-- Reset State -->
+                <form hx-post="/admin/reset"
+                      hx-trigger="submit"
+                      hx-on::after-request="var btn = event.target.querySelector('button'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.reload(), 7000)"
+                      class="menu-item-form">
+                    <button type="submit" class="menu-item menu-item-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="menu-item-icon"
+                             viewBox="0 0 24 24">
+                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
+                            <path d="M20 4v5h-5" />
+                            </g>
+                        </svg>
+                        Reset state
+                    </button>
+                </form>
+            </div>
         </div>
         <!-- JavaScript -->
         <script src="/static/js/demo.js"></script>
@@ -165,7 +201,7 @@
 
         async function runScenario(scenarioIndex) {
             const outputContent = document.getElementById('output-content');
-            outputContent.innerHTML = '<div class="output-running">Running scenario...</div>';
+            outputContent.innerHTML = '<div class="output-running">Scenario wordt uitgevoerd...</div>';
 
             try {
                 const response = await fetch('/demo/feature/run-scenario', {
@@ -267,19 +303,19 @@
                 // Update status
                 const statusEl = document.getElementById('scenario-status');
                 if (data.status === 'completed') {
-                    statusEl.textContent = '✅ Passed';
+                    statusEl.textContent = '✅ Geslaagd';
                     statusEl.className = 'scenario-status passed';
                     clearInterval(pollInterval);
                     // Scroll to top when test completes
                     outputContent.scrollTop = 0;
                 } else if (data.status === 'failed') {
-                    statusEl.textContent = '❌ Failed';
+                    statusEl.textContent = '❌ Mislukt';
                     statusEl.className = 'scenario-status failed';
                     clearInterval(pollInterval);
                     // Scroll to top when test completes
                     outputContent.scrollTop = 0;
                 } else {
-                    statusEl.textContent = '⏳ Running...';
+                    statusEl.textContent = '⏳ Bezig...';
                     statusEl.className = 'scenario-status running';
                     // Auto-scroll to bottom while running
                     outputContent.scrollTop = outputContent.scrollHeight;
@@ -293,7 +329,7 @@
 
         async function runAllScenarios() {
             const outputContent = document.getElementById('output-content');
-            outputContent.innerHTML = '<div class="output-running">Running all scenarios...</div>';
+            outputContent.innerHTML = '<div class="output-running">Alle scenario\'s worden uitgevoerd...</div>';
 
             try {
                 const response = await fetch('/demo/run-feature', {
@@ -318,7 +354,7 @@
 
         function clearOutput() {
             document.getElementById('output-content').innerHTML =
-                '<div class="output-placeholder">Run a scenario to see output here...</div>';
+                '<div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>';
             document.getElementById('scenario-status').textContent = '';
             if (pollInterval) {
                 clearInterval(pollInterval);
@@ -334,12 +370,17 @@
                 lawsLoaded: false,
                 featuresLoaded: false,
                 isFullscreen: false,
+                menuOpen: false,          // Hamburger menu state
+                theme: localStorage.getItem('theme') || 'light',  // Theme: 'light' or 'dark'
                 openedLawTabs: [],        // Array of {path: string, name: string, id: string}
                 activeLawTabId: null,     // Currently active law tab ID
                 nextLawTabId: 1,          // Auto-incrementing ID for law tabs
                 maxLawTabs: 10,           // Maximum number of law tabs
 
                 init() {
+                    // Initialize theme
+                    document.documentElement.setAttribute('data-theme', this.theme);
+
                     // Load law tabs from localStorage
                     const savedLawTabs = localStorage.getItem('openedLawTabs');
                     if (savedLawTabs) {
@@ -422,6 +463,21 @@
                             }
                         }
                     });
+
+                    // Listen for postMessage from iframes when Ctrl-R is pressed inside them
+                    window.addEventListener('message', (e) => {
+                        if (e.origin === window.location.origin && e.data.type === 'refresh-iframe') {
+                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'];
+
+                            if (iframeTabs.includes(this.activeTab)) {
+                                const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${this.activeTab}'"] iframe`);
+                                if (iframe) {
+                                    iframe.src = iframe.src; // Reload iframe
+                                    console.log(`Refreshed iframe from inside: ${this.activeTab}`);
+                                }
+                            }
+                        }
+                    });
                 },
 
                 toggleFullscreen() {
@@ -447,6 +503,14 @@
                         }
                         this.isFullscreen = false;
                     }
+                },
+
+                toggleTheme() {
+                    // Toggle between light and dark mode
+                    this.theme = this.theme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', this.theme);
+                    localStorage.setItem('theme', this.theme);
+                    console.log('Theme switched to:', this.theme);
                 },
 
                 switchTab(tab) {
@@ -781,7 +845,7 @@
                             const lawPath = href.replace('/demo/law/', '');
 
                             // Extract name from link text or use path
-                            const lawName = link.textContent.replace('→ Go to ', '').trim() || lawPath;
+                            const lawName = link.textContent.replace('→ Ga naar ', '').trim() || lawPath;
 
                             // Open in new law tab (without service/law metadata for cross-refs)
                             this.openLawTab(lawPath, lawName, '', '');
