@@ -170,15 +170,15 @@ async function pollForOutput() {
         // Update status
         const statusEl = document.getElementById('scenario-status');
         if (data.status === 'completed') {
-            statusEl.textContent = '✅ Passed';
+            statusEl.textContent = '✅ Geslaagd';
             statusEl.className = 'scenario-status passed';
             clearInterval(pollInterval);
         } else if (data.status === 'failed') {
-            statusEl.textContent = '❌ Failed';
+            statusEl.textContent = '❌ Mislukt';
             statusEl.className = 'scenario-status failed';
             clearInterval(pollInterval);
         } else {
-            statusEl.textContent = '⏳ Running...';
+            statusEl.textContent = '⏳ Bezig...';
             statusEl.className = 'scenario-status running';
         }
 

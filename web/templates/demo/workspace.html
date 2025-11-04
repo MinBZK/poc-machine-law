@@ -303,19 +303,19 @@
                 // Update status
                 const statusEl = document.getElementById('scenario-status');
                 if (data.status === 'completed') {
-                    statusEl.textContent = '✅ Passed';
+                    statusEl.textContent = '✅ Geslaagd';
                     statusEl.className = 'scenario-status passed';
                     clearInterval(pollInterval);
                     // Scroll to top when test completes
                     outputContent.scrollTop = 0;
                 } else if (data.status === 'failed') {
-                    statusEl.textContent = '❌ Failed';
+                    statusEl.textContent = '❌ Mislukt';
                     statusEl.className = 'scenario-status failed';
                     clearInterval(pollInterval);
                     // Scroll to top when test completes
                     outputContent.scrollTop = 0;
                 } else {
-                    statusEl.textContent = '⏳ Running...';
+                    statusEl.textContent = '⏳ Bezig...';
                     statusEl.className = 'scenario-status running';
                     // Auto-scroll to bottom while running
                     outputContent.scrollTop = outputContent.scrollHeight;
