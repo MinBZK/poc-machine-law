@@ -471,7 +471,6 @@ body {
 
 .yaml-section {
     margin-left: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
 }
 
 .yaml-key-line {
@@ -551,6 +550,7 @@ body {
 .yaml-array-item.yaml-section {
     display: block;
     margin-left: 0;
+    margin-bottom: var(--spacing-md);
 }
 
 .yaml-array-item.yaml-section .yaml-key-line {
