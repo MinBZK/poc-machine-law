@@ -1,5 +1,5 @@
 # Build stage
-FROM digilabpublic.azurecr.io/golang:1.24.4-alpine3.22 AS builder
+FROM digilabpublic.azurecr.io/golang:1.25.3-alpine3.22 AS builder
 
 # Set working directory
 WORKDIR /build

@@ -1,6 +1,6 @@
 module github.com/minbzk/poc-machine-law/simulator
 
-go 1.24.1
+go 1.25.3
 
 require (
 	github.com/gammazero/workerpool v1.1.3

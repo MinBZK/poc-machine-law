@@ -1,4 +1,4 @@
-FROM digilabpublic.azurecr.io/golang:1.24.4-alpine3.22 AS builder
+FROM digilabpublic.azurecr.io/golang:1.25.3-alpine3.22 AS builder
 
 # Cache dependencies
 RUN go install github.com/githubnemo/CompileDaemon@latest

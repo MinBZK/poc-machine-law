@@ -1,6 +1,6 @@
 module github.com/minbzk/poc-machine-law/lac-to-regelspraak
 
-go 1.24.1
+go 1.25.3
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
