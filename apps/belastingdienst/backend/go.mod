@@ -1,6 +1,6 @@
 module github.com/minbzk/poc-machine-law/apps/belastingdienst/backend
 
-go 1.24.4
+go 1.25.3
 
 require (
 	github.com/go-chi/chi/v5 v5.2.2
