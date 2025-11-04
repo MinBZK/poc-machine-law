@@ -240,7 +240,7 @@ profiles:
           age: 36
           has_dutch_nationality: true
           has_partner: true
-          residence_address: Glitterstraat 1, 1103SK Amsterdam
+          residence_address: Glitterstraat 301, 1103SK Amsterdam
           has_fixed_address: true
           household_size: 4
         relaties:
@@ -2501,7 +2501,7 @@ profiles:
           age: 38
           has_dutch_nationality: true
           has_partner: true
-          residence_address: Glitterstraat 1, 1103SK Amsterdam
+          residence_address: Glitterstraat 301, 1103SK Amsterdam
           has_fixed_address: true
           household_size: 4
         relaties:
@@ -2595,7 +2595,7 @@ profiles:
           age: 5
           has_dutch_nationality: true
           has_partner: false
-          residence_address: Glitterstraat 1, 1103SK Amsterdam
+          residence_address: Glitterstraat 301, 1103SK Amsterdam
           has_fixed_address: true
           household_size: 4
         relaties:
@@ -2635,7 +2635,7 @@ profiles:
           age: 3
           has_dutch_nationality: true
           has_partner: false
-          residence_address: Glitterstraat 1, 1103SK Amsterdam
+          residence_address: Glitterstraat 301, 1103SK Amsterdam
           has_fixed_address: true
           household_size: 4
         relaties:
