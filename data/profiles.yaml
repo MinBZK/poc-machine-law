@@ -224,8 +224,8 @@ profiles:
         - bsn: '100000001'
           verblijfsvergunning_type: null
   '999991905':
-    name: Linda Vieltlep
-    description: Moeder van twee jonge kinderen, werkt parttime
+    name: Linda Strijps
+    description: Moeder van twee jonge kinderen, werkt parttime, met NL Wallet
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -251,10 +251,10 @@ profiles:
           kinderen:
           - bsn: '999991723'
             geboortedatum: '2020-06-10'
-            naam: Kind 1
+            naam: Kind 1 Strijps
           - bsn: '999992740'
             geboortedatum: '2022-08-15'
-            naam: Kind 2
+            naam: Kind 2 Strijps
         verblijfplaats:
         - bsn: '999991905'
           straat: Glitterstraat
@@ -263,12 +263,12 @@ profiles:
           woonplaats: Amsterdam
           type: WOONADRES
         CHILDREN_DATA:
-        - kind_bsn: '999991723'
-          geboortedatum: '2020-06-10'
-          naam: Kind 1
-        - kind_bsn: '999992740'
-          geboortedatum: '2022-08-15'
-          naam: Kind 2
+        - bsn: '999991905'
+          kinderen:
+          - kind_bsn: '999991723'
+            geboortedatum: '2020-06-10'
+          - kind_bsn: '999992740'
+            geboortedatum: '2022-08-15'
       UWV:
         dienstverbanden:
         - bsn: '999991905'
@@ -317,6 +317,798 @@ profiles:
         partner_assets:
         - bsn: '999991905'
           bedrag: 3000000
+  '900253010':
+    name: Bertje von Deutekom
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900253010'
+          geboortedatum: '1965-04-12'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 60
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Pluim-es 31, 2925CL Utrecht
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900253010'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900253010'
+          straat: Pluim-es
+          huisnummer: '31'
+          postcode: 2925CL
+          woonplaats: Utrecht
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900253010'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900253010'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900253010'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900253010'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900253010'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900253010'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900253010'
+          bedrag: 166700
+        assets:
+        - bsn: '900253010'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900253010'
+          bedrag: 0
+  '900253022':
+    name: Willem Waarde
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900253022'
+          geboortedatum: '1975-07-21'
+          verblijfsadres: Nijmegen
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 50
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Plataan 39, 8862DD Nijmegen
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900253022'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900253022'
+          straat: Plataan
+          huisnummer: '39'
+          postcode: 8862DD
+          woonplaats: Nijmegen
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900253022'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900253022'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900253022'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900253022'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900253022'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900253022'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900253022'
+          bedrag: 166700
+        assets:
+        - bsn: '900253022'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900253022'
+          bedrag: 0
+  '900253034':
+    name: Marcello de Goede
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900253034'
+          geboortedatum: '1985-09-13'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 40
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Plataan 39, 2925CL Utrecht
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900253034'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900253034'
+          straat: Plataan
+          huisnummer: '39'
+          postcode: 2925CL
+          woonplaats: Utrecht
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900253034'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900253034'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900253034'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900253034'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900253034'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900253034'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900253034'
+          bedrag: 166700
+        assets:
+        - bsn: '900253034'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900253034'
+          bedrag: 0
+  '900253046':
+    name: Caroline van der Oever
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900253046'
+          geboortedatum: '1995-09-27'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 30
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Evenaar 9, 2561EG Rotterdam
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900253046'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900253046'
+          straat: Evenaar
+          huisnummer: '9'
+          postcode: 2561EG
+          woonplaats: Rotterdam
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900253046'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900253046'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900253046'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900253046'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900253046'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900253046'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900253046'
+          bedrag: 166700
+        assets:
+        - bsn: '900253046'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900253046'
+          bedrag: 0
+  '900253058':
+    name: Suzanne Wesseling
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900253058'
+          geboortedatum: '1995-10-02'
+          verblijfsadres: Den Haag
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 30
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Zonnebloem 140, 3067DA Den Haag
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900253058'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900253058'
+          straat: Zonnebloem
+          huisnummer: '140'
+          postcode: 3067DA
+          woonplaats: Den Haag
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900253058'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900253058'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900253058'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900253058'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900253058'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900253058'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900253058'
+          bedrag: 166700
+        assets:
+        - bsn: '900253058'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900253058'
+          bedrag: 0
+  '900265425':
+    name: Widolf van der Moes
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900265425'
+          geboortedatum: '2000-10-04'
+          verblijfsadres: Toetsoog
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 25
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Colensostraat 61, 2596TW Toetsoog
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900265425'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900265425'
+          straat: Colensostraat
+          huisnummer: '61'
+          postcode: 2596TW
+          woonplaats: Toetsoog
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900265425'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900265425'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900265425'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900265425'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900265425'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900265425'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900265425'
+          bedrag: 166700
+        assets:
+        - bsn: '900265425'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900265425'
+          bedrag: 0
+  '900265437':
+    name: Koos over 't Wiel
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900265437'
+          geboortedatum: '2000-10-04'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 25
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Zonegge 555, 3061CL Rotterdam
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900265437'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900265437'
+          straat: Zonegge
+          huisnummer: '555'
+          postcode: 3061CL
+          woonplaats: Rotterdam
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900265437'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900265437'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900265437'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900265437'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900265437'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900265437'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900265437'
+          bedrag: 166700
+        assets:
+        - bsn: '900265437'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900265437'
+          bedrag: 0
+  '900265449':
+    name: Circe Żywiałowska
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900265449'
+          geboortedatum: '2000-10-15'
+          verblijfsadres: Amsterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 25
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Stadhoudersweg 10, 1079WZ Amsterdam
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900265449'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900265449'
+          straat: Stadhoudersweg
+          huisnummer: '10'
+          postcode: 1079WZ
+          woonplaats: Amsterdam
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900265449'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900265449'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900265449'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900265449'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900265449'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900265449'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900265449'
+          bedrag: 166700
+        assets:
+        - bsn: '900265449'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900265449'
+          bedrag: 0
+  '900265450':
+    name: Christine du Leclercq
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900265450'
+          geboortedatum: '2000-10-21'
+          verblijfsadres: Voorschoten
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 25
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Jasmijn 4, 2252EB Voorschoten
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900265450'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900265450'
+          straat: Jasmijn
+          huisnummer: '4'
+          postcode: 2252EB
+          woonplaats: Voorschoten
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900265450'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900265450'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900265450'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900265450'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900265450'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900265450'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900265450'
+          bedrag: 166700
+        assets:
+        - bsn: '900265450'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900265450'
+          bedrag: 0
+  '900265462':
+    name: Lennert uijt de Fruitplukker
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '900265462'
+          geboortedatum: '2000-10-28'
+          verblijfsadres: Hellevoetsluis
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 25
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Lavendelweg 75, 3224TT Hellevoetsluis
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '900265462'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '900265462'
+          straat: Lavendelweg
+          huisnummer: '75'
+          postcode: 3224TT
+          woonplaats: Hellevoetsluis
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '900265462'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '900265462'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '900265462'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '900265462'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '900265462'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '900265462'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '900265462'
+          bedrag: 166700
+        assets:
+        - bsn: '900265462'
+          bedrag: 1000000
+        business_income:
+        - bsn: '900265462'
+          bedrag: 0
+  '999991772':
+    name: Frouke Jansen
+    description: Persoon met NL Wallet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '999991772'
+          geboortedatum: '2000-03-24'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 25
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Groenewoudsedijk 51, 3528BG Utrecht
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '999991772'
+          has_partner: false
+        verblijfplaats:
+        - bsn: '999991772'
+          straat: Groenewoudsedijk
+          huisnummer: '51'
+          postcode: 3528BG
+          woonplaats: Utrecht
+          type: WOONADRES
+      UWV:
+        dienstverbanden:
+        - bsn: '999991772'
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+          uren_per_week: 24
+          worked_hours: 1248
+      BELASTINGDIENST:
+        box1:
+        - bsn: '999991772'
+          loon_uit_dienstbetrekking: 2000000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '999991772'
+          dividend: 0
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '999991772'
+          spaargeld: 1000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '999991772'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '999991772'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '999991772'
+          bedrag: 166700
+        assets:
+        - bsn: '999991772'
+          bedrag: 1000000
+        business_income:
+        - bsn: '999991772'
+          bedrag: 0
   '100000002':
     name: Maria Rodriguez
     description: Alleenstaande moeder, parttime werkend in de horeca met onregelmatige
@@ -1720,10 +2512,10 @@ profiles:
           kinderen:
           - bsn: '999991723'
             geboortedatum: '2020-06-10'
-            naam: Kind 1
+            naam: Kind 1 Strijps
           - bsn: '999992740'
             geboortedatum: '2022-08-15'
-            naam: Kind 2
+            naam: Kind 2 Strijps
         verblijfplaats:
         - bsn: '999993872'
           straat: Glitterstraat
@@ -1732,12 +2524,12 @@ profiles:
           woonplaats: Amsterdam
           type: WOONADRES
         CHILDREN_DATA:
-        - kind_bsn: '999991723'
-          geboortedatum: '2020-06-10'
-          naam: Kind 1
-        - kind_bsn: '999992740'
-          geboortedatum: '2022-08-15'
-          naam: Kind 2
+        - bsn: '999993872'
+          kinderen:
+          - kind_bsn: '999991723'
+            geboortedatum: '2020-06-10'
+          - kind_bsn: '999992740'
+            geboortedatum: '2022-08-15'
       UWV:
         dienstverbanden:
         - bsn: '999993872'
@@ -1787,8 +2579,8 @@ profiles:
         - bsn: '999993872'
           bedrag: 1000000
   '999991723':
-    name: Kind 1 Vieltlep
-    description: Kind van Linda Vieltlep en Peter-Jan van der Meijden
+    name: Kind 1 Strijps
+    description: Kind van Linda Strijps en Peter-Jan van der Meijden
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1800,7 +2592,7 @@ profiles:
           verblijfsadres: Amsterdam
           land_verblijf: NEDERLAND
           nationaliteit: NEDERLANDS
-          age: 4
+          age: 5
           has_dutch_nationality: true
           has_partner: false
           residence_address: Glitterstraat 1, 1103SK Amsterdam
@@ -1827,8 +2619,8 @@ profiles:
           bedrag: 0
           land: GEEN
   '999992740':
-    name: Kind 2 Vieltlep
-    description: Kind van Linda Vieltlep en Peter-Jan van der Meijden
+    name: Kind 2 Strijps
+    description: Kind van Linda Strijps en Peter-Jan van der Meijden
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1840,7 +2632,7 @@ profiles:
           verblijfsadres: Amsterdam
           land_verblijf: NEDERLAND
           nationaliteit: NEDERLANDS
-          age: 2
+          age: 3
           has_dutch_nationality: true
           has_partner: false
           residence_address: Glitterstraat 1, 1103SK Amsterdam
