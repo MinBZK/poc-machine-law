@@ -47,6 +47,33 @@
     --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
+/* Dark Mode */
+:root[data-theme="dark"] {
+    /* Color palette - Dark mode */
+    --primary-color: #3b82f6;
+    --primary-hover: #60a5fa;
+    --secondary-color: #94a3b8;
+    --success-color: #4ade80;
+    --error-color: #f87171;
+    --warning-color: #fbbf24;
+
+    /* Neutral colors - Dark mode */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --border-color: #475569;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+
+    /* Code colors - Dark mode */
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+    --yaml-key: #38bdf8;
+    --yaml-value: #a78bfa;
+    --yaml-string: #4ade80;
+}
+
 body {
     font-family: var(--font-sans);
     color: var(--text-primary);
@@ -1518,6 +1545,7 @@ body {
     cursor: pointer;
     font-size: 1rem;
     line-height: 1;
+    color: var(--text-primary);
     transition: all 0.2s;
     z-index: 10;
 }
@@ -1555,6 +1583,7 @@ body {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 1rem;
+    color: var(--text-primary);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
     transition: all 0.2s;
