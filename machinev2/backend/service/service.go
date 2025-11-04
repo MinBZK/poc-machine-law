@@ -4,27 +4,36 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/config"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager/manager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/ace"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	machine "github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
+	"github.com/sirupsen/logrus"
 )
 
 var _ Servicer = &Service{}
 
 type Service struct {
-	logger   *slog.Logger
-	cfg      *config.Config
-	service  *machine.Services
-	profiles map[string]model.Profile
-	input    model.Input
+	logger       *slog.Logger
+	cfg          *config.Config
+	service      *machine.Services
+	claimManager claimmanager.ClaimManager
+	casemanager  casemanager.CaseManager
+	profiles     map[string]model.Profile
+	input        model.Input
 }
 
-func New(logger *slog.Logger, cfg *config.Config) (*Service, error) {
+func New(logr *slog.Logger, cfg *config.Config) (*Service, error) {
 	options := []machine.Option{
 		machine.WithOrganizationName(cfg.Organization),
 	}
@@ -42,19 +51,29 @@ func New(logger *slog.Logger, cfg *config.Config) (*Service, error) {
 	}
 
 	if cfg.ExternalClaimResolverEndpoint != "" {
-		options = append(options, machine.WithExternalClaimResolverEndpoint(cfg.ExternalClaimResolverEndpoint))
+		options = append(options, machine.WithExternalClaimResolverUBB(cfg.ExternalClaimResolverEndpoint))
 	}
 
-	services, err := machine.NewServices(time.Now(), options...)
+	logr2 := logger.New("service", os.Stdout, logrus.DebugLevel)
+
+	caseManager := manager.New(logr2)
+	// claimManager := inmemory.New(logr2, caseManager)
+	claimManager := ace.New(cfg.ExternalClaimResolverEndpoint, logr2)
+
+	services, err := machine.New(logr2, time.Now(), caseManager, claimManager, options...)
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
 
+	caseManager.SetService(services)
+
 	return &Service{
-		logger:   logger,
-		cfg:      cfg,
-		service:  services,
-		profiles: make(map[string]model.Profile),
+		logger:       logr,
+		cfg:          cfg,
+		service:      services,
+		claimManager: claimManager,
+		casemanager:  caseManager,
+		profiles:     make(map[string]model.Profile),
 	}, nil
 }
 

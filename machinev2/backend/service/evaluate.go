@@ -20,7 +20,7 @@ func (service *Service) Evaluate(ctx context.Context, evaluate model.Evaluate) (
 		date = evaluate.Date.Format("2006-01-02")
 	}
 
-	var input map[string]map[string]any
+	var input map[string]any
 	if evaluate.Input != nil {
 		input = *evaluate.Input
 	}

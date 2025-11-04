@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/engine"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
@@ -17,6 +19,8 @@ type RuleService struct {
 	logger           logger.Logger
 	ServiceName      string
 	Services         service.ServiceProvider
+	CaseManager      casemanager.CaseManager
+	ClaimManager     claimmanager.ClaimManager
 	Resolver         *ruleresolver.RuleResolver
 	engines          map[string]map[string]*engine.RulesEngine
 	SourceDataFrames model.SourceDataFrame
@@ -24,7 +28,7 @@ type RuleService struct {
 }
 
 // New creates a new rule service instance
-func New(logger logger.Logger, serviceName string, services service.ServiceProvider) (*RuleService, error) {
+func New(logger logger.Logger, serviceName string, services service.ServiceProvider, caseManager casemanager.CaseManager, claimManager claimmanager.ClaimManager) (*RuleService, error) {
 	logger.Warningf("creating inmemory ruleservice: %s", serviceName)
 
 	resolver, err := ruleresolver.New()
@@ -36,6 +40,8 @@ func New(logger logger.Logger, serviceName string, services service.ServiceProvi
 		logger:           logger.WithName("service"),
 		ServiceName:      serviceName,
 		Services:         services,
+		CaseManager:      caseManager,
+		ClaimManager:     claimManager,
 		Resolver:         resolver,
 		engines:          make(map[string]map[string]*engine.RulesEngine),
 		SourceDataFrames: NewSourceDataFrame(),
@@ -66,7 +72,7 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 		return nil, fmt.Errorf("rule spec service '%s' does not match service '%s'", spec.Service, rs.ServiceName)
 	}
 
-	ruleEngine := engine.NewRulesEngine(spec, rs.Services, referenceDate)
+	ruleEngine := engine.NewRulesEngine(spec, rs.Services, rs.CaseManager, rs.ClaimManager, referenceDate)
 	rs.engines[law][referenceDate] = ruleEngine
 
 	return ruleEngine, nil
@@ -83,7 +89,7 @@ func (rs *RuleService) Evaluate(
 	law string,
 	referenceDate string,
 	parameters map[string]any,
-	overwriteInput map[string]map[string]any,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {

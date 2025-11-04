@@ -11,17 +11,18 @@ import (
 // ServiceProvider interface defines what a service provider needs to implement
 type ServiceProvider interface {
 	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate string,
-		overwriteInput map[string]map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
+		overwriteInput map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
+	ApplyRules(ctx context.Context, event model.Event) error
 	GetRuleResolver() *ruleresolver.RuleResolver
 	GetServiceResolver() *serviceresolver.ServiceResolver
-	GetCaseManager() CaseManagerAccessor
-	GetClaimManager() ClaimManagerAccessor
 	RuleServicesInMemory() bool
 	HasOrganizationName() bool
 	GetOrganizationName() string
 	InStandAloneMode() bool
-	HasExternalClaimResolverEndpoint() bool
-	GetExternalClaimResolverEndpoint() string
+	HasExternalClaimResolver() bool
+	GetExternalClaimResolver() string
+	GetExternalClaimResolverDefaultEndpoint() string
+	GetExternalClaimResolverUBBEndpoint() string
 }
 
 // CaseManagerAccessor interface for accessing case manager events

@@ -9,7 +9,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 )
 
 type defaultResolver struct {
@@ -29,6 +29,7 @@ func (c defaultResolver) do(ctx context.Context, key string, table string, field
 	logr := logger.FromContext(ctx).WithName("resolver")
 	logr = logr.WithField("resolver", "external_claim").
 		WithField("resolver_type", "default").
+		WithField("key", key).
 		WithField("table", table).
 		WithField("field", field).
 		WithField("filters", filters)

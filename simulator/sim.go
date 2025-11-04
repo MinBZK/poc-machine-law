@@ -14,14 +14,20 @@ import (
 
 	"github.com/gammazero/workerpool"
 	"github.com/schollz/progressbar/v3"
+	"github.com/sirupsen/logrus"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager/manager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/inmemory"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 )
 
 type Res struct {
-	persons  []Person
-	services *serviceprovider.Services
+	persons     []Person
+	services    *serviceprovider.Services
+	caseManager casemanager.CaseManager
 }
 
 // Person represents an individual in the simulation
@@ -180,12 +186,18 @@ func (ls *LawSimulator) GeneratePairedPeople(numPeople int, people chan []Person
 
 // SetupTestData prepares all the data sources for simulation
 func (ls *LawSimulator) SetupTestData(ctx context.Context, date time.Time, people <-chan []Person, data chan<- Res) error {
+	logger := logger.New("main", os.Stdout, logrus.DebugLevel)
 
 	for persons := range people {
-		services, err := serviceprovider.NewServices(date, serviceprovider.WithRuleServiceInMemory())
+		caseManager := manager.New(logger)
+		claimManager := inmemory.New(logger, caseManager)
+
+		services, err := serviceprovider.New(logger, date, caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
 		if err != nil {
 			return fmt.Errorf("new services: %w", err)
 		}
+
+		caseManager.SetService(services)
 
 		services.SetSourceDataFrame(ctx, "CBS", "levensverwachting", dataframe.New([]map[string]any{
 			{
@@ -312,8 +324,9 @@ func (ls *LawSimulator) SetupTestData(ctx context.Context, date time.Time, peopl
 		}
 
 		data <- Res{
-			persons:  persons,
-			services: services,
+			persons:     persons,
+			services:    services,
+			caseManager: caseManager,
 		}
 	}
 
@@ -402,7 +415,7 @@ func (ls *LawSimulator) SimulatePerson(res Res) error {
 		ls.mutex.Unlock()
 	}
 
-	res.services.CaseManager.Close()
+	res.caseManager.Close()
 
 	return nil
 }

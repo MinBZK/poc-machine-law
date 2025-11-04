@@ -19,16 +19,17 @@ from .machine_client.law_as_code_client.models import (
     DataFrame,
     Evaluate,
     EvaluateBody,
+    EvaluateInput,
     EvaluateParameters,
     Profile,
     ProfileSources,
     SetSourceDataFrameBody,
 )
 from .machine_client.law_as_code_client.models import (
-    EvaluateResponseSchema as ApiRuleResult,
+    PathNode as ApiPathNode,
 )
 from .machine_client.law_as_code_client.models import (
-    PathNode as ApiPathNode,
+    ResponseEvaluateSchema as ApiRuleResult,
 )
 from .machine_client.law_as_code_client.types import UNSET
 
@@ -127,7 +128,7 @@ class MachineService(EngineInterface):
             data.date = datetime.strptime(reference_date, "%Y-%m-%d").date()
 
         if overwrite_input:
-            data.input = overwrite_input
+            data.input_ = EvaluateInput.from_dict(overwrite_input)
 
         if requested_output:
             data.output = requested_output

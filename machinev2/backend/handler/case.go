@@ -26,11 +26,11 @@ func (handler *Handler) CaseBasedOnBSNServiceLaw(ctx context.Context, request ap
 
 		return api.CaseBasedOnBSNServiceLaw400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case get based on bsn, service & law: %w", err)),
-		}, nil
+		}, err
 	}
 
 	return api.CaseBasedOnBSNServiceLaw200JSONResponse{
-		CaseResponseJSONResponse: api.CaseResponseJSONResponse{
+		ResponseCaseJSONResponse: api.ResponseCaseJSONResponse{
 			Data: adapter.FromCase(case_),
 		},
 	}, nil
@@ -42,11 +42,11 @@ func (handler *Handler) CaseListBasedOnServiceLaw(ctx context.Context, request a
 	if err != nil {
 		return api.CaseListBasedOnServiceLaw400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case list based on service & law: %w", err)),
-		}, nil
+		}, err
 	}
 
 	return api.CaseListBasedOnServiceLaw200JSONResponse{
-		CaseListResponseJSONResponse: api.CaseListResponseJSONResponse{
+		ResponseCaseListJSONResponse: api.ResponseCaseListJSONResponse{
 			Data: adapter.FromCases(cases),
 		},
 	}, nil
@@ -58,11 +58,11 @@ func (handler *Handler) CaseListBasedOnBSN(ctx context.Context, request api.Case
 	if err != nil {
 		return api.CaseListBasedOnBSN400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case list based on bsn: %w", err)),
-		}, nil
+		}, err
 	}
 
 	return api.CaseListBasedOnBSN200JSONResponse{
-		CaseListResponseJSONResponse: api.CaseListResponseJSONResponse{
+		ResponseCaseListJSONResponse: api.ResponseCaseListJSONResponse{
 			Data: adapter.FromCases(cases),
 		},
 	}, nil
@@ -72,11 +72,11 @@ func (handler *Handler) CaseListBasedOnBSN(ctx context.Context, request api.Case
 func (handler *Handler) CaseSubmit(ctx context.Context, request api.CaseSubmitRequestObject) (api.CaseSubmitResponseObject, error) {
 	caseID, err := handler.servicer.CaseSubmit(ctx, adapter.ToCaseSubmit(request.Body.Data))
 	if err != nil {
-		return api.CaseSubmit400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case submit: %w", err))}, nil
+		return api.CaseSubmit400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case submit: %w", err))}, err
 	}
 
 	return api.CaseSubmit201JSONResponse{
-		CaseSubmitResponseJSONResponse: api.CaseSubmitResponseJSONResponse{
+		ResponseCaseSubmitJSONResponse: api.ResponseCaseSubmitJSONResponse{
 			Data: caseID,
 		},
 	}, nil
@@ -100,7 +100,7 @@ func (handler *Handler) CaseGet(ctx context.Context, request api.CaseGetRequestO
 	}
 
 	return api.CaseGet200JSONResponse{
-		CaseResponseJSONResponse: api.CaseResponseJSONResponse{
+		ResponseCaseJSONResponse: api.ResponseCaseJSONResponse{
 			Data: adapter.FromCase(case_),
 		},
 	}, nil
@@ -123,14 +123,14 @@ func (handler *Handler) CaseReview(ctx context.Context, request api.CaseReviewRe
 						Message: err.Error(),
 					}},
 				},
-			}, nil
+			}, err
 		}
 
 		return api.CaseReview400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case review: %w", err))}, nil
 	}
 
 	return api.CaseReview200JSONResponse{
-		CaseReviewResponseJSONResponse: api.CaseReviewResponseJSONResponse{
+		ResponseCaseReviewJSONResponse: api.ResponseCaseReviewJSONResponse{
 			Data: caseID,
 		},
 	}, nil
@@ -158,7 +158,7 @@ func (handler *Handler) CaseObject(ctx context.Context, request api.CaseObjectRe
 	}
 
 	return api.CaseObject200JSONResponse{
-		CaseObjectResponseJSONResponse: api.CaseObjectResponseJSONResponse{
+		ResponseCaseObjectJSONResponse: api.ResponseCaseObjectJSONResponse{
 			Data: caseID,
 		},
 	}, nil

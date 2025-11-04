@@ -1,4 +1,4 @@
-package serviceprovider
+package manager
 
 import (
 	"context"
@@ -12,8 +12,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
 
 	eh "github.com/looplab/eventhorizon"
 	"github.com/looplab/eventhorizon/commandhandler/bus"
@@ -22,10 +23,10 @@ import (
 	"github.com/looplab/eventhorizon/repo/memory"
 )
 
-// CaseManager manages service cases using the EventHorizon-based casemanager.
-type CaseManager struct {
+// InMemoryCaseManager manages service cases using the EventHorizon-based casemanager.
+type InMemoryCaseManager struct {
 	logger       logger.Logger
-	Services     *Services
+	services     service.ServiceProvider
 	caseIndex    map[string]uuid.UUID // Maps (bsn:service:law) -> case_id
 	SampleRate   float64
 	mu           sync.RWMutex
@@ -39,8 +40,8 @@ type CaseManager struct {
 
 var ErrCaseNotFound = errors.New("case_not_found")
 
-// NewCaseManager creates a new case manager with EventHorizon components.
-func NewCaseManager(logger logger.Logger, services *Services) *CaseManager {
+// New creates a new case manager with EventHorizon components.
+func New(logger logger.Logger) *InMemoryCaseManager {
 	// Create the event buses
 	eventBus := localEventBus.NewEventBus()
 	observerBus := localEventBus.NewEventBus()
@@ -74,9 +75,8 @@ func NewCaseManager(logger logger.Logger, services *Services) *CaseManager {
 	caseRepo := memory.NewRepo()
 	caseRepo.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
 
-	cm := &CaseManager{
+	cm := &InMemoryCaseManager{
 		logger:       logger.WithName("case_manager"),
-		Services:     services,
 		caseIndex:    make(map[string]uuid.UUID),
 		SampleRate:   0.10, // 10% sample rate
 		commandBus:   commandBus,
@@ -96,19 +96,27 @@ func NewCaseManager(logger logger.Logger, services *Services) *CaseManager {
 	return cm
 }
 
+func (cm *InMemoryCaseManager) SetService(services service.ServiceProvider) {
+	cm.services = services
+}
+
+func (cm *InMemoryCaseManager) SetSampleRate(value float64) {
+	cm.SampleRate = value
+}
+
 // indexKey generates a composite key for case indexing
-func (cm *CaseManager) indexKey(bsn, service, law string) string {
+func (cm *InMemoryCaseManager) indexKey(bsn, service, law string) string {
 	return fmt.Sprintf("%s:%s:%s", bsn, service, law)
 }
 
 // indexCase adds a case to the index
-func (cm *CaseManager) indexCase(caseID uuid.UUID, bsn, service, law string) {
+func (cm *InMemoryCaseManager) indexCase(caseID uuid.UUID, bsn, service, law string) {
 	key := cm.indexKey(bsn, service, law)
 	cm.SetCase(caseID, key)
 }
 
 // recordEvent records a new event
-func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[string]any) {
+func (cm *InMemoryCaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[string]any) {
 	event := model.Event{
 		CaseID:    caseID,
 		Timestamp: time.Now(),
@@ -117,10 +125,11 @@ func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[
 	}
 
 	cm.wg.Add(1)
+
 	// Trigger rules in response to event
 	go func() {
 		ctx := context.Background()
-		if err := cm.Services.ApplyRules(ctx, event); err != nil {
+		if err := cm.services.ApplyRules(ctx, event); err != nil {
 			cm.logger.WithIndent().Errorf("Error applying rules: %v", err)
 		}
 
@@ -129,7 +138,7 @@ func (cm *CaseManager) recordEvent(caseID uuid.UUID, eventType string, data map[
 }
 
 // resultsMatch compares claimed and verified results to determine if they match
-func (cm *CaseManager) resultsMatch(claimed, verified map[string]any) bool {
+func (cm *InMemoryCaseManager) resultsMatch(claimed, verified map[string]any) bool {
 	// First check that both maps have the same keys
 	if len(claimed) != len(verified) {
 		return false
@@ -212,7 +221,7 @@ func deepEqual(a, b any) bool {
 	return string(aJson) == string(bJson)
 }
 
-func (cm *CaseManager) SetCase(caseID uuid.UUID, key string) {
+func (cm *InMemoryCaseManager) SetCase(caseID uuid.UUID, key string) {
 	cm.mu.Lock()
 
 	cm.caseIndex[key] = caseID
@@ -221,7 +230,7 @@ func (cm *CaseManager) SetCase(caseID uuid.UUID, key string) {
 
 }
 
-func (cm *CaseManager) GetCaseByKey(key string) (uuid.UUID, bool) {
+func (cm *InMemoryCaseManager) GetCaseByKey(key string) (uuid.UUID, bool) {
 	cm.mu.RLock()
 
 	caseID, exists := cm.caseIndex[key]
@@ -232,7 +241,7 @@ func (cm *CaseManager) GetCaseByKey(key string) (uuid.UUID, bool) {
 }
 
 // SubmitCase submits a new case and automatically processes it
-func (cm *CaseManager) SubmitCase(
+func (cm *InMemoryCaseManager) SubmitCase(
 	ctx context.Context,
 	bsn string,
 	serviceType string,
@@ -243,7 +252,7 @@ func (cm *CaseManager) SubmitCase(
 ) (uuid.UUID, error) {
 
 	// Verify using rules engine
-	result, err := cm.Services.Evaluate(
+	result, err := cm.services.Evaluate(
 		ctx,
 		serviceType,
 		law,
@@ -322,7 +331,7 @@ func (cm *CaseManager) SubmitCase(
 }
 
 // CompleteManualReview completes manual review of a case
-func (cm *CaseManager) CompleteManualReview(
+func (cm *InMemoryCaseManager) CompleteManualReview(
 	ctx context.Context,
 	caseID uuid.UUID,
 	verifierID string,
@@ -361,7 +370,7 @@ func (cm *CaseManager) CompleteManualReview(
 }
 
 // ObjectCase submits an objection for a case
-func (cm *CaseManager) ObjectCase(ctx context.Context, caseID uuid.UUID, reason string) error {
+func (cm *InMemoryCaseManager) ObjectCase(ctx context.Context, caseID uuid.UUID, reason string) error {
 	// Object to the case
 	if err := casemanager.ObjectToCase(ctx, cm.commandBus, caseID, reason); err != nil {
 		return fmt.Errorf("failed to object to case: %w", err)
@@ -371,7 +380,7 @@ func (cm *CaseManager) ObjectCase(ctx context.Context, caseID uuid.UUID, reason 
 }
 
 // DetermineObjectionStatus determines objection status and periods
-func (cm *CaseManager) DetermineObjectionStatus(
+func (cm *InMemoryCaseManager) DetermineObjectionStatus(
 	caseID uuid.UUID,
 	possible *bool,
 	notPossibleReason string,
@@ -405,7 +414,7 @@ func (cm *CaseManager) DetermineObjectionStatus(
 }
 
 // DetermineObjectionAdmissibility determines whether an objection is admissible
-func (cm *CaseManager) DetermineObjectionAdmissibility(caseID uuid.UUID, admissible *bool) error {
+func (cm *InMemoryCaseManager) DetermineObjectionAdmissibility(caseID uuid.UUID, admissible *bool) error {
 	ctx := context.Background()
 
 	// Determine objection admissibility
@@ -417,7 +426,7 @@ func (cm *CaseManager) DetermineObjectionAdmissibility(caseID uuid.UUID, admissi
 }
 
 // DetermineAppealStatus determines appeal status and parameters
-func (cm *CaseManager) DetermineAppealStatus(
+func (cm *InMemoryCaseManager) DetermineAppealStatus(
 	caseID uuid.UUID,
 	possible *bool,
 	notPossibleReason string,
@@ -468,7 +477,7 @@ func (cm *CaseManager) DetermineAppealStatus(
 }
 
 // CanAppeal checks if appeal is possible for a case
-func (cm *CaseManager) CanAppeal(caseID uuid.UUID) (bool, error) {
+func (cm *InMemoryCaseManager) CanAppeal(caseID uuid.UUID) (bool, error) {
 	ctx := context.Background()
 
 	// Find the case
@@ -481,7 +490,7 @@ func (cm *CaseManager) CanAppeal(caseID uuid.UUID) (bool, error) {
 }
 
 // CanObject checks if objection is possible for a case
-func (cm *CaseManager) CanObject(caseID uuid.UUID) (bool, error) {
+func (cm *InMemoryCaseManager) CanObject(caseID uuid.UUID) (bool, error) {
 	ctx := context.Background()
 
 	// Find the case
@@ -494,7 +503,7 @@ func (cm *CaseManager) CanObject(caseID uuid.UUID) (bool, error) {
 }
 
 // GetCase gets a case for a specific bsn, service and law combination
-func (cm *CaseManager) GetCase(ctx context.Context, bsn, serviceType, law string) (*casemanager.Case, error) {
+func (cm *InMemoryCaseManager) GetCase(ctx context.Context, bsn, serviceType, law string) (*casemanager.Case, error) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 
@@ -516,7 +525,7 @@ func (cm *CaseManager) GetCase(ctx context.Context, bsn, serviceType, law string
 }
 
 // GetCaseByID gets a case by ID
-func (cm *CaseManager) GetCaseByID(ctx context.Context, id uuid.UUID) (*casemanager.Case, error) {
+func (cm *InMemoryCaseManager) GetCaseByID(ctx context.Context, id uuid.UUID) (*casemanager.Case, error) {
 	// Find the case in the repository
 	c, err := casemanager.FindCase(ctx, cm.caseRepo, id)
 	if err != nil {
@@ -527,7 +536,7 @@ func (cm *CaseManager) GetCaseByID(ctx context.Context, id uuid.UUID) (*casemana
 }
 
 // GetCasesByStatus gets all cases for a service in a particular status
-func (cm *CaseManager) GetCasesByStatus(serviceType string, status casemanager.CaseStatus) []*casemanager.Case {
+func (cm *InMemoryCaseManager) GetCasesByStatus(serviceType string, status casemanager.CaseStatus) []*casemanager.Case {
 	// This would normally involve a more efficient query to the repository
 	// For now, we'll scan through all cases in the index
 	cm.mu.RLock()
@@ -551,7 +560,7 @@ func (cm *CaseManager) GetCasesByStatus(serviceType string, status casemanager.C
 }
 
 // GetCasesByLaw gets all cases for a specific law and service combination
-func (cm *CaseManager) GetCasesByLaw(ctx context.Context, service, law string) ([]*casemanager.Case, error) {
+func (cm *InMemoryCaseManager) GetCasesByLaw(ctx context.Context, service, law string) ([]*casemanager.Case, error) {
 	// This would normally involve a more efficient query to the repository
 	// For now, we'll scan through all cases in the index
 	cm.mu.RLock()
@@ -572,7 +581,7 @@ func (cm *CaseManager) GetCasesByLaw(ctx context.Context, service, law string) (
 	return result, nil
 }
 
-func (cm *CaseManager) GetCasesByBSN(ctx context.Context, bsn string) ([]*casemanager.Case, error) {
+func (cm *InMemoryCaseManager) GetCasesByBSN(ctx context.Context, bsn string) ([]*casemanager.Case, error) {
 	// This would normally involve a more efficient query to the repository
 	// For now, we'll scan through all cases in the index
 	cm.mu.RLock()
@@ -594,21 +603,21 @@ func (cm *CaseManager) GetCasesByBSN(ctx context.Context, bsn string) ([]*casema
 }
 
 // GetEventsByUUID gets events, optionally filtered by case ID
-func (cm *CaseManager) GetEventsByUUID(caseID uuid.UUID) []model.Event {
+func (cm *InMemoryCaseManager) GetEventsByUUID(caseID uuid.UUID) []model.Event {
 	return cm.eventIndexer.GetEventsByUUID(caseID)
 }
 
 // GetEvents implements the CaseManagerAccessor interface
 // Converts internal event model to map format for use by dataframe
-func (cm *CaseManager) GetEvents(caseID any) []model.Event {
+func (cm *InMemoryCaseManager) GetEvents(caseID any) []model.Event {
 	return cm.eventIndexer.GetEvents(caseID)
 }
 
-func (cm *CaseManager) Wait() {
+func (cm *InMemoryCaseManager) Wait() {
 	cm.wg.Wait()
 }
 
-func (cm *CaseManager) Close() {
+func (cm *InMemoryCaseManager) Close() {
 	cm.wg.Wait()
 	cm.eventBus.Close()
 	cm.observerBus.Close()
