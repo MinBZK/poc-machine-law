@@ -304,7 +304,7 @@ def render_yaml_to_html(data: Any, level: int = 0, key: str = None, parent_path:
                 link_info = v["_link"]
                 html_parts.append(
                     f'    <a href="/demo/law/{html.escape(link_info["target"])}" class="cross-law-link">'
-                    f"→ Go to {html.escape(link_info['display'])}</a>"
+                    f"→ Ga naar {html.escape(link_info['display'])}</a>"
                 )
 
             if not is_collapsible:

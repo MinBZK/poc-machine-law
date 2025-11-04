@@ -845,7 +845,7 @@
                             const lawPath = href.replace('/demo/law/', '');
 
                             // Extract name from link text or use path
-                            const lawName = link.textContent.replace('→ Go to ', '').trim() || lawPath;
+                            const lawName = link.textContent.replace('→ Ga naar ', '').trim() || lawPath;
 
                             // Open in new law tab (without service/law metadata for cross-refs)
                             this.openLawTab(lawPath, lawName, '', '');
