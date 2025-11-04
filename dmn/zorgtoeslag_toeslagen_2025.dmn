@@ -156,7 +156,7 @@
       <formalParameter name="percentage_drempel" typeRef="number"/>
       <formalParameter name="afbouwpercentage" typeRef="number"/>
       <literalExpression>
-        <text>(percentage_drempel * min(inkomen, drempelinkomen)) + (if inkomen > drempelinkomen then afbouwpercentage * (inkomen - drempelinkomen) else 0)</text>
+        <text>if inkomen > drempelinkomen then percentage_drempel * drempelinkomen + afbouwpercentage * (inkomen - drempelinkomen) else percentage_drempel * inkomen</text>
       </literalExpression>
     </encapsulatedLogic>
   </businessKnowledgeModel>
@@ -171,7 +171,7 @@
       <formalParameter name="percentage_drempel" typeRef="number"/>
       <formalParameter name="afbouwpercentage" typeRef="number"/>
       <literalExpression>
-        <text>let gezamenlijk_inkomen = inkomen + partner_inkomen in (percentage_drempel * min(gezamenlijk_inkomen, drempelinkomen)) + (if gezamenlijk_inkomen > drempelinkomen then afbouwpercentage * (gezamenlijk_inkomen - drempelinkomen) else 0)</text>
+        <text>if inkomen + partner_inkomen > drempelinkomen then percentage_drempel * drempelinkomen + afbouwpercentage * (inkomen + partner_inkomen - drempelinkomen) else percentage_drempel * (inkomen + partner_inkomen)</text>
       </literalExpression>
     </encapsulatedLogic>
   </businessKnowledgeModel>
@@ -193,15 +193,187 @@
     </literalExpression>
   </decision>
 
-  <!-- Decision: Hoogte Toeslag -->
-  <decision id="decision_hoogte_toeslag" name="Hoogte Toeslag">
-    <variable name="hoogte_toeslag" typeRef="number"/>
+  <!-- REFACTORED INTERMEDIATE DECISIONS -->
+
+  <!-- Intermediate Decision: Gezamenlijk Inkomen -->
+  <decision id="decision_gezamenlijk_inkomen" name="Gezamenlijk Inkomen">
+    <description>Calculate combined income for partners, or just individual income for singles</description>
+    <variable name="gezamenlijk_inkomen" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_heeft_partner"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_toetsingsinkomen"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_partner_toetsingsinkomen"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>if heeft_partner then toetsingsinkomen + partner_toetsingsinkomen else toetsingsinkomen</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Intermediate Decision: Applicable Drempelinkomen -->
+  <decision id="decision_applicable_drempelinkomen" name="Applicable Drempelinkomen">
+    <description>Determine which income threshold applies based on partner status</description>
+    <variable name="applicable_drempelinkomen" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_heeft_partner"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_constants"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>if heeft_partner then constants().DREMPELINKOMEN_TOESLAGPARTNER else constants().DREMPELINKOMEN_ALLEENSTAANDE</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Intermediate Decision: Applicable Vermogensgrens -->
+  <decision id="decision_applicable_vermogensgrens" name="Applicable Vermogensgrens">
+    <description>Determine which wealth limit applies based on partner status</description>
+    <variable name="applicable_vermogensgrens" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_heeft_partner"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_constants"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>if heeft_partner then constants().VERMOGENSGRENS_TOESLAGPARTNER else constants().VERMOGENSGRENS_ALLEENSTAANDE</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Intermediate Decision: Inkomen Overschreden -->
+  <decision id="decision_inkomen_overschreden" name="Inkomen Overschreden">
+    <description>Check if income exceeds the applicable threshold</description>
+    <variable name="inkomen_overschreden" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_gezamenlijk_inkomen"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_applicable_drempelinkomen"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>gezamenlijk_inkomen > applicable_drempelinkomen</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Intermediate Decision: Vermogen Overschreden -->
+  <decision id="decision_vermogen_overschreden" name="Vermogen Overschreden">
+    <description>Check if wealth exceeds the applicable limit</description>
+    <variable name="vermogen_overschreden" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_vermogen"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_applicable_vermogensgrens"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>vermogen > applicable_vermogensgrens</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision Table: Eligibility Scenario -->
+  <decision id="decision_eligibility_scenario" name="Eligibility Scenario">
+    <description>Determine which eligibility scenario applies based on checks</description>
+    <variable name="eligibility_scenario" typeRef="string"/>
     <informationRequirement>
       <requiredDecision href="#decision_is_verzekerde_zorgtoeslag"/>
     </informationRequirement>
     <informationRequirement>
       <requiredDecision href="#decision_heeft_partner"/>
     </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_inkomen_overschreden"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_vermogen_overschreden"/>
+    </informationRequirement>
+    <decisionTable id="table_eligibility_scenario" hitPolicy="UNIQUE">
+      <input id="input_verzekerd" label="Is Verzekerde">
+        <inputExpression typeRef="boolean">
+          <text>is_verzekerde_zorgtoeslag</text>
+        </inputExpression>
+      </input>
+      <input id="input_inkomen_check" label="Inkomen Overschreden">
+        <inputExpression typeRef="boolean">
+          <text>inkomen_overschreden</text>
+        </inputExpression>
+      </input>
+      <input id="input_vermogen_check" label="Vermogen Overschreden">
+        <inputExpression typeRef="boolean">
+          <text>vermogen_overschreden</text>
+        </inputExpression>
+      </input>
+      <input id="input_partner_check" label="Heeft Partner">
+        <inputExpression typeRef="boolean">
+          <text>heeft_partner</text>
+        </inputExpression>
+      </input>
+      <output id="output_scenario" label="Eligibility Scenario" typeRef="string"/>
+      <rule id="rule_not_eligible">
+        <inputEntry><text>false</text></inputEntry>
+        <inputEntry><text>-</text></inputEntry>
+        <inputEntry><text>-</text></inputEntry>
+        <inputEntry><text>-</text></inputEntry>
+        <outputEntry><text>"not_eligible"</text></outputEntry>
+      </rule>
+      <rule id="rule_income_too_high">
+        <inputEntry><text>true</text></inputEntry>
+        <inputEntry><text>true</text></inputEntry>
+        <inputEntry><text>-</text></inputEntry>
+        <inputEntry><text>-</text></inputEntry>
+        <outputEntry><text>"income_too_high"</text></outputEntry>
+      </rule>
+      <rule id="rule_assets_too_high">
+        <inputEntry><text>true</text></inputEntry>
+        <inputEntry><text>false</text></inputEntry>
+        <inputEntry><text>true</text></inputEntry>
+        <inputEntry><text>-</text></inputEntry>
+        <outputEntry><text>"assets_too_high"</text></outputEntry>
+      </rule>
+      <rule id="rule_eligible_single">
+        <inputEntry><text>true</text></inputEntry>
+        <inputEntry><text>false</text></inputEntry>
+        <inputEntry><text>false</text></inputEntry>
+        <inputEntry><text>false</text></inputEntry>
+        <outputEntry><text>"eligible_single"</text></outputEntry>
+      </rule>
+      <rule id="rule_eligible_partner">
+        <inputEntry><text>true</text></inputEntry>
+        <inputEntry><text>false</text></inputEntry>
+        <inputEntry><text>false</text></inputEntry>
+        <inputEntry><text>true</text></inputEntry>
+        <outputEntry><text>"eligible_partner"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <!-- Decision: Benefit Calculation Single -->
+  <decision id="decision_benefit_calculation_single" name="Benefit Calculation Single">
+    <description>Calculate benefit for single person (alleenstaand)</description>
+    <variable name="benefit_calculation_single" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_standaardpremie"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_toetsingsinkomen"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_constants"/>
+    </knowledgeRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_normpremie_single"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>standaardpremie - normpremie_single(toetsingsinkomen, constants().DREMPELINKOMEN_ALLEENSTAANDE, constants().PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND, constants().AFBOUWPERCENTAGE_MINIMUM)</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision: Benefit Calculation Partner -->
+  <decision id="decision_benefit_calculation_partner" name="Benefit Calculation Partner">
+    <description>Calculate benefit for person with partner (toeslagpartner)</description>
+    <variable name="benefit_calculation_partner" typeRef="number"/>
     <informationRequirement>
       <requiredDecision href="#decision_standaardpremie"/>
     </informationRequirement>
@@ -211,20 +383,65 @@
     <informationRequirement>
       <requiredDecision href="#decision_partner_toetsingsinkomen"/>
     </informationRequirement>
-    <informationRequirement>
-      <requiredDecision href="#decision_vermogen"/>
-    </informationRequirement>
     <knowledgeRequirement>
       <requiredKnowledge href="#bkm_constants"/>
-    </knowledgeRequirement>
-    <knowledgeRequirement>
-      <requiredKnowledge href="#bkm_normpremie_single"/>
     </knowledgeRequirement>
     <knowledgeRequirement>
       <requiredKnowledge href="#bkm_normpremie_partner"/>
     </knowledgeRequirement>
     <literalExpression>
-      <text>if is_verzekerde_zorgtoeslag = false then 0 else if heeft_partner = false then if toetsingsinkomen > constants().DREMPELINKOMEN_ALLEENSTAANDE then 0 else if vermogen > constants().VERMOGENSGRENS_ALLEENSTAANDE then 0 else let normpremie = normpremie_single(toetsingsinkomen, constants().DREMPELINKOMEN_ALLEENSTAANDE, constants().PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND, constants().AFBOUWPERCENTAGE_MINIMUM) in standaardpremie - normpremie else let gezamenlijk_inkomen = toetsingsinkomen + partner_toetsingsinkomen in if gezamenlijk_inkomen > constants().DREMPELINKOMEN_TOESLAGPARTNER then 0 else if vermogen > constants().VERMOGENSGRENS_TOESLAGPARTNER then 0 else let normpremie = normpremie_partner(toetsingsinkomen, partner_toetsingsinkomen, constants().DREMPELINKOMEN_TOESLAGPARTNER, constants().PERCENTAGE_DREMPELINKOMEN_MET_PARTNER, constants().AFBOUWPERCENTAGE_MINIMUM) in (2 * standaardpremie) - normpremie</text>
+      <text>(2 * standaardpremie) - normpremie_partner(toetsingsinkomen, partner_toetsingsinkomen, constants().DREMPELINKOMEN_TOESLAGPARTNER, constants().PERCENTAGE_DREMPELINKOMEN_MET_PARTNER, constants().AFBOUWPERCENTAGE_MINIMUM)</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision: Final Benefit Calculation -->
+  <decision id="decision_benefit_calculation" name="Benefit Calculation">
+    <description>Select the appropriate benefit calculation based on eligibility scenario</description>
+    <variable name="benefit_calculation" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_eligibility_scenario"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_benefit_calculation_single"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_benefit_calculation_partner"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>if eligibility_scenario = "eligible_single" then benefit_calculation_single else if eligibility_scenario = "eligible_partner" then benefit_calculation_partner else 0</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision: Hoogte Toeslag (Refactored) -->
+  <decision id="decision_hoogte_toeslag" name="Hoogte Toeslag">
+    <description>Calculate healthcare benefit amount. Refactored from complex nested logic into decision table and intermediate decisions for better readability and maintainability.</description>
+    <variable name="hoogte_toeslag" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_benefit_calculation"/>
+    </informationRequirement>
+    <literalExpression>
+      <!--
+        ORIGINAL COMPLEX LOGIC (Kept for reference):
+        if is_verzekerde_zorgtoeslag = false then 0
+        else if heeft_partner = false then
+          if toetsingsinkomen > constants().DREMPELINKOMEN_ALLEENSTAANDE then 0
+          else if vermogen > constants().VERMOGENSGRENS_ALLEENSTAANDE then 0
+          else let normpremie = normpremie_single(toetsingsinkomen, constants().DREMPELINKOMEN_ALLEENSTAANDE, constants().PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND, constants().AFBOUWPERCENTAGE_MINIMUM) in standaardpremie - normpremie
+        else let gezamenlijk_inkomen = toetsingsinkomen + partner_toetsingsinkomen in
+          if gezamenlijk_inkomen > constants().DREMPELINKOMEN_TOESLAGPARTNER then 0
+          else if vermogen > constants().VERMOGENSGRENS_TOESLAGPARTNER then 0
+          else let normpremie = normpremie_partner(toetsingsinkomen, partner_toetsingsinkomen, constants().DREMPELINKOMEN_TOESLAGPARTNER, constants().PERCENTAGE_DREMPELINKOMEN_MET_PARTNER, constants().AFBOUWPERCENTAGE_MINIMUM) in (2 * standaardpremie) - normpremie
+
+        NOW REFACTORED INTO:
+        - decision_gezamenlijk_inkomen: Calculate combined income
+        - decision_applicable_drempelinkomen: Determine income threshold
+        - decision_applicable_vermogensgrens: Determine wealth limit
+        - decision_inkomen_overschreden: Check income threshold
+        - decision_vermogen_overschreden: Check wealth limit
+        - decision_eligibility_scenario: Decision table for eligibility path
+        - decision_benefit_calculation: Calculate final amount
+      -->
+      <text>benefit_calculation</text>
     </literalExpression>
   </decision>
 

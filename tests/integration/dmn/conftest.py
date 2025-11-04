@@ -137,3 +137,15 @@ def test_income_data_retired():
         'pension': 2000000,  # €20,000
         'other_benefits': 0,
     }
+
+
+@pytest.fixture
+def test_income_data_high_income():
+    """Test data: high income above threshold."""
+    return {
+        'work_income': 5000000,  # €50,000 (above threshold)
+        'unemployment_benefit': 0,
+        'disability_benefit': 0,
+        'pension': 0,
+        'other_benefits': 0,
+    }

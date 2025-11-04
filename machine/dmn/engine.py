@@ -265,6 +265,16 @@ class DMNEngine:
         # Build FEEL context
         feel_context = context.get_all_values()
 
+        # Add BKMs as callable functions
+        for bkm_id, bkm in dmn_spec.bkms.items():
+            if bkm_id.startswith('bkm_'):
+                func_name = bkm_id[4:]  # Remove "bkm_" prefix
+            else:
+                func_name = bkm.variable_name
+            feel_context[func_name] = lambda *args, b=bkm: self._invoke_bkm(
+                b, args, context, dmn_spec
+            )
+
         # Evaluate each rule
         matching_rules = []
 
@@ -408,6 +418,16 @@ class DMNEngine:
         for i, param in enumerate(bkm.parameters):
             if i < len(args):
                 param_context[param.variable_name] = args[i]
+
+        # Add BKMs as callable functions (so BKMs can call other BKMs)
+        for bkm_id, other_bkm in dmn_spec.bkms.items():
+            if bkm_id.startswith('bkm_'):
+                func_name = bkm_id[4:]  # Remove "bkm_" prefix
+            else:
+                func_name = other_bkm.variable_name
+            param_context[func_name] = lambda *args, b=other_bkm: self._invoke_bkm(
+                b, args, context, dmn_spec
+            )
 
         # Evaluate BKM expression
         if isinstance(bkm.expression, LiteralExpression):

@@ -74,32 +74,98 @@ zorgtoeslag_toeslagen_2025.dmn (Main Decision)
    - Calls: `decisionService_belastingdienst(person, tax_data).vermogen`
    - Returns: Wealth amount
 
-### Final Decisions:
+### Eligibility Decisions:
 
-8. **decision_is_verzekerde_zorgtoeslag** (Eligibility)
+8. **decision_is_verzekerde_zorgtoeslag** (Basic Eligibility)
    - Depends on: leeftijd, is_verzekerde
    - Logic: `leeftijd >= 18 AND is_verzekerde = true`
-   - Returns: Boolean (eligible?)
+   - Returns: Boolean (meets basic criteria?)
 
-9. **decision_hoogte_toeslag** (Benefit Amount)
-   - Depends on: ALL above decisions + BKMs
-   - Logic: Complex calculation based on:
-     - If not eligible → 0
-     - If single person:
-       - Check income threshold (€39,719)
-       - Check wealth threshold (€141,896)
-       - Calculate: standaardpremie - normpremie
-     - If with partner:
-       - Check combined income threshold (€50,206)
-       - Check wealth threshold (€179,429)
-       - Calculate: (2 × standaardpremie) - normpremie
-   - Returns: Benefit amount in eurocents
+### Intermediate Calculation Decisions:
+
+9. **decision_gezamenlijk_inkomen** (Combined Income)
+   - Depends on: heeft_partner, toetsingsinkomen, partner_toetsingsinkomen
+   - Logic: If has partner, sum both incomes; otherwise just applicant's income
+   - Returns: Number (combined income in eurocents)
+
+10. **decision_applicable_drempelinkomen** (Applicable Income Threshold)
+    - Depends on: heeft_partner
+    - Logic: Select threshold based on partnership status
+    - Returns: Number (€39,719 single / €50,206 partner)
+
+11. **decision_applicable_vermogensgrens** (Applicable Wealth Limit)
+    - Depends on: heeft_partner
+    - Logic: Select limit based on partnership status
+    - Returns: Number (€141,896 single / €179,429 partner)
+
+12. **decision_inkomen_overschreden** (Income Exceeded)
+    - Depends on: gezamenlijk_inkomen, applicable_drempelinkomen
+    - Logic: Check if combined income exceeds threshold
+    - Returns: Boolean
+
+13. **decision_vermogen_overschreden** (Wealth Exceeded)
+    - Depends on: vermogen, applicable_vermogensgrens
+    - Logic: Check if wealth exceeds limit
+    - Returns: Boolean
+
+### Eligibility Scenario Determination:
+
+14. **decision_eligibility_scenario** (Scenario Classification)
+    - Depends on: is_verzekerde_zorgtoeslag, inkomen_overschreden, vermogen_overschreden, heeft_partner
+    - Logic: Decision table with 5 rules:
+      1. Not eligible → "not_eligible"
+      2. Income too high → "income_too_high"
+      3. Assets too high → "assets_too_high"
+      4. Eligible single → "eligible_single"
+      5. Eligible partner → "eligible_partner"
+    - Returns: String (scenario classification)
+
+### Benefit Calculation Decisions:
+
+15. **decision_benefit_calculation_single** (Single Benefit)
+    - Depends on: standaardpremie, toetsingsinkomen
+    - Logic: `standaardpremie - normpremie_single(...)`
+    - Returns: Number (benefit for single person)
+
+16. **decision_benefit_calculation_partner** (Partner Benefit)
+    - Depends on: standaardpremie, toetsingsinkomen, partner_toetsingsinkomen
+    - Logic: `(2 × standaardpremie) - normpremie_partner(...)`
+    - Returns: Number (benefit for person with partner)
+
+17. **decision_benefit_calculation** (Final Calculation Selector)
+    - Depends on: eligibility_scenario, benefit_calculation_single, benefit_calculation_partner
+    - Logic: Select appropriate calculation based on scenario:
+      - "eligible_single" → use benefit_calculation_single
+      - "eligible_partner" → use benefit_calculation_partner
+      - Otherwise → 0
+    - Returns: Number (final benefit amount)
+
+18. **decision_hoogte_toeslag** (Benefit Amount - Main Output)
+    - Depends on: benefit_calculation
+    - Logic: Simple reference to benefit_calculation
+    - Returns: Benefit amount in eurocents
 
 ### Business Knowledge Models (BKMs):
 
-- **constants()**: Returns all threshold values
-- **calculate_normpremie_single()**: Calculates norm premium for singles
-- **calculate_normpremie_partner()**: Calculates norm premium for couples
+- **constants()**: Returns all threshold values (income thresholds, wealth limits, percentages)
+- **normpremie_single()**: Calculates norm premium for singles
+  - Simplified expression: `if income > threshold then percentage_drempel * threshold + afbouwpercentage * (income - threshold) else percentage_drempel * income`
+- **normpremie_partner()**: Calculates norm premium for couples
+  - Simplified expression: `if income + partner_income > threshold then ... else ...`
+
+### Refactoring Notes:
+
+The decision logic was refactored from a single complex 828-character nested expression into:
+- 5 intermediate decisions for threshold/limit calculations
+- 1 decision table with 5 rules for eligibility scenario determination
+- 2 separate calculation decisions (single vs partner)
+- 1 selector decision that chooses the right calculation
+
+This improves:
+- **Readability**: Each decision has a clear, single purpose
+- **Maintainability**: Changes to thresholds or logic are localized
+- **Traceability**: Execution path shows each step of the decision process
+- **Testability**: Each decision can be tested independently
 
 ## Execution Order
 
@@ -125,25 +191,41 @@ When evaluating `decision_hoogte_toeslag`:
             └─ Use decision table with insurance status rules
 
 3. Evaluate decision_hoogte_toeslag
-   ├─ Use result from decision_is_verzekerde_zorgtoeslag
-   ├─ Evaluate decision_heeft_partner
-   │  └─ Call decisionService_brp() [cached from step 2]
-   ├─ Evaluate decision_standaardpremie
-   │  └─ Call decisionService_standaardpremie() from standaardpremie_2025.dmn
-   ├─ Evaluate decision_toetsingsinkomen
-   │  └─ Call decisionService_uwv() from wet_inkomstenbelasting_uwv.dmn
-   │     └─ Evaluate decision_toetsingsinkomen (sum of income sources)
-   ├─ Evaluate decision_partner_toetsingsinkomen
-   │  └─ Call decisionService_uwv() again with partner data
-   ├─ Evaluate decision_vermogen
-   │  └─ Call decisionService_belastingdienst() from wet_inkomstenbelasting_belastingdienst.dmn
-   │     └─ Evaluate decisions:
-   │        ├─ decision_verzamelinkomen (calls BKM)
-   │        └─ decision_vermogen (extracts from tax_data)
-   │
-   └─ Execute complex if-then-else expression with:
-      ├─ Call constants() BKM for threshold values
-      └─ Call calculate_normpremie_single() or calculate_normpremie_partner() BKM
+   └─ Evaluate decision_benefit_calculation
+      ├─ Evaluate decision_eligibility_scenario (Decision Table)
+      │  ├─ Use result from decision_is_verzekerde_zorgtoeslag
+      │  ├─ Evaluate decision_inkomen_overschreden
+      │  │  ├─ Evaluate decision_gezamenlijk_inkomen
+      │  │  │  ├─ Evaluate decision_heeft_partner
+      │  │  │  │  └─ Call decisionService_brp() [cached from step 2]
+      │  │  │  ├─ Evaluate decision_toetsingsinkomen
+      │  │  │  │  └─ Call decisionService_uwv() from wet_inkomstenbelasting_uwv.dmn
+      │  │  │  │     └─ Calculate sum of income sources (work + benefits)
+      │  │  │  └─ Evaluate decision_partner_toetsingsinkomen
+      │  │  │     └─ Call decisionService_uwv() again with partner data
+      │  │  └─ Evaluate decision_applicable_drempelinkomen
+      │  │     └─ Use constants() BKM to get threshold
+      │  ├─ Evaluate decision_vermogen_overschreden
+      │  │  ├─ Evaluate decision_vermogen
+      │  │  │  └─ Call decisionService_belastingdienst() from wet_inkomstenbelasting_belastingdienst.dmn
+      │  │  │     └─ Extract vermogen from tax_data
+      │  │  └─ Evaluate decision_applicable_vermogensgrens
+      │  │     └─ Use constants() BKM to get limit
+      │  └─ Apply decision table rules to determine scenario
+      │
+      ├─ Evaluate decision_benefit_calculation_single
+      │  ├─ Evaluate decision_standaardpremie
+      │  │  └─ Call decisionService_standaardpremie() from standaardpremie_2025.dmn
+      │  └─ Call normpremie_single() BKM with constants
+      │
+      ├─ Evaluate decision_benefit_calculation_partner
+      │  ├─ Use decision_standaardpremie [cached]
+      │  └─ Call normpremie_partner() BKM with constants
+      │
+      └─ Select appropriate calculation based on eligibility_scenario:
+         - "eligible_single" → return benefit_calculation_single
+         - "eligible_partner" → return benefit_calculation_partner
+         - Otherwise → return 0
 ```
 
 ## Layer Architecture
