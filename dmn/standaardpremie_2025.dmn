@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+             id="standaardpremie_2025"
+             name="Standaardpremie 2025 (VWS)"
+             namespace="https://regels.overheid.nl/standaardpremie/VWS-2025-01-01"
+             exporter="Claude Code"
+             exporterVersion="1.0">
+
+  <decision id="decision_standaardpremie" name="Standaardpremie 2025">
+    <variable name="standaardpremie" typeRef="number"/>
+    <literalExpression>
+      <text>211200</text>
+    </literalExpression>
+  </decision>
+
+  <decisionService id="decisionService_standaardpremie" name="Standaardpremie Decision Service">
+    <outputDecision href="#decision_standaardpremie"/>
+  </decisionService>
+
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram_standaardpremie">
+      <dmndi:DMNShape id="shape_decision_standaardpremie" dmnElementRef="decision_standaardpremie">
+        <dc:Bounds x="150" y="150" width="180" height="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+
+</definitions>

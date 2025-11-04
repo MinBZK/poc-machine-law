@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+             id="wet_inkomstenbelasting_belastingdienst"
+             name="Wet Inkomstenbelasting (Belastingdienst)"
+             namespace="https://regels.overheid.nl/wet_inkomstenbelasting/BELASTINGDIENST-2025-01-01"
+             exporter="Claude Code"
+             exporterVersion="1.0">
+
+  <!-- Input Data -->
+  <inputData id="input_person" name="Person">
+    <variable name="person" typeRef="context"/>
+  </inputData>
+
+  <inputData id="input_tax_data" name="Tax Data">
+    <variable name="tax_data" typeRef="context"/>
+  </inputData>
+
+  <!-- Business Knowledge Model: Calculate Verzamelinkomen -->
+  <businessKnowledgeModel id="bkm_calculate_verzamelinkomen" name="Calculate Verzamelinkomen">
+    <variable name="verzamelinkomen" typeRef="number"/>
+    <encapsulatedLogic>
+      <formalParameter name="box1" typeRef="number"/>
+      <formalParameter name="box2" typeRef="number"/>
+      <formalParameter name="box3" typeRef="number"/>
+      <literalExpression>
+        <text>box1 + box2 + box3</text>
+      </literalExpression>
+    </encapsulatedLogic>
+  </businessKnowledgeModel>
+
+  <!-- Decision: Verzamelinkomen -->
+  <decision id="decision_verzamelinkomen" name="Verzamelinkomen">
+    <variable name="verzamelinkomen" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_tax_data"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_calculate_verzamelinkomen"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>calculate_verzamelinkomen(
+        if tax_data.box1_inkomen != null then tax_data.box1_inkomen else 0,
+        if tax_data.box2_inkomen != null then tax_data.box2_inkomen else 0,
+        if tax_data.box3_inkomen != null then tax_data.box3_inkomen else 0
+      )</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision: Vermogen -->
+  <decision id="decision_vermogen" name="Vermogen">
+    <variable name="vermogen" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_tax_data"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>if tax_data.vermogen != null then tax_data.vermogen else 0</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision Service -->
+  <decisionService id="decisionService_belastingdienst" name="Belastingdienst Decision Service">
+    <outputDecision href="#decision_verzamelinkomen"/>
+    <outputDecision href="#decision_vermogen"/>
+    <inputData href="#input_person"/>
+    <inputData href="#input_tax_data"/>
+  </decisionService>
+
+  <!-- Diagram -->
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram_belastingdienst">
+      <dmndi:DMNShape id="shape_input_person" dmnElementRef="input_person">
+        <dc:Bounds x="100" y="400" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_input_tax_data" dmnElementRef="input_tax_data">
+        <dc:Bounds x="300" y="400" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_bkm_calculate" dmnElementRef="bkm_calculate_verzamelinkomen">
+        <dc:Bounds x="300" y="250" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_verzamelinkomen" dmnElementRef="decision_verzamelinkomen">
+        <dc:Bounds x="100" y="100" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_vermogen" dmnElementRef="decision_vermogen">
+        <dc:Bounds x="300" y="100" width="180" height="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+
+</definitions>

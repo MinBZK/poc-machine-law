@@ -7,7 +7,10 @@ build/
 dist/
 wheels/
 *.egg-info
+
+# IDE directories
 .vscode
+.idea
 
 # Environment variables
 .env
@@ -27,3 +30,4 @@ machinev2/backend/backend
 __debug_bin*
 
 .claude
+nul

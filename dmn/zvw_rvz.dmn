@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:yaoqiang="http://bpmn.sourceforge.net" exporter="Claude Code" exporterVersion="1.0" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="zvw_rvz" name="Zorgverzekeringswet (RVZ)" namespace="https://regels.overheid.nl/zvw/RVZ-2024-01-01" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <extensionElements>
+    <yaoqiang:pageFormat height="841.8897637795276" imageableHeight="831.8897637795276" imageableWidth="588.1102362204724" imageableX="5.0" imageableY="5.0" orientation="0" width="598.1102362204724"/>
+    <yaoqiang:page background="#FFFFFF" horizontalCount="1" verticalCount="1"/>
+  </extensionElements>
+  <inputData id="input_person" name="Person">
+    <extensionElements>
+      <yaoqiang:bounds height="40.0" width="120.0" x="480.0" y="200.0"/>
+    </extensionElements>
+    <variable name="person" typeRef="context"/>
+  </inputData>
+  <decision id="decision_verzekerd_voor_zvw" name="Verzekerd voor ZVW">
+    <extensionElements>
+      <yaoqiang:bounds height="40.0" width="120.0" x="480.0" y="100.0"/>
+    </extensionElements>
+    <variable name="verzekerd_voor_zvw" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredInput href="#input_person"/>
+    </informationRequirement>
+    <decisionTable hitPolicy="UNIQUE" preferredOrientation="Rule-as-Row">
+      <input id="input_insurance_status" label="Health Insurance Status">
+        <inputExpression typeRef="string">
+          <text><![CDATA[person.health_insurance_status]]></text>
+        </inputExpression>
+      </input>
+      <input id="input_resident" label="Resident in Netherlands">
+        <inputExpression typeRef="boolean">
+          <text><![CDATA[person.is_resident]]></text>
+        </inputExpression>
+      </input>
+      <output id="output_verzekerd" label="Verzekerd voor ZVW" typeRef="boolean"/>
+      <rule id="rule_insured">
+        <inputEntry>
+          <text><![CDATA["verzekerd", "basisverzekering"]]></text>
+        </inputEntry>
+        <inputEntry>
+          <text><![CDATA[true]]></text>
+        </inputEntry>
+        <outputEntry>
+          <text><![CDATA[true]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_not_insured">
+        <inputEntry>
+          <text><![CDATA["niet_verzekerd", "onbekend", null]]></text>
+        </inputEntry>
+        <inputEntry>
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry>
+          <text><![CDATA[false]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_not_resident">
+        <inputEntry>
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry>
+          <text><![CDATA[false]]></text>
+        </inputEntry>
+        <outputEntry>
+          <text><![CDATA[false]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decisionService id="decisionService_zvw" name="ZVW Decision Service">
+    <outputDecision href="#decision_verzekerd_voor_zvw"/>
+    <inputData href="#input_person"/>
+  </decisionService>
+</definitions>

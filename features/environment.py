@@ -11,6 +11,19 @@ def before_all(context) -> None:
     log_level = context.config.userdata.get("log_level", "DEBUG")
     context.loggers = configure_logging(log_level)
 
+    # Check if we're running DMN-only tests (which don't need the web server)
+    # DMN tests are in features/dmn/ or have "dmn" in the filename
+    import os
+    feature_files = [f.location.filename for f in context._runner.features]
+    needs_web_server = any(
+        not ("dmn" in os.path.basename(f).lower() or "/dmn/" in f or "\\dmn\\" in f)
+        for f in feature_files
+    )
+
+    if not needs_web_server:
+        print("Skipping web server startup for DMN-only tests")
+        return
+
     # Start the web server once for all tests that need it
     # Check if server is already running
     server_running = False

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+             xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+             id="zorgtoeslag_toeslagen_2025"
+             name="Zorgtoeslag 2025 (Toeslagen)"
+             namespace="https://regels.overheid.nl/zorgtoeslagwet/TOESLAGEN-2025-01-01"
+             exporter="Claude Code"
+             exporterVersion="1.0">
+
+  <!-- Import Dependencies -->
+  <import namespace="https://regels.overheid.nl/standaardpremie/VWS-2025-01-01"
+          locationURI="standaardpremie_2025.dmn"
+          importType="https://www.omg.org/spec/DMN/20191111/MODEL/"/>
+  <import namespace="https://regels.overheid.nl/wet_brp/RVIG-2020-01-01"
+          locationURI="wet_brp_rvig.dmn"
+          importType="https://www.omg.org/spec/DMN/20191111/MODEL/"/>
+  <import namespace="https://regels.overheid.nl/zvw/RVZ-2024-01-01"
+          locationURI="zvw_rvz.dmn"
+          importType="https://www.omg.org/spec/DMN/20191111/MODEL/"/>
+  <import namespace="https://regels.overheid.nl/wet_inkomstenbelasting/BELASTINGDIENST-2025-01-01"
+          locationURI="wet_inkomstenbelasting_belastingdienst.dmn"
+          importType="https://www.omg.org/spec/DMN/20191111/MODEL/"/>
+  <import namespace="https://regels.overheid.nl/wet_inkomstenbelasting/UWV-2025-01-01"
+          locationURI="wet_inkomstenbelasting_uwv.dmn"
+          importType="https://www.omg.org/spec/DMN/20191111/MODEL/"/>
+
+  <!-- Input Data -->
+  <inputData id="input_person" name="Person">
+    <variable name="person" typeRef="context"/>
+  </inputData>
+
+  <inputData id="input_reference_date" name="Reference Date">
+    <variable name="reference_date" typeRef="date"/>
+  </inputData>
+
+  <inputData id="input_tax_data" name="Tax Data">
+    <variable name="tax_data" typeRef="context"/>
+  </inputData>
+
+  <inputData id="input_income_data" name="Income Data">
+    <variable name="income_data" typeRef="context"/>
+  </inputData>
+
+  <inputData id="input_partner_income_data" name="Partner Income Data">
+    <variable name="partner_income_data" typeRef="context"/>
+  </inputData>
+
+  <!-- Constants -->
+  <businessKnowledgeModel id="bkm_constants" name="Zorgtoeslag Constants">
+    <variable name="constants" typeRef="context"/>
+    <encapsulatedLogic>
+      <literalExpression>
+        <text>{
+          MINIMUM_LEEFTIJD: 18,
+          PERCENTAGE_DREMPELINKOMEN_MET_PARTNER: 0.04273,
+          PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND: 0.01896,
+          AFBOUWPERCENTAGE_MINIMUM: 0.13700,
+          DREMPELINKOMEN_ALLEENSTAANDE: 3971900,
+          DREMPELINKOMEN_TOESLAGPARTNER: 5020600,
+          VERMOGENSGRENS_ALLEENSTAANDE: 14189600,
+          VERMOGENSGRENS_TOESLAGPARTNER: 17942900
+        }</text>
+      </literalExpression>
+    </encapsulatedLogic>
+  </businessKnowledgeModel>
+
+  <!-- External Decision: Standaardpremie -->
+  <decision id="decision_standaardpremie" name="Standaardpremie">
+    <variable name="standaardpremie" typeRef="number"/>
+    <literalExpression>
+      <text>decisionService_standaardpremie()</text>
+    </literalExpression>
+  </decision>
+
+  <!-- External Decision: Leeftijd -->
+  <decision id="decision_leeftijd" name="Leeftijd">
+    <variable name="leeftijd" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_person"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#input_reference_date"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>decisionService_brp(person, reference_date).leeftijd</text>
+    </literalExpression>
+  </decision>
+
+  <!-- External Decision: Heeft Toeslagpartner -->
+  <decision id="decision_heeft_partner" name="Heeft Toeslagpartner">
+    <variable name="heeft_partner" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredInput href="#input_person"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#input_reference_date"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>decisionService_brp(person, reference_date).heeft_toeslagpartner</text>
+    </literalExpression>
+  </decision>
+
+  <!-- External Decision: Verzekerd voor ZVW -->
+  <decision id="decision_is_verzekerde" name="Is Verzekerde">
+    <variable name="is_verzekerde" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredInput href="#input_person"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>decisionService_zvw(person)</text>
+    </literalExpression>
+  </decision>
+
+  <!-- External Decision: Toetsingsinkomen -->
+  <decision id="decision_toetsingsinkomen" name="Toetsingsinkomen">
+    <variable name="toetsingsinkomen" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_income_data"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>decisionService_uwv(person, income_data)</text>
+    </literalExpression>
+  </decision>
+
+  <!-- External Decision: Partner Toetsingsinkomen -->
+  <decision id="decision_partner_toetsingsinkomen" name="Partner Toetsingsinkomen">
+    <variable name="partner_toetsingsinkomen" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_partner_income_data"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>if partner_income_data != null then decisionService_uwv(person, partner_income_data) else 0</text>
+    </literalExpression>
+  </decision>
+
+  <!-- External Decision: Vermogen -->
+  <decision id="decision_vermogen" name="Vermogen">
+    <variable name="vermogen" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_tax_data"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>decisionService_belastingdienst(person, tax_data).vermogen</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Business Knowledge Model: Calculate Normpremie for Singles -->
+  <businessKnowledgeModel id="bkm_normpremie_single" name="Calculate Normpremie Single">
+    <variable name="normpremie_single" typeRef="number"/>
+    <encapsulatedLogic>
+      <formalParameter name="inkomen" typeRef="number"/>
+      <formalParameter name="drempelinkomen" typeRef="number"/>
+      <formalParameter name="percentage_drempel" typeRef="number"/>
+      <formalParameter name="afbouwpercentage" typeRef="number"/>
+      <literalExpression>
+        <text>(percentage_drempel * min(inkomen, drempelinkomen)) + (if inkomen > drempelinkomen then afbouwpercentage * (inkomen - drempelinkomen) else 0)</text>
+      </literalExpression>
+    </encapsulatedLogic>
+  </businessKnowledgeModel>
+
+  <!-- Business Knowledge Model: Calculate Normpremie for Partners -->
+  <businessKnowledgeModel id="bkm_normpremie_partner" name="Calculate Normpremie Partner">
+    <variable name="normpremie_partner" typeRef="number"/>
+    <encapsulatedLogic>
+      <formalParameter name="inkomen" typeRef="number"/>
+      <formalParameter name="partner_inkomen" typeRef="number"/>
+      <formalParameter name="drempelinkomen" typeRef="number"/>
+      <formalParameter name="percentage_drempel" typeRef="number"/>
+      <formalParameter name="afbouwpercentage" typeRef="number"/>
+      <literalExpression>
+        <text>let gezamenlijk_inkomen = inkomen + partner_inkomen in (percentage_drempel * min(gezamenlijk_inkomen, drempelinkomen)) + (if gezamenlijk_inkomen > drempelinkomen then afbouwpercentage * (gezamenlijk_inkomen - drempelinkomen) else 0)</text>
+      </literalExpression>
+    </encapsulatedLogic>
+  </businessKnowledgeModel>
+
+  <!-- Decision: Eligibility Check -->
+  <decision id="decision_is_verzekerde_zorgtoeslag" name="Is Verzekerde Zorgtoeslag">
+    <variable name="is_verzekerde_zorgtoeslag" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_leeftijd"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_is_verzekerde"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_constants"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>leeftijd >= constants().MINIMUM_LEEFTIJD and is_verzekerde = true</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision: Hoogte Toeslag -->
+  <decision id="decision_hoogte_toeslag" name="Hoogte Toeslag">
+    <variable name="hoogte_toeslag" typeRef="number"/>
+    <informationRequirement>
+      <requiredDecision href="#decision_is_verzekerde_zorgtoeslag"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_heeft_partner"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_standaardpremie"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_toetsingsinkomen"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_partner_toetsingsinkomen"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#decision_vermogen"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_constants"/>
+    </knowledgeRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_normpremie_single"/>
+    </knowledgeRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_normpremie_partner"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>if is_verzekerde_zorgtoeslag = false then 0 else if heeft_partner = false then if toetsingsinkomen > constants().DREMPELINKOMEN_ALLEENSTAANDE then 0 else if vermogen > constants().VERMOGENSGRENS_ALLEENSTAANDE then 0 else let normpremie = normpremie_single(toetsingsinkomen, constants().DREMPELINKOMEN_ALLEENSTAANDE, constants().PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND, constants().AFBOUWPERCENTAGE_MINIMUM) in standaardpremie - normpremie else let gezamenlijk_inkomen = toetsingsinkomen + partner_toetsingsinkomen in if gezamenlijk_inkomen > constants().DREMPELINKOMEN_TOESLAGPARTNER then 0 else if vermogen > constants().VERMOGENSGRENS_TOESLAGPARTNER then 0 else let normpremie = normpremie_partner(toetsingsinkomen, partner_toetsingsinkomen, constants().DREMPELINKOMEN_TOESLAGPARTNER, constants().PERCENTAGE_DREMPELINKOMEN_MET_PARTNER, constants().AFBOUWPERCENTAGE_MINIMUM) in (2 * standaardpremie) - normpremie</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision Service -->
+  <decisionService id="decisionService_zorgtoeslag" name="Zorgtoeslag Decision Service">
+    <outputDecision href="#decision_is_verzekerde_zorgtoeslag"/>
+    <outputDecision href="#decision_hoogte_toeslag"/>
+    <inputData href="#input_person"/>
+    <inputData href="#input_reference_date"/>
+    <inputData href="#input_tax_data"/>
+    <inputData href="#input_income_data"/>
+    <inputData href="#input_partner_income_data"/>
+  </decisionService>
+
+  <!-- Diagram -->
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram_zorgtoeslag">
+      <dmndi:DMNShape id="shape_input_person" dmnElementRef="input_person">
+        <dc:Bounds x="100" y="600" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_input_reference_date" dmnElementRef="input_reference_date">
+        <dc:Bounds x="300" y="600" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_input_tax_data" dmnElementRef="input_tax_data">
+        <dc:Bounds x="500" y="600" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_input_income_data" dmnElementRef="input_income_data">
+        <dc:Bounds x="700" y="600" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_leeftijd" dmnElementRef="decision_leeftijd">
+        <dc:Bounds x="100" y="450" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_heeft_partner" dmnElementRef="decision_heeft_partner">
+        <dc:Bounds x="300" y="450" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_is_verzekerde" dmnElementRef="decision_is_verzekerde">
+        <dc:Bounds x="100" y="300" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_eligibility" dmnElementRef="decision_is_verzekerde_zorgtoeslag">
+        <dc:Bounds x="100" y="150" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_hoogte" dmnElementRef="decision_hoogte_toeslag">
+        <dc:Bounds x="400" y="50" width="180" height="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+
+</definitions>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+             id="wet_inkomstenbelasting_uwv"
+             name="Wet Inkomstenbelasting - Toetsingsinkomen (UWV)"
+             namespace="https://regels.overheid.nl/wet_inkomstenbelasting/UWV-2025-01-01"
+             exporter="Claude Code"
+             exporterVersion="1.0">
+
+  <!-- Input Data -->
+  <inputData id="input_person" name="Person">
+    <variable name="person" typeRef="context"/>
+  </inputData>
+
+  <inputData id="input_income_data" name="Income Data">
+    <variable name="income_data" typeRef="context"/>
+  </inputData>
+
+  <!-- Business Knowledge Model: Calculate Toetsingsinkomen -->
+  <businessKnowledgeModel id="bkm_calculate_toetsingsinkomen" name="Calculate Toetsingsinkomen">
+    <variable name="toetsingsinkomen" typeRef="number"/>
+    <encapsulatedLogic>
+      <formalParameter name="work_income" typeRef="number"/>
+      <formalParameter name="unemployment_benefit" typeRef="number"/>
+      <formalParameter name="disability_benefit" typeRef="number"/>
+      <formalParameter name="pension" typeRef="number"/>
+      <formalParameter name="other_benefits" typeRef="number"/>
+      <literalExpression>
+        <text>work_income + unemployment_benefit + disability_benefit + pension + other_benefits</text>
+      </literalExpression>
+    </encapsulatedLogic>
+  </businessKnowledgeModel>
+
+  <!-- Decision: Toetsingsinkomen -->
+  <decision id="decision_toetsingsinkomen" name="Toetsingsinkomen">
+    <variable name="toetsingsinkomen" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_income_data"/>
+    </informationRequirement>
+    <knowledgeRequirement>
+      <requiredKnowledge href="#bkm_calculate_toetsingsinkomen"/>
+    </knowledgeRequirement>
+    <literalExpression>
+      <text>calculate_toetsingsinkomen(
+        if income_data.work_income != null then income_data.work_income else 0,
+        if income_data.unemployment_benefit != null then income_data.unemployment_benefit else 0,
+        if income_data.disability_benefit != null then income_data.disability_benefit else 0,
+        if income_data.pension != null then income_data.pension else 0,
+        if income_data.other_benefits != null then income_data.other_benefits else 0
+      )</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision Service -->
+  <decisionService id="decisionService_uwv" name="UWV Decision Service">
+    <outputDecision href="#decision_toetsingsinkomen"/>
+    <inputData href="#input_person"/>
+    <inputData href="#input_income_data"/>
+  </decisionService>
+
+  <!-- Diagram -->
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram_uwv">
+      <dmndi:DMNShape id="shape_input_person" dmnElementRef="input_person">
+        <dc:Bounds x="100" y="400" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_input_income_data" dmnElementRef="input_income_data">
+        <dc:Bounds x="300" y="400" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_bkm_calculate" dmnElementRef="bkm_calculate_toetsingsinkomen">
+        <dc:Bounds x="300" y="250" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_toetsingsinkomen" dmnElementRef="decision_toetsingsinkomen">
+        <dc:Bounds x="200" y="100" width="180" height="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+
+</definitions>

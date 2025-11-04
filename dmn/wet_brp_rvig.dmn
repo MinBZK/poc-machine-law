@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+             xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+             id="wet_brp_rvig"
+             name="Wet Basisregistratie Personen (RvIG)"
+             namespace="https://regels.overheid.nl/wet_brp/RVIG-2020-01-01"
+             exporter="Claude Code"
+             exporterVersion="1.0">
+
+  <!-- Input Data -->
+  <inputData id="input_person" name="Person">
+    <variable name="person" typeRef="context"/>
+  </inputData>
+
+  <inputData id="input_reference_date" name="Reference Date">
+    <variable name="reference_date" typeRef="date"/>
+  </inputData>
+
+  <!-- Decision: Calculate Age -->
+  <decision id="decision_leeftijd" name="Leeftijd">
+    <variable name="leeftijd" typeRef="number"/>
+    <informationRequirement>
+      <requiredInput href="#input_person"/>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#input_reference_date"/>
+    </informationRequirement>
+    <literalExpression>
+      <text>years(person.birth_date, reference_date)</text>
+    </literalExpression>
+  </decision>
+
+  <!-- Decision: Has Toeslagpartner -->
+  <decision id="decision_heeft_toeslagpartner" name="Heeft Toeslagpartner">
+    <variable name="heeft_toeslagpartner" typeRef="boolean"/>
+    <informationRequirement>
+      <requiredInput href="#input_person"/>
+    </informationRequirement>
+    <decisionTable hitPolicy="UNIQUE">
+      <input id="input_partnership_status" label="Partnership Status">
+        <inputExpression typeRef="string">
+          <text>person.partnership_status</text>
+        </inputExpression>
+      </input>
+      <output id="output_heeft_toeslagpartner" label="Heeft Toeslagpartner" typeRef="boolean"/>
+      <rule id="rule_has_partner">
+        <inputEntry>
+          <text>"gehuwd", "geregistreerd_partnerschap", "fiscaal_partner"</text>
+        </inputEntry>
+        <outputEntry>
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_no_partner">
+        <inputEntry>
+          <text>"alleenstaand", "gescheiden", "weduwe", "weduwnaar", null</text>
+        </inputEntry>
+        <outputEntry>
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <!-- Decision Service -->
+  <decisionService id="decisionService_brp" name="BRP Decision Service">
+    <outputDecision href="#decision_leeftijd"/>
+    <outputDecision href="#decision_heeft_toeslagpartner"/>
+    <inputData href="#input_person"/>
+    <inputData href="#input_reference_date"/>
+  </decisionService>
+
+  <!-- Diagram -->
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="diagram_brp">
+      <dmndi:DMNShape id="shape_input_person" dmnElementRef="input_person">
+        <dc:Bounds x="150" y="300" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_input_reference_date" dmnElementRef="input_reference_date">
+        <dc:Bounds x="350" y="300" width="150" height="60"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_leeftijd" dmnElementRef="decision_leeftijd">
+        <dc:Bounds x="150" y="150" width="180" height="80"/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="shape_decision_heeft_toeslagpartner" dmnElementRef="decision_heeft_toeslagpartner">
+        <dc:Bounds x="350" y="150" width="180" height="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+
+</definitions>
