@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>RegelRecht Demo Mode - Workspace</title>
         <link rel="stylesheet" href="/static/css/demo.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script defer
                 src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
         <style>
@@ -47,13 +48,12 @@
                      @click="switchTab('zaaksysteem')">
                     <span class="tab-label">Zaaksysteem</span>
                 </div>
-                <!-- Fullscreen Toggle Button -->
-                <button class="fullscreen-toggle"
-                        @click="toggleFullscreen()"
-                        :title="isFullscreen ? 'Volledig scherm verlaten (ESC)' : 'Volledig scherm'">
-                    <span x-show="!isFullscreen">⛶</span>
-                    <span x-show="isFullscreen">⤓</span>
-                </button>
+                <!-- Hamburger Menu Button -->
+                <div class="demo-menu">
+                    <button class="menu-toggle"
+                            @click.stop="menuOpen = !menuOpen"
+                            title="Menu">⋮</button>
+                </div>
             </div>
             <!-- Second Row: Law Tabs (only visible when activeTab === 'laws') -->
             <div class="law-tab-bar"
@@ -125,6 +125,45 @@
                             class="tab-iframe"
                             title="Simulatie"></iframe>
                 </div>
+            </div>
+
+            <!-- Menu Overlay (shown when menu is open) -->
+            <div x-show="menuOpen"
+                 x-cloak
+                 @click="menuOpen = false"
+                 class="menu-overlay"></div>
+
+            <!-- Menu Dropdown (fixed position, over iframes) -->
+            <div x-show="menuOpen"
+                 x-cloak
+                 @click.away="menuOpen = false"
+                 class="menu-dropdown-fixed">
+                <!-- Fullscreen Toggle -->
+                <button @click="toggleFullscreen(); menuOpen = false" class="menu-item">
+                    <span x-show="!isFullscreen">⛶ Volledig scherm</span>
+                    <span x-show="isFullscreen">⤓ Volledig scherm verlaten</span>
+                </button>
+                <!-- Reset State -->
+                <form hx-post="/admin/reset"
+                      hx-trigger="submit"
+                      hx-on::after-request="var btn = event.target.querySelector('button'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.reload(), 7000)"
+                      class="menu-item-form">
+                    <button type="submit" class="menu-item menu-item-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="menu-item-icon"
+                             viewBox="0 0 24 24">
+                            <g fill="none"
+                               stroke="currentColor"
+                               stroke-linecap="round"
+                               stroke-linejoin="round"
+                               stroke-width="2">
+                                <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
+                                <path d="M20 4v5h-5" />
+                            </g>
+                        </svg>
+                        Reset state
+                    </button>
+                </form>
             </div>
         </div>
         <!-- JavaScript -->
@@ -334,6 +373,7 @@
                 lawsLoaded: false,
                 featuresLoaded: false,
                 isFullscreen: false,
+                menuOpen: false,          // Hamburger menu state
                 openedLawTabs: [],        // Array of {path: string, name: string, id: string}
                 activeLawTabId: null,     // Currently active law tab ID
                 nextLawTabId: 1,          // Auto-incrementing ID for law tabs
