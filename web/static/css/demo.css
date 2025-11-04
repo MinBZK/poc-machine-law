@@ -47,6 +47,33 @@
     --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
+/* Dark Mode */
+:root[data-theme="dark"] {
+    /* Color palette - Dark mode */
+    --primary-color: #3b82f6;
+    --primary-hover: #60a5fa;
+    --secondary-color: #94a3b8;
+    --success-color: #4ade80;
+    --error-color: #f87171;
+    --warning-color: #fbbf24;
+
+    /* Neutral colors - Dark mode */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --border-color: #475569;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+
+    /* Code colors - Dark mode */
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+    --yaml-key: #38bdf8;
+    --yaml-value: #a78bfa;
+    --yaml-string: #4ade80;
+}
+
 body {
     font-family: var(--font-sans);
     color: var(--text-primary);
@@ -1178,7 +1205,7 @@ body {
     display: flex;
     flex-direction: column;
     background-color: var(--bg-secondary);
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Tab Bar (Browser-like) */
@@ -1189,6 +1216,8 @@ body {
     padding: 0 var(--spacing-sm);
     gap: 2px;
     overflow-x: auto;
+    position: relative;
+    z-index: 10000;
 }
 
 .tab {
@@ -1227,33 +1256,104 @@ body {
     color: var(--text-primary);
 }
 
-/* Fullscreen Toggle Button */
-.fullscreen-toggle {
+/* Demo Menu (Hamburger) */
+.demo-menu {
     margin-left: auto;
+    position: relative;
+    align-self: center;
+    z-index: 9999;
+}
+
+.menu-toggle {
     padding: var(--spacing-xs) var(--spacing-md);
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
     cursor: pointer;
     font-size: 1.25rem;
     line-height: 1;
+    color: var(--text-primary);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     min-width: 40px;
     height: 36px;
-    align-self: center;
 }
 
-.fullscreen-toggle:hover {
-    background-color: var(--bg-primary);
+.menu-toggle:hover {
+    background-color: var(--bg-secondary);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.fullscreen-toggle:active {
+.menu-toggle:active {
     transform: translateY(0);
+}
+
+/* Menu Overlay - Full screen backdrop */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+}
+
+/* Menu Dropdown - Fixed position to appear over iframes */
+.menu-dropdown-fixed {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 10001;
+    overflow: hidden;
+}
+
+/* Menu Items */
+.menu-item {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    text-align: left;
+    transition: background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.menu-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.menu-item-danger {
+    color: #dc2626; /* red-600 */
+}
+
+.menu-item-danger:hover {
+    background-color: #fee2e2; /* red-50 */
+}
+
+.menu-item-form {
+    margin: 0;
+    padding: 0;
+}
+
+.menu-item-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
 }
 
 /* ========================================
@@ -1412,6 +1512,8 @@ body {
 .tab-content.iframe-content {
     padding: 0;
     overflow: hidden;
+    position: relative;
+    z-index: 0;
 }
 
 .tab-iframe {
@@ -1419,6 +1521,8 @@ body {
     height: 100%;
     border: none;
     display: block;
+    position: relative;
+    z-index: 0;
 }
 
 /* Error Message */
@@ -1441,6 +1545,7 @@ body {
     cursor: pointer;
     font-size: 1rem;
     line-height: 1;
+    color: var(--text-primary);
     transition: all 0.2s;
     z-index: 10;
 }
@@ -1478,6 +1583,7 @@ body {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 1rem;
+    color: var(--text-primary);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
     transition: all 0.2s;
