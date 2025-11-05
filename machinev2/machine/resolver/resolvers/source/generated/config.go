@@ -1,10 +1,7 @@
-//go:build tools
-// +build tools
-
 package machine
 
 import (
-	_ "github.com/Khan/genqlient"
+	_ "github.com/Khan/genqlient/generate"
 )
 
 //go:generate go run github.com/Khan/genqlient
