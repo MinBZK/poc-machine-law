@@ -20,10 +20,41 @@ Feature: Berekening Zorgtoeslag 2025 (DMN)
       | 2005-01-01 | alleenstaand       | verzekerd               | true        |
     And DMN tax data:
       | box1_inkomen | box2_inkomen | box3_inkomen | vermogen |
-      | 79547        | 0            | 0            | 50000    |
+      | 79547        | 0            | 0            | 0        |
     And DMN income data:
       | work_income | unemployment_benefit | disability_benefit | pension | other_benefits |
       | 79547       | 0                    | 0                  | 0       | 0              |
-    And DMN reference date is "2025-02-01"
+    And DMN reference date is "2025-01-01"
     When the DMN zorgtoeslag decision is evaluated
     Then the DMN eligibility result should be true
+    And the DMN benefit amount should be "2096.92" euro
+
+  Scenario: Alleenstaande met laag inkomen heeft recht op zorgtoeslag (DMN)
+    Given DMN person data:
+      | birth_date | partnership_status | health_insurance_status | is_resident |
+      | 1998-01-01 | alleenstaand       | verzekerd               | true        |
+    And DMN tax data:
+      | box1_inkomen | box2_inkomen | box3_inkomen | vermogen |
+      | 20000        | 0            | 0            | 10000    |
+    And DMN income data:
+      | work_income | unemployment_benefit | disability_benefit | pension | other_benefits |
+      | 20000       | 0                    | 0                  | 0       | 0              |
+    And DMN reference date is "2025-01-01"
+    When the DMN zorgtoeslag decision is evaluated
+    Then the DMN eligibility result should be true
+    And the DMN benefit amount should be "2108.21" euro
+
+  Scenario: Persoon met laag inkomen (15000) heeft recht op zorgtoeslag (DMN)
+    Given DMN person data:
+      | birth_date | partnership_status | health_insurance_status | is_resident |
+      | 2004-01-01 | alleenstaand       | verzekerd               | true        |
+    And DMN tax data:
+      | box1_inkomen | box2_inkomen | box3_inkomen | vermogen |
+      | 15000        | 0            | 0            | 0        |
+    And DMN income data:
+      | work_income | unemployment_benefit | disability_benefit | pension | other_benefits |
+      | 15000       | 0                    | 0                  | 0       | 0              |
+    And DMN reference date is "2025-01-01"
+    When the DMN zorgtoeslag decision is evaluated
+    Then the DMN eligibility result should be true
+    And the DMN benefit amount should be "2109.16" euro

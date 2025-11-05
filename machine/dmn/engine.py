@@ -249,8 +249,43 @@ class DMNEngine:
                         spec, ds, args, context
                     )
 
+        # Create a trace callback to capture FEEL evaluation steps
+        def trace_callback(event_type: str, data: dict):
+            """Handle trace events from FEEL evaluator."""
+            if event_type == 'condition':
+                # Create a path node for condition evaluation
+                condition_node = PathNode(
+                    type="feel_condition",
+                    name=f"Condition: {data['expression']}",
+                    result=data['result'],
+                    details={'expression': data['expression']},
+                    children=[]
+                )
+                context.current_path.children.append(condition_node)
+
+            elif event_type == 'branch':
+                # Create a path node for branch selection
+                branch_node = PathNode(
+                    type="feel_branch",
+                    name=f"Branch: {data['branch_type']}",
+                    result=None,
+                    details={'branch_type': data['branch_type'], 'expression': data['expression']},
+                    children=[]
+                )
+                context.current_path.children.append(branch_node)
+                # Store reference to branch node for adding result later
+                context._current_branch_node = branch_node
+
+            elif event_type == 'branch_result':
+                # Add result to the branch node
+                if hasattr(context, '_current_branch_node'):
+                    context._current_branch_node.result = data['result']
+
+        # Create a FEEL evaluator with tracing enabled
+        traced_evaluator = FEELEvaluator(trace_callback=trace_callback)
+
         try:
-            result = self.feel_evaluator.evaluate(expression.text, feel_context)
+            result = traced_evaluator.evaluate(expression.text, feel_context)
             return result
         except FEELEvaluationError as e:
             raise DMNExecutionError(f"FEEL evaluation failed: {e}") from e

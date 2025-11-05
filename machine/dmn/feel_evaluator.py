@@ -23,8 +23,14 @@ from .exceptions import FEELEvaluationError, FEELSyntaxError
 class FEELEvaluator:
     """Evaluates FEEL expressions."""
 
-    def __init__(self):
+    def __init__(self, trace_callback=None):
         self.context: Dict[str, Any] = {}
+        self.trace_callback = trace_callback
+
+    def _trace(self, event_type: str, data: Dict[str, Any]):
+        """Emit a trace event if callback is configured."""
+        if self.trace_callback:
+            self.trace_callback(event_type, data)
 
     def evaluate(self, expression: str, context: Dict[str, Any]) -> Any:
         """
@@ -260,10 +266,36 @@ class FEELEvaluator:
         # Evaluate condition
         cond_result = self._eval_expression(condition)
 
+        # Trace the condition evaluation
+        self._trace('condition', {
+            'expression': condition,
+            'result': cond_result
+        })
+
         if cond_result:
-            return self._eval_expression(true_value)
+            # Trace that we're taking the 'then' branch
+            self._trace('branch', {
+                'branch_type': 'then',
+                'expression': true_value
+            })
+            result = self._eval_expression(true_value)
+            self._trace('branch_result', {
+                'branch_type': 'then',
+                'result': result
+            })
+            return result
         elif false_value is not None:
-            return self._eval_expression(false_value)
+            # Trace that we're taking the 'else' branch
+            self._trace('branch', {
+                'branch_type': 'else',
+                'expression': false_value
+            })
+            result = self._eval_expression(false_value)
+            self._trace('branch_result', {
+                'branch_type': 'else',
+                'result': result
+            })
+            return result
         else:
             return None
 

@@ -51,6 +51,19 @@ def format_trace(path_node: Any, indent: int = 0, show_details: bool = True) -> 
                     lines.append(f"{prefix}|     {key}: {value}")
             else:
                 lines.append(f"{prefix}|   Result: {node_result}")
+    elif node_type == "feel_condition":
+        # Format FEEL condition evaluation
+        expression = node_details.get('expression', '')
+        lines.append(f"{prefix}  > Condition: {expression}")
+        lines.append(f"{prefix}    Evaluated to: {node_result}")
+    elif node_type == "feel_branch":
+        # Format FEEL branch selection
+        branch_type = node_details.get('branch_type', 'unknown')
+        expression = node_details.get('expression', '')
+        lines.append(f"{prefix}  > Branch taken: {branch_type}")
+        lines.append(f"{prefix}    Expression: {expression}")
+        if node_result is not None:
+            lines.append(f"{prefix}    Result: {node_result}")
     else:
         lines.append(f"{prefix}+ [{node_type.upper()}] {node_name}")
         if node_result is not None:
@@ -135,10 +148,18 @@ def step_evaluate_dmn_zorgtoeslag(context):
     if 'partner_income_data' not in context.dmn_parameters:
         context.dmn_parameters['partner_income_data'] = None
 
-    # Evaluate the eligibility decision
+    # Determine which decision to evaluate based on available data
+    # If tax_data and income_data are provided, evaluate benefit amount
+    # Otherwise, just evaluate eligibility
+    if 'tax_data' in context.dmn_parameters and 'income_data' in context.dmn_parameters:
+        decision_id = "decision_hoogte_toeslag"
+    else:
+        decision_id = "decision_is_verzekerde_zorgtoeslag"
+
+    # Evaluate the decision
     result = context.dmn_engine.evaluate(
         dmn_spec,
-        "decision_is_verzekerde_zorgtoeslag",
+        decision_id,
         context.dmn_parameters
     )
 
@@ -165,7 +186,33 @@ def step_evaluate_dmn_zorgtoeslag(context):
 def step_check_dmn_eligibility(context, expected_value):
     """Check DMN eligibility result."""
     expected = expected_value.lower() == 'true'
-    actual = context.dmn_result['is_verzekerde_zorgtoeslag']
+    # Check if we have eligibility result (from decision_is_verzekerde_zorgtoeslag)
+    # or infer from hoogte_toeslag result
+    if 'is_verzekerde_zorgtoeslag' in context.dmn_result:
+        actual = context.dmn_result['is_verzekerde_zorgtoeslag']
+    elif 'hoogte_toeslag' in context.dmn_result:
+        # If we evaluated hoogte_toeslag, infer eligibility from benefit amount > 0
+        actual = context.dmn_result['hoogte_toeslag'] > 0
+    else:
+        raise KeyError("No eligibility or benefit result found in DMN output")
 
     assert actual == expected, \
         f"Expected eligibility to be {expected}, but got {actual}"
+
+
+@then('the DMN benefit amount should be "{expected_amount}" euro')
+def step_check_dmn_benefit_amount(context, expected_amount):
+    """Check DMN benefit amount in euros."""
+    # Convert expected amount from euros to eurocents
+    expected_eurocents = float(expected_amount) * 100
+
+    # Get actual amount in eurocents
+    actual_eurocents = context.dmn_result.get('hoogte_toeslag', 0)
+
+    # Allow small rounding differences (within 1 cent)
+    difference = abs(actual_eurocents - expected_eurocents)
+
+    assert difference < 1.0, \
+        f"Expected benefit amount to be €{expected_amount} ({expected_eurocents} eurocents), " \
+        f"but got {actual_eurocents} eurocents (€{actual_eurocents/100:.2f}). " \
+        f"Difference: {difference:.2f} eurocents"

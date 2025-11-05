@@ -51,6 +51,19 @@ def format_trace(path_node: Any, indent: int = 0, show_details: bool = True) -> 
                     lines.append(f"{prefix}|     {key}: {value}")
             else:
                 lines.append(f"{prefix}|   Result: {node_result}")
+    elif node_type == "feel_condition":
+        # Format FEEL condition evaluation
+        expression = node_details.get('expression', '')
+        lines.append(f"{prefix}  > Condition: {expression}")
+        lines.append(f"{prefix}    Evaluated to: {node_result}")
+    elif node_type == "feel_branch":
+        # Format FEEL branch selection
+        branch_type = node_details.get('branch_type', 'unknown')
+        expression = node_details.get('expression', '')
+        lines.append(f"{prefix}  > Branch taken: {branch_type}")
+        lines.append(f"{prefix}    Expression: {expression}")
+        if node_result is not None:
+            lines.append(f"{prefix}    Result: {node_result}")
     else:
         lines.append(f"{prefix}+ [{node_type.upper()}] {node_name}")
         if node_result is not None:
