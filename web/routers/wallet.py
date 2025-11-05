@@ -154,46 +154,13 @@ async def get_attributes(
     except ValidationError as e:
         return JSONResponse(content={"success": False, "message": f"Invalid credential format: {str(e)}"})
 
-    # Check that it contains exactly one object
-    if len(credentials) != 1:
-        return JSONResponse(
-            content={"success": False, "message": f"Expected exactly 1 credential, got {len(credentials)}"}
-        )
-
-    credential = credentials[0]
-
-    # Check that the id is "housing_attestation"
-    if credential.id != "housing_attestation":
-        return JSONResponse(
-            content={
-                "success": False,
-                "message": f"Expected credential id 'housing_attestation', got '{credential.id}'",
-            }
-        )
-
-    # Check that attestations has exactly one object
-    if len(credential.attestations) != 1:
-        return JSONResponse(
-            content={"success": False, "message": f"Expected exactly 1 attestation, got {len(credential.attestations)}"}
-        )
-
-    attestation = credential.attestations[0]
-
-    # Validate attestation fields
-    expected_values = {
-        "attestation_type": "com.example.housing",
-        "format": "dc+sd-jwt",
-        "issuer_uri": "https://housing.example.com",
-        "attestation_qualification": "EAA",
-        "ca": "ca.issuer.example.com",
-    }
-
-    for field, expected_value in expected_values.items():
-        actual_value = getattr(attestation, field)
-        if actual_value != expected_value:
-            return JSONResponse(
-                content={"success": False, "message": f"Expected {field} '{expected_value}', got '{actual_value}'"}
-            )
+    # In our DCQL query we requested one copy of a single credential.
+    # If the wallet did not respond with exactly that, or if the credential was expired or invalid
+    # or did not contain the requested attributes, then the `verification_server` would have
+    # responded with an error message instead of verified attributes.
+    # Therefore, if we are here then we may assume that we have our one copy of a single credential
+    # and that it contains verified, i.e. trustworthy, attributes.
+    attestation = credentials[0].attestations[0]
 
     # Parse currency values and convert to cents
     parsed_attributes = {}
@@ -225,7 +192,7 @@ async def get_attributes(
             field_name = wallet_to_field.get(wallet_attr)
             if field_name:
                 id = claim_manager.submit_claim(service, field_name, value, "wallet", "housing corporation", law, bsn)
-                claim_manager.approve_claim(id, "wallet", None)
+                claim_manager.approve_claim(id, attestation.issuer_uri, None)
 
         # Evaluate the law with the wallet attributes as overrides
         law, result, parameters = evaluate_law(
