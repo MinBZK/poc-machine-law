@@ -1,7 +1,7 @@
 {
   "purposeStatement": {
-    "nl": "Uitgifte",
-    "en": "Issuance"
+    "nl": "Huurtoeslagaanvraag",
+    "en": "Rent benefit application"
   },
   "retentionPolicy": {
     "intentToRetain": true,
@@ -15,25 +15,25 @@
   },
   "organization": {
     "displayName": {
-      "nl": "DroomWoon",
-      "en": "DreamHome"
+      "nl": "RegelRecht",
+      "en": "RegelRecht"
     },
     "legalName": {
-      "nl": "DroomWoon N.V.",
-      "en": "DroomWoon N.V."
+      "nl": "RegelRecht N.V.",
+      "en": "RegelRecht N.V."
     },
     "description": {
-      "nl": "DroomWoon is een voorbeeld-woningcorporatie.",
-      "en": "DreamHome is an exemplar housing company."
+      "nl": "RegelRecht is een demo die laat zien hoe wetten als code werken.",
+      "en": "RegelRecht is a demonstration showcasing the operation of laws as code."
     },
-    "webUrl": "https://housingcompany.example.com",
+    "webUrl": "https://ui.lac.apps.digilab.network/",
     "city": {
       "nl": "Den Haag",
       "en": "The Hague"
     },
     "category": {
-      "nl": "Woningcorporatie",
-      "en": "Housing company"
+      "nl": "Demo",
+      "en": "Demo"
     },
     "logo": {
       "mimeType": "image/svg+xml",
@@ -41,11 +41,15 @@
     },
     "countryCode": "nl",
     "kvk": "99876543",
-    "privacyPolicyUrl": "https://housingcompany.example.com/privacy"
+    "privacyPolicyUrl": "https://ui.lac.apps.digilab.network/privacy"
   },
-  "requestOriginBaseUrl": "https://housingcompany.example.com",
+  "requestOriginBaseUrl": "https://ui.lac.apps.digilab.network/",
   "authorizedAttributes": {
     "urn:eudi:pid:nl:1": [["urn:eudi:pid:nl:1", "bsn"]],
-    "com.example.housing": [["rent"], ["service_charges"], ["eligible_service_charges"]]
+    "com.example.housing": [
+      ["rent"],
+      ["service_charges"],
+      ["eligible_service_charges"]
+    ]
   }
 }
