@@ -92,21 +92,31 @@
                 return;
             }
 
-            fetch('/wallet/attributes', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ session_token: session_token })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Wallet attributes received:', data.attributes);
-                } else {
-                    console.error('Wallet error:', data.message);
+            // Get bsn, law, and service from URL params or form inputs
+            const urlParams = new URLSearchParams(window.location.search);
+            const bsn = urlParams.get('bsn') || '{{ bsn }}' || '100000001';
+            let service = urlParams.get('service') || '';
+            let law = urlParams.get('law') || '';
+
+            // If not found in URL, check form inputs
+            if (!service || !law) {
+                const serviceInput = document.querySelector('input[name="service"]');
+                const lawInput = document.querySelector('input[name="law"]');
+
+                if (serviceInput) service = serviceInput.value;
+                if (lawInput) law = lawInput.value;
+            }
+
+            // Use HTMX to make the request with plain object (HTMX will form-encode it)
+            htmx.ajax('POST', '/wallet/attributes', {
+                target: '#application-panel',
+                swap: 'innerHTML',
+                values: {
+                    session_token: session_token,
+                    bsn: bsn,
+                    law: law,
+                    service: service
                 }
-            })
-            .catch(error => {
-                console.error('Failed to fetch wallet attributes:', error);
             });
         };
         </script>
