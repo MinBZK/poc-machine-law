@@ -1824,6 +1824,12 @@ async function loadPopulations(autoSelectId = null) {
             // Add change event listener
             select.onchange = () => showPopulationDetails(select.value);
 
+            // Reset to default option if no auto-select
+            if (!autoSelectId) {
+                select.value = '';
+                document.getElementById('selected-population-info').classList.add('hidden');
+            }
+
             // Auto-select if a population ID was provided
             if (autoSelectId) {
                 select.value = autoSelectId;
@@ -1840,6 +1846,10 @@ async function loadPopulations(autoSelectId = null) {
                     select.classList.remove('population-highlight');
                 }, 3000);
             }
+        } else {
+            // No populations available - hide the selector
+            document.getElementById('population-selector').classList.add('hidden');
+            document.getElementById('selected-population-info').classList.add('hidden');
         }
     } catch (error) {
         console.error('Error loading populations:', error);
@@ -1894,8 +1904,11 @@ async function deleteSelectedPopulation() {
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // Removed alert - silent success with visual feedback
+                    // Hide the population info panel immediately
+                    document.getElementById('selected-population-info').classList.add('hidden');
                     selectedPopulationId = null;
+
+                    // Reload the population list (which will hide selector if empty)
                     await loadPopulations();
                 } else {
                     showErrorModal('Fout bij verwijderen', result.message);
