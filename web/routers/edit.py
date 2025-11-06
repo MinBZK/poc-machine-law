@@ -438,13 +438,13 @@ async def update_situation(
             law = "wet_brp"
 
             # Change sources
-            parameters["ADRES"] = {
-                "straat": parameters["ADRES.straat"],
-                "huisnummer": parameters["ADRES.huisnummer"],
-                "postcode": parameters["ADRES.postcode"],
-                "woonplaats": parameters["ADRES.woonplaats"],
-                "type": "WOONADRES",
-            }
+            # parameters["ADRES"] = {
+            #     "straat": parameters["ADRES.straat"],
+            #     "huisnummer": parameters["ADRES.huisnummer"],
+            #     "postcode": parameters["ADRES.postcode"],
+            #     "woonplaats": parameters["ADRES.woonplaats"],
+            #     "type": "WOONADRES",
+            # }
             parameters["VERBLIJFSADRES"] = parameters[
                 "ADRES.woonplaats"
             ]  # Note: somehow only the city is used in the case system
