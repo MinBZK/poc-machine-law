@@ -18,10 +18,36 @@
     timestamp: Date;
   };
 
-  let anthropicApiKey = localStorage.getItem('anthropic-api-key') || '';
-  let tavilyApiKey = localStorage.getItem('tavily-api-key') || '';
-  let apiFormIsShown = anthropicApiKey === '' || tavilyApiKey === '';
+  let anthropicApiKey = browser ? localStorage.getItem('anthropic-api-key') || '' : '';
+  let tavilyApiKey = browser ? localStorage.getItem('tavily-api-key') || '' : '';
+  let anthropicAvailableViaEnv = false;
+  let tavilyAvailableViaEnv = false;
+  let apiFormIsShown = false;
   let anthropicApiKeyInput: HTMLInputElement | undefined;
+
+  // Check which API keys are available via environment variables
+  async function checkApiKeysStatus() {
+    try {
+      const response = await fetch('/importer/api-keys-status');
+      const data = await response.json();
+      anthropicAvailableViaEnv = data.anthropic_available;
+      tavilyAvailableViaEnv = data.tavily_available;
+      
+      // Show form only if at least one key is needed and not available via env
+      const needsAnthropicKey = !anthropicAvailableViaEnv && anthropicApiKey === '';
+      const needsTavilyKey = !tavilyAvailableViaEnv && tavilyApiKey === '';
+      apiFormIsShown = needsAnthropicKey || needsTavilyKey;
+    } catch (error) {
+      console.error('Failed to check API keys status:', error);
+      // Fallback to showing form if we can't check
+      apiFormIsShown = anthropicApiKey === '' || tavilyApiKey === '';
+    }
+  }
+
+  // Check API keys status on component mount
+  if (browser) {
+    checkApiKeysStatus();
+  }
 
   let messages: Message[] = [];
   let input = '';
@@ -43,15 +69,16 @@
       localStorage.setItem('tavily-api-key', tavilyApiKey);
     }
 
-    // Send the keys to the server
-    socket.send(
-      JSON.stringify({
-        type: 'keys',
-        anthropicApiKey,
-        tavilyApiKey,
-      }),
-    );
-
+    // Send the keys to the server (only send non-empty keys)
+    const keysToSend: any = { type: 'keys' };
+    if (!anthropicAvailableViaEnv && anthropicApiKey) {
+      keysToSend.anthropicApiKey = anthropicApiKey;
+    }
+    if (!tavilyAvailableViaEnv && tavilyApiKey) {
+      keysToSend.tavilyApiKey = tavilyApiKey;
+    }
+    
+    socket.send(JSON.stringify(keysToSend));
     apiFormIsShown = false;
   }
 
@@ -63,14 +90,20 @@
     console.log('Connected to server');
 
     // If the API keys are already set, send them to the server
-    if (anthropicApiKey && tavilyApiKey) {
-      socket.send(
-        JSON.stringify({
-          type: 'keys',
-          anthropicApiKey,
-          tavilyApiKey,
-        }),
-      );
+    const keysToSend: any = { type: 'keys' };
+    let hasKeys = false;
+    
+    if (!anthropicAvailableViaEnv && anthropicApiKey) {
+      keysToSend.anthropicApiKey = anthropicApiKey;
+      hasKeys = true;
+    }
+    if (!tavilyAvailableViaEnv && tavilyApiKey) {
+      keysToSend.tavilyApiKey = tavilyApiKey;
+      hasKeys = true;
+    }
+    
+    if (hasKeys) {
+      socket.send(JSON.stringify(keysToSend));
     }
   });
 
@@ -180,57 +213,96 @@
       on:submit|preventDefault={handleKeySubmit}
       class="mb-5 grid grid-cols-5 gap-4 rounded-md border border-gray-300 bg-gray-50 p-4"
     >
-      <div class="col-span-2 flex flex-col">
-        <label class="mb-2 inline-block font-medium" for="api-key">Claude / Anthropic API key</label
+      {#if !anthropicAvailableViaEnv}
+        <div class="col-span-2 flex flex-col">
+          <label class="mb-2 inline-block font-medium" for="api-key">Claude / Anthropic API key</label
+          >
+
+          <input
+            bind:value={anthropicApiKey}
+            bind:this={anthropicApiKeyInput}
+            placeholder="sk-…"
+            id="api-key"
+            type="text"
+            class="mt-auto block w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 focus:border-blue-500 focus:ring-blue-500"
+            autocomplete="off"
+          />
+        </div>
+      {:else}
+        <div class="col-span-2 flex flex-col">
+          <span class="mb-2 inline-block font-medium">Claude / Anthropic API key</span>
+          <div class="flex items-center rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-2 h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4 text-emerald-600" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0"/><path d="m9 12l2 2l4-4"/></g></svg>
+            <span class="text-sm text-emerald-700">Ingesteld via omgevingsvariable</span>
+          </div>
+        </div>
+      {/if}
+
+      {#if !tavilyAvailableViaEnv}
+        <div class="col-span-2 flex flex-col">
+          <label class="mb-2 inline-block font-medium" for="tavily-api-key">Tavily API key</label>
+
+          <input
+            bind:value={tavilyApiKey}
+            placeholder="tvly-…"
+            id="tavily-api-key"
+            type="text"
+            class="mt-auto block w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 focus:border-blue-500 focus:ring-blue-500"
+            autocomplete="off"
+          />
+        </div>
+      {:else}
+        <div class="col-span-2 flex flex-col">
+          <span class="mb-2 inline-block font-medium">Tavily API key</span>
+          <div class="flex items-center rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-2 h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4 text-emerald-600" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0"/><path d="m9 12l2 2l4-4"/></g></svg>
+            <span class="text-sm text-emerald-700">Ingesteld via omgevingsvariable</span>
+          </div>
+        </div>
+      {/if}
+
+      {#if !anthropicAvailableViaEnv || !tavilyAvailableViaEnv}
+        <button
+          type="submit"
+          class="mt-auto cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
         >
+          Gebruiken
+        </button>
+      {:else}
+        <button
+          type="button"
+          on:click={() => apiFormIsShown = false}
+          class="mt-auto cursor-pointer rounded-md border border-gray-600 bg-gray-600 px-4 py-2 text-white transition duration-200 hover:border-gray-700 hover:bg-gray-700"
+        >
+          Sluiten
+        </button>
+      {/if}
 
-        <input
-          bind:value={anthropicApiKey}
-          bind:this={anthropicApiKeyInput}
-          placeholder="sk-…"
-          id="api-key"
-          type="text"
-          class="mt-auto block w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 focus:border-blue-500 focus:ring-blue-500"
-          autocomplete="off"
-        />
-      </div>
-
-      <div class="col-span-2 flex flex-col">
-        <label class="mb-2 inline-block font-medium" for="tavily-api-key">Tavily API key</label>
-
-        <input
-          bind:value={tavilyApiKey}
-          placeholder="tvly-…"
-          id="tavily-api-key"
-          type="text"
-          class="mt-auto block w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 focus:border-blue-500 focus:ring-blue-500"
-          autocomplete="off"
-        />
-      </div>
-
-      <button
-        type="submit"
-        class="mt-auto cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-white transition duration-200 hover:border-blue-700 hover:bg-blue-700"
-      >
-        Gebruiken
-      </button>
-
-      <small class="col-span-5 text-sm text-gray-600"
-        >Verplicht, worden niet opgeslagen, alleen in de browser. Meer informatie: <a
-          class="text-blue-700 underline hover:no-underline"
-          href="https://console.anthropic.com/"
-          target="_blank"
-          rel="nofollow">Anthropic</a
-        >,
-        <a
-          class="text-blue-700 underline hover:no-underline"
-          href="https://tavily.com/#faq"
-          target="_blank"
-          rel="nofollow">Tavily</a
-        >.</small
-      >
+      <small class="col-span-5 text-sm text-gray-600">
+        {#if !anthropicAvailableViaEnv || !tavilyAvailableViaEnv}
+          Verplicht, worden niet opgeslagen, alleen in de browser. Meer informatie:
+          {#if !anthropicAvailableViaEnv}
+            <a
+              class="text-blue-700 underline hover:no-underline"
+              href="https://console.anthropic.com/"
+              target="_blank"
+              rel="nofollow">Anthropic</a
+            >{#if !tavilyAvailableViaEnv}, {/if}
+          {/if}
+          {#if !tavilyAvailableViaEnv}
+            <a
+              class="text-blue-700 underline hover:no-underline"
+              href="https://tavily.com/#faq"
+              target="_blank"
+              rel="nofollow">Tavily</a
+            >
+          {/if}.
+        {:else}
+          Alle API keys zijn ingesteld via omgevingsvariabelen.
+        {/if}
+      </small>
     </form>
-  {:else}
+  {:else if !anthropicAvailableViaEnv || !tavilyAvailableViaEnv}
     <div
       class="mb-5 flex items-center rounded-md border border-emerald-700/25 bg-emerald-50 px-3 py-2"
     >
@@ -247,7 +319,13 @@
           ><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0" /><path d="m9 12l2 2l4-4" /></g
         ></svg
       >
-      Claude / Anthropic en Tavily API keys ingesteld
+      {#if anthropicAvailableViaEnv}
+        Claude / Anthropic API key ingesteld via omgevingsvariabele, Tavily API key via browser
+      {:else if tavilyAvailableViaEnv}
+        Tavily API key ingesteld via omgevingsvariabele, Claude / Anthropic API key via browser
+      {:else}
+        Claude / Anthropic en Tavily API keys ingesteld via browser
+      {/if}
 
       <button
         on:click={async () => {
