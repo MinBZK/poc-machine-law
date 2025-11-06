@@ -1,22 +1,21 @@
 # RFC-001: Rules Language Selection
 
-**Status:** Accepted | **Date:** 2025-11-05 | **Authors:** Tim, Anne
+**Status:** Proposed | **Date:** 2025-11-05 | **Authors:** Tim, Anne
 
 ## Context
 
-Machine Law requires a rules language for representing Dutch government legislation computationally. Several established standards exist (NRML, DMN with FEEL, Datalog), each with proven track records in various domains. The choice of language fundamentally shapes the system's capabilities, maintainability, and ability to serve its specific mission.
+Machine Law requires a rules language for representing Dutch government legislation computationally. Multiple rules languages exist (DMN with FEEL, Datalog, NRML, and others), each with different characteristics and adoption levels. The choice of language fundamentally shapes the system's capabilities, maintainability, and ability to serve its specific mission.
 
 During the proof-of-concept phase, we developed and tested a custom YAML-based language. This language is currently used in the `regelrecht-laws` submodule, which contains implementations of over 30 Dutch laws including Zorgtoeslagwet, Algemene Ouderdomswet, Participatiewet, and others. The POC has validated the approach's viability for representing real-world legislation.
 
 ## Decision
 
-**Continue with and formalize the custom YAML-based rules language, with optional future conversion capabilities from established standards.**
+**Continue with and formalize the custom YAML-based rules language, with optional future conversion capabilities from existing rules languages.**
 
 The language:
 - Uses YAML syntax for structure and human readability
 - Defines domain-specific constructs tailored to Dutch legislation
 - Has been validated through POC implementations of actual laws
-- Can technically support conversion from established formats (DMN, NRML, Datalog); implemented when stakeholders need it
 - Provides precise semantics matching our computational requirements
 
 ## Why
@@ -27,9 +26,9 @@ The decision centers on achieving **optimal fit** between language capabilities 
 
 After evaluating all alternatives, the core trade-off is:
 
-**Established standards** (DMN, NRML, Datalog): Market adoption and proven track records provide confidence, ecosystem support, tooling, and cross-organization compatibility.
+**Existing rules languages**: Provide varying levels of market adoption, ecosystem support, tooling, and compatibility. Market-driven standards offer cross-organization compatibility; NRML offers Dutch government domain alignment.
 
-**Custom YAML**: Greater freedom and ownership. Complete control over semantics, versioning, and evolution without external dependencies. Better ability to limit functionality to exactly what's needed. No risk of external models being fed into the system with expectations of full feature support that may not align with our use case. No pressure to implement breaking changes or new features from external standard updates.
+**Custom YAML**: Greater freedom and ownership. Complete control over semantics, versioning, and evolution without external dependencies. Better ability to limit functionality to exactly what's needed. No risk of external models being fed into the system with expectations of full feature support that may not align with our use case. No pressure to implement breaking changes or new features from external updates.
 
 Since we are doing something new and complex, a rules language that is a 100% match for our specific requirements will benefit the project. The custom YAML language addresses these needs:
 
@@ -37,7 +36,6 @@ Since we are doing something new and complex, a rules language that is a 100% ma
 2. **Evolving understanding**: As a research-oriented project, requirements continue to clarify through implementation; custom language can adapt without external constraints
 3. **Precise semantics needed**: Government decisions require unambiguous interpretation; custom language provides exact semantics without vendor-specific ambiguities
 4. **Proven viability**: POC with 30+ laws in `regelrecht-laws` demonstrates the YAML approach successfully models real legislation
-5. **Conversion capability**: Can serve as compilation target from other formats for features within our scope (technically feasible, implemented when stakeholders need it)
 
 ### Conversion Strategy (Technically Feasible, Stakeholder-Driven)
 
@@ -73,22 +71,31 @@ Benefits when stakeholders need this capability:
 
 **Mitigation strategies:**
 - Start with minimal feature set, expand based on proven needs
-- Learn from established languages' design patterns
+- Learn from existing languages' design patterns
 - Maintain comprehensive test suite
 - Document all design decisions (via RFCs)
-- Support conversion from established formats to leverage existing work
-
-**Established language trade-offs:**
-- Features designed for different domains may not align perfectly
-- External governance of standards may conflict with mission needs
-- Risk of users providing models using unsupported features
-- Semantic ambiguities in standards require interpretation
+- Support conversion from other formats to leverage existing work (when stakeholders need it)
 
 ## Alternatives Considered
 
-*Note: Adoption ratings (X/10) indicate worldwide usage and market penetration, from research conducted to understand the maturity and ecosystem support of each option.*
+The alternatives to custom YAML fall into two categories:
 
-### DMN with FEEL (Adoption: 9/10)
+**Market-driven standards** (DMN, Datalog, Prolog, OWL/RDF, Catala) are evaluated based on:
+- Worldwide adoption and market penetration
+- Tool ecosystem maturity
+- Cross-organization compatibility
+- Vendor support
+
+**Dutch government-specific initiative** (NRML) is evaluated based on:
+- Fit with Dutch government legislation needs
+- Relationship to this initiative (both from MinBZK)
+- Currently no external adoption beyond development team
+
+Both categories represent valid alternatives to custom YAML, but are assessed using different criteria appropriate to their context.
+
+*Note: Adoption levels (Low/Medium/High) for market-driven standards indicate worldwide usage and ecosystem maturity.*
+
+### DMN with FEEL (Adoption: High)
 **Strengths**:
 - Most widely adopted decision modeling standard
 - Strong vendor support and tool ecosystem
@@ -110,24 +117,26 @@ Benefits when stakeholders need this capability:
 
 **When FEEL is needed**: Complex calculations, date/time logic, list operations, string manipulation, conditional expressions beyond tables
 
-### NRML (Nederlandse Regelgeving Markup Language) (Adoption: 2/10)
-**Strengths**:
-- Purpose-built for Dutch regulations
-- Domain-specific constructs for regulatory complexity
-- Developed with Dutch government context in mind
+### NRML (Nederlandse Regelgeving Markup Language)
+**Note:** NRML is developed within the same MinBZK initiative as this project. It is not a market-driven standard but rather a parallel effort to create a Dutch government-specific rules language. Currently, NRML has no external adoption beyond its development team.
 
-**Context**:
-- Netherlands-specific adoption
-- Limited to Dutch regulatory domain
-- Smaller ecosystem and community
+**Strengths**:
+- Purpose-built for Dutch regulations with government context
+- Domain-specific constructs for regulatory complexity
+- Shared organizational knowledge and potential collaboration
+
+**Relationship to this project**:
+- Both NRML and custom YAML emerge from MinBZK's law-as-code efforts
+- Different approaches to solving similar problems
+- Potential for knowledge sharing and alignment
 
 **Fit assessment**:
 - Strong domain alignment with Dutch legislation
 - Broader feature set designed for wider range of regulatory scenarios; risk of additional complexity when only subset of capabilities needed
-- Limited tooling compared to international standards
+- As a related initiative, not subject to external market forces or governance
 - Service reference patterns would need validation
 
-### Datalog (Adoption: 3/10, growing)
+### Datalog (Adoption: Low, growing)
 **Strengths**:
 - Declarative rules that read like legal text
 - Excellent for legal reasoning and explanations
@@ -159,7 +168,7 @@ ineligible_reason(Person, "te jong") :-
     person(Person), age(Person, Age), Age < 18.
 ```
 
-### Prolog (Adoption: 5/10)
+### Prolog (Adoption: Medium)
 **Strengths**:
 - Powerful logical inference and backtracking
 - Established in legal expert systems
@@ -177,7 +186,7 @@ ineligible_reason(Person, "te jong") :-
 - Less predictable performance than Datalog
 - Accessibility challenges for non-technical reviewers
 
-### OWL/RDF with SHACL (Adoption: 7/10 in semantic web)
+### OWL/RDF with SHACL (Adoption: High in semantic web)
 **Strengths**:
 - Excellent for knowledge representation and ontologies
 - Semantic reasoning capabilities
@@ -197,7 +206,7 @@ ineligible_reason(Person, "te jong") :-
 - Better suited as complement than primary language
 - Service references could map to linked data patterns
 
-### Catala (Adoption: 1/10)
+### Catala (Adoption: Low)
 **Strengths**:
 - Programming language specifically designed for law
 - Strong formal foundations with proof capabilities
@@ -218,19 +227,11 @@ ineligible_reason(Person, "te jong") :-
 - Formal verification capabilities valuable but not immediate need
 
 ### Other Logic Programming Options
-**Answer Set Programming (ASP)** (Adoption: 2/10): Handles non-monotonic reasoning common in legal rules; primarily research-focused
+**Answer Set Programming (ASP)** (Adoption: Low): Handles non-monotonic reasoning common in legal rules; primarily research-focused
 
-**Production Rules Engines** (Drools, JENA) (Adoption: 8/10): Established in enterprise; more procedural than declarative; strong Java ecosystem
+**Production Rules Engines** (Drools, JENA) (Adoption: High): Established in enterprise; more procedural than declarative; strong Java ecosystem
 
-**LegalRuleML** (Adoption: 4/10): OASIS standard for legal rules; more expressive than DMN; growing in research but limited production use
-
-### Comparative Summary
-
-**Best for straightforward decisions**: DMN (when non-technical stakeholders need to review)
-**Best for complex reasoning**: Datalog (interdependencies and explanations)
-**Best for Dutch domain alignment**: NRML (if external governance acceptable)
-**Best for semantic web integration**: OWL/RDF (knowledge graphs and data sharing)
-**Best for formal verification**: Catala (though immature)
+**LegalRuleML** (Adoption: Low): OASIS standard for legal rules; more expressive than DMN; growing in research but limited production use
 
 ## Related
 
