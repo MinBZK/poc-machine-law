@@ -32,7 +32,7 @@
       const data = await response.json();
       anthropicAvailableViaEnv = data.anthropic_available;
       tavilyAvailableViaEnv = data.tavily_available;
-      
+
       // Show form only if at least one key is needed and not available via env
       const needsAnthropicKey = !anthropicAvailableViaEnv && anthropicApiKey === '';
       const needsTavilyKey = !tavilyAvailableViaEnv && tavilyApiKey === '';
@@ -77,7 +77,7 @@
     if (!tavilyAvailableViaEnv && tavilyApiKey) {
       keysToSend.tavilyApiKey = tavilyApiKey;
     }
-    
+
     socket.send(JSON.stringify(keysToSend));
     apiFormIsShown = false;
   }
@@ -92,7 +92,7 @@
     // If the API keys are already set, send them to the server
     const keysToSend: any = { type: 'keys' };
     let hasKeys = false;
-    
+
     if (!anthropicAvailableViaEnv && anthropicApiKey) {
       keysToSend.anthropicApiKey = anthropicApiKey;
       hasKeys = true;
@@ -101,7 +101,7 @@
       keysToSend.tavilyApiKey = tavilyApiKey;
       hasKeys = true;
     }
-    
+
     if (hasKeys) {
       socket.send(JSON.stringify(keysToSend));
     }

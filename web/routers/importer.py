@@ -177,7 +177,7 @@ def check_law_input(state: State, config: dict) -> dict:
     # If the API keys are unset or empty, return an error message
     anthropic_key = state.get("anthropic_api_key") or os.getenv("ANTHROPIC_API_KEY")
     tavily_key = state.get("tavily_api_key") or os.getenv("TAVILY_API_KEY")
-    
+
     if (not anthropic_key) or (not tavily_key):
         loop.run_until_complete(
             manager.send_message(
@@ -536,10 +536,12 @@ manager = ConnectionManager()
 @router.get("/api-keys-status")
 async def get_api_keys_status():
     """Check which API keys are available via environment variables."""
-    return JSONResponse({
-        "anthropic_available": bool(os.getenv("ANTHROPIC_API_KEY")),
-        "tavily_available": bool(os.getenv("TAVILY_API_KEY"))
-    })
+    return JSONResponse(
+        {
+            "anthropic_available": bool(os.getenv("ANTHROPIC_API_KEY")),
+            "tavily_available": bool(os.getenv("TAVILY_API_KEY")),
+        }
+    )
 
 
 @router.websocket("/ws")
@@ -559,7 +561,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     state_update["anthropic_api_key"] = user_input["anthropicApiKey"]
                 if "tavilyApiKey" in user_input and user_input["tavilyApiKey"]:
                     state_update["tavily_api_key"] = user_input["tavilyApiKey"]
-                
+
                 if state_update:
                     graph.update_state(
                         {"configurable": {"thread_id": thread_id}},
