@@ -100,20 +100,23 @@ def step_impl(context, law, service):
     if not hasattr(context, "test_data"):
         context.test_data = {}
 
-    # Process the table to get the input data
+    # Process the table to get the input data (only one row for parameters)
     for row in context.table:
-        key = row.headings[0]
-        value = row[key]
-        # Special handling for JSON-like values
-        if value.startswith('[') or value.startswith('{'):
-            import json
-            try:
-                value = json.loads(value.replace("'", '"'))
-            except json.JSONDecodeError:
-                pass
-        context.test_data[key] = value
-        # Also add to parameters for direct parameter access
-        context.parameters[key] = value
+        for key, value in row.items():
+            # Special handling for JSON-like values
+            if isinstance(value, str) and (value.startswith('[') or value.startswith('{')):
+                import json
+                try:
+                    value = json.loads(value.replace("'", '"'))
+                except json.JSONDecodeError:
+                    pass
+            # Parse boolean values
+            elif isinstance(value, str):
+                value = parse_value(value)
+
+            context.test_data[key] = value
+            # Also add to parameters for direct parameter access
+            context.parameters[key] = value
 
     evaluate_law(context, service, law)
 
@@ -858,3 +861,19 @@ def step_impl(context, maanden):
         actual, expected,
         f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
     )
+
+# Generic output field checkers
+@then('is {field_name} "{expected_value}"')
+def step_impl(context, field_name, expected_value):
+    """Check if output field equals expected value"""
+    if field_name not in context.result.output:
+        raise AssertionError(f"Output field '{field_name}' not found in result. Available fields: {list(context.result.output.keys())}")
+    
+    actual_value = context.result.output[field_name]
+    
+    # Parse expected value
+    parsed_expected = parse_value(expected_value)
+    
+    # Compare
+    if actual_value != parsed_expected:
+        raise AssertionError(f"Expected {field_name} to be {parsed_expected}, but got {actual_value}")
