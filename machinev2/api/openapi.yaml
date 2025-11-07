@@ -425,10 +425,15 @@ components:
         parameters:
           type: object
           additionalProperties: true
-        date:
+        effectiveDate:
           type: string
           format: date
-          description: Can be used to overwrite the date used by the service
+          description: Can be used to set the effective execution date
+          example: "2025-01-31"
+        referenceDate:
+          type: string
+          format: date
+          description: Can be used to set the reference date of data
           example: "2025-01-31"
         input:
           type: object

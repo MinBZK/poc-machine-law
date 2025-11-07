@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -39,7 +40,8 @@ type RuleContextData struct {
 type RuleContext struct {
 	ServiceProvider service.ServiceProvider
 	propertySpecs   map[string]ruleresolver.Field
-	calculationDate string
+	referenceDate   time.Time
+	effectiveDate   time.Time
 	LocalResolver   *local.LocalResolver
 	OutputsResolver *output.OutputsResolver
 	Resolvers       []resolver.Resolver
@@ -51,7 +53,7 @@ func NewRuleContext(
 	definitions map[string]any, serviceProvider service.ServiceProvider, caseManager casemanager.CaseManager,
 	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
 	sources model.SourceDataFrame,
-	overwriteInput map[string]any, calculationDate string,
+	overwriteInput map[string]any, referenceDate, effectiveDate time.Time,
 	claims map[string]model.Claim, approved bool) (*RuleContext, error) {
 
 	localresolver := local.NewLocalResolver()
@@ -59,13 +61,14 @@ func NewRuleContext(
 
 	rc := &RuleContext{
 		propertySpecs:   propertySpecs,
-		calculationDate: calculationDate,
+		referenceDate:   referenceDate,
+		effectiveDate:   effectiveDate,
 		MissingRequired: false,
 		LocalResolver:   localresolver,
 		OutputsResolver: outputresolver,
 	}
 
-	source, err := sourceresolver.New(rc, serviceProvider, caseManager, sources, propertySpecs)
+	source, err := sourceresolver.New(rc, serviceProvider, caseManager, sources, propertySpecs, effectiveDate)
 	if err != nil {
 		return nil, fmt.Errorf("sourceresolver new: %w", err)
 	}
@@ -78,7 +81,7 @@ func NewRuleContext(
 		outputresolver,
 		overwriteresolver.New(propertySpecs, overwriteInput),
 		source,
-		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, calculationDate, approved),
+		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, referenceDate, effectiveDate, approved),
 	}
 
 	return rc, nil
@@ -144,7 +147,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 	logger := logger.FromContext(ctx)
 
 	// Resolve dates first
-	dateValue, err := resolveDate(strPath, rc.calculationDate)
+	dateValue, err := resolveDate(strPath, rc.referenceDate)
 	if err == nil && dateValue != nil {
 		logger.Debugf("Resolved date $%s: %v", strPath, dateValue)
 		node.Result = dateValue
@@ -288,33 +291,18 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 }
 
 // resolveDate handles special date-related paths
-func resolveDate(path string, date string) (any, error) {
-	if path == "calculation_date" {
+func resolveDate(path string, date time.Time) (any, error) {
+	switch path {
+	case "calculation_date":
 		return date, nil
-	}
-
-	if path == "january_first" {
-		calcDate, err := time.Parse("2006-01-02", date)
-		if err != nil {
-			return nil, err
-		}
-		januaryFirst := time.Date(calcDate.Year(), 1, 1, 0, 0, 0, 0, calcDate.Location())
-		return januaryFirst.Format("2006-01-02"), nil
-	}
-
-	if path == "prev_january_first" {
-		calcDate, err := time.Parse("2006-01-02", date)
-		if err != nil {
-			return nil, err
-		}
-		prevJanuaryFirst := time.Date(calcDate.Year()-1, 1, 1, 0, 0, 0, 0, calcDate.Location())
-		return prevJanuaryFirst.Format("2006-01-02"), nil
-	}
-
-	if path == "year" {
-		if len(date) >= 4 {
-			return date[:4], nil
-		}
+	case "january_first":
+		januaryFirst := time.Date(date.Year(), 1, 1, 0, 0, 0, 0, date.Location())
+		return januaryFirst.Format(time.DateOnly), nil
+	case "prev_january_first":
+		prevJanuaryFirst := time.Date(date.Year()-1, 1, 1, 0, 0, 0, 0, date.Location())
+		return prevJanuaryFirst.Format(time.DateOnly), nil
+	case "year":
+		return strconv.Itoa(date.Year()), nil
 	}
 
 	return nil, fmt.Errorf("not a date path")

@@ -27,7 +27,9 @@ class Evaluate:
         service (str): Specify the service that needs to be executed
         law (str): Specify the law that needs to be executed
         parameters (Union[Unset, EvaluateParameters]):
-        date (Union[Unset, datetime.date]): Can be used to overwrite the date used by the service Example: 2025-01-31.
+        effective_date (Union[Unset, datetime.date]): Can be used to set the effective execution date Example:
+            2025-01-31.
+        reference_date (Union[Unset, datetime.date]): Can be used to set the reference date of data Example: 2025-01-31.
         input_ (Union[Unset, EvaluateInput]):
         output (Union[Unset, str]): specify a requested output value
         approved (Union[Unset, bool]): only use approved claims, default to true
@@ -36,7 +38,8 @@ class Evaluate:
     service: str
     law: str
     parameters: Union[Unset, "EvaluateParameters"] = UNSET
-    date: Union[Unset, datetime.date] = UNSET
+    effective_date: Union[Unset, datetime.date] = UNSET
+    reference_date: Union[Unset, datetime.date] = UNSET
     input_: Union[Unset, "EvaluateInput"] = UNSET
     output: Union[Unset, str] = UNSET
     approved: Union[Unset, bool] = UNSET
@@ -51,9 +54,13 @@ class Evaluate:
         if not isinstance(self.parameters, Unset):
             parameters = self.parameters.to_dict()
 
-        date: Union[Unset, str] = UNSET
-        if not isinstance(self.date, Unset):
-            date = self.date.isoformat()
+        effective_date: Union[Unset, str] = UNSET
+        if not isinstance(self.effective_date, Unset):
+            effective_date = self.effective_date.isoformat()
+
+        reference_date: Union[Unset, str] = UNSET
+        if not isinstance(self.reference_date, Unset):
+            reference_date = self.reference_date.isoformat()
 
         input_: Union[Unset, dict[str, Any]] = UNSET
         if not isinstance(self.input_, Unset):
@@ -73,8 +80,10 @@ class Evaluate:
         )
         if parameters is not UNSET:
             field_dict["parameters"] = parameters
-        if date is not UNSET:
-            field_dict["date"] = date
+        if effective_date is not UNSET:
+            field_dict["effectiveDate"] = effective_date
+        if reference_date is not UNSET:
+            field_dict["referenceDate"] = reference_date
         if input_ is not UNSET:
             field_dict["input"] = input_
         if output is not UNSET:
@@ -101,12 +110,19 @@ class Evaluate:
         else:
             parameters = EvaluateParameters.from_dict(_parameters)
 
-        _date = d.pop("date", UNSET)
-        date: Union[Unset, datetime.date]
-        if isinstance(_date, Unset):
-            date = UNSET
+        _effective_date = d.pop("effectiveDate", UNSET)
+        effective_date: Union[Unset, datetime.date]
+        if isinstance(_effective_date, Unset):
+            effective_date = UNSET
         else:
-            date = isoparse(_date).date()
+            effective_date = isoparse(_effective_date).date()
+
+        _reference_date = d.pop("referenceDate", UNSET)
+        reference_date: Union[Unset, datetime.date]
+        if isinstance(_reference_date, Unset):
+            reference_date = UNSET
+        else:
+            reference_date = isoparse(_reference_date).date()
 
         _input_ = d.pop("input", UNSET)
         input_: Union[Unset, EvaluateInput]
@@ -123,7 +139,8 @@ class Evaluate:
             service=service,
             law=law,
             parameters=parameters,
-            date=date,
+            effective_date=effective_date,
+            reference_date=reference_date,
             input_=input_,
             output=output,
             approved=approved,

@@ -60,28 +60,25 @@ func New(logger logger.Logger, service string, services service.ServiceProvider,
 func (h *HTTPService) Evaluate(
 	ctx context.Context,
 	law string,
-	referenceDate string,
+	referenceDate time.Time,
+	effectiveDate time.Time,
 	parameters map[string]any,
 	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
-	date, err := time.Parse("2006-01-02", referenceDate)
-	if err != nil {
-		return nil, fmt.Errorf("reference date parse: %w", err)
-	}
-
 	h.logger.Debugf("sending evaluate to: %s", h.svcresolver.Name)
 
 	body := api.EvaluateJSONRequestBody{
 		Data: api.Evaluate{
-			Approved:   &approved,
-			Date:       &types.Date{Time: date},
-			Input:      &overwriteInput,
-			Law:        law,
-			Output:     &requestedOutput,
-			Parameters: &parameters,
-			Service:    h.service,
+			Approved:      &approved,
+			ReferenceDate: &types.Date{Time: referenceDate},
+			EffectiveDate: &types.Date{Time: effectiveDate},
+			Input:         &overwriteInput,
+			Law:           law,
+			Output:        &requestedOutput,
+			Parameters:    &parameters,
+			Service:       h.service,
 		},
 	}
 

@@ -20,14 +20,16 @@ import (
 )
 
 type ubbResolver struct {
-	propertySpec map[string]ruleresolver.Field
-	client       graphql.Client
+	propertySpec  map[string]ruleresolver.Field
+	client        graphql.Client
+	effectiveDate time.Time
 }
 
-func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field) *ubbResolver {
+func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field, effectiveDate time.Time) *ubbResolver {
 	return &ubbResolver{
-		client:       graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
-		propertySpec: propertySpec,
+		client:        graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
+		propertySpec:  propertySpec,
+		effectiveDate: effectiveDate,
 	}
 
 }
@@ -43,7 +45,7 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 
 	f := c.propertySpec[key]
 
-	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), time.Now())
+	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), c.effectiveDate)
 	if err != nil {
 		return nil, fmt.Errorf("claim attributes object id: %w", err)
 	}
