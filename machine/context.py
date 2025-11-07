@@ -118,15 +118,21 @@ class PathNode:
 
 
 @dataclass
-class RuleContext:
-    """Context for rule evaluation"""
+class ExecutionContext:
+    """
+    Context for law execution.
+
+    Manages state for a single law evaluation, including value resolution,
+    caching, and execution path tracking.
+    """
 
     definitions: dict[str, Any]
-    service_provider: Any | None
+    law_evaluator: Any | None  # Reference to LawEvaluator for external law calls
+    data_context: Any | None  # Reference to DataContext for data access
     parameters: dict[str, Any]
     property_specs: dict[str, dict[str, Any]]
     output_specs: dict[str, TypeSpec]
-    sources: dict[str, pd.DataFrame]
+    sources: dict[str, pd.DataFrame]  # Local sources (deprecated, use data_context)
     local: dict[str, Any] = field(default_factory=dict)
     accessed_paths: set[str] = field(default_factory=set)
     values_cache: dict[str, Any] = field(default_factory=dict)
@@ -136,10 +142,19 @@ class RuleContext:
     outputs: dict[str, Any] = field(default_factory=dict)
     calculation_date: str | None = None
     resolved_paths: dict[str, Any] = field(default_factory=dict)
-    service_name: str | None = None
     claims: dict[str:Claim] = None
     approved: bool | None = True
     missing_required: bool | None = False
+
+    @property
+    def service_provider(self):
+        """Backward compatibility: service_provider now points to law_evaluator"""
+        return self.law_evaluator
+
+    @service_provider.setter
+    def service_provider(self, value):
+        """Backward compatibility: setting service_provider sets law_evaluator"""
+        self.law_evaluator = value
 
     def track_access(self, path: str) -> None:
         """Track accessed data paths"""
@@ -276,20 +291,39 @@ class RuleContext:
                     node.resolve_type = "OUTPUT"
                     return self.outputs[path]
 
-                # Check overwrite data
+                # Check overwrite data (support both old service_reference and new external_reference)
                 if path in self.property_specs:
                     spec = self.property_specs[path]
+                    # Support old service_reference format for backward compatibility
                     service_ref = spec.get("service_reference", {})
-                    if (
-                        service_ref
-                        and service_ref["service"] in self.overwrite_input
-                        and service_ref["field"] in self.overwrite_input[service_ref["service"]]
-                    ):
-                        value = self.overwrite_input[service_ref["service"]][service_ref["field"]]
-                        logger.debug(f"Resolving from OVERWRITE: {value}")
-                        node.result = value
-                        node.resolve_type = "OVERWRITE"
-                        return value
+                    external_ref = spec.get("external_reference", {})
+
+                    # Use external_reference if present, otherwise fall back to service_reference
+                    ref = external_ref if external_ref else service_ref
+
+                    if ref:
+                        # Old format: check service-based overwrite
+                        if service_ref and "service" in service_ref:
+                            if (
+                                service_ref["service"] in self.overwrite_input
+                                and service_ref["field"] in self.overwrite_input[service_ref["service"]]
+                            ):
+                                value = self.overwrite_input[service_ref["service"]][service_ref["field"]]
+                                logger.debug(f"Resolving from OVERWRITE: {value}")
+                                node.result = value
+                                node.resolve_type = "OVERWRITE"
+                                return value
+                        # New format: check law-based overwrite
+                        elif external_ref and "law" in external_ref:
+                            if (
+                                external_ref["law"] in self.overwrite_input
+                                and external_ref["field"] in self.overwrite_input[external_ref["law"]]
+                            ):
+                                value = self.overwrite_input[external_ref["law"]][external_ref["field"]]
+                                logger.debug(f"Resolving from OVERWRITE: {value}")
+                                node.result = value
+                                node.resolve_type = "OVERWRITE"
+                                return value
 
                 # Check sources
                 if path in self.property_specs:
@@ -319,14 +353,33 @@ class RuleContext:
                         table = None
                         if source_ref.get("source_type") == "laws":
                             table = "laws"
-                            df = self.service_provider.resolver.rules_dataframe()
-                        if source_ref.get("source_type") == "events":
+                            # Use law_evaluator if available, otherwise fall back to old service_provider
+                            if self.law_evaluator:
+                                df = self.law_evaluator.resolver.rules_dataframe()
+                            elif self.service_provider:
+                                df = self.service_provider.resolver.rules_dataframe()
+                        elif source_ref.get("source_type") == "events":
                             table = "events"
-                            events = self.service_provider.case_manager.get_events()
+                            # Use law_evaluator if available, otherwise fall back to old service_provider
+                            if self.law_evaluator:
+                                events = self.law_evaluator.case_manager.get_events()
+                            elif self.service_provider:
+                                events = self.service_provider.case_manager.get_events()
+                            else:
+                                events = []
                             df = pd.DataFrame(events)
-                        elif self.sources and "table" in source_ref:
+                        elif "table" in source_ref:
                             table = source_ref.get("table")
-                            if table in self.sources:
+                            # Try data_context first (new approach)
+                            if self.data_context:
+                                # In new architecture, sources are organized by source_name/table_name
+                                # For now, check all source names for the table
+                                for source_name in self.data_context.sources:
+                                    if table in self.data_context.sources[source_name]:
+                                        df = self.data_context.get_source(source_name, table)
+                                        break
+                            # Fall back to local sources (old approach)
+                            elif self.sources and table in self.sources:
                                 df = self.sources[table]
 
                         if df is not None:
@@ -346,28 +399,58 @@ class RuleContext:
 
                             return result
 
-                # Check services
+                # Check external references (new) or service references (old)
                 if path in self.property_specs:
                     spec = self.property_specs[path]
+                    external_ref = spec.get("external_reference", {})
                     service_ref = spec.get("service_reference", {})
-                    if service_ref and self.service_provider:
-                        value = self._resolve_from_service(path, service_ref, spec)
+
+                    # Prefer external_reference (new format)
+                    if external_ref and self.law_evaluator:
+                        value = self._resolve_from_external(path, external_ref, spec)
                         logger.debug(
-                            f"Result for ${path} from {service_ref['service']} field {service_ref['field']}: {value}"
+                            f"Result for ${path} from law {external_ref['law']} field {external_ref['field']}: {value}"
                         )
                         node.result = value
-                        node.resolve_type = "SERVICE"
+                        node.resolve_type = "EXTERNAL"
                         node.required = bool(spec.get("required", False))
 
                         # Add type information to the node
                         if "type" in spec:
                             node.details["type"] = spec["type"]
                         if "type_spec" in spec:
-                            # Gebruik helper-methode om enum-referenties op te lossen
                             resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
                             node.details["type_spec"] = resolved_type_spec
 
                         return value
+                    # Fall back to service_reference (old format)
+                    elif service_ref:
+                        # Try new law_evaluator first
+                        if self.law_evaluator:
+                            value = self._resolve_from_service_via_evaluator(path, service_ref, spec)
+                        # Fall back to old service_provider
+                        elif self.service_provider:
+                            value = self._resolve_from_service(path, service_ref, spec)
+                        else:
+                            value = None
+
+                        if value is not None:
+                            logger.debug(
+                                f"Result for ${path} from {service_ref.get('service', service_ref.get('law'))} "
+                                f"field {service_ref['field']}: {value}"
+                            )
+                            node.result = value
+                            node.resolve_type = "SERVICE"
+                            node.required = bool(spec.get("required", False))
+
+                            # Add type information to the node
+                            if "type" in spec:
+                                node.details["type"] = spec["type"]
+                            if "type_spec" in spec:
+                                resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
+                                node.details["type_spec"] = resolved_type_spec
+
+                            return value
 
                 logger.warning(f"Could not resolve value for {path}")
                 node.result = None
@@ -477,6 +560,118 @@ class RuleContext:
         finally:
             self.pop_path()
 
+    def _resolve_from_external(self, path, external_ref, spec):
+        """
+        Resolve a value from an external law reference (new architecture).
+
+        Args:
+            path: Variable path
+            external_ref: External reference dict with 'law', 'field', 'parameters'
+            spec: Property specification
+
+        Returns:
+            Resolved value from the external law
+        """
+        parameters = copy(self.parameters)
+        if "parameters" in external_ref:
+            parameters.update({p["name"]: self.resolve_value(p["reference"]) for p in external_ref["parameters"]})
+
+        reference_date = self.calculation_date
+        if "temporal" in spec and "reference" in spec["temporal"]:
+            reference_date = self.resolve_value(spec["temporal"]["reference"])
+
+        # Check cache
+        def param_to_str(v):
+            """Convert parameter value to string for cache key, handling lists and dicts"""
+            if isinstance(v, list | dict):
+                return str(v)
+            return v
+
+        cache_key = (
+            f"{path}({','.join([f'{k}:{param_to_str(v)}' for k, v in sorted(parameters.items())])},{reference_date})"
+        )
+        if cache_key in self.values_cache:
+            logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
+            return self.values_cache[cache_key]
+
+        logger.debug(f"Resolving from law {external_ref['law']} field {external_ref['field']} ({parameters})")
+
+        # Create external evaluation node
+        details = {
+            "law": external_ref["law"],
+            "field": external_ref["field"],
+            "reference_date": reference_date,
+            "parameters": parameters,
+            "path": path,
+        }
+
+        # Copy type information from spec to details
+        if "type" in spec:
+            details["type"] = spec["type"]
+        if "type_spec" in spec:
+            details["type_spec"] = spec["type_spec"]
+
+        external_node = PathNode(
+            type="external_evaluation",
+            name=f"External law call: {external_ref['law']}",
+            result=None,
+            details=details,
+        )
+        self.add_to_path(external_node)
+
+        try:
+            result = self.law_evaluator.evaluate_law(
+                law=external_ref["law"],
+                parameters=parameters,
+                reference_date=reference_date,
+                overwrite_input=self.overwrite_input,
+                requested_output=external_ref["field"],
+                approved=self.approved,
+            )
+
+            value = result.output.get(external_ref["field"])
+            self.values_cache[cache_key] = value
+
+            # Update the external node with the result and add child path
+            external_node.result = value
+            external_node.children.append(result.path)
+
+            self.missing_required = self.missing_required or result.missing_required
+
+            return value
+        finally:
+            self.pop_path()
+
+    def _resolve_from_service_via_evaluator(self, path, service_ref, spec):
+        """
+        Resolve a value from a service_reference using the new law_evaluator (backward compatibility).
+
+        This method handles old service_reference format but uses the new law_evaluator.
+        The service parameter is ignored - only the law is used.
+
+        Args:
+            path: Variable path
+            service_ref: Service reference dict with 'service' (ignored), 'law', 'field', 'parameters'
+            spec: Property specification
+
+        Returns:
+            Resolved value from the law
+        """
+        # Convert service_reference to external_reference format
+        external_ref = {
+            "law": service_ref["law"],
+            "field": service_ref["field"],
+        }
+        if "parameters" in service_ref:
+            external_ref["parameters"] = service_ref["parameters"]
+
+        # Log that we're ignoring the service parameter
+        if "service" in service_ref:
+            logger.debug(f"Ignoring service '{service_ref['service']}' (deprecated in new architecture)")
+
+        # Use the external reference resolution
+        return self._resolve_from_external(path, external_ref, spec)
+
     def _resolve_type_spec_enums(self, spec: dict[str, Any], type_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Resolve enum references in type_spec voor arrays
@@ -564,3 +759,7 @@ class RuleContext:
         if len(result) == 1:
             return result[0]
         return result
+
+
+# Backward compatibility: RuleContext is now ExecutionContext
+RuleContext = ExecutionContext

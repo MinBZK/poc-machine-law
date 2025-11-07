@@ -4,6 +4,8 @@ from enum import Enum
 
 import pandas as pd
 
+from machine.data_context import DataContext
+from machine.law_evaluator import LawEvaluator
 from machine.profile_loader import get_project_root, load_profiles_from_yaml
 from machine.service import Services
 from web.config_loader import ConfigLoader
@@ -30,16 +32,24 @@ class MachineType(Enum):
 
 config_loader = ConfigLoader()
 
-# Configure service for the internal engine
+# Configure law evaluator for the internal engine (new architecture)
+data_context = DataContext()
+law_evaluator = LawEvaluator(datetime.today().strftime("%Y-%m-%d"), data_context)
+
+# Backward compatibility: keep Services instance
 services = Services(datetime.today().strftime("%Y-%m-%d"))
 
 
-def _initialize_profiles(services_instance: Services) -> None:
+def _initialize_profiles(services_instance: Services, law_evaluator_instance: LawEvaluator = None) -> None:
     """
-    Load all profiles from YAML and initialize them into the services instance.
+    Load all profiles from YAML and initialize them into the services instance and law evaluator.
 
     This ensures that all profile data (including related personas like partners and children)
     is available in the dataframes for query resolution.
+
+    Args:
+        services_instance: Old Services instance (backward compatibility)
+        law_evaluator_instance: New LawEvaluator instance (new architecture)
     """
     try:
         # Load profiles from YAML
@@ -80,6 +90,10 @@ def _initialize_profiles(services_instance: Services) -> None:
 
                 rule_service.source_dataframes[table_name] = df
                 logger.debug(f"Loaded global {service_name}.{table_name}: {len(df)} rows")
+
+                # Also load into law_evaluator's DataContext (new architecture)
+                if law_evaluator_instance:
+                    law_evaluator_instance.data_context.add_source(service_name, table_name, df)
 
         profiles = load_profiles_from_yaml(profiles_path)
 
@@ -127,6 +141,17 @@ def _initialize_profiles(services_instance: Services) -> None:
                         rule_service.source_dataframes[table_name] = df
                         logger.debug(f"Created {service_name}.{table_name} with {len(df)} rows")
 
+                    # Also load into law_evaluator's DataContext (new architecture)
+                    if law_evaluator_instance:
+                        # Check if data already exists in DataContext
+                        if law_evaluator_instance.data_context.has_source(service_name, table_name):
+                            # Get existing data and concatenate
+                            existing_df = law_evaluator_instance.data_context.get_source(service_name, table_name)
+                            combined_df = pd.concat([existing_df, df], ignore_index=True)
+                            law_evaluator_instance.data_context.add_source(service_name, table_name, combined_df)
+                        else:
+                            law_evaluator_instance.data_context.add_source(service_name, table_name, df)
+
         logger.info(f"Successfully initialized {len(profiles)} profiles into services")
 
     except Exception as e:
@@ -135,8 +160,8 @@ def _initialize_profiles(services_instance: Services) -> None:
         # This allows the app to run even if profiles.yaml is missing
 
 
-# Initialize all profiles at startup
-_initialize_profiles(services)
+# Initialize all profiles at startup (both old and new architecture)
+_initialize_profiles(services, law_evaluator)
 
 
 class MachineFactory:

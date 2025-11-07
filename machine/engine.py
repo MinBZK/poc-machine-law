@@ -7,23 +7,41 @@ from typing import Any
 
 import pandas as pd
 
-from .context import PathNode, RuleContext, TypeSpec, logger
+from .context import ExecutionContext, PathNode, RuleContext, TypeSpec, logger
 
 
 class RulesEngine:
     """Rules engine for evaluating business rules"""
 
-    def __init__(self, spec: dict[str, Any], service_provider: Any | None = None) -> None:
+    def __init__(
+        self,
+        spec: dict[str, Any],
+        service_provider: Any | None = None,
+        law_evaluator: Any | None = None,
+    ) -> None:
+        """
+        Initialize the RulesEngine.
+
+        Args:
+            spec: Law specification dict
+            service_provider: DEPRECATED - use law_evaluator instead
+            law_evaluator: LawEvaluator instance for orchestrating law calls
+        """
         self.spec = spec
-        self.service_name = spec.get("service")
         self.law = spec.get("law")
+        self.service_name = spec.get("service")  # May be None for v0.1.7
         self.requirements = spec.get("requirements", [])
         self.actions = spec.get("actions", [])
         self.parameter_specs = spec.get("properties", {}).get("parameters", {})
         self.property_specs = self._build_property_specs(spec.get("properties", {}))
         self.output_specs = self._build_output_specs(spec.get("properties", {}))
         self.definitions = spec.get("properties", {}).get("definitions", {})
-        self.service_provider = service_provider
+
+        # Support both old and new architecture
+        self.law_evaluator = law_evaluator
+        self.service_provider = service_provider  # Backward compatibility
+        if law_evaluator and not service_provider:
+            self.service_provider = law_evaluator  # For backward compat code
 
     @staticmethod
     def _build_property_specs(properties: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -176,35 +194,51 @@ class RulesEngine:
         calculation_date=None,
         requested_output: str | None = None,
         approved: bool = False,
+        reference_date: str | None = None,  # Alias for calculation_date
     ) -> dict[str, Any]:
-        """Evaluate rules using service context and sources"""
+        """Evaluate rules using execution context"""
         parameters = parameters or {}
         for p in self.parameter_specs:
             if p["required"] and p["name"] not in parameters:
                 logger.warning(f"Required parameter {p} not found in {parameters}")
 
-        logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
+        # Support both calculation_date and reference_date
+        if reference_date and not calculation_date:
+            calculation_date = reference_date
+
+        logger.debug(f"Evaluating rules for {self.law} ({calculation_date} {requested_output})")
         root = PathNode(type="root", name="evaluation", result=None)
 
         claims = None
         if "BSN" in parameters:
             bsn = parameters["BSN"]
-            claims = self.service_provider.claim_manager.get_claim_by_bsn_service_law(
-                bsn, self.service_name, self.law, approved=approved
-            )
+            # Use law_evaluator if available, fall back to service_provider
+            evaluator = self.law_evaluator or self.service_provider
+            if evaluator and hasattr(evaluator, 'claim_manager'):
+                # Both architectures use get_claim_by_bsn_service_law for now
+                # (claims indexing not yet refactored to be service-agnostic)
+                service_name = self.service_name or "ALL"  # Use "ALL" for v0.1.7 laws
+                claims = evaluator.claim_manager.get_claim_by_bsn_service_law(
+                    bsn, service_name, self.law, approved=approved
+                )
 
-        context = RuleContext(
+        # Get data_context from law_evaluator if available
+        data_context = None
+        if self.law_evaluator and hasattr(self.law_evaluator, 'data_context'):
+            data_context = self.law_evaluator.data_context
+
+        context = ExecutionContext(
             definitions=self.definitions,
-            service_provider=self.service_provider,
+            law_evaluator=self.law_evaluator,
+            data_context=data_context,
             parameters=parameters,
             property_specs=self.property_specs,
             output_specs=self.output_specs,
-            sources=sources,
+            sources=sources or {},
             path=[root],
             overwrite_input=overwrite_input or {},
             overwrite_definitions=overwrite_definitions or {},
             calculation_date=calculation_date,
-            service_name=self.service_name,
             claims=claims,
             approved=approved,
         )

@@ -41,7 +41,7 @@ class RuleSpec:
     name: str
     law: str
     valid_from: datetime
-    service: str
+    service: str | None  # Optional in v0.1.7+
     discoverable: str
     properties: dict[str, Any]
 
@@ -62,14 +62,23 @@ class RuleSpec:
             valid_from=data.get("valid_from")
             if isinstance(data.get("valid_from"), datetime)
             else datetime.combine(data.get("valid_from"), datetime.min.time()),
-            service=data.get("service", ""),
+            service=data.get("service"),  # May be None in v0.1.7+
             properties=data.get("properties", {}),
         )
 
 
 class RuleResolver:
     def __init__(self) -> None:
-        self.rules_dir = Path(BASE_DIR)
+        # Handle Windows symlink issue: if BASE_DIR is a file, read its contents as the real path
+        base_path = Path(BASE_DIR)
+        if base_path.is_file():
+            # This is a symlink checked out as a text file on Windows
+            with open(base_path) as f:
+                real_path = f.read().strip()
+            self.rules_dir = Path(real_path)
+        else:
+            self.rules_dir = base_path
+
         self.rules: list[RuleSpec] = []
         # Rule cache indexed by (law, reference_date, service)
         self._rule_cache = {}
@@ -92,9 +101,16 @@ class RuleResolver:
         self.laws_by_service = defaultdict(set)
         self.discoverable_laws_by_service = defaultdict(lambda: defaultdict(set))
         for rule in self.rules:
-            self.laws_by_service[rule.service].add(rule.law)
-            if rule.discoverable:
-                self.discoverable_laws_by_service[rule.discoverable][rule.service].add(rule.law)
+            # Handle both v0.1.6 (with service) and v0.1.7 (without service)
+            if rule.service:
+                self.laws_by_service[rule.service].add(rule.law)
+                if rule.discoverable:
+                    self.discoverable_laws_by_service[rule.discoverable][rule.service].add(rule.law)
+            else:
+                # v0.1.7: No service field, add to "ALL" pseudo-service
+                self.laws_by_service["ALL"].add(rule.law)
+                if rule.discoverable:
+                    self.discoverable_laws_by_service[rule.discoverable]["ALL"].add(rule.law)
 
     def get_service_laws(self):
         return self.laws_by_service
@@ -103,7 +119,20 @@ class RuleResolver:
         return self.discoverable_laws_by_service[discoverable_by]
 
     def find_rule(self, law: str, reference_date: str, service: str | None = None) -> RuleSpec | None:
-        """Find the applicable rule for a given law and reference date"""
+        """
+        Find the applicable rule for a given law and reference date.
+
+        Args:
+            law: Law identifier (e.g., "zorgtoeslagwet")
+            reference_date: Reference date (YYYY-MM-DD)
+            service: Optional service name (for v0.1.6 compatibility). In v0.1.7, this is ignored.
+
+        Returns:
+            RuleSpec for the law
+
+        Raises:
+            ValueError: If no rules found
+        """
         # Check if we have a cached result
         cache_key = (law, reference_date, service)
         if cache_key in self._rule_cache:
@@ -115,8 +144,12 @@ class RuleResolver:
         law_rules = [r for r in self.rules if r.law == law]
 
         if service:
-            # If a service is given, filter rules for the given service
-            law_rules = [r for r in law_rules if r.service == service]
+            # If a service is given, try to filter by service (v0.1.6 compatibility)
+            # But also include rules without service field (v0.1.7)
+            law_rules_with_service = [r for r in law_rules if r.service == service or r.service is None]
+            # If we found matches, use them; otherwise use all law_rules
+            if law_rules_with_service:
+                law_rules = law_rules_with_service
 
         if not law_rules:
             raise ValueError(f"No rules found for law: {law} (and service: {service})")
@@ -155,7 +188,7 @@ class RuleResolver:
                 "name": rule.name,
                 "law": rule.law,
                 "valid_from": rule.valid_from,
-                "service": rule.service,
+                "service": rule.service or "ALL",  # v0.1.7 compatibility: None → "ALL"
                 "discoverable": rule.discoverable,
                 **{f"prop_{k}": v for k, v in rule.properties.items()},
             }
