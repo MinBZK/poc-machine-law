@@ -90,6 +90,14 @@ app.mount(
         html=True,
     ),
 )
+app.mount("/analysis/hierarchy/law", StaticFiles(directory="law"))
+app.mount(
+    "/analysis/hierarchy",
+    StaticFiles(
+        directory="analysis/hierarchy/build",
+        html=True,
+    ),
+)
 app.mount(
     "/importer",
     StaticFiles(
