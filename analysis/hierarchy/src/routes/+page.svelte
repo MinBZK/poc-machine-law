@@ -1,7 +1,6 @@
 <script lang="ts">
   import yaml from 'yaml';
   import { untrack } from 'svelte';
-  import { resolve } from '$app/paths';
   import {
     MarkerType,
     SvelteFlow,
@@ -146,7 +145,17 @@
       });
     }
 
+    // Build index for O(1) lookup: service -> laws (performance optimization)
+    const lawsByService = new Map<string, Law[]>();
+    for (const law of laws) {
+      if (!lawsByService.has(law.service)) {
+        lawsByService.set(law.service, []);
+      }
+      lawsByService.get(law.service)!.push(law);
+    }
+
     // Create edges based on service_references (only for selected laws)
+    // Now O(n*m) instead of O(n²) where m = avg laws per service
     for (const law of laws) {
       if (!selectedSet.has(law.uuid)) continue;
 
@@ -154,9 +163,9 @@
         const ref = input.service_reference;
         if (!ref) continue;
 
-        for (const sourceLaw of laws) {
-          if (sourceLaw.service !== ref.service) continue;
-
+        // O(m) lookup instead of O(n) - much faster with many laws!
+        const candidateLaws = lawsByService.get(ref.service) || [];
+        for (const sourceLaw of candidateLaws) {
           if (ref.law) {
             const sourcePath = lawPathMap.get(sourceLaw.uuid) || '';
             if (!sourcePath.includes(ref.law)) continue;
@@ -258,11 +267,13 @@
 
       let allLaws = await Promise.all(
         filePaths.map(async (filePath) => {
-          // Read the file content
-          // @ts-expect-error ts(2345)
-          const fileContent = await fetch(resolve(`/law/${filePath}`)).then((response) =>
-            response.text(),
-          );
+          // Read the file content - construct URL properly
+          const lawUrl = `/analysis/hierarchy/law/${filePath}`;
+          const response = await fetch(lawUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch law ${filePath}: ${response.statusText}`);
+          }
+          const fileContent = await response.text();
 
           // Parse the YAML content
           const law = yaml.parse(fileContent) as Law;

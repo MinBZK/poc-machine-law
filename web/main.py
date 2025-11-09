@@ -71,11 +71,23 @@ def analysis_laws_index():
 
 @app.get("/analysis/laws/{catchall:path}", response_class=FileResponse)
 def analysis_laws_fallback(request: Request):
-    # Prevent path traversal by resolving the absolute path and checking its parent
+    # Prevent path traversal by validating and resolving paths securely
     base_dir = Path("analysis/laws/build").resolve()
-    requested_path = (base_dir / request.path_params["catchall"]).resolve()
+    catchall = request.path_params["catchall"]
 
-    if base_dir in requested_path.parents and requested_path.exists():
+    # Validate catchall doesn't contain path traversal attempts
+    if ".." in catchall or catchall.startswith("/"):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
+    requested_path = (base_dir / catchall).resolve()
+
+    # Check if resolved path is under base_dir (prevents path traversal)
+    try:
+        requested_path.relative_to(base_dir)
+    except ValueError:
+        raise HTTPException(status_code=403, detail="Forbidden: path outside allowed directory")
+
+    if requested_path.exists() and requested_path.is_file():
         return FileResponse(str(requested_path))
 
     # Fallback to the index file
@@ -90,14 +102,17 @@ app.mount(
         html=True,
     ),
 )
-app.mount("/analysis/hierarchy/law", StaticFiles(directory="law"))
-app.mount(
-    "/analysis/hierarchy",
-    StaticFiles(
-        directory="analysis/hierarchy/build",
-        html=True,
-    ),
-)
+# Mount hierarchy viewer if built
+hierarchy_build_dir = Path("analysis/hierarchy/build")
+if hierarchy_build_dir.exists():
+    app.mount("/analysis/hierarchy/law", StaticFiles(directory="law"))
+    app.mount(
+        "/analysis/hierarchy",
+        StaticFiles(
+            directory="analysis/hierarchy/build",
+            html=True,
+        ),
+    )
 app.mount(
     "/importer",
     StaticFiles(

@@ -9,9 +9,40 @@ export interface Node {
 }
 
 /**
+ * Escape text for safe insertion into SVG
+ */
+function escapeSvgText(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * Sanitize ID for use in CSS selector
+ */
+function sanitizeIdForSelector(id: string): string {
+  // Use CSS.escape if available (modern browsers)
+  if (typeof CSS !== 'undefined' && CSS.escape) {
+    return CSS.escape(id);
+  }
+  // Fallback: remove potentially dangerous characters
+  return id.replace(/[^\w-]/g, '');
+}
+
+/**
  * Calculate the bounding box of all visible nodes
  */
 export function calculateBounds(nodes: Node[], padding: number = 50) {
+  // Validate inputs
+  if (!Array.isArray(nodes)) {
+    throw new TypeError('nodes must be an array');
+  }
+  if (!Number.isFinite(padding) || padding < 0) {
+    throw new RangeError('padding must be a non-negative finite number');
+  }
   const visibleNodes = nodes.filter(n => !n.hidden);
 
   if (visibleNodes.length === 0) {
@@ -165,8 +196,9 @@ export async function exportViewportToSvg(
     const width = node.width || 280;
     const height = node.height || 100;
 
-    // Get the actual node element to extract text and styles
-    const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+    // Get the actual node element to extract text and styles (with sanitized selector)
+    const sanitizedId = node.id ? sanitizeIdForSelector(node.id) : '';
+    const nodeElement = sanitizedId ? document.querySelector(`[data-id="${sanitizedId}"]`) : null;
     const nodeRect = document.createElementNS(svgNS, 'rect');
     nodeRect.setAttribute('x', x.toString());
     nodeRect.setAttribute('y', y.toString());
@@ -186,7 +218,7 @@ export async function exportViewportToSvg(
     }
     svg.appendChild(nodeRect);
 
-    // Add text from node
+    // Add text from node (with XSS protection)
     if (nodeElement) {
       const textContent = nodeElement.textContent?.trim() || '';
       const text = document.createElementNS(svgNS, 'text');
@@ -197,7 +229,8 @@ export async function exportViewportToSvg(
       text.setAttribute('font-size', '14');
       text.setAttribute('font-family', 'system-ui, -apple-system, sans-serif');
       text.setAttribute('fill', '#111827');
-      text.textContent = textContent;
+      // Use textContent (safe) instead of innerHTML, and escape for extra safety
+      text.textContent = escapeSvgText(textContent);
       svg.appendChild(text);
     }
   }
