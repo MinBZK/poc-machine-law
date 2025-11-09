@@ -41,6 +41,8 @@
   "type": "module",
   "dependencies": {
     "@xyflow/svelte": "^1.4.1",
+    "html-to-image": "^1.11.13",
+    "jspdf": "^3.0.3",
     "yaml": "^2.8.1"
   }
 }

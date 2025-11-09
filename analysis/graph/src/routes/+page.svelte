@@ -14,6 +14,7 @@
     Position,
   } from '@xyflow/svelte';
   import LawNode from './LawNode.svelte';
+  import { exportViewportToPng, exportViewportToPdf } from '$lib/exportUtils';
 
   // Import the styles for Svelte Flow to work
   import '@xyflow/svelte/dist/style.css';
@@ -65,6 +66,41 @@
   let laws = $state<Law[]>([]);
   let selectedLaws = $state<string[]>([]); // Contains the law UUIDs. This will hold the selected laws from the checkboxes
   let selectedRootNode = $state<string | null>(null); // Track currently selected root node for edge highlighting
+  let isExporting = $state(false);
+
+  async function exportToPng() {
+    if (nodes.length === 0) {
+      alert('Geen wetten om te exporteren. Selecteer eerst enkele wetten.');
+      return;
+    }
+
+    isExporting = true;
+    try {
+      await exportViewportToPng(nodes, 'law-graph');
+    } catch (error) {
+      console.error('Error exporting to PNG:', error);
+      alert('Fout bij exporteren naar PNG. Zie console voor details.');
+    } finally {
+      isExporting = false;
+    }
+  }
+
+  async function exportToPdf() {
+    if (nodes.length === 0) {
+      alert('Geen wetten om te exporteren. Selecteer eerst enkele wetten.');
+      return;
+    }
+
+    isExporting = true;
+    try {
+      await exportViewportToPdf(nodes, 'law-graph');
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      alert('Fout bij exporteren naar PDF. Zie console voor details.');
+    } finally {
+      isExporting = false;
+    }
+  }
 
   (async () => {
     try {
@@ -589,7 +625,7 @@
   <div class="sticky top-0 bg-white pt-6 pb-2">
     <h1 class="mb-3 text-base font-semibold">Selectie van wetten</h1>
 
-    <div class="flex gap-2">
+    <div class="flex flex-col gap-2">
       <button
         type="button"
         onclick={calculatePositions}
@@ -604,6 +640,22 @@
         class="cursor-pointer rounded-md border border-gray-600 bg-gray-600 px-3 py-1.5 text-white transition duration-200 hover:border-gray-700 hover:bg-gray-700"
         >Selecteer alles</button
       >
+      <div class="flex gap-2">
+        <button
+          type="button"
+          onclick={exportToPng}
+          disabled={isExporting}
+          class="flex-1 cursor-pointer rounded-md border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-white transition duration-200 hover:border-emerald-700 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >{isExporting ? 'PNG' : 'PNG'}</button
+        >
+        <button
+          type="button"
+          onclick={exportToPdf}
+          disabled={isExporting}
+          class="flex-1 cursor-pointer rounded-md border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-white transition duration-200 hover:border-emerald-700 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >{isExporting ? 'PDF' : 'PDF'}</button
+        >
+      </div>
     </div>
   </div>
 
