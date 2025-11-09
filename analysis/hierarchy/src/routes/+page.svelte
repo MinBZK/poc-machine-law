@@ -14,16 +14,28 @@
     Position,
   } from '@xyflow/svelte';
   import HierarchyNode from './HierarchyNode.svelte';
-  import { exportViewportToPng, exportViewportToPdf } from '$lib/exportUtils';
+  import { exportViewportToPng, exportViewportToSvg } from '$lib/exportUtils';
 
   // Import the styles for Svelte Flow to work
   import '@xyflow/svelte/dist/style.css';
+
+  // Layout configuration constants
+  const LAYOUT_CONFIG = {
+    NODE_WIDTH: 280,
+    NODE_HEIGHT: 100,
+    X_SPACING: 450,
+    Y_SPACING: 120,
+    ORPHAN_X_OFFSET_COLUMNS: 2,
+    GRID_NODES_PER_COLUMN: 10,
+    MAX_SERVICE_COLORS: 7,
+  } as const;
 
   type Law = {
     uuid: string;
     name: string;
     service: string;
     valid_from: string;
+    law_type?: string;
     properties: {
       sources?: { name: string }[];
       input?: { name: string; service_reference?: { service: string; law: string; field: string } }[];
@@ -45,9 +57,8 @@
   let flowInstance: any = $state(null);
   let isExporting = $state(false);
 
-  function onInit(instance: any) {
+  function oninit(instance: any) {
     flowInstance = instance;
-    console.log('SvelteFlow initialized');
   }
 
   async function exportToPng() {
@@ -67,7 +78,7 @@
     }
   }
 
-  async function exportToPdf() {
+  async function exportToSvg() {
     if (nodes.length === 0) {
       alert('Geen wetten om te exporteren. Selecteer eerst enkele wetten.');
       return;
@@ -75,30 +86,15 @@
 
     isExporting = true;
     try {
-      await exportViewportToPdf(nodes, 'zorgtoeslagwet-hierarchy');
+      await exportViewportToSvg(nodes, 'zorgtoeslagwet-hierarchy');
     } catch (error) {
-      console.error('Error exporting to PDF:', error);
-      alert('Fout bij exporteren naar PDF. Zie console voor details.');
+      console.error('Error exporting to SVG:', error);
+      alert('Fout bij exporteren naar SVG. Zie console voor details.');
     } finally {
       isExporting = false;
     }
   }
 
-  // Monitor when nodes are measured
-  $effect(() => {
-    const measuredNodes = nodes.filter(n => n.measured);
-    if (measuredNodes.length > 0) {
-      console.log(`Measured nodes: ${measuredNodes.length}/${nodes.length}`);
-    }
-  });
-
-  // Monitor edges array
-  $effect(() => {
-    console.log('Edges state changed:', edges.length, 'edges');
-    if (edges.length > 0) {
-      console.log('First edge in state:', edges[0]);
-    }
-  });
 
   // Map service names to color indices (0-6)
   const serviceToColorIndex = new Map<string, number>();
@@ -106,7 +102,7 @@
 
   function getServiceColorIndex(service: string): number {
     if (!serviceToColorIndex.has(service)) {
-      serviceToColorIndex.set(service, nextColorIndex % 7);
+      serviceToColorIndex.set(service, nextColorIndex % LAYOUT_CONFIG.MAX_SERVICE_COLORS);
       nextColorIndex++;
     }
     return serviceToColorIndex.get(service)!;
@@ -116,22 +112,108 @@
   let selectedLaws = $state<string[]>([]);
   let lawPathMap = new Map<string, string>(); // Maps UUID to file path
 
-  // Determine the layer of a law based on its file path
-  function determineLawLayer(filePath: string): string {
-    const lowerPath = filePath.toLowerCase();
+  // Function to rebuild nodes and edges based on selected laws
+  function rebuildNodesAndEdges() {
+    if (laws.length === 0) return;
 
-    if (lowerPath.includes('/regelingen/') || lowerPath.includes('/regeling_')) {
-      return 'regeling';
-    } else if (lowerPath.includes('/beleidsregels/') || lowerPath.includes('/beleidsregel_')) {
-      return 'beleidsregel';
-    } else if (lowerPath.includes('/amvb/')) {
-      return 'amvb';
-    } else if (lowerPath.includes('/werkinstructies/') || lowerPath.includes('/werkinstructie_')) {
-      return 'werkinstructie';
-    } else {
-      // Default to "wet" for main law files
-      return 'wet';
+    const ns: Node[] = [];
+    const es: Edge[] = [];
+
+    // Create nodes ONLY for selected laws
+    const selectedSet = new Set(selectedLaws);
+
+    for (const law of laws) {
+      // Skip laws that are not selected
+      if (!selectedSet.has(law.uuid)) continue;
+
+      const layer = determineLawLayer(law.law_type || 'FORMELE_WET');
+      const colorIndex = getServiceColorIndex(law.service);
+
+      ns.push({
+        id: law.uuid,
+        type: 'hierarchy',
+        data: {
+          label: law.name,
+          layer: layer,
+          service: law.service,
+        },
+        position: { x: 0, y: 0 }, // Will be set by layoutTree
+        width: LAYOUT_CONFIG.NODE_WIDTH,
+        height: LAYOUT_CONFIG.NODE_HEIGHT,
+        class: `hierarchy-node service-${colorIndex}`,
+        sourcePosition: Position.Left,
+        targetPosition: Position.Right,
+      });
     }
+
+    // Create edges based on service_references (only for selected laws)
+    for (const law of laws) {
+      if (!selectedSet.has(law.uuid)) continue;
+
+      for (const input of law.properties.input || []) {
+        const ref = input.service_reference;
+        if (!ref) continue;
+
+        for (const sourceLaw of laws) {
+          if (sourceLaw.service !== ref.service) continue;
+
+          if (ref.law) {
+            const sourcePath = lawPathMap.get(sourceLaw.uuid) || '';
+            if (!sourcePath.includes(ref.law)) continue;
+          }
+
+          // Check if this law outputs the referenced field
+          const hasOutput = sourceLaw.properties.output?.some(o => o.name === ref.field);
+          if (!hasOutput) continue;
+
+          // Create edge from source law to current law
+          es.push({
+            id: `${sourceLaw.uuid}-${law.uuid}-${ref.field}`,
+            source: sourceLaw.uuid,
+            target: law.uuid,
+            label: ref.field,
+            type: 'bezier',
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 20,
+              height: 40,
+            },
+            animated: true,
+          });
+          break; // Only create one edge per input
+        }
+      }
+    }
+
+    nodes = ns;
+    edges = es;
+
+    // Auto-layout the tree
+    layoutTree();
+
+    // Fit view after layout
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (flowInstance) {
+          flowInstance.fitView({ padding: 0.2, duration: 800 });
+        }
+      });
+    });
+  }
+
+  // Determine the layer of a law based on its law_type from YAML
+  function determineLawLayer(lawType: string): string {
+    // Map law_type values to display labels
+    // Currently only FORMELE_WET exists in schema, but this is extensible
+    const typeMap: Record<string, string> = {
+      'FORMELE_WET': 'wet',
+      'AMVB': 'amvb',
+      'REGELING': 'regeling',
+      'BELEIDSREGEL': 'beleidsregel',
+      'WERKINSTRUCTIE': 'werkinstructie',
+    };
+
+    return typeMap[lawType] || lawType.toLowerCase();
   }
 
   // Build a hierarchy map: parent UUID -> child UUIDs
@@ -173,9 +255,6 @@
       // Fetch the available laws from the backend
       const response = await fetch('/laws/list');
       filePaths = await response.json();
-
-      const ns: Node[] = [];
-      const es: Edge[] = [];
 
       let allLaws = await Promise.all(
         filePaths.map(async (filePath) => {
@@ -289,156 +368,13 @@
         }
 
         selectedLaws = Array.from(selectedSet);
-        console.log('Selected laws:', selectedLaws.length, 'starting from Zorgtoeslag (including all zorgtoeslagwet/* files)');
-
-        // Group by layer to see what we have
-        const selectedByLayer = new Map<string, string[]>();
-        for (const uuid of selectedSet) {
-          const law = laws.find(l => l.uuid === uuid);
-          if (!law) continue;
-          const filePath = lawPathMap.get(uuid) || '';
-          const layer = determineLawLayer(filePath);
-          if (!selectedByLayer.has(layer)) selectedByLayer.set(layer, []);
-          selectedByLayer.get(layer)!.push(law.name);
-        }
-
-        console.log('Selected by layer:');
-        for (const [layer, names] of selectedByLayer.entries()) {
-          console.log(`  ${layer}: ${names.length}`, names);
-        }
       } else {
         // Fallback: show all laws
         selectedLaws = laws.map((law) => law.uuid);
       }
 
-      // Create nodes ONLY for selected laws
-      const selectedSet = new Set(selectedLaws);
-
-      for (const law of laws) {
-        // Skip laws that are not selected
-        if (!selectedSet.has(law.uuid)) continue;
-
-        const filePath = lawPathMap.get(law.uuid) || '';
-        const layer = determineLawLayer(filePath);
-        const colorIndex = getServiceColorIndex(law.service);
-
-        ns.push({
-          id: law.uuid,
-          type: 'hierarchy',
-          data: {
-            label: law.name,
-            layer: layer,
-            service: law.service,
-          },
-          position: { x: 0, y: 0 }, // Will be set by layoutTree
-          width: 280,
-          height: 100,
-          class: `hierarchy-node service-${colorIndex}`,
-          sourcePosition: Position.Left,
-          targetPosition: Position.Right,
-        });
-      }
-
-      // Create edges based on service_references (only for selected laws)
-      for (const law of laws) {
-        // Skip if target law is not selected
-        if (!selectedSet.has(law.uuid)) continue;
-
-        for (const input of law.properties.input || []) {
-          const ref = input.service_reference;
-          if (!ref) continue;
-
-          // Find the law that provides this reference
-          for (const sourceLaw of laws) {
-            // Skip if source law is not selected
-            if (!selectedSet.has(sourceLaw.uuid)) continue;
-            if (sourceLaw.service !== ref.service) continue;
-
-            // If ref.law is specified, check if the source path matches
-            if (ref.law) {
-              const sourcePath = lawPathMap.get(sourceLaw.uuid) || '';
-              if (!sourcePath.includes(ref.law)) continue;
-            }
-
-            // Check if this law outputs the referenced field
-            const hasOutput = sourceLaw.properties.output?.some(o => o.name === ref.field);
-            if (!hasOutput) continue;
-
-            // Create edge from source law to current law
-            es.push({
-              id: `${sourceLaw.uuid}-${law.uuid}-${ref.field}`,
-              source: sourceLaw.uuid,
-              target: law.uuid,
-              label: ref.field,
-              type: 'bezier',
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-                width: 20,
-                height: 40,
-              },
-              animated: true,
-            });
-            break; // Only create one edge per input
-          }
-        }
-      }
-
-      nodes = ns;
-      edges = es;
-
-      console.log('Created', ns.length, 'nodes and', es.length, 'edges');
-      console.log('Node names:', ns.map(n => n.data.label));
-      console.log('Sample edges:', es.slice(0, 3));
-      console.log('Edge 0:', es[0]);
-
-      // Verify edges connect to actual nodes
-      const nodeIds = new Set(ns.map(n => n.id));
-      const validEdges = es.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
-      const invalidEdges = es.filter(e => !nodeIds.has(e.source) || !nodeIds.has(e.target));
-      console.log(`Valid edges: ${validEdges.length}/${es.length}, Invalid: ${invalidEdges.length}`);
-      if (invalidEdges.length > 0) {
-        console.log('Sample invalid edge:', invalidEdges[0]);
-      }
-
-      console.log('Selected laws:', selectedLaws.length);
-
-      // Auto-layout the tree
-      layoutTree();
-
-      console.log('After layout, visible nodes:', nodes.filter(n => !n.hidden).length);
-      console.log('After layout, first 5 node positions:', nodes.slice(0, 5).map(n => ({
-        label: n.data.label,
-        pos: n.position,
-        hidden: n.hidden
-      })));
-
-      // Fit view after a short delay to ensure layout is complete
-      setTimeout(() => {
-        if (flowInstance) {
-          flowInstance.fitView({ padding: 0.2, duration: 800 });
-        }
-
-        // Debug: Check edge rendering
-        setTimeout(() => {
-          const edgeEls = document.querySelectorAll('.svelte-flow__edge');
-          console.log(`DOM edges found: ${edgeEls.length}`);
-          if (edgeEls.length > 0) {
-            const firstEdge = edgeEls[0];
-            const path = firstEdge.querySelector('path');
-            if (path) {
-              const styles = window.getComputedStyle(path);
-              console.log('First edge path styles:', {
-                stroke: styles.stroke,
-                strokeWidth: styles.strokeWidth,
-                display: styles.display,
-                visibility: styles.visibility,
-                opacity: styles.opacity,
-                d: path.getAttribute('d')?.substring(0, 50)
-              });
-            }
-          }
-        }, 500);
-      }, 200);
+      // Build nodes and edges based on selected laws
+      rebuildNodesAndEdges();
     } catch (error) {
       console.error('Error loading laws:', error);
     }
@@ -447,15 +383,12 @@
   // Layout algorithm: Zorgtoeslagwet on LEFT, dependencies to the RIGHT
   function layoutTree() {
     if (nodes.length === 0) {
-      console.log('layoutTree: no nodes');
       return;
     }
-    console.log('layoutTree: processing', nodes.length, 'nodes and', edges.length, 'edges');
 
     const visibleNodeIds = new Set(nodes.filter(n => !n.hidden).map(n => n.id));
     const visibleEdges = edges.filter(e => !e.hidden);
 
-    console.log('Visible nodes:', visibleNodeIds.size, 'Visible edges:', visibleEdges.length);
 
     // Find Zorgtoeslag as the starting point (leftmost)
     const zorgtoeslagwet = nodes.find(n =>
@@ -463,12 +396,10 @@
     );
 
     if (!zorgtoeslagwet) {
-      console.log('Zorgtoeslagwet not found - using simple grid layout');
       simpleGridLayout();
       return;
     }
 
-    console.log('Starting from:', zorgtoeslagwet.data.label);
 
     // Calculate depth by traversing dependencies (edges point FROM dependency TO dependent)
     // Edge: source -> target means "source provides data to target"
@@ -484,6 +415,10 @@
         const nodeName = nodes.find(n => n.id === nodeId)?.data.label;
         console.warn(`Circular dependency detected at node: ${nodeName}`);
         nodesWithCycles.add(nodeId);
+        // Still set depth to position the node, even if it's in a cycle
+        if (!depths.has(nodeId)) {
+          depths.set(nodeId, currentDepth);
+        }
         return;
       }
 
@@ -511,30 +446,12 @@
     // Start from Zorgtoeslagwet at depth 0
     calculateDepth(zorgtoeslagwet.id, 0);
 
-    // Log circular dependencies found
-    if (nodesWithCycles.size > 0) {
-      console.log('Nodes with circular dependencies:', Array.from(nodesWithCycles).map(id =>
-        nodes.find(n => n.id === id)?.data.label
-      ));
-    }
-
-    console.log('Depths calculated for', depths.size, 'nodes');
-    console.log('Depth breakdown:', Array.from(depths.entries()).map(([id, depth]) => ({
-      depth,
-      name: nodes.find(n => n.id === id)?.data.label
-    })));
-
     // Find orphaned nodes (nodes without a depth assignment)
     const orphanedNodes: string[] = [];
     for (const node of nodes) {
       if (!node.hidden && !depths.has(node.id)) {
         orphanedNodes.push(node.id);
       }
-    }
-
-    if (orphanedNodes.length > 0) {
-      console.log('Found', orphanedNodes.length, 'orphaned nodes (not reachable from Zorgtoeslagwet):');
-      console.log(orphanedNodes.map(id => nodes.find(n => n.id === id)?.data.label));
     }
 
     // Group nodes by depth
@@ -545,11 +462,10 @@
     }
 
     // Position nodes
-    const xSpacing = 450;
-    const ySpacing = 120;
+    const xSpacing = LAYOUT_CONFIG.X_SPACING;
+    const ySpacing = LAYOUT_CONFIG.Y_SPACING;
     const maxDepth = depths.size > 0 ? Math.max(...depths.values()) : 0;
 
-    console.log('Max depth:', maxDepth);
 
     for (let depth = 0; depth <= maxDepth; depth++) {
       const nodesAtDepth = nodesByDepth.get(depth) || [];
@@ -559,13 +475,11 @@
       const totalHeight = nodesAtDepth.length * ySpacing;
       let y = -totalHeight / 2; // Center vertically
 
-      console.log(`Depth ${depth}: ${nodesAtDepth.length} nodes at x=${x}`);
 
       for (const nodeId of nodesAtDepth) {
         const nodeIndex = nodes.findIndex(n => n.id === nodeId);
         if (nodeIndex !== -1) {
           const nodeName = nodes[nodeIndex].data.label;
-          console.log(`Positioning ${nodeName} at depth ${depth}: (${x}, ${y})`);
           nodes[nodeIndex] = {
             ...nodes[nodeIndex],
             position: { x, y },
@@ -581,11 +495,10 @@
 
     // Position orphaned nodes in a separate column to the far right
     if (orphanedNodes.length > 0) {
-      const orphanX = (maxDepth + 2) * xSpacing; // Place 2 columns to the right of the deepest node
+      const orphanX = (maxDepth + LAYOUT_CONFIG.ORPHAN_X_OFFSET_COLUMNS) * xSpacing;
       const orphanTotalHeight = orphanedNodes.length * ySpacing;
       let orphanY = -orphanTotalHeight / 2;
 
-      console.log(`Positioning ${orphanedNodes.length} orphaned nodes at x=${orphanX}`);
 
       for (const nodeId of orphanedNodes) {
         const nodeIndex = nodes.findIndex(n => n.id === nodeId);
@@ -606,7 +519,6 @@
     // Safety check: if most nodes are orphaned, use grid layout instead
     const positionedNodesCount = depths.size;
     if (orphanedNodes.length > positionedNodesCount && orphanedNodes.length > 3) {
-      console.log('Too many orphaned nodes - falling back to grid layout');
       simpleGridLayout();
       return;
     }
@@ -617,11 +529,10 @@
   // Simple grid layout fallback for when tree structure is not available
   function simpleGridLayout(nodesWithCycles: Set<string> = new Set()) {
     const visibleNodes = nodes.filter(n => !n.hidden);
-    const xSpacing = 450;
-    const ySpacing = 120;
-    const nodesPerColumn = 10;
+    const xSpacing = LAYOUT_CONFIG.X_SPACING;
+    const ySpacing = LAYOUT_CONFIG.Y_SPACING;
+    const nodesPerColumn = LAYOUT_CONFIG.GRID_NODES_PER_COLUMN;
 
-    console.log('Using simple grid layout for', visibleNodes.length, 'nodes');
 
     let nodeIndex = 0;
     for (const node of visibleNodes) {
@@ -633,7 +544,6 @@
 
       const idx = nodes.findIndex(n => n.id === node.id);
       if (idx !== -1) {
-        console.log(`Grid positioning node ${node.data.label} at (${x}, ${y})`);
         nodes[idx] = {
           ...nodes[idx],
           position: { x, y },
@@ -646,7 +556,6 @@
       nodeIndex++;
     }
 
-    console.log('Grid layout complete, sample positions:', nodes.slice(0, 3).map(n => ({ label: n.data.label, pos: n.position })));
     nodes = [...nodes]; // Trigger reactivity
   }
 
@@ -656,25 +565,11 @@
     const lawsCount = selectedLaws.length;
 
     untrack(() => {
-      console.log('$effect triggered, selectedLaws:', lawsCount, 'nodes:', nodes.length);
+      // Don't run until laws are loaded
+      if (laws.length === 0) return;
 
-      if (nodes.length === 0) return; // Don't run until nodes are loaded
-
-      // Show only selected laws (no expansion)
-      const selected = new Set(selectedLaws);
-
-      nodes = nodes.map((node) => ({
-        ...node,
-        hidden: !selected.has(node.id),
-      }));
-
-      edges = edges.map((edge) => ({
-        ...edge,
-        hidden: !selected.has(edge.source) || !selected.has(edge.target),
-      }));
-
-      // Re-layout when selection changes
-      layoutTree();
+      // Rebuild nodes and edges based on new selection
+      rebuildNodesAndEdges();
     });
   });
 </script>
@@ -711,41 +606,15 @@
           onclick={exportToPng}
           disabled={isExporting}
           class="flex-1 cursor-pointer rounded-md border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-white transition duration-200 hover:border-emerald-700 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >{isExporting ? 'PNG' : 'PNG'}</button
+          >{isExporting ? 'Exporteren...' : 'PNG'}</button
         >
         <button
           type="button"
-          onclick={exportToPdf}
+          onclick={exportToSvg}
           disabled={isExporting}
           class="flex-1 cursor-pointer rounded-md border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-white transition duration-200 hover:border-emerald-700 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >{isExporting ? 'PDF' : 'PDF'}</button
+          >{isExporting ? 'Exporteren...' : 'SVG'}</button
         >
-      </div>
-    </div>
-
-    <div class="mb-4 border-t pt-3">
-      <h2 class="text-sm font-semibold mb-2">Lagen</h2>
-      <div class="space-y-1 text-xs">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded bg-blue-600"></div>
-          <span>Wet (formele wet)</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded bg-indigo-500"></div>
-          <span>AMvB (algemene maatregel van bestuur)</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded bg-purple-500"></div>
-          <span>Regeling (ministeriële regeling)</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded bg-pink-500"></div>
-          <span>Beleidsregel</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded bg-rose-400"></div>
-          <span>Werkinstructie</span>
-        </div>
       </div>
     </div>
   </div>
@@ -793,7 +662,7 @@
     bind:nodes
     bind:edges
     {nodeTypes}
-    {onInit}
+    {oninit}
     fitView
     nodesConnectable={false}
     proOptions={{
