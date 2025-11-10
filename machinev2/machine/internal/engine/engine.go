@@ -400,7 +400,8 @@ func (re *RulesEngine) Evaluate(
 	parameters map[string]any,
 	overwriteInput map[string]any,
 	sources model.SourceDataFrame,
-	calculationDate string,
+	referenceDate time.Time,
+	effectiveDate time.Time,
 	requestedOutput string,
 	approved bool,
 ) (model.EvaluateResult, error) {
@@ -418,7 +419,7 @@ func (re *RulesEngine) Evaluate(
 	}
 
 	logr.Debugf("Evaluating rules for %s %s (%s %s)",
-		re.ServiceName, re.Law, calculationDate, requestedOutput)
+		re.ServiceName, re.Law, referenceDate.Format(time.DateOnly), requestedOutput)
 
 	// Handle claims
 	var claims map[string]model.Claim
@@ -456,7 +457,8 @@ func (re *RulesEngine) Evaluate(
 		re.PropertySpecs,
 		sources,
 		overwriteInput,
-		calculationDate,
+		referenceDate,
+		effectiveDate,
 		claims,
 		approved,
 	)
@@ -518,7 +520,7 @@ func (re *RulesEngine) Evaluate(
 	}
 
 	if len(outputValues) == 0 {
-		logr.WithIndent().Warningf("No output values computed for %s %s", calculationDate, requestedOutput)
+		logr.WithIndent().Warningf("No output values computed for %s %s", referenceDate.Format(time.DateOnly), requestedOutput)
 	}
 
 	return model.EvaluateResult{

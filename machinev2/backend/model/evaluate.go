@@ -10,9 +10,10 @@ type Evaluate struct {
 	// Approved only use approved claims, default to true
 	Approved *bool
 
-	// Date Can be used to overwrite the date used by the service
-	Date  *time.Time
-	Input *map[string]any
+	// EffectiveDate Can be used to overwrite the date used by the service
+	EffectiveDate *time.Time
+	ReferenceDate *time.Time
+	Input         *map[string]any
 
 	// Law Specify the law that needs to be executed
 	Law string

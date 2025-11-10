@@ -6,6 +6,7 @@ import (
 	"maps"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
@@ -23,14 +24,15 @@ type CachedValue struct {
 }
 
 type PropertySpecServiceResolver struct {
-	propertySpec    map[string]ruleresolver.Field
-	rc              resolver.RuleContexter
-	sp              service.ServiceProvider
-	parameters      map[string]any
-	overwriteInput  map[string]any
-	cache           sync.Map
-	calculationDate string
-	approved        bool
+	propertySpec   map[string]ruleresolver.Field
+	rc             resolver.RuleContexter
+	sp             service.ServiceProvider
+	parameters     map[string]any
+	overwriteInput map[string]any
+	cache          sync.Map
+	referenceDate  time.Time
+	effectiveDate  time.Time
+	approved       bool
 }
 
 func New(
@@ -39,18 +41,20 @@ func New(
 	propertySpec map[string]ruleresolver.Field,
 	parameters map[string]any,
 	overwriteInput map[string]any,
-	calculationDate string,
+	referenceDate time.Time,
+	effectiveDate time.Time,
 	approved bool,
 ) *PropertySpecServiceResolver {
 	return &PropertySpecServiceResolver{
-		rc:              rc,
-		sp:              sp,
-		propertySpec:    propertySpec,
-		parameters:      parameters,
-		overwriteInput:  overwriteInput,
-		cache:           sync.Map{},
-		calculationDate: calculationDate,
-		approved:        approved,
+		rc:             rc,
+		sp:             sp,
+		propertySpec:   propertySpec,
+		parameters:     parameters,
+		overwriteInput: overwriteInput,
+		cache:          sync.Map{},
+		referenceDate:  referenceDate,
+		effectiveDate:  effectiveDate,
+		approved:       approved,
 	}
 }
 
@@ -113,7 +117,7 @@ func (l *PropertySpecServiceResolver) resolveFromService(
 	}
 
 	// Get reference date
-	referenceDate := l.calculationDate
+	referenceDate := l.referenceDate
 	if spec.GetBase().Temporal != nil {
 		if reference, ok := spec.GetBase().Temporal.Reference.(string); ok {
 			refDate, err := l.rc.ResolveValue(ctx, reference)
@@ -122,12 +126,15 @@ func (l *PropertySpecServiceResolver) resolveFromService(
 			}
 
 			if refDateStr, ok := refDate.(string); ok {
-				referenceDate = refDateStr
+				referenceDate, err = time.Parse(time.DateOnly, refDateStr)
+				if err != nil {
+					return nil, false, err
+				}
 			}
 		}
 	}
 
-	key := getCacheKey(ppath, referenceDate, parameters)
+	key := getCacheKey(ppath, referenceDate.Format(time.DateOnly), parameters)
 	if val, ok := l.cache.Load(key); ok {
 		if v, ok := val.(CachedValue); ok {
 			logr.WithIndent().Debugf("Resolving from CACHE with key '%s': %v", key, v.value)
@@ -140,7 +147,7 @@ func (l *PropertySpecServiceResolver) resolveFromService(
 		"service":        serviceRef.Service,
 		"law":            serviceRef.Law,
 		"field":          serviceRef.Field,
-		"reference_date": referenceDate,
+		"reference_date": referenceDate.Format(time.DateOnly),
 		"parameters":     parameters,
 		"path":           ppath,
 	}
@@ -169,7 +176,8 @@ func (l *PropertySpecServiceResolver) resolveFromService(
 		serviceRef.Service,
 		serviceRef.Law,
 		parameters,
-		referenceDate,
+		&referenceDate,
+		&l.effectiveDate,
 		l.overwriteInput,
 		serviceRef.Field,
 		l.approved,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
@@ -35,6 +36,7 @@ func New(
 	cm casemanager.CaseManager,
 	sources model.SourceDataFrame,
 	propertySpec map[string]ruleresolver.Field,
+	effectiveDate time.Time,
 ) (*PropertySpecSourceResolver, error) {
 	var externalClaimResolver *ExternalClaimResolver
 	if sp.HasExternalClaimResolver() {
@@ -44,7 +46,7 @@ func New(
 		case "default":
 			resolver = newDefaultResolver(sp.GetExternalClaimResolverDefaultEndpoint())
 		case "ubb":
-			resolver = newUBBResolver(sp.GetExternalClaimResolverUBBEndpoint(), propertySpec)
+			resolver = newUBBResolver(sp.GetExternalClaimResolverUBBEndpoint(), propertySpec, effectiveDate)
 		default:
 			return nil, errors.New("invalid configuration: external claim resolver")
 		}

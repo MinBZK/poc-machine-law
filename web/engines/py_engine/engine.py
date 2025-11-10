@@ -48,6 +48,7 @@ class PythonMachineService(EngineInterface):
         law: str,
         parameters: dict[str, Any],
         reference_date: str | None = None,
+        effective_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
