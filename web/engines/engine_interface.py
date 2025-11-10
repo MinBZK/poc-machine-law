@@ -92,7 +92,7 @@ class EngineInterface(ABC):
             law: Name of the law (e.g., "zorgtoeslagwet")
             parameters: Context data for service provider
             reference_date: Reference date for rule version (YYYY-MM-DD)
-            effective_date: : The temporal context of the input data being evaluated (YYYY-MM-DD)
+            effective_date: The temporal context of the input data being evaluated (YYYY-MM-DD)
             overwrite_input: Optional overrides for input values
             requested_output: Optional specific output field to calculate
             approved: Whether this evaluation is for an approved claim
