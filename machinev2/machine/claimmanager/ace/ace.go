@@ -19,8 +19,9 @@ import (
 
 // ClaimManager implements the claimmanager interface using ACE
 type ClaimManager struct {
-	logger  logger.Logger
-	clients clients
+	logger     logger.Logger
+	clients    clients
+	claimTypes claimTypes
 }
 
 type clients struct {
@@ -29,16 +30,55 @@ type clients struct {
 	grp graphql.Client
 }
 
+type claimTypes map[string][]claimType
+type claimType struct {
+	Name           string
+	ReferencedName string
+	ReferencedType string
+}
+
 // New creates a new ACE-backed claim manager
-func New(endpoint string, logger logger.Logger) claimmanager.ClaimManager {
-	return &ClaimManager{
-		logger: logger,
-		clients: clients{
-			dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
-			ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
-			grp: graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
-		},
+func New(endpoint string, logger logger.Logger) (claimmanager.ClaimManager, error) {
+	clients := clients{
+		dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
+		ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
+		grp: graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
 	}
+
+	claimTypes, err := getClaimTypes(clients.ddl)
+	if err != nil {
+		return nil, fmt.Errorf("could not get claim types: %w", err)
+	}
+
+	return &ClaimManager{
+		logger:     logger,
+		clients:    clients,
+		claimTypes: claimTypes,
+	}, nil
+}
+
+func getClaimTypes(client graphql.Client) (claimTypes, error) {
+	data, err := generated.GetClaimTypes(context.Background(), client)
+	if err != nil {
+		return nil, nil
+	}
+
+	claimTypes := claimTypes{}
+
+	for _, ctype := range data.ClaimTypes {
+		name := *ctype.Name
+		claimTypes[name] = make([]claimType, 0, len(ctype.Roles))
+
+		for _, role := range ctype.Roles {
+			claimTypes[name] = append(claimTypes[name], claimType{
+				Name:           *role.Name,
+				ReferencedName: *role.ReferencedName,
+				ReferencedType: string(*role.ReferencedType),
+			})
+		}
+	}
+
+	return claimTypes, nil
 }
 
 // Submit submits a new claim to ACE
@@ -333,11 +373,23 @@ func (cm *ClaimManager) getBSN(ctx context.Context, txID *string, bsn string) (s
 
 func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimType string, bsnID string, value any, t *time.Time) (string, error) {
 	cm.logger.Info("create ace claim", logger.NewField("claimType", claimType), logger.NewField("bsn", bsnID), logger.NewField("value", value))
-	response, err := generated.AddClaim(ctx, cm.clients.ddl, &txID, claimType, []generated.TagInput{
-		{Name: "Bsn", Value: bsnID},
-		{Name: "amountEurocent", Value: fmt.Sprintf("%v", value)},
-	})
 
+	input := []generated.TagInput{
+		{Name: "Bsn", Value: bsnID},
+	}
+
+	cType, ok := cm.claimTypes[claimType]
+	if !ok {
+		return "", fmt.Errorf("could not retrieve claim type: %s", claimType)
+	}
+
+	for _, role := range cType {
+		if role.ReferencedType == "LabelType" {
+			input = append(input, generated.TagInput{Name: role.Name, Value: fmt.Sprintf("%v", value)})
+		}
+	}
+
+	response, err := generated.AddClaim(ctx, cm.clients.ddl, &txID, claimType, input)
 	if err != nil {
 		return "", err
 	}

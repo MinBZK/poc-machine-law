@@ -864,10 +864,6 @@ func (re *RulesEngine) evaluateForeach(
 ) (any, error) {
 	logr := logger.FromContext(ctx)
 
-	if operation.Combine == nil {
-		return nil, fmt.Errorf("combine operation not specified for FOREACH")
-	}
-
 	arrayData, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 	if err != nil {
 		return nil, err
@@ -893,6 +889,9 @@ func (re *RulesEngine) evaluateForeach(
 	}
 
 	var values []any
+	if operation.Combine == nil {
+		return nil, fmt.Errorf("combine operation not specified for FOREACH")
+	}
 
 	err = logr.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", *operation.Combine), func(ctx context.Context) error {
 		logr := logger.FromContext(ctx)

@@ -43,6 +43,8 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 		WithField("field", field).
 		WithField("filters", filters)
 
+	logr.Debug("ubb resolver do")
+
 	f := c.propertySpec[key]
 
 	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), c.effectiveDate)
