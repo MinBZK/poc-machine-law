@@ -132,11 +132,9 @@ Test these common scenarios using overrides:
 
 **Combined Example:**
 ```json
-{
-            "overrides": {
-                "UWV": {"inkomen": 4000000},
-    "RVO": {"AANTAL_WERKNEMERS": 200}
-  }
+{"overrides": {"UWV": {"inkomen": 4000000},
+        "RVO": {"AANTAL_WERKNEMERS": 200}
+    }
 }
 ```
 

@@ -1,6 +1,6 @@
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
@@ -20,8 +20,8 @@ from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInter
 from web.feature_flags import (
     is_change_wizard_enabled,
     is_chat_enabled,
-    is_total_income_widget_enabled,
     is_effective_date_adjustment_enabled,
+    is_total_income_widget_enabled,
     is_wallet_enabled,
 )
 from web.routers import admin, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet
