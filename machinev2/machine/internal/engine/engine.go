@@ -628,14 +628,14 @@ func (re *RulesEngine) evaluateRequirementAction(
 	if r.Requirement != nil {
 		res, err := re.evaluateRequirements(ctx, []ruleresolver.Requirement{*r.Requirement}, ruleCtx)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("evaluate requirements: %w", err)
 		}
 
 		return res, nil
 	} else if r.Action != nil {
 		res, err := re.evaluateOperation(ctx, *r.Action, ruleCtx)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("evaluate operation: %w", err)
 		}
 
 		var result bool
@@ -1347,6 +1347,11 @@ func convertToTime(v any) (time.Time, error) {
 				return t, nil
 			}
 		}
+
+		if v, err := strconv.Atoi(val); err == nil {
+			return time.Unix(int64(v), 0), nil
+		}
+
 		return time.Time{}, fmt.Errorf("cannot convert string %s to date", val)
 	default:
 		return time.Time{}, fmt.Errorf("cannot convert %v of type %T to date", v, v)

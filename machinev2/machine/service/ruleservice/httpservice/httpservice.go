@@ -83,7 +83,6 @@ func (h *HTTPService) Evaluate(
 	}
 
 	resp, err := h.client.EvaluateWithResponse(ctx, body)
-
 	if err != nil {
 		return nil, fmt.Errorf("evaluate: %w", err)
 	}
