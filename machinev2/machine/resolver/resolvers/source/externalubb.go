@@ -43,8 +43,6 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 		WithField("field", field).
 		WithField("filters", filters)
 
-	logr.Debug("ubb resolver do")
-
 	f := c.propertySpec[key]
 
 	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), c.effectiveDate)
@@ -82,16 +80,14 @@ func solver(
 	values []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult,
 	f ruleresolver.Field,
 ) (any, error) {
-
 	for _, value := range values {
-		// logr.Debug("VALUE", logger.NewField("value", value))
-
 		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(field)) ||
-			strings.EqualFold(pascalCase(field), strings.ToLower(value.Name)) {
+			strings.EqualFold(strings.ToLower(value.Name), pascalCase(field)) {
 			return solveField(logr, value, f)
 		}
 
-		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) {
+		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) ||
+			strings.EqualFold(strings.ToLower(value.Name), pascalCase(table)) {
 			return solver(logr, table, field, conv(value.Values), f)
 		}
 	}
@@ -106,6 +102,7 @@ func conv(
 
 	for idx := range values {
 		v = append(v, machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult{
+			Name: values[idx].Key,
 			Values: []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResultValues{
 				{
 					Key:   values[idx].Key,
