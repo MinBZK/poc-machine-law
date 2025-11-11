@@ -4,21 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/service"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/ruleservice"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/serviceresolver"
 	tracer "github.com/minbzk/poc-machine-law/machinev2/machine/trace"
-	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -30,21 +29,34 @@ type Services struct {
 	RuleResolver      *ruleresolver.RuleResolver
 	services          map[string]ruleservice.RuleServicer
 	ServiceResolver   *serviceresolver.ServiceResolver
-	RootReferenceDate string
-	CaseManager       *CaseManager
-	ClaimManager      *ClaimManager
+	RootReferenceDate time.Time
+	CaseManager       casemanager.CaseManager
 	tracer            trace.Tracer
 
 	mu sync.RWMutex
 
 	shutdownFns []func(context.Context) error
 
-	ruleServiceInMemory           bool
-	organization                  *string
-	standAloneMode                bool
-	ldvEnabled                    bool
-	rvaIDs                        map[string]uuid.UUID
-	externalClaimResolverEndpoint *string
+	ruleServiceInMemory   bool
+	organization          *string
+	standAloneMode        bool
+	ldvEnabled            bool
+	rvaIDs                map[string]uuid.UUID
+	externalClaimResolver *ExternalClaimResolver
+}
+
+type ExternalClaimResolver struct {
+	Current string
+	Default *ExternalClaimResolverDefault
+	UBB     *ExternalClaimResolverUBB
+}
+
+type ExternalClaimResolverDefault struct {
+	endpoint string
+}
+
+type ExternalClaimResolverUBB struct {
+	endpoint string
 }
 
 type Option func(*Services)
@@ -85,15 +97,38 @@ func SetStandaloneMode() Option {
 	}
 }
 
-func WithExternalClaimResolverEndpoint(endpoint string) Option {
+func WithExternalClaimResolverDefault(endpoint string) Option {
 	return func(s *Services) {
 		s.logger.Warning("external claim resolver setup", logger.NewField("endpoint", endpoint))
-		s.externalClaimResolverEndpoint = &endpoint
+		s.externalClaimResolver = &ExternalClaimResolver{
+			Current: "default",
+			Default: &ExternalClaimResolverDefault{
+				endpoint: endpoint,
+			},
+		}
 	}
 }
 
-// NewServices creates a new services instance
-func NewServices(referenceDate time.Time, options ...Option) (*Services, error) {
+func WithExternalClaimResolverUBB(endpoint string) Option {
+	return func(s *Services) {
+		s.logger.Warning("external claim resolver setup", logger.NewField("endpoint", endpoint))
+		s.externalClaimResolver = &ExternalClaimResolver{
+			Current: "ubb",
+			UBB: &ExternalClaimResolverUBB{
+				endpoint: endpoint,
+			},
+		}
+	}
+}
+
+// New creates a new services instance without managers (use SetManagers after creation)
+func New(
+	logr logger.Logger,
+	referenceDate time.Time,
+	caseManager casemanager.CaseManager,
+	claimManager claimmanager.ClaimManager,
+	options ...Option,
+) (*Services, error) {
 	serviceResolver, err := serviceresolver.New()
 	if err != nil {
 		return nil, fmt.Errorf("new service resolver: %w", err)
@@ -104,14 +139,13 @@ func NewServices(referenceDate time.Time, options ...Option) (*Services, error) 
 		return nil, fmt.Errorf("new rule resolver: %w", err)
 	}
 
-	logr := logger.New("service", os.Stdout, logrus.DebugLevel)
-
 	s := &Services{
 		logger:              logr,
 		RuleResolver:        ruleResolver,
 		ServiceResolver:     serviceResolver,
+		CaseManager:         caseManager,
 		services:            make(map[string]ruleservice.RuleServicer),
-		RootReferenceDate:   referenceDate.Format("2006-01-02"),
+		RootReferenceDate:   referenceDate,
 		ruleServiceInMemory: false,
 		organization:        nil,
 		standAloneMode:      false,
@@ -127,18 +161,13 @@ func NewServices(referenceDate time.Time, options ...Option) (*Services, error) 
 
 	// Initialize services
 	for service := range s.RuleResolver.GetServiceLaws() {
-		svc, err := ruleservice.New(logr, service, s)
+		svc, err := ruleservice.New(logr, service, s, caseManager, claimManager)
 		if err != nil {
 			return nil, fmt.Errorf("new rule service: %w", err)
 		}
 
 		s.services[service] = svc
 	}
-
-	// Create managers
-	s.CaseManager = NewCaseManager(logr, s)
-	s.ClaimManager = NewClaimManager(s)
-	s.ClaimManager.CaseManager = s.CaseManager
 
 	return s, nil
 }
@@ -192,42 +221,44 @@ func (s *Services) GetServiceResolver() *serviceresolver.ServiceResolver {
 	return s.ServiceResolver
 }
 
-// GetCaseManager returns the case manager with access to events
-func (s *Services) GetCaseManager() service.CaseManagerAccessor {
-	return s.CaseManager
-}
-
-// GetClaimManager returns the claim manager with access to claims
-func (s *Services) GetClaimManager() service.ClaimManagerAccessor {
-	return s.ClaimManager
-}
-
 // Evaluate evaluates rules for a specific service, law, and context
 func (s *Services) Evaluate(
 	ctx context.Context,
 	service string,
 	law string,
 	parameters map[string]any,
-	referenceDate string,
-	overwriteInput map[string]map[string]any,
+	referenceDate *time.Time,
+	effectiveDate *time.Time,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
 	var span trace.Span
 
-	if referenceDate == "" {
-		referenceDate = s.RootReferenceDate
+	rDate := s.RootReferenceDate
+	if referenceDate != nil {
+		rDate = *referenceDate
 	}
 
-	spec, err := s.RuleResolver.GetRuleSpec(law, referenceDate, service)
+	eDate := s.RootReferenceDate
+	if effectiveDate != nil {
+		eDate = *effectiveDate
+	}
+
+	spec, err := s.RuleResolver.GetRuleSpec(law, rDate, service)
 	if err != nil {
 		return nil, fmt.Errorf("get rule spec: %w", err)
+	}
+
+	bsn, ok := parameters["BSN"].(string)
+	if !ok {
+		return nil, fmt.Errorf("bsn not found in parameters")
 	}
 
 	if s.ldvEnabled {
 		ctx, span = tracer.Action(ctx, s.tracer,
 			fmt.Sprintf("uri://%s.example/activities/evaluate-do", strings.ToLower(s.GetOrganizationName())),
-			tracer.SetAttributeBSN(parameters["BSN"].(string)),
+			tracer.SetAttributeBSN(bsn),
 			tracer.SetAttributeActivityID(s.rvaIDs["evaluate-do"].String()),
 			tracer.SetAlgorithmID(spec.UUID.String()),
 		)
@@ -242,7 +273,7 @@ func (s *Services) Evaluate(
 			WithLaw(spec.Law),
 	)
 
-	result, err := s.evaluate(ctx, service, law, parameters, referenceDate, overwriteInput, requestedOutput, approved)
+	result, err := s.evaluate(ctx, service, law, parameters, rDate, eDate, overwriteInput, requestedOutput, approved)
 	if err != nil {
 		if span != nil {
 			span.SetStatus(codes.Error, err.Error())
@@ -263,18 +294,15 @@ func (s *Services) evaluate(
 	service string,
 	law string,
 	parameters map[string]any,
-	referenceDate string,
-	overwriteInput map[string]map[string]any,
+	referenceDate time.Time,
+	effectiveDate time.Time,
+	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
 	svc, ok := s.GetService(service)
 	if !ok {
 		return nil, fmt.Errorf("service not found: %s", service)
-	}
-
-	if referenceDate == "" {
-		referenceDate = s.RootReferenceDate
 	}
 
 	var result *model.RuleResult
@@ -291,6 +319,7 @@ func (s *Services) evaluate(
 				ctx,
 				law,
 				referenceDate,
+				effectiveDate,
 				parameters,
 				overwriteInput,
 				requestedOutput,
@@ -424,15 +453,16 @@ func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
 
 				parameters := map[string]any{
 					apply.Name: aggregate,
+					"BSN":      aggregate.BSN,
 				}
 
-				ctx := context.Background()
 				result, err := s.Evaluate(
 					ctx,
 					rule.Service,
 					rule.Law,
 					parameters,
-					s.RootReferenceDate,
+					nil, // TODO: Should probably take the event date
+					nil, // TODO: Should probably take the event date
 					nil,
 					"",
 					true,
@@ -599,13 +629,28 @@ func (s *Services) InStandAloneMode() bool {
 	return s.standAloneMode
 }
 
-func (s *Services) HasExternalClaimResolverEndpoint() bool {
-	return s.externalClaimResolverEndpoint != nil
+func (s *Services) HasExternalClaimResolver() bool {
+	return s.externalClaimResolver != nil
 }
 
-func (s *Services) GetExternalClaimResolverEndpoint() string {
-	if s.HasExternalClaimResolverEndpoint() {
-		return *s.externalClaimResolverEndpoint
+func (s *Services) GetExternalClaimResolver() string {
+	if s.HasExternalClaimResolver() {
+		return s.externalClaimResolver.Current
+	}
+
+	return ""
+}
+
+func (s *Services) GetExternalClaimResolverDefaultEndpoint() string {
+	if s.HasExternalClaimResolver() && s.externalClaimResolver.Default != nil {
+		return s.externalClaimResolver.Default.endpoint
+	}
+
+	return ""
+}
+func (s *Services) GetExternalClaimResolverUBBEndpoint() string {
+	if s.HasExternalClaimResolver() && s.externalClaimResolver.UBB != nil {
+		return s.externalClaimResolver.UBB.endpoint
 	}
 
 	return ""

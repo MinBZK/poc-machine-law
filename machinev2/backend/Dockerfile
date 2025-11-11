@@ -1,5 +1,5 @@
 # Build stage
-FROM digilabpublic.azurecr.io/golang:1.24.4-alpine3.22 AS builder
+FROM digilabpublic.azurecr.io/golang:1.25.3-alpine3.22 AS builder
 
 # Set working directory
 WORKDIR /build
@@ -41,7 +41,7 @@ COPY --from=builder /build/server /app/server
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY ./law /app/law
+COPY ./submodules/regelrecht-laws/laws ./app/law
 COPY ./services /app/services
 
 # Set working directory

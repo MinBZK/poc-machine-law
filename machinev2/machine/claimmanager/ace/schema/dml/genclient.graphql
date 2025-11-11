@@ -1,0 +1,150 @@
+# BSN operations
+mutation AddBsn($transactionID: ID, $bsn: String!) {
+  addBsn(TransactionID: $transactionID, bsn: $bsn)
+}
+
+# Generic claim operations - using specific typed mutations
+mutation AddBewering(
+  $transactionID: ID
+  $bsn: ID!
+  $reason: String
+  $law: String
+  $key: String
+) {
+  addBewering(
+    TransactionID: $transactionID
+    Bsn: $bsn
+    reason: $reason
+    law: $law
+    key: $key
+  )
+}
+
+mutation AddVerified(
+  $transactionID: ID
+  $beweringID: ID!
+  $verifiedBy: String!
+  $verifiedReason: String!
+  $verifiedAt: String!
+) {
+  addVerified(
+    TransactionID: $transactionID
+    Bewering: $beweringID
+    verifiedBy: $verifiedBy
+    verifiedReason: $verifiedReason
+    verifiedAt: $verifiedAt
+  )
+}
+
+mutation AddRejected(
+  $transactionID: ID
+  $beweringID: ID!
+  $rejectedBy: String!
+  $rejectedReason: String!
+  $rejectedAt: String!
+) {
+  addRejected(
+    TransactionID: $transactionID
+    Bewering: $beweringID
+    rejectedBy: $rejectedBy
+    rejectedReason: $rejectedReason
+    rejectedAt: $rejectedAt
+  )
+}
+
+mutation AddBeweringStatus(
+  $transactionID: ID
+  $bewering: ID!
+  $beweringStatus: String!
+) {
+  addBeweringStatus(
+    TransactionID: $transactionID
+    Bewering: $bewering
+    beweringStatus: $beweringStatus
+  )
+}
+
+mutation AddBeweringProposed(
+  $transactionID: ID
+  $bewering: ID!
+  $proposed: ID!
+) {
+  addBeweringProposed(
+    TransactionID: $transactionID
+    Bewering: $bewering
+    proposed: $proposed
+  )
+}
+
+mutation AddBeweringOriginal(
+  $transactionID: ID
+  $bewering: ID!
+  $original: ID!
+) {
+  addBeweringOriginal(
+    TransactionID: $transactionID
+    Bewering: $bewering
+    original: $original
+  )
+}
+
+mutation AddBeweringEvidencePath(
+  $transactionID: ID
+  $bewering: ID!
+  $evidencePath: String!
+) {
+  addBeweringEvidencePath(
+    TransactionID: $transactionID
+    Bewering: $bewering
+    evidencePath: $evidencePath
+  )
+}
+
+mutation AddBeweringCase($transactionID: ID, $bewering: ID!, $caseID: ID!) {
+  addBeweringCase(
+    TransactionID: $transactionID
+    Bewering: $bewering
+    caseID: $caseID
+  )
+}
+
+# Annotation mutations
+mutation AddAnnotationValidFrom(
+  $transactionID: ID
+  $_claim: ID!
+  $from: DateTime!
+) {
+  addAnnotationValidFrom(
+    TransactionID: $transactionID
+    _claim: $_claim
+    from: $from
+  )
+}
+
+query GetClaimsBsn($transactionID: ID, $bsn: String!) {
+  getClaimsBsn(
+    TransactionID: $transactionID
+    RoleFilter: { bsn: { operation: EQ, value: $bsn } }
+  ) {
+    id
+  }
+}
+
+query GetBeweringOnBsn($bsn: ID!) {
+  getClaimsBewering(RoleFilter: { Bsn: { operation: EQ, value: $bsn } }) {
+    id
+  }
+}
+
+query GetClaimsBeweringProposed($transactionID: ID, $beweringID: ID!) {
+  getClaimsBeweringProposed(
+    TransactionID: $transactionID
+    RoleFilter: { Bewering: { operation: EQ, value: $beweringID } }
+  ) {
+    id
+    registeredAt
+    roles {
+      proposed
+    }
+  }
+}

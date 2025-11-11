@@ -171,6 +171,7 @@ class RulesEngine:
         self,
         parameters: dict[str, Any] | None = None,
         overwrite_input: dict[str, Any] | None = None,
+        overwrite_definitions: dict[str, Any] | None = None,
         sources: dict[str, pd.DataFrame] | None = None,
         calculation_date=None,
         requested_output: str | None = None,
@@ -201,6 +202,7 @@ class RulesEngine:
             sources=sources,
             path=[root],
             overwrite_input=overwrite_input or {},
+            overwrite_definitions=overwrite_definitions or {},
             calculation_date=calculation_date,
             service_name=self.service_name,
             claims=claims,
@@ -467,6 +469,22 @@ class RulesEngine:
     @staticmethod
     def _evaluate_comparison(op: str, left: Any, right: Any) -> bool | None:
         """Handle comparison operations"""
+        # Handle None values in comparisons
+        if left is None or right is None:
+            # For EQUALS/NOT_EQUALS, we can compare None values
+            if op == "EQUALS":
+                result = left == right
+                logger.debug(f"Compute {op}({left}, {right}) = {result}")
+                return result
+            elif op == "NOT_EQUALS":
+                result = left != right
+                logger.debug(f"Compute {op}({left}, {right}) = {result}")
+                return result
+            else:
+                # For other comparisons (GREATER_THAN, etc), None is not comparable
+                logger.warning(f"Cannot compute {op}({left}, {right}): one or both values are None")
+                return None
+
         if isinstance(left, date) and isinstance(right, str):
             right = datetime.strptime(right, "%Y-%m-%d").date()
         elif isinstance(right, date) and isinstance(left, str):

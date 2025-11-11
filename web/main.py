@@ -17,10 +17,15 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
-from web.feature_flags import is_change_wizard_enabled, is_chat_enabled, is_wallet_enabled
-from web.routers import admin, chat, edit, importer, laws, mcp, simulation, wallet
+from web.feature_flags import (
+    is_change_wizard_enabled,
+    is_chat_enabled,
+    is_total_income_widget_enabled,
+    is_wallet_enabled,
+)
+from web.routers import admin, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet
 
-app = FastAPI(title="Burger.nl")
+app = FastAPI(title="RegelRecht")
 
 # Add session middleware with a secure secret key and max age of 7 days
 # In production, this should be stored securely and not in the code
@@ -39,6 +44,8 @@ if STATIC_DIR.exists():
 # Include routers
 app.include_router(laws.router)
 app.include_router(admin.router)
+app.include_router(dashboard.router)
+app.include_router(demo.router)
 app.include_router(edit.router)
 app.include_router(chat.router)
 app.include_router(importer.router)
@@ -130,6 +137,7 @@ async def root(
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
+            "total_income_widget_enabled": is_total_income_widget_enabled(),
             "accepted_claims": accepted_claims,
             "now": datetime.now(),
         },
@@ -137,22 +145,16 @@ async def root(
 
 
 if __name__ == "__main__":
-    from multiprocessing import cpu_count
-
     import uvicorn
 
-    # Use half the available CPU cores (a common practice)
-    n_workers = cpu_count() // 2
-
-    # Ensure at least 1 worker
-    n_workers = max(n_workers, 1)
-
+    # Use single worker for demo mode to maintain in-memory state
+    # Multiple workers would have separate memory spaces, breaking the _test_runs dictionary
     config = uvicorn.Config(
         app=app,
         host="0.0.0.0",
         port=8000,
-        workers=n_workers,
-        reload=True,
+        workers=1,
+        reload=False,
     )
     server = uvicorn.Server(config)
     server.run()

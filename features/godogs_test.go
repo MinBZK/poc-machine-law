@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"strconv"
 	"strings"
@@ -16,7 +17,11 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager/manager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/inmemory"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 	"github.com/sirupsen/logrus"
@@ -30,6 +35,8 @@ type resultCtxKey struct{}
 type inputCtxKey struct{}
 type servicesCtxKey struct{}
 type serviceCtxKey struct{}
+type caseManagerCtxKey struct{}
+type claimManagerCtxKey struct{}
 type lawCtxKey struct{}
 type caseIDCtxKey struct{}
 
@@ -39,7 +46,7 @@ func TestFeatures(t *testing.T) {
 		Options: &godog.Options{
 			Format: "pretty", // pretty, progress, cucumber, events, junit
 			// ShowStepDefinitions: false,
-			Paths:    []string{"."},
+			Paths:    []string{"../submodules/regelrecht-laws/laws"},
 			TestingT: t, // Testing instance that will run subtests.
 		},
 	}
@@ -115,14 +122,14 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^is de reactietermijn_weken "([^"]*)"$`, isDeReactietermijnWeken)
 	ctx.Step(`^is de onderzoekstermijn_maanden "([^"]*)"$`, isDeOnderzoekstermijnMaanden)
 
-	ctx.StepContext().After(func(ctx context.Context, st *godog.Step, status godog.StepResultStatus, err error) (context.Context, error) {
-		services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-		if !ok || services == nil {
+	ctx.StepContext().After(func(ctx context.Context, _ *godog.Step, _ godog.StepResultStatus, _ error) (context.Context, error) {
+		cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+		if !ok || cm == nil {
 			return ctx, nil
 		}
 
 		// wait after every step to make sure the state machine is finished
-		services.CaseManager.Wait()
+		cm.Wait()
 
 		return ctx, nil
 	})
@@ -141,7 +148,7 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 
 	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
 	if !ok || services == nil {
-		return ctx, fmt.Errorf("services not set")
+		return ctx, errors.New("services not set")
 	}
 
 	err := services.Reset(ctx)
@@ -155,7 +162,7 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 
 	params := ctx.Value(paramsCtxKey{}).(map[string]any)
 
-	result, err := services.Evaluate(ctx, svc, law, params, "", nil, "", approved)
+	result, err := services.Evaluate(ctx, svc, law, params, nil, nil, nil, "", approved)
 	require.NoError(godog.T(ctx), err)
 
 	ctx = context.WithValue(ctx, serviceCtxKey{}, svc)
@@ -239,13 +246,23 @@ func deDatumIs(ctx context.Context, arg1 string) (context.Context, error) {
 		return nil, fmt.Errorf("could not parse time: %w", err)
 	}
 
-	// services, err := service.NewServices(t1, service.WithOrganizationName("TOESLAGEN"))
-	services, err := serviceprovider.NewServices(t1, serviceprovider.WithRuleServiceInMemory())
+	logr := logger.New("godog_test", os.Stdout, logrus.DebugLevel)
+
+	caseManager := manager.New(logr)
+	claimManager := inmemory.New(logr, caseManager)
+
+	services, err := serviceprovider.New(logr, t1, caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
 
-	return context.WithValue(ctx, servicesCtxKey{}, services), nil
+	caseManager.SetService(services)
+
+	ctx = context.WithValue(ctx, servicesCtxKey{}, services)
+	ctx = context.WithValue(ctx, caseManagerCtxKey{}, caseManager)
+	ctx = context.WithValue(ctx, claimManagerCtxKey{}, claimManager)
+
+	return ctx, nil
 }
 
 func eenPersoonMetBSN(ctx context.Context, bsn string) (context.Context, error) {
@@ -269,7 +286,7 @@ func deWetWordtUitgevoerdDoorServiceMetWijzigingen(ctx context.Context, law, ser
 
 func deWetWordtUitgevoerdDoorServiceMet(ctx context.Context, law, service string, table *godog.Table) (context.Context, error) {
 	if len(table.Rows) <= 1 {
-		return ctx, fmt.Errorf("table must have at least one data row")
+		return ctx, errors.New("table must have at least one data row")
 	}
 
 	// Get or create params map
@@ -353,21 +370,27 @@ func isHetToeslagbedragEuro(ctx context.Context, expected float64) error {
 	return nil
 }
 
+type SampleRater interface {
+	SetSampleRate(value float64)
+}
+
 func alleAanvragenWordenBeoordeeld(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("casemanager not set")
 	}
 
-	services.CaseManager.SampleRate = 1.0
+	if cm, ok := cm.(SampleRater); ok {
+		cm.SetSampleRate(1.0)
+	}
 
 	return nil
 }
 
 func deBeoordelaarDeAanvraagAfwijstMetReden(ctx context.Context, reason string) (context.Context, error) {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return ctx, fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return ctx, errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
@@ -379,15 +402,15 @@ func deBeoordelaarDeAanvraagAfwijstMetReden(ctx context.Context, reason string) 
 		verifiedResult = result.Output
 	}
 
-	return ctx, services.CaseManager.CompleteManualReview(ctx, caseID, "BEOORDELAAR", false, reason, verifiedResult)
+	return ctx, cm.CompleteManualReview(ctx, caseID, "BEOORDELAAR", false, reason, verifiedResult)
 }
 
 func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve string, reason string) (context.Context, error) {
 	approved := approve == "toewijst"
 
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return ctx, fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return ctx, errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
@@ -399,25 +422,25 @@ func deBeoordelaarHetBezwaarBeoordeeldMetReden(ctx context.Context, approve stri
 		verifiedResult = result.Output
 	}
 
-	return ctx, services.CaseManager.CompleteManualReview(ctx, caseID, "BEOORDELAAR", approved, reason, verifiedResult)
+	return ctx, cm.CompleteManualReview(ctx, caseID, "BEOORDELAAR", approved, reason, verifiedResult)
 }
 
 func deBurgerBezwaarMaaktMetReden(ctx context.Context, reason string) (context.Context, error) {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return ctx, fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return ctx, errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	err := services.CaseManager.ObjectCase(ctx, caseID, reason)
+	err := cm.ObjectCase(ctx, caseID, reason)
 	return ctx, err
 }
 
 func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Table) (context.Context, error) {
 	if len(table.Rows) <= 1 {
-		return ctx, fmt.Errorf("table must have at least one data row")
+		return ctx, errors.New("table must have at least one data row")
 	}
 
 	type claim struct {
@@ -456,16 +479,16 @@ func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Ta
 	params := ctx.Value(paramsCtxKey{}).(map[string]any)
 	bsn, ok := params["BSN"].(string)
 	if !ok {
-		return ctx, fmt.Errorf("BSN not set in parameters")
+		return ctx, errors.New("BSN not set in parameters")
 	}
 
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return ctx, fmt.Errorf("services not set")
+	claimManager, ok := ctx.Value(claimManagerCtxKey{}).(claimmanager.ClaimManager)
+	if !ok || claimManager == nil {
+		return ctx, errors.New("claim manager not set")
 	}
 
 	for _, v := range claims {
-		_, err := services.ClaimManager.SubmitClaim(
+		_, err := claimManager.Submit(
 			ctx,
 			v.Service,
 			v.Key,
@@ -489,9 +512,9 @@ func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Ta
 }
 
 func dePersoonDitAanvraagt(ctx context.Context) (context.Context, error) {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return ctx, fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return ctx, errors.New("case manager not set")
 	}
 
 	params := ctx.Value(paramsCtxKey{}).(map[string]any)
@@ -499,12 +522,14 @@ func dePersoonDitAanvraagt(ctx context.Context) (context.Context, error) {
 	law := ctx.Value(lawCtxKey{}).(string)
 	result := ctx.Value(resultCtxKey{}).(model.RuleResult)
 
-	caseID, err := services.CaseManager.SubmitCase(
+	maps.Copy(params, result.Input)
+
+	caseID, err := cm.SubmitCase(
 		ctx,
 		params["BSN"].(string),
 		svc,
 		law,
-		result.Input,
+		params,
 		result.Output,
 		true,
 	)
@@ -535,15 +560,15 @@ func heeftDePersoonGeenStemrecht(ctx context.Context) error {
 }
 
 func isDeAanvraagAfgewezen(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatusDecided))
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseStatus(casemanager.CaseStatusDecided))
 	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatusDecided, c.Status, "Expected case to be decided")
@@ -554,15 +579,15 @@ func isDeAanvraagAfgewezen(ctx context.Context) error {
 }
 
 func isDeAanvraagToegekend(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatusDecided))
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseStatus(casemanager.CaseStatusDecided))
 	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatusDecided, c.Status, "Expected case to be decided")
@@ -588,19 +613,19 @@ func isDeHuurtoeslagEuro(ctx context.Context, expected float64) error {
 }
 
 func isDeStatus(ctx context.Context, expected string) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatus(expected)))
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseStatus(casemanager.CaseStatus(expected)))
 	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatus(expected), c.Status,
-		fmt.Sprintf("Expected status to be %s, but was %s", expected, c.Status))
+		"Expected status to be %s, but was %s", expected, c.Status)
 
 	return nil
 }
@@ -672,20 +697,20 @@ func isVoldaanAanDeVoorwaarden(ctx context.Context) error {
 }
 
 func kanDeBurgerInBeroepGaanBij(ctx context.Context, competentCourt string) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseCanAppeal)
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseCanAppeal)
 	require.NoError(godog.T(ctx), err)
 
 	assert.True(godog.T(ctx), c.CanAppeal(), "Expected to be able to appeal")
 
-	require.True(godog.T(ctx), c.AppealStatus.CompetentCourt != nil, "Expected competent court to be set")
+	require.NotNil(godog.T(ctx), c.AppealStatus.CompetentCourt, "Expected competent court to be set")
 
 	assert.Equal(godog.T(ctx), competentCourt, *c.AppealStatus.CompetentCourt, "Expected another competent court")
 
@@ -693,15 +718,15 @@ func kanDeBurgerInBeroepGaanBij(ctx context.Context, competentCourt string) erro
 }
 
 func kanDeBurgerInBezwaarGaan(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseCanObject)
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseCanObject)
 	require.NoError(godog.T(ctx), err)
 
 	assert.True(godog.T(ctx), c.CanObject(), "Expected case to be objectable")
@@ -710,22 +735,22 @@ func kanDeBurgerInBezwaarGaan(ctx context.Context) error {
 }
 
 func kanDeBurgerNietInBezwaarGaanMetReden(ctx context.Context, expectedReason string) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseCanNotObject)
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseCanNotObject)
 	require.NoError(godog.T(ctx), err)
 	require.NotNil(godog.T(ctx), c)
 
 	assert.False(godog.T(ctx), c.CanObject(), "Expected case not to be objectable")
 
 	reason := c.ObjectionStatus.NotPossibleReason
-	require.True(godog.T(ctx), reason != nil, "Expected reason to be set")
+	require.NotNil(godog.T(ctx), reason, "Expected reason to be set")
 
 	assert.Equal(godog.T(ctx), expectedReason, *reason, "Expected reasons to match")
 
@@ -751,15 +776,15 @@ func ontbrekenErVerplichteGegevens(ctx context.Context) error {
 }
 
 func wordtDeAanvraagToegevoegdAanHandmatigeBeoordeling(ctx context.Context) error {
-	services, ok := ctx.Value(servicesCtxKey{}).(*serviceprovider.Services)
-	if !ok || services == nil {
-		return fmt.Errorf("services not set")
+	cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
+	if !ok || cm == nil {
+		return errors.New("case manager not set")
 	}
 
 	caseID, ok := ctx.Value(caseIDCtxKey{}).(uuid.UUID)
 	require.True(godog.T(ctx), ok)
 
-	c, err := getCaseByID(ctx, services.CaseManager, caseID, compareCaseStatus(casemanager.CaseStatusInReview))
+	c, err := getCaseByID(ctx, cm, caseID, compareCaseStatus(casemanager.CaseStatusInReview))
 	require.NoError(godog.T(ctx), err)
 
 	assert.Equal(godog.T(ctx), casemanager.CaseStatusInReview, c.Status, "Expected case to be in review")
@@ -810,7 +835,7 @@ func compareCaseCanAppeal(c *casemanager.Case) bool {
 	return c.CanAppeal()
 }
 
-func getCaseByID(ctx context.Context, cm *serviceprovider.CaseManager, caseID uuid.UUID, fn func(c *casemanager.Case) bool) (*casemanager.Case, error) {
+func getCaseByID(ctx context.Context, cm casemanager.CaseManager, caseID uuid.UUID, fn func(c *casemanager.Case) bool) (*casemanager.Case, error) {
 	var err error
 	var c *casemanager.Case
 	for range 500 {
@@ -850,12 +875,12 @@ func heeftDePersoonRechtOpKinderopvangtoeslag(ctx context.Context) error {
 
 	v, ok := result.Output["is_gerechtigd"]
 	if !ok {
-		return fmt.Errorf("could not find: 'is_gerechtigd'")
+		return errors.New("could not find: 'is_gerechtigd'")
 	}
 
 	actual, ok := v.(bool)
 	if !ok {
-		return fmt.Errorf("could not convert 'is_gerechtigd' to bool")
+		return errors.New("could not convert 'is_gerechtigd' to bool")
 	}
 
 	assert.True(godog.T(ctx), actual, "Expected person to be eligible for childcare allowance, but they were not")
@@ -874,7 +899,7 @@ func heeftDePersoonGeenRechtOpKinderopvangtoeslag(ctx context.Context) error {
 
 	actual, ok := v.(bool)
 	if !ok {
-		return fmt.Errorf("could not convert 'is_gerechtigd' to bool")
+		return errors.New("could not convert 'is_gerechtigd' to bool")
 	}
 
 	assert.False(godog.T(ctx), actual, "Expected person to NOT be eligible for childcare allowance, but they were")
@@ -1120,7 +1145,7 @@ func ontvangtDePersoonDeALOkopOmdatDezeAlleenstaandIs(ctx context.Context) error
 	actual, ok := v.(int)
 	require.True(godog.T(ctx), ok)
 
-	assert.Greater(godog.T(ctx), actual, 0, "Expected ALO-kop to be greater than 0 for single parent")
+	assert.Positive(godog.T(ctx), actual, "Expected ALO-kop to be greater than 0 for single parent")
 
 	return nil
 }
@@ -1224,7 +1249,7 @@ func isHetSignaalType(ctx context.Context, expectedSignaalType string) error {
 	require.True(godog.T(ctx), ok)
 
 	assert.Equal(godog.T(ctx), expectedSignaalType, actualSignaalType,
-		fmt.Sprintf("Expected signaal_type to be '%s', but was '%s'", expectedSignaalType, actualSignaalType))
+		"Expected signaal_type to be '%s', but was '%s'", expectedSignaalType, actualSignaalType)
 
 	return nil
 }
@@ -1243,7 +1268,7 @@ func isDeReactietermijnWeken(ctx context.Context, weken string) error {
 	require.NoError(godog.T(ctx), err, "Failed to parse expected weeks")
 
 	assert.Equal(godog.T(ctx), expected, actual,
-		fmt.Sprintf("Expected reactietermijn_weken to be %d, but was %d", expected, actual))
+		"Expected reactietermijn_weken to be %d, but was %d", expected, actual)
 
 	return nil
 }
@@ -1262,7 +1287,7 @@ func isDeOnderzoekstermijnMaanden(ctx context.Context, maanden string) error {
 	require.NoError(godog.T(ctx), err, "Failed to parse expected months")
 
 	assert.Equal(godog.T(ctx), expected, actual,
-		fmt.Sprintf("Expected onderzoekstermijn_maanden to be %d, but was %d", expected, actual))
+		"Expected onderzoekstermijn_maanden to be %d, but was %d", expected, actual)
 
 	return nil
 }

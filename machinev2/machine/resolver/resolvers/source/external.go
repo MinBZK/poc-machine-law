@@ -3,14 +3,12 @@ package source
 import (
 	"context"
 
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 type ExternalClaimResolver struct {
-	resolver     externalResolver
-	propertySpec map[string]ruleresolver.Field
+	resolver externalResolver
 }
 
 type Filter struct {
@@ -21,20 +19,20 @@ type Filter struct {
 
 type Filters []Filter
 
-func NewExternalClaimResolver(endpoint string, propertySpec map[string]ruleresolver.Field) *ExternalClaimResolver {
-	var resolver externalResolver
-
-	resolver = newDefaultResolver(endpoint)
-	resolver = newUBBResolver(endpoint, propertySpec)
-
+func NewExternalClaimResolver(resolver externalResolver) *ExternalClaimResolver {
 	return &ExternalClaimResolver{
-		propertySpec: propertySpec,
-		resolver:     resolver,
+		resolver: resolver,
 	}
 }
 
 // Resolve implements Resolver.
-func (c *ExternalClaimResolver) Resolve(ctx context.Context, key string, table string, field string, filters Filters) (*resolver.Resolved, bool) {
+func (c *ExternalClaimResolver) Resolve(
+	ctx context.Context,
+	key string,
+	table string,
+	field string,
+	filters Filters,
+) (*resolver.Resolved, bool) {
 	logr := logger.FromContext(ctx).WithName("resolver")
 	logr = logr.WithField("resolver", "external_claim")
 
@@ -49,27 +47,7 @@ func (c *ExternalClaimResolver) Resolve(ctx context.Context, key string, table s
 		return nil, false
 	}
 
-	resolved := &resolver.Resolved{
+	return &resolver.Resolved{
 		Value: value,
-	}
-
-	// Add type information for claims
-	if spec, ok := c.propertySpec[field]; ok {
-		if spec.GetBase().Type != "" {
-			resolved.Details.Type = spec.GetBase().Type
-		}
-
-		if spec.GetBase().TypeSpec != nil {
-			resolved.Details.TypeSpec = spec.GetBase().TypeSpec.ToMap()
-		}
-
-		required := false
-		if spec.GetBase().Required != nil {
-			required = *spec.GetBase().Required
-		}
-
-		resolved.Required = required
-	}
-
-	return resolved, true
+	}, true
 }

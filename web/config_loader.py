@@ -14,6 +14,9 @@ class Service:
 class ServiceRoutingConfig:
     enabled: bool
     services: dict[str, Service]
+    query_all_for_cases: bool = True  # Query all services for get_cases_by_bsn
+    query_all_for_claims: bool = True  # Query all services for get_claims_by_bsn
+    query_all_for_profiles: bool = False  # Query all services for get_all_profiles (default: use default URL)
 
     @classmethod
     def from_dict(cls, data: dict) -> Optional["ServiceRoutingConfig"]:
@@ -23,7 +26,13 @@ class ServiceRoutingConfig:
             service_name: Service(domain=service_data["domain"])
             for service_name, service_data in data.get("services", {}).items()
         }
-        return cls(enabled=data.get("enabled", False), services=services)
+        return cls(
+            enabled=data.get("enabled", False),
+            services=services,
+            query_all_for_cases=data.get("query_all_for_cases", True),
+            query_all_for_claims=data.get("query_all_for_claims", True),
+            query_all_for_profiles=data.get("query_all_for_profiles", False),
+        )
 
 
 @dataclass

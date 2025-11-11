@@ -20,7 +20,7 @@ func (handler *Handler) ProfileList(ctx context.Context, request api.ProfileList
 	}
 
 	return api.ProfileList200JSONResponse{
-		ProfileListResponseJSONResponse: api.ProfileListResponseJSONResponse{
+		ResponseProfileListJSONResponse: api.ResponseProfileListJSONResponse{
 			Data: adapter.FromProfiles(profiles),
 		},
 	}, nil

@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/path"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/context/tracker"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/resolver"
 	claimresolver "github.com/minbzk/poc-machine-law/machinev2/machine/resolver/resolvers/claim"
@@ -38,7 +40,8 @@ type RuleContextData struct {
 type RuleContext struct {
 	ServiceProvider service.ServiceProvider
 	propertySpecs   map[string]ruleresolver.Field
-	calculationDate string
+	referenceDate   time.Time
+	effectiveDate   time.Time
 	LocalResolver   *local.LocalResolver
 	OutputsResolver *output.OutputsResolver
 	Resolvers       []resolver.Resolver
@@ -47,35 +50,41 @@ type RuleContext struct {
 
 // NewRuleContext creates a new rule context
 func NewRuleContext(
-	definitions map[string]any, serviceProvider service.ServiceProvider,
+	definitions map[string]any, serviceProvider service.ServiceProvider, caseManager casemanager.CaseManager,
 	parameters map[string]any, propertySpecs map[string]ruleresolver.Field,
 	sources model.SourceDataFrame,
-	overwriteInput map[string]map[string]any, calculationDate string,
-	claims map[string]model.Claim, approved bool) *RuleContext {
+	overwriteInput map[string]any, referenceDate, effectiveDate time.Time,
+	claims map[string]model.Claim, approved bool) (*RuleContext, error) {
 
 	localresolver := local.NewLocalResolver()
 	outputresolver := output.NewOutputsResolver()
 
 	rc := &RuleContext{
 		propertySpecs:   propertySpecs,
-		calculationDate: calculationDate,
+		referenceDate:   referenceDate,
+		effectiveDate:   effectiveDate,
 		MissingRequired: false,
 		LocalResolver:   localresolver,
 		OutputsResolver: outputresolver,
 	}
 
+	source, err := sourceresolver.New(rc, serviceProvider, caseManager, sources, propertySpecs, effectiveDate)
+	if err != nil {
+		return nil, fmt.Errorf("sourceresolver new: %w", err)
+	}
+
 	rc.Resolvers = []resolver.Resolver{
-		claimresolver.New(claims, propertySpecs),
+		claimresolver.New(claims),
 		localresolver,
 		definitionresolver.New(definitions),
 		parameterresolver.New(parameters),
 		outputresolver,
 		overwriteresolver.New(propertySpecs, overwriteInput),
-		sourceresolver.New(rc, serviceProvider, sources, propertySpecs),
-		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, calculationDate, approved),
+		source,
+		serviceresolver.New(rc, serviceProvider, propertySpecs, parameters, overwriteInput, referenceDate, effectiveDate, approved),
 	}
 
-	return rc
+	return rc, nil
 }
 
 func (rc *RuleContext) ResolveAction(ctx context.Context, action ruleresolver.Action) (any, error) {
@@ -138,7 +147,7 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 	logger := logger.FromContext(ctx)
 
 	// Resolve dates first
-	dateValue, err := resolveDate(strPath, rc.calculationDate)
+	dateValue, err := resolveDate(strPath, rc.referenceDate)
 	if err == nil && dateValue != nil {
 		logger.Debugf("Resolved date $%s: %v", strPath, dateValue)
 		node.Result = dateValue
@@ -237,32 +246,12 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		return currentValue, nil
 	}
 
-	for _, resolve := range rc.Resolvers {
-		if resolved, ok := resolve.Resolve(ctx, strPath); ok {
-			node.Result = resolved.Value
-			node.ResolveType = resolve.ResolveType()
-			node.Details = resolved.Details.ToMap()
-
-			if resolved.MissingRequired != nil {
-				rc.MissingRequired = rc.MissingRequired || *resolved.MissingRequired
-			}
-
-			logger.Debugf("Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
-
-			return resolved.Value, nil
-		}
-	}
-
 	// Handle property specs
 	if spec, exists := rc.propertySpecs[strPath]; exists {
 		// Handle required fields
 		node.Required = false
 		if spec.GetBase().Required != nil {
 			node.Required = *spec.GetBase().Required
-		}
-
-		if node.Required {
-			rc.MissingRequired = true
 		}
 
 		// Add type information
@@ -275,6 +264,25 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 		}
 	}
 
+	for _, resolve := range rc.Resolvers {
+		if resolved, ok := resolve.Resolve(ctx, strPath); ok {
+			node.Result = resolved.Value
+			node.ResolveType = resolve.ResolveType()
+
+			if resolved.MissingRequired != nil {
+				rc.MissingRequired = rc.MissingRequired || *resolved.MissingRequired
+			}
+
+			logger.Debugf("Resolving from %s: %v", resolve.ResolveType(), resolved.Value)
+
+			return resolved.Value, nil
+		}
+	}
+
+	if node.Required {
+		rc.MissingRequired = true
+	}
+
 	logger.Warningf("Could not resolve value for %s", strPath)
 	node.Result = nil
 	node.ResolveType = "NONE"
@@ -283,33 +291,18 @@ func (rc *RuleContext) resolveValueInternal(ctx context.Context, key any) (any, 
 }
 
 // resolveDate handles special date-related paths
-func resolveDate(path string, date string) (any, error) {
-	if path == "calculation_date" {
+func resolveDate(path string, date time.Time) (any, error) {
+	switch path {
+	case "calculation_date":
 		return date, nil
-	}
-
-	if path == "january_first" {
-		calcDate, err := time.Parse("2006-01-02", date)
-		if err != nil {
-			return nil, err
-		}
-		januaryFirst := time.Date(calcDate.Year(), 1, 1, 0, 0, 0, 0, calcDate.Location())
-		return januaryFirst.Format("2006-01-02"), nil
-	}
-
-	if path == "prev_january_first" {
-		calcDate, err := time.Parse("2006-01-02", date)
-		if err != nil {
-			return nil, err
-		}
-		prevJanuaryFirst := time.Date(calcDate.Year()-1, 1, 1, 0, 0, 0, 0, calcDate.Location())
-		return prevJanuaryFirst.Format("2006-01-02"), nil
-	}
-
-	if path == "year" {
-		if len(date) >= 4 {
-			return date[:4], nil
-		}
+	case "january_first":
+		januaryFirst := time.Date(date.Year(), 1, 1, 0, 0, 0, 0, date.Location())
+		return januaryFirst.Format(time.DateOnly), nil
+	case "prev_january_first":
+		prevJanuaryFirst := time.Date(date.Year()-1, 1, 1, 0, 0, 0, 0, date.Location())
+		return prevJanuaryFirst.Format(time.DateOnly), nil
+	case "year":
+		return strconv.Itoa(date.Year()), nil
 	}
 
 	return nil, fmt.Errorf("not a date path")

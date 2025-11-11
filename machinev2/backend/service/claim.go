@@ -20,7 +20,7 @@ func (service *Service) ClaimListBasedOnBSN(ctx context.Context, bsn string, fil
 		includeRejected = *filter.IncludeRejected
 	}
 
-	records, err := service.service.ClaimManager.GetClaimsByBSN(bsn, onlyApproved, includeRejected)
+	records, err := service.claimManager.GetClaimsByBSN(ctx, bsn, onlyApproved, includeRejected)
 	if err != nil {
 		return nil, fmt.Errorf("get claims by bsn: %w", err)
 	}
@@ -39,7 +39,7 @@ func (service *Service) ClaimListBasedOnBSNServiceLaw(ctx context.Context, bsn, 
 		includeRejected = *filter.IncludeRejected
 	}
 
-	records, err := service.service.ClaimManager.GetClaimByBSNServiceLaw(bsn, svc, law, onlyApproved, includeRejected)
+	records, err := service.claimManager.GetClaimByBSNServiceLaw(ctx, bsn, svc, law, onlyApproved, includeRejected)
 	if err != nil {
 		return nil, fmt.Errorf("get claims by bsn: %w", err)
 	}
@@ -55,7 +55,11 @@ func (service *Service) ClaimListBasedOnBSNServiceLaw(ctx context.Context, bsn, 
 
 // ClaimApprove implements Servicer.
 func (service *Service) ClaimApprove(ctx context.Context, claim model.ClaimApprove) error {
-	err := service.service.ClaimManager.ApproveClaim(ctx, claim.ID, claim.VerifiedBy, claim.VerifiedValue)
+	verification := machinemodel.ClaimVerification{
+		By:    claim.VerifiedBy,
+		Value: claim.VerifiedValue,
+	}
+	err := service.claimManager.Approve(ctx, claim.ID, verification)
 	if err != nil {
 		return fmt.Errorf("approve claim: %w", err)
 	}
@@ -65,9 +69,13 @@ func (service *Service) ClaimApprove(ctx context.Context, claim model.ClaimAppro
 
 // ClaimReject implements Servicer.
 func (service *Service) ClaimReject(ctx context.Context, claim model.ClaimReject) error {
-	err := service.service.ClaimManager.RejectClaim(ctx, claim.ID, claim.RejectedBy, claim.RejectionReason)
+	rejection := machinemodel.ClaimRejection{
+		By:     claim.RejectedBy,
+		Reason: claim.RejectionReason,
+	}
+	err := service.claimManager.Reject(ctx, claim.ID, rejection)
 	if err != nil {
-		return fmt.Errorf("approve claim: %w", err)
+		return fmt.Errorf("reject claim: %w", err)
 	}
 
 	return nil
@@ -95,7 +103,7 @@ func (service *Service) ClaimSubmit(ctx context.Context, claim model.ClaimSubmit
 		evidencePath = *claim.EvidencePath
 	}
 
-	claimID, err := service.service.ClaimManager.SubmitClaim(
+	claimID, err := service.claimManager.Submit(
 		ctx,
 		claim.Service,
 		claim.Key,
@@ -110,7 +118,7 @@ func (service *Service) ClaimSubmit(ctx context.Context, claim model.ClaimSubmit
 		autoApprove,
 	)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("approve claim: %w", err)
+		return uuid.Nil, fmt.Errorf("submit claim: %w", err)
 	}
 
 	return claimID, nil

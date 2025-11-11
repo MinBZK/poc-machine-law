@@ -18,7 +18,7 @@ func (handler *Handler) EventList(ctx context.Context, request api.EventListRequ
 	}
 
 	return api.EventList200JSONResponse{
-		EventListResponseJSONResponse: api.EventListResponseJSONResponse{
+		ResponseEventListJSONResponse: api.ResponseEventListJSONResponse{
 			Data: adapter.FromEvents(events),
 		},
 	}, nil
@@ -32,7 +32,7 @@ func (handler *Handler) EventListBasedOnCaseID(ctx context.Context, request api.
 	}
 
 	return api.EventListBasedOnCaseID200JSONResponse{
-		EventListResponseJSONResponse: api.EventListResponseJSONResponse{
+		ResponseEventListJSONResponse: api.ResponseEventListJSONResponse{
 			Data: adapter.FromEvents(events),
 		},
 	}, nil

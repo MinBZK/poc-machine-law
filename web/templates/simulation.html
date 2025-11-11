@@ -18,686 +18,557 @@
                 </button>
             </div>
             <form id="simulation-form" class="space-y-4">
-                <!-- Preset Scenarios - At the top for quick access -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="p-4">
-                        <h2 class="text-base font-medium text-gray-900 mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-500"
+                <!-- POPULATIEBEHEER BLOCK -->
+                <div class="bg-white shadow-lg rounded-lg border-2 border-green-200">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 border-b border-green-200">
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-green-600"
                                  fill="none"
                                  stroke="currentColor"
                                  viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
                             </svg>
-                            Snel Starten
+                            Populatiebeheer
                         </h2>
-                        <div class="space-y-2">
+                        <p class="text-sm text-gray-600 mt-1 ml-8">Definieer de demografische samenstelling van de populatie</p>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <!-- Scenarios - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
                             <button type="button"
-                                    onclick="loadPreset('current')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5"
+                                    onclick="toggleSection('scenarios-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-indigo-500"
                                          fill="none"
                                          stroke="currentColor"
                                          viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                     </svg>
-                                    <div>
-                                        <div class="font-medium text-gray-900">Huidige Realiteit</div>
-                                        <div class="text-sm text-gray-500">Standaard parameters - huidige Nederlandse situatie</div>
-                                    </div>
-                                </div>
+                                    Scenarios
+                                </h3>
+                                <svg id="scenarios-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </button>
-                            <button type="button"
-                                    onclick="loadPreset('recession')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                                    </svg>
-                                    <div>
-                                        <div class="font-medium text-gray-900">Economische Recessie</div>
-                                        <div class="text-sm text-gray-500">Hogere werkloosheid, lagere inkomens, verhoogde bijstand</div>
+                            <div id="scenarios-section" class="hidden">
+                                <div class="px-4 pb-4">
+                                    <div class="space-y-2">
+                                        <button type="button"
+                                                onclick="loadPreset('current')"
+                                                class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-gray-400 mr-3 mt-0.5"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                    </path>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Huidige Realiteit</div>
+                                                    <div class="text-sm text-gray-500">Standaard parameters - huidige Nederlandse situatie</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
+                                                onclick="loadPreset('recession')"
+                                                class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-red-400 mr-3 mt-0.5"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Economische Recessie</div>
+                                                    <div class="text-sm text-gray-500">Hogere werkloosheid, lagere inkomens, verhoogde bijstand</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
+                                                onclick="loadPreset('housing_crisis')"
+                                                class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-orange-400 mr-3 mt-0.5"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                                    </path>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Wooncrisis</div>
+                                                    <div class="text-sm text-gray-500">Hogere huren, meer huurders, verhoogde huurtoeslag</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
+                                                onclick="loadPreset('aging')"
+                                                class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-purple-400 mr-3 mt-0.5"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                    </path>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Vergrijzing</div>
+                                                    <div class="text-sm text-gray-500">Meer ouderen, hogere AOW uitgaven, minder werkenden</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button type="button"
+                                                onclick="loadPreset('healthcare')"
+                                                class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                                    </path>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Zorgkosten Stijging</div>
+                                                    <div class="text-sm text-gray-500">Hogere zorgpremies, meer zorgtoeslag nodig</div>
+                                                </div>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <!-- Demographics - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="toggleSection('demographics-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900">Demografie</h3>
+                                <svg id="demographics-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </button>
-                            <button type="button"
-                                    onclick="loadPreset('housing_crisis')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-orange-400 mr-3 mt-0.5"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                        </path>
-                                    </svg>
+                            <div id="demographics-section" class="px-4 pb-4 hidden">
+                                <!-- Age Distribution -->
+                                <h3 class="text-sm font-medium text-gray-700 mb-2 mt-3">Leeftijdsverdeling</h3>
+                                <div class="space-y-3">
                                     <div>
-                                        <div class="font-medium text-gray-900">Wooncrisis</div>
-                                        <div class="text-sm text-gray-500">Hogere huren, meer huurders, verhoogde huurtoeslag</div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="age_18_30" class="font-medium text-gray-700">18-30 jaar</label>
+                                            <span id="age_18_30_value" class="text-gray-500">{{ default_params.age_18_30 }}%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="age_18_30"
+                                               id="age_18_30"
+                                               value="{{ default_params.age_18_30 }}"
+                                               min="0"
+                                               max="100"
+                                               step="1"
+                                               oninput="updateSliderValue('age_18_30'); validateAgeDistribution('age_18_30')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="age_30_45" class="font-medium text-gray-700">30-45 jaar</label>
+                                            <span id="age_30_45_value" class="text-gray-500">{{ default_params.age_30_45 }}%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="age_30_45"
+                                               id="age_30_45"
+                                               value="{{ default_params.age_30_45 }}"
+                                               min="0"
+                                               max="100"
+                                               step="1"
+                                               oninput="updateSliderValue('age_30_45'); validateAgeDistribution('age_30_45')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="age_45_67" class="font-medium text-gray-700">45-67 jaar</label>
+                                            <span id="age_45_67_value" class="text-gray-500">{{ default_params.age_45_67 }}%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="age_45_67"
+                                               id="age_45_67"
+                                               value="{{ default_params.age_45_67 }}"
+                                               min="0"
+                                               max="100"
+                                               step="1"
+                                               oninput="updateSliderValue('age_45_67'); validateAgeDistribution('age_45_67')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="age_67_85" class="font-medium text-gray-700">67-85 jaar</label>
+                                            <span id="age_67_85_value" class="text-gray-500">{{ default_params.age_67_85 }}%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="age_67_85"
+                                               id="age_67_85"
+                                               value="{{ default_params.age_67_85 }}"
+                                               min="0"
+                                               max="100"
+                                               step="1"
+                                               oninput="updateSliderValue('age_67_85'); validateAgeDistribution('age_67_85')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="age_85_plus" class="font-medium text-gray-700">85+ jaar</label>
+                                            <span id="age_85_plus_value" class="text-gray-500">{{ default_params.age_85_plus }}%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="age_85_plus"
+                                               id="age_85_plus"
+                                               value="{{ default_params.age_85_plus }}"
+                                               min="0"
+                                               max="100"
+                                               step="1"
+                                               oninput="updateSliderValue('age_85_plus'); validateAgeDistribution('age_85_plus')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div id="age-total" class="text-sm font-medium">
+                                        Totaal: <span id="age-total-value" class="text-gray-900">100%</span>
+                                        <span id="age-warning" class="text-red-600 ml-2 hidden">Moet 100% zijn!</span>
                                     </div>
                                 </div>
-                            </button>
-                            <button type="button"
-                                    onclick="loadPreset('aging')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-purple-400 mr-3 mt-0.5"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
+                                <!-- Income Distribution -->
+                                <h3 class="text-sm font-medium text-gray-700 mb-2 mt-4">Inkomensverdeling</h3>
+                                <div class="grid grid-cols-1 gap-3">
                                     <div>
-                                        <div class="font-medium text-gray-900">Vergrijzing</div>
-                                        <div class="text-sm text-gray-500">Meer ouderen, hogere AOW uitgaven, minder werkenden</div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="income_low_pct" class="font-medium text-gray-700">Laag inkomen (€0-30k)</label>
+                                            <span id="income_low_pct_value" class="text-gray-500">30%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="income_low_pct"
+                                               id="income_low_pct"
+                                               value="30"
+                                               min="0"
+                                               max="100"
+                                               step="5"
+                                               oninput="updateIncomeDistribution('income_low_pct')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="income_middle_pct" class="font-medium text-gray-700">Midden inkomen (€30k-60k)</label>
+                                            <span id="income_middle_pct_value" class="text-gray-500">50%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="income_middle_pct"
+                                               id="income_middle_pct"
+                                               value="50"
+                                               min="0"
+                                               max="100"
+                                               step="5"
+                                               oninput="updateIncomeDistribution('income_middle_pct')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <label for="income_high_pct" class="font-medium text-gray-700">Hoog inkomen (€60k+)</label>
+                                            <span id="income_high_pct_value" class="text-gray-500">20%</span>
+                                        </div>
+                                        <input type="range"
+                                               name="income_high_pct"
+                                               id="income_high_pct"
+                                               value="20"
+                                               min="0"
+                                               max="100"
+                                               step="5"
+                                               oninput="updateIncomeDistribution('income_high_pct')"
+                                               class="mt-1 w-full">
+                                    </div>
+                                    <div class="mt-2 text-sm">
+                                        <span class="font-medium text-gray-700">Totaal:</span>
+                                        <span id="income-total-value" class="ml-1 font-semibold text-gray-900">100%</span>
+                                        <span id="income-warning" class="ml-2 text-red-600 hidden">Moet 100% zijn!</span>
+                                    </div>
+                                    <!-- Economic Parameters -->
+                                    <h3 class="text-base font-medium text-gray-700 mb-3 mt-6">Huisvesting & Economie</h3>
+                                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                        <div>
+                                            <div class="flex justify-between text-sm">
+                                                <label for="zero_income_prob" class="font-medium text-gray-700">Kans op geen inkomen</label>
+                                                <span id="zero_income_prob_value" class="text-gray-500">{{ default_params.zero_income_prob }}%</span>
+                                            </div>
+                                            <input type="range"
+                                                   name="zero_income_prob"
+                                                   id="zero_income_prob"
+                                                   value="{{ default_params.zero_income_prob }}"
+                                                   min="0"
+                                                   max="20"
+                                                   step="1"
+                                                   oninput="updateSliderValue('zero_income_prob')"
+                                                   class="mt-1 w-full">
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm">
+                                                <label for="rent_percentage" class="font-medium text-gray-700">Percentage huurders</label>
+                                                <span id="rent_percentage_value" class="text-gray-500">{{ default_params.rent_percentage }}%</span>
+                                            </div>
+                                            <input type="range"
+                                                   name="rent_percentage"
+                                                   id="rent_percentage"
+                                                   value="{{ default_params.rent_percentage }}"
+                                                   min="0"
+                                                   max="100"
+                                                   step="1"
+                                                   oninput="updateSliderValue('rent_percentage')"
+                                                   class="mt-1 w-full">
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm">
+                                                <label for="student_percentage_young" class="font-medium text-gray-700">Studenten (18-30 jaar)</label>
+                                                <span id="student_percentage_young_value" class="text-gray-500">{{ default_params.student_percentage_young }}%</span>
+                                            </div>
+                                            <input type="range"
+                                                   name="student_percentage_young"
+                                                   id="student_percentage_young"
+                                                   value="{{ default_params.student_percentage_young }}"
+                                                   min="0"
+                                                   max="80"
+                                                   step="5"
+                                                   oninput="updateSliderValue('student_percentage_young')"
+                                                   class="mt-1 w-full">
+                                        </div>
                                     </div>
                                 </div>
-                            </button>
-                            <button type="button"
-                                    onclick="loadPreset('healthcare')"
-                                    class="w-full text-left px-3 py-2 border border-gray-300 shadow-sm rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-blue-400 mr-3 mt-0.5"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                        </path>
-                                    </svg>
-                                    <div>
-                                        <div class="font-medium text-gray-900">Zorgkosten Stijging</div>
-                                        <div class="text-sm text-gray-500">Hogere zorgpremies, meer zorgtoeslag nodig</div>
-                                    </div>
+                            </div>
+                        </div>
+                        <!-- Basic Settings -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4">
+                            <h3 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h3>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal personen</label>
+                                    <input type="number"
+                                           name="num_people"
+                                           id="num_people"
+                                           value="{{ default_params.num_people }}"
+                                           min="10"
+                                           max="10000"
+                                           step="10"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <p class="mt-1 text-sm text-gray-500">Tussen 10 en 10.000</p>
                                 </div>
+                                <div>
+                                    <label for="simulation_date" class="block text-sm font-medium text-gray-700">Simulatiedatum</label>
+                                    <input type="date"
+                                           name="simulation_date"
+                                           id="simulation_date"
+                                           value="{{ default_params.simulation_date }}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <p class="mt-1 text-sm text-gray-500">Datum voor wetsevaluatie</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Opgeslagen Populaties -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-gray-900 mb-3">Opgeslagen Populaties</h3>
+                            <p class="text-xs text-gray-500 mb-3">Hergebruik een bestaande populatie voor consistente vergelijkingen</p>
+                            <div id="population-selector" class="hidden space-y-2">
+                                <select id="population-select"
+                                        class="block w-full rounded-md border-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm py-2 px-3 bg-white hover:border-gray-400 cursor-pointer transition-all">
+                                    <option value="">-- Selecteer populatie --</option>
+                                </select>
+                                <div id="selected-population-info"
+                                     class="hidden p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg text-sm border-2 border-green-200 shadow-sm">
+                                    <div class="font-semibold text-gray-900 mb-3 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-green-600"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                            </path>
+                                        </svg>
+                                        Populatie Details
+                                    </div>
+                                    <div id="population-details"
+                                         class="text-gray-700 space-y-1.5 text-xs font-medium"></div>
+                                    <button type="button"
+                                            onclick="deleteSelectedPopulation()"
+                                            class="mt-4 w-full inline-flex items-center justify-center px-3 py-2 text-xs text-red-600 hover:text-white hover:bg-red-600 font-semibold border-2 border-red-600 rounded-md transition-all cursor-pointer">
+                                        <svg class="w-4 h-4 mr-1.5"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg>
+                                        Verwijder deze populatie
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="population-list" class="space-y-2"></div>
+                        </div>
+                        <!-- Create Population Button -->
+                        <div class="mt-4 pt-4 border-t border-green-200">
+                            <button type="button"
+                                    onclick="createPopulation()"
+                                    class="w-full inline-flex items-center justify-center px-6 py-3 border-2 border-green-600 text-base font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md cursor-pointer transition-all">
+                                <svg class="mr-2 -ml-1 h-5 w-5"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Nieuwe Populatie Aanmaken
                             </button>
                         </div>
                     </div>
                 </div>
-                <!-- Basic Settings - Always visible -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="p-4">
-                        <h2 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h2>
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal personen</label>
-                                <input type="number"
-                                       name="num_people"
-                                       id="num_people"
-                                       value="{{ default_params.num_people }}"
-                                       min="10"
-                                       max="10000"
-                                       step="10"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                <p class="mt-1 text-sm text-gray-500">Tussen 10 en 10.000</p>
-                            </div>
-                            <div>
-                                <label for="simulation_date" class="block text-sm font-medium text-gray-700">Simulatiedatum</label>
-                                <input type="date"
-                                       name="simulation_date"
-                                       id="simulation_date"
-                                       value="{{ default_params.simulation_date }}"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                <p class="mt-1 text-sm text-gray-500">Datum voor wetsevaluatie</p>
-                            </div>
-                        </div>
+                <!-- WETGEVING BLOCK -->
+                <div class="bg-white shadow-lg rounded-lg border-2 border-blue-200">
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b border-blue-200">
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-blue-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Wetgeving
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1 ml-8">Pas de parameters van wetten en regelingen aan</p>
                     </div>
-                </div>
-                <!-- Demographics - Collapsible -->
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <button type="button"
-                            onclick="toggleSection('demographics-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h2 class="text-base font-medium text-gray-900">Demografie</h2>
-                        <svg id="demographics-section-chevron"
-                             class="w-5 h-5 text-gray-500 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="demographics-section" class="px-4 pb-4 hidden">
-                        <!-- Age Distribution -->
-                        <h3 class="text-sm font-medium text-gray-700 mb-2 mt-3">Leeftijdsverdeling</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="age_18_30" class="font-medium text-gray-700">18-30 jaar</label>
-                                    <span id="age_18_30_value" class="text-gray-500">{{ default_params.age_18_30 }}%</span>
-                                </div>
-                                <input type="range"
-                                       name="age_18_30"
-                                       id="age_18_30"
-                                       value="{{ default_params.age_18_30 }}"
-                                       min="0"
-                                       max="100"
-                                       step="1"
-                                       oninput="updateSliderValue('age_18_30'); validateAgeDistribution('age_18_30')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="age_30_45" class="font-medium text-gray-700">30-45 jaar</label>
-                                    <span id="age_30_45_value" class="text-gray-500">{{ default_params.age_30_45 }}%</span>
-                                </div>
-                                <input type="range"
-                                       name="age_30_45"
-                                       id="age_30_45"
-                                       value="{{ default_params.age_30_45 }}"
-                                       min="0"
-                                       max="100"
-                                       step="1"
-                                       oninput="updateSliderValue('age_30_45'); validateAgeDistribution('age_30_45')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="age_45_67" class="font-medium text-gray-700">45-67 jaar</label>
-                                    <span id="age_45_67_value" class="text-gray-500">{{ default_params.age_45_67 }}%</span>
-                                </div>
-                                <input type="range"
-                                       name="age_45_67"
-                                       id="age_45_67"
-                                       value="{{ default_params.age_45_67 }}"
-                                       min="0"
-                                       max="100"
-                                       step="1"
-                                       oninput="updateSliderValue('age_45_67'); validateAgeDistribution('age_45_67')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="age_67_85" class="font-medium text-gray-700">67-85 jaar</label>
-                                    <span id="age_67_85_value" class="text-gray-500">{{ default_params.age_67_85 }}%</span>
-                                </div>
-                                <input type="range"
-                                       name="age_67_85"
-                                       id="age_67_85"
-                                       value="{{ default_params.age_67_85 }}"
-                                       min="0"
-                                       max="100"
-                                       step="1"
-                                       oninput="updateSliderValue('age_67_85'); validateAgeDistribution('age_67_85')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="age_85_plus" class="font-medium text-gray-700">85+ jaar</label>
-                                    <span id="age_85_plus_value" class="text-gray-500">{{ default_params.age_85_plus }}%</span>
-                                </div>
-                                <input type="range"
-                                       name="age_85_plus"
-                                       id="age_85_plus"
-                                       value="{{ default_params.age_85_plus }}"
-                                       min="0"
-                                       max="100"
-                                       step="1"
-                                       oninput="updateSliderValue('age_85_plus'); validateAgeDistribution('age_85_plus')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div id="age-total" class="text-sm font-medium">
-                                Totaal: <span id="age-total-value" class="text-gray-900">100%</span>
-                                <span id="age-warning" class="text-red-600 ml-2 hidden">Moet 100% zijn!</span>
-                            </div>
-                        </div>
-                        <!-- Income Distribution -->
-                        <h3 class="text-sm font-medium text-gray-700 mb-2 mt-4">Inkomensverdeling</h3>
-                        <div class="grid grid-cols-1 gap-3">
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="income_low_pct" class="font-medium text-gray-700">Laag inkomen (€0-30k)</label>
-                                    <span id="income_low_pct_value" class="text-gray-500">30%</span>
-                                </div>
-                                <input type="range"
-                                       name="income_low_pct"
-                                       id="income_low_pct"
-                                       value="30"
-                                       min="0"
-                                       max="100"
-                                       step="5"
-                                       oninput="updateIncomeDistribution('income_low_pct')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="income_middle_pct" class="font-medium text-gray-700">Midden inkomen (€30k-60k)</label>
-                                    <span id="income_middle_pct_value" class="text-gray-500">50%</span>
-                                </div>
-                                <input type="range"
-                                       name="income_middle_pct"
-                                       id="income_middle_pct"
-                                       value="50"
-                                       min="0"
-                                       max="100"
-                                       step="5"
-                                       oninput="updateIncomeDistribution('income_middle_pct')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm">
-                                    <label for="income_high_pct" class="font-medium text-gray-700">Hoog inkomen (€60k+)</label>
-                                    <span id="income_high_pct_value" class="text-gray-500">20%</span>
-                                </div>
-                                <input type="range"
-                                       name="income_high_pct"
-                                       id="income_high_pct"
-                                       value="20"
-                                       min="0"
-                                       max="100"
-                                       step="5"
-                                       oninput="updateIncomeDistribution('income_high_pct')"
-                                       class="mt-1 w-full">
-                            </div>
-                            <div class="mt-2 text-sm">
-                                <span class="font-medium text-gray-700">Totaal:</span>
-                                <span id="income-total-value" class="ml-1 font-semibold text-gray-900">100%</span>
-                                <span id="income-warning" class="ml-2 text-red-600 hidden">Moet 100% zijn!</span>
-                            </div>
-                            <!-- Economic Parameters -->
-                            <h3 class="text-base font-medium text-gray-700 mb-3 mt-6">Huisvesting & Economie</h3>
-                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <div>
-                                    <div class="flex justify-between text-sm">
-                                        <label for="zero_income_prob" class="font-medium text-gray-700">Kans op geen inkomen</label>
-                                        <span id="zero_income_prob_value" class="text-gray-500">{{ default_params.zero_income_prob }}%</span>
-                                    </div>
-                                    <input type="range"
-                                           name="zero_income_prob"
-                                           id="zero_income_prob"
-                                           value="{{ default_params.zero_income_prob }}"
-                                           min="0"
-                                           max="20"
-                                           step="1"
-                                           oninput="updateSliderValue('zero_income_prob')"
-                                           class="mt-1 w-full">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm">
-                                        <label for="rent_percentage" class="font-medium text-gray-700">Percentage huurders</label>
-                                        <span id="rent_percentage_value" class="text-gray-500">{{ default_params.rent_percentage }}%</span>
-                                    </div>
-                                    <input type="range"
-                                           name="rent_percentage"
-                                           id="rent_percentage"
-                                           value="{{ default_params.rent_percentage }}"
-                                           min="0"
-                                           max="100"
-                                           step="1"
-                                           oninput="updateSliderValue('rent_percentage')"
-                                           class="mt-1 w-full">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm">
-                                        <label for="student_percentage_young" class="font-medium text-gray-700">Studenten (18-30 jaar)</label>
-                                        <span id="student_percentage_young_value" class="text-gray-500">{{ default_params.student_percentage_young }}%</span>
-                                    </div>
-                                    <input type="range"
-                                           name="student_percentage_young"
-                                           id="student_percentage_young"
-                                           value="{{ default_params.student_percentage_young }}"
-                                           min="0"
-                                           max="80"
-                                           step="5"
-                                           oninput="updateSliderValue('student_percentage_young')"
-                                           class="mt-1 w-full">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Law Parameters - Collapsible -->
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <button type="button"
-                            onclick="toggleSection('law-parameters-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h2 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h2>
-                        <svg id="law-parameters-section-chevron"
-                             class="w-5 h-5 text-gray-500 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="law-parameters-section" class="px-4 pb-4 hidden space-y-3">
-                        <!-- Zorgtoeslag Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-blue-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                                    </path>
-                                </svg>
-                                Zorgtoeslag
-                            </h3>
-                            <div class="grid grid-cols-1 gap-3">
-                                <div>
-                                    <label for="zorgtoeslag_standaardpremie"
-                                           class="block text-sm font-medium text-gray-700">
-                                        Standaardpremie (€/maand)
-                                    </label>
-                                    <input type="number"
-                                           name="zorgtoeslag_standaardpremie"
-                                           id="zorgtoeslag_standaardpremie"
-                                           value="{{ '%.2f'|format(law_params.zorgtoeslag.standaardpremie) }}"
-                                           min="0"
-                                           max="500"
-                                           step="0.01"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Huurtoeslag Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-green-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                    </path>
-                                </svg>
-                                Huurtoeslag
-                            </h3>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="huurtoeslag_max_huur"
-                                           class="block text-sm font-medium text-gray-700">Max huur (€/maand)</label>
-                                    <input type="number"
-                                           name="huurtoeslag_max_huur"
-                                           id="huurtoeslag_max_huur"
-                                           value="{{ '%.2f'|format(law_params.huurtoeslag.max_huur) }}"
-                                           min="0"
-                                           max="1500"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="huurtoeslag_basishuur"
-                                           class="block text-sm font-medium text-gray-700">Basishuur (€/maand)</label>
-                                    <input type="number"
-                                           name="huurtoeslag_basishuur"
-                                           id="huurtoeslag_basishuur"
-                                           value="{{ '%.2f'|format(law_params.huurtoeslag.basishuur) }}"
-                                           min="0"
-                                           max="500"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Kinderopvangtoeslag Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-purple-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                    </path>
-                                </svg>
-                                Kinderopvangtoeslag
-                            </h3>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="kinderopvang_uurprijs"
-                                           class="block text-sm font-medium text-gray-700">
-                                        Max uurtarief dagopvang (€)
-                                    </label>
-                                    <input type="number"
-                                           name="kinderopvang_uurprijs"
-                                           id="kinderopvang_uurprijs"
-                                           value="{{ '%.2f'|format(law_params.kinderopvangtoeslag.uurprijs) }}"
-                                           min="0"
-                                           max="20"
-                                           step="0.01"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="kinderopvang_max_uren"
-                                           class="block text-sm font-medium text-gray-700">Max uren per maand</label>
-                                    <input type="number"
-                                           name="kinderopvang_max_uren"
-                                           id="kinderopvang_max_uren"
-                                           value="{{ '%d'|format(law_params.kinderopvangtoeslag.max_uren) }}"
-                                           min="0"
-                                           max="300"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- AOW Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-orange-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
-                                    </path>
-                                </svg>
-                                AOW (Pensioen)
-                            </h3>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="aow_pensioenleeftijd"
-                                           class="block text-sm font-medium text-gray-700">Pensioenleeftijd</label>
-                                    <input type="number"
-                                           name="aow_pensioenleeftijd"
-                                           id="aow_pensioenleeftijd"
-                                           value="{{ '%.2f'|format(law_params.aow.pensioenleeftijd) }}"
-                                           min="65"
-                                           max="70"
-                                           step="0.25"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="aow_basisbedrag" class="block text-sm font-medium text-gray-700">Basisbedrag (€/maand)</label>
-                                    <input type="number"
-                                           name="aow_basisbedrag"
-                                           id="aow_basisbedrag"
-                                           value="{{ '%.2f'|format(law_params.aow.basisbedrag) }}"
-                                           min="1000"
-                                           max="2000"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Bijstand Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-red-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
-                                    </path>
-                                </svg>
-                                Bijstand
-                            </h3>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="bijstand_norm_alleenstaand"
-                                           class="block text-sm font-medium text-gray-700">
-                                        Norm alleenstaand (€/maand)
-                                    </label>
-                                    <input type="number"
-                                           name="bijstand_norm_alleenstaand"
-                                           id="bijstand_norm_alleenstaand"
-                                           value="{{ '%.2f'|format(law_params.bijstand.norm_alleenstaand) }}"
-                                           min="800"
-                                           max="1500"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="bijstand_norm_gehuwd"
-                                           class="block text-sm font-medium text-gray-700">
-                                        Norm gehuwd/samenwonend (€/maand)
-                                    </label>
-                                    <input type="number"
-                                           name="bijstand_norm_gehuwd"
-                                           id="bijstand_norm_gehuwd"
-                                           value="{{ '%.2f'|format(law_params.bijstand.norm_gehuwd) }}"
-                                           min="1200"
-                                           max="2200"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Inkomstenbelasting Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-indigo-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                                Inkomstenbelasting
-                            </h3>
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="ib_tarief_schijf1"
-                                           class="block text-sm font-medium text-gray-700">Tarief schijf 1 (%)</label>
-                                    <input type="number"
-                                           name="ib_tarief_schijf1"
-                                           id="ib_tarief_schijf1"
-                                           value="{{ '%.2f'|format(law_params.inkomstenbelasting.tarief_schijf1) }}"
-                                           min="0"
-                                           max="50"
-                                           step="0.01"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="ib_tarief_schijf2"
-                                           class="block text-sm font-medium text-gray-700">Tarief schijf 2 (%)</label>
-                                    <input type="number"
-                                           name="ib_tarief_schijf2"
-                                           id="ib_tarief_schijf2"
-                                           value="{{ '%.2f'|format(law_params.inkomstenbelasting.tarief_schijf2) }}"
-                                           min="0"
-                                           max="60"
-                                           step="0.01"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="ib_grens_schijf1"
-                                           class="block text-sm font-medium text-gray-700">Grens schijf 1 (€)</label>
-                                    <input type="number"
-                                           name="ib_grens_schijf1"
-                                           id="ib_grens_schijf1"
-                                           value="{{ '%d'|format(law_params.inkomstenbelasting.grens_schijf1) }}"
-                                           min="50000"
-                                           max="100000"
-                                           step="100"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div>
-                                    <label for="ib_algemene_heffingskorting"
-                                           class="block text-sm font-medium text-gray-700">
-                                        Algemene heffingskorting max (€)
-                                    </label>
-                                    <input type="number"
-                                           name="ib_algemene_heffingskorting"
-                                           id="ib_algemene_heffingskorting"
-                                           value="{{ '%d'|format(law_params.inkomstenbelasting.algemene_heffingskorting) }}"
-                                           min="2000"
-                                           max="5000"
-                                           step="10"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Kiesrecht Parameters -->
-                        <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-yellow-500"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-                                    </path>
-                                </svg>
-                                Kiesrecht
-                            </h3>
-                            <div class="grid grid-cols-1 gap-3">
-                                <div>
-                                    <label for="kiesrecht_min_leeftijd"
-                                           class="block text-sm font-medium text-gray-700">
-                                        Minimale stemleeftijd
-                                    </label>
-                                    <input type="number"
-                                           name="kiesrecht_min_leeftijd"
-                                           id="kiesrecht_min_leeftijd"
-                                           value="{{ law_params.kiesrecht.min_leeftijd }}"
-                                           min="16"
-                                           max="21"
-                                           step="1"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Eigen Configuraties - Collapsible -->
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <button type="button"
-                            onclick="toggleSection('config-section')"
-                            class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                        <h2 class="text-base font-medium text-gray-900">Eigen Configuraties</h2>
-                        <svg id="config-section-chevron"
-                             class="w-5 h-5 text-gray-500 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="config-section" class="px-4 pb-4 hidden">
-                        <p class="text-sm text-gray-600 mb-3 mt-3">
-                            Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.
-                        </p>
-                        <div class="flex items-center space-x-3">
+                    <div class="p-4 space-y-4">
+                        <!-- Law Parameters - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
                             <button type="button"
-                                    onclick="saveConfiguration()"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
-                                <svg class="w-4 h-4 mr-2"
+                                    onclick="toggleSection('law-parameters-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900">Parameters van Wetgeving</h3>
+                                <svg id="law-parameters-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
                                      fill="none"
                                      stroke="currentColor"
                                      viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2">
-                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
-                                Configuratie opslaan
                             </button>
-                            <button type="button"
-                                    onclick="loadConfiguration()"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
-                                <svg class="w-4 h-4 mr-2"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                    </path>
-                                </svg>
-                                Configuratie laden
-                            </button>
+                            <div id="law-parameters-section" class="px-4 pb-4 hidden space-y-2">
+                                <!-- Dynamically render ALL law parameters from law_params dict -->
+                                {% for law_name, params in law_params.items() %}
+                                    {% if params %}
+                                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                            <button type="button"
+                                                    onclick="toggleSection('law-{{ law_name }}-params')"
+                                                    class="w-full px-3 py-2 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                                <div class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-2 text-blue-500"
+                                                         fill="none"
+                                                         stroke="currentColor"
+                                                         viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                        </path>
+                                                    </svg>
+                                                    <span class="text-sm font-semibold text-gray-900">{{ law_name.title() }}</span>
+                                                </div>
+                                                <svg id="law-{{ law_name }}-params-chevron"
+                                                     class="w-4 h-4 text-gray-500 transform transition-transform"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </button>
+                                            <div id="law-{{ law_name }}-params" class="px-3 pb-3 hidden">
+                                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                    {% for param_name, param_value in params.items() %}
+                                                        {% if param_value is not none %}
+                                                            <div>
+                                                                <label for="{{ law_name }}_{{ param_name }}"
+                                                                       class="block text-sm font-medium text-gray-700">
+                                                                    {{ param_name.replace('_', ' ').title() }}
+                                                                </label>
+                                                                <input type="number"
+                                                                       name="{{ law_name }}_{{ param_name }}"
+                                                                       id="{{ law_name }}_{{ param_name }}"
+                                                                       value="{% if param_value is number %}{{ '%.2f'|format(param_value) }}{% else %}{{ param_value }}{% endif %}"
+                                                                       step="0.01"
+                                                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                                                <span class="text-xs text-gray-500">Default:
+                                                                    {% if param_value is number %}
+                                                                        {{ '%.2f'|format(param_value) }}
+                                                                    {% else %}
+                                                                        {{ param_value }}
+                                                                    {% endif %}
+                                                                </span>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
-                        <div class="mt-4">
-                            <div id="saved-configs" class="space-y-2 max-h-40 overflow-y-auto">
-                                <!-- Saved configurations will be displayed here -->
+                        <!-- Eigen Configuraties - Collapsible -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="toggleSection('config-section')"
+                                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                                <h3 class="text-base font-medium text-gray-900">Eigen Configuraties</h3>
+                                <svg id="config-section-chevron"
+                                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="config-section" class="px-4 pb-4 hidden">
+                                <p class="text-sm text-gray-600 mb-3 mt-3">
+                                    Sla je huidige configuratie op om later te hergebruiken, of laad een eerder opgeslagen configuratie.
+                                </p>
+                                <div class="flex items-center space-x-3">
+                                    <button type="button"
+                                            onclick="saveConfiguration()"
+                                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                                        <svg class="w-4 h-4 mr-2"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2">
+                                            </path>
+                                        </svg>
+                                        Configuratie opslaan
+                                    </button>
+                                    <button type="button"
+                                            onclick="loadConfiguration()"
+                                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                                        <svg class="w-4 h-4 mr-2"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                            </path>
+                                        </svg>
+                                        Configuratie laden
+                                    </button>
+                                </div>
+                                <div class="mt-4">
+                                    <div id="saved-configs" class="space-y-2 max-h-40 overflow-y-auto">
+                                        <!-- Saved configurations will be displayed here -->
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -763,7 +634,191 @@
                 </div>
             </div>
         </div>
+        <!-- Custom Styles for Population UI -->
+        <style>
+            /* Hide Alpine.js elements before Alpine is ready */
+            [x-cloak] { display: none !important; }
+
+            /* Population highlight animation */
+            .population-highlight {
+                animation: pulse-green 2s ease-in-out;
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+
+            @keyframes pulse-green {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+                }
+                50% {
+                    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+                }
+            }
+
+            /* Enhanced dropdown styling */
+            #population-select {
+                transition: all 0.2s ease-in-out;
+            }
+
+            #population-select:focus {
+                border-color: rgb(34, 197, 94);
+                ring-color: rgb(34, 197, 94);
+                box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+            }
+
+            #population-select option {
+                padding: 8px;
+            }
+
+            /* Smooth transitions for population info panel */
+            #selected-population-info {
+                transition: all 0.3s ease-in-out;
+            }
+        </style>
+        <!-- Alpine.js Modal Component -->
+        <div x-data
+             x-show="$store.modal.isOpen"
+             x-cloak
+             class="fixed inset-0 z-50 overflow-y-auto"
+             @keydown.escape.window="$store.modal.closeModal()">
+            <!-- Backdrop -->
+            <div x-show="$store.modal.isOpen"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-gray-500/75 transition-opacity"
+                 @click="$store.modal.closeModal()"></div>
+            <!-- Modal Content -->
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="$store.modal.isOpen"
+                     x-transition:enter="ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave="ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:w-full sm:max-w-lg"
+                     @click.stop>
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <!-- Icon -->
+                            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10"
+                                 :class="{ 'bg-red-100': $store.modal.modalType === 'confirm', 'bg-green-100': $store.modal.modalType === 'success', 'bg-red-100': $store.modal.modalType === 'error' }">
+                                <!-- Warning Icon (for confirm) -->
+                                <svg x-show="$store.modal.modalType === 'confirm'"
+                                     class="h-6 w-6 text-red-600"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                                <!-- Success Icon -->
+                                <svg x-show="$store.modal.modalType === 'success'"
+                                     class="h-6 w-6 text-green-600"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <!-- Error Icon -->
+                                <svg x-show="$store.modal.modalType === 'error'"
+                                     class="h-6 w-6 text-red-600"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke-width="1.5"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left flex-1">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900"
+                                    x-text="$store.modal.modalTitle"></h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500" x-html="$store.modal.modalMessage"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <!-- Confirm Modal Buttons -->
+                        <template x-if="$store.modal.modalType === 'confirm'">
+                            <div class="sm:flex sm:flex-row-reverse w-full">
+                                <button type="button"
+                                        @click="$store.modal.confirmAction()"
+                                        class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
+                                    Ja, verwijderen
+                                </button>
+                                <button type="button"
+                                        @click="$store.modal.closeModal()"
+                                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                    Annuleren
+                                </button>
+                            </div>
+                        </template>
+                        <!-- Success/Error Modal Button -->
+                        <template x-if="$store.modal.modalType === 'success' || $store.modal.modalType === 'error'">
+                            <button type="button"
+                                    @click="$store.modal.closeModal()"
+                                    class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto">
+                                OK
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script>
+// Alpine.js Modal Store
+document.addEventListener('alpine:init', () => {
+    Alpine.store('modal', {
+        isOpen: false,
+        modalType: 'confirm', // 'confirm', 'success', 'error'
+        modalTitle: '',
+        modalMessage: '',
+        confirmCallback: null,
+
+        openModal(type, title, message, callback = null) {
+            this.modalType = type;
+            this.modalTitle = title;
+            this.modalMessage = message;
+            this.confirmCallback = callback;
+            this.isOpen = true;
+        },
+
+        closeModal() {
+            this.isOpen = false;
+            this.confirmCallback = null;
+        },
+
+        confirmAction() {
+            if (this.confirmCallback) {
+                this.confirmCallback();
+            }
+            this.closeModal();
+        }
+    });
+});
+
+// Global modal helper functions
+function showConfirmModal(title, message, callback) {
+    Alpine.store('modal').openModal('confirm', title, message, callback);
+}
+
+function showSuccessModal(title, message) {
+    Alpine.store('modal').openModal('success', title, message);
+}
+
+function showErrorModal(title, message) {
+    Alpine.store('modal').openModal('error', title, message);
+}
+
 // Store default law parameters for comparison
 const defaultLawParams = {{ law_params|tojson|safe }};
 
@@ -1564,6 +1619,7 @@ async function runSimulation() {
     const data = {
         num_people: parseInt(formData.get('num_people')),
         simulation_date: formData.get('simulation_date'),
+        population_id: selectedPopulationId,  // Add selected population ID if any
         age_distribution: {
             age_18_30: parseInt(formData.get('age_18_30')),
             age_30_45: parseInt(formData.get('age_30_45')),
@@ -1581,36 +1637,39 @@ async function runSimulation() {
             rent_percentage: parseInt(formData.get('rent_percentage')),
             student_percentage_young: parseInt(formData.get('student_percentage_young'))
         },
-        law_parameters: {
-            zorgtoeslag: {
-                standaardpremie: parseFloat(formData.get('zorgtoeslag_standaardpremie'))
-            },
-            huurtoeslag: {
-                max_huur: parseFloat(formData.get('huurtoeslag_max_huur')),
-                basishuur: parseFloat(formData.get('huurtoeslag_basishuur'))
-            },
-            kinderopvangtoeslag: {
-                max_uurprijs: parseFloat(formData.get('kinderopvang_uurprijs')),
-                max_uren: parseInt(formData.get('kinderopvang_max_uren'))
-            },
-            aow: {
-                pensioenleeftijd: parseFloat(formData.get('aow_pensioenleeftijd')),
-                basisbedrag: parseFloat(formData.get('aow_basisbedrag'))
-            },
-            bijstand: {
-                norm_alleenstaand: parseFloat(formData.get('bijstand_norm_alleenstaand')),
-                norm_gehuwd: parseFloat(formData.get('bijstand_norm_gehuwd'))
-            },
-            inkomstenbelasting: {
-                tarief_schijf1: parseFloat(formData.get('ib_tarief_schijf1')),
-                tarief_schijf2: parseFloat(formData.get('ib_tarief_schijf2')),
-                grens_schijf1: parseFloat(formData.get('ib_grens_schijf1')),
-                algemene_heffingskorting: parseFloat(formData.get('ib_algemene_heffingskorting'))
-            },
-            kiesrecht: {
-                min_leeftijd: parseInt(formData.get('kiesrecht_min_leeftijd'))
-            }
-        }
+        law_parameters: (() => {
+            // Dynamically collect ALL law parameters from the form
+            const lawParams = {};
+
+            // Get all input fields from the law parameters section
+            const lawInputs = document.querySelectorAll('#law-parameters-section input[type="number"]');
+
+            lawInputs.forEach(input => {
+                const name = input.name;
+                if (!name) return;
+
+                // Parse field name format: {law_name}_{param_name}
+                const parts = name.split('_');
+                if (parts.length < 2) return;
+
+                const lawName = parts[0];
+                const paramName = parts.slice(1).join('_');
+                const value = parseFloat(input.value);
+
+                // Skip if value is NaN or null
+                if (isNaN(value)) return;
+
+                // Initialize law object if it doesn't exist
+                if (!lawParams[lawName]) {
+                    lawParams[lawName] = {};
+                }
+
+                // Add parameter to law object
+                lawParams[lawName][paramName] = value;
+            });
+
+            return lawParams;
+        })()
     };
 
     // Create tab for this simulation
@@ -1700,10 +1759,182 @@ async function runSimulation() {
 
     } catch (error) {
         console.error('Error running simulation:', error);
-        alert('Er is een fout opgetreden bij het uitvoeren van de simulatie.');
+        console.error('Error stack:', error.stack);
+        console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        alert(`Er is een fout opgetreden bij het uitvoeren van de simulatie:\n\n${error.message}\n\nCheck de browser console voor meer details (F12).`);
         document.getElementById(`progress-section-${simulationId}`).classList.add('hidden');
         closeTab(simulationId);
     }
+}
+
+// Population Management Functions
+let selectedPopulationId = null;
+
+async function createPopulation() {
+    // Gather form data for population parameters
+    const formData = new FormData(document.getElementById('simulation-form'));
+    const data = {
+        operation: 'create_population',
+        num_people: parseInt(formData.get('num_people')),
+        simulation_date: formData.get('simulation_date'),
+        age_distribution: {
+            age_18_30: parseInt(formData.get('age_18_30')),
+            age_30_45: parseInt(formData.get('age_30_45')),
+            age_45_67: parseInt(formData.get('age_45_67')),
+            age_67_85: parseInt(formData.get('age_67_85')),
+            age_85_plus: parseInt(formData.get('age_85_plus'))
+        },
+        income_distribution: {
+            income_low_pct: parseInt(formData.get('income_low_pct')),
+            income_middle_pct: parseInt(formData.get('income_middle_pct')),
+            income_high_pct: parseInt(formData.get('income_high_pct'))
+        },
+        economic_params: {
+            zero_income_prob: parseInt(formData.get('zero_income_prob')),
+            rent_percentage: parseInt(formData.get('rent_percentage')),
+            student_percentage_young: parseInt(formData.get('student_percentage_young'))
+        }
+    };
+
+    try {
+        const response = await fetch('/simulation/population/create', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            // Removed alert() - will use auto-selection and highlight instead
+            // Refresh population list and auto-select the new population
+            await loadPopulations(result.population_id);
+        } else {
+            showErrorModal('Fout bij aanmaken populatie', result.message);
+        }
+    } catch (error) {
+        showErrorModal('Fout bij aanmaken populatie', error.message);
+    }
+}
+
+async function loadPopulations(autoSelectId = null) {
+    try {
+        const response = await fetch('/simulation/population/list');
+        const result = await response.json();
+
+        if (result.status === 'success' && result.populations.length > 0) {
+            // Show population selector
+            document.getElementById('population-selector').classList.remove('hidden');
+
+            // Update select dropdown
+            const select = document.getElementById('population-select');
+            select.innerHTML = '<option value="">-- Selecteer populatie --</option>';
+
+            result.populations.forEach(pop => {
+                const option = document.createElement('option');
+                option.value = pop.population_id;
+                const date = new Date(pop.created_at).toLocaleString('nl-NL');
+                option.textContent = `${pop.num_people} personen - ${date}`;
+                select.appendChild(option);
+            });
+
+            // Add change event listener
+            select.onchange = () => showPopulationDetails(select.value);
+
+            // Reset to default option if no auto-select
+            if (!autoSelectId) {
+                select.value = '';
+                document.getElementById('selected-population-info').classList.add('hidden');
+            }
+
+            // Auto-select if a population ID was provided
+            if (autoSelectId) {
+                select.value = autoSelectId;
+                showPopulationDetails(autoSelectId);
+
+                // Add highlight animation to the select element
+                select.classList.add('population-highlight');
+
+                // Scroll the select element into view
+                select.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                // Remove highlight after animation completes
+                setTimeout(() => {
+                    select.classList.remove('population-highlight');
+                }, 3000);
+            }
+        } else {
+            // No populations available - hide the selector
+            document.getElementById('population-selector').classList.add('hidden');
+            document.getElementById('selected-population-info').classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading populations:', error);
+    }
+}
+
+function showPopulationDetails(populationId) {
+    if (!populationId) {
+        document.getElementById('selected-population-info').classList.add('hidden');
+        selectedPopulationId = null;
+        return;
+    }
+
+    selectedPopulationId = populationId;
+
+    fetch(`/simulation/population/${populationId}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                const pop = result.population;
+                const details = document.getElementById('population-details');
+                const date = new Date(pop.created_at).toLocaleDateString('nl-NL');
+
+                details.innerHTML = `
+                    <div>📊 ${pop.num_people} personen</div>
+                    <div>📅 Aangemaakt: ${date}</div>
+                    <div>👤 Gem. leeftijd: ${pop.demographics.avg_age.toFixed(1)} jaar</div>
+                    <div>🏘️ Huurders: ${pop.demographics.renters_pct.toFixed(1)}%</div>
+                    <div>👫 Met partners: ${pop.demographics.with_partners_pct.toFixed(1)}%</div>
+                    <div>🎓 Studenten: ${pop.demographics.students_pct.toFixed(1)}%</div>
+                `;
+
+                document.getElementById('selected-population-info').classList.remove('hidden');
+            }
+        })
+        .catch(error => console.error('Error loading population details:', error));
+}
+
+async function deleteSelectedPopulation() {
+    if (!selectedPopulationId) return;
+
+    // Use Alpine.js modal instead of confirm()
+    showConfirmModal(
+        'Populatie verwijderen?',
+        'Weet je zeker dat je deze populatie wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
+        async () => {
+            try {
+                const response = await fetch(`/simulation/population/${selectedPopulationId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Hide the population info panel immediately
+                    document.getElementById('selected-population-info').classList.add('hidden');
+                    selectedPopulationId = null;
+
+                    // Reload the population list (which will hide selector if empty)
+                    await loadPopulations();
+                } else {
+                    showErrorModal('Fout bij verwijderen', result.message);
+                }
+            } catch (error) {
+                showErrorModal('Fout bij verwijderen', error.message);
+            }
+        }
+    );
 }
 
 function displayResults(data, simulationId) {
@@ -1810,23 +2041,23 @@ function displayResults(data, simulationId) {
             <h3 class="text-sm font-medium text-gray-700 mt-6 mb-2">Wetten & Regelingen</h3>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslag', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('zorgtoeslagwet', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslag')}Zorgtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('zorgtoeslagwet')}Zorgtoeslag</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.zorgtoeslag.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.zorgtoeslag.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.zorgtoeslagwet.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.zorgtoeslagwet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslag-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="zorgtoeslagwet-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="zorgtoeslag-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="zorgtoeslagwet-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.zorgtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslag.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.zorgtoeslagwet.breakdowns ? renderLawBreakdowns(data.summary.laws.zorgtoeslagwet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -1854,13 +2085,13 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('aow', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('algemeneouderdomswet', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('aow')}AOW</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('algemeneouderdomswet')}AOW</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.aow.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.aow.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.algemeneouderdomswet.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.algemeneouderdomswet.avg_amount.toFixed(2)}
                                 </p>
                             </div>
                             <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="aow-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1870,7 +2101,7 @@ function displayResults(data, simulationId) {
                     </div>
                     <div id="aow-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.aow.breakdowns ? renderLawBreakdowns(data.summary.laws.aow.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.algemeneouderdomswet.breakdowns ? renderLawBreakdowns(data.summary.laws.algemeneouderdomswet.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -1898,23 +2129,67 @@ function displayResults(data, simulationId) {
                 </div>
 
                 <div class="bg-gray-50 rounded p-3">
-                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvangtoeslag', this)">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kinderopvang', this)">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-medium flex items-center">${getLawIcon('kinderopvangtoeslag')}Kinderopvangtoeslag</h4>
+                                <h4 class="font-medium flex items-center">${getLawIcon('kinderopvang')}Kinderopvangtoeslag</h4>
                                 <p class="text-sm text-gray-600">
-                                    In aanmerking: ${data.summary.laws.kinderopvangtoeslag.eligible_pct.toFixed(1)}%<br>
-                                    Gem. bedrag: €${data.summary.laws.kinderopvangtoeslag.avg_amount.toFixed(2)}
+                                    In aanmerking: ${data.summary.laws.kinderopvang.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.kinderopvang.avg_amount.toFixed(2)}
                                 </p>
                             </div>
-                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvangtoeslag-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kinderopvang-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
                     </div>
-                    <div id="kinderopvangtoeslag-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                    <div id="kinderopvang-details" class="hidden mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs space-y-3">
-                            ${data.summary.laws.kinderopvangtoeslag.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvangtoeslag.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                            ${data.summary.laws.kinderopvang.breakdowns ? renderLawBreakdowns(data.summary.laws.kinderopvang.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded p-3">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('kindgebonden_budget', this)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-medium flex items-center">${getLawIcon('kindgebonden_budget')}Kindgebonden budget</h4>
+                                <p class="text-sm text-gray-600">
+                                    In aanmerking: ${data.summary.laws.kindgebonden_budget.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.kindgebonden_budget.avg_amount.toFixed(2)}
+                                </p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="kindgebonden_budget-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="kindgebonden_budget-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                        <div class="text-xs space-y-3">
+                            ${data.summary.laws.kindgebonden_budget.breakdowns ? renderLawBreakdowns(data.summary.laws.kindgebonden_budget.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded p-3">
+                    <div class="cursor-pointer hover:bg-gray-100 transition-colors -m-3 p-3" onclick="toggleLawDetails('ww', this)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-medium flex items-center">${getLawIcon('ww')}WW-uitkering</h4>
+                                <p class="text-sm text-gray-600">
+                                    In aanmerking: ${data.summary.laws.ww.eligible_pct.toFixed(1)}%<br>
+                                    Gem. bedrag: €${data.summary.laws.ww.avg_amount.toFixed(2)}
+                                </p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-500 transform transition-transform" id="ww-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="ww-details" class="hidden mt-3 pt-3 border-t border-gray-200">
+                        <div class="text-xs space-y-3">
+                            ${data.summary.laws.ww.breakdowns ? renderLawBreakdowns(data.summary.laws.ww.breakdowns) : '<p class="text-gray-500">Geen details beschikbaar</p>'}
                         </div>
                     </div>
                 </div>
@@ -2107,13 +2382,15 @@ function copyResultsAsMarkdown(simulationId) {
     markdown += `| Wet | In aanmerking | Gem. bedrag |\n`;
     markdown += `|-----|---------------|-------------|\n`;
 
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     laws.forEach(law => {
         const lawData = data.summary.laws[law];
-        markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
+        if (lawData.avg_amount !== undefined) {
+            markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | €${lawData.avg_amount.toFixed(0)}/maand |\n`;
+        } else {
+            markdown += `| ${getLawDisplayName(law)} | ${lawData.eligible_pct.toFixed(1)}% | - |\n`;
+        }
     });
-
-    markdown += `| Kiesrecht | ${data.summary.laws.voting_rights.eligible_pct.toFixed(1)}% | - |\n`;
     markdown += `| Inkomstenbelasting | - | €${data.summary.laws.inkomstenbelasting.avg_tax.toFixed(0)}/maand |\n\n`;
 
     // Disposable income
@@ -2140,11 +2417,13 @@ function copyResultsAsMarkdown(simulationId) {
 
 function getLawIcon(lawName) {
     const icons = {
-        'zorgtoeslag': '<svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        'zorgtoeslagwet': '<svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
         'huurtoeslag': '<svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
-        'kinderopvangtoeslag': '<svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
-        'aow': '<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        'kinderopvang': '<svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
+        'kindgebonden_budget': '<svg class="w-5 h-5 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>',
+        'algemeneouderdomswet': '<svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
         'bijstand': '<svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>',
+        'ww': '<svg class="w-5 h-5 mr-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>',
         'voting_rights': '<svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>',
         'income_tax': '<svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>'
     };
@@ -2248,7 +2527,7 @@ function exportComparison(format) {
 
     // Laws
     csv += '\nWETTEN & REGELINGEN\n';
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag', 'voting_rights'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     laws.forEach(law => {
         const lawName = getLawDisplayName(law);
         csv += createCSVRow(`${lawName} - In aanmerking (%)`, baseline.results.summary.laws[law].eligible_pct, comparisons.map(c => c.results.summary.laws[law].eligible_pct), 'percentage');
@@ -2387,14 +2666,20 @@ function renderComparisonContent(simulations) {
 }
 
 function renderComparisonRows(baseline, comparisons) {
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag', 'voting_rights'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
     let html = '';
 
-    // Demographics
+    // Demographics (collapsible accordion)
+    const demoId = 'demographics-accordion';
     html += `
-        <tr class="bg-gray-50">
+        <tr class="bg-gray-50 cursor-pointer hover:bg-gray-100" onclick="toggleAccordion('${demoId}')">
             <td colspan="${2 + comparisons.length * 2}" class="px-6 py-2 text-sm font-medium text-gray-900">
-                Demografie
+                <div class="flex items-center">
+                    <svg id="${demoId}-icon" class="w-4 h-4 mr-2 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    Demografie
+                </div>
             </td>
         </tr>
     `;
@@ -2408,12 +2693,34 @@ function renderComparisonRows(baseline, comparisons) {
     ];
 
     demoMetrics.forEach(metric => {
-        html += renderMetricRow(
-            metric.label,
-            baseline.results.summary.demographics[metric.key],
-            comparisons.map(c => c.results.summary.demographics[metric.key]),
-            metric.format
-        );
+        html += `<tr id="${demoId}-content" class="hidden">`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">${metric.label}</td>`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${formatValue(baseline.results.summary.demographics[metric.key], metric.format)}</td>`;
+
+        comparisons.forEach(comp => {
+            const baseValue = baseline.results.summary.demographics[metric.key];
+            const value = comp.results.summary.demographics[metric.key];
+            const diff = value - baseValue;
+            const diffPct = baseValue !== 0 ? (diff / baseValue) * 100 : 0;
+            const diffColor = diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-500';
+
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${formatValue(value, metric.format)}</td>`;
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right ${diffColor}">`;
+
+            if (metric.format === 'percentage') {
+                html += `${diff > 0 ? '+' : ''}${diff.toFixed(1)}pp`;
+            } else if (metric.format === 'currency') {
+                html += `${diff > 0 ? '+' : ''}€${Math.abs(diff).toFixed(0)}`;
+                if (Math.abs(diffPct) >= 0.1) {
+                    html += ` (${diff > 0 ? '+' : ''}${diffPct.toFixed(1)}%)`;
+                }
+            } else {
+                html += `${diff > 0 ? '+' : ''}${diff.toFixed(metric.format === 'decimal' ? 1 : 0)}`;
+            }
+
+            html += `</td>`;
+        });
+        html += `</tr>`;
     });
 
     // Income
@@ -2445,23 +2752,62 @@ function renderComparisonRows(baseline, comparisons) {
         const lawData = baseline.results.summary.laws[law];
         const lawName = getLawDisplayName(law);
 
-        // Eligible percentage
-        html += renderMetricRow(
-            `${lawName} - In aanmerking (%)`,
-            lawData.eligible_pct,
-            comparisons.map(c => c.results.summary.laws[law].eligible_pct),
-            'percentage'
-        );
+        // Combined eligible percentage and average amount
+        html += `<tr>`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">${lawName}</td>`;
 
-        // Average amount (if applicable)
-        if (lawData.avg_amount !== undefined) {
-            html += renderMetricRow(
-                `${lawName} - Gem. bedrag`,
-                lawData.avg_amount,
-                comparisons.map(c => c.results.summary.laws[law].avg_amount),
-                'currency'
-            );
-        }
+        // Baseline value
+        const baseEligible = lawData.eligible_pct;
+        const baseAmount = lawData.avg_amount !== undefined ? lawData.avg_amount : null;
+        const baseDisplay = baseAmount !== null
+            ? `${baseEligible.toFixed(1)}% | €${baseAmount.toFixed(0)}`
+            : `${baseEligible.toFixed(1)}%`;
+        html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${baseDisplay}</td>`;
+
+        // Comparison values
+        comparisons.forEach(comp => {
+            const compLawData = comp.results.summary.laws[law];
+            const compEligible = compLawData.eligible_pct;
+            const compAmount = compLawData.avg_amount !== undefined ? compLawData.avg_amount : null;
+
+            // Display combined value
+            const compDisplay = compAmount !== null
+                ? `${compEligible.toFixed(1)}% | €${compAmount.toFixed(0)}`
+                : `${compEligible.toFixed(1)}%`;
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right text-gray-900">${compDisplay}</td>`;
+
+            // Calculate and display combined difference
+            const eligibleDiff = compEligible - baseEligible;
+            const amountDiff = compAmount !== null && baseAmount !== null ? compAmount - baseAmount : null;
+
+            // Determine color based on both metrics (prioritize amount if available, otherwise eligible)
+            let diffColor = 'text-gray-500';
+            if (amountDiff !== null) {
+                diffColor = amountDiff > 0 ? 'text-green-600' : amountDiff < 0 ? 'text-red-600' : 'text-gray-500';
+            } else {
+                diffColor = eligibleDiff > 0 ? 'text-green-600' : eligibleDiff < 0 ? 'text-red-600' : 'text-gray-500';
+            }
+
+            html += `<td class="px-6 py-3 whitespace-nowrap text-sm text-right ${diffColor}">`;
+
+            // Format difference display
+            let diffParts = [];
+            diffParts.push(`${eligibleDiff > 0 ? '+' : ''}${eligibleDiff.toFixed(1)}pp`);
+
+            if (amountDiff !== null && baseAmount !== null) {
+                const amountDiffPct = baseAmount !== 0 ? (amountDiff / baseAmount) * 100 : 0;
+                let amountStr = `${amountDiff > 0 ? '+' : ''}€${Math.abs(amountDiff).toFixed(0)}`;
+                if (Math.abs(amountDiffPct) >= 0.1) {
+                    amountStr += ` (${amountDiff > 0 ? '+' : ''}${amountDiffPct.toFixed(1)}%)`;
+                }
+                diffParts.push(amountStr);
+            }
+
+            html += diffParts.join(' | ');
+            html += `</td>`;
+        });
+
+        html += `</tr>`;
     });
 
     // Income tax
@@ -2538,11 +2884,13 @@ function formatValue(value, format) {
 
 function getLawDisplayName(law) {
     const names = {
-        'zorgtoeslag': 'Zorgtoeslag',
+        'zorgtoeslagwet': 'Zorgtoeslag',
         'huurtoeslag': 'Huurtoeslag',
-        'aow': 'AOW',
+        'algemeneouderdomswet': 'AOW',
         'bijstand': 'Bijstand',
-        'kinderopvangtoeslag': 'Kinderopvangtoeslag',
+        'kinderopvang': 'Kinderopvangtoeslag',
+        'kindgebonden_budget': 'Kindgebonden budget',
+        'ww': 'WW-uitkering',
         'voting_rights': 'Kiesrecht',
         'inkomstenbelasting': 'Inkomstenbelasting'
     };
@@ -2560,10 +2908,10 @@ function getParamDisplayName(param) {
         'basisbedrag': 'Basisbedrag',
         'norm_alleenstaand': 'Norm alleenstaand',
         'norm_gehuwd': 'Norm gehuwd/samenwonend',
-        'tarief_schijf1': 'Tarief schijf 1',
-        'tarief_schijf2': 'Tarief schijf 2',
-        'grens_schijf1': 'Grens schijf 1',
-        'algemene_heffingskorting': 'Algemene heffingskorting',
+        'box1_tarief1': 'Tarief schijf 1',
+        'box1_tarief2': 'Tarief schijf 2',
+        'box1_schijf1_grens': 'Grens schijf 1',
+        'algemene_heffingskorting_max': 'Algemene heffingskorting',
         'min_leeftijd': 'Minimale leeftijd'
     };
     return names[param] || param;
@@ -2633,7 +2981,7 @@ function renderComparisonCharts(baseline, comparisons) {
 
     // Prepare data for charts
     const eligibilityData = [];
-    const laws = ['zorgtoeslag', 'huurtoeslag', 'aow', 'bijstand', 'kinderopvangtoeslag'];
+    const laws = ['zorgtoeslagwet', 'huurtoeslag', 'algemeneouderdomswet', 'bijstand', 'kinderopvang', 'kindgebonden_budget', 'ww', 'voting_rights'];
 
     laws.forEach(law => {
         eligibilityData.push({
@@ -2886,10 +3234,26 @@ function renderDisposableIncomeBreakdowns(breakdowns) {
     return html || '<p class="text-gray-500">Geen details beschikbaar</p>';
 }
 
+// Toggle accordion sections in comparison table
+function toggleAccordion(accordionId) {
+    const rows = document.querySelectorAll(`tr[id="${accordionId}-content"]`);
+    const icon = document.getElementById(`${accordionId}-icon`);
+
+    rows.forEach(row => {
+        row.classList.toggle('hidden');
+    });
+
+    // Rotate the chevron icon
+    if (icon) {
+        icon.classList.toggle('rotate-90');
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     validateAgeDistribution();
     updateIncomeDistribution();
+    loadPopulations();  // Load saved populations on page load
 });
         </script>
     {% endblock %}

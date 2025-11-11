@@ -52,11 +52,14 @@ RUN uv sync
 COPY ./schema /app/web/schema
 COPY ./law /app/web/law
 COPY ./law /app/law
+COPY ./law_mcp /app/law_mcp
 COPY ./services /app/web/services
 COPY ./machine /app/machine
 COPY ./explain /app/explain
 COPY ./web /app/web
-COPY ./script /app/script
+COPY ./submodules/regelrecht-laws/script /app/script
+COPY ./data /app/data
+COPY ./*.py /app
 
 WORKDIR /app/web
 

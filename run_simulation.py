@@ -2,7 +2,6 @@
 """Standalone simulation runner to avoid class registration conflicts."""
 
 import json
-import os
 import sys
 from datetime import datetime
 
@@ -10,15 +9,38 @@ from datetime import datetime
 from simulate import LawSimulator
 
 
-def run_simulation(params: dict):
-    """Run simulation with given parameters and return results as JSON."""
+def create_population(params: dict):
+    """Create a population and return its ID and metadata."""
     num_people = params.get("num_people", 1000)
     simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
-    law_parameters = params.get("law_parameters", {})
+    population_params = params.get("population_params", {})
 
-    # Create simulator with law parameters
-    simulator = LawSimulator(simulation_date, law_parameters)
+    # Create simulator
+    simulator = LawSimulator(simulation_date)
 
+    # Apply custom parameters if provided
+    apply_custom_parameters(simulator, params)
+
+    # Create and save population
+    population_id, people = simulator.create_population(num_people, save=True, population_params=population_params)
+
+    # Return population metadata
+    return {
+        "status": "success",
+        "population_id": population_id,
+        "num_people": len(people),
+        "demographics": {
+            "avg_age": sum(p["age"] for p in people) / len(people),
+            "with_partners_pct": sum(1 for p in people if p["has_partner"]) / len(people) * 100,
+            "students_pct": sum(1 for p in people if p["is_student"]) / len(people) * 100,
+            "renters_pct": sum(1 for p in people if p["housing_type"] == "rent") / len(people) * 100,
+            "with_children_pct": sum(1 for p in people if p["has_children"]) / len(people) * 100,
+        },
+    }
+
+
+def apply_custom_parameters(simulator: LawSimulator, params: dict):
+    """Apply custom demographic parameters to simulator."""
     # Apply custom parameters if provided
     if "age_distribution" in params:
         age_dist = params["age_distribution"]
@@ -56,27 +78,49 @@ def run_simulation(params: dict):
             "high": (rent.get("rent_high_min", 850), rent.get("rent_high_max", 1200)),
         }
 
-    # Run simulation
-    results_df = simulator.run_simulation(num_people)
+
+def run_simulation(params: dict):
+    """Run simulation with given parameters and return results as JSON."""
+    num_people = params.get("num_people", 1000)
+    simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
+    law_parameters = params.get("law_parameters", {})
+    population_id = params.get("population_id")  # Optional: use existing population
+
+    # Create simulator with law parameters
+    simulator = LawSimulator(simulation_date, law_parameters)
+
+    # Apply custom parameters if not using existing population
+    if not population_id:
+        apply_custom_parameters(simulator, params)
+
+    # Run simulation with optional population_id
+    results_df = simulator.run_simulation(num_people=num_people, population_id=population_id)
 
     # Get summary with breakdowns using the method from simulate.py
     return simulator.get_summary_with_breakdowns(results_df, simulation_date)
 
 
 if __name__ == "__main__":
+    import logging
+
+    # Set up logging
+    logging.basicConfig(level=logging.ERROR)
+    logger = logging.getLogger(__name__)
+
     # Read parameters from stdin
     params = json.loads(sys.stdin.read())
 
-    # Suppress stderr output to avoid progress bar being treated as error
-    with open(os.devnull, "w") as devnull:
-        old_stderr = sys.stderr
-        sys.stderr = devnull
-        try:
-            result = run_simulation(params)
-            print(json.dumps(result))
-        except Exception as e:
-            error_result = {"status": "error", "message": str(e)}
-            print(json.dumps(error_result))
-            sys.exit(1)
-        finally:
-            sys.stderr = old_stderr
+    # Determine operation: create_population or run_simulation
+    operation = params.get("operation", "run_simulation")
+
+    try:
+        result = create_population(params) if operation == "create_population" else run_simulation(params)
+        print(json.dumps(result))
+    except Exception as e:
+        # Log full error server-side for debugging
+        logger.error("Simulation error: %s", str(e), exc_info=True)
+
+        # Return generic error to client without exposing internal details
+        error_result = {"status": "error", "message": "An internal error occurred during simulation"}
+        print(json.dumps(error_result), file=sys.stderr)
+        sys.exit(1)

@@ -1,0 +1,38 @@
+# Transaction management
+mutation BeginTransaction {
+  beginTransaction
+}
+
+mutation CommitTransaction($transactionID: ID!) {
+  commitTransaction(TransactionID: $transactionID)
+}
+
+mutation RollbackTransaction($transactionID: ID!) {
+  rollbackTransaction(TransactionID: $transactionID)
+}
+
+# Generic claim mutation using addClaim
+mutation AddClaim($transactionID: ID, $name: String!, $roles: [TagInput!]) {
+  addClaim(TransactionID: $transactionID, Name: $name, Roles: $roles)
+}
+
+query GetClaimTypes {
+  claimTypes {
+    ExpressionType
+    Identity
+    Name
+    NestedExpressionType
+    Roles {
+      Name
+      ReferencedName
+      ReferencedType
+    }
+    Tags {
+      Name
+      Value
+    }
+    Unicities {
+      RoleNames
+    }
+  }
+}

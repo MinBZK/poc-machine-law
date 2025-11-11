@@ -10,11 +10,12 @@ import (
 var _ resolver.Resolver = &PropertySpecOverwriteResolver{}
 
 type PropertySpecOverwriteResolver struct {
+	service        string
 	propertySpec   map[string]ruleresolver.Field
-	overwriteInput map[string]map[string]any
+	overwriteInput map[string]any
 }
 
-func New(propertySpec map[string]ruleresolver.Field, overwriteInput map[string]map[string]any) *PropertySpecOverwriteResolver {
+func New(propertySpec map[string]ruleresolver.Field, overwriteInput map[string]any) *PropertySpecOverwriteResolver {
 	return &PropertySpecOverwriteResolver{
 		propertySpec:   propertySpec,
 		overwriteInput: overwriteInput,
@@ -28,27 +29,30 @@ func (l *PropertySpecOverwriteResolver) Resolve(ctx context.Context, key string)
 		return nil, false
 	}
 
-	var serviceRef *ruleresolver.ServiceReference
 	if spec.Input != nil {
-		serviceRef = &spec.Input.ServiceReference
+		return l.resolveServiceReference(spec.Input.ServiceReference)
 	} else if spec.Source != nil {
-		serviceRef = spec.Source.ServiceReference
+		if spec.Source.ServiceReference != nil {
+			return l.resolveServiceReference(*spec.Source.ServiceReference)
+		} else if spec.Source.SourceReference != nil {
+			return l.resolveSourceReference(*spec.Source.SourceReference)
+		}
 	}
 
-	if serviceRef == nil {
+	return nil, false
+}
+
+// ResolveType implements Resolver.
+func (l *PropertySpecOverwriteResolver) ResolveType() string {
+	return "OVERWRITE"
+}
+
+func (l *PropertySpecOverwriteResolver) resolveServiceReference(serviceRef ruleresolver.ServiceReference) (*resolver.Resolved, bool) {
+	if serviceRef.Field == "" || l.overwriteInput == nil {
 		return nil, false
 	}
 
-	if serviceRef.Service == "" || serviceRef.Field == "" || l.overwriteInput == nil {
-		return nil, false
-	}
-
-	serviceOverwrites, ok := l.overwriteInput[serviceRef.Service]
-	if !ok {
-		return nil, false
-	}
-
-	value, ok := serviceOverwrites[serviceRef.Field]
+	value, ok := l.overwriteInput[serviceRef.Field]
 	if !ok {
 		return nil, false
 	}
@@ -56,7 +60,22 @@ func (l *PropertySpecOverwriteResolver) Resolve(ctx context.Context, key string)
 	return &resolver.Resolved{Value: value}, true
 }
 
-// ResolveType implements Resolver.
-func (l *PropertySpecOverwriteResolver) ResolveType() string {
-	return "OVERWRITE"
+func (l *PropertySpecOverwriteResolver) resolveSourceReference(sourceRef ruleresolver.SourceReference) (*resolver.Resolved, bool) {
+	if sourceRef.Field != nil {
+		if value, ok := l.overwriteInput[*sourceRef.Field]; ok {
+			return &resolver.Resolved{Value: value}, true
+		}
+
+	}
+
+	if sourceRef.Fields != nil {
+		for _, field := range *sourceRef.Fields {
+			if value, ok := l.overwriteInput[field]; ok {
+				return &resolver.Resolved{Value: value}, true
+			}
+
+		}
+	}
+
+	return nil, false
 }

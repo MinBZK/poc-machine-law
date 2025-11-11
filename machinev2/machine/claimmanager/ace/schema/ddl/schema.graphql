@@ -1,0 +1,193 @@
+#
+type PrimitiveType {
+  #
+  GraphQLName: String
+
+  #
+  Name: String
+}
+
+#
+type ClaimType {
+  #
+  ExpressionType: String
+
+  #
+  Identity: [String]
+
+  #
+  Name: String
+
+  #
+  NestedExpressionType: String
+
+  #
+  Roles: [RoleType]
+
+  #
+  Tags: [Tag]
+
+  #
+  Unicities: [Unicity]
+}
+
+#
+type RoleType {
+  #
+  Name: String
+
+  #
+  ReferencedName: String
+
+  #
+  ReferencedType: ReferencedTypeEnum
+}
+
+#
+union Role = LabelRole | ClaimRole
+
+#
+type Tag {
+  #
+  Name: String
+
+  #
+  Value: String
+}
+
+# The `DateTime` scalar type represents a DateTime. The DateTime is serialized as an RFC 3339 quoted string
+scalar DateTime
+
+#
+type Mutation {
+  #
+  addAnnotationType(
+    ExpressionType: String!
+    NestedExpressionType: String = ""
+    Unicities: [[String]]!
+    Tags: [TagInput]
+    Name: String!
+  ): Boolean
+
+  #
+  addClaim(TransactionID: ID, Name: String!, Roles: [TagInput]): ID!
+
+  #
+  addClaimType(
+    ExpressionType: String!
+    NestedExpressionType: String = ""
+    Unicities: [[String]]!
+    Tags: [TagInput]
+    Name: String!
+  ): Boolean
+
+  #
+  addLabelType(
+    Regex: String
+    Tags: [TagInput]
+    Name: String!
+    PrimitiveName: String!
+  ): Boolean
+
+  #
+  beginTransaction: ID!
+
+  #
+  commitTransaction(TransactionID: ID!): Boolean!
+
+  #
+  reset: Boolean!
+
+  #
+  restart: Boolean!
+
+  #
+  rollbackTransaction(TransactionID: ID!): Boolean!
+}
+
+#
+input TagInput {
+  #
+  Name: String!
+
+  #
+  Value: String!
+}
+
+#
+type Unicity {
+  #
+  RoleNames: [String]
+}
+
+#
+enum ReferencedTypeEnum {
+  #
+  LabelType
+
+  #
+  ClaimType
+
+  #
+  AnnotationType
+}
+
+#
+type Query {
+  #
+  annotationTypes: [ClaimType]
+
+  #
+  claimTypes: [ClaimType]
+
+  #
+  getClaim(ID: ID, TransactionID: ID): ClaimRole
+
+  #
+  getClaims(TransactionID: ID): [ClaimRole]
+
+  #
+  labelTypes: [LabelType]
+
+  #
+  primitiveTypes: [PrimitiveType]
+}
+
+#
+type LabelType {
+  #
+  Name: String
+
+  #
+  PrimitiveName: String
+
+  #
+  Tags: [Tag]
+}
+
+#
+type ClaimRole {
+  #
+  ClaimType: String
+
+  #
+  ID: ID
+
+  #
+  RegisteredAt: DateTime
+
+  #
+  Roles: [Role]
+}
+
+#
+type LabelRole {
+  #
+  Name: ID
+
+  #
+  PrimitiveType: String
+
+  #
+  Value: String
+}

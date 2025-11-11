@@ -1,27 +1,50 @@
 import itertools
+import json
 import logging
 import random
 import sys
+import uuid
 from datetime import date, datetime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
+from machine.law_parameter_config import (
+    _ensure_registry_initialized,
+    create_overrides,
+    find_law_config_by_technical_name,
+)
 from machine.service import Services
 
 # Create a logger for this module
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
+# Directory for storing populations
+POPULATIONS_DIR = Path("data/populations")
+
 
 class LawSimulator:
     def __init__(self, simulation_date="2025-03-01", law_parameters=None) -> None:
         self.simulation_date = simulation_date
         self.services = Services(simulation_date)
+
+        # Initialize the law parameter registry with our Services instance
+        # This prevents eventsourcing conflicts in subprocess contexts
+        _ensure_registry_initialized(services=self.services)
+
         self.results = []
         self.used_bsns = set()  # Track used BSNs
         self.law_parameters = law_parameters or {}
+
+        # DEBUG: Log received law parameters
+        if self.law_parameters:
+            logger.info(f"Received law_parameters with keys: {list(self.law_parameters.keys())}")
+            for law_name, params in self.law_parameters.items():
+                if params:
+                    logger.info(f"  {law_name}: {len(params)} parameters")
 
         # CBS demographic data for more realistic simulation
         self.age_distribution = {
@@ -58,6 +81,107 @@ class LawSimulator:
             "medium": (700, 850),  # Upper social/lower private
             "high": (850, 1200),  # Private sector (some eligible for huurtoeslag)
         }
+
+    @staticmethod
+    def save_population(population_id: str, people: list, params: dict) -> None:
+        """Save a population to disk for reuse."""
+        POPULATIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Convert dates to ISO format for JSON serialization
+        serializable_people = []
+        for person in people:
+            person_copy = person.copy()
+            person_copy["birth_date"] = person["birth_date"].isoformat()
+            # Convert children data
+            if "children_data" in person_copy:
+                for child in person_copy["children_data"]:
+                    child["birth_date"] = child["birth_date"].isoformat()
+            serializable_people.append(person_copy)
+
+        # Save population data
+        population_file = POPULATIONS_DIR / f"{population_id}.json"
+        with open(population_file, "w") as f:
+            json.dump(serializable_people, f, indent=2)
+
+        # Save metadata
+        metadata = {
+            "population_id": population_id,
+            "created_at": datetime.now().isoformat(),
+            "num_people": len(people),
+            "params": params,
+            "demographics": {
+                "avg_age": sum(p["age"] for p in people) / len(people),
+                "with_partners_pct": sum(1 for p in people if p["has_partner"]) / len(people) * 100,
+                "students_pct": sum(1 for p in people if p["is_student"]) / len(people) * 100,
+                "renters_pct": sum(1 for p in people if p["housing_type"] == "rent") / len(people) * 100,
+                "with_children_pct": sum(1 for p in people if p["has_children"]) / len(people) * 100,
+            },
+        }
+
+        metadata_file = POPULATIONS_DIR / f"{population_id}.meta.json"
+        with open(metadata_file, "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        logger.info(f"Saved population {population_id} with {len(people)} people")
+
+    @staticmethod
+    def load_population(population_id: str) -> list:
+        """Load a previously saved population from disk."""
+        population_file = POPULATIONS_DIR / f"{population_id}.json"
+
+        if not population_file.exists():
+            raise FileNotFoundError(f"Population {population_id} not found")
+
+        with open(population_file) as f:
+            people_data = json.load(f)
+
+        # Convert ISO format strings back to date objects
+        for person in people_data:
+            person["birth_date"] = date.fromisoformat(person["birth_date"])
+            # Convert children data
+            if "children_data" in person:
+                for child in person["children_data"]:
+                    child["birth_date"] = date.fromisoformat(child["birth_date"])
+
+        logger.info(f"Loaded population {population_id} with {len(people_data)} people")
+        return people_data
+
+    @staticmethod
+    def list_populations() -> list[dict]:
+        """List all saved populations with their metadata."""
+        if not POPULATIONS_DIR.exists():
+            return []
+
+        populations = []
+        for meta_file in POPULATIONS_DIR.glob("*.meta.json"):
+            try:
+                with open(meta_file) as f:
+                    metadata = json.load(f)
+                populations.append(metadata)
+            except Exception as e:
+                logger.error(f"Error reading metadata file {meta_file}: {e}")
+
+        # Sort by creation date, newest first
+        populations.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        return populations
+
+    @staticmethod
+    def delete_population(population_id: str) -> bool:
+        """Delete a saved population and its metadata."""
+        population_file = POPULATIONS_DIR / f"{population_id}.json"
+        metadata_file = POPULATIONS_DIR / f"{population_id}.meta.json"
+
+        deleted = False
+        if population_file.exists():
+            population_file.unlink()
+            deleted = True
+        if metadata_file.exists():
+            metadata_file.unlink()
+            deleted = True
+
+        if deleted:
+            logger.info(f"Deleted population {population_id}")
+        return deleted
 
     def generate_bsn(self):
         while True:
@@ -273,7 +397,16 @@ class LawSimulator:
 
         return pairs
 
-    def setup_test_data(self, pairs):
+    def setup_test_data(self, pairs, random_seed=None):
+        # Set random seed if provided (for reproducibility with loaded populations)
+        if random_seed is not None:
+            # Convert string seed to integer if needed (e.g., UUID strings)
+            if isinstance(random_seed, str):
+                # Convert UUID string to integer using hash
+                random_seed = int(uuid.UUID(random_seed).int % (2**32))
+            random.seed(random_seed)
+            np.random.seed(random_seed)
+
         # Flatten pairs into list of people with partner references
         people = []
         for person, partner in pairs:
@@ -301,7 +434,8 @@ class LawSimulator:
                     "age": p["age"],
                     "has_dutch_nationality": p["has_dutch_nationality"],
                     "has_partner": p["has_partner"],
-                    "residence_address": f"Teststraat {random.randint(1, 999)}, {random.randint(1000, 9999)}AB Amsterdam",
+                    "residence_address": p.get("residence_address")
+                    or f"Teststraat {random.randint(1, 999)}, {random.randint(1000, 9999)}AB Amsterdam",
                     "has_fixed_address": True,
                     "household_size": 1 + (1 if p["has_partner"] else 0) + len(p.get("children_data", [])),
                 }
@@ -313,8 +447,8 @@ class LawSimulator:
                     "bsn": p["bsn"],
                     "partnerschap_type": "HUWELIJK" if p["has_partner"] else "GEEN",
                     "partner_bsn": p["partner_bsn"],
-                    # Add children directly in the format expected by features
-                    "children": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
+                    # Add children directly in the format expected by features (Dutch field name!)
+                    "kinderen": [{"bsn": child["bsn"]} for child in p.get("children_data", [])]
                     if p.get("children_data")
                     else [],
                 }
@@ -324,11 +458,26 @@ class LawSimulator:
             ("RvIG", "verblijfplaats"): [
                 {
                     "bsn": p["bsn"],
-                    "straat": "Kalverstraat" if random.random() < 0.7 else "Teststraat",
-                    "huisnummer": str(random.randint(1, 999)),
-                    "postcode": f"{random.randint(1000, 9999)}AB",
+                    "straat": p.get("straat") or ("Kalverstraat" if random.random() < 0.7 else "Teststraat"),
+                    "huisnummer": p.get("huisnummer") or str(random.randint(1, 999)),
+                    "postcode": p.get("postcode") or f"{random.randint(1000, 9999)}AB",
                     "woonplaats": "Amsterdam",
-                    "type": "WOONADRES" if random.random() < 0.95 else "BRIEFADRES",
+                    "type": p.get("address_type") or ("WOONADRES" if random.random() < 0.95 else "BRIEFADRES"),
+                }
+                for p in people
+            ],
+            # RvIG data for werkloosheidsuitkering (nationality and residence)
+            ("RvIG", "heeft_nederlandse_nationaliteit"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": p["has_dutch_nationality"],
+                }
+                for p in people
+            ],
+            ("RvIG", "woont_in_nederland"): [
+                {
+                    "bsn": p["bsn"],
+                    "value": True,  # All simulated people live in Netherlands
                 }
                 for p in people
             ],
@@ -518,6 +667,44 @@ class LawSimulator:
                 }
                 for p in people
             ],
+            # UWV work data for werkloosheidsuitkering (WW) - table structure
+            ("UWV", "uwv_werkgegevens"): [
+                {
+                    "bsn": p["bsn"],
+                    "gemiddeld_uren_per_week": float(
+                        random.randint(32, 40) if not p["is_student"] else random.randint(12, 24)
+                    ),
+                    # Simulate some unemployment: 10% of non-students are currently unemployed (0 hours)
+                    "huidige_uren_per_week": float(
+                        0
+                        if not p["is_student"] and random.random() < 0.10
+                        else random.randint(32, 40)
+                        if not p["is_student"]
+                        else random.randint(12, 24)
+                    ),
+                    # Most people (80%) meet the requirement of 26+ weeks out of 36
+                    "gewerkte_weken_36": random.randint(26, 36) if random.random() < 0.80 else random.randint(10, 25),
+                    "arbeidsverleden_jaren": int(p["work_years"]),
+                    "jaarloon": p["annual_income"],
+                }
+                for p in people
+            ],
+            # UWV ziektewet data - table name must match feature test
+            ("UWV", "ziektewet"): [
+                {
+                    "bsn": p["bsn"],
+                    "heeft_ziektewet_uitkering": False,  # Very few people receive sickness benefits
+                }
+                for p in people
+            ],
+            # UWV WIA data - table name must match feature test
+            ("UWV", "WIA"): [
+                {
+                    "bsn": p["bsn"],
+                    "heeft_wia_uitkering": False,  # Very few people receive disability benefits
+                }
+                for p in people
+            ],
             # SVB insurance data
             ("SVB", "verzekerde_tijdvakken"): [
                 {
@@ -531,6 +718,24 @@ class LawSimulator:
                 {
                     "bsn": p["bsn"],
                     "leeftijd": 67 + random.randint(0, 3) / 10,  # 67.0-67.3
+                }
+                for p in people
+            ],
+            # SVB kinderbijslag data for kindgebonden budget (table structure)
+            ("SVB", "algemene_kinderbijslagwet"): [
+                {
+                    "ouder_bsn": p["bsn"],
+                    "aantal_kinderen": len(p.get("children_data", [])),
+                    "kinderen_leeftijden": [child["age"] for child in p.get("children_data", [])],
+                    "ontvangt_kinderbijslag": p["has_children"],
+                }
+                for p in people
+            ],
+            # SVB pension age data for WW eligibility check (table structure)
+            ("SVB", "algemene_ouderdomswet_gegevens"): [
+                {
+                    "bsn": p["bsn"],
+                    "pensioenleeftijd": 67,  # AOW retirement age in 2025
                 }
                 for p in people
             ],
@@ -1037,6 +1242,19 @@ class LawSimulator:
             file=sys.stderr,
         )
 
+        # Store generated random values back into people for reproducibility
+        for p in people:
+            rvig_person = next((x for x in sources[("RvIG", "personen")] if x["bsn"] == p["bsn"]), None)
+            if rvig_person:
+                p["residence_address"] = rvig_person["residence_address"]
+
+            rvig_address = next((x for x in sources[("RvIG", "verblijfplaats")] if x["bsn"] == p["bsn"]), None)
+            if rvig_address:
+                p["straat"] = rvig_address["straat"]
+                p["huisnummer"] = rvig_address["huisnummer"]
+                p["postcode"] = rvig_address["postcode"]
+                p["address_type"] = rvig_address["type"]
+
         return people
 
     def simulate_person(self, person) -> None:
@@ -1068,13 +1286,14 @@ class LawSimulator:
         # Evaluate all relevant laws
         try:
             # 1. Zorgtoeslag (healthcare subsidy)
-            zorgtoeslag_overrides = self._create_law_overrides("zorgtoeslagwet")
+            zorgtoeslag_input, zorgtoeslag_defs = self._create_law_overrides("zorgtoeslagwet")
             zorgtoeslag = self.services.evaluate(
                 "TOESLAGEN",
                 "zorgtoeslagwet",
                 {"BSN": person["bsn"]},
                 self.simulation_date,
-                overwrite_input=zorgtoeslag_overrides,
+                overwrite_input=zorgtoeslag_input,
+                overwrite_definitions=zorgtoeslag_defs,
             )
 
             # Also evaluate 2024 version for comparison if simulating in 2025
@@ -1086,7 +1305,8 @@ class LawSimulator:
                         "zorgtoeslagwet",
                         {"BSN": person["bsn"]},
                         "2024-12-31",
-                        overwrite_input=zorgtoeslag_overrides,
+                        overwrite_input=zorgtoeslag_input,
+                        overwrite_definitions=zorgtoeslag_defs,
                     )
                 except Exception:
                     pass
@@ -1096,13 +1316,14 @@ class LawSimulator:
 
             # 3. Huurtoeslag (rent subsidy)
             try:
-                huurtoeslag_overrides = self._create_law_overrides("wet_op_de_huurtoeslag")
+                huurtoeslag_input, huurtoeslag_defs = self._create_law_overrides("wet_op_de_huurtoeslag")
                 huurtoeslag = self.services.evaluate(
                     "TOESLAGEN",
                     "wet_op_de_huurtoeslag",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=huurtoeslag_overrides,
+                    overwrite_input=huurtoeslag_input,
+                    overwrite_definitions=huurtoeslag_defs,
                 )
             except Exception as e:
                 logger.debug(f"Error evaluating huurtoeslag for BSN {person['bsn']}: {e}")
@@ -1110,13 +1331,14 @@ class LawSimulator:
 
             # 4. Bijstand (social assistance)
             try:
-                bijstand_overrides = self._create_law_overrides("participatiewet/bijstand")
+                bijstand_input, bijstand_defs = self._create_law_overrides("participatiewet/bijstand")
                 bijstand = self.services.evaluate(
                     "GEMEENTE_AMSTERDAM",
                     "participatiewet/bijstand",
                     {"BSN": person["bsn"]},
                     self.simulation_date,
-                    overwrite_input=bijstand_overrides,
+                    overwrite_input=bijstand_input,
+                    overwrite_definitions=bijstand_defs,
                 )
             except Exception:
                 bijstand = None
@@ -1126,32 +1348,77 @@ class LawSimulator:
             kinderopvangtoeslag = None
             if person["has_children"] and any(child["age"] < 12 for child in person.get("children_data", [])):
                 try:
-                    kinderopvang_overrides = self._create_law_overrides("wet_kinderopvang")
+                    kinderopvang_input, kinderopvang_defs = self._create_law_overrides("wet_kinderopvang")
                     kinderopvangtoeslag = self.services.evaluate(
                         "TOESLAGEN",
                         "wet_kinderopvang",
                         {"BSN": person["bsn"]},
                         self.simulation_date,
-                        overwrite_input=kinderopvang_overrides,
+                        overwrite_input=kinderopvang_input,
+                        overwrite_definitions=kinderopvang_defs,
                     )
                 except Exception as e:
                     logger.debug(f"Error evaluating kinderopvangtoeslag for BSN {person['bsn']}: {e}")
                     kinderopvangtoeslag = None
 
-            # 6. Kiesrecht (voting rights)
-            kiesrecht_overrides = self._create_law_overrides("kieswet")
+            # 6. Kindgebonden budget
+            kindgebonden_budget = None
+            if person["has_children"]:
+                try:
+                    kindgebonden_budget_input, kindgebonden_budget_defs = self._create_law_overrides(
+                        "wet_op_het_kindgebonden_budget"
+                    )
+                    kindgebonden_budget = self.services.evaluate(
+                        "TOESLAGEN",
+                        "wet_op_het_kindgebonden_budget",
+                        {"BSN": person["bsn"]},
+                        self.simulation_date,
+                        overwrite_input=kindgebonden_budget_input,
+                        overwrite_definitions=kindgebonden_budget_defs,
+                    )
+                except Exception as e:
+                    logger.debug(f"Error evaluating kindgebonden budget for BSN {person['bsn']}: {e}")
+                    kindgebonden_budget = None
+
+            # 7. WW-uitkering (unemployment benefit)
+            ww_uitkering = None
+            try:
+                ww_input, ww_defs = self._create_law_overrides("werkloosheidswet")
+                ww_uitkering = self.services.evaluate(
+                    "UWV",
+                    "werkloosheidswet",
+                    {"BSN": person["bsn"]},
+                    self.simulation_date,
+                    overwrite_input=ww_input,
+                    overwrite_definitions=ww_defs,
+                )
+            except Exception as e:
+                import traceback
+
+                logger.error(f"Error evaluating WW-uitkering for BSN {person['bsn']}: {e}")
+                logger.error(traceback.format_exc())
+                ww_uitkering = None
+
+            # 8. Kiesrecht (voting rights)
+            kiesrecht_input, kiesrecht_defs = self._create_law_overrides("kieswet")
             kiesrecht = self.services.evaluate(
-                "KIESRAAD", "kieswet", {"BSN": person["bsn"]}, self.simulation_date, overwrite_input=kiesrecht_overrides
+                "KIESRAAD",
+                "kieswet",
+                {"BSN": person["bsn"]},
+                self.simulation_date,
+                overwrite_input=kiesrecht_input,
+                overwrite_definitions=kiesrecht_defs,
             )
 
-            # 7. Inkomstenbelasting (income tax)
-            inkomstenbelasting_overrides = self._create_law_overrides("wet_inkomstenbelasting")
+            # 9. Inkomstenbelasting (income tax)
+            ib_overwrite_input, ib_overwrite_definitions = self._create_law_overrides("wet_inkomstenbelasting")
             inkomstenbelasting = self.services.evaluate(
                 "BELASTINGDIENST",
                 "wet_inkomstenbelasting",
                 {"BSN": person["bsn"]},
                 self.simulation_date,
-                overwrite_input=inkomstenbelasting_overrides,
+                overwrite_input=ib_overwrite_input,
+                overwrite_definitions=ib_overwrite_definitions,
             )
         except Exception:
             return None
@@ -1183,6 +1450,14 @@ class LawSimulator:
                 "kinderopvangtoeslag_amount": kinderopvangtoeslag.output.get("jaarbedrag", 0) / 100 / 12
                 if kinderopvangtoeslag
                 else 0,
+                # Kindgebonden budget
+                "kindgebonden_budget_eligible": kindgebonden_budget.requirements_met if kindgebonden_budget else False,
+                "kindgebonden_budget_amount": kindgebonden_budget.output.get("kindgebonden_budget_jaar", 0) / 100 / 12
+                if kindgebonden_budget
+                else 0,
+                # WW-uitkering
+                "ww_eligible": ww_uitkering.requirements_met if ww_uitkering else False,
+                "ww_amount": ww_uitkering.output.get("ww_uitkering_per_maand", 0) / 100 if ww_uitkering else 0,
                 # Kiesrecht
                 "voting_rights": kiesrecht.output.get("heeft_stemrecht", False),
                 # Belasting
@@ -1206,6 +1481,8 @@ class LawSimulator:
             + result["bijstand_amount"]
             + result["bijstand_housing"]
             + result["kinderopvangtoeslag_amount"]
+            + result["kindgebonden_budget_amount"]
+            + result["ww_amount"]
         )
 
         # Calculate housing costs (rent or mortgage)
@@ -1224,32 +1501,56 @@ class LawSimulator:
             "aow": result["aow_amount"],
             "bijstand": result["bijstand_amount"] + result["bijstand_housing"],
             "kinderopvangtoeslag": result["kinderopvangtoeslag_amount"],
+            "kindgebonden_budget": result["kindgebonden_budget_amount"],
+            "ww": result["ww_amount"],
             "housing_costs": housing_costs,
         }
 
         self.results.append(result)
 
     def _create_law_overrides(self, law_name):
-        """Create overwrite_input dict for a specific law based on UI parameters."""
-        overrides = {}
+        """
+        Create override dicts for a specific law based on UI parameters.
 
-        if law_name == "zorgtoeslagwet" and "zorgtoeslag" in self.law_parameters:
-            params = self.law_parameters["zorgtoeslag"]
-            if "standaardpremie" in params and params["standaardpremie"] is not None:
-                # Convert monthly to yearly (in eurocents)
-                yearly_premium = int(params["standaardpremie"] * 12 * 100)
-                overrides["VWS"] = {"standaardpremie": yearly_premium}
+        Uses the law_parameter_config registry to map UI parameters to engine overrides.
+        This eliminates hardcoded law-specific logic.
 
-        # Note: Most other law parameters are in the 'definitions' section of YAML files,
-        # which cannot be overridden through the overwrite_input mechanism.
-        # These would require extending the system to support definition overrides.
+        Args:
+            law_name: Technical law name (e.g., "wet_inkomstenbelasting")
 
-        # For now, we can only override input parameters, not definition constants.
-        # Future enhancement: Add support for overriding law definitions.
+        Returns:
+            Tuple of (overwrite_input, overwrite_definitions):
+            - overwrite_input: Dict for input overrides {service: {field: value}}
+            - overwrite_definitions: Dict for definition overrides {field: value}
+        """
+        # Find law config by technical name
+        config = find_law_config_by_technical_name(law_name)
+        if not config:
+            logger.debug(f"No config found for technical law name: {law_name}")
+            return {}, {}
 
-        return overrides
+        # Check if we have UI parameters for this law
+        ui_law_name = config.ui_name
+        logger.debug(f"Looking for UI law name '{ui_law_name}' (from technical name '{law_name}') in law_parameters")
+        logger.debug(f"Available law_parameters keys: {list(self.law_parameters.keys())}")
 
-    def run_simulation(self, num_people=1000):
+        if ui_law_name not in self.law_parameters:
+            logger.debug(f"No parameters found for UI law name: {ui_law_name}")
+            return {}, {}
+
+        logger.info(f"Found {len(self.law_parameters[ui_law_name])} parameters for {ui_law_name}")
+
+        # Create overrides using registry
+        overwrite_input, overwrite_definitions = create_overrides(ui_law_name, self.law_parameters[ui_law_name])
+
+        # Log info about definition overrides if present
+        if overwrite_definitions:
+            logger.info(f"Applying definition overrides for {law_name}: {list(overwrite_definitions.keys())}")
+
+        return overwrite_input, overwrite_definitions
+
+    def create_population(self, num_people=1000, save=True, population_params=None):
+        """Create a new population and optionally save it."""
         import sys
 
         print(f"Generating {num_people} people with realistic demographics...", file=sys.stderr)
@@ -1257,6 +1558,35 @@ class LawSimulator:
 
         print("Setting up test data sources...", file=sys.stderr)
         people = self.setup_test_data(pairs)
+
+        if save:
+            population_id = str(uuid.uuid4())
+            params = population_params or {
+                "num_people": num_people,
+                "simulation_date": self.simulation_date,
+            }
+            self.save_population(population_id, people, params)
+            print(f"Saved population as {population_id}", file=sys.stderr)
+            return population_id, people
+        else:
+            return None, people
+
+    def run_simulation(self, num_people=1000, population_id=None):
+        """Run simulation with either a new or existing population."""
+        import sys
+
+        # Use existing population if provided
+        if population_id:
+            print(f"Loading existing population {population_id}...", file=sys.stderr)
+            people = self.load_population(population_id)
+            # Re-setup data sources with loaded population
+            # Note: Don't reinitialize Services to avoid registration conflicts
+            # Use population_id as random seed for reproducibility
+            self.setup_test_data_from_people(people, random_seed=population_id)
+        else:
+            # Create new population
+            _, people = self.create_population(num_people, save=False)
+
         total_people = len(people)
 
         print(f"Simulating laws for {total_people} people...", file=sys.stderr)
@@ -1274,6 +1604,31 @@ class LawSimulator:
             return results_df
         else:
             raise ValueError("Simulation failed to generate valid results")
+
+    def setup_test_data_from_people(self, people, random_seed=None):
+        """Setup test data from pre-existing people list (for loaded populations)."""
+        # Convert the people list into pairs format expected by setup_test_data
+        # This is a bit of a hack but maintains compatibility
+        pairs = []
+        processed_bsns = set()
+
+        for person in people:
+            if person["bsn"] in processed_bsns:
+                continue
+
+            processed_bsns.add(person["bsn"])
+
+            # Find partner if exists
+            partner = None
+            if person.get("partner_bsn"):
+                partner = next((p for p in people if p["bsn"] == person["partner_bsn"]), None)
+                if partner:
+                    processed_bsns.add(partner["bsn"])
+
+            pairs.append((person, partner))
+
+        # Now call the original setup_test_data with the random seed
+        return self.setup_test_data(pairs, random_seed=random_seed)
 
     def calculate_law_breakdowns(self, df, law_name, eligible_col, amount_col):
         """Calculate breakdowns by various demographics for a specific law."""
@@ -1595,7 +1950,7 @@ class LawSimulator:
                 "median_annual": float(results_df["income"].median()),
             },
             "laws": {
-                "zorgtoeslag": {
+                "zorgtoeslagwet": {
                     "eligible_pct": float(results_df["zorgtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["zorgtoeslag_eligible"]]["zorgtoeslag_amount"].mean())
                     if any(results_df["zorgtoeslag_eligible"])
@@ -1613,7 +1968,7 @@ class LawSimulator:
                         results_df, "huurtoeslag", "huurtoeslag_eligible", "huurtoeslag_amount"
                     ),
                 },
-                "aow": {
+                "algemeneouderdomswet": {
                     "eligible_pct": float(results_df["aow_eligible"].mean() * 100),
                     "avg_amount": float(results_df[results_df["aow_eligible"]]["aow_amount"].mean())
                     if any(results_df["aow_eligible"])
@@ -1629,7 +1984,7 @@ class LawSimulator:
                         results_df, "bijstand", "bijstand_eligible", "bijstand_amount"
                     ),
                 },
-                "kinderopvangtoeslag": {
+                "kinderopvang": {
                     "eligible_pct": float(results_df["kinderopvangtoeslag_eligible"].mean() * 100),
                     "avg_amount": float(
                         results_df[results_df["kinderopvangtoeslag_eligible"]]["kinderopvangtoeslag_amount"].mean()
@@ -1639,6 +1994,24 @@ class LawSimulator:
                     "breakdowns": self.calculate_law_breakdowns(
                         results_df, "kinderopvangtoeslag", "kinderopvangtoeslag_eligible", "kinderopvangtoeslag_amount"
                     ),
+                },
+                "kindgebonden_budget": {
+                    "eligible_pct": float(results_df["kindgebonden_budget_eligible"].mean() * 100),
+                    "avg_amount": float(
+                        results_df[results_df["kindgebonden_budget_eligible"]]["kindgebonden_budget_amount"].mean()
+                    )
+                    if any(results_df["kindgebonden_budget_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(
+                        results_df, "kindgebonden_budget", "kindgebonden_budget_eligible", "kindgebonden_budget_amount"
+                    ),
+                },
+                "ww": {
+                    "eligible_pct": float(results_df["ww_eligible"].mean() * 100),
+                    "avg_amount": float(results_df[results_df["ww_eligible"]]["ww_amount"].mean())
+                    if any(results_df["ww_eligible"])
+                    else 0,
+                    "breakdowns": self.calculate_law_breakdowns(results_df, "ww", "ww_eligible", "ww_amount"),
                 },
                 "voting_rights": {
                     "eligible_pct": float(results_df["voting_rights"].mean() * 100),
@@ -1855,6 +2228,17 @@ def main() -> None:
 
     # Bijstand
     print_law_statistics(results, "🤲 Bijstand (Social Assistance)", "bijstand_eligible", "bijstand_amount")
+
+    # WW-uitkering
+    print_law_statistics(results, "💼 WW-uitkering (Unemployment Benefits)", "ww_eligible", "ww_amount")
+
+    # Kindgebonden budget
+    print_law_statistics(
+        results,
+        "👨‍👩‍👧 Kindgebonden Budget (Child Budget)",
+        "kindgebonden_budget_eligible",
+        "kindgebonden_budget_amount",
+    )
 
     # Kinderopvangtoeslag
     print_law_statistics(

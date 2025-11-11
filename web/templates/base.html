@@ -822,6 +822,20 @@
         console.log('👀 Form observer set up to auto-fill new forms with wallet data');
     });
         </script>
+        <script>
+        // Listen for Ctrl-R / Cmd-R when inside iframe and notify parent
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                // Check if we're inside an iframe
+                if (window !== window.parent) {
+                    e.preventDefault(); // Prevent full page refresh
+                    window.parent.postMessage({ type: 'refresh-iframe' }, window.location.origin);
+                    console.log('Sent refresh-iframe message to parent');
+                }
+                // If not in iframe, allow normal browser refresh
+            }
+        });
+        </script>
         <!-- Footer -->
         <footer class="bg-gray-100 border-t mt-12">
             <div class="container mx-auto px-4 py-8">

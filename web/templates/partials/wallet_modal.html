@@ -76,11 +76,11 @@
                 <h4 class="text-lg font-medium mb-2">Verbinden met NL Wallet</h4>
                 <p class="text-sm text-gray-600">Een moment geduld alstublieft...</p>
             </div>
-            <!-- Modal Content - Step 3: Login to burger.nl -->
+            <!-- Modal Content - Step 3: Login to RegelRecht -->
             <div x-show="step === 3" class="p-6">
-                <h4 class="text-lg font-medium mb-4 text-center">Inloggen bij burger.nl</h4>
+                <h4 class="text-lg font-medium mb-4 text-center">Inloggen bij RegelRecht</h4>
                 <div class="p-4 bg-blue-50 rounded-lg mb-6">
-                    <p class="text-sm">burger.nl wil gegevens uit uw NL Wallet gebruiken om u te identificeren.</p>
+                    <p class="text-sm">RegelRecht wil gegevens uit uw NL Wallet gebruiken om u te identificeren.</p>
                 </div>
                 <div class="flex justify-center space-x-4">
                     <button @click="step = 1"
@@ -181,7 +181,7 @@
                     </div>
                 </div>
                 <h4 class="text-lg font-medium mb-2">Gegevens succesvol gedeeld</h4>
-                <p class="text-sm text-gray-600 mb-6">Uw gegevens zijn overgedragen aan burger.nl</p>
+                <p class="text-sm text-gray-600 mb-6">Uw gegevens zijn overgedragen aan RegelRecht</p>
                 <button id="complete-wallet-flow"
                         onclick="document.getElementById('wallet-modal').style.display='none'; console.log('Direct close!'); setTimeout(function() { document.dispatchEvent(new CustomEvent('wallet-data-received', { detail: { success: true, bsn: new URLSearchParams(window.location.search).get('bsn') || '{{ bsn }}', profile: window.lastWalletData || {} }})); }, 100);"
                         class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors cursor-pointer">

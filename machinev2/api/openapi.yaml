@@ -3,7 +3,22 @@ info:
   title: Law as Code
   version: 0.0.1
 servers:
-  - url: https://api.server.test/v1
+  - url: https://rvig-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictief RvIG)
+  - url: https://bd-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve Belastingdienst)
+  - url: https://toeslagen-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve Dienst Toeslagen)
+  - url: https://uwv-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve UWV)
+  - url: http://rvig-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictief RvIG)
+  - url: http://bd-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve Belastingdienst)
+  - url: http://toeslagen-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve Dienst Toeslagen)
+  - url: http://uwv-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve UWV)
 tags:
   - name: Law
   - name: Profile
@@ -410,16 +425,19 @@ components:
         parameters:
           type: object
           additionalProperties: true
-        date:
+        effectiveDate:
           type: string
           format: date
-          description: Can be used to overwrite the date used by the service
+          description: Can be used to set the effective execution date
+          example: "2025-01-31"
+        referenceDate:
+          type: string
+          format: date
+          description: Can be used to set the reference date of data
           example: "2025-01-31"
         input:
           type: object
-          additionalProperties:
-            type: object
-            additionalProperties: true
+          additionalProperties: true
         output:
           type: string
           description: specify a requested output value

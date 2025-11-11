@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 if ! git -C submodules/regelrecht-laws diff-index --quiet HEAD 2>/dev/null; then

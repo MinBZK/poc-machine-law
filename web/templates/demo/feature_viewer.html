@@ -1,0 +1,228 @@
+{% extends "demo/base.html" %}
+{% block title %}{{ feature_data.feature.name }} - Machine Law Demo{% endblock %}
+{% block content %}
+    <div class="demo-layout three-panel">
+        <!-- Sidebar with feature list -->
+        <aside class="demo-sidebar">
+            <div class="sidebar-header">
+                <h2>Feature Files</h2>
+                <input type="text"
+                       id="feature-search"
+                       class="law-search"
+                       placeholder="Zoek features...">
+            </div>
+            <div class="law-list" id="feature-list">
+                {% for directory, features in grouped_features.items() %}
+                    <div class="law-directory">
+                        <div class="directory-header" onclick="toggleDirectory(this)">
+                            <span class="directory-icon">▼</span>
+                            <span class="directory-name">{{ directory }}</span>
+                            <span class="directory-count">({{ features|length }})</span>
+                        </div>
+                        <div class="directory-laws">
+                            {% for feature in features %}
+                                <a href="/demo/feature/{{ feature.path }}"
+                                   class="law-item {% if feature.path in feature_path %}active{% endif %}">
+                                    <div class="law-item-header">
+                                        <span class="law-name">{{ feature.name }}</span>
+                                        <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </aside>
+        <!-- Main content area with Gherkin viewer -->
+        <main class="demo-content feature-content">
+            <div class="feature-viewer">
+                <!-- Toolbar -->
+                <div class="feature-toolbar">
+                    <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
+                    <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
+                    <span class="scenario-status" id="scenario-status"></span>
+                </div>
+                <!-- Gherkin content -->
+                <div class="gherkin-wrapper">{{ feature_html | safe }}</div>
+            </div>
+        </main>
+        <!-- Output panel -->
+        <aside class="output-panel">
+            <div class="output-header">
+                <h3>Test Output</h3>
+                <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
+            </div>
+            <div class="output-content" id="output-content">
+                <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
+            </div>
+        </aside>
+    </div>
+    <script>
+// Store current feature path and run ID
+let currentFeaturePath = '{{ feature_path }}';
+let currentRunId = null;
+let pollInterval = null;
+
+// Toggle scenario collapsed/expanded
+function toggleScenario(element) {
+    const scenario = element.closest('.gherkin-scenario');
+    if (!scenario) return;
+
+    scenario.classList.toggle('collapsed');
+    const icon = element.querySelector('.collapse-icon');
+    if (icon) {
+        icon.textContent = scenario.classList.contains('collapsed') ? '▶' : '▼';
+    }
+}
+
+// Expand all scenarios
+function expandAllScenarios() {
+    document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+        scenario.classList.remove('collapsed');
+        const icon = scenario.querySelector('.collapse-icon');
+        if (icon) icon.textContent = '▼';
+    });
+}
+
+// Collapse all scenarios
+function collapseAllScenarios() {
+    document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+        scenario.classList.add('collapsed');
+        const icon = scenario.querySelector('.collapse-icon');
+        if (icon) icon.textContent = '▶';
+    });
+}
+
+// Run a single scenario
+async function runScenario(scenarioIndex) {
+    const outputContent = document.getElementById('output-content');
+    outputContent.innerHTML = '<div class="output-running">Running scenario...</div>';
+
+    try {
+        const response = await fetch('/demo/feature/run-scenario', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                feature_path: currentFeaturePath,
+                scenario_index: parseInt(scenarioIndex)
+            })
+        });
+
+        const data = await response.json();
+        currentRunId = data.run_id;
+
+        // Start polling for output
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollForOutput, 500);
+
+    } catch (error) {
+        outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
+    }
+}
+
+// Filter output to show only relevant parts
+function filterOutput(output) {
+    if (!output) return '';
+
+    const lines = output.split('\n');
+    let startIndex = -1;
+
+    // Find the first line that contains a step definition (e.g., "steps.py:50")
+    // This marks the start of actual test execution
+    for (let i = 0; i < lines.length; i++) {
+        // Look for lines that contain the pattern: .py: followed by a number
+        // This matches lines like: "Given de datum is... # steps.py:50"
+        if (/\.py:\d+/.test(lines[i])) {
+            console.log('Found start line at index', i, ':', lines[i]);
+            startIndex = i;
+            break;
+        }
+    }
+
+    // If we found the marker, return from that point
+    if (startIndex >= 0) {
+        const filtered = lines.slice(startIndex).join('\n');
+        console.log('Filtered output from line', startIndex, 'length:', filtered.length);
+        return filtered;
+    }
+
+    // Otherwise return the full output
+    console.log('No filter marker found, returning full output');
+    return output;
+}
+
+// Poll for test output
+async function pollForOutput() {
+    if (!currentRunId) return;
+
+    try {
+        const response = await fetch(`/demo/feature/run-status/${currentRunId}`);
+        const data = await response.json();
+
+        const outputContent = document.getElementById('output-content');
+        const filteredOutput = filterOutput(data.output);
+        outputContent.innerHTML = `<pre class="output-text">${filteredOutput}</pre>`;
+
+        // Auto-scroll to bottom
+        outputContent.scrollTop = outputContent.scrollHeight;
+
+        // Update status
+        const statusEl = document.getElementById('scenario-status');
+        if (data.status === 'completed') {
+            statusEl.textContent = '✅ Geslaagd';
+            statusEl.className = 'scenario-status passed';
+            clearInterval(pollInterval);
+        } else if (data.status === 'failed') {
+            statusEl.textContent = '❌ Mislukt';
+            statusEl.className = 'scenario-status failed';
+            clearInterval(pollInterval);
+        } else {
+            statusEl.textContent = '⏳ Bezig...';
+            statusEl.className = 'scenario-status running';
+        }
+
+    } catch (error) {
+        console.error('Error polling output:', error);
+        clearInterval(pollInterval);
+    }
+}
+
+// Run all scenarios
+async function runAllScenarios() {
+    const outputContent = document.getElementById('output-content');
+    outputContent.innerHTML = '<div class="output-running">Running all scenarios...</div>';
+
+    try {
+        const response = await fetch('/demo/run-feature', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                feature_path: currentFeaturePath
+            })
+        });
+
+        const data = await response.json();
+        currentRunId = data.run_id;
+
+        // Start polling for output
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollForOutput, 500);
+
+    } catch (error) {
+        outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
+    }
+}
+
+// Clear output
+function clearOutput() {
+    document.getElementById('output-content').innerHTML =
+        '<div class="output-placeholder">Run a scenario to see output here...</div>';
+    document.getElementById('scenario-status').textContent = '';
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+    }
+}
+    </script>
+{% endblock %}

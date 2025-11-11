@@ -4,10 +4,10 @@ import (
 	"context"
 
 	eh "github.com/looplab/eventhorizon"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 )
 
-// LoggingMiddleware is a tiny command handle middleware for logging.
+// LoggingMiddleware is a tiny command handle middleware for logger.
 func LoggingMiddleware(logr logger.Logger) func(h eh.CommandHandler) eh.CommandHandler {
 	return func(h eh.CommandHandler) eh.CommandHandler {
 		return eh.CommandHandlerFunc(func(ctx context.Context, cmd eh.Command) error {

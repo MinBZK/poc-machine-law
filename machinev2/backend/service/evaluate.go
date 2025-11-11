@@ -15,12 +15,7 @@ func (service *Service) Evaluate(ctx context.Context, evaluate model.Evaluate) (
 		parameters = *evaluate.Parameters
 	}
 
-	var date string
-	if evaluate.Date != nil {
-		date = evaluate.Date.Format("2006-01-02")
-	}
-
-	var input map[string]map[string]any
+	var input map[string]any
 	if evaluate.Input != nil {
 		input = *evaluate.Input
 	}
@@ -35,7 +30,7 @@ func (service *Service) Evaluate(ctx context.Context, evaluate model.Evaluate) (
 		approved = *evaluate.Approved
 	}
 
-	result, err := service.service.Evaluate(ctx, evaluate.Service, evaluate.Law, parameters, date, input, output, approved)
+	result, err := service.service.Evaluate(ctx, evaluate.Service, evaluate.Law, parameters, evaluate.ReferenceDate, evaluate.EffectiveDate, input, output, approved)
 	if err != nil {
 		return model.EvaluateResponse{}, fmt.Errorf("evaluate: %w", err)
 	}

@@ -181,14 +181,9 @@ func (r *RuleResolver) GetDiscoverableServiceLaws(discoverableBy string) map[str
 }
 
 // FindRule finds the applicable rule for a given law and reference date
-func (r *RuleResolver) FindRule(law, referenceDate string, service string) (RuleSpec, error) {
+func (r *RuleResolver) FindRule(law string, referenceDate time.Time, service string) (RuleSpec, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
-	refDate, err := time.Parse("2006-01-02", referenceDate)
-	if err != nil {
-		return RuleSpec{}, fmt.Errorf("invalid reference date: %s", referenceDate)
-	}
 
 	// Filter rules for the given law
 	var lawRules []RuleSpec
@@ -207,13 +202,13 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 	// Find the most recent valid rule before the reference date
 	var validRules []RuleSpec
 	for _, rule := range lawRules {
-		if !rule.ValidFrom.After(refDate) {
+		if !rule.ValidFrom.After(referenceDate) {
 			validRules = append(validRules, rule)
 		}
 	}
 
 	if len(validRules) == 0 {
-		return RuleSpec{}, fmt.Errorf("no valid rules found for law %s at date %s", law, referenceDate)
+		return RuleSpec{}, fmt.Errorf("no valid rules found for law %s at date %s", law, referenceDate.Format(time.RFC3339))
 	}
 
 	// Return the most recently valid rule
@@ -228,7 +223,7 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 }
 
 // GetRuleSpec gets the rule specification as a map
-func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (RuleSpec, error) {
+func (r *RuleResolver) GetRuleSpec(law string, referenceDate time.Time, service string) (RuleSpec, error) {
 	rule, err := r.FindRule(law, referenceDate, service)
 	if err != nil {
 		return RuleSpec{}, err

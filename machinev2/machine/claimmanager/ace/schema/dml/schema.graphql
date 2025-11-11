@@ -1,0 +1,1414 @@
+#
+type Bsn {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID!
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BsnRoles
+}
+
+#
+input BeweringProposedAnnotationArgs {
+  #
+  proposed: [proposedFilter]
+}
+
+#
+union AnnotationRole =
+  | AnnotationExpired
+  | AnnotationValidFrom
+  | AnnotationValidUntil
+  | BeweringOriginal
+  | BeweringProposed
+  | BeweringReferentie
+
+#
+type AnnotationValidUntilRoles {
+  #
+  _claim: ID
+
+  #
+  until: DateTime
+}
+
+#
+type RejectedRoles {
+  #
+  Bewering: Bewering
+
+  #
+  rejectedAt: String
+
+  #
+  rejectedBy: String
+
+  #
+  rejectedReason: String
+}
+
+#
+type Mutation {
+  #
+  addAnnotationExpired(TransactionID: ID, _claim: ID): ID
+
+  #
+  addAnnotationValidFrom(TransactionID: ID, _claim: ID, from: DateTime): ID
+
+  #
+  addAnnotationValidUntil(TransactionID: ID, until: DateTime, _claim: ID): ID
+
+  #
+  addBewering(
+    #
+    key: String
+
+    #
+    law: String
+
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+
+    #
+    reason: String
+
+    #
+    TransactionID: ID
+  ): ID!
+
+  #
+  addBeweringCase(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+
+    #
+    caseID: ID
+  ): ID
+
+  #
+  addBeweringEvidencePath(
+    #
+    TransactionID: ID
+
+    #
+    evidencePath: String
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+  ): ID
+
+  #
+  addBeweringNieuweWaarde(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+
+    #
+    waarde: String
+  ): ID
+
+  #
+  addBeweringOriginal(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+
+    #
+    original: ID
+  ): ID
+
+  #
+  addBeweringProposed(
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+
+    #
+    proposed: ID
+
+    #
+    TransactionID: ID
+  ): ID
+
+  #
+  addBeweringReferentie(
+    #
+    original: ID
+
+    #
+    proposed: ID
+
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+  ): ID
+
+  #
+  addBeweringStatus(
+    #
+    TransactionID: ID
+
+    #
+    beweringStatus: String
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+  ): ID
+
+  #
+  addBsn(TransactionID: ID, bsn: String): ID
+
+  #
+  addHuurprijs(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+
+    #
+    amountEurocent: Int
+  ): ID
+
+  #
+  addHuurprijsProposed(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+
+    #
+    amountEurocent: Int
+  ): ID
+
+  #
+  addRejected(
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+
+    #
+    rejectedBy: String
+
+    #
+    rejectedReason: String
+
+    #
+    rejectedAt: String
+
+    #
+    TransactionID: ID
+  ): ID
+
+  #
+  addServicekosten(
+    #
+    TransactionID: ID
+
+    #
+    amountEurocent: Int
+
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+  ): ID
+
+  #
+  addServicekostenProposed(
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+
+    #
+    amountEurocent: Int
+
+    #
+    TransactionID: ID
+  ): ID
+
+  #
+  addSubsidiabeleServicekosten(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+
+    #
+    amountEurocent: Int
+  ): ID
+
+  #
+  addSubsidiabeleServicekostenProposed(
+    # `ID` of the referenced Existential claim
+    Bsn: ID
+
+    #
+    amountEurocent: Int
+
+    #
+    TransactionID: ID
+  ): ID
+
+  #
+  addVerified(
+    #
+    TransactionID: ID
+
+    # `ID` of the referenced Existential claim
+    Bewering: ID
+
+    #
+    verifiedBy: String
+
+    #
+    verifiedReason: String
+
+    #
+    verifiedAt: String
+  ): ID
+
+  #
+  beginTransaction: ID
+
+  #
+  commitTransaction(TransactionID: ID): Boolean
+
+  #
+  rollbackTransaction(TransactionID: ID): Boolean
+}
+
+#
+input AnnotationValidFromAnnotationArgs {
+  #
+  _claim: [_claimFilter]
+
+  #
+  from: [fromFilter]
+}
+
+#
+type AnnotationExpiredRoles {
+  #
+  _claim: ID
+}
+
+#
+type AnnotationValidFrom {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: AnnotationValidFromRoles
+}
+
+#
+type BeweringProposed {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringProposedRoles
+}
+
+#
+type BeweringReferentieRoles {
+  #
+  Bewering: Bewering
+
+  #
+  original: ID
+
+  #
+  proposed: ID
+}
+
+#
+type HuurprijsProposed {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: HuurprijsProposedRoles
+}
+
+#
+type BeweringCaseRoles {
+  #
+  Bewering: Bewering
+
+  #
+  caseID: ID
+}
+
+#
+enum StringOperation {
+  #
+  EQ
+
+  #
+  NE
+}
+
+#
+input BeweringReferentieAnnotationArgs {
+  #
+  original: [originalFilter]
+
+  #
+  proposed: [proposedFilter]
+}
+
+#
+type BeweringOriginalRoles {
+  #
+  Bewering: Bewering
+
+  #
+  original: ID
+}
+
+#
+type BeweringEvidencePathRoles {
+  #
+  Bewering: Bewering
+
+  #
+  evidencePath: String
+}
+
+#
+input RejectedRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  rejectedBy: [rejectedByFilter]
+
+  #
+  rejectedReason: [rejectedReasonFilter]
+
+  #
+  rejectedAt: [rejectedAtFilter]
+}
+
+#
+input rejectedByFilter {
+  #
+  value: String
+
+  #
+  operation: StringOperation
+}
+
+#
+input BeweringReferentieRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  original: [originalFilter]
+
+  #
+  proposed: [proposedFilter]
+}
+
+#
+input untilFilter {
+  #
+  operation: DateTimeOperation
+
+  #
+  value: DateTime
+}
+
+#
+enum IntegerOperation {
+  #
+  EQ
+
+  #
+  NE
+
+  #
+  GT
+
+  #
+  LT
+
+  #
+  GE
+
+  #
+  LE
+}
+
+#
+type ServicekostenProposed {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: ServicekostenProposedRoles
+}
+
+#
+type BeweringNieuweWaarde {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringNieuweWaardeRoles
+}
+
+#
+type BeweringEvidencePath {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringEvidencePathRoles
+}
+
+#
+input rejectedAtFilter {
+  #
+  value: String
+
+  #
+  operation: StringOperation
+}
+
+#
+input BeweringNieuweWaardeRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  waarde: [waardeFilter]
+}
+
+#
+input beweringStatusFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+enum UUIDOperation {
+  #
+  EQ
+
+  #
+  NE
+}
+
+#
+input AnnotationValidUntilAnnotationArgs {
+  #
+  _claim: [_claimFilter]
+
+  #
+  until: [untilFilter]
+}
+
+#
+type BeweringOriginal {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringOriginalRoles
+}
+
+#
+type SubsidiabeleServicekostenProposed {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: SubsidiabeleServicekostenProposedRoles
+}
+
+#
+type SubsidiabeleServicekostenProposedRoles {
+  #
+  Bsn: Bsn
+
+  #
+  amountEurocent: Int
+}
+
+#
+type Rejected {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: RejectedRoles
+}
+
+#
+type SubsidiabeleServicekosten {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: SubsidiabeleServicekostenRoles
+}
+
+#
+input BeweringRoleFilter {
+  #
+  law: [lawFilter]
+
+  #
+  Bsn: [BsnFilter]
+
+  #
+  reason: [reasonFilter]
+
+  #
+  key: [keyFilter]
+}
+
+#
+enum DateTimeOperation {
+  #
+  EQ
+
+  #
+  NE
+
+  #
+  GT
+
+  #
+  LT
+
+  #
+  GE
+
+  #
+  LE
+}
+
+# The `DateTime` scalar type represents a DateTime. The DateTime is serialized as an RFC 3339 quoted string
+scalar DateTime
+
+#
+input AnnotationExpiredRoleFilter {
+  #
+  _claim: [_claimFilter]
+}
+
+#
+input AnnotationValidFromRoleFilter {
+  #
+  _claim: [_claimFilter]
+
+  #
+  from: [fromFilter]
+}
+
+#
+input reasonFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+type BeweringNieuweWaardeRoles {
+  #
+  Bewering: Bewering
+
+  #
+  waarde: String
+}
+
+#
+input verifiedByFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+type Verified {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: VerifiedRoles
+}
+
+#
+type BsnRoles {
+  #
+  bsn: String
+}
+
+#
+input BsnFilter {
+  #
+  value: ID
+
+  #
+  operation: ClaimIDOperation
+}
+
+#
+input rejectedReasonFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+type Servicekosten {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: ServicekostenRoles
+}
+
+#
+input SubsidiabeleServicekostenRoleFilter {
+  #
+  Bsn: [BsnFilter]
+
+  #
+  amountEurocent: [amountEurocentFilter]
+}
+
+#
+type VerifiedRoles {
+  #
+  Bewering: Bewering
+
+  #
+  verifiedAt: String
+
+  #
+  verifiedBy: String
+
+  #
+  verifiedReason: String
+}
+
+#
+type Huurprijs {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: HuurprijsRoles
+}
+
+#
+input BeweringCaseRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  caseID: [caseIDFilter]
+}
+
+#
+input BeweringEvidencePathRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  evidencePath: [evidencePathFilter]
+}
+
+#
+input evidencePathFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+input BeweringOriginalRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  original: [originalFilter]
+}
+
+#
+input verifiedReasonFilter {
+  #
+  value: String
+
+  #
+  operation: StringOperation
+}
+
+#
+input HuurprijsRoleFilter {
+  #
+  Bsn: [BsnFilter]
+
+  #
+  amountEurocent: [amountEurocentFilter]
+}
+
+#
+input bsnFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+input AnnotationFilter {
+  #
+  AnnotationExpired: AnnotationExpiredAnnotationArgs
+
+  #
+  AnnotationValidFrom: AnnotationValidFromAnnotationArgs
+
+  #
+  BeweringReferentie: BeweringReferentieAnnotationArgs
+
+  #
+  AnnotationValidUntil: AnnotationValidUntilAnnotationArgs
+
+  #
+  BeweringProposed: BeweringProposedAnnotationArgs
+
+  #
+  BeweringOriginal: BeweringOriginalAnnotationArgs
+}
+
+#
+type BeweringReferentie {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringReferentieRoles
+}
+
+#
+input amountEurocentFilter {
+  #
+  operation: IntegerOperation
+
+  #
+  value: Int
+}
+
+#
+type SubsidiabeleServicekostenRoles {
+  #
+  Bsn: Bsn
+
+  #
+  amountEurocent: Int
+}
+
+#
+input keyFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+input HuurprijsProposedRoleFilter {
+  #
+  Bsn: [BsnFilter]
+
+  #
+  amountEurocent: [amountEurocentFilter]
+}
+
+#
+input verifiedAtFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+input _claimFilter {
+  #
+  value: ID
+
+  #
+  operation: ClaimIDOperation
+}
+
+#
+input fromFilter {
+  #
+  operation: DateTimeOperation
+
+  #
+  value: DateTime
+}
+
+#
+input ServicekostenProposedRoleFilter {
+  #
+  amountEurocent: [amountEurocentFilter]
+
+  #
+  Bsn: [BsnFilter]
+}
+
+#
+type ServicekostenProposedRoles {
+  #
+  Bsn: Bsn
+
+  #
+  amountEurocent: Int
+}
+
+#
+input waardeFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+input VerifiedRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  verifiedBy: [verifiedByFilter]
+
+  #
+  verifiedReason: [verifiedReasonFilter]
+
+  #
+  verifiedAt: [verifiedAtFilter]
+}
+
+#
+type HuurprijsRoles {
+  #
+  Bsn: Bsn
+
+  #
+  amountEurocent: Int
+}
+
+#
+input caseIDFilter {
+  #
+  value: ID
+
+  #
+  operation: UUIDOperation
+}
+
+#
+enum ClaimIDOperation {
+  #
+  EQ
+
+  #
+  NE
+}
+
+#
+input BeweringOriginalAnnotationArgs {
+  #
+  original: [originalFilter]
+}
+
+#
+input AnnotationExpiredAnnotationArgs {
+  #
+  _claim: [_claimFilter]
+}
+
+#
+type AnnotationValidFromRoles {
+  #
+  _claim: ID
+
+  #
+  from: DateTime
+}
+
+#
+type AnnotationValidUntil {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: AnnotationValidUntilRoles
+}
+
+#
+input lawFilter {
+  #
+  operation: StringOperation
+
+  #
+  value: String
+}
+
+#
+input BeweringProposedRoleFilter {
+  #
+  Bewering: [BeweringFilter]
+
+  #
+  proposed: [proposedFilter]
+}
+
+#
+type BeweringCase {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringCaseRoles
+}
+
+#
+type Query {
+  #
+  getClaimsAnnotationExpired(
+    TransactionID: ID
+    RoleFilter: AnnotationExpiredRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [AnnotationExpired]
+
+  #
+  getClaimsAnnotationValidFrom(
+    TransactionID: ID
+    RoleFilter: AnnotationValidFromRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [AnnotationValidFrom]
+
+  #
+  getClaimsAnnotationValidUntil(
+    TransactionID: ID
+    RoleFilter: AnnotationValidUntilRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [AnnotationValidUntil]
+
+  #
+  getClaimsBewering(
+    TransactionID: ID
+    RoleFilter: BeweringRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [Bewering]
+
+  #
+  getClaimsBeweringCase(
+    TransactionID: ID
+    RoleFilter: BeweringCaseRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringCase]
+
+  #
+  getClaimsBeweringEvidencePath(
+    TransactionID: ID
+    RoleFilter: BeweringEvidencePathRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringEvidencePath]
+
+  #
+  getClaimsBeweringNieuweWaarde(
+    TransactionID: ID
+    RoleFilter: BeweringNieuweWaardeRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringNieuweWaarde]
+
+  #
+  getClaimsBeweringOriginal(
+    TransactionID: ID
+    RoleFilter: BeweringOriginalRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringOriginal]
+
+  #
+  getClaimsBeweringProposed(
+    TransactionID: ID
+    RoleFilter: BeweringProposedRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringProposed]
+
+  #
+  getClaimsBeweringReferentie(
+    TransactionID: ID
+    RoleFilter: BeweringReferentieRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringReferentie]
+
+  #
+  getClaimsBeweringStatus(
+    TransactionID: ID
+    RoleFilter: BeweringStatusRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [BeweringStatus]
+
+  #
+  getClaimsBsn(
+    RoleFilter: BsnRoleFilter
+    AnnotationFilter: AnnotationFilter
+    TransactionID: ID
+  ): [Bsn]
+
+  #
+  getClaimsHuurprijs(
+    TransactionID: ID
+    RoleFilter: HuurprijsRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [Huurprijs]
+
+  #
+  getClaimsHuurprijsProposed(
+    TransactionID: ID
+    RoleFilter: HuurprijsProposedRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [HuurprijsProposed]
+
+  #
+  getClaimsRejected(
+    TransactionID: ID
+    RoleFilter: RejectedRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [Rejected]
+
+  #
+  getClaimsServicekosten(
+    TransactionID: ID
+    RoleFilter: ServicekostenRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [Servicekosten]
+
+  #
+  getClaimsServicekostenProposed(
+    TransactionID: ID
+    RoleFilter: ServicekostenProposedRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [ServicekostenProposed]
+
+  #
+  getClaimsSubsidiabeleServicekosten(
+    TransactionID: ID
+    RoleFilter: SubsidiabeleServicekostenRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [SubsidiabeleServicekosten]
+
+  #
+  getClaimsSubsidiabeleServicekostenProposed(
+    RoleFilter: SubsidiabeleServicekostenProposedRoleFilter
+    AnnotationFilter: AnnotationFilter
+    TransactionID: ID
+  ): [SubsidiabeleServicekostenProposed]
+
+  #
+  getClaimsVerified(
+    TransactionID: ID
+    RoleFilter: VerifiedRoleFilter
+    AnnotationFilter: AnnotationFilter
+  ): [Verified]
+}
+
+#
+type AnnotationExpired {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: AnnotationExpiredRoles
+}
+
+#
+type BeweringProposedRoles {
+  #
+  Bewering: Bewering
+
+  #
+  proposed: ID
+}
+
+#
+input ServicekostenRoleFilter {
+  #
+  amountEurocent: [amountEurocentFilter]
+
+  #
+  Bsn: [BsnFilter]
+}
+
+#
+type ServicekostenRoles {
+  #
+  Bsn: Bsn
+
+  #
+  amountEurocent: Int
+}
+
+#
+input AnnotationValidUntilRoleFilter {
+  #
+  until: [untilFilter]
+
+  #
+  _claim: [_claimFilter]
+}
+
+#
+type BeweringStatus {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringStatusRoles
+}
+
+#
+input SubsidiabeleServicekostenProposedRoleFilter {
+  #
+  amountEurocent: [amountEurocentFilter]
+
+  #
+  Bsn: [BsnFilter]
+}
+
+#
+type BeweringStatusRoles {
+  #
+  Bewering: Bewering
+
+  #
+  beweringStatus: String
+}
+
+#
+input BeweringFilter {
+  #
+  operation: ClaimIDOperation
+
+  #
+  value: ID
+}
+
+#
+input proposedFilter {
+  #
+  value: ID
+
+  #
+  operation: ClaimIDOperation
+}
+
+#
+type Bewering {
+  #
+  annotations: [AnnotationRole]
+
+  #
+  id: ID
+
+  #
+  registeredAt: DateTime
+
+  #
+  roles: BeweringRoles
+}
+
+#
+type HuurprijsProposedRoles {
+  #
+  Bsn: Bsn
+
+  #
+  amountEurocent: Int
+}
+
+#
+input BeweringStatusRoleFilter {
+  #
+  beweringStatus: [beweringStatusFilter]
+
+  #
+  Bewering: [BeweringFilter]
+}
+
+#
+input BsnRoleFilter {
+  #
+  bsn: [bsnFilter]
+}
+
+#
+input originalFilter {
+  #
+  operation: ClaimIDOperation
+
+  #
+  value: ID
+}
+
+#
+type BeweringRoles {
+  #
+  Bsn: Bsn
+
+  #
+  key: String
+
+  #
+  law: String
+
+  #
+  reason: String
+}

@@ -1,0 +1,66 @@
+<div class="demo-layout three-panel">
+    <!-- Toggle button when sidebar is collapsed -->
+    <button class="sidebar-toggle-collapsed"
+            id="features-sidebar-toggle-collapsed">☰</button>
+    <!-- Sidebar with feature list -->
+    <aside class="demo-sidebar collapsed" id="features-sidebar">
+        <button class="sidebar-toggle" style="display: none">−</button>
+        <div class="sidebar-header">
+            <h2>Feature Bestanden</h2>
+            <input type="text"
+                   id="feature-search"
+                   class="law-search"
+                   placeholder="Zoek features...">
+        </div>
+        <div class="law-list" id="feature-list">
+            {% for directory, features in grouped_features.items() %}
+                <div class="law-directory">
+                    <div class="directory-header" onclick="toggleDirectory(this)">
+                        <span class="directory-icon">▼</span>
+                        <span class="directory-name">{{ directory }}</span>
+                        <span class="directory-count">({{ features|length }})</span>
+                    </div>
+                    <div class="directory-laws">
+                        {% for feature in features %}
+                            <a href="/demo/feature/{{ feature.path }}"
+                               class="law-item {% if feature.path in feature_path %}active{% endif %}">
+                                <div class="law-item-header">
+                                    <span class="law-name">{{ feature.name }}</span>
+                                    <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </aside>
+    <!-- Main content area with Gherkin viewer -->
+    <main class="demo-content feature-content">
+        <div class="feature-viewer">
+            <!-- Toolbar -->
+            <div class="feature-toolbar">
+                <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
+                <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
+                <span class="scenario-status" id="scenario-status"></span>
+            </div>
+            <!-- Gherkin content -->
+            <div class="gherkin-wrapper">{{ feature_html | safe }}</div>
+        </div>
+    </main>
+    <!-- Output panel -->
+    <aside class="output-panel">
+        <div class="output-header">
+            <h3>Test Output</h3>
+            <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
+        </div>
+        <div class="output-content" id="output-content">
+            <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
+        </div>
+    </aside>
+</div>
+<script>
+// Set the current feature path for this loaded content
+// The global functions are defined in workspace.html
+currentFeaturePath = '{{ feature_path }}';
+</script>

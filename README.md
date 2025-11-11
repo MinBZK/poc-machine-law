@@ -98,47 +98,47 @@ Vooralsnog zijn deze wetten geïmplementeerd in `machine law` (met behulp van ee
 
 ### Zorgtoeslag
 
-- [Hoofdwet](law/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml) - Berekening zorgtoeslag
-- [Verzekeringsstatus](law/zvw/RVZ-2024-01-01.yaml) - Bepaling verzekeringsstatus
+- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml) - Berekening zorgtoeslag
+- [Verzekeringsstatus](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/zvw/RVZ-2024-01-01.yaml) - Bepaling verzekeringsstatus
 
 ### AOW
 
-- [Hoofdwet](law/algemene_ouderdomswet/SVB-2024-01-01.yaml) - Berekening AOW-uitkering
-- [Leeftijdsbepaling](law/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml) - Bepaling AOW-leeftijd
+- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/algemene_ouderdomswet/SVB-2024-01-01.yaml) - Berekening AOW-uitkering
+- [Leeftijdsbepaling](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml) - Bepaling AOW-leeftijd
 
 ### Huurtoeslag
 
-- [Hoofdwet](law/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml) - Berekening huurtoeslag
+- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml) - Berekening huurtoeslag
 
 ### Participatiewet (Bijstand)
 
-- [Landelijke regels](law/participatiewet/bijstand/SZW-2023-01-01.yaml) - Beoordeling bijstandsrecht (SZW)
-- [Gemeente Amsterdam](law/participatiewet/bijstand/gemeenten/GEMEENTE_AMSTERDAM-2023-01-01.yaml) - Lokale bijstandsregels
+- [Landelijke regels](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/participatiewet/bijstand/SZW-2023-01-01.yaml) - Beoordeling bijstandsrecht (SZW)
+- [Gemeente Amsterdam](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/participatiewet/bijstand/gemeenten/GEMEENTE_AMSTERDAM-2023-01-01.yaml) - Lokale bijstandsregels
 
 ### Bestuursrecht (AWB)
 
-- [Bezwaarprocedure](law/awb/bezwaar/JenV-2024-01-01.yaml) - Regels voor bezwaar
-- [Beroepsprocedure](law/awb/beroep/JenV-2024-01-01.yaml) - Regels voor beroep
+- [Bezwaarprocedure](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/awb/bezwaar/JenV-2024-01-01.yaml) - Regels voor bezwaar
+- [Beroepsprocedure](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/awb/beroep/JenV-2024-01-01.yaml) - Regels voor beroep
 
 ### Kieswet
 
-- [Hoofdwet](law/kieswet/KIESRAAD-2024-01-01.yaml) - Bepaling kiesrecht
+- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/kieswet/KIESRAAD-2024-01-01.yaml) - Bepaling kiesrecht
 
 ### Overige Wetten
 
-- [Handelsregisterwet](law/handelsregisterwet/KVK-2024-01-01.yaml) - KVK-registratie
-- [Vreemdelingenwet](law/vreemdelingenwet/IND-2024-01-01.yaml) - Verblijfsvergunningen
-- [Penitentiaire Beginselenwet](law/penitentiaire_beginselenwet/DJI-2022-01-01.yaml) - Detentieregels
-- [Wet Forensische Zorg](law/wet_forensische_zorg/DJI-2022-01-01.yaml) - Forensische zorg
-- [Wet Studiefinanciering](law/wet_studiefinanciering/DUO-2024-01-01.yaml) - Studiefinanciering
-- [Wetboek van Strafrecht](law/wetboek_van_strafrecht/JUSTID-2023-01-01.yaml) - Strafbepalingen
+- [Handelsregisterwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/handelsregisterwet/KVK-2024-01-01.yaml) - KVK-registratie
+- [Vreemdelingenwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/vreemdelingenwet/IND-2024-01-01.yaml) - Verblijfsvergunningen
+- [Penitentiaire Beginselenwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/penitentiaire_beginselenwet/DJI-2022-01-01.yaml) - Detentieregels
+- [Wet Forensische Zorg](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_forensische_zorg/DJI-2022-01-01.yaml) - Forensische zorg
+- [Wet Studiefinanciering](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_studiefinanciering/DUO-2024-01-01.yaml) - Studiefinanciering
+- [Wetboek van Strafrecht](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wetboek_van_strafrecht/JUSTID-2023-01-01.yaml) - Strafbepalingen
 
 ### Ondersteunende Wetten
 
-- [Wet BRP](law/wet_brp/RvIG-2020-01-01.yaml) - Persoonsgegevens
-- [Wet Inkomstenbelasting](law/wet_inkomstenbelasting/UWV-2020-01-01.yaml) - Toetsingsinkomen
-- [SUWI](law/wet_structuur_uitvoeringsorganisatie_werk_en_inkomen/UWV-2024-01-01.yaml) - Verzekerde jaren
-- [CBS](law/wet_op_het_centraal_bureau_voor_de_statistiek/CBS-2024-01-01.yaml) - Levensverwachting
+- [Wet BRP](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_brp/RvIG-2020-01-01.yaml) - Persoonsgegevens
+- [Wet Inkomstenbelasting](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_inkomstenbelasting/UWV-2020-01-01.yaml) - Toetsingsinkomen
+- [SUWI](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_structuur_uitvoeringsorganisatie_werk_en_inkomen/UWV-2024-01-01.yaml) - Verzekerde jaren
+- [CBS](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_op_het_centraal_bureau_voor_de_statistiek/CBS-2024-01-01.yaml) - Levensverwachting
 
 ## 🚀 Aan de slag
 
@@ -223,7 +223,7 @@ De web interface is geconfigureerd om standaard de Go engine te gebruiken (zie `
 
 ```bash
 cd machinev2/backend
-APP_BACKEND_LISTEN_ADDRESS=:8081 APP_INPUT_FILE=./cmd/serve_input.yaml APP_DEBUG=false go run . serve
+APP_BACKEND_LISTEN_ADDRESS=:8081 APP_INPUT_FILE=../../data/profiles.yaml APP_DEBUG=false go run . serve
 ```
 
 De Go server is vervolgens beschikbaar op port 8081. Als je de Python engine wilt gebruiken in plaats van de Go engine, pas dan `web/config/config.yaml` aan door de `default: true` regel te verplaatsen naar de Python engine.

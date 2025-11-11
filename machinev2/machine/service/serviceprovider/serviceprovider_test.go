@@ -8,8 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager/manager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/inmemory"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -24,10 +26,14 @@ func TestService(t *testing.T) {
 	// Set up context
 	ctx := context.Background()
 
+	caseManager := manager.New(logger)
+	claimManager := inmemory.New(logger, caseManager)
+
 	// Initialize services with current date
-	currentDate := time.Now()
-	services, err := serviceprovider.NewServices(currentDate, serviceprovider.WithRuleServiceInMemory())
+	services, err := serviceprovider.New(logger, time.Now(), caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
 	require.NoError(t, err)
+
+	caseManager.SetService(services)
 
 	logger.Infof("Direct rules engine evaluation example:")
 
@@ -113,7 +119,8 @@ func TestService(t *testing.T) {
 		"GEMEENTE_AMSTERDAM",
 		"participatiewet/bijstand",
 		evalParams,
-		"",
+		nil,
+		nil,
 		nil,
 		"",
 		true,
@@ -156,13 +163,18 @@ func TestService(t *testing.T) {
 
 func BenchmarkService(b *testing.B) {
 	// SETUP
+	logger := logger.New("main", os.Stdout, logrus.DebugLevel)
+
+	caseManager := manager.New(logger)
+	claimManager := inmemory.New(logger, caseManager)
 
 	// Initialize services with current date
-	currentDate := time.Now()
-	services, err := serviceprovider.NewServices(currentDate, serviceprovider.WithRuleServiceInMemory())
+	services, err := serviceprovider.New(logger, time.Now(), caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
 	if err != nil {
 		b.Errorf("new services: %v", err)
 	}
+
+	caseManager.SetService(services)
 
 	evalParams := map[string]any{
 		"BSN": "999993653",
@@ -251,7 +263,8 @@ func BenchmarkService(b *testing.B) {
 			"GEMEENTE_AMSTERDAM",
 			"participatiewet/bijstand",
 			evalParams,
-			"",
+			nil,
+			nil,
 			nil,
 			"",
 			true,

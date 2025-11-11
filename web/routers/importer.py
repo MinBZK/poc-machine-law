@@ -10,6 +10,7 @@ import jsonschema
 import nest_asyncio
 import yaml
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.responses import JSONResponse
 from jsonschema import validate
 from langchain_anthropic import ChatAnthropic
 from langchain_community.document_loaders import WebBaseLoader
@@ -37,6 +38,7 @@ is_production = os.getenv("IS_PRODUCTION", "false").lower() == "true"
 
 router = APIRouter(prefix="/importer", tags=["importer"])
 
+# Initialize model without API key initially - will be set dynamically when needed
 model = ChatAnthropic(
     model="claude-3-7-sonnet-latest",
     temperature=0,
@@ -44,8 +46,11 @@ model = ChatAnthropic(
     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
 )
 
-# Retriever to find the specified law online
-retriever = TavilySearchAPIRetriever(k=1, include_domains=["wetten.overheid.nl"])  # Limit to 1 result
+# Initialize retriever without API key initially - will be set dynamically when needed
+retriever = TavilySearchAPIRetriever(
+    k=1,
+    include_domains=["wetten.overheid.nl"],
+)  # Limit to 1 result
 
 
 class State(TypedDict):
@@ -170,7 +175,10 @@ def check_law_input(state: State, config: dict) -> dict:
         return {"should_retry": True, "law": resp}
 
     # If the API keys are unset or empty, return an error message
-    if (not state.get("anthropic_api_key")) or (not state.get("tavily_api_key")):
+    anthropic_key = state.get("anthropic_api_key") or os.getenv("ANTHROPIC_API_KEY")
+    tavily_key = state.get("tavily_api_key") or os.getenv("TAVILY_API_KEY")
+
+    if (not anthropic_key) or (not tavily_key):
         loop.run_until_complete(
             manager.send_message(
                 WebSocketMessage(
@@ -525,6 +533,17 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
+@router.get("/api-keys-status")
+async def get_api_keys_status():
+    """Check which API keys are available via environment variables."""
+    return JSONResponse(
+        {
+            "anthropic_available": bool(os.getenv("ANTHROPIC_API_KEY")),
+            "tavily_available": bool(os.getenv("TAVILY_API_KEY")),
+        }
+    )
+
+
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     thread_id = await manager.connect(websocket)
@@ -536,14 +555,18 @@ async def websocket_endpoint(websocket: WebSocket):
             # print("message received:", user_input)
 
             if user_input.get("type") == "keys":
-                # Store the keys in the state
-                graph.update_state(
-                    {"configurable": {"thread_id": thread_id}},
-                    {
-                        "anthropic_api_key": user_input["anthropicApiKey"],
-                        "tavily_api_key": user_input["tavilyApiKey"],
-                    },
-                )
+                # Store the keys in the state (only if provided)
+                state_update = {}
+                if "anthropicApiKey" in user_input and user_input["anthropicApiKey"]:
+                    state_update["anthropic_api_key"] = user_input["anthropicApiKey"]
+                if "tavilyApiKey" in user_input and user_input["tavilyApiKey"]:
+                    state_update["tavily_api_key"] = user_input["tavilyApiKey"]
+
+                if state_update:
+                    graph.update_state(
+                        {"configurable": {"thread_id": thread_id}},
+                        state_update,
+                    )
 
             elif user_input.get("type") == "text":
                 contains_yaml = False
