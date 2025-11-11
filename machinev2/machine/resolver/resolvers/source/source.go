@@ -283,7 +283,9 @@ func (l *PropertySpecSourceResolver) resolveFromSourceReferenceTable(ctx context
 			},
 		}), nil
 	} else if sourceRef.Fields != nil {
-		data := make([]map[string]any, 1)
+		data := []map[string]any{
+			{},
+		}
 
 		for _, field := range *sourceRef.Fields {
 			resolved, ok := l.externalClaimResolver.Resolve(ctx, key, sourceRef.Table, field, filters)
