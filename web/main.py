@@ -103,6 +103,7 @@ app.mount(
 async def root(
     request: Request,
     bsn: str = "100000001",
+    date: str = None,
     services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -140,6 +141,7 @@ async def root(
             "total_income_widget_enabled": is_total_income_widget_enabled(),
             "accepted_claims": accepted_claims,
             "now": datetime.now(),
+            "effective_date": date,  # Pass the date parameter to the template
         },
     )
 

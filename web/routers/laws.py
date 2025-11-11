@@ -39,6 +39,7 @@ def evaluate_law(
     machine_service: EngineInterface,
     approved: bool = True,
     claim_manager: ClaimManagerInterface | None = None,
+    effective_date: str | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
     """Evaluate a law for a given BSN"""
 
@@ -69,6 +70,7 @@ def evaluate_law(
         law=law,
         parameters=parameters,
         reference_date=TODAY,
+        effective_date=effective_date,
         approved=approved,
         overwrite_input=overwrite_input,
     )
@@ -96,6 +98,7 @@ async def execute_law(
     service: str,
     law: str,
     bsn: str,
+    date: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
@@ -107,7 +110,7 @@ async def execute_law(
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager
+            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager, effective_date=date
         )
 
     except Exception as e:
@@ -167,7 +170,7 @@ async def submit_case(
     law = unquote(law)
 
     law, result, parameters = evaluate_law(
-        bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+        bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, effective_date=request.query_params.get('date')
     )
 
     case_id = case_manager.submit_case(
@@ -222,7 +225,7 @@ async def objection_case(
         reason=reason,
     )
 
-    law, result, parameters = evaluate_law(bsn, law, service, machine_service, claim_manager=claim_manager)
+    law, result, parameters = evaluate_law(bsn, law, service, machine_service, claim_manager=claim_manager, effective_date=request.query_params.get('date'))
 
     template_path = get_tile_template(service, law)
 
@@ -273,7 +276,7 @@ async def explanation(
         print(f"Explanation requested for {service}, {law}, with provider: {provider}")
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, effective_date=request.query_params.get('date')
         )
 
         # Convert path and rule_spec to JSON strings
@@ -376,7 +379,7 @@ async def application_panel(
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager
+            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, effective_date=request.query_params.get('date')
         )
 
         value_tree = machine_service.extract_value_tree(result.path)

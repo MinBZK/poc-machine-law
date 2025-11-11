@@ -112,7 +112,7 @@
 </section>
 <!-- Total Income Widget -->
 {% if total_income_widget_enabled %}
-    <div hx-get="/dashboard/total-net-income?bsn={{ bsn }}"
+    <div hx-get="/dashboard/total-net-income?bsn={{ bsn }}{% if request.query_params.get('date') %}&date={{ request.query_params.get('date') }}{% endif %}"
          hx-trigger="load"
          hx-swap="outerHTML">
         <div class="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-100 overflow-hidden">
@@ -340,7 +340,7 @@
     <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
         {% for law in discoverable_service_laws %}
-            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}"
+            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}{% if request.query_params.get('date') %}&date={{ request.query_params.get('date') }}{% endif %}"
                  hx-trigger="load"
                  hx-swap="outerHTML"
                  class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
