@@ -170,7 +170,13 @@ async def submit_case(
     law = unquote(law)
 
     law, result, parameters = evaluate_law(
-        bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, effective_date=request.query_params.get('date')
+        bsn,
+        law,
+        service,
+        machine_service,
+        approved=approved,
+        claim_manager=claim_manager,
+        effective_date=request.query_params.get("date"),
     )
 
     case_id = case_manager.submit_case(
@@ -225,7 +231,9 @@ async def objection_case(
         reason=reason,
     )
 
-    law, result, parameters = evaluate_law(bsn, law, service, machine_service, claim_manager=claim_manager, effective_date=request.query_params.get('date'))
+    law, result, parameters = evaluate_law(
+        bsn, law, service, machine_service, claim_manager=claim_manager, effective_date=request.query_params.get("date")
+    )
 
     template_path = get_tile_template(service, law)
 
@@ -276,7 +284,13 @@ async def explanation(
         print(f"Explanation requested for {service}, {law}, with provider: {provider}")
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, effective_date=request.query_params.get('date')
+            bsn,
+            law,
+            service,
+            machine_service,
+            approved=approved,
+            claim_manager=claim_manager,
+            effective_date=request.query_params.get("date"),
         )
 
         # Convert path and rule_spec to JSON strings
@@ -379,7 +393,13 @@ async def application_panel(
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=approved, claim_manager=claim_manager, effective_date=request.query_params.get('date')
+            bsn,
+            law,
+            service,
+            machine_service,
+            approved=approved,
+            claim_manager=claim_manager,
+            effective_date=request.query_params.get("date"),
         )
 
         value_tree = machine_service.extract_value_tree(result.path)

@@ -151,9 +151,11 @@ def is_change_wizard_enabled() -> bool:
     """Check if the change wizard feature is enabled."""
     return FeatureFlags.is_enabled("CHANGE_WIZARD")
 
+
 def is_effective_date_adjustment_enabled() -> bool:
     """Check if the adjustable effective date feature is enabled."""
     return FeatureFlags.is_enabled("ADJUSTABLE_EFFECTIVE_DATE")
+
 
 def is_total_income_widget_enabled() -> bool:
     """Check if the total income widget is enabled."""

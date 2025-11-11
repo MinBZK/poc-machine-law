@@ -102,21 +102,21 @@
         </div>
         <div class="flex items-center space-x-2">
             <span class="text-sm text-gray-600">Datum:
-              {% if adjustable_effective_date_enabled %}
-                <input id="date-input"
-                  class="bg-white px-2 py-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  type="date"
-                  value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
-              {% else %}
-                {{ effective_date.strftime("%-d %B %Y") }}
-              {% endif %}
+                {% if adjustable_effective_date_enabled %}
+                    <input id="date-input"
+                           class="bg-white px-2 py-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           type="date"
+                           value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
+                {% else %}
+                    {{ effective_date.strftime("%-d %B %Y") }}
+                {% endif %}
             </span>
         </div>
     </div>
 </section>
 <!-- Total Income Widget -->
 {% if total_income_widget_enabled %}
-    <div hx-get="/dashboard/total-net-income?bsn={{ bsn }}{% if request.query_params.get('date') %}&date={{ request.query_params.get('date') }}{% endif %}"
+    <div hx-get="/dashboard/total-net-income?bsn={{ bsn }}{% if request.query_params.get('date') %}&date={{ request.query_params.get("date") }}{% endif %}"
          hx-trigger="load"
          hx-swap="outerHTML">
         <div class="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-100 overflow-hidden">
@@ -344,7 +344,7 @@
     <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
         {% for law in discoverable_service_laws %}
-            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}{% if request.query_params.get('date') %}&date={{ request.query_params.get('date') }}{% endif %}"
+            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}{% if request.query_params.get('date') %}&date={{ request.query_params.get("date") }}{% endif %}"
                  hx-trigger="load"
                  hx-swap="outerHTML"
                  class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
