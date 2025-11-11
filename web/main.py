@@ -21,6 +21,7 @@ from web.feature_flags import (
     is_change_wizard_enabled,
     is_chat_enabled,
     is_total_income_widget_enabled,
+    is_effective_date_adjustment_enabled,
     is_wallet_enabled,
 )
 from web.routers import admin, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet
@@ -127,6 +128,11 @@ async def root(
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
 
+    try:
+        effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+    except ValueError:
+        effective_date = datetime.now()
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -138,10 +144,11 @@ async def root(
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
+            "adjustable_effective_date_enabled": is_effective_date_adjustment_enabled(),
             "total_income_widget_enabled": is_total_income_widget_enabled(),
             "accepted_claims": accepted_claims,
             "now": datetime.now(),
-            "effective_date": date,  # Pass the date parameter to the template
+            "effective_date": effective_date,  # Pass the parsed date parameter to the template
         },
     )
 

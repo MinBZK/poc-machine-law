@@ -102,10 +102,14 @@
         </div>
         <div class="flex items-center space-x-2">
             <span class="text-sm text-gray-600">Datum:
-              <input id="date-input"
-                class="bg-white px-2 py-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                type="date"
-                value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
+              {% if adjustable_effective_date_enabled %}
+                <input id="date-input"
+                  class="bg-white px-2 py-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  type="date"
+                  value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
+              {% else %}
+                {{ effective_date.strftime("%-d %B %Y") }}
+              {% endif %}
             </span>
         </div>
     </div>
