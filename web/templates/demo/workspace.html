@@ -34,6 +34,11 @@
                     <span class="tab-label">Graaf analyse</span>
                 </div>
                 <div class="tab"
+                     :class="{ 'active': activeTab === 'hierarchy' }"
+                     @click="switchTab('hierarchy')">
+                    <span class="tab-label">Hiërarchie</span>
+                </div>
+                <div class="tab"
                      :class="{ 'active': activeTab === 'simulatie' }"
                      @click="switchTab('simulatie')">
                     <span class="tab-label">Simulatie</span>
@@ -98,6 +103,15 @@
                             frameborder="0"
                             class="tab-iframe"
                             title="Graph Analysis"></iframe>
+                </div>
+                <!-- Hierarchy Tab (IFrame) -->
+                <div class="tab-content iframe-content"
+                     x-show="activeTab === 'hierarchy'"
+                     x-cloak>
+                    <iframe src="/analysis/hierarchy/?demo=true"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Law Hierarchy"></iframe>
                 </div>
                 <!-- Burger.nl Tab (IFrame) -->
                 <div class="tab-content iframe-content"
