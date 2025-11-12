@@ -2,6 +2,7 @@ default_language_version:
   python: python3.12
 
 ci:
+  autofix_prs: false
   submodules: true
   skip: [check-submodule-uptodate]
 
