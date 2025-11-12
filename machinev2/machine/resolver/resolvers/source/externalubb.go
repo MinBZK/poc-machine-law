@@ -126,12 +126,12 @@ func solveField(
 
 	switch v.Key {
 	case "date":
-		t, err := strconv.Atoi(v.Value)
+		t, err := time.Parse(time.DateOnly, v.Value)
 		if err != nil {
 			return nil, fmt.Errorf("could not parse date: %w", err)
 		}
 
-		x = time.Unix(int64(t), 0)
+		x = t
 	case "eurocent", "amountEurocent":
 		t, err := strconv.Atoi(v.Value)
 		if err != nil {
