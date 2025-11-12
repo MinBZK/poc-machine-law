@@ -229,7 +229,7 @@ class MachineService(EngineInterface):
 
                     for item in content.data:
                         # Use BSN as key - will overwrite if same profile exists in multiple services
-                        result[item.bsn] = profile_transform(item)
+                        result[item.bsn] = self.profile_transform(item)
 
                     logger.debug(f"[MachineService] Found {len(content.data)} profiles from {service_name}")
 
@@ -246,7 +246,7 @@ class MachineService(EngineInterface):
 
             result = {}
             for item in content.data:
-                result[item.bsn] = profile_transform(item)
+                result[item.bsn] = self.profile_transform(item)
 
             return result
 
@@ -265,7 +265,7 @@ class MachineService(EngineInterface):
 
                 # Handle different response types
                 if response.status_code == 200:
-                    return profile_transform(content.data)
+                    return self.profile_transform(content.data)
                 elif response.status_code == 404:
                     logger.warning(f"[MachineService] Profile not found for BSN: {bsn}")
                     return None
@@ -347,12 +347,11 @@ class MachineService(EngineInterface):
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.__aexit__(exc_type, exc_val, exc_tb)
 
-
-def profile_transform(profile: Profile) -> dict[str, Any]:
-    p = profile.to_dict()
-    p["sources"] = source_transform(profile.sources)
-
-    return p
+    def profile_transform(self, profile: Profile) -> dict[str, Any]:
+        p = profile.to_dict()
+        p["sources"] = source_transform(profile.sources)
+        p["properties"] = super().get_profile_properties(p)
+        return p
 
 
 def source_transform(sources: ProfileSources) -> dict[str, Any]:
