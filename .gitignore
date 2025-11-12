@@ -27,10 +27,3 @@ machinev2/backend/backend
 __debug_bin*
 
 .claude
-
-nl-wallet/
-nl-wallet-files
-nl-wallet-setup/verification_server
-nl-wallet-setup/verification_server.toml
-nl-wallet-setup/housing_reader.*
-nl-wallet-setup/ca.regelrecht.reader.key.pem
