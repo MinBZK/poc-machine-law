@@ -18,7 +18,7 @@ class FeatureFlags:
 
     # Default values for feature flags
     DEFAULTS = {
-        "WALLET": True,  # Wallet feature is disabled by default
+        "WALLET": False,  # Wallet feature is disabled by default
         "CHAT": False,  # Chat feature is disabled by default
         "CHANGE_WIZARD": False,  # Change wizard is disabled by default
         "TOTAL_INCOME_WIDGET": False,  # Total income dashboard widget is disabled by default
