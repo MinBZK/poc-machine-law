@@ -29,7 +29,7 @@ type Services struct {
 	RuleResolver      *ruleresolver.RuleResolver
 	services          map[string]ruleservice.RuleServicer
 	ServiceResolver   *serviceresolver.ServiceResolver
-	RootReferenceDate string
+	RootReferenceDate time.Time
 	CaseManager       casemanager.CaseManager
 	tracer            trace.Tracer
 
@@ -145,7 +145,7 @@ func New(
 		ServiceResolver:     serviceResolver,
 		CaseManager:         caseManager,
 		services:            make(map[string]ruleservice.RuleServicer),
-		RootReferenceDate:   referenceDate.Format("2006-01-02"),
+		RootReferenceDate:   referenceDate,
 		ruleServiceInMemory: false,
 		organization:        nil,
 		standAloneMode:      false,
@@ -227,18 +227,25 @@ func (s *Services) Evaluate(
 	service string,
 	law string,
 	parameters map[string]any,
-	referenceDate string,
+	referenceDate *time.Time,
+	effectiveDate *time.Time,
 	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
 ) (*model.RuleResult, error) {
 	var span trace.Span
 
-	if referenceDate == "" {
-		referenceDate = s.RootReferenceDate
+	rDate := s.RootReferenceDate
+	if referenceDate != nil {
+		rDate = *referenceDate
 	}
 
-	spec, err := s.RuleResolver.GetRuleSpec(law, referenceDate, service)
+	eDate := s.RootReferenceDate
+	if effectiveDate != nil {
+		eDate = *effectiveDate
+	}
+
+	spec, err := s.RuleResolver.GetRuleSpec(law, rDate, service)
 	if err != nil {
 		return nil, fmt.Errorf("get rule spec: %w", err)
 	}
@@ -266,7 +273,7 @@ func (s *Services) Evaluate(
 			WithLaw(spec.Law),
 	)
 
-	result, err := s.evaluate(ctx, service, law, parameters, referenceDate, overwriteInput, requestedOutput, approved)
+	result, err := s.evaluate(ctx, service, law, parameters, rDate, eDate, overwriteInput, requestedOutput, approved)
 	if err != nil {
 		if span != nil {
 			span.SetStatus(codes.Error, err.Error())
@@ -287,7 +294,8 @@ func (s *Services) evaluate(
 	service string,
 	law string,
 	parameters map[string]any,
-	referenceDate string,
+	referenceDate time.Time,
+	effectiveDate time.Time,
 	overwriteInput map[string]any,
 	requestedOutput string,
 	approved bool,
@@ -295,10 +303,6 @@ func (s *Services) evaluate(
 	svc, ok := s.GetService(service)
 	if !ok {
 		return nil, fmt.Errorf("service not found: %s", service)
-	}
-
-	if referenceDate == "" {
-		referenceDate = s.RootReferenceDate
 	}
 
 	var result *model.RuleResult
@@ -315,6 +319,7 @@ func (s *Services) evaluate(
 				ctx,
 				law,
 				referenceDate,
+				effectiveDate,
 				parameters,
 				overwriteInput,
 				requestedOutput,
@@ -456,7 +461,8 @@ func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
 					rule.Service,
 					rule.Law,
 					parameters,
-					s.RootReferenceDate,
+					nil, // TODO: Should probably take the event date
+					nil, // TODO: Should probably take the event date
 					nil,
 					"",
 					true,
