@@ -400,7 +400,8 @@ func (re *RulesEngine) Evaluate(
 	parameters map[string]any,
 	overwriteInput map[string]any,
 	sources model.SourceDataFrame,
-	calculationDate string,
+	referenceDate time.Time,
+	effectiveDate time.Time,
 	requestedOutput string,
 	approved bool,
 ) (model.EvaluateResult, error) {
@@ -418,7 +419,7 @@ func (re *RulesEngine) Evaluate(
 	}
 
 	logr.Debugf("Evaluating rules for %s %s (%s %s)",
-		re.ServiceName, re.Law, calculationDate, requestedOutput)
+		re.ServiceName, re.Law, referenceDate.Format(time.DateOnly), requestedOutput)
 
 	// Handle claims
 	var claims map[string]model.Claim
@@ -456,7 +457,8 @@ func (re *RulesEngine) Evaluate(
 		re.PropertySpecs,
 		sources,
 		overwriteInput,
-		calculationDate,
+		referenceDate,
+		effectiveDate,
 		claims,
 		approved,
 	)
@@ -518,7 +520,7 @@ func (re *RulesEngine) Evaluate(
 	}
 
 	if len(outputValues) == 0 {
-		logr.WithIndent().Warningf("No output values computed for %s %s", calculationDate, requestedOutput)
+		logr.WithIndent().Warningf("No output values computed for %s %s", referenceDate.Format(time.DateOnly), requestedOutput)
 	}
 
 	return model.EvaluateResult{
@@ -626,14 +628,14 @@ func (re *RulesEngine) evaluateRequirementAction(
 	if r.Requirement != nil {
 		res, err := re.evaluateRequirements(ctx, []ruleresolver.Requirement{*r.Requirement}, ruleCtx)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("evaluate requirements: %w", err)
 		}
 
 		return res, nil
 	} else if r.Action != nil {
 		res, err := re.evaluateOperation(ctx, *r.Action, ruleCtx)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("evaluate operation: %w", err)
 		}
 
 		var result bool
@@ -862,10 +864,6 @@ func (re *RulesEngine) evaluateForeach(
 ) (any, error) {
 	logr := logger.FromContext(ctx)
 
-	if operation.Combine == nil {
-		return nil, fmt.Errorf("combine operation not specified for FOREACH")
-	}
-
 	arrayData, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 	if err != nil {
 		return nil, err
@@ -891,6 +889,9 @@ func (re *RulesEngine) evaluateForeach(
 	}
 
 	var values []any
+	if operation.Combine == nil {
+		return nil, fmt.Errorf("combine operation not specified for FOREACH")
+	}
 
 	err = logr.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", *operation.Combine), func(ctx context.Context) error {
 		logr := logger.FromContext(ctx)
@@ -1346,6 +1347,11 @@ func convertToTime(v any) (time.Time, error) {
 				return t, nil
 			}
 		}
+
+		if v, err := strconv.Atoi(val); err == nil {
+			return time.Unix(int64(v), 0), nil
+		}
+
 		return time.Time{}, fmt.Errorf("cannot convert string %s to date", val)
 	default:
 		return time.Time{}, fmt.Errorf("cannot convert %v of type %T to date", v, v)

@@ -32,6 +32,112 @@ type CommitTransactionResponse struct {
 // GetCommitTransaction returns CommitTransactionResponse.CommitTransaction, and is useful for accessing the field via an interface.
 func (v *CommitTransactionResponse) GetCommitTransaction() bool { return v.CommitTransaction }
 
+// GetClaimTypesClaimTypesClaimType includes the requested fields of the GraphQL type ClaimType.
+type GetClaimTypesClaimTypesClaimType struct {
+	ExpressionType       *string                                             `json:"ExpressionType"`
+	Identity             []*string                                           `json:"Identity"`
+	Name                 *string                                             `json:"Name"`
+	NestedExpressionType *string                                             `json:"NestedExpressionType"`
+	Roles                []*GetClaimTypesClaimTypesClaimTypeRolesRoleType    `json:"Roles"`
+	Tags                 []*GetClaimTypesClaimTypesClaimTypeTagsTag          `json:"Tags"`
+	Unicities            []*GetClaimTypesClaimTypesClaimTypeUnicitiesUnicity `json:"Unicities"`
+}
+
+// GetExpressionType returns GetClaimTypesClaimTypesClaimType.ExpressionType, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetExpressionType() *string { return v.ExpressionType }
+
+// GetIdentity returns GetClaimTypesClaimTypesClaimType.Identity, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetIdentity() []*string { return v.Identity }
+
+// GetName returns GetClaimTypesClaimTypesClaimType.Name, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetName() *string { return v.Name }
+
+// GetNestedExpressionType returns GetClaimTypesClaimTypesClaimType.NestedExpressionType, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetNestedExpressionType() *string {
+	return v.NestedExpressionType
+}
+
+// GetRoles returns GetClaimTypesClaimTypesClaimType.Roles, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetRoles() []*GetClaimTypesClaimTypesClaimTypeRolesRoleType {
+	return v.Roles
+}
+
+// GetTags returns GetClaimTypesClaimTypesClaimType.Tags, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetTags() []*GetClaimTypesClaimTypesClaimTypeTagsTag {
+	return v.Tags
+}
+
+// GetUnicities returns GetClaimTypesClaimTypesClaimType.Unicities, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimType) GetUnicities() []*GetClaimTypesClaimTypesClaimTypeUnicitiesUnicity {
+	return v.Unicities
+}
+
+// GetClaimTypesClaimTypesClaimTypeRolesRoleType includes the requested fields of the GraphQL type RoleType.
+type GetClaimTypesClaimTypesClaimTypeRolesRoleType struct {
+	Name           *string             `json:"Name"`
+	ReferencedName *string             `json:"ReferencedName"`
+	ReferencedType *ReferencedTypeEnum `json:"ReferencedType"`
+}
+
+// GetName returns GetClaimTypesClaimTypesClaimTypeRolesRoleType.Name, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimTypeRolesRoleType) GetName() *string { return v.Name }
+
+// GetReferencedName returns GetClaimTypesClaimTypesClaimTypeRolesRoleType.ReferencedName, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimTypeRolesRoleType) GetReferencedName() *string {
+	return v.ReferencedName
+}
+
+// GetReferencedType returns GetClaimTypesClaimTypesClaimTypeRolesRoleType.ReferencedType, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimTypeRolesRoleType) GetReferencedType() *ReferencedTypeEnum {
+	return v.ReferencedType
+}
+
+// GetClaimTypesClaimTypesClaimTypeTagsTag includes the requested fields of the GraphQL type Tag.
+type GetClaimTypesClaimTypesClaimTypeTagsTag struct {
+	Name  *string `json:"Name"`
+	Value *string `json:"Value"`
+}
+
+// GetName returns GetClaimTypesClaimTypesClaimTypeTagsTag.Name, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimTypeTagsTag) GetName() *string { return v.Name }
+
+// GetValue returns GetClaimTypesClaimTypesClaimTypeTagsTag.Value, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimTypeTagsTag) GetValue() *string { return v.Value }
+
+// GetClaimTypesClaimTypesClaimTypeUnicitiesUnicity includes the requested fields of the GraphQL type Unicity.
+type GetClaimTypesClaimTypesClaimTypeUnicitiesUnicity struct {
+	RoleNames []*string `json:"RoleNames"`
+}
+
+// GetRoleNames returns GetClaimTypesClaimTypesClaimTypeUnicitiesUnicity.RoleNames, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesClaimTypesClaimTypeUnicitiesUnicity) GetRoleNames() []*string {
+	return v.RoleNames
+}
+
+// GetClaimTypesResponse is returned by GetClaimTypes on success.
+type GetClaimTypesResponse struct {
+	ClaimTypes []*GetClaimTypesClaimTypesClaimType `json:"claimTypes"`
+}
+
+// GetClaimTypes returns GetClaimTypesResponse.ClaimTypes, and is useful for accessing the field via an interface.
+func (v *GetClaimTypesResponse) GetClaimTypes() []*GetClaimTypesClaimTypesClaimType {
+	return v.ClaimTypes
+}
+
+type ReferencedTypeEnum string
+
+const (
+	ReferencedTypeEnumLabeltype      ReferencedTypeEnum = "LabelType"
+	ReferencedTypeEnumClaimtype      ReferencedTypeEnum = "ClaimType"
+	ReferencedTypeEnumAnnotationtype ReferencedTypeEnum = "AnnotationType"
+)
+
+var AllReferencedTypeEnum = []ReferencedTypeEnum{
+	ReferencedTypeEnumLabeltype,
+	ReferencedTypeEnumClaimtype,
+	ReferencedTypeEnumAnnotationtype,
+}
+
 // RollbackTransactionResponse is returned by RollbackTransaction on success.
 type RollbackTransactionResponse struct {
 	RollbackTransaction bool `json:"rollbackTransaction"`
@@ -170,6 +276,51 @@ func CommitTransaction(
 	}
 
 	data_ = &CommitTransactionResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by GetClaimTypes.
+const GetClaimTypes_Operation = `
+query GetClaimTypes {
+	claimTypes {
+		ExpressionType
+		Identity
+		Name
+		NestedExpressionType
+		Roles {
+			Name
+			ReferencedName
+			ReferencedType
+		}
+		Tags {
+			Name
+			Value
+		}
+		Unicities {
+			RoleNames
+		}
+	}
+}
+`
+
+func GetClaimTypes(
+	ctx_ context.Context,
+	client_ graphql.Client,
+) (data_ *GetClaimTypesResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "GetClaimTypes",
+		Query:  GetClaimTypes_Operation,
+	}
+
+	data_ = &GetClaimTypesResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

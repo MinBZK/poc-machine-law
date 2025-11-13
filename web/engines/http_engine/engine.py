@@ -107,6 +107,7 @@ class MachineService(EngineInterface):
         law: str,
         parameters: dict[str, Any],
         reference_date: str | None = None,
+        effective_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
@@ -125,7 +126,10 @@ class MachineService(EngineInterface):
         )
 
         if reference_date:
-            data.date = datetime.strptime(reference_date, "%Y-%m-%d").date()
+            data.reference_date = datetime.strptime(reference_date, "%Y-%m-%d").date()
+
+        if effective_date:
+            data.effective_date = datetime.strptime(effective_date, "%Y-%m-%d").date()
 
         if overwrite_input:
             data.input_ = EvaluateInput.from_dict(overwrite_input)

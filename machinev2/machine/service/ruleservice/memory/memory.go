@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
@@ -49,13 +50,15 @@ func New(logger logger.Logger, serviceName string, services service.ServiceProvi
 }
 
 // getEngine gets or creates a RulesEngine instance for given law and date
-func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine, error) {
+func (rs *RuleService) getEngine(law string, referenceDate time.Time) (*engine.RulesEngine, error) {
+	date := referenceDate.Format(time.DateOnly)
+
 	rs.mu.Lock()
 	defer rs.mu.Unlock()
 
 	// Check if engine already exists
 	if lawEngines, ok := rs.engines[law]; ok {
-		if engine, ok := lawEngines[referenceDate]; ok {
+		if engine, ok := lawEngines[date]; ok {
 			return engine, nil
 		}
 	} else {
@@ -72,8 +75,8 @@ func (rs *RuleService) getEngine(law, referenceDate string) (*engine.RulesEngine
 		return nil, fmt.Errorf("rule spec service '%s' does not match service '%s'", spec.Service, rs.ServiceName)
 	}
 
-	ruleEngine := engine.NewRulesEngine(spec, rs.Services, rs.CaseManager, rs.ClaimManager, referenceDate)
-	rs.engines[law][referenceDate] = ruleEngine
+	ruleEngine := engine.NewRulesEngine(spec, rs.Services, rs.CaseManager, rs.ClaimManager, date)
+	rs.engines[law][date] = ruleEngine
 
 	return ruleEngine, nil
 }
@@ -87,7 +90,7 @@ func (rs *RuleService) GetResolver() *ruleresolver.RuleResolver {
 func (rs *RuleService) Evaluate(
 	ctx context.Context,
 	law string,
-	referenceDate string,
+	referenceDate, effectiveDate time.Time,
 	parameters map[string]any,
 	overwriteInput map[string]any,
 	requestedOutput string,
@@ -104,6 +107,7 @@ func (rs *RuleService) Evaluate(
 		overwriteInput,
 		rs.SourceDataFrames,
 		referenceDate,
+		effectiveDate,
 		requestedOutput,
 		approved,
 	)

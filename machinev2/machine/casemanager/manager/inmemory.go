@@ -257,7 +257,8 @@ func (cm *InMemoryCaseManager) SubmitCase(
 		serviceType,
 		law,
 		parameters,
-		"", // Use default reference date
+		nil, // Use default reference date
+		nil,
 		nil,
 		"",
 		true,

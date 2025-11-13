@@ -20,14 +20,16 @@ import (
 )
 
 type ubbResolver struct {
-	propertySpec map[string]ruleresolver.Field
-	client       graphql.Client
+	propertySpec  map[string]ruleresolver.Field
+	client        graphql.Client
+	effectiveDate time.Time
 }
 
-func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field) *ubbResolver {
+func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field, effectiveDate time.Time) *ubbResolver {
 	return &ubbResolver{
-		client:       graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
-		propertySpec: propertySpec,
+		client:        graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
+		propertySpec:  propertySpec,
+		effectiveDate: effectiveDate,
 	}
 
 }
@@ -43,7 +45,7 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 
 	f := c.propertySpec[key]
 
-	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), time.Now())
+	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), c.effectiveDate)
 	if err != nil {
 		return nil, fmt.Errorf("claim attributes object id: %w", err)
 	}
@@ -78,16 +80,14 @@ func solver(
 	values []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult,
 	f ruleresolver.Field,
 ) (any, error) {
-
 	for _, value := range values {
-		// logr.Debug("VALUE", logger.NewField("value", value))
-
 		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(field)) ||
-			strings.EqualFold(pascalCase(field), strings.ToLower(value.Name)) {
+			strings.EqualFold(strings.ToLower(value.Name), pascalCase(field)) {
 			return solveField(logr, value, f)
 		}
 
-		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) {
+		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) ||
+			strings.EqualFold(strings.ToLower(value.Name), pascalCase(table)) {
 			return solver(logr, table, field, conv(value.Values), f)
 		}
 	}
@@ -102,6 +102,7 @@ func conv(
 
 	for idx := range values {
 		v = append(v, machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult{
+			Name: values[idx].Key,
 			Values: []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResultValues{
 				{
 					Key:   values[idx].Key,
@@ -125,12 +126,12 @@ func solveField(
 
 	switch v.Key {
 	case "date":
-		t, err := strconv.Atoi(v.Value)
+		t, err := time.Parse(time.DateOnly, v.Value)
 		if err != nil {
 			return nil, fmt.Errorf("could not parse date: %w", err)
 		}
 
-		x = time.Unix(int64(t), 0)
+		x = t
 	case "eurocent", "amountEurocent":
 		t, err := strconv.Atoi(v.Value)
 		if err != nil {

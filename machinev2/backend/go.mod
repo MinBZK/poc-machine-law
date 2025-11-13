@@ -20,13 +20,9 @@ require (
 
 require (
 	github.com/Khan/genqlient v0.8.1 // indirect
-	github.com/agnivade/levenshtein v1.2.1 // indirect
-	github.com/alexflint/go-arg v1.6.0 // indirect
-	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/apache/arrow/go/v14 v14.0.2 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bmatcuk/doublestar/v4 v4.9.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
