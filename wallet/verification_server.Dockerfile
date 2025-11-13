@@ -67,11 +67,14 @@ RUN /app/wallet_ca reader \
 # Environment variables for postgres connection
 # These should be set at runtime via docker run -e or docker-compose
 ENV RUST_LOG=info
-ENV WALLET_REACHABLE_ADDRESS=127.0.0.1 # TODO, probably, need a public endpoint for the wallet but that shouldn't be written into docker image.
+ENV WALLET_REACHABLE_ADDRESS=127.0.0.1
+# TODO, probably, need a public endpoint for the wallet but that shouldn't be written into docker image.
 
 # Expose verification_server ports
-EXPOSE 3010 # requester
-EXPOSE 3009 # wallet
+# requester
+EXPOSE 3010
+# wallet
+EXPOSE 3009
 
 # Run entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]
