@@ -47,14 +47,16 @@ async def housing(request_body: WalletStartRequest):
                 }
             ]
         },
-        "return_url_template": "http://127.0.0.1:8000/?wallet_session_token={session_token}",
+        # TODO: make base URL configurable
+        "return_url_template": "http://burger.127-0-0-1.nip.io:8080/?wallet_session_token={session_token}",
     }
 
     # Make HTTP call to disclosure service
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                "http://localhost:3010/disclosure/sessions",
+                # TODO: make base URL configurable
+                "http://ro-wallet-verifier-svc:3010/disclosure/sessions",
                 json=disclosure_payload,
                 headers={"Content-Type": "application/json"},
             )
@@ -73,7 +75,8 @@ async def housing(request_body: WalletStartRequest):
     # Return the disclosure session information
     return JSONResponse(
         content={
-            "status_url": f"http://127.0.0.1:3009/disclosure/sessions/{session_token}",
+            # TODO: make base URL configurable
+            "status_url": f"http://ro-wallet-verifier.127-0-0-1.nip.io:8080/disclosure/sessions/{session_token}",
             "session_token": session_token,
         }
     )
@@ -138,7 +141,8 @@ async def get_attributes(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"http://127.0.0.1:3010/disclosure/sessions/{session_token}/disclosed_attributes"
+                # TODO: make base URL configurable
+                f"http://ro-wallet-verifier-svc:3010/disclosure/sessions/{session_token}/disclosed_attributes"
             )
             response.raise_for_status()
 
