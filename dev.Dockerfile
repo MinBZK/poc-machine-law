@@ -1,4 +1,4 @@
-# Stage 1: build the SvelteKit apps (same as production but for dev)
+# Build Stage 1: build the SvelteKit apps (same as production but for dev)
 FROM node:24-alpine3.21 AS node_builder
 
 # Install corepack and pnpm
@@ -26,8 +26,31 @@ COPY importer/. .
 RUN pnpm run build
 
 
-# Stage 2: Development Python app with hot reloading
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+## Build Stage 2: build nl-wallet web assets
+FROM node:24-alpine3.21 AS wallet_builder
+
+# Copy nl-wallet submodule
+WORKDIR /wallet
+COPY wallet/nl-wallet ./nl-wallet
+
+# Build wallet-web
+WORKDIR /wallet/nl-wallet/wallet_web
+ENV VITE_HELP_BASE_URL="https://example.com"
+RUN npm ci && npm run build
+
+# Collect all required wallet files into a single directory
+WORKDIR /wallet-files
+RUN cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/button-reset.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/reset.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_index/assets/css/nav.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/common.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/page.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/buttons-after.css . && \
+    cp /wallet/nl-wallet/wallet_web/dist/nl-wallet-web.iife.js .
+
+
+# Release stage: Development Python app with hot reloading
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS release
 
 # Install system dependencies for development
 RUN apt-get update && apt-get install -y \
@@ -65,6 +88,7 @@ WORKDIR /app/web
 
 COPY --from=node_builder /analysis-graph/build analysis/graph/build
 COPY --from=node_builder /importer/build importer/build
+COPY --from=wallet_builder /wallet-files nl-wallet-files
 
 # Expose the port
 EXPOSE 8000
