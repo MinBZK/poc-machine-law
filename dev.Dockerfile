@@ -8,7 +8,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /analysis-graph
 COPY analysis/graph/.eslintrc.cjs analysis/graph/.npmrc analysis/graph/.prettierrc analysis/graph/package.json analysis/graph/pnpm-lock.yaml analysis/graph/postcss.config.js analysis/graph/svelte.config.js analysis/graph/tailwind.config.js analysis/graph/tsconfig.json analysis/graph/vite.config.ts ./
 
-RUN pnpm install
+RUN pnpm install --package-import-method=hardlink
 
 COPY analysis/graph/. .
 
@@ -19,7 +19,7 @@ RUN pnpm run build
 WORKDIR /importer
 COPY importer/.eslintrc.cjs importer/.npmrc importer/.prettierrc importer/package.json importer/pnpm-lock.yaml importer/postcss.config.js importer/svelte.config.js importer/tailwind.config.js importer/tsconfig.json importer/vite.config.ts ./
 
-RUN pnpm install
+RUN pnpm install --package-import-method=hardlink
 
 COPY importer/. .
 
