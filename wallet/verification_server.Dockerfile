@@ -64,11 +64,9 @@ RUN /app/wallet_ca reader \
     --file-prefix /app/housing_reader \
     --force
 
-# Environment variables for postgres connection
-# These should be set at runtime via docker run -e or docker-compose
+# Environment variables for postgres connection. These can be overwritten when starting the container in another environment.
 ENV RUST_LOG=info
-ENV WALLET_REACHABLE_ADDRESS=127.0.0.1
-# TODO, probably, need a public endpoint for the wallet but that shouldn't be written into docker image.
+ENV WALLET_REACHABLE_URL=http://127.0.0.1:3009/
 
 # Expose verification_server ports
 # requester

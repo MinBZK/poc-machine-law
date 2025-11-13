@@ -1,4 +1,4 @@
-public_url = 'http://$WALLET_REACHABLE_ADDRESS:3009/'
+public_url = '$WALLET_REACHABLE_URL'
 issuer_trust_anchors = [
     "$ISSUER_CA_CRT",
 ]
