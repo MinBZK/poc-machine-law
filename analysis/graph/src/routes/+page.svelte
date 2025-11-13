@@ -1,7 +1,7 @@
 <script lang="ts">
   import yaml from 'yaml';
   import { untrack } from 'svelte';
-  import { resolve } from '$app/paths';
+  import { base } from '$app/paths';
   import {
     MarkerType,
     SvelteFlow,
@@ -43,8 +43,8 @@
   // Define the paths to the YAML files
   let filePaths: string[] = [];
 
-  let nodes = $state.raw<Node[]>([]);
-  let edges = $state.raw<Edge[]>([]);
+  let nodes = $state<Node[]>([]);
+  let edges = $state<Edge[]>([]);
 
   const nodeTypes: any = {
     law: LawNode,
@@ -83,8 +83,7 @@
       let allLaws = await Promise.all(
         filePaths.map(async (filePath) => {
           // Read the file content
-          // @ts-expect-error ts(2345) // Seems like a bug in the type definitions of `resolve`
-          const fileContent = await fetch(resolve(`/law/${filePath}`)).then((response) =>
+          const fileContent = await fetch(`${base}/law/${filePath}`).then((response) =>
             response.text(),
           );
 
