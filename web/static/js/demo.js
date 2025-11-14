@@ -10,7 +10,14 @@ function toggleDirectory(element) {
     const directory = element.closest('.law-directory');
     if (!directory) return;
 
+    const isCollapsed = directory.classList.contains('collapsed');
     directory.classList.toggle('collapsed');
+
+    // Update icon
+    const icon = element.querySelector('.directory-icon');
+    if (icon) {
+        icon.textContent = isCollapsed ? '▼' : '▶';
+    }
 }
 
 /**
