@@ -24,14 +24,14 @@
                     <span class="tab-label">Wetten</span>
                 </div>
                 <div class="tab"
-                     :class="{ 'active': activeTab === 'features' }"
-                     @click="switchTab('features')">
-                    <span class="tab-label">Scenarios</span>
-                </div>
-                <div class="tab"
                      :class="{ 'active': activeTab === 'graph' }"
                      @click="switchTab('graph')">
                     <span class="tab-label">Graaf analyse</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'features' }"
+                     @click="switchTab('features')">
+                    <span class="tab-label">Scenarios</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'simulatie' }"
