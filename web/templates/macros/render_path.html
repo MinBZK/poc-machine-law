@@ -14,8 +14,7 @@
             hx-target="#edit-form-container"
             hx-vals='{ "case_id": "{{ case_id }}", "service": "{{ service }}", "key": "{{ key }}", "value": {{ display_value|tojson }}, "law": "{{ law }}", "bsn": "{{ bsn }}", "show_approve": {{ show_approve|default(false) |tojson }}, "claimant": "{{ claimant }}", {% if node.details %}"details": {{ node.details|tojson }},{% endif %} "has_details": {{ (node.details is defined)|tojson }} }'
             type="button"
-            {% if node is mapping and ('service' in node and 'children' in node and node.children) %} disabled {% endif %}
-            >
+            {% if node is mapping and ('service' in node and 'children' in node and node.children) %}disabled{% endif %}>
         {% if display_value is none or display_value is undefined or display_value == {} %}
             {% if node.required is defined and node.required %}
                 <span class="text-red-600 font-medium">BENODIGD GEGEVEN</span>
