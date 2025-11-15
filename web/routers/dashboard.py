@@ -74,6 +74,7 @@ def calculate_yearly_amount(amount_in_cents: int, per_month: bool) -> int:
 async def total_net_income(
     request: Request,
     bsn: str,
+    date: str = None,
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Calculate total net income (benefits - taxes) for a citizen"""
@@ -102,6 +103,7 @@ async def total_net_income(
                 law=law,
                 parameters={"BSN": bsn},
                 reference_date=TODAY,
+                effective_date=date,  # Pass the date as effective_date
                 approved=False,  # Show current state including pending changes
             )
 

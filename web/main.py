@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -9,7 +10,6 @@ from starlette.middleware.sessions import SessionMiddleware
 sys.path.append(str(Path(__file__).parent.parent))
 
 from web.dependencies import (
-    FORMATTED_DATE,
     STATIC_DIR,
     get_case_manager,
     get_claim_manager,
@@ -20,6 +20,7 @@ from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInter
 from web.feature_flags import (
     is_change_wizard_enabled,
     is_chat_enabled,
+    is_effective_date_adjustment_enabled,
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
@@ -110,6 +111,7 @@ app.mount(
 async def root(
     request: Request,
     bsn: str = "100000001",
+    date: str = None,
     services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -133,20 +135,27 @@ async def root(
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
 
+    try:
+        effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+    except ValueError:
+        effective_date = datetime.now()
+
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "profile": profile,
             "bsn": bsn,
-            "formatted_date": FORMATTED_DATE,
             "all_profiles": services.get_all_profiles(),
             "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
+            "adjustable_effective_date_enabled": is_effective_date_adjustment_enabled(),
             "total_income_widget_enabled": is_total_income_widget_enabled(),
             "accepted_claims": accepted_claims,
+            "now": datetime.now(),
+            "effective_date": effective_date,  # Pass the parsed date parameter to the template
         },
     )
 
