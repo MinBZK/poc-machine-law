@@ -9,11 +9,13 @@
     {% else %}
         {% set color = "blue" %}
     {% endif %}
-    <button class="group inline-flex items-center gap-1 text-{{- color -}}-600 hover:text-{{- color -}}-800 cursor-pointer rounded px-1 hover:bg-{{- color -}}-50"
+    <button class="group inline-flex items-center gap-1 text-{{- color -}}-600 hover:text-{{- color -}}-800 cursor-pointer rounded px-1 hover:bg-{{- color -}}-50 disabled:hover:bg-gray-50 disabled:cursor-not-allowed"
             hx-get="/edit/edit-form"
             hx-target="#edit-form-container"
             hx-vals='{ "case_id": "{{ case_id }}", "service": "{{ service }}", "key": "{{ key }}", "value": {{ display_value|tojson }}, "law": "{{ law }}", "bsn": "{{ bsn }}", "show_approve": {{ show_approve|default(false) |tojson }}, "claimant": "{{ claimant }}", {% if node.details %}"details": {{ node.details|tojson }},{% endif %} "has_details": {{ (node.details is defined)|tojson }} }'
-            type="button">
+            type="button"
+            {% if node is mapping and ('service' in node and 'children' in node and node.children) %} disabled {% endif %}
+            >
         {% if display_value is none or display_value is undefined or display_value == {} %}
             {% if node.required is defined and node.required %}
                 <span class="text-red-600 font-medium">BENODIGD GEGEVEN</span>
@@ -73,7 +75,7 @@
                 {{ display_value }}
             {% endif %}
         {% endif %}
-        <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-{{- color -}}-400 transition-colors"
+        <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-{{- color -}}-400 group-disabled:text-gray-300 transition-colors"
              fill="none"
              viewBox="0 0 24 24"
              stroke="currentColor">
