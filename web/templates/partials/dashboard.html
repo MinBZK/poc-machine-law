@@ -120,8 +120,9 @@
 {% endif %}
 <!-- templates/partials/dashboard.html -->
 <section class="mb-8 bg-white rounded-lg shadow">
-    <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
+  <div class="p-6">
+    {% if profile.sources.RvIG %}
+    <div class="flex items-center justify-between mb-4">
             <div>
                 <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
                 <div class="text-sm text-gray-600 mt-1">
@@ -328,6 +329,10 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
+        <p>Geen profieldata gevonden.</p>
+        {% endif %}
     </div>
 </section>
 <!-- Laws Grid -->
