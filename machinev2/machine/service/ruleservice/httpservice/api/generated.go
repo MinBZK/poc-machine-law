@@ -701,6 +701,9 @@ type PathService = string
 // QueryDiscoverableBy DiscoverableBy is a string that can be used to filter lists
 type QueryDiscoverableBy = DiscoverableBy
 
+// QueryEffectiveDate defines model for queryEffectiveDate.
+type QueryEffectiveDate = openapi_types.Date
+
 // QueryIncludeRejected defines model for queryIncludeRejected.
 type QueryIncludeRejected = bool
 
@@ -932,6 +935,18 @@ type ServiceLawsDiscoverableListParams struct {
 type EvaluateJSONBody struct {
 	// Data Evaluate.
 	Data Evaluate `json:"data"`
+}
+
+// ProfileListParams defines parameters for ProfileList.
+type ProfileListParams struct {
+	// EffectiveDate Can be used to set the effective execution date
+	EffectiveDate *QueryEffectiveDate `form:"effective_date,omitempty" json:"effective_date,omitempty"`
+}
+
+// ProfileGetParams defines parameters for ProfileGet.
+type ProfileGetParams struct {
+	// EffectiveDate Can be used to set the effective execution date
+	EffectiveDate *QueryEffectiveDate `form:"effective_date,omitempty" json:"effective_date,omitempty"`
 }
 
 // RuleSpecGetParams defines parameters for RuleSpecGet.
@@ -1300,10 +1315,10 @@ type ClientInterface interface {
 	EventList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ProfileList request
-	ProfileList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ProfileList(ctx context.Context, params *ProfileListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ProfileGet request
-	ProfileGet(ctx context.Context, bsn PathBSN, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ProfileGet(ctx context.Context, bsn PathBSN, params *ProfileGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RuleSpecGet request
 	RuleSpecGet(ctx context.Context, params *RuleSpecGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1602,8 +1617,8 @@ func (c *Client) EventList(ctx context.Context, reqEditors ...RequestEditorFn) (
 	return c.Client.Do(req)
 }
 
-func (c *Client) ProfileList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewProfileListRequest(c.Server)
+func (c *Client) ProfileList(ctx context.Context, params *ProfileListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProfileListRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1614,8 +1629,8 @@ func (c *Client) ProfileList(ctx context.Context, reqEditors ...RequestEditorFn)
 	return c.Client.Do(req)
 }
 
-func (c *Client) ProfileGet(ctx context.Context, bsn PathBSN, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewProfileGetRequest(c.Server, bsn)
+func (c *Client) ProfileGet(ctx context.Context, bsn PathBSN, params *ProfileGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProfileGetRequest(c.Server, bsn, params)
 	if err != nil {
 		return nil, err
 	}
@@ -2423,7 +2438,7 @@ func NewEventListRequest(server string) (*http.Request, error) {
 }
 
 // NewProfileListRequest generates requests for ProfileList
-func NewProfileListRequest(server string) (*http.Request, error) {
+func NewProfileListRequest(server string, params *ProfileListParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -2441,6 +2456,28 @@ func NewProfileListRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.EffectiveDate != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "effective_date", runtime.ParamLocationQuery, *params.EffectiveDate); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
@@ -2450,7 +2487,7 @@ func NewProfileListRequest(server string) (*http.Request, error) {
 }
 
 // NewProfileGetRequest generates requests for ProfileGet
-func NewProfileGetRequest(server string, bsn PathBSN) (*http.Request, error) {
+func NewProfileGetRequest(server string, bsn PathBSN, params *ProfileGetParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2473,6 +2510,28 @@ func NewProfileGetRequest(server string, bsn PathBSN) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.EffectiveDate != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "effective_date", runtime.ParamLocationQuery, *params.EffectiveDate); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -2701,10 +2760,10 @@ type ClientWithResponsesInterface interface {
 	EventListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*EventListResponse, error)
 
 	// ProfileListWithResponse request
-	ProfileListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ProfileListResponse, error)
+	ProfileListWithResponse(ctx context.Context, params *ProfileListParams, reqEditors ...RequestEditorFn) (*ProfileListResponse, error)
 
 	// ProfileGetWithResponse request
-	ProfileGetWithResponse(ctx context.Context, bsn PathBSN, reqEditors ...RequestEditorFn) (*ProfileGetResponse, error)
+	ProfileGetWithResponse(ctx context.Context, bsn PathBSN, params *ProfileGetParams, reqEditors ...RequestEditorFn) (*ProfileGetResponse, error)
 
 	// RuleSpecGetWithResponse request
 	RuleSpecGetWithResponse(ctx context.Context, params *RuleSpecGetParams, reqEditors ...RequestEditorFn) (*RuleSpecGetResponse, error)
@@ -3436,8 +3495,8 @@ func (c *ClientWithResponses) EventListWithResponse(ctx context.Context, reqEdit
 }
 
 // ProfileListWithResponse request returning *ProfileListResponse
-func (c *ClientWithResponses) ProfileListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ProfileListResponse, error) {
-	rsp, err := c.ProfileList(ctx, reqEditors...)
+func (c *ClientWithResponses) ProfileListWithResponse(ctx context.Context, params *ProfileListParams, reqEditors ...RequestEditorFn) (*ProfileListResponse, error) {
+	rsp, err := c.ProfileList(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -3445,8 +3504,8 @@ func (c *ClientWithResponses) ProfileListWithResponse(ctx context.Context, reqEd
 }
 
 // ProfileGetWithResponse request returning *ProfileGetResponse
-func (c *ClientWithResponses) ProfileGetWithResponse(ctx context.Context, bsn PathBSN, reqEditors ...RequestEditorFn) (*ProfileGetResponse, error) {
-	rsp, err := c.ProfileGet(ctx, bsn, reqEditors...)
+func (c *ClientWithResponses) ProfileGetWithResponse(ctx context.Context, bsn PathBSN, params *ProfileGetParams, reqEditors ...RequestEditorFn) (*ProfileGetResponse, error) {
+	rsp, err := c.ProfileGet(ctx, bsn, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

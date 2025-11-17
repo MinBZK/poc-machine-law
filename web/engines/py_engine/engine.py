@@ -18,7 +18,7 @@ class PythonMachineService(EngineInterface):
     def __init__(self, services: Services):
         self.services = services
 
-    def get_profile_data(self, bsn: str) -> dict[str, Any]:
+    def get_profile_data(self, bsn: str, effective_date: datetime.Date | None = None) -> dict[str, Any]:
         """
         Get profile data for a specific BSN.
 
@@ -31,7 +31,7 @@ class PythonMachineService(EngineInterface):
         profiles = self.get_all_profiles()
         return profiles.get(bsn)
 
-    def get_all_profiles(self) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: datetime.Date | None = None) -> dict[str, dict[str, Any]]:
         """
         Get all available profiles.
 
