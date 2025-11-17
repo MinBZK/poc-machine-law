@@ -1,4 +1,4 @@
-# Stage 1: build the SvelteKit app
+## Build Stage 1: build the SvelteKit app
 FROM node:24-alpine3.21 AS node_builder
 
 # Install corepack and pnpm
@@ -14,7 +14,6 @@ COPY analysis/laws/. .
 
 RUN pnpm run build
 
-
 # Copy and build analysis/graph
 WORKDIR /analysis-graph
 COPY analysis/graph/.eslintrc.cjs analysis/graph/.npmrc analysis/graph/.prettierrc analysis/graph/package.json analysis/graph/pnpm-lock.yaml analysis/graph/postcss.config.js analysis/graph/svelte.config.js analysis/graph/tailwind.config.js analysis/graph/tsconfig.json analysis/graph/vite.config.ts ./
@@ -24,7 +23,6 @@ RUN pnpm install
 COPY analysis/graph/. .
 
 RUN pnpm run build
-
 
 # Copy and build importer
 WORKDIR /importer
@@ -37,20 +35,44 @@ COPY importer/. .
 RUN pnpm run build
 
 
-# Stage 2: serve the Python app including static files
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+## Build Stage 2: build nl-wallet web assets
+FROM node:24-alpine3.21 AS wallet_builder
+
+# Copy nl-wallet submodule
+WORKDIR /wallet
+COPY wallet/nl-wallet ./nl-wallet
+
+# Build wallet-web
+WORKDIR /wallet/nl-wallet/wallet_web
+ENV VITE_HELP_BASE_URL="https://example.com"
+RUN npm ci && npm run build
+
+# Collect all required wallet files into a single directory
+WORKDIR /wallet-files
+RUN cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/button-reset.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/reset.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_index/assets/css/nav.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/common.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/page.css . && \
+    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/buttons-after.css . && \
+    cp /wallet/nl-wallet/wallet_web/dist/nl-wallet-web.iife.js .
+
+
+## Release stage: serve the Python app including static files
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS release
 
 # Install the Dutch locale
 RUN apt-get update && apt-get install -y locales locales-all
 
-ADD . .
-
 COPY --from=node_builder /analysis-laws/build analysis/laws/build
 COPY --from=node_builder /analysis-graph/build analysis/graph/build
 COPY --from=node_builder /importer/build importer/build
+COPY --from=wallet_builder /wallet-files nl-wallet-files
+
+ADD . .
 
 RUN uv sync --no-dev
 
-CMD ["uv", "run", "--no-dev", "web/main.py"]
-
 EXPOSE 8000
+
+CMD ["uv", "run", "--no-dev", "web/main.py"]
