@@ -60,7 +60,7 @@ class ClaimManager(ClaimManagerInterface):
 
         return self.base_url
 
-    def get_claims_by_bsn(self, bsn: str, approved: bool = False, include_rejected: bool = False) -> list[Claim]:
+    def get_claims_by_bsn(self, bsn: str, approved: bool = False, include_rejected: bool = False, effective_date: str | None = None) -> list[Claim]:
         """
         Retrieves case information using the embedded Python machine.service library.
 
@@ -86,9 +86,17 @@ class ClaimManager(ClaimManagerInterface):
                 try:
                     client = Client(base_url=service_config.domain)
                     with client as client:
-                        response = claim_list_based_on_bsn.sync_detailed(
-                            client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
-                        )
+                        # If effective_date is provided, we need to manually add it as a query parameter
+                        if effective_date:
+                            # Get the base kwargs and add effective_date parameter
+                            kwargs = claim_list_based_on_bsn._get_kwargs(bsn=bsn, approved=approved, include_rejected=include_rejected)
+                            kwargs["params"]["effective_date"] = effective_date
+                            response_raw = client.get_httpx_client().request(**kwargs)
+                            response = claim_list_based_on_bsn._build_response(client=client, response=response_raw)
+                        else:
+                            response = claim_list_based_on_bsn.sync_detailed(
+                                client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
+                            )
                         claims = to_claims(response.parsed.data)
                         all_claims.extend(claims)
                 except Exception as e:
@@ -102,14 +110,22 @@ class ClaimManager(ClaimManagerInterface):
         client = Client(base_url=self.base_url)
 
         with client as client:
-            response = claim_list_based_on_bsn.sync_detailed(
-                client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
-            )
+            # If effective_date is provided, we need to manually add it as a query parameter
+            if effective_date:
+                # Get the base kwargs and add effective_date parameter
+                kwargs = claim_list_based_on_bsn._get_kwargs(bsn=bsn, approved=approved, include_rejected=include_rejected)
+                kwargs["params"]["effective_date"] = effective_date
+                response_raw = client.get_httpx_client().request(**kwargs)
+                response = claim_list_based_on_bsn._build_response(client=client, response=response_raw)
+            else:
+                response = claim_list_based_on_bsn.sync_detailed(
+                    client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
+                )
 
             return to_claims(response.parsed.data)
 
     def get_claim_by_bsn_service_law(
-        self, bsn: str, service: str, law: str, approved: bool = False, include_rejected: bool = False
+        self, bsn: str, service: str, law: str, approved: bool = False, include_rejected: bool = False, effective_date: str | None = None
     ) -> dict[UUID:Claim]:
         """
         Retrieves case information using the embedded Python machine.service library.
@@ -128,9 +144,17 @@ class ClaimManager(ClaimManagerInterface):
         client = Client(base_url=service_base_url)
 
         with client as client:
-            response = claim_list_based_on_bsn_service_law.sync_detailed(
-                client=client, bsn=bsn, service=service, law=law, approved=approved, include_rejected=include_rejected
-            )
+            # If effective_date is provided, we need to manually add it as a query parameter
+            if effective_date:
+                # Get the base kwargs and add effective_date parameter
+                kwargs = claim_list_based_on_bsn_service_law._get_kwargs(bsn=bsn, service=service, law=law, approved=approved, include_rejected=include_rejected)
+                kwargs["params"]["effective_date"] = effective_date
+                response_raw = client.get_httpx_client().request(**kwargs)
+                response = claim_list_based_on_bsn_service_law._build_response(client=client, response=response_raw)
+            else:
+                response = claim_list_based_on_bsn_service_law.sync_detailed(
+                    client=client, bsn=bsn, service=service, law=law, approved=approved, include_rejected=include_rejected
+                )
 
             return to_dict_claims(response.parsed.data.additional_properties)
 
