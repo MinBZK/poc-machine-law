@@ -1,5 +1,5 @@
 ## Build Stage 1: build the SvelteKit app
-FROM node:24-alpine3.21 AS node_builder
+FROM node:25-alpine3.21 AS node_builder
 
 # Install corepack and pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -36,7 +36,7 @@ RUN pnpm run build
 
 
 ## Build Stage 2: build nl-wallet web assets
-FROM node:24-alpine3.21 AS wallet_builder
+FROM node:25-alpine3.21 AS wallet_builder
 
 # Copy nl-wallet submodule
 WORKDIR /wallet
