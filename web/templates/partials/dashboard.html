@@ -597,35 +597,35 @@
           [
             {
               type: "input",
-              name: "BOX1_DIENSTBETREKKING",
+              name: "loon_uit_dienstbetrekking",
               label: "Box 1: Loon uit dienstbetrekking",
               inputType: "number",
               placeholder: "Nieuw bruto jaarloon…",
             },
             {
               type: "input",
-              name: "BOX1_UITKERINGEN",
+              name: "uitkeringen_en_pensioenen",
               label: "Box 1: Uitkeringen en pensioenen",
               inputType: "number",
               placeholder: "Nieuw bruto jaarbedrag…",
             },
             {
               type: "input",
-              name: "BOX1_ONDERNEMING",
+              name: "winst_uit_onderneming",
               label: "Box 1: Winst uit onderneming",
               inputType: "number",
               placeholder: "Nieuw bruto jaarbedrag…",
             },
             {
               type: "input",
-              name: "BOX1_OVERIGE_WERKZAAMHEDEN",
+              name: "resultaat_overige_werkzaamheden",
               label: "Box 1: Resultaat overige werkzaamheden",
               inputType: "number",
               placeholder: "Nieuw bruto jaarbedrag…",
             },
             {
               type: "input",
-              name: "BOX1_EIGEN_WONING",
+              name: "eigen_woning",
               label: "Box 1: Inkomsten uit eigen woning",
               inputType: "number",
               placeholder: "Nieuw bruto jaarbedrag…",
@@ -633,14 +633,14 @@
 
             {
               type: "input",
-              name: "BOX2_DIVIDEND",
+              name: "reguliere_voordelen",
               label: "Box 2: Reguliere voordelen (dividend)",
               inputType: "number",
               placeholder: "Nieuw bruto jaarbedrag…",
             },
             {
               type: "input",
-              name: "BOX2_AANDELEN",
+              name: "vervreemdingsvoordelen",
               label: "Box 2: Vervreemdingsvoordelen (verkoop aanmerkelijk belang)",
               inputType: "number",
               placeholder: "Nieuw bruto jaarbedrag…",
@@ -648,34 +648,34 @@
 
             {
               type: "input",
-              name: "BOX3_SPAREN",
+              name: "spaargeld",
               label: "Box 3: Spaargeld",
               inputType: "number",
               placeholder: "Nieuw bedrag…",
             },
             {
               type: "input",
-              name: "BOX3_BELEGGEN",
+              name: "beleggingen",
               label: "Box 3: Beleggingen",
               inputType: "number",
               placeholder: "Nieuw bedrag…",
             },
             {
               type: "input",
-              name: "BOX3_ONROEREND_GOED",
+              name: "onroerend_goed",
               label: "Box 3: Onroerend goed",
               inputType: "number",
               placeholder: "Nieuw bedrag…",
             },
             {
               type: "input",
-              name: "BOX3_SCHULDEN",
+              name: "schulden",
               label: "Box 3: Schulden",
               inputType: "number",
               placeholder: "Nieuw bedrag…",
             },
 
-            { type: "input", label: "Ingangsdatum", inputType: "date" },
+            { type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" },
           ],
         ],
         woonadres: [
@@ -741,6 +741,13 @@
               label: "Nieuwe huurprijs",
               inputType: "number",
               placeholder: "Voer de nieuwe huurprijs in…",
+            },
+            {
+              type: "input",
+              name: "SERVICEKOSTEN",
+              label: "Servicekosten",
+              inputType: "number",
+              placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
             },
             {
               type: "input",
@@ -914,18 +921,18 @@
 
       // Handle final step (details textarea)
       if (stepIndex === this.stepsByType[this.selectedType].length - 1) {
-        const detailsDiv = document.createElement("div");
-        detailsDiv.innerHTML = `
-          <label for="change-details" class="mb-2 block font-medium">Details van de wijziging</label>
-          <textarea id="change-details" rows="4" class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none" placeholder="Beschrijf hier de details van de wijziging…">${this.answers["details"] || ""}</textarea>
-        `;
+        // const detailsDiv = document.createElement("div");
+        // detailsDiv.innerHTML = `
+        //   <label for="change-details" class="mb-2 block font-medium">Details van de wijziging</label>
+        //   <textarea id="change-details" rows="4" class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none" placeholder="Beschrijf hier de details van de wijziging…">${this.answers["details"] || ""}</textarea>
+        // `;
 
-        const textarea = detailsDiv.querySelector("textarea");
-        textarea.addEventListener("input", (e) => {
-          this.answers["details"] = e.target.value;
-        });
+        // const textarea = detailsDiv.querySelector("textarea");
+        // textarea.addEventListener("input", (e) => {
+        //   this.answers["details"] = e.target.value;
+        // });
 
-        stepContent.appendChild(detailsDiv);
+        // stepContent.appendChild(detailsDiv);
 
         // Show submit button instead of next button
         document.getElementById("next-btn").classList.add("hidden");

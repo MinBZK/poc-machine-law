@@ -438,27 +438,27 @@ async def update_situation(
             law = "wet_brp"
 
             # Change sources
-            # parameters["ADRES"] = {
-            #     "straat": parameters["ADRES.straat"],
-            #     "huisnummer": parameters["ADRES.huisnummer"],
-            #     "postcode": parameters["ADRES.postcode"],
-            #     "woonplaats": parameters["ADRES.woonplaats"],
-            #     "type": "WOONADRES",
-            # }
-            parameters["VERBLIJFSADRES"] = parameters[
-                "ADRES.woonplaats"
-            ]  # Note: somehow only the city is used in the case system
-            parameters["LAND_VAN_VERBLIJF"] = "NEDERLAND"
+            parameters["verblijfplaats"] = {
+                "straat": parameters["ADRES.straat"],
+                "huisnummer": parameters["ADRES.huisnummer"],
+                "postcode": parameters["ADRES.postcode"],
+                "woonplaats": parameters["ADRES.woonplaats"],
+                "type": "WOONADRES",
+            }
+            # parameters["VERBLIJFSADRES"] = parameters[
+            #     "ADRES.woonplaats"
+            # ]  # Note: somehow only the city is used in the case system
+            parameters["land_verblijf"] = "NEDERLAND"
 
             # Change outputs accordingly
             parameters["verblijfsadres"] = (
                 f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
             )
-            parameters["woonplaats"] = parameters["ADRES.woonplaats"]
-            parameters["postadres"] = parameters["verblijfsadres"]
-            parameters["heeft_vast_adres"] = True
+            # parameters["woonplaats"] = parameters["ADRES.woonplaats"]
+            # parameters["postadres"] = parameters["verblijfsadres"]
+            # parameters["heeft_vast_adres"] = True
 
-            # Remove address fields from parameters after grouping them
+            # Remove address fields that are no longer used (and do not correspond to claims) from parameters
             for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:
                 parameters.pop(k, None)
         case "huurprijs":
@@ -470,15 +470,8 @@ async def update_situation(
 
             match payload.get("situation_household_change_type"):
                 case "scheiden":
-                    # Change sources
-                    parameters["PARTNERTYPE"] = "GEEN"
-                    parameters["PARTNER_BSN"] = None
-                    parameters["PARTNER_GEBOORTEDATUM"] = None
-
-                    # Change outputs accordingly
-                    parameters["heeft_partner"] = False
                     parameters["partner_bsn"] = None
-                    parameters["partner_geboortedatum"] = None
+                    parameters["partnerschap_type"] = "GEEN"
 
                 # Show an error message for other household changes. IMPROVE: handle more household change types
                 case _:
@@ -486,11 +479,16 @@ async def update_situation(
                         {"status": "error", "message": "Deze flow is nog niet ondersteund."},
                         status_code=400,
                     )
+
+                parameters.pop("situation_household_change_type", None)
         case _:
             return JSONResponse(
                 {"status": "error", "message": f"unrecognized type: {situation_type}"},
                 status_code=400,
             )
+
+    # Remove the effective_date from the parameters. TODO: apply it to the case or claims when supported
+    parameters.pop("effective_date", None)
 
     # Create a case
     try:
@@ -538,4 +536,4 @@ async def update_situation(
             # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
         )
 
-    return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
+    return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt"})
