@@ -425,9 +425,6 @@ async def update_situation(
     # Prepare parameters for the case, using all payload fields except meta
     parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn")}
 
-    # The Go engine expects the BSN to be present (with uppercase) in the parameters, so we add it
-    parameters["BSN"] = bsn
-
     # Split the payload into multiple claims and assign them to the same case
     match situation_type:
         case "inkomen":
@@ -480,7 +477,7 @@ async def update_situation(
                         status_code=400,
                     )
 
-                parameters.pop("situation_household_change_type", None)
+            parameters.pop("situation_household_change_type", None)
         case _:
             return JSONResponse(
                 {"status": "error", "message": f"unrecognized type: {situation_type}"},
@@ -496,7 +493,7 @@ async def update_situation(
             bsn=bsn,
             service=service,
             law=law,
-            parameters=parameters,
+            parameters=parameters | {"BSN": bsn},  # The Go engine expects the BSN to be present (with uppercase) in the case parameters, so we add it
             claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
         )
@@ -521,9 +518,6 @@ async def update_situation(
 
     # Add the claim(s) to the case
     for key, value in parameters.items():
-        if key in ("BSN"):
-            continue  # Skip BSN as it's not a claimable field
-
         claim_manager.submit_claim(
             service=service,
             key=key,
