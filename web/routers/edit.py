@@ -434,29 +434,22 @@ async def update_situation(
             service = "RvIG"
             law = "wet_brp"
 
-            # Change sources
+            # Set the correct claims
             parameters["verblijfplaats"] = {
-                "straat": parameters["ADRES.straat"],
-                "huisnummer": parameters["ADRES.huisnummer"],
-                "postcode": parameters["ADRES.postcode"],
-                "woonplaats": parameters["ADRES.woonplaats"],
+                "straat": parameters["adres.straat"],
+                "huisnummer": parameters["adres.huisnummer"],
+                "postcode": parameters["adres.postcode"],
+                "woonplaats": parameters["adres.woonplaats"],
                 "type": "WOONADRES",
             }
-            # parameters["VERBLIJFSADRES"] = parameters[
-            #     "ADRES.woonplaats"
-            # ]  # Note: somehow only the city is used in the case system
             parameters["land_verblijf"] = "NEDERLAND"
 
-            # Change outputs accordingly
             parameters["verblijfsadres"] = (
-                f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
+                f"{parameters['adres.straat']} {parameters['adres.huisnummer']}, {parameters['adres.postcode']} {parameters['adres.woonplaats']}"
             )
-            # parameters["woonplaats"] = parameters["ADRES.woonplaats"]
-            # parameters["postadres"] = parameters["verblijfsadres"]
-            # parameters["heeft_vast_adres"] = True
 
             # Remove address fields that are no longer used (and do not correspond to claims) from parameters
-            for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:
+            for k in ["adres.straat", "adres.huisnummer", "adres.postcode", "adres.woonplaats"]:
                 parameters.pop(k, None)
         case "huurprijs":
             service = "TOESLAGEN"
