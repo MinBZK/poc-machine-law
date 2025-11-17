@@ -486,7 +486,10 @@ async def update_situation(
             bsn=bsn,
             service=service,
             law=law,
-            parameters=parameters | {"BSN": bsn},  # The Go engine expects the BSN to be present (with uppercase) in the case parameters, so we add it
+            parameters=parameters
+            | {
+                "BSN": bsn
+            },  # The Go engine expects the BSN to be present (with uppercase) in the case parameters, so we add it
             claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
         )
