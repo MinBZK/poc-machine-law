@@ -47,6 +47,6 @@ jobs:
         uses: int128/kaniko-action@v1
         with:
           context: ./wallet
-          file: verification_server.Dockerfile
+          file: ./wallet/verification_server.Dockerfile
           push: true
           tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/wallet/verification_server:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}
