@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_factory import llm_factory
-from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service, templates
+from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
 
@@ -426,6 +426,7 @@ async def application_panel(
                 "claim_map": claim_map,
                 "missing_required": result.missing_required,
                 "wallet_enabled": is_wallet_enabled(),
+                "current_engine_id": get_engine_id(),
             },
         )
     except Exception as e:
@@ -437,5 +438,6 @@ async def application_panel(
                 "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
                 "service": service,
                 "law": law,
+                "current_engine_id": get_engine_id(),
             },
         )

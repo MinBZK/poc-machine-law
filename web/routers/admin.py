@@ -453,6 +453,7 @@ async def view_case(
             "claim_map": claim_map,
             "claim_ids": claim_ids,
             "person_name": person_name,
+            "current_engine_id": get_engine_id(),
         },
     )
 
