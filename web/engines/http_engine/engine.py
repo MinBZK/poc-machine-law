@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import httpx
@@ -192,7 +192,7 @@ class MachineService(EngineInterface):
 
             return result
 
-    def get_all_profiles(self, effective_date: datetime.date | None = None) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
         if effective_date is None:
             effective_date = UNSET
 
@@ -239,7 +239,7 @@ class MachineService(EngineInterface):
 
             return result
 
-    def get_profile_data(self, bsn: str, effective_date: datetime.date | None = None) -> dict[str, Any] | None:
+    def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any] | None:
         if effective_date is None:
             effective_date = UNSET
 
