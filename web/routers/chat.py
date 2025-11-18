@@ -11,6 +11,7 @@ from web.dependencies import (
     TODAY,
     get_case_manager,
     get_claim_manager,
+    get_engine_id,
     get_machine_service,
     templates,
 )
@@ -133,6 +134,7 @@ async def handle_application_display(
                 missing_required=result.missing_required,
                 in_chat_panel=True,
                 registry_service_name=registry_service_name,  # Pass the registry service name for submission
+                current_engine_id=get_engine_id(),
             )
 
             # Send the application panel to the client
