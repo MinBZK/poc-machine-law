@@ -251,7 +251,15 @@ class MachineService(EngineInterface):
             response = profile_get.sync_detailed(client=client, bsn=bsn, effective_date=effective_date)
             content = response.parsed
 
-            return profile_transform(content.data)
+            # Handle different response types
+            if response.status_code == 200:
+                return profile_transform(content.data)
+            elif response.status_code == 404:
+                logger.warning(f"[MachineService] Profile not found for BSN: {bsn}")
+                return None
+            else:
+                logger.error(f"[MachineService] Error getting profile for BSN {bsn}: Status {response.status_code}")
+                return None
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         # Instantiate the API client with service-specific base URL

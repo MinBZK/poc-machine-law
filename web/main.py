@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -123,7 +123,7 @@ async def root(
     except ValueError:
         effective_date = datetime.now()
 
-    profile = services.get_profile_data(bsn, effective_date=effective_date)
+    profile = services.get_profile_data(bsn, effective_date=effective_date.date())
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 

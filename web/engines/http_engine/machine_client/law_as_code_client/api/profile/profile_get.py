@@ -40,21 +40,41 @@ def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
 ) -> Optional[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
     if response.status_code == 200:
-        response_200 = ProfileGetResponse200.from_dict(response.json())
-
-        return response_200
+        if response.content and len(response.content) > 0:
+            try:
+                response_200 = ProfileGetResponse200.from_dict(response.json())
+                return response_200
+            except Exception:
+                raise errors.UnexpectedStatus(response.status_code, response.content)
+        else:
+            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
     if response.status_code == 400:
-        response_400 = ProfileGetResponse400.from_dict(response.json())
-
-        return response_400
+        if response.content and len(response.content) > 0:
+            try:
+                response_400 = ProfileGetResponse400.from_dict(response.json())
+                return response_400
+            except Exception:
+                raise errors.UnexpectedStatus(response.status_code, response.content)
+        else:
+            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
     if response.status_code == 404:
-        response_404 = ProfileGetResponse404.from_dict(response.json())
-
-        return response_404
+        if response.content and len(response.content) > 0:
+            try:
+                response_404 = ProfileGetResponse404.from_dict(response.json())
+                return response_404
+            except Exception:
+                raise errors.UnexpectedStatus(response.status_code, response.content)
+        else:
+            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
     if response.status_code == 500:
-        response_500 = ProfileGetResponse500.from_dict(response.json())
-
-        return response_500
+        if response.content and len(response.content) > 0:
+            try:
+                response_500 = ProfileGetResponse500.from_dict(response.json())
+                return response_500
+            except Exception:
+                raise errors.UnexpectedStatus(response.status_code, response.content)
+        else:
+            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
