@@ -836,7 +836,9 @@
         ],
       };
 
-      this.init();
+      if (document.getElementById("wizard-form")) {
+        this.init();
+      }
     }
 
     init() {
