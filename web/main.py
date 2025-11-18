@@ -117,7 +117,13 @@ async def root(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
-    profile = services.get_profile_data(bsn)
+    # Get the profile
+    try:
+        effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+    except ValueError:
+        effective_date = datetime.now()
+
+    profile = services.get_profile_data(bsn, effective_date=effective_date)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -134,11 +140,6 @@ async def root(
         if claims:
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
-
-    try:
-        effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
-    except ValueError:
-        effective_date = datetime.now()
 
     return templates.TemplateResponse(
         "index.html",
