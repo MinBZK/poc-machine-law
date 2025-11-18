@@ -135,8 +135,8 @@ Test these common scenarios using overrides:
 {
             "overrides": {
                 "UWV": {"inkomen": 4000000},
-    "RVO": {"AANTAL_WERKNEMERS": 200}
-  }
+        "RVO": {"AANTAL_WERKNEMERS": 200}
+    }
 }
 ```
 

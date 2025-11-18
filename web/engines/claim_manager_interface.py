@@ -11,13 +11,16 @@ class ClaimManagerInterface(ABC):
     """
 
     @abstractmethod
-    def get_claims_by_bsn(self, bsn: str, approved: bool = False, include_rejected: bool = False) -> list[Claim]:
+    def get_claims_by_bsn(
+        self, bsn: str, approved: bool = False, include_rejected: bool = False, effective_date: str | None = None
+    ) -> list[Claim]:
         """
         Retrieves case information based on bsn.
 
         Args:
             bsn: Citizen identifier
             include_rejected: include rejected claims
+            effective_date: Optional effective date in YYYY-MM-DD format
 
         Returns:
             A Case containing the case information
@@ -25,7 +28,13 @@ class ClaimManagerInterface(ABC):
 
     @abstractmethod
     def get_claim_by_bsn_service_law(
-        self, bsn: str, service: str, law: str, approved: bool = False, include_rejected: bool = False
+        self,
+        bsn: str,
+        service: str,
+        law: str,
+        approved: bool = False,
+        include_rejected: bool = False,
+        effective_date: str | None = None,
     ) -> dict[UUID:Claim]:
         """
         Retrieves case information based on provided parameters.
@@ -35,6 +44,7 @@ class ClaimManagerInterface(ABC):
             service: Service provider code (e.g., "TOESLAGEN")
             law: Law identifier (e.g., "zorgtoeslagwet")
             include_rejected: include rejected claims
+            effective_date: Optional effective date in YYYY-MM-DD format
 
         Returns:
             A Case containing the case information

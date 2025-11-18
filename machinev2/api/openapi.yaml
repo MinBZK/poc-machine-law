@@ -46,6 +46,8 @@ paths:
         - Profile
       description: Get all profiles
       operationId: profileList
+      parameters:
+        - $ref: "#/components/parameters/queryEffectiveDate"
       responses:
         "200":
           $ref: "#/components/responses/ResponseProfileList"
@@ -61,6 +63,7 @@ paths:
       operationId: profileGet
       parameters:
         - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/queryEffectiveDate"
       responses:
         "200":
           $ref: "#/components/responses/ProfileResponse"
@@ -1375,6 +1378,15 @@ components:
       schema:
         type: string
         example: zorgtoeslagwet
+    queryEffectiveDate:
+      name: effective_date
+      in: query
+      description: Can be used to set the effective execution date
+      schema:
+        type: string
+        format: date
+        example: "2025-01-31"
+      required: false
     queryOnlyApproved:
       name: approved
       in: query

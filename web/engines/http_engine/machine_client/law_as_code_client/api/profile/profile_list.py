@@ -1,3 +1,4 @@
+import datetime
 from http import HTTPStatus
 from typing import Any, Optional, Union
 
@@ -8,13 +9,26 @@ from ...client import AuthenticatedClient, Client
 from ...models.profile_list_response_200 import ProfileListResponse200
 from ...models.profile_list_response_400 import ProfileListResponse400
 from ...models.profile_list_response_500 import ProfileListResponse500
-from ...types import Response
+from ...types import UNSET, Response, Unset
 
 
-def _get_kwargs() -> dict[str, Any]:
+def _get_kwargs(
+    *,
+    effective_date: Union[Unset, datetime.date] = UNSET,
+) -> dict[str, Any]:
+    params: dict[str, Any] = {}
+
+    json_effective_date: Union[Unset, str] = UNSET
+    if not isinstance(effective_date, Unset):
+        json_effective_date = effective_date.isoformat()
+    params["effective_date"] = json_effective_date
+
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
     _kwargs: dict[str, Any] = {
         "method": "get",
         "url": "/profiles",
+        "params": params,
     }
 
     return _kwargs
@@ -55,8 +69,12 @@ def _build_response(
 def sync_detailed(
     *,
     client: Union[AuthenticatedClient, Client],
+    effective_date: Union[Unset, datetime.date] = UNSET,
 ) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
+
+    Args:
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -66,7 +84,9 @@ def sync_detailed(
         Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]
     """
 
-    kwargs = _get_kwargs()
+    kwargs = _get_kwargs(
+        effective_date=effective_date,
+    )
 
     response = client.get_httpx_client().request(
         **kwargs,
@@ -78,8 +98,12 @@ def sync_detailed(
 def sync(
     *,
     client: Union[AuthenticatedClient, Client],
+    effective_date: Union[Unset, datetime.date] = UNSET,
 ) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
+
+    Args:
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -91,14 +115,19 @@ def sync(
 
     return sync_detailed(
         client=client,
+        effective_date=effective_date,
     ).parsed
 
 
 async def asyncio_detailed(
     *,
     client: Union[AuthenticatedClient, Client],
+    effective_date: Union[Unset, datetime.date] = UNSET,
 ) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
+
+    Args:
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -108,7 +137,9 @@ async def asyncio_detailed(
         Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]
     """
 
-    kwargs = _get_kwargs()
+    kwargs = _get_kwargs(
+        effective_date=effective_date,
+    )
 
     response = await client.get_async_httpx_client().request(**kwargs)
 
@@ -118,8 +149,12 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: Union[AuthenticatedClient, Client],
+    effective_date: Union[Unset, datetime.date] = UNSET,
 ) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
+
+    Args:
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -132,5 +167,6 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
+            effective_date=effective_date,
         )
     ).parsed

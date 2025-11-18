@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
@@ -52,7 +52,7 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
-    def get_profile_data(self, bsn: str) -> dict[str, Any]:
+    def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any]:
         """
         Get profile data for a specific BSN.
 
@@ -64,7 +64,7 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
-    def get_all_profiles(self) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
         """
         Get all available profiles.
 
