@@ -1,5 +1,6 @@
 """API endpoints for the wallet module."""
 
+import os
 import re
 
 import httpx
@@ -11,6 +12,11 @@ from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_mac
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.feature_flags import is_wallet_enabled
 from web.routers.laws import evaluate_law
+
+# Wallet configuration
+RETURN_URL = os.environ.get("WALLET_RETURN_URL", "http://127.0.0.1:8000")
+REQUESTER_URL = os.environ.get("WALLET_VERIFIER_REQUESTER_URL", "http://127.0.0.1:3010")
+WALLET_URL = os.environ.get("WALLET_VERIFIER_WALLET_URL", "http://127.0.0.1:3009")
 
 router = APIRouter(prefix="/wallet", tags=["wallet"])
 
@@ -47,14 +53,14 @@ async def housing(request_body: WalletStartRequest):
                 }
             ]
         },
-        "return_url_template": "http://127.0.0.1:8000/?wallet_session_token={session_token}",
+        "return_url_template": f"{RETURN_URL}/?wallet_session_token={{session_token}}",
     }
 
     # Make HTTP call to disclosure service
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                "http://localhost:3010/disclosure/sessions",
+                f"{REQUESTER_URL}/disclosure/sessions",
                 json=disclosure_payload,
                 headers={"Content-Type": "application/json"},
             )
@@ -73,7 +79,7 @@ async def housing(request_body: WalletStartRequest):
     # Return the disclosure session information
     return JSONResponse(
         content={
-            "status_url": f"http://127.0.0.1:3009/disclosure/sessions/{session_token}",
+            "status_url": f"{WALLET_URL}/disclosure/sessions/{session_token}",
             "session_token": session_token,
         }
     )
@@ -137,9 +143,7 @@ async def get_attributes(
     # Make HTTP GET request to the verification_server
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"http://127.0.0.1:3010/disclosure/sessions/{session_token}/disclosed_attributes"
-            )
+            response = await client.get(f"{REQUESTER_URL}/disclosure/sessions/{session_token}/disclosed_attributes")
             response.raise_for_status()
 
             # Parse the response
