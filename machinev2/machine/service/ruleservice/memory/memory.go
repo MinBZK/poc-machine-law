@@ -24,7 +24,7 @@ type RuleService struct {
 	Services         service.ServiceProvider
 	CaseManager      casemanager.CaseManager
 	ClaimManager     claimmanager.ClaimManager
-	Resolver         *ruleresolver.RuleResolver
+	Resolver         *ruleresolver.RuleResolve
 	engines          map[string]map[string]*engine.RulesEngine
 	SourceDataFrames model.SourceDataFrame
 	mu               sync.RWMutex
@@ -84,7 +84,7 @@ func (rs *RuleService) getEngine(law string, referenceDate time.Time) (*engine.R
 }
 
 // GetResolver returns the rule resolver
-func (rs *RuleService) GetResolver() *ruleresolver.RuleResolver {
+func (rs *RuleService) GetResolver() *ruleresolver.RuleResolve {
 	return rs.Resolver
 }
 

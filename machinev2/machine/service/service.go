@@ -14,7 +14,7 @@ type ServiceProvider interface {
 	Evaluate(ctx context.Context, service, law string, parameters map[string]any, referenceDate, effectiveDate *time.Time,
 		overwriteInput map[string]any, requestedOutput string, approved bool) (*model.RuleResult, error)
 	ApplyRules(ctx context.Context, event model.Event) error
-	GetRuleResolver() *ruleresolver.RuleResolver
+	GetRuleResolver() ruleresolver.RuleResolver
 	GetServiceResolver() *serviceresolver.ServiceResolver
 	RuleServicesInMemory() bool
 	HasOrganizationName() bool

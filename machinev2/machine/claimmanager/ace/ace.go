@@ -15,13 +15,16 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/ace/generated"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 // ClaimManager implements the claimmanager interface using ACE
 type ClaimManager struct {
-	logger     logger.Logger
-	clients    clients
-	claimTypes claimTypes
+	logger       logger.Logger
+	clients      clients
+	claimTypes   claimTypes
+	ruleResolver *ruleresolver.RuleResolve
+	service      string
 }
 
 type clients struct {
@@ -38,7 +41,7 @@ type claimType struct {
 }
 
 // New creates a new ACE-backed claim manager
-func New(endpoint string, logger logger.Logger) (claimmanager.ClaimManager, error) {
+func New(service string, ruleResolver *ruleresolver.RuleResolve, endpoint string, logger logger.Logger) (claimmanager.ClaimManager, error) {
 	clients := clients{
 		dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
 		ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
@@ -51,9 +54,11 @@ func New(endpoint string, logger logger.Logger) (claimmanager.ClaimManager, erro
 	}
 
 	return &ClaimManager{
-		logger:     logger,
-		clients:    clients,
-		claimTypes: claimTypes,
+		logger:       logger,
+		clients:      clients,
+		claimTypes:   claimTypes,
+		ruleResolver: ruleResolver,
+		service:      service,
 	}, nil
 }
 
@@ -98,6 +103,7 @@ func (cm *ClaimManager) Submit(
 ) (uuid.UUID, error) {
 	// Create internal claim
 	claim := model.NewClaim(service, key, newValue, reason, claimant, law, bsn, caseID, oldValue, evidencePath)
+	key = cm.convertOutputToSourceField(key, service, law)
 
 	if err := cm.transaction(ctx, func(ctx context.Context, txID string) error {
 		// Get or create BSN claim
@@ -230,7 +236,7 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 
 	m := &model.Claim{
 		ID:      claimID,
-		Service: "TOESLAGEN",
+		Service: cm.service,
 	}
 
 	for _, value := range bewering.Values {
@@ -245,6 +251,8 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 			m.Reason = *value.Value
 		}
 	}
+
+	m.Key = cm.convertSourceToOutputField(m.Key, cm.service, m.Law)
 
 	for _, value := range bewering.Subvalues {
 		switch value.Name {
@@ -484,7 +492,6 @@ func (cm *ClaimManager) matchesStatusFilter(claim *model.Claim, approved bool, i
 }
 
 func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string) (uuid.UUID, error) {
-
 	// Create Bewering (claim tracking) in ACE
 	beweringResp, err := generated.AddBewering(ctx, cm.clients.dml, &txID, bsnID, &reason, &law, &key)
 	if err != nil {
@@ -582,6 +589,70 @@ func (cm *ClaimManager) addBeweringCase(ctx context.Context, txID string, claimI
 	}
 
 	return nil
+}
+
+// convertOutputToSourceField converts an output field name to its source field name.
+func (cm *ClaimManager) convertOutputToSourceField(key, svc, law string) string {
+	// Get the rule spec
+	spec, err := cm.ruleResolver.GetRuleSpec(law, time.Now(), svc)
+	if err != nil {
+		// If we can't get the spec, just return the original key
+		return key
+	}
+
+	// Build the mapping
+	outputToSource := buildOutputToSourceMap(spec)
+
+	// Return the mapped field name, or the original key if no mapping exists
+	if sourceField, ok := outputToSource[key]; ok {
+		return sourceField[0]
+	}
+
+	return key
+}
+
+// convertSourceToOutputField converts a source field name to its output field name(s).
+func (cm *ClaimManager) convertSourceToOutputField(key, svc, law string) string {
+	// Get the rule spec
+	spec, err := cm.ruleResolver.GetRuleSpec(law, time.Now(), svc)
+	if err != nil {
+		// If we can't get the spec, just return the original key
+		return key
+	}
+
+	// Build the mapping
+	outputToSource := buildOutputToSourceMap(spec)
+
+	// Reverse the mapping to find output names
+	// Return the mapped field name, or the original key if no mapping exists
+
+	for k, v := range outputToSource {
+		for _, v1 := range v {
+			if v1 == key {
+				return k
+			}
+		}
+	}
+
+	return key
+}
+
+// buildOutputToSourceMap builds a mapping from output field names to source_reference field names.
+func buildOutputToSourceMap(spec ruleresolver.RuleSpec) map[string][]string {
+	// Build a map of source names to their fields
+	sourceFields := make(map[string][]string)
+	for _, source := range spec.Properties.Sources {
+		if source.SourceReference != nil {
+			if source.SourceReference.Fields != nil {
+				sourceFields[source.Name] = *source.SourceReference.Fields
+			}
+			if source.SourceReference.Field != nil {
+				sourceFields[source.Name] = []string{*source.SourceReference.Field}
+			}
+		}
+	}
+
+	return sourceFields
 }
 
 var ErrBeweringNotFound = errors.New("bewering_not_found")
