@@ -435,18 +435,30 @@ async def update_situation(
             law = "wet_brp"
 
             # Set the correct claims
-            parameters["verblijfplaats"] = {
-                "straat": parameters["adres.straat"],
-                "huisnummer": parameters["adres.huisnummer"],
-                "postcode": parameters["adres.postcode"],
-                "woonplaats": parameters["adres.woonplaats"],
-                "type": "WOONADRES",
-            }
+            verblijfplaats = {"type": "WOONADRES"}
+
+            # Only set address attributes if the corresponding parameters exist
+            if "adres.straat" in parameters:
+                verblijfplaats["straat"] = parameters["adres.straat"]
+            if "adres.huisnummer" in parameters:
+                verblijfplaats["huisnummer"] = parameters["adres.huisnummer"]
+            if "adres.postcode" in parameters:
+                verblijfplaats["postcode"] = parameters["adres.postcode"]
+            if "adres.woonplaats" in parameters:
+                verblijfplaats["woonplaats"] = parameters["adres.woonplaats"]
+
+            parameters["verblijfplaats"] = verblijfplaats
             parameters["land_verblijf"] = "NEDERLAND"
 
-            parameters["verblijfsadres"] = (
-                f"{parameters['adres.straat']} {parameters['adres.huisnummer']}, {parameters['adres.postcode']} {parameters['adres.woonplaats']}"
-            )
+            # Build verblijfsadres only from available parameters
+            address_parts = []
+            if "adres.straat" in parameters and "adres.huisnummer" in parameters:
+                address_parts.append(f"{parameters['adres.straat']} {parameters['adres.huisnummer']}")
+            if "adres.postcode" in parameters and "adres.woonplaats" in parameters:
+                address_parts.append(f"{parameters['adres.postcode']} {parameters['adres.woonplaats']}")
+
+            if address_parts:
+                parameters["verblijfsadres"] = ", ".join(address_parts)
 
             # Remove address fields that are no longer used (and do not correspond to claims) from parameters
             for k in ["adres.straat", "adres.huisnummer", "adres.postcode", "adres.woonplaats"]:
