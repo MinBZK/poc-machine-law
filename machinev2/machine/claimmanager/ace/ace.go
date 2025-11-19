@@ -385,7 +385,20 @@ func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimTy
 
 	for _, role := range cType {
 		if role.ReferencedType == "LabelType" {
-			input = append(input, generated.TagInput{Name: role.Name, Value: fmt.Sprintf("%v", value)})
+			// Handle float values, since '%v' formats large numbers using scientific notation
+			var val string
+			switch x := value.(type) {
+				case int:
+					val = strconv.Itoa(x)
+				case float32:
+					val = strconv.FormatFloat(float64(x), 'f', -1, 32)
+				case float64:
+					val = strconv.FormatFloat(x, 'f', -1, 64)
+				default:
+					val = fmt.Sprintf("%v", x)
+			}
+
+			input = append(input, generated.TagInput{Name: role.Name, Value: val})
 		}
 	}
 
