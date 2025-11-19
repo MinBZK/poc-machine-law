@@ -26,7 +26,7 @@ import (
 // Services is the main service provider for rule evaluation
 type Services struct {
 	logger            logger.Logger
-	RuleResolver      *ruleresolver.RuleResolver
+	ruleResolver      ruleresolver.RuleResolver
 	services          map[string]ruleservice.RuleServicer
 	ServiceResolver   *serviceresolver.ServiceResolver
 	RootReferenceDate time.Time
@@ -127,6 +127,7 @@ func New(
 	referenceDate time.Time,
 	caseManager casemanager.CaseManager,
 	claimManager claimmanager.ClaimManager,
+	ruleResolver ruleresolver.RuleResolver,
 	options ...Option,
 ) (*Services, error) {
 	serviceResolver, err := serviceresolver.New()
@@ -134,14 +135,9 @@ func New(
 		return nil, fmt.Errorf("new service resolver: %w", err)
 	}
 
-	ruleResolver, err := ruleresolver.New()
-	if err != nil {
-		return nil, fmt.Errorf("new rule resolver: %w", err)
-	}
-
 	s := &Services{
 		logger:              logr,
-		RuleResolver:        ruleResolver,
+		ruleResolver:        ruleResolver,
 		ServiceResolver:     serviceResolver,
 		CaseManager:         caseManager,
 		services:            make(map[string]ruleservice.RuleServicer),
@@ -160,7 +156,7 @@ func New(
 	}
 
 	// Initialize services
-	for service := range s.RuleResolver.GetServiceLaws() {
+	for service := range s.ruleResolver.GetServiceLaws() {
 		svc, err := ruleservice.New(logr, service, s, caseManager, claimManager)
 		if err != nil {
 			return nil, fmt.Errorf("new rule service: %w", err)
@@ -182,7 +178,7 @@ func (s *Services) GetService(key string) (ruleservice.RuleServicer, bool) {
 
 // GetDiscoverableServiceLaws returns discoverable services and laws
 func (s *Services) GetDiscoverableServiceLaws(discoverableBy string) map[string][]string {
-	return s.RuleResolver.GetDiscoverableServiceLaws(discoverableBy)
+	return s.ruleResolver.GetDiscoverableServiceLaws(discoverableBy)
 }
 
 // SetSourceDataFrame sets a source DataFrame for a service
@@ -212,11 +208,11 @@ func (s *Services) Reset(ctx context.Context) error {
 }
 
 // GetRuleResolver returns the rule resolver
-func (s *Services) GetRuleResolver() *ruleresolver.RuleResolver {
-	return s.RuleResolver
+func (s *Services) GetRuleResolver() ruleresolver.RuleResolver {
+	return s.ruleResolver
 }
 
-// GetRuleResolver returns the rule resolver
+// GetServiceResolver returns the rule resolver
 func (s *Services) GetServiceResolver() *serviceresolver.ServiceResolver {
 	return s.ServiceResolver
 }
@@ -245,7 +241,7 @@ func (s *Services) Evaluate(
 		eDate = *effectiveDate
 	}
 
-	spec, err := s.RuleResolver.GetRuleSpec(law, rDate, service)
+	spec, err := s.ruleResolver.GetRuleSpec(law, rDate, service)
 	if err != nil {
 		return nil, fmt.Errorf("get rule spec: %w", err)
 	}
@@ -442,7 +438,7 @@ func (s *Services) ExtractValueTree(root *model.PathNode) map[string]any {
 
 // ApplyRules applies rules in response to events
 func (s *Services) ApplyRules(ctx context.Context, event model.Event) error {
-	for _, rule := range s.RuleResolver.Rules {
+	for _, rule := range s.ruleResolver.GetRules() {
 		for _, apply := range rule.Properties.Applies {
 			if s.matchesEvent(event, apply) {
 				aggregateID := event.CaseID

@@ -56,14 +56,19 @@ func New(logr *slog.Logger, cfg *config.Config) (*Service, error) {
 
 	logr2 := logger.New("service", os.Stdout, logrus.DebugLevel)
 
+	ruleResolver, err := ruleresolver.New()
+	if err != nil {
+		return nil, fmt.Errorf("new rule resolver: %w", err)
+	}
+
 	caseManager := manager.New(logr2)
 	// claimManager := inmemory.New(logr2, caseManager)
-	claimManager, err := ace.New(cfg.ExternalClaimResolverEndpoint, logr2)
+	claimManager, err := ace.New(cfg.Organization, ruleResolver, cfg.ExternalClaimResolverEndpoint, logr2)
 	if err != nil {
 		return nil, fmt.Errorf("claim manager new: %w", err)
 	}
 
-	services, err := machine.New(logr2, time.Now(), caseManager, claimManager, options...)
+	services, err := machine.New(logr2, time.Now(), caseManager, claimManager, ruleResolver, options...)
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
@@ -188,7 +193,7 @@ func (service *Service) ServiceLawsDiscoverableList(ctx context.Context, discove
 }
 
 func (service *Service) GetRuleSpec(svc, law string, referenceDate time.Time) (ruleresolver.RuleSpec, error) {
-	rule, err := service.service.RuleResolver.GetRuleSpec(law, referenceDate, svc)
+	rule, err := service.service.GetRuleResolver().GetRuleSpec(law, referenceDate, svc)
 	if err != nil {
 		return ruleresolver.RuleSpec{}, fmt.Errorf("get rule spec: %w", err)
 	}
