@@ -1126,6 +1126,11 @@ components:
           type: boolean
           default: false
           description: Whether to automatically approve the claim
+        effective_date:
+          type: string
+          format: date
+          example: "2025-01-31"
+          description: The date on which the case, when accepted, should become effective. Defaults to the moment of acceptance.
     ClaimReject:
       description: Reject a claim
       type: object

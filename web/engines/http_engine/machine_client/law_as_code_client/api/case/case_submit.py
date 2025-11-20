@@ -36,35 +36,17 @@ def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
 ) -> Optional[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
     if response.status_code == 201:
-        if response.content and len(response.content) > 0:
-            try:
-                response_201 = CaseSubmitResponse201.from_dict(response.json())
-                return response_201
-            except Exception:
-                raise errors.UnexpectedStatus(response.status_code, response.content)
-        else:
-            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
+        response_201 = CaseSubmitResponse201.from_dict(response.json())
+
+        return response_201
     if response.status_code == 400:
-        if response.content and len(response.content) > 0:
-            try:
-                response_400 = CaseSubmitResponse400.from_dict(response.json())
-                return response_400
-            except Exception:
-                raise errors.UnexpectedStatus(response.status_code, response.content)
-        else:
-            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
+        response_400 = CaseSubmitResponse400.from_dict(response.json())
+
+        return response_400
     if response.status_code == 500:
-        # Check if response has content before trying to parse JSON
-        if response.content and len(response.content) > 0:
-            try:
-                response_500 = CaseSubmitResponse500.from_dict(response.json())
-                return response_500
-            except Exception:
-                # If JSON parsing fails, raise error with actual content
-                raise errors.UnexpectedStatus(response.status_code, response.content)
-        else:
-            # Empty response body, raise an error with status code
-            raise errors.UnexpectedStatus(response.status_code, b"Empty response body from server")
+        response_500 = CaseSubmitResponse500.from_dict(response.json())
+
+        return response_500
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:

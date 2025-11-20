@@ -279,6 +279,9 @@ type ClaimSubmit struct {
 	// Claimant Identity of the claimant
 	Claimant string `json:"claimant"`
 
+	// EffectiveDate The date on which the case, when accepted, should become effective. Defaults to the moment of acceptance.
+	EffectiveDate *openapi_types.Date `json:"effective_date,omitempty"`
+
 	// EvidencePath Path to evidence supporting the claim
 	EvidencePath *string `json:"evidencePath"`
 
