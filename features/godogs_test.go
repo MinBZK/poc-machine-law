@@ -506,6 +506,7 @@ func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Ta
 			nil,
 			v.Evidence,
 			false,
+			time.Now(),
 		)
 
 		if err != nil {
@@ -537,6 +538,7 @@ func dePersoonDitAanvraagt(ctx context.Context) (context.Context, error) {
 		params,
 		result.Output,
 		true,
+		nil,
 	)
 
 	if err != nil {
