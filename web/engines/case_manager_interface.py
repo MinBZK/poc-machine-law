@@ -1,7 +1,7 @@
+import datetime
 from abc import ABC, abstractmethod
 from typing import Any
 from uuid import UUID
-import datetime
 
 from .models import Case, Event
 
