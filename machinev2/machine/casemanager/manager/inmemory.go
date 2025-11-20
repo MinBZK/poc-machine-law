@@ -249,6 +249,7 @@ func (cm *InMemoryCaseManager) SubmitCase(
 	parameters map[string]any,
 	claimedResult map[string]any,
 	approvedClaimsOnly bool,
+	effectiveDate time.Time,
 ) (uuid.UUID, error) {
 
 	// Verify using rules engine
@@ -288,6 +289,7 @@ func (cm *InMemoryCaseManager) SubmitCase(
 			verifiedResult,
 			result.RulespecUUID,
 			approvedClaimsOnly,
+			effectiveDate,
 		)
 		if err != nil {
 			return uuid.Nil, fmt.Errorf("failed to submit case: %w", err)

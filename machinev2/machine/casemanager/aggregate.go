@@ -65,6 +65,7 @@ func (aggregate *CaseAggregate) HandleCommand(ctx context.Context, cmd eh.Comman
 				VerifiedResult:     cmd.VerifiedResult,
 				RulespecUUID:       cmd.RulespecID,
 				ApprovedClaimsOnly: cmd.ApprovedClaimsOnly,
+				EffectiveDate:      cmd.EffectiveDate,
 			},
 			time.Now(),
 		)
@@ -246,6 +247,7 @@ func (aggregate *CaseAggregate) ApplyEvent(ctx context.Context, event eh.Event) 
 			data.VerifiedResult,
 			data.RulespecUUID,
 			data.ApprovedClaimsOnly,
+			data.EffectiveDate,
 		)
 
 		// After case creation, we would normally check if results match and decide if manual review is needed

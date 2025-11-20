@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -24,17 +25,18 @@ type Claim struct {
 }
 
 type ClaimSubmit struct {
-	BSN          string
-	CaseID       *uuid.UUID
-	Claimant     string
-	EvidencePath *string
-	Key          string
-	Law          string
-	Service      string
-	NewValue     any
-	OldValue     *any
-	Reason       string
-	AutoApprove  *bool
+	BSN           string
+	CaseID        *uuid.UUID
+	Claimant      string
+	EvidencePath  *string
+	Key           string
+	Law           string
+	Service       string
+	NewValue      any
+	OldValue      *any
+	Reason        string
+	AutoApprove   *bool
+	EffectiveDate time.Time
 }
 
 type ClaimApprove struct {

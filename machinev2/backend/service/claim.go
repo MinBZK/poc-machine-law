@@ -116,6 +116,7 @@ func (service *Service) ClaimSubmit(ctx context.Context, claim model.ClaimSubmit
 		oldValue,
 		evidencePath,
 		autoApprove,
+		claim.EffectiveDate,
 	)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("submit claim: %w", err)
