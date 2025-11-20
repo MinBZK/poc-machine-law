@@ -51,7 +51,7 @@ type CaseSubmit struct {
 	ApprovedClaimsOnly bool
 	ClaimedResult      map[string]any
 	Parameters         map[string]any
-	EffectiveDate      time.Time
+	EffectiveDate      *time.Time
 }
 
 type CaseReview struct {

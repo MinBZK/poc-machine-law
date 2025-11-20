@@ -121,7 +121,7 @@ func SubmitCase(
 	verifiedResult map[string]any,
 	rulespecID uuid.UUID,
 	approvedClaimsOnly bool,
-	effectiveDate time.Time,
+	effectiveDate *time.Time,
 ) (uuid.UUID, error) {
 	// Create a unique ID for the case
 	id := uuid.New()

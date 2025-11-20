@@ -56,7 +56,7 @@ type SubmitCaseCommand struct {
 	VerifiedResult     map[string]any `json:"verified_result" eh:"optional"`
 	RulespecID         uuid.UUID      `json:"rulespec_uuid"`
 	ApprovedClaimsOnly bool           `json:"approved_claims_only"`
-	EffectiveDate      time.Time      `json:"effective_date"`
+	EffectiveDate      *time.Time     `json:"effective_date,omitempty" eh:"optional"`
 }
 
 // CommandType returns the type of the command.

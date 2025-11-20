@@ -11,7 +11,7 @@ import (
 // CaseManager interface defines the contract for case management operations.
 type CaseManager interface {
 	// Case lifecycle operations
-	SubmitCase(ctx context.Context, bsn, serviceType, law string, parameters, claimedResult map[string]any, approvedClaimsOnly bool, effectiveDate time.Time) (uuid.UUID, error)
+	SubmitCase(ctx context.Context, bsn, serviceType, law string, parameters, claimedResult map[string]any, approvedClaimsOnly bool, effectiveDate *time.Time) (uuid.UUID, error)
 	CompleteManualReview(ctx context.Context, caseID uuid.UUID, verifierID string, approved bool, reason string, overrideResult map[string]any) error
 	ObjectCase(ctx context.Context, caseID uuid.UUID, reason string) error
 	DetermineObjectionStatus(caseID uuid.UUID, possible *bool, notPossibleReason string, objectionPeriod, decisionPeriod, extensionPeriod *int) error

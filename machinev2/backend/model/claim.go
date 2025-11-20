@@ -36,7 +36,7 @@ type ClaimSubmit struct {
 	OldValue      *any
 	Reason        string
 	AutoApprove   *bool
-	EffectiveDate time.Time
+	EffectiveDate *time.Time
 }
 
 type ClaimApprove struct {
