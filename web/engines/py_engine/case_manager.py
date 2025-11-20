@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 from uuid import UUID
 
@@ -56,7 +57,10 @@ class CaseManager(CaseManagerInterface):
         parameters: dict[str, Any],
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
+        effective_date: datetime.date | None = None,
     ) -> UUID:
+        # Note: The underlying machine.service library does not support effective_date yet
+        # For now, we pass the existing parameters and ignore effective_date
         return self.case_manager.submit_case(
             bsn=bsn,
             service_type=service,
