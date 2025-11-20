@@ -1,11 +1,9 @@
-import datetime
 from collections.abc import Mapping
 from typing import Any, TypeVar, Union, cast
 from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-from dateutil.parser import isoparse
 
 from ..types import UNSET, Unset
 
@@ -28,8 +26,6 @@ class ClaimSubmit:
         old_value (Union[Unset, Any]):
         evidence_path (Union[None, Unset, str]): Path to evidence supporting the claim
         auto_approve (Union[Unset, bool]): Whether to automatically approve the claim Default: False.
-        effective_date (Union[Unset, datetime.date]): The date on which the case, when accepted, should become
-            effective. Defaults to the moment of acceptance. Example: 2025-01-31.
     """
 
     service: str
@@ -43,7 +39,6 @@ class ClaimSubmit:
     old_value: Union[Unset, Any] = UNSET
     evidence_path: Union[None, Unset, str] = UNSET
     auto_approve: Union[Unset, bool] = False
-    effective_date: Union[Unset, datetime.date] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -79,10 +74,6 @@ class ClaimSubmit:
 
         auto_approve = self.auto_approve
 
-        effective_date: Union[Unset, str] = UNSET
-        if not isinstance(self.effective_date, Unset):
-            effective_date = self.effective_date.isoformat()
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -104,8 +95,6 @@ class ClaimSubmit:
             field_dict["evidencePath"] = evidence_path
         if auto_approve is not UNSET:
             field_dict["autoApprove"] = auto_approve
-        if effective_date is not UNSET:
-            field_dict["effective_date"] = effective_date
 
         return field_dict
 
@@ -156,13 +145,6 @@ class ClaimSubmit:
 
         auto_approve = d.pop("autoApprove", UNSET)
 
-        _effective_date = d.pop("effective_date", UNSET)
-        effective_date: Union[Unset, datetime.date]
-        if isinstance(_effective_date, Unset):
-            effective_date = UNSET
-        else:
-            effective_date = isoparse(_effective_date).date()
-
         claim_submit = cls(
             service=service,
             key=key,
@@ -175,7 +157,6 @@ class ClaimSubmit:
             old_value=old_value,
             evidence_path=evidence_path,
             auto_approve=auto_approve,
-            effective_date=effective_date,
         )
 
         claim_submit.additional_properties = d
