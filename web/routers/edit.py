@@ -1,5 +1,6 @@
 import json
 import re
+from datetime import datetime
 
 from fastapi import (
     APIRouter,
@@ -489,8 +490,9 @@ async def update_situation(
                 status_code=400,
             )
 
-    # Remove the effective_date from the parameters. TODO: apply it to the case or claims when supported
-    effective_date = parameters.pop("effective_date", None)
+    # Get the effective_date from the parameters and parse it
+    effective_date_str = parameters.pop("effective_date", None)
+    effective_date = datetime.strptime(effective_date_str, "%Y-%m-%d").date() if effective_date_str else None
 
     # Create a case
     try:
