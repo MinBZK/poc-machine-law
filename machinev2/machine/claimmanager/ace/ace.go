@@ -100,6 +100,7 @@ func (cm *ClaimManager) Submit(
 	oldValue any,
 	evidencePath string,
 	autoApprove bool,
+	effectiveDate time.Time,
 ) (uuid.UUID, error) {
 	// Create internal claim
 	claim := model.NewClaim(service, key, newValue, reason, claimant, law, bsn, caseID, oldValue, evidencePath)
@@ -112,27 +113,24 @@ func (cm *ClaimManager) Submit(
 			return fmt.Errorf("get BSN: %w", err)
 		}
 
-		beweringID, err := cm.addBewering(ctx, txID, bsnID, reason, law, key)
+		beweringID, err := cm.addBewering(ctx, txID, bsnID, reason, law, key, effectiveDate)
 		if err != nil {
 			return fmt.Errorf("add bewering: %w", err)
 		}
 
-		// Add ValidFrom annotation to proposed claim (valid from now)
-		now := claim.CreatedAt
-
 		// Add BeweringStatus as "PENDING"
-		if err := cm.addBeweringStatus(ctx, txID, beweringID, "PENDING", &now); err != nil {
+		if err := cm.addBeweringStatus(ctx, txID, beweringID, "PENDING", &effectiveDate); err != nil {
 			return fmt.Errorf("add bewering status: %w", err)
 		}
 
 		// Create proposed value in ACE
 		claimTypeName := cm.normalizeClaimType(key) + "Proposed"
-		proposedID, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, newValue, &now)
+		proposedID, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, newValue, &effectiveDate)
 		if err != nil {
 			return fmt.Errorf("create proposed claim: %w", err)
 		}
 
-		if err = cm.AddBeweringProposed(ctx, txID, beweringID, proposedID, &now); err != nil {
+		if err = cm.AddBeweringProposed(ctx, txID, beweringID, proposedID, &effectiveDate); err != nil {
 			return fmt.Errorf("add bewering proposed: %w", err)
 		}
 
@@ -149,7 +147,7 @@ func (cm *ClaimManager) Submit(
 
 		// Auto-approve if requested
 		if autoApprove {
-			err = cm.approveInTransaction(ctx, txID, claim.ID, newValue, claimant, bsnID)
+			err = cm.approveInTransaction(ctx, txID, claim.ID, newValue, claimant, bsnID, effectiveDate)
 			if err != nil {
 				return fmt.Errorf("auto-approve: %w", err)
 			}
@@ -171,7 +169,7 @@ func (cm *ClaimManager) Approve(ctx context.Context, claimID uuid.UUID, verifica
 			return fmt.Errorf("get bewering: %w", err)
 		}
 
-		if err := cm.approveInTransaction(ctx, txID, bewering.ID, verification.Value, verification.By, bewering.BSN); err != nil {
+		if err := cm.approveInTransaction(ctx, txID, bewering.ID, verification.Value, verification.By, bewering.BSN, time.Now()); err != nil {
 			return err
 		}
 
@@ -396,14 +394,14 @@ func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimTy
 			// Handle float values, since '%v' formats large numbers using scientific notation
 			var val string
 			switch x := value.(type) {
-				case int:
-					val = strconv.Itoa(x)
-				case float32:
-					val = strconv.FormatFloat(float64(x), 'f', -1, 32)
-				case float64:
-					val = strconv.FormatFloat(x, 'f', -1, 64)
-				default:
-					val = fmt.Sprintf("%v", x)
+			case int:
+				val = strconv.Itoa(x)
+			case float32:
+				val = strconv.FormatFloat(float64(x), 'f', -1, 32)
+			case float64:
+				val = strconv.FormatFloat(x, 'f', -1, 64)
+			default:
+				val = fmt.Sprintf("%v", x)
 			}
 
 			input = append(input, generated.TagInput{Name: role.Name, Value: val})
@@ -429,7 +427,7 @@ func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimTy
 	return response.AddClaim, nil
 }
 
-func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, claimID uuid.UUID, verifiedValue any, verifiedBy string, bsnID string) error {
+func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, claimID uuid.UUID, verifiedValue any, verifiedBy string, bsnID string, effectiveDate time.Time) error {
 	log := cm.logger.WithFields(
 		logger.NewField("tx", txID),
 		logger.NewField("claimID", claimID),
@@ -437,8 +435,6 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 		logger.NewField("by", verifiedBy),
 		logger.NewField("bsn", bsnID),
 	)
-
-	approvalTime := time.Now()
 
 	bewering, err := cm.get(ctx, &txID, claimID)
 	if err != nil {
@@ -450,18 +446,18 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 
 	// Create real value in ACE
 	claimTypeName := cm.normalizeClaimType(bewering.Key)
-	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &approvalTime); err != nil {
+	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("create real claim: %w", err)
 	}
 
 	log.Info("add bewering status")
 
-	if err := cm.addBeweringStatus(ctx, txID, bewering.ID, "APPROVED", &approvalTime); err != nil {
+	if err := cm.addBeweringStatus(ctx, txID, bewering.ID, "APPROVED", &effectiveDate); err != nil {
 		return fmt.Errorf("add bewering status: %w", err)
 	}
 
 	log.Info("add verified")
-	if err := cm.addVerified(ctx, txID, bewering.ID, verifiedBy, bewering.NewValue, &approvalTime); err != nil {
+	if err := cm.addVerified(ctx, txID, bewering.ID, verifiedBy, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("add verified: %w", err)
 	}
 
@@ -491,7 +487,7 @@ func (cm *ClaimManager) matchesStatusFilter(claim *model.Claim, approved bool, i
 	return claim.Status == model.ClaimStatusApproved || claim.Status == model.ClaimStatusPending
 }
 
-func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string) (uuid.UUID, error) {
+func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string, effectiveDate time.Time) (uuid.UUID, error) {
 	// Create Bewering (claim tracking) in ACE
 	beweringResp, err := generated.AddBewering(ctx, cm.clients.dml, &txID, bsnID, &reason, &law, &key)
 	if err != nil {
@@ -503,7 +499,7 @@ func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID stri
 		return uuid.Nil, fmt.Errorf("bewerings uuid parse: %w", err)
 	}
 
-	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, beweringResp.AddBewering, time.Now()); err != nil {
+	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, beweringResp.AddBewering, effectiveDate); err != nil {
 		return uuid.Nil, fmt.Errorf("add annotation valid from: %w", err)
 	}
 

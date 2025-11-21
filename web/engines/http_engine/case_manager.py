@@ -1,3 +1,4 @@
+import datetime
 import logging
 import urllib.parse
 from typing import Any
@@ -176,6 +177,7 @@ class CaseManager(CaseManagerInterface):
         parameters: dict[str, Any],
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
+        effective_date: datetime.date | None = None,
     ) -> UUID:
         # Instantiate the API client with service-specific base URL
         service_base_url = self._get_base_url_for_service(service)
@@ -188,6 +190,7 @@ class CaseManager(CaseManagerInterface):
             parameters=parameters,
             claimed_result=claimed_result,
             approved_claims_only=approved_claims_only,
+            effective_date=effective_date if effective_date is not None else UNSET,
         )
         body = CaseSubmitBody(data=data)
 

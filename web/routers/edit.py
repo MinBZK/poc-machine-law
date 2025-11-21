@@ -1,5 +1,6 @@
 import json
 import re
+from datetime import datetime
 
 from fastapi import (
     APIRouter,
@@ -489,8 +490,9 @@ async def update_situation(
                 status_code=400,
             )
 
-    # Remove the effective_date from the parameters. TODO: apply it to the case or claims when supported
-    parameters.pop("effective_date", None)
+    # Get the effective_date from the parameters and parse it
+    effective_date_str = parameters.pop("effective_date", None)
+    effective_date = datetime.strptime(effective_date_str, "%Y-%m-%d").date() if effective_date_str else None
 
     # Create a case
     try:
@@ -504,6 +506,7 @@ async def update_situation(
             },  # The Go engine expects the BSN to be present (with uppercase) in the case parameters, so we add it
             claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
+            effective_date=effective_date,
         )
     except UnexpectedStatus as e:
         return JSONResponse(

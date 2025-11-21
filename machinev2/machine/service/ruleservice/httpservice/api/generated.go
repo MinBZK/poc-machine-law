@@ -208,6 +208,9 @@ type CaseSubmit struct {
 	Bsn           Bsn                    `json:"bsn"`
 	ClaimedResult map[string]interface{} `json:"claimedResult"`
 
+	// EffectiveDate The date on which the case, when accepted, should become effective. Defaults to the moment of acceptance.
+	EffectiveDate *openapi_types.Date `json:"effective_date,omitempty"`
+
 	// Law Specify the law that needs to be executed
 	Law        string                 `json:"law"`
 	Parameters map[string]interface{} `json:"parameters"`

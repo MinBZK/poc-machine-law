@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	eh "github.com/looplab/eventhorizon"
@@ -120,6 +121,7 @@ func SubmitCase(
 	verifiedResult map[string]any,
 	rulespecID uuid.UUID,
 	approvedClaimsOnly bool,
+	effectiveDate *time.Time,
 ) (uuid.UUID, error) {
 	// Create a unique ID for the case
 	id := uuid.New()
@@ -135,6 +137,7 @@ func SubmitCase(
 		VerifiedResult:     verifiedResult,
 		RulespecID:         rulespecID,
 		ApprovedClaimsOnly: approvedClaimsOnly,
+		EffectiveDate:      effectiveDate,
 	}
 
 	// Execute the command

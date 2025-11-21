@@ -1182,6 +1182,11 @@ components:
           additionalProperties: true
         approvedClaimsOnly:
           type: boolean
+        effective_date:
+          type: string
+          format: date
+          example: "2025-01-31"
+          description: The date on which the case, when accepted, should become effective. Defaults to the moment of acceptance.
     CaseReview:
       type: object
       required:
