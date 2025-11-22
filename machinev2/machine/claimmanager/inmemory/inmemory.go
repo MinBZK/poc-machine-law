@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
@@ -83,6 +84,7 @@ func (cm *ClaimManager) Submit(
 	oldValue any,
 	evidencePath string,
 	autoApprove bool,
+	effectiveDate time.Time,
 ) (uuid.UUID, error) {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()

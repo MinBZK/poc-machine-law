@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
 from explain.llm_factory import LLMFactory
+from machine.utils import RuleResolver
 from web.config_loader import ConfigLoader
 from web.dependencies import (
     get_case_manager,
@@ -24,6 +25,7 @@ from web.routers.laws import evaluate_law
 
 config_loader = ConfigLoader()
 llm_factory = LLMFactory()
+rule_resolver = RuleResolver()
 
 
 def get_person_name(bsn: str, services: EngineInterface) -> str:
@@ -278,13 +280,11 @@ async def admin_dashboard(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
-    discoverable_laws = services.get_discoverable_service_laws("CITIZEN") | services.get_discoverable_service_laws(
-        "BUSINESS"
-    )
-    available_services = list(discoverable_laws.keys())
+    all_laws = rule_resolver.get_service_laws()
+    available_services = list(all_laws.keys())
 
     # Get cases for selected service
-    service_laws = discoverable_laws.get(service, [])
+    service_laws = all_laws.get(service, [])
     service_cases = {}
     for law in service_laws:
         cases = case_manager.get_cases_by_law(service, law)
@@ -453,6 +453,7 @@ async def view_case(
             "claim_map": claim_map,
             "claim_ids": claim_ids,
             "person_name": person_name,
+            "current_engine_id": get_engine_id(),
         },
     )
 

@@ -23,6 +23,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -250,8 +251,12 @@ func deDatumIs(ctx context.Context, arg1 string) (context.Context, error) {
 
 	caseManager := manager.New(logr)
 	claimManager := inmemory.New(logr, caseManager)
+	ruleresolver, err := ruleresolver.New()
+	if err != nil {
+		return nil, fmt.Errorf("new ruleresolver: %w", err)
+	}
 
-	services, err := serviceprovider.New(logr, t1, caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
+	services, err := serviceprovider.New(logr, t1, caseManager, claimManager, ruleresolver, serviceprovider.WithRuleServiceInMemory())
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
@@ -501,6 +506,7 @@ func deBurgerGegevensIndient(ctx context.Context, chance string, table *godog.Ta
 			nil,
 			v.Evidence,
 			false,
+			time.Now(),
 		)
 
 		if err != nil {
@@ -532,6 +538,7 @@ func dePersoonDitAanvraagt(ctx context.Context) (context.Context, error) {
 		params,
 		result.Output,
 		true,
+		nil,
 	)
 
 	if err != nil {

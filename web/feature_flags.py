@@ -21,6 +21,7 @@ class FeatureFlags:
         "WALLET": False,  # Wallet feature is disabled by default
         "CHAT": True,  # Chat feature is enabled by default
         "CHANGE_WIZARD": False,  # Change wizard is disabled by default
+        "ADJUSTABLE_EFFECTIVE_DATE": False,  # Adjustable effective date is disabled by default
         "TOTAL_INCOME_WIDGET": False,  # Total income dashboard widget is disabled by default
     }
 
@@ -149,6 +150,11 @@ def is_chat_enabled() -> bool:
 def is_change_wizard_enabled() -> bool:
     """Check if the change wizard feature is enabled."""
     return FeatureFlags.is_enabled("CHANGE_WIZARD")
+
+
+def is_effective_date_adjustment_enabled() -> bool:
+    """Check if the adjustable effective date feature is enabled."""
+    return FeatureFlags.is_enabled("ADJUSTABLE_EFFECTIVE_DATE")
 
 
 def is_total_income_widget_enabled() -> bool:

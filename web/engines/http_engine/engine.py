@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import httpx
@@ -192,7 +192,10 @@ class MachineService(EngineInterface):
 
             return result
 
-    def get_all_profiles(self) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
+        if effective_date is None:
+            effective_date = UNSET
+
         # When service routing is enabled and configured to query all services
         service_routing_config = getattr(self, "_service_routing_config", None)
         query_all = (
@@ -210,7 +213,7 @@ class MachineService(EngineInterface):
                 )
                 client = Client(base_url=service_config.domain)
                 with client as client:
-                    response = profile_list.sync_detailed(client=client)
+                    response = profile_list.sync_detailed(client=client, effective_date=effective_date)
                     content = response.parsed
 
                     for item in content.data:
@@ -227,7 +230,7 @@ class MachineService(EngineInterface):
         client = Client(base_url=self.base_url)
 
         with client as client:
-            response = profile_list.sync_detailed(client=client)
+            response = profile_list.sync_detailed(client=client, effective_date=effective_date)
             content = response.parsed
 
             result = {}
@@ -236,16 +239,27 @@ class MachineService(EngineInterface):
 
             return result
 
-    def get_profile_data(self, bsn: str) -> dict[str, Any] | None:
+    def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any] | None:
+        if effective_date is None:
+            effective_date = UNSET
+
         # Always use default base_url for profile data (profiles are centralized)
         # Service routing does not apply to individual profile lookups
         client = Client(base_url=self.base_url)
 
         with client as client:
-            response = profile_get.sync_detailed(client=client, bsn=bsn)
+            response = profile_get.sync_detailed(client=client, bsn=bsn, effective_date=effective_date)
             content = response.parsed
 
-            return profile_transform(content.data)
+            # Handle different response types
+            if response.status_code == 200:
+                return profile_transform(content.data)
+            elif response.status_code == 404:
+                logger.warning(f"[MachineService] Profile not found for BSN: {bsn}")
+                return None
+            else:
+                logger.error(f"[MachineService] Error getting profile for BSN {bsn}: Status {response.status_code}")
+                return None
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         # Instantiate the API client with service-specific base URL

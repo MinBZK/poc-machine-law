@@ -65,6 +65,7 @@ func (aggregate *CaseAggregate) HandleCommand(ctx context.Context, cmd eh.Comman
 				VerifiedResult:     cmd.VerifiedResult,
 				RulespecUUID:       cmd.RulespecID,
 				ApprovedClaimsOnly: cmd.ApprovedClaimsOnly,
+				EffectiveDate:      cmd.EffectiveDate,
 			},
 			time.Now(),
 		)
@@ -236,6 +237,12 @@ func (aggregate *CaseAggregate) HandleCommand(ctx context.Context, cmd eh.Comman
 func (aggregate *CaseAggregate) ApplyEvent(ctx context.Context, event eh.Event) error {
 	switch data := event.Data().(type) {
 	case *CaseSubmitted:
+		// Determine effective date - use provided date or default to now
+		effectiveDate := time.Now()
+		if data.EffectiveDate != nil {
+			effectiveDate = *data.EffectiveDate
+		}
+
 		// Create a new case with the data from the event
 		aggregate.c = NewCase(
 			data.BSN,
@@ -246,6 +253,7 @@ func (aggregate *CaseAggregate) ApplyEvent(ctx context.Context, event eh.Event) 
 			data.VerifiedResult,
 			data.RulespecUUID,
 			data.ApprovedClaimsOnly,
+			effectiveDate,
 		)
 
 		// After case creation, we would normally check if results match and decide if manual review is needed

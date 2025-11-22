@@ -7,7 +7,7 @@
         <title>RegelRecht Demo</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <script type="module" src="../../nl-wallet-files/nl-wallet-web.iife.js"></script>
+        <script type="module" src="/nl-wallet-files/nl-wallet-web.iife.js"></script>
         <script defer
                 src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
         <style>
@@ -468,14 +468,13 @@
         <!-- Shared Application Panel -->
         <div id="shared-application-panel"></div>
         <script>
-            // Global ESC key handler for closing the panel
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    document.dispatchEvent(new CustomEvent('close-panel'));
-                }
-            });
-        </script>
-        <script>
+        // Global ESC key handler for closing the panel
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.dispatchEvent(new CustomEvent('close-panel'));
+            }
+        });
+
         // Listen for Ctrl-R / Cmd-R when inside iframe and notify parent
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'r') {

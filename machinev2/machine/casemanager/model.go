@@ -49,6 +49,7 @@ type Case struct {
 	AppealStatus       CaseAppealStatus    `json:"appeal_status,omitempty"`
 	Approved           *bool               `json:"approved,omitempty"`
 	Status             CaseStatus          `json:"status"`
+	EffectiveDate      time.Time           `json:"effective_date"`
 	CreatedAt          time.Time           `json:"created_at"`
 	UpdatedAt          time.Time           `json:"updated_at"`
 }
@@ -82,6 +83,7 @@ func NewCase(
 	verifiedResult map[string]any,
 	rulespecUUID uuid.UUID,
 	approvedClaimsOnly bool,
+	effectiveDate time.Time,
 ) *Case {
 	now := time.Now()
 	return &Case{
@@ -96,6 +98,7 @@ func NewCase(
 		VerifiedResult:     verifiedResult,
 		Parameters:         parameters,
 		Status:             CaseStatusSubmitted,
+		EffectiveDate:      effectiveDate,
 		CreatedAt:          now,
 		UpdatedAt:          now,
 	}

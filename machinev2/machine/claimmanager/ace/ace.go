@@ -15,13 +15,16 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/ace/generated"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 // ClaimManager implements the claimmanager interface using ACE
 type ClaimManager struct {
-	logger     logger.Logger
-	clients    clients
-	claimTypes claimTypes
+	logger       logger.Logger
+	clients      clients
+	claimTypes   claimTypes
+	ruleResolver *ruleresolver.RuleResolve
+	service      string
 }
 
 type clients struct {
@@ -38,7 +41,7 @@ type claimType struct {
 }
 
 // New creates a new ACE-backed claim manager
-func New(endpoint string, logger logger.Logger) (claimmanager.ClaimManager, error) {
+func New(service string, ruleResolver *ruleresolver.RuleResolve, endpoint string, logger logger.Logger) (claimmanager.ClaimManager, error) {
 	clients := clients{
 		dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
 		ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
@@ -51,9 +54,11 @@ func New(endpoint string, logger logger.Logger) (claimmanager.ClaimManager, erro
 	}
 
 	return &ClaimManager{
-		logger:     logger,
-		clients:    clients,
-		claimTypes: claimTypes,
+		logger:       logger,
+		clients:      clients,
+		claimTypes:   claimTypes,
+		ruleResolver: ruleResolver,
+		service:      service,
 	}, nil
 }
 
@@ -95,9 +100,11 @@ func (cm *ClaimManager) Submit(
 	oldValue any,
 	evidencePath string,
 	autoApprove bool,
+	effectiveDate time.Time,
 ) (uuid.UUID, error) {
 	// Create internal claim
 	claim := model.NewClaim(service, key, newValue, reason, claimant, law, bsn, caseID, oldValue, evidencePath)
+	key = cm.convertOutputToSourceField(key, service, law)
 
 	if err := cm.transaction(ctx, func(ctx context.Context, txID string) error {
 		// Get or create BSN claim
@@ -106,27 +113,24 @@ func (cm *ClaimManager) Submit(
 			return fmt.Errorf("get BSN: %w", err)
 		}
 
-		beweringID, err := cm.addBewering(ctx, txID, bsnID, reason, law, key)
+		beweringID, err := cm.addBewering(ctx, txID, bsnID, reason, law, key, effectiveDate)
 		if err != nil {
 			return fmt.Errorf("add bewering: %w", err)
 		}
 
-		// Add ValidFrom annotation to proposed claim (valid from now)
-		now := claim.CreatedAt
-
 		// Add BeweringStatus as "PENDING"
-		if err := cm.addBeweringStatus(ctx, txID, beweringID, "PENDING", &now); err != nil {
+		if err := cm.addBeweringStatus(ctx, txID, beweringID, "PENDING", &effectiveDate); err != nil {
 			return fmt.Errorf("add bewering status: %w", err)
 		}
 
 		// Create proposed value in ACE
 		claimTypeName := cm.normalizeClaimType(key) + "Proposed"
-		proposedID, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, newValue, &now)
+		proposedID, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, newValue, &effectiveDate)
 		if err != nil {
 			return fmt.Errorf("create proposed claim: %w", err)
 		}
 
-		if err = cm.AddBeweringProposed(ctx, txID, beweringID, proposedID, &now); err != nil {
+		if err = cm.AddBeweringProposed(ctx, txID, beweringID, proposedID, &effectiveDate); err != nil {
 			return fmt.Errorf("add bewering proposed: %w", err)
 		}
 
@@ -143,7 +147,7 @@ func (cm *ClaimManager) Submit(
 
 		// Auto-approve if requested
 		if autoApprove {
-			err = cm.approveInTransaction(ctx, txID, claim.ID, newValue, claimant, bsnID)
+			err = cm.approveInTransaction(ctx, txID, claim.ID, newValue, claimant, bsnID, effectiveDate)
 			if err != nil {
 				return fmt.Errorf("auto-approve: %w", err)
 			}
@@ -165,7 +169,7 @@ func (cm *ClaimManager) Approve(ctx context.Context, claimID uuid.UUID, verifica
 			return fmt.Errorf("get bewering: %w", err)
 		}
 
-		if err := cm.approveInTransaction(ctx, txID, bewering.ID, verification.Value, verification.By, bewering.BSN); err != nil {
+		if err := cm.approveInTransaction(ctx, txID, bewering.ID, verification.Value, verification.By, bewering.BSN, time.Now()); err != nil {
 			return err
 		}
 
@@ -230,7 +234,7 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 
 	m := &model.Claim{
 		ID:      claimID,
-		Service: "TOESLAGEN",
+		Service: cm.service,
 	}
 
 	for _, value := range bewering.Values {
@@ -245,6 +249,8 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 			m.Reason = *value.Value
 		}
 	}
+
+	m.Key = cm.convertSourceToOutputField(m.Key, cm.service, m.Law)
 
 	for _, value := range bewering.Subvalues {
 		switch value.Name {
@@ -385,7 +391,20 @@ func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimTy
 
 	for _, role := range cType {
 		if role.ReferencedType == "LabelType" {
-			input = append(input, generated.TagInput{Name: role.Name, Value: fmt.Sprintf("%v", value)})
+			// Handle float values, since '%v' formats large numbers using scientific notation
+			var val string
+			switch x := value.(type) {
+			case int:
+				val = strconv.Itoa(x)
+			case float32:
+				val = strconv.FormatFloat(float64(x), 'f', -1, 32)
+			case float64:
+				val = strconv.FormatFloat(x, 'f', -1, 64)
+			default:
+				val = fmt.Sprintf("%v", x)
+			}
+
+			input = append(input, generated.TagInput{Name: role.Name, Value: val})
 		}
 	}
 
@@ -408,7 +427,7 @@ func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimTy
 	return response.AddClaim, nil
 }
 
-func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, claimID uuid.UUID, verifiedValue any, verifiedBy string, bsnID string) error {
+func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, claimID uuid.UUID, verifiedValue any, verifiedBy string, bsnID string, effectiveDate time.Time) error {
 	log := cm.logger.WithFields(
 		logger.NewField("tx", txID),
 		logger.NewField("claimID", claimID),
@@ -416,8 +435,6 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 		logger.NewField("by", verifiedBy),
 		logger.NewField("bsn", bsnID),
 	)
-
-	approvalTime := time.Now()
 
 	bewering, err := cm.get(ctx, &txID, claimID)
 	if err != nil {
@@ -429,18 +446,18 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 
 	// Create real value in ACE
 	claimTypeName := cm.normalizeClaimType(bewering.Key)
-	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &approvalTime); err != nil {
+	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("create real claim: %w", err)
 	}
 
 	log.Info("add bewering status")
 
-	if err := cm.addBeweringStatus(ctx, txID, bewering.ID, "APPROVED", &approvalTime); err != nil {
+	if err := cm.addBeweringStatus(ctx, txID, bewering.ID, "APPROVED", &effectiveDate); err != nil {
 		return fmt.Errorf("add bewering status: %w", err)
 	}
 
 	log.Info("add verified")
-	if err := cm.addVerified(ctx, txID, bewering.ID, verifiedBy, bewering.NewValue, &approvalTime); err != nil {
+	if err := cm.addVerified(ctx, txID, bewering.ID, verifiedBy, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("add verified: %w", err)
 	}
 
@@ -470,8 +487,7 @@ func (cm *ClaimManager) matchesStatusFilter(claim *model.Claim, approved bool, i
 	return claim.Status == model.ClaimStatusApproved || claim.Status == model.ClaimStatusPending
 }
 
-func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string) (uuid.UUID, error) {
-
+func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string, effectiveDate time.Time) (uuid.UUID, error) {
 	// Create Bewering (claim tracking) in ACE
 	beweringResp, err := generated.AddBewering(ctx, cm.clients.dml, &txID, bsnID, &reason, &law, &key)
 	if err != nil {
@@ -483,7 +499,7 @@ func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID stri
 		return uuid.Nil, fmt.Errorf("bewerings uuid parse: %w", err)
 	}
 
-	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, beweringResp.AddBewering, time.Now()); err != nil {
+	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, beweringResp.AddBewering, effectiveDate); err != nil {
 		return uuid.Nil, fmt.Errorf("add annotation valid from: %w", err)
 	}
 
@@ -569,6 +585,70 @@ func (cm *ClaimManager) addBeweringCase(ctx context.Context, txID string, claimI
 	}
 
 	return nil
+}
+
+// convertOutputToSourceField converts an output field name to its source field name.
+func (cm *ClaimManager) convertOutputToSourceField(key, svc, law string) string {
+	// Get the rule spec
+	spec, err := cm.ruleResolver.GetRuleSpec(law, time.Now(), svc)
+	if err != nil {
+		// If we can't get the spec, just return the original key
+		return key
+	}
+
+	// Build the mapping
+	outputToSource := buildOutputToSourceMap(spec)
+
+	// Return the mapped field name, or the original key if no mapping exists
+	if sourceField, ok := outputToSource[key]; ok {
+		return sourceField[0]
+	}
+
+	return key
+}
+
+// convertSourceToOutputField converts a source field name to its output field name(s).
+func (cm *ClaimManager) convertSourceToOutputField(key, svc, law string) string {
+	// Get the rule spec
+	spec, err := cm.ruleResolver.GetRuleSpec(law, time.Now(), svc)
+	if err != nil {
+		// If we can't get the spec, just return the original key
+		return key
+	}
+
+	// Build the mapping
+	outputToSource := buildOutputToSourceMap(spec)
+
+	// Reverse the mapping to find output names
+	// Return the mapped field name, or the original key if no mapping exists
+
+	for k, v := range outputToSource {
+		for _, v1 := range v {
+			if v1 == key {
+				return k
+			}
+		}
+	}
+
+	return key
+}
+
+// buildOutputToSourceMap builds a mapping from output field names to source_reference field names.
+func buildOutputToSourceMap(spec ruleresolver.RuleSpec) map[string][]string {
+	// Build a map of source names to their fields
+	sourceFields := make(map[string][]string)
+	for _, source := range spec.Properties.Sources {
+		if source.SourceReference != nil {
+			if source.SourceReference.Fields != nil {
+				sourceFields[source.Name] = *source.SourceReference.Fields
+			}
+			if source.SourceReference.Field != nil {
+				sourceFields[source.Name] = []string{*source.SourceReference.Field}
+			}
+		}
+	}
+
+	return sourceFields
 }
 
 var ErrBeweringNotFound = errors.New("bewering_not_found")

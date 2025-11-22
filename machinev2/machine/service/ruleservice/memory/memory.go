@@ -3,6 +3,8 @@ package memory
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httputil"
 	"sync"
 	"time"
 
@@ -22,7 +24,7 @@ type RuleService struct {
 	Services         service.ServiceProvider
 	CaseManager      casemanager.CaseManager
 	ClaimManager     claimmanager.ClaimManager
-	Resolver         *ruleresolver.RuleResolver
+	Resolver         *ruleresolver.RuleResolve
 	engines          map[string]map[string]*engine.RulesEngine
 	SourceDataFrames model.SourceDataFrame
 	mu               sync.RWMutex
@@ -82,7 +84,7 @@ func (rs *RuleService) getEngine(law string, referenceDate time.Time) (*engine.R
 }
 
 // GetResolver returns the rule resolver
-func (rs *RuleService) GetResolver() *ruleresolver.RuleResolver {
+func (rs *RuleService) GetResolver() *ruleresolver.RuleResolve {
 	return rs.Resolver
 }
 
@@ -126,8 +128,37 @@ func (rs *RuleService) SetSourceDataFrame(_ context.Context, table string, df mo
 }
 
 // Reset removes all data in the rule service
-func (rs *RuleService) Reset(_ context.Context) error {
+func (rs *RuleService) Reset(ctx context.Context) error {
 	rs.SourceDataFrames.Reset()
+
+	switch rs.Services.GetExternalClaimResolver() {
+	case "ubb":
+		if err := rs.UbbReset(ctx); err != nil {
+			return fmt.Errorf("ubb reset: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (rs *RuleService) UbbReset(ctx context.Context) error {
+	endpoint := rs.Services.GetExternalClaimResolverUBBEndpoint()
+	client := http.DefaultClient
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint+":8081/reset-reseed", nil)
+	if err != nil {
+		return fmt.Errorf("new request: %w", err)
+	}
+
+	response, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("do: %w", err)
+	}
+
+	if response.StatusCode != http.StatusOK {
+		body, _ := httputil.DumpResponse(response, true)
+		return fmt.Errorf("invalid response code: %d body: %s", response.StatusCode, string(body))
+	}
 
 	return nil
 }

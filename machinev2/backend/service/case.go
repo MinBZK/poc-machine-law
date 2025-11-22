@@ -65,6 +65,7 @@ func (service *Service) CaseSubmit(ctx context.Context, case_ model.CaseSubmit) 
 		case_.Parameters,
 		case_.ClaimedResult,
 		case_.ApprovedClaimsOnly,
+		case_.EffectiveDate,
 	)
 
 	if err != nil {

@@ -46,6 +46,7 @@ jobs:
       - name: Build and Push Wallet varification server with Kaniko
         uses: int128/kaniko-action@v1
         with:
-          file: ./wallet/verification_server/Dockerfile
+          context: ./wallet
+          file: ./wallet/verification_server.Dockerfile
           push: true
           tags: ghcr.io/${{ steps.lowercase-repository.outputs.github_repository }}/wallet/verification_server:${{ github.sha }}-${{ github.ref_name }}-${{ github.run_id }}

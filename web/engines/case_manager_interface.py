@@ -1,3 +1,4 @@
+import datetime
 from abc import ABC, abstractmethod
 from typing import Any
 from uuid import UUID
@@ -70,6 +71,7 @@ class CaseManagerInterface(ABC):
         parameters: dict[str, Any],
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
+        effective_date: datetime.date | None = None,
     ) -> UUID:
         """
         Submit a case with information.
@@ -81,6 +83,7 @@ class CaseManagerInterface(ABC):
             parameters: dictionary containing the parameters that where used to execute the law
             claimed_result: dictionary containing the claimed result from the law
             approved_claims_only: Boolean only use approved claims while processing this case
+            effective_date: Optional date on which the case, when accepted, should become effective
 
         Returns:
             A Case containing the case information

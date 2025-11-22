@@ -1,6 +1,6 @@
 openapi: "3.0.3"
 info:
-  title: Law as Code
+  title: RegelRecht Engine API
   version: 0.0.1
 servers:
   - url: https://rvig-engine.bzlg.apps.digilab.network/v0
@@ -11,6 +11,12 @@ servers:
     description: Production server (Fictieve Dienst Toeslagen)
   - url: https://uwv-engine.bzlg.apps.digilab.network/v0
     description: Production server (Fictieve UWV)
+  - url: https://rvz-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictief Register Zorgverzekeringen)
+  - url: https://svb-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve Sociale Verzekeringsbank)
+  - url: https://ind-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve IND)
   - url: http://rvig-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictief RvIG)
   - url: http://bd-engine.127-0-0-1.nip.io:8080/v0
@@ -19,6 +25,12 @@ servers:
     description: Local development server (Fictieve Dienst Toeslagen)
   - url: http://uwv-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictieve UWV)
+  - url: http://rvz-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictief Register Zorgverzekeringen)
+  - url: http://svb-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve Sociale Verzekeringsbank)
+  - url: http://ind-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve IND)
 tags:
   - name: Law
   - name: Profile
@@ -46,6 +58,8 @@ paths:
         - Profile
       description: Get all profiles
       operationId: profileList
+      parameters:
+        - $ref: "#/components/parameters/queryEffectiveDate"
       responses:
         "200":
           $ref: "#/components/responses/ResponseProfileList"
@@ -61,6 +75,7 @@ paths:
       operationId: profileGet
       parameters:
         - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/queryEffectiveDate"
       responses:
         "200":
           $ref: "#/components/responses/ProfileResponse"
@@ -863,15 +878,6 @@ components:
 
       description: Output field extending BaseField
 
-    Field:
-      type: object
-      properties:
-        input:
-          $ref: "#/components/schemas/InputField"
-        source:
-          $ref: "#/components/schemas/SourceField"
-      description: Field containing input or source field
-
     SourceReference:
       type: object
       properties:
@@ -1034,10 +1040,6 @@ components:
         - $ref: "#/components/schemas/Requirement"
         - $ref: "#/components/schemas/Action"
 
-    VariableReference:
-      type: object
-      description: Variable reference (structure not fully defined)
-      additionalProperties: true
     Claim:
       description: Claim
       type: object
@@ -1056,7 +1058,6 @@ components:
           type: string
         caseId:
           $ref: "#/components/schemas/caseID"
-          nullable: true
         newValue: {}
         reason:
           type: string
@@ -1181,6 +1182,11 @@ components:
           additionalProperties: true
         approvedClaimsOnly:
           type: boolean
+        effective_date:
+          type: string
+          format: date
+          example: "2025-01-31"
+          description: The date on which the case, when accepted, should become effective. Defaults to the moment of acceptance.
     CaseReview:
       type: object
       required:
@@ -1375,6 +1381,15 @@ components:
       schema:
         type: string
         example: zorgtoeslagwet
+    queryEffectiveDate:
+      name: effective_date
+      in: query
+      description: Can be used to set the effective execution date
+      schema:
+        type: string
+        format: date
+        example: "2025-01-31"
+      required: false
     queryOnlyApproved:
       name: approved
       in: query
