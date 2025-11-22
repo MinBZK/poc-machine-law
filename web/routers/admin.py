@@ -381,6 +381,11 @@ async def complete_review(
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Complete manual review of a case"""
+
+    # Provide a fallback reason if none is provided
+    if not reason:
+        reason = "(No reason provided)"
+
     try:
         case_manager.complete_manual_review(case_id=case_id, verifier_id="ADMIN", approved=decision, reason=reason)
 
