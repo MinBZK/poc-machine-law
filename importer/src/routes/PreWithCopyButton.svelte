@@ -1,4 +1,6 @@
 <script lang="ts">
+  let { children } = $props();
+
   let pre: HTMLPreElement;
 
   // Function to download the file
@@ -25,7 +27,7 @@
 <div>
   <button
     class="float-right inline-flex cursor-pointer items-center rounded-tr-sm bg-gray-800/90 px-1.5 py-1 text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
-    on:click={downloadFile}
+    onclick={downloadFile}
     type="button"
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" viewBox="0 0 24 24"
@@ -44,7 +46,7 @@
   <button
     class="border-r-1 float-right inline-flex cursor-pointer items-center rounded-tl-sm border-gray-500 bg-gray-800/90 px-1.5 py-1 text-sm text-gray-200 hover:bg-gray-800 hover:text-white"
     type="button"
-    on:click={() => navigator.clipboard.writeText(pre.textContent || '')}
+    onclick={() => navigator.clipboard.writeText(pre.textContent || '')}
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-4 w-4" viewBox="0 0 24 24"
       ><g
@@ -61,5 +63,5 @@
   </button>
   <pre
     class="clear-right overflow-x-auto whitespace-pre-wrap rounded-sm rounded-tr-none bg-gray-900 px-3 py-2 text-sm text-white"
-    bind:this={pre}><slot /></pre>
+    bind:this={pre}>{@render children()}</pre>
 </div>

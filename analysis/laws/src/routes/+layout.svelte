@@ -2,6 +2,8 @@
   import { resolve } from '$app/paths';
   import '../app.pcss';
 
+  let { children } = $props();
+
   let menuOpen = $state(false);
 
   function clickOutside(node: HTMLElement) {
@@ -216,4 +218,4 @@
   </div>
 </div>
 
-<slot />
+{@render children()}
