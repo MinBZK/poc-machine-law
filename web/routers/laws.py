@@ -441,3 +441,86 @@ async def application_panel(
                 "current_engine_id": get_engine_id(),
             },
         )
+
+
+@router.post("/simulate")
+async def simulate_scenario(
+    request: Request,
+    machine_service: EngineInterface = Depends(get_machine_service),
+):
+    """
+    Simulate a scenario with fictional data without creating cases or claims.
+    This allows citizens to perform 'what-if' calculations (proefberekening).
+    """
+    try:
+        # Get the request body
+        body = await request.json()
+
+        bsn = body.get("bsn")
+        scenario_data = body.get("scenario_data", {})
+        effective_date = body.get("effective_date")
+
+        if not bsn:
+            return JSONResponse(
+                {"status": "error", "message": "BSN is required"},
+                status_code=400,
+            )
+
+        # Get all discoverable service laws
+        discoverable_service_laws = machine_service.get_sorted_discoverable_service_laws(bsn)
+
+        # Evaluate all laws with the scenario data
+        results = []
+        for service_law in discoverable_service_laws:
+            service = service_law["service"]
+            law = service_law["law"]
+
+            try:
+                # Evaluate the law with scenario data as overwrite_input
+                result = machine_service.evaluate(
+                    service=service,
+                    law=law,
+                    parameters={"BSN": bsn},
+                    reference_date=TODAY,
+                    effective_date=effective_date,
+                    approved=False,
+                    overwrite_input=scenario_data,
+                )
+
+                rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+                results.append(
+                    {
+                        "service": service,
+                        "law": law,
+                        "law_name": rule_spec.get("name", law),
+                        "output": result.output,
+                        "input": result.input,
+                        "requirements_met": result.requirements_met,
+                        "missing_required": result.missing_required,
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Error evaluating {service}/{law} for simulation: {e}")
+                results.append(
+                    {
+                        "service": service,
+                        "law": law,
+                        "error": str(e),
+                    }
+                )
+
+        return JSONResponse(
+            {
+                "status": "ok",
+                "results": results,
+                "scenario_data": scenario_data,
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error in simulate_scenario: {e}")
+        return JSONResponse(
+            {"status": "error", "message": str(e)},
+            status_code=500,
+        )
