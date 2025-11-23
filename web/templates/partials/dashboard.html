@@ -359,25 +359,26 @@
 <!-- Proefberekening Section -->
 <section class="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow border border-blue-100">
     <div class="p-6">
-        <div class="flex items-start justify-between mb-4">
-            <div>
-                <h3 class="font-semibold text-lg text-gray-900 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-6 w-6 mr-2 text-blue-600"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    Proefberekening
-                </h3>
-                <p class="text-gray-600 mt-2">
-                    Pas hieronder uw gegevens aan om te zien wat het effect is op uw regelingen.
-                    <span class="font-medium text-blue-700">Deze berekening heeft geen invloed op uw werkelijke gegevens.</span>
-                </p>
-            </div>
+        <div class="mb-6">
+            <h3 class="font-semibold text-lg text-gray-900 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="h-6 w-6 mr-2 text-blue-600"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Proefberekening
+            </h3>
+            <p class="text-gray-600 mt-2">
+                Pas uw gegevens aan en zie direct het effect op uw regelingen.
+                <span class="font-medium text-blue-700">Deze berekening heeft geen invloed op uw werkelijke gegevens.</span>
+            </p>
         </div>
-        <div id="scenario-container">
+        <!-- Two column layout: form left, results right -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left column: Form -->
+            <div id="scenario-container">
             <form id="scenario-form" class="space-y-6">
                 <p class="text-sm text-gray-600 bg-blue-50 p-3 rounded">
                     💡 <strong>Tip:</strong> Vul alleen de velden in die u wilt aanpassen voor uw scenario. Lege velden gebruiken uw huidige gegevens.
@@ -571,45 +572,34 @@
                     </div>
                 {% endif %}
                 <!-- Submit button -->
-                <div class="flex justify-end gap-3">
+                <div class="flex gap-3">
                     <button type="button"
-                            onclick="document.getElementById('scenario-form').reset()"
-                            class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
-                        Wis alle velden
+                            onclick="document.getElementById('scenario-form').reset(); document.getElementById('scenario-results').classList.add('hidden');"
+                            class="flex-1 cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
+                        Reset
                     </button>
                     <button type="submit"
                             id="scenario-calculate-btn"
-                            class="cursor-pointer rounded bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 focus:outline-none shadow-sm">
-                        Bereken scenario
+                            class="flex-1 cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none shadow-sm">
+                        Bereken
                     </button>
                 </div>
             </form>
-        </div>
-        <!-- Results container -->
-        <div id="scenario-results" class="hidden mt-6">
-            <div class="border-t pt-6">
-                <h4 class="font-semibold text-lg mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-5 w-5 mr-2 text-green-600"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Resultaten van uw scenario
-                </h4>
-                <div id="scenario-results-content" class="space-y-4"></div>
-                <div class="flex gap-3 mt-4">
-                    <button type="button"
-                            id="scenario-back-btn"
-                            class="cursor-pointer rounded bg-gray-500 px-4 py-2 font-medium text-white hover:bg-gray-600 focus:outline-none">
-                        Terug naar aanpassen
-                    </button>
-                    <button type="button"
-                            id="scenario-reset-btn"
-                            class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
-                        Nieuw scenario (reset)
-                    </button>
+            </div>
+            <!-- Right column: Results -->
+            <div id="scenario-results" class="hidden">
+                <div class="sticky top-4">
+                    <h4 class="font-semibold text-lg mb-4 flex items-center text-gray-900">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5 mr-2 text-green-600"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Resultaten
+                    </h4>
+                    <div id="scenario-results-content" class="space-y-4 max-h-[800px] overflow-y-auto pr-2"></div>
                 </div>
             </div>
         </div>
@@ -1337,14 +1327,6 @@
           e.preventDefault();
           this.submitScenario();
         });
-
-      document
-        .getElementById("scenario-reset-btn")
-        .addEventListener("click", () => this.resetScenario());
-
-      document
-        .getElementById("scenario-back-btn")
-        .addEventListener("click", () => this.backToForm());
     }
 
     submitScenario() {
@@ -1402,8 +1384,7 @@
     }
 
     showResults(results, scenarioData) {
-      // Hide form, show results
-      document.getElementById("scenario-container").classList.add("hidden");
+      // Show results column
       document.getElementById("scenario-results").classList.remove("hidden");
 
       const resultsContent = document.getElementById("scenario-results-content");
@@ -1412,15 +1393,15 @@
       // Show scenario data summary if there are changes
       if (Object.keys(scenarioData).length > 0) {
         const summaryDiv = document.createElement("div");
-        summaryDiv.className = "bg-blue-50 p-4 rounded-lg mb-4";
+        summaryDiv.className = "bg-blue-50 p-3 rounded-lg mb-4 border border-blue-200";
         summaryDiv.innerHTML = `
-          <h5 class="font-semibold mb-2">Aangepaste gegevens:</h5>
-          <ul class="list-disc list-inside text-sm text-gray-700">
+          <h5 class="font-semibold mb-2 text-sm">Aangepaste gegevens:</h5>
+          <ul class="space-y-1 text-xs text-gray-700">
             ${Object.entries(scenarioData)
               .map(([key, value]) => {
                 const displayValue = typeof value === "number" ? `€${(value / 100).toFixed(2)}` : value;
                 const displayKey = key.replace(/_/g, " ");
-                return `<li><strong>${displayKey}:</strong> ${displayValue}</li>`;
+                return `<li class="flex justify-between"><span class="text-gray-600">${displayKey}:</span><span class="font-medium">${displayValue}</span></li>`;
               })
               .join("")}
           </ul>
@@ -1431,7 +1412,7 @@
       // Show results for each law
       results.forEach((result) => {
         const resultDiv = document.createElement("div");
-        resultDiv.className = "bg-white p-4 rounded-lg shadow border";
+        resultDiv.className = "bg-white p-4 rounded-lg shadow-sm border";
 
         if (result.error) {
           resultDiv.innerHTML = `
@@ -1440,21 +1421,41 @@
           `;
         } else {
           const outputHtml = this.formatOutput(result.output);
-          const meetsRequirements = result.requirements_met ? "✓ Voldoet aan voorwaarden" : "✗ Voldoet niet aan voorwaarden";
-          const requirementsClass = result.requirements_met ? "text-green-600" : "text-red-600";
+          const missingHtml = this.formatMissingRequirements(result.missing_required);
+
+          let statusHtml = '';
+          if (result.requirements_met) {
+            statusHtml = `
+              <div class="flex items-center text-green-700 bg-green-50 px-3 py-2 rounded mb-3">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm font-medium">Voldoet aan voorwaarden</span>
+              </div>
+            `;
+          } else {
+            statusHtml = `
+              <div class="bg-red-50 px-3 py-2 rounded mb-3">
+                <div class="flex items-center text-red-700 mb-2">
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="text-sm font-medium">Voldoet niet aan voorwaarden</span>
+                </div>
+                ${missingHtml}
+              </div>
+            `;
+          }
 
           resultDiv.innerHTML = `
-            <h5 class="font-semibold mb-2">${result.law_name}</h5>
-            <p class="text-sm ${requirementsClass} mb-2">${meetsRequirements}</p>
-            ${outputHtml ? `<div class="text-sm text-gray-700">${outputHtml}</div>` : ""}
+            <h5 class="font-semibold mb-3 text-gray-900">${result.law_name}</h5>
+            ${statusHtml}
+            ${outputHtml ? `<div class="text-sm text-gray-700 space-y-1">${outputHtml}</div>` : ""}
           `;
         }
 
         resultsContent.appendChild(resultDiv);
       });
-
-      // Scroll to results
-      document.getElementById("scenario-results").scrollIntoView({ behavior: "smooth" });
     }
 
     formatOutput(output) {
@@ -1469,30 +1470,29 @@
             displayValue = value ? "Ja" : "Nee";
           }
           const displayKey = key.replace(/_/g, " ");
-          return `<div><strong>${displayKey}:</strong> ${displayValue}</div>`;
+          return `<div class="flex justify-between py-1 border-b border-gray-100 last:border-0"><span class="text-gray-600">${displayKey}:</span><span class="font-medium">${displayValue}</span></div>`;
         })
         .join("");
     }
 
-    backToForm() {
-      // Hide results, show form (keep values)
-      document.getElementById("scenario-results").classList.add("hidden");
-      document.getElementById("scenario-container").classList.remove("hidden");
+    formatMissingRequirements(missingRequired) {
+      if (!missingRequired || missingRequired.length === 0) {
+        return "";
+      }
 
-      // Scroll to form
-      document.getElementById("scenario-container").scrollIntoView({ behavior: "smooth" });
-    }
-
-    resetScenario() {
-      // Reset form
-      document.getElementById("scenario-form").reset();
-
-      // Hide results, show form
-      document.getElementById("scenario-results").classList.add("hidden");
-      document.getElementById("scenario-container").classList.remove("hidden");
-
-      // Scroll to form
-      document.getElementById("scenario-container").scrollIntoView({ behavior: "smooth" });
+      return `
+        <div class="text-xs text-red-700 mt-2">
+          <p class="font-medium mb-1">Ontbrekende gegevens:</p>
+          <ul class="list-disc list-inside space-y-0.5 ml-1">
+            ${missingRequired
+              .map((field) => {
+                const displayField = field.replace(/_/g, " ");
+                return `<li>${displayField}</li>`;
+              })
+              .join("")}
+          </ul>
+        </div>
+      `;
     }
   }
 </script>
