@@ -372,68 +372,218 @@
                     Proefberekening
                 </h3>
                 <p class="text-gray-600 mt-2">
-                    Bereken wat er verandert als uw situatie in de toekomst wijzigt.
+                    Pas hieronder uw gegevens aan om te zien wat het effect is op uw regelingen.
                     <span class="font-medium text-blue-700">Deze berekening heeft geen invloed op uw werkelijke gegevens.</span>
                 </p>
             </div>
         </div>
-        <div id="scenario-wizard-container">
-            <!-- Step 0: Select scenario type -->
-            <div id="scenario-step-0" class="scenario-step">
-                <h4 class="mb-4 block font-medium text-gray-900">Wat wilt u doorrekenen?</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <button type="button"
-                            class="wizard-type-btn scenario-type-btn"
-                            data-type="inkomen">
+        <div id="scenario-container">
+            <form id="scenario-form" class="space-y-6">
+                <p class="text-sm text-gray-600 bg-blue-50 p-3 rounded">
+                    💡 <strong>Tip:</strong> Vul alleen de velden in die u wilt aanpassen voor uw scenario. Lege velden gebruiken uw huidige gegevens.
+                </p>
+                <!-- Income fields (Box 1) -->
+                {% if profile.sources.BELASTINGDIENST and profile.sources.BELASTINGDIENST.box1 %}
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5 mr-2 text-blue-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Inkomen - Box 1 (per jaar)
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Loon uit dienstbetrekking</label>
+                                <input type="number"
+                                       name="loon_uit_dienstbetrekking"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Huidig: €{{ (accepted_claims['BOX1_DIENSTBETREKKING'] or profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking or 0) / 100 }}" />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Uitkeringen en pensioenen</label>
+                                <input type="number"
+                                       name="uitkeringen_en_pensioenen"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bruto jaarbedrag..." />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Winst uit onderneming</label>
+                                <input type="number"
+                                       name="winst_uit_onderneming"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Huidig: €{{ (accepted_claims['BOX1_ONDERNEMING'] or profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming or 0) / 100 }}" />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Resultaat overige werkzaamheden</label>
+                                <input type="number"
+                                       name="resultaat_overige_werkzaamheden"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bruto jaarbedrag..." />
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <!-- Income fields (Box 2) -->
+                {% if profile.sources.BELASTINGDIENST and profile.sources.BELASTINGDIENST.box2 %}
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5 mr-2 text-purple-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Inkomen - Box 2 (aanmerkelijk belang, per jaar)
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Reguliere voordelen (dividend)</label>
+                                <input type="number"
+                                       name="reguliere_voordelen"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bruto jaarbedrag..." />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Vervreemdingsvoordelen</label>
+                                <input type="number"
+                                       name="vervreemdingsvoordelen"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bruto jaarbedrag..." />
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <!-- Wealth fields (Box 3) -->
+                {% if profile.sources.BELASTINGDIENST and profile.sources.BELASTINGDIENST.box3 %}
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5 mr-2 text-green-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                            </svg>
+                            Vermogen - Box 3
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Spaargeld</label>
+                                <input type="number"
+                                       name="spaargeld"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Huidig: €{{ (accepted_claims['BOX3_SPAREN'] or profile.sources.BELASTINGDIENST.box3[0].spaargeld or 0) / 100 }}" />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Beleggingen</label>
+                                <input type="number"
+                                       name="beleggingen"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bedrag..." />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Onroerend goed (niet eigen woning)</label>
+                                <input type="number"
+                                       name="onroerend_goed"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bedrag..." />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Schulden</label>
+                                <input type="number"
+                                       name="schulden"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bedrag..." />
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <!-- Rent/Housing fields -->
+                <div class="bg-white p-4 rounded-lg border">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-8 w-8 text-blue-600"
+                             class="h-5 w-5 mr-2 text-yellow-600"
                              fill="none"
                              viewBox="0 0 24 24"
                              stroke="currentColor">
-                            <ellipse cx="12" cy="6" rx="7" ry="3" stroke-width="2" stroke="currentColor" fill="none" />
-                            <path stroke-width="2" stroke="currentColor" fill="none" d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
-                            <path stroke-width="2" stroke="currentColor" fill="none" d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
-                        <span class="font-medium">Inkomen</span>
+                        Woning
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Huurprijs per maand</label>
+                            <input type="number"
+                                   name="huurprijs"
+                                   class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                   placeholder="Maandelijkse huur..." />
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Servicekosten per maand</label>
+                            <input type="number"
+                                   name="servicekosten"
+                                   class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                   placeholder="Maandelijkse servicekosten..." />
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Subsidiabele servicekosten per maand</label>
+                            <input type="number"
+                                   name="subsidiabele_servicekosten"
+                                   class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                   placeholder="Maandelijkse subsidiabele servicekosten..." />
+                        </div>
+                    </div>
+                </div>
+                <!-- Partner income (if applicable) -->
+                {% if profile.sources.RvIG and profile.sources.RvIG.relaties and profile.sources.RvIG.relaties[0].partnerschap_type != "GEEN" %}
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5 mr-2 text-pink-600"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Inkomen partner (per jaar)
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Loon partner uit dienstbetrekking</label>
+                                <input type="number"
+                                       name="loon_partner_uit_dienstbetrekking"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Bruto jaarloon partner..." />
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Toetsingsinkomen partner</label>
+                                <input type="number"
+                                       name="toetsingsinkomen_partner"
+                                       class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none"
+                                       placeholder="Toetsingsinkomen..." />
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <!-- Submit button -->
+                <div class="flex justify-end gap-3">
+                    <button type="button"
+                            onclick="document.getElementById('scenario-form').reset()"
+                            class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
+                        Wis alle velden
                     </button>
-                    <button type="button"
-                            class="wizard-type-btn scenario-type-btn"
-                            data-type="huurprijs">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-8 w-8 text-yellow-600"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <rect x="6" y="4" width="12" height="16" rx="2" stroke-width="2" stroke="currentColor" fill="none" />
-                            <path stroke-width="2" stroke="currentColor" fill="none" d="M9 8h6M9 12h6M9 16h2" />
-                        </svg>
-                        <span class="font-medium">Huurprijs</span>
+                    <button type="submit"
+                            id="scenario-calculate-btn"
+                            class="cursor-pointer rounded bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 focus:outline-none shadow-sm">
+                        Bereken scenario
                     </button>
                 </div>
-            </div>
-            <!-- Scenario wizard steps -->
-            <div id="scenario-wizard-steps" class="hidden">
-                <form id="scenario-wizard-form" class="space-y-6">
-                    <div id="scenario-step-content" class="space-y-3"></div>
-                    <div id="scenario-step-navigation" class="flex justify-between">
-                        <button type="button"
-                                id="scenario-prev-btn"
-                                class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
-                            Terug
-                        </button>
-                        <button type="button"
-                                id="scenario-next-btn"
-                                class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
-                            Volgende
-                        </button>
-                        <button type="submit"
-                                id="scenario-submit-btn"
-                                class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none hidden">
-                            Bereken scenario
-                        </button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
         <!-- Results container -->
         <div id="scenario-results" class="hidden mt-6">
@@ -449,11 +599,18 @@
                     Resultaten van uw scenario
                 </h4>
                 <div id="scenario-results-content" class="space-y-4"></div>
-                <button type="button"
-                        id="scenario-reset-btn"
-                        class="mt-4 cursor-pointer rounded bg-gray-500 px-4 py-2 font-medium text-white hover:bg-gray-600 focus:outline-none">
-                    Nieuw scenario
-                </button>
+                <div class="flex gap-3 mt-4">
+                    <button type="button"
+                            id="scenario-back-btn"
+                            class="cursor-pointer rounded bg-gray-500 px-4 py-2 font-medium text-white hover:bg-gray-600 focus:outline-none">
+                        Terug naar aanpassen
+                    </button>
+                    <button type="button"
+                            id="scenario-reset-btn"
+                            class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
+                        Nieuw scenario (reset)
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -461,15 +618,6 @@
 {% if change_wizard_enabled %}
     <!-- Wijziging doorgeven Wizard -->
     <style>
-  /* Scenario wizard styles */
-  .scenario-step {
-    display: none;
-  }
-
-  .scenario-step.active {
-    display: block;
-  }
-
   .wizard-type-btn {
     display: flex;
     cursor: pointer;
@@ -1170,188 +1318,58 @@
   // Initialize wizard when DOM is loaded
   document.addEventListener("DOMContentLoaded", () => {
     new WizardManager();
-    new ScenarioWizardManager();
+    new ScenarioManager();
   });
 
-  // Scenario Wizard Manager for Proefberekening
-  class ScenarioWizardManager {
+  // Scenario Manager for Proefberekening
+  class ScenarioManager {
     constructor() {
-      this.currentStep = 0;
-      this.selectedType = null;
-      this.answers = {};
-      this.stepsByType = {
-        inkomen: [
-          [
-            {
-              type: "input",
-              name: "loon_uit_dienstbetrekking",
-              label: "Box 1: Loon uit dienstbetrekking (per jaar)",
-              inputType: "number",
-              placeholder: "Nieuw bruto jaarloon…",
-            },
-            {
-              type: "input",
-              name: "uitkeringen_en_pensioenen",
-              label: "Box 1: Uitkeringen en pensioenen (per jaar)",
-              inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
-            },
-            {
-              type: "input",
-              name: "winst_uit_onderneming",
-              label: "Box 1: Winst uit onderneming (per jaar)",
-              inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
-            },
-            {
-              type: "input",
-              name: "spaargeld",
-              label: "Box 3: Spaargeld",
-              inputType: "number",
-              placeholder: "Nieuw bedrag…",
-            },
-          ],
-        ],
-        huurprijs: [
-          [
-            {
-              type: "input",
-              name: "huurprijs",
-              label: "Huurprijs per maand",
-              inputType: "number",
-              placeholder: "Voer de nieuwe huurprijs in…",
-            },
-            {
-              type: "input",
-              name: "servicekosten",
-              label: "Servicekosten per maand",
-              inputType: "number",
-              placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
-            },
-          ],
-        ],
-      };
-
-      if (document.getElementById("scenario-wizard-form")) {
+      if (document.getElementById("scenario-form")) {
         this.init();
       }
     }
 
     init() {
-      // Add event listeners for type selection
-      document.querySelectorAll(".scenario-type-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          this.selectType(btn.dataset.type);
-        });
-      });
-
-      // Add event listeners for navigation
+      // Add event listeners
       document
-        .getElementById("scenario-prev-btn")
-        .addEventListener("click", () => this.prevStep());
-      document
-        .getElementById("scenario-next-btn")
-        .addEventListener("click", () => this.nextStep());
-      document
-        .getElementById("scenario-wizard-form")
+        .getElementById("scenario-form")
         .addEventListener("submit", (e) => {
           e.preventDefault();
           this.submitScenario();
         });
+
       document
         .getElementById("scenario-reset-btn")
         .addEventListener("click", () => this.resetScenario());
 
-      // Show initial step
-      document.getElementById("scenario-step-0").classList.add("active");
-    }
-
-    selectType(type) {
-      this.selectedType = type;
-      this.currentStep = 1;
-      this.answers = {};
-
-      document.getElementById("scenario-step-0").classList.remove("active");
-      document.getElementById("scenario-wizard-steps").classList.remove("hidden");
-
-      this.renderStep();
-    }
-
-    renderStep() {
-      if (!this.selectedType || this.currentStep === 0) return;
-
-      const stepIndex = this.currentStep - 1;
-      const fields = this.stepsByType[this.selectedType][stepIndex];
-      const stepContent = document.getElementById("scenario-step-content");
-      stepContent.innerHTML = "";
-
-      fields.forEach((field, i) => {
-        if (field.type === "input") {
-          const div = document.createElement("div");
-          const value = this.answers[field.name] !== undefined
-            ? (field.inputType === "number" ? this.answers[field.name] / 100 : this.answers[field.name])
-            : "";
-
-          div.innerHTML = `
-            <label for="scenario-input-${i}" class="mb-2 block font-medium">${field.label}</label>
-            <input id="scenario-input-${i}" type="${field.inputType}" class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none" placeholder="${field.placeholder || ""}" value="${value}" />
-          `;
-
-          const input = div.querySelector("input");
-          input.addEventListener("input", (e) => {
-            if (field.inputType === "number") {
-              this.answers[field.name] = parseFloat(e.target.value) * 100;
-            } else {
-              this.answers[field.name] = e.target.value;
-            }
-          });
-
-          stepContent.appendChild(div);
-        }
-      });
-
-      // Handle final step
-      if (stepIndex === this.stepsByType[this.selectedType].length - 1) {
-        document.getElementById("scenario-next-btn").classList.add("hidden");
-        document.getElementById("scenario-submit-btn").classList.remove("hidden");
-      } else {
-        document.getElementById("scenario-next-btn").classList.remove("hidden");
-        document.getElementById("scenario-submit-btn").classList.add("hidden");
-      }
-
-      // Handle back button visibility
-      document.getElementById("scenario-prev-btn").style.display =
-        this.currentStep > 0 ? "block" : "none";
-    }
-
-    nextStep() {
-      if (this.currentStep < this.stepsByType[this.selectedType].length) {
-        this.currentStep++;
-        this.renderStep();
-      }
-    }
-
-    prevStep() {
-      if (this.currentStep > 1) {
-        this.currentStep--;
-        this.renderStep();
-      } else {
-        // Go back to type selection
-        this.currentStep = 0;
-        this.selectedType = null;
-        document.getElementById("scenario-wizard-steps").classList.add("hidden");
-        document.getElementById("scenario-step-0").classList.add("active");
-      }
+      document
+        .getElementById("scenario-back-btn")
+        .addEventListener("click", () => this.backToForm());
     }
 
     submitScenario() {
-      const result = {
+      const form = document.getElementById("scenario-form");
+      const formData = new FormData(form);
+      const scenarioData = {};
+
+      // Collect all non-empty form fields and convert to cents for currency
+      for (const [key, value] of formData.entries()) {
+        if (value !== "" && value !== null) {
+          // Convert to number and multiply by 100 (to cents)
+          const numValue = parseFloat(value);
+          if (!isNaN(numValue)) {
+            scenarioData[key] = numValue * 100;
+          }
+        }
+      }
+
+      const payload = {
         bsn: "{{ bsn }}",
-        scenario_data: this.answers,
+        scenario_data: scenarioData,
       };
 
       // Show loading state
-      const submitBtn = document.getElementById("scenario-submit-btn");
+      const submitBtn = document.getElementById("scenario-calculate-btn");
       const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
       submitBtn.textContent = "Berekenen...";
@@ -1359,7 +1377,7 @@
       fetch("/laws/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result),
+        body: JSON.stringify(payload),
       })
         .then((response) => response.json())
         .then((data) => {
@@ -1384,29 +1402,31 @@
     }
 
     showResults(results, scenarioData) {
-      // Hide wizard, show results
-      document.getElementById("scenario-wizard-container").classList.add("hidden");
+      // Hide form, show results
+      document.getElementById("scenario-container").classList.add("hidden");
       document.getElementById("scenario-results").classList.remove("hidden");
 
       const resultsContent = document.getElementById("scenario-results-content");
       resultsContent.innerHTML = "";
 
-      // Show scenario data summary
-      const summaryDiv = document.createElement("div");
-      summaryDiv.className = "bg-blue-50 p-4 rounded-lg mb-4";
-      summaryDiv.innerHTML = `
-        <h5 class="font-semibold mb-2">Uw scenario:</h5>
-        <ul class="list-disc list-inside text-sm text-gray-700">
-          ${Object.entries(scenarioData)
-            .map(([key, value]) => {
-              const displayValue = typeof value === "number" ? `€${(value / 100).toFixed(2)}` : value;
-              const displayKey = key.replace(/_/g, " ");
-              return `<li>${displayKey}: ${displayValue}</li>`;
-            })
-            .join("")}
-        </ul>
-      `;
-      resultsContent.appendChild(summaryDiv);
+      // Show scenario data summary if there are changes
+      if (Object.keys(scenarioData).length > 0) {
+        const summaryDiv = document.createElement("div");
+        summaryDiv.className = "bg-blue-50 p-4 rounded-lg mb-4";
+        summaryDiv.innerHTML = `
+          <h5 class="font-semibold mb-2">Aangepaste gegevens:</h5>
+          <ul class="list-disc list-inside text-sm text-gray-700">
+            ${Object.entries(scenarioData)
+              .map(([key, value]) => {
+                const displayValue = typeof value === "number" ? `€${(value / 100).toFixed(2)}` : value;
+                const displayKey = key.replace(/_/g, " ");
+                return `<li><strong>${displayKey}:</strong> ${displayValue}</li>`;
+              })
+              .join("")}
+          </ul>
+        `;
+        resultsContent.appendChild(summaryDiv);
+      }
 
       // Show results for each law
       results.forEach((result) => {
@@ -1454,20 +1474,25 @@
         .join("");
     }
 
-    resetScenario() {
-      // Reset state
-      this.currentStep = 0;
-      this.selectedType = null;
-      this.answers = {};
-
-      // Hide results, show wizard
+    backToForm() {
+      // Hide results, show form (keep values)
       document.getElementById("scenario-results").classList.add("hidden");
-      document.getElementById("scenario-wizard-container").classList.remove("hidden");
-      document.getElementById("scenario-wizard-steps").classList.add("hidden");
-      document.getElementById("scenario-step-0").classList.add("active");
+      document.getElementById("scenario-container").classList.remove("hidden");
 
-      // Scroll to wizard
-      document.getElementById("scenario-wizard-container").scrollIntoView({ behavior: "smooth" });
+      // Scroll to form
+      document.getElementById("scenario-container").scrollIntoView({ behavior: "smooth" });
+    }
+
+    resetScenario() {
+      // Reset form
+      document.getElementById("scenario-form").reset();
+
+      // Hide results, show form
+      document.getElementById("scenario-results").classList.add("hidden");
+      document.getElementById("scenario-container").classList.remove("hidden");
+
+      // Scroll to form
+      document.getElementById("scenario-container").scrollIntoView({ behavior: "smooth" });
     }
   }
 </script>
