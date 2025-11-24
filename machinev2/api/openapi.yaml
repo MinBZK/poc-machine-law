@@ -10,13 +10,15 @@ servers:
   - url: https://toeslagen-engine.bzlg.apps.digilab.network/v0
     description: Production server (Fictieve Dienst Toeslagen)
   - url: https://uwv-engine.bzlg.apps.digilab.network/v0
-    description: Production server (Fictieve UWV)
+    description: Production server (Fictief UWV)
   - url: https://rvz-engine.bzlg.apps.digilab.network/v0
     description: Production server (Fictief Register Zorgverzekeringen)
   - url: https://svb-engine.bzlg.apps.digilab.network/v0
     description: Production server (Fictieve Sociale Verzekeringsbank)
   - url: https://ind-engine.bzlg.apps.digilab.network/v0
     description: Production server (Fictieve IND)
+  - url: https://vws-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictief Ministerie van VWS)
   - url: http://rvig-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictief RvIG)
   - url: http://bd-engine.127-0-0-1.nip.io:8080/v0
@@ -24,13 +26,15 @@ servers:
   - url: http://toeslagen-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictieve Dienst Toeslagen)
   - url: http://uwv-engine.127-0-0-1.nip.io:8080/v0
-    description: Local development server (Fictieve UWV)
+    description: Local development server (Fictief UWV)
   - url: http://rvz-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictief Register Zorgverzekeringen)
   - url: http://svb-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictieve Sociale Verzekeringsbank)
   - url: http://ind-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictieve IND)
+  - url: http://vws-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictief Ministerie van VWS)
 tags:
   - name: Law
   - name: Profile
@@ -465,6 +469,7 @@ components:
       example:
         service: "TOESLAGEN"
         law: "zorgtoeslagwet"
+        parameters: { "BSN": "100000001" }
     ResponseEvaluateSchema:
       description: Evaluate response
       type: object
@@ -472,9 +477,24 @@ components:
         output:
           type: object
           additionalProperties: true
+          example:
+            "hoogte_toeslag": 123456
+            "is_verzekerde_zorgtoeslag": true
         input:
           type: object
           additionalProperties: true
+          example:
+            "$DREMPELINKOMEN_ALLEENSTAANDE": 3971900,
+            "$HEEFT_PARTNER": false,
+            "$INKOMEN": 1234500,
+            "$IS_VERZEKERDE": true,
+            "$LEEFTIJD": 35,
+            "$MINIMUM_LEEFTIJD": 18,
+            "$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND": 0.01896,
+            "$STANDAARDPREMIE": 211200,
+            "$VERMOGEN": 123400,
+            "$VERMOGENSGRENS_ALLEENSTAANDE": 14189600,
+            "$prev_january_first": "2024-01-01"
         requirementsMet:
           type: boolean
           description: Will be true when all requirements where met
@@ -485,6 +505,7 @@ components:
         missingRequired:
           type: boolean
           description: Will be true when a required value is missing
+          example: false
         path:
           $ref: "#/components/schemas/PathNode"
       required:
