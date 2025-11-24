@@ -269,19 +269,19 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                         <div class="mt-3 grid grid-cols-2 gap-4 text-sm">
                                             <div>
                                                 <p class="text-gray-600">Nieuwe waarde</p>
-                                                <p>{{ claim.new_value }}</p>
+                                                <p>{{ claim.new_value | format_value }}</p>
                                             </div>
                                             {% if claim.status == 'APPROVED' %}
                                                 <div>
                                                     <p class="text-gray-600">Geverifieerde waarde</p>
-                                                    <p>{{ claim.verified_value }}</p>
+                                                    <p>{{ claim.verified_value | format_value }}</p>
                                                 </div>
                                             {% endif %}
                                         </div>
                                         {% if claim.status == 'PENDING' %}
                                             <div class="mt-4 flex justify-end gap-2">
                                                 <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer"
-                                                        hx-get="/edit/approve-claim"
+                                                        hx-post="/edit/approve-claim"
                                                         hx-target="#edit-form-container"
                                                         hx-vals='{ "claim_id": "{{ claim.id }}" }'>
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

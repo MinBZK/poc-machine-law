@@ -14,6 +14,7 @@ type CaseManager interface {
 	SubmitCase(ctx context.Context, bsn, serviceType, law string, parameters, claimedResult map[string]any, approvedClaimsOnly bool, effectiveDate *time.Time) (uuid.UUID, error)
 	CompleteManualReview(ctx context.Context, caseID uuid.UUID, verifierID string, approved bool, reason string, overrideResult map[string]any) error
 	ObjectCase(ctx context.Context, caseID uuid.UUID, reason string) error
+	AddClaimToCase(ctx context.Context, caseID uuid.UUID, claimID uuid.UUID) error
 	DetermineObjectionStatus(caseID uuid.UUID, possible *bool, notPossibleReason string, objectionPeriod, decisionPeriod, extensionPeriod *int) error
 	DetermineObjectionAdmissibility(caseID uuid.UUID, admissible *bool) error
 	DetermineAppealStatus(caseID uuid.UUID, possible *bool, notPossibleReason string, appealPeriod *int, directAppeal *bool, directAppealReason, competentCourt, courtType string) error

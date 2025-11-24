@@ -126,6 +126,20 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
 
     templates.env.filters["format_currency"] = format_currency
 
+    def format_value(value) -> str:
+        """Format a value for display, handling dicts and other types nicely."""
+        if value is None:
+            return ""
+        if isinstance(value, dict):
+            # Format dict as readable key-value pairs
+            parts = [f"{k}: {v}" for k, v in value.items()]
+            return ", ".join(parts)
+        if isinstance(value, list):
+            return ", ".join(str(v) for v in value)
+        return str(value)
+
+    templates.env.filters["format_value"] = format_value
+
     return templates
 
 

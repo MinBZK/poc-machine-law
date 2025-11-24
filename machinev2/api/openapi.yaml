@@ -1285,6 +1285,11 @@ components:
           $ref: "#/components/schemas/CaseObjectionStatus"
         appealStatus:
           $ref: "#/components/schemas/CaseAppealStatus"
+        claim_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
     CaseObjectionStatus:
       description: Parameters to set the objection status
       type: object

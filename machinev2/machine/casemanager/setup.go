@@ -70,6 +70,7 @@ func Setup(
 		CommandAddToManualReview,
 		CommandCompleteManualReview,
 		CommandObjectToCase,
+		CommandAddClaimToCase,
 		CommandSetObjectionStatus,
 		CommandSetObjectionAdmissibility,
 		CommandSetAppealStatus,
@@ -96,6 +97,11 @@ func Setup(
 
 	// Add a logger as an observer
 	if err := local.AddHandler(ctx, eh.MatchAll{}, NewLogger(logger)); err != nil {
+		return fmt.Errorf("could not add logger to event bus: %w", err)
+	}
+
+	// Add a projector as an updator
+	if err := local.AddHandler(ctx, eh.MatchAll{}, NewCasesProjector(caseRepo)); err != nil {
 		return fmt.Errorf("could not add logger to event bus: %w", err)
 	}
 
@@ -242,6 +248,24 @@ func ObjectToCase(
 
 	if err := commandBus.HandleCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("could not object to case: %w", err)
+	}
+
+	return nil
+}
+
+func AddClaimToCase(
+	ctx context.Context,
+	commandBus eh.CommandHandler,
+	caseID uuid.UUID,
+	claimID uuid.UUID,
+) error {
+	cmd := AddClaimToCaseCommand{
+		ID:      caseID,
+		ClaimID: claimID,
+	}
+
+	if err := commandBus.HandleCommand(ctx, cmd); err != nil {
+		return fmt.Errorf("could not add claim to case: %w", err)
 	}
 
 	return nil

@@ -173,7 +173,24 @@ func (aggregate *CaseAggregate) HandleCommand(ctx context.Context, cmd eh.Comman
 		)
 
 		return nil
+	case AddClaimToCaseCommand:
+		if aggregate.c == nil {
+			return fmt.Errorf("case does not exist")
+		}
 
+		if aggregate.c.Status == CaseStatusDecided {
+			return fmt.Errorf("can not alter object on decided cases")
+		}
+
+		aggregate.AppendEvent(
+			CaseAddClaimEvent,
+			&CaseAddClaim{
+				ClaimID: cmd.ClaimID,
+			},
+			time.Now(),
+		)
+
+		return nil
 	case SetObjectionStatusCommand:
 		if aggregate.c == nil {
 			return fmt.Errorf("case does not exist")
@@ -298,7 +315,8 @@ func (aggregate *CaseAggregate) ApplyEvent(ctx context.Context, event eh.Event) 
 
 	case *CaseObjected:
 		return aggregate.c.Object(data.Reason)
-
+	case *CaseAddClaim:
+		return aggregate.c.AddClaim(data.ClaimID)
 	case *ObjectionStatusDetermined:
 		// Set objection status
 		return aggregate.c.DetermineObjectionStatus(

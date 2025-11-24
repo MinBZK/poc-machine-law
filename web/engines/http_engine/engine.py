@@ -9,13 +9,17 @@ import pandas as pd
 from web.config_loader import ServiceRoutingConfig
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
-from .machine_client.law_as_code_client import Client
+from .machine_client.regel_recht_engine_api_client import Client
 
 logger = logging.getLogger(__name__)
-from .machine_client.law_as_code_client.api.data_frames import set_source_data_frame
-from .machine_client.law_as_code_client.api.law import evaluate, rule_spec_get, service_laws_discoverable_list
-from .machine_client.law_as_code_client.api.profile import profile_get, profile_list
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.api.data_frames import set_source_data_frame
+from .machine_client.regel_recht_engine_api_client.api.law import (
+    evaluate,
+    rule_spec_get,
+    service_laws_discoverable_list,
+)
+from .machine_client.regel_recht_engine_api_client.api.profile import profile_get, profile_list
+from .machine_client.regel_recht_engine_api_client.models import (
     DataFrame,
     Evaluate,
     EvaluateBody,
@@ -25,13 +29,13 @@ from .machine_client.law_as_code_client.models import (
     ProfileSources,
     SetSourceDataFrameBody,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     PathNode as ApiPathNode,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     ResponseEvaluateSchema as ApiRuleResult,
 )
-from .machine_client.law_as_code_client.types import UNSET
+from .machine_client.regel_recht_engine_api_client.types import UNSET
 
 
 class MachineService(EngineInterface):

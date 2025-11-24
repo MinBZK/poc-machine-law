@@ -8,17 +8,17 @@ from web.config_loader import ServiceRoutingConfig
 
 from ..claim_manager_interface import ClaimManagerInterface
 from ..models import Claim
-from .machine_client.law_as_code_client import Client
+from .machine_client.regel_recht_engine_api_client import Client
 
 logger = logging.getLogger(__name__)
-from .machine_client.law_as_code_client.api.claim import (
+from .machine_client.regel_recht_engine_api_client.api.claim import (
     claim_approve,
     claim_list_based_on_bsn,
     claim_list_based_on_bsn_service_law,
     claim_reject,
     claim_submit,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     ClaimApprove,
     ClaimApproveBody,
     ClaimReject,
@@ -26,7 +26,7 @@ from .machine_client.law_as_code_client.models import (
     ClaimSubmit,
     ClaimSubmitBody,
 )
-from .machine_client.law_as_code_client.types import UNSET
+from .machine_client.regel_recht_engine_api_client.types import UNSET
 
 
 class ClaimManager(ClaimManagerInterface):
