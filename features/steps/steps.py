@@ -915,11 +915,15 @@ def step_impl(context, jaar):
     """Setup: burger heeft een lopende zorgtoeslag (voorschot vastgesteld)"""
     bsn = context.parameters.get("BSN")
 
+    # Use reference date from context as aanvraag datum (as ISO string for serialization)
+    aanvraag_datum = context.root_reference_date if hasattr(context, 'root_reference_date') else None
+
     # Aanvraag indienen
     context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
         bsn=bsn,
         toeslag_type=ToeslagType.ZORGTOESLAG,
         berekeningsjaar=jaar,
+        aanvraag_datum=aanvraag_datum,
     )
 
     # Bereken de toeslag
@@ -1766,6 +1770,41 @@ def step_impl(context, maand_naam):
     betalingen_maanden = {b["maand"] for b in context.toeslag.maandelijkse_betalingen}
 
     expected_maanden = set(range(1, expected_maand + 1))
+
+    assertions.assertEqual(
+        berekeningen_maanden, expected_maanden,
+        f"Expected berekeningen for months {expected_maanden}, but found {berekeningen_maanden}"
+    )
+    assertions.assertEqual(
+        betalingen_maanden, expected_maanden,
+        f"Expected betalingen for months {expected_maanden}, but found {betalingen_maanden}"
+    )
+
+
+@then('zijn alle maanden vanaf aanvraag tot en met {maand_naam} verwerkt')
+def step_impl(context, maand_naam):
+    """Verify all months from aanvraag date to the named month are processed"""
+    maand_mapping = {
+        "januari": 1, "februari": 2, "maart": 3, "april": 4,
+        "mei": 5, "juni": 6, "juli": 7, "augustus": 8,
+        "september": 9, "oktober": 10, "november": 11, "december": 12
+    }
+    expected_end_maand = maand_mapping.get(maand_naam.lower())
+    if expected_end_maand is None:
+        raise ValueError(f"Unknown month name: {maand_naam}")
+
+    # Determine start month based on aanvraag datum (stored as ISO string)
+    toeslag = context.toeslag
+    aanvraag_date = _parse_date(toeslag.aanvraag_datum) if toeslag.aanvraag_datum else None
+    if aanvraag_date and aanvraag_date.year < toeslag.berekeningsjaar:
+        start_maand = 1
+    else:
+        start_maand = aanvraag_date.month if aanvraag_date else 1
+
+    berekeningen_maanden = {b["maand"] for b in toeslag.maandelijkse_berekeningen}
+    betalingen_maanden = {b["maand"] for b in toeslag.maandelijkse_betalingen}
+
+    expected_maanden = set(range(start_maand, expected_end_maand + 1))
 
     assertions.assertEqual(
         berekeningen_maanden, expected_maanden,

@@ -76,7 +76,11 @@ class Toeslag(Aggregate):
         self.type = toeslag_type
         self.regeling = TOESLAG_TYPE_REGELING[toeslag_type]
         self.berekeningsjaar = berekeningsjaar
-        self.aanvraag_datum = aanvraag_datum or date.today()
+        # Store as ISO string for eventsourcing serialization
+        if aanvraag_datum:
+            self.aanvraag_datum = aanvraag_datum if isinstance(aanvraag_datum, str) else aanvraag_datum.isoformat()
+        else:
+            self.aanvraag_datum = date.today().isoformat()
 
         self.status = ToeslagStatus.AANVRAAG
 

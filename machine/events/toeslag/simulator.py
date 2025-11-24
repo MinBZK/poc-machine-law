@@ -376,12 +376,14 @@ class TimeSimulator:
         toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
         berekende_maanden = sorted([b["maand"] for b in toeslag.maandelijkse_berekeningen])
         betaalde_maanden = sorted([b["maand"] for b in toeslag.maandelijkse_betalingen])
+        aanvraag_datum = toeslag.aanvraag_datum if toeslag.aanvraag_datum else "onbekend"
 
         logger.debug("╔══════════════════════════════════════════════════════════════")
         logger.debug(f"║ WORKFLOW STATE {action}")
         logger.debug("╠══════════════════════════════════════════════════════════════")
         logger.debug(f"║ Datum:           {self.current_date.isoformat()}")
         logger.debug(f"║ Toeslag ID:      {toeslag_id[:8]}...")
+        logger.debug(f"║ Aanvraag datum:  {aanvraag_datum}")
         logger.debug(f"║ Status:          {toeslag.status.value}")
         logger.debug(f"║ Huidige maand:   {toeslag.huidige_maand}")
         logger.debug(f"║ Berekend:        maanden {berekende_maanden}")
@@ -441,8 +443,14 @@ class TimeSimulator:
             toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
             berekende_maanden = {b["maand"] for b in toeslag.maandelijkse_berekeningen}
 
-            # Verwerk alle gemiste maanden tot en met de huidige maand
-            for maand in range(1, current_month + 1):
+            # Verwerk alle gemiste maanden vanaf aanvraagdatum tot en met de huidige maand
+            # Als de aanvraag in een vorig jaar was, start vanaf maand 1 van het berekeningsjaar
+            aanvraag_date = date.fromisoformat(toeslag.aanvraag_datum) if toeslag.aanvraag_datum else None
+            if aanvraag_date and aanvraag_date.year < toeslag.berekeningsjaar:
+                aanvraag_maand = 1
+            else:
+                aanvraag_maand = aanvraag_date.month if aanvraag_date else 1
+            for maand in range(aanvraag_maand, current_month + 1):
                 if maand not in berekende_maanden:
                     logger.debug(f"╠─ Maand {maand}: geen berekening gevonden, triggering AWIR...")
                     # Nog geen berekening voor deze maand - voer AWIR maandverwerking uit
