@@ -146,10 +146,14 @@ async def get_attributes(
             response = await client.get(f"{REQUESTER_URL}/disclosure/sessions/{session_token}/disclosed_attributes")
             response.raise_for_status()
 
+            print(response.text)
+
             # Parse the response
             disclosed_data = response.json()
     except httpx.HTTPError as e:
         return JSONResponse(content={"success": False, "message": f"Failed to retrieve disclosed attributes: {str(e)}"})
+    except Exception as e:
+        return JSONResponse(content={"success": False, "message": f"An unexpected error occurred: {str(e)}"})
 
     # Parse into Pydantic models
     try:
