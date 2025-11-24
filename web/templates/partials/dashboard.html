@@ -498,7 +498,7 @@
                                     class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
                                 Terug
                             </button>
-                            <button type="button"
+                            <button type="submit"
                                     id="next-btn"
                                     class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
                                 Volgende
@@ -855,10 +855,24 @@
         .addEventListener("click", () => this.prevStep());
       document
         .getElementById("next-btn")
-        .addEventListener("click", () => this.nextStep());
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          this.nextStep();
+        });
       document.getElementById("wizard-form").addEventListener("submit", (e) => {
         e.preventDefault();
-        this.submitWizard();
+        
+        // Check which button was clicked or if it's the final step
+        const nextBtn = document.getElementById("next-btn");
+        const submitBtn = document.getElementById("submit-btn");
+        
+        if (!submitBtn.classList.contains("hidden")) {
+          // Final step - submit the wizard
+          this.submitWizard();
+        } else {
+          // Not final step - go to next step
+          this.nextStep();
+        }
       });
 
       // Show initial step
@@ -946,32 +960,30 @@
         }
       });
 
-      // Handle final step (details textarea)
+      const nextBtn = document.getElementById("next-btn");
+      const submitBtn = document.getElementById("submit-btn");
+
       if (stepIndex === this.stepsByType[this.selectedType].length - 1) {
-        // const detailsDiv = document.createElement("div");
-        // detailsDiv.innerHTML = `
-        //   <label for="change-details" class="mb-2 block font-medium">Details van de wijziging</label>
-        //   <textarea id="change-details" rows="4" class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none" placeholder="Beschrijf hier de details van de wijziging…">${this.answers["details"] || ""}</textarea>
-        // `;
-
-        // const textarea = detailsDiv.querySelector("textarea");
-        // textarea.addEventListener("input", (e) => {
-        //   this.answers["details"] = e.target.value;
-        // });
-
-        // stepContent.appendChild(detailsDiv);
-
-        // Show submit button instead of next button
-        document.getElementById("next-btn").classList.add("hidden");
-        document.getElementById("submit-btn").classList.remove("hidden");
+        // Final step: disable next button and show submit button
+        nextBtn.disabled = true;
+        nextBtn.classList.add("hidden");
+        submitBtn.classList.remove("hidden");
       } else {
-        document.getElementById("next-btn").classList.remove("hidden");
-        document.getElementById("submit-btn").classList.add("hidden");
+        // Not final step: enable next button and hide submit button
+        nextBtn.disabled = false;
+        nextBtn.classList.remove("hidden");
+        submitBtn.classList.add("hidden");
       }
 
       // Handle back button visibility
       document.getElementById("prev-btn").style.display =
         this.currentStep > 0 ? "block" : "none";
+
+      // Focus the first input in the step if it exists
+      const firstInput = document.getElementById("wizard-input-0");
+      if (firstInput) {
+        firstInput.focus();
+      }
     }
 
     nextStep() {
