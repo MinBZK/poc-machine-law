@@ -861,11 +861,11 @@
         });
       document.getElementById("wizard-form").addEventListener("submit", (e) => {
         e.preventDefault();
-        
+
         // Check which button was clicked or if it's the final step
         const nextBtn = document.getElementById("next-btn");
         const submitBtn = document.getElementById("submit-btn");
-        
+
         if (!submitBtn.classList.contains("hidden")) {
           // Final step - submit the wizard
           this.submitWizard();
