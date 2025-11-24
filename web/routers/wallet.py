@@ -179,13 +179,16 @@ async def get_attributes(
             euros_str = match.group(1).replace(".", "")  # Remove thousand separators
             cents_str = match.group(2)
             parsed_attributes[key] = int(euros_str) * 100 + int(cents_str)
+            print(f"Parsed {key}: {parsed_attributes[key]} cents")
         else:
             return JSONResponse(content={"success": False, "message": f"Invalid currency format for {key}: {value}"})
+    print("Parsed attributes:", parsed_attributes)
 
     # Get law specification using machine service
     try:
         # Get rule spec from machine service
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+        print(f"Received rule spec for law {law}: {rule_spec}")
 
         # Build reverse mapping from wallet attributes to law field names
         wallet_to_field = {}
@@ -193,11 +196,14 @@ async def get_attributes(
             wallet_attr = source.get("source_reference", {}).get("wallet_attribute")
             if wallet_attr:
                 wallet_to_field[wallet_attr] = source["name"]
+                print(f"Mapping wallet attribute '{wallet_attr}' to field '{source['name']}'")
+        print(wallet_to_field)
 
         # Transform parsed_attributes using the mapping
         for wallet_attr, value in parsed_attributes.items():
             field_name = wallet_to_field.get(wallet_attr)
             if field_name:
+                print(f"Submitting claim for {field_name}: {value}")
                 id = claim_manager.submit_claim(service, field_name, value, "wallet", "housing corporation", law, bsn)
                 claim_manager.approve_claim(id, attestation.issuer_uri, None)
 
