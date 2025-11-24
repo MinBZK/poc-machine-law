@@ -12,6 +12,8 @@ from explain.llm_factory import llm_factory
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
+import requests
+
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 
@@ -435,13 +437,97 @@ async def application_panel(
             "partials/tiles/components/application_panel.html",
             {
                 "request": request,
-                "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
+                "error": (
+                    "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw."
+                ),
                 "service": service,
                 "law": law,
                 "current_engine_id": get_engine_id(),
             },
         )
 
+
+def extract_thresholds_from_spec(rule_spec: dict[str, Any], input_data: dict[str, Any]) -> list[dict[str, Any]]:
+    """
+    Extract income thresholds from rule specification requirements.
+    This helps identify critical boundaries where benefits change.
+
+    Args:
+        rule_spec: The rule specification dictionary
+        input_data: The input data used for evaluation
+
+    Returns:
+        List of threshold information dictionaries
+    """
+    thresholds = []
+
+    # Calculate total income from input
+    total_income = 0
+    income_fields = [
+        "loon_uit_dienstbetrekking",
+        "uitkeringen_en_pensioenen",
+        "winst_uit_onderneming",
+        "resultaat_overige_werkzaamheden",
+        "reguliere_voordelen",
+        "vervreemdingsvoordelen",
+        "voordeel_sparen_beleggen",
+    ]
+
+    for field in income_fields:
+        if input_data and field in input_data and isinstance(input_data[field], (int, float)):
+            total_income += input_data[field]
+
+    # Try to extract thresholds from requirements
+    # TODO: Parse requirements to extract actual threshold values from law specifications
+    # requirements = rule_spec.get("requirements", [])
+    # This is a PLACEHOLDER - real implementation would parse the requirement logic
+    # to extract thresholds dynamically from expressions like "toetsingsinkomen < 43651"
+
+    # For now, use common Dutch benefit thresholds as fallback
+    # TODO: Extract these dynamically from the law specifications
+    common_thresholds = [
+        {
+            "name": "Zorgtoeslag maximum inkomen (alleenstaand)",
+            "value": 4365100,  # €43,651 (2024)
+            "type": "income_limit",
+            "description": "Boven dit inkomen komt u niet meer in aanmerking voor zorgtoeslag",
+        },
+        {
+            "name": "Huurtoeslag maximum inkomen (alleenstaand)",
+            "value": 3067400,  # €30,674 (2024)
+            "type": "income_limit",
+            "description": "Boven dit inkomen komt u niet meer in aanmerking voor huurtoeslag",
+        },
+        {
+            "name": "Kindgebonden budget afbouwgrens",
+            "value": 2400000,  # €24,000
+            "type": "income_limit",
+            "description": "Vanaf dit inkomen wordt het kindgebonden budget afgebouwd",
+        },
+    ]
+
+    # Only include thresholds that are relevant (within reasonable range of current income)
+    for threshold in common_thresholds:
+        if total_income > 0 and abs(total_income - threshold["value"]) < threshold["value"] * 0.6:
+            thresholds.append(
+                {
+                    "name": threshold["name"],
+                    "threshold_value": threshold["value"],
+                    "current_value": total_income,
+                    "type": threshold["type"],
+                    "description": threshold["description"],
+                    "distance": abs(total_income - threshold["value"]),
+                    "is_close": abs(total_income - threshold["value"]) < 500000,  # Within €5000
+                }
+            )
+
+    return thresholds
+
+@router.post("/test")
+async def test_post_request(
+    request: Request
+):
+    return {"hoi": "hey"}
 
 @router.post("/simulate")
 async def simulate_scenario(
@@ -476,6 +562,7 @@ async def simulate_scenario(
             law = service_law["law"]
 
             try:
+
                 # Evaluate the law with scenario data as overwrite_input
                 result = machine_service.evaluate(
                     service=service,
@@ -485,9 +572,39 @@ async def simulate_scenario(
                     effective_date=effective_date,
                     approved=False,
                     overwrite_input=scenario_data,
-                )
+                ) 
+
+                if (law == "zorgtoeslagwet"):
+                    print("-----------------------------")
+                    print("INPUT:")
+                    for key, value in result.input.items() :
+                        print(f"    {key}: {value}")
+
+                    print("OVERWRITE:")
+                    print(scenario_data)
+
+                    print("LAW")
+                    print(law)
+                    print(service)
+
+                    print("OUTPUT")
+                    for key, value in result.output.items() :
+                        print(f"    {key}: {value}")
+
+                    result.output["hoogte_toeslag"] = 0
+                    result.output["is_verzekerde_zorgtoeslag"] = False
+
+                    print("-----------------------------")
+
+                    data = {'name': 'Suzan', 'email': 'suzan@example.com'}
+                    response = requests.post('http://localhost:8000/laws/test', json=data)
+                    print(response.json())
+
 
                 rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+                # Extract thresholds from requirements (if any)
+                thresholds = extract_thresholds_from_spec(rule_spec, result.input)
 
                 results.append(
                     {
@@ -498,6 +615,7 @@ async def simulate_scenario(
                         "input": result.input,
                         "requirements_met": result.requirements_met,
                         "missing_required": result.missing_required,
+                        "thresholds": thresholds,  # Add threshold information
                     }
                 )
             except Exception as e:
