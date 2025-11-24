@@ -247,11 +247,12 @@ func FromSourceReference(src ruleresolver.SourceReference) *api.SourceReference 
 	}
 
 	return &api.SourceReference{
-		SourceType: &src.SourceType,
-		Table:      &src.Table,
-		Field:      src.Field,
-		Fields:     src.Fields,
-		SelectOn:   selectsOn,
+		SourceType:      &src.SourceType,
+		Table:           &src.Table,
+		Field:           src.Field,
+		Fields:          src.Fields,
+		SelectOn:        selectsOn,
+		WalletAttribute: src.WalletAttribute,
 	}
 }
 
