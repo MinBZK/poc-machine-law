@@ -1220,3 +1220,558 @@ def step_impl(context, aantal):
         actual, aantal,
         f"Expected {aantal} betalingen, but found {actual}"
     )
+
+
+# === Isolated State Transition Tests ===
+
+
+@given('een toeslag in status "{status}"')
+def step_impl(context, status):
+    """Create a toeslag in a specific status for isolated testing"""
+    bsn = context.parameters.get("BSN", "999993653")
+
+    # Create initial toeslag
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=2025,
+    )
+
+    # Advance to the requested status
+    if status == "AANVRAAG":
+        pass  # Already in AANVRAAG
+    elif status == "BEREKEND":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=True,
+            berekend_jaarbedrag=120000,
+        )
+    elif status == "VOORSCHOT":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=True,
+            berekend_jaarbedrag=120000,
+        )
+        context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+    elif status == "LOPEND":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=True,
+            berekend_jaarbedrag=120000,
+        )
+        context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+        context.services.toeslag_manager.start_maand(toeslag_id=context.toeslag_uuid, maand=1)
+    elif status == "DEFINITIEF":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=True,
+            berekend_jaarbedrag=120000,
+        )
+        context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+        context.services.toeslag_manager.start_maand(toeslag_id=context.toeslag_uuid, maand=1)
+        context.services.toeslag_manager.stel_definitief_vast(
+            toeslag_id=context.toeslag_uuid,
+            definitief_jaarbedrag=120000,
+        )
+    elif status == "VEREFFEND":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=True,
+            berekend_jaarbedrag=120000,
+        )
+        context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+        context.services.toeslag_manager.start_maand(toeslag_id=context.toeslag_uuid, maand=1)
+        # Simulate payments
+        for maand in range(1, 13):
+            context.services.toeslag_manager.betaal_maand(
+                toeslag_id=context.toeslag_uuid,
+                maand=maand,
+                betaald_bedrag=10000,
+            )
+        context.services.toeslag_manager.stel_definitief_vast(
+            toeslag_id=context.toeslag_uuid,
+            definitief_jaarbedrag=120000,
+        )
+        context.services.toeslag_manager.vereffen(toeslag_id=context.toeslag_uuid)
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('een toeslag in status "{status}" met aanspraak')
+def step_impl(context, status):
+    """Create a toeslag with aanspraak=True"""
+    context.execute_steps(f'Given een toeslag in status "{status}"')
+    # Already has aanspraak set to True in the setup
+
+
+@given('een toeslag in status "{status}" zonder aanspraak')
+def step_impl(context, status):
+    """Create a toeslag with aanspraak=False"""
+    bsn = context.parameters.get("BSN", "999993653")
+
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=2025,
+    )
+
+    if status == "BEREKEND":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=False,
+            berekend_jaarbedrag=0,
+        )
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('een toeslag in status "{status}" met nabetaling')
+def step_impl(context, status):
+    """Create a toeslag in DEFINITIEF status where definitief > betaald (nabetaling)"""
+    bsn = context.parameters.get("BSN", "999993653")
+
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=2025,
+    )
+    context.services.toeslag_manager.bereken_aanspraak(
+        toeslag_id=context.toeslag_uuid,
+        heeft_aanspraak=True,
+        berekend_jaarbedrag=100000,
+    )
+    context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+    context.services.toeslag_manager.start_maand(toeslag_id=context.toeslag_uuid, maand=1)
+
+    # Pay less than definitief
+    for maand in range(1, 13):
+        context.services.toeslag_manager.betaal_maand(
+            toeslag_id=context.toeslag_uuid,
+            maand=maand,
+            betaald_bedrag=8000,  # 96000 total
+        )
+
+    # Definitief is higher than betaald -> nabetaling
+    context.services.toeslag_manager.stel_definitief_vast(
+        toeslag_id=context.toeslag_uuid,
+        definitief_jaarbedrag=100000,  # 100000 - 96000 = 4000 nabetaling
+    )
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('een toeslag in status "{status}" met terugvordering')
+def step_impl(context, status):
+    """Create a toeslag in DEFINITIEF status where definitief < betaald (terugvordering)"""
+    bsn = context.parameters.get("BSN", "999993653")
+
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=2025,
+    )
+    context.services.toeslag_manager.bereken_aanspraak(
+        toeslag_id=context.toeslag_uuid,
+        heeft_aanspraak=True,
+        berekend_jaarbedrag=100000,
+    )
+    context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+    context.services.toeslag_manager.start_maand(toeslag_id=context.toeslag_uuid, maand=1)
+
+    # Pay more than definitief
+    for maand in range(1, 13):
+        context.services.toeslag_manager.betaal_maand(
+            toeslag_id=context.toeslag_uuid,
+            maand=maand,
+            betaald_bedrag=10000,  # 120000 total
+        )
+
+    # Definitief is lower than betaald -> terugvordering
+    context.services.toeslag_manager.stel_definitief_vast(
+        toeslag_id=context.toeslag_uuid,
+        definitief_jaarbedrag=100000,  # 100000 - 120000 = -20000 terugvordering
+    )
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de status transition "{transition}" wordt uitgevoerd met aanspraak')
+def step_impl(context, transition):
+    """Execute a status transition with aanspraak=True"""
+    if transition == "bereken_aanspraak":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=True,
+            berekend_jaarbedrag=120000,
+        )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de status transition "{transition}" wordt uitgevoerd zonder aanspraak')
+def step_impl(context, transition):
+    """Execute a status transition with aanspraak=False"""
+    if transition == "bereken_aanspraak":
+        context.services.toeslag_manager.bereken_aanspraak(
+            toeslag_id=context.toeslag_uuid,
+            heeft_aanspraak=False,
+            berekend_jaarbedrag=0,
+        )
+        # Also execute wijs_af since geen aanspraak leads to afwijzing
+        context.services.toeslag_manager.wijs_af(
+            toeslag_id=context.toeslag_uuid,
+            reden="Geen recht op toeslag",
+        )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de status transition "{transition}" wordt uitgevoerd')
+def step_impl(context, transition):
+    """Execute a status transition"""
+    if transition == "stel_voorschot_vast":
+        context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+    elif transition == "wijs_af":
+        context.services.toeslag_manager.wijs_af(
+            toeslag_id=context.toeslag_uuid,
+            reden="Geen recht op toeslag",
+        )
+    elif transition == "stel_definitief_vast":
+        context.services.toeslag_manager.stel_definitief_vast(
+            toeslag_id=context.toeslag_uuid,
+            definitief_jaarbedrag=context.toeslag.voorschot_jaarbedrag or 120000,
+        )
+    elif transition == "vereffen":
+        context.services.toeslag_manager.vereffen(toeslag_id=context.toeslag_uuid)
+    elif transition == "beeindig":
+        context.services.toeslag_manager.beeindig(
+            toeslag_id=context.toeslag_uuid,
+            reden="Geen voortzetting",
+        )
+    elif transition == "herzien_voorschot":
+        context.services.toeslag_manager.herzien_voorschot(
+            toeslag_id=context.toeslag_uuid,
+            nieuw_jaarbedrag=150000,
+            nieuw_maandbedrag=12500,
+            reden="Inkomenswijziging",
+        )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de status transition "{transition}" wordt uitgevoerd voor maand {maand:d}')
+def step_impl(context, transition, maand):
+    """Execute a status transition with a month parameter"""
+    if transition == "start_maand":
+        context.services.toeslag_manager.start_maand(
+            toeslag_id=context.toeslag_uuid,
+            maand=maand,
+        )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+# === Time Simulation Steps ===
+
+from datetime import date
+from dateutil.relativedelta import relativedelta
+from machine.events.toeslag import TimeSimulator
+
+
+def _parse_date(date_str: str) -> date:
+    """Parse a date string to a date object"""
+    return date.fromisoformat(date_str)
+
+
+def _create_services_factory(context):
+    """Create a factory function that returns the existing Services.
+
+    The TimeSimulator uses reference_date parameter in evaluate() calls,
+    so we don't need to create new Services instances for each date.
+    Reusing the same Services avoids eventsourcing topic registration conflicts.
+    """
+    return lambda date_str: context.services
+
+
+@when('tijd vordert {maanden:d} maanden met maandelijkse verwerking')
+def step_impl(context, maanden):
+    """Advance time by N months with automatic monthly processing"""
+    start_date = _parse_date(context.root_reference_date)
+
+    simulator = TimeSimulator(
+        services_factory=_create_services_factory(context),
+        toeslag_manager=context.services.toeslag_manager,
+        start_date=start_date,
+    )
+
+    # Determine start month from current toeslag state
+    toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+    start_month = max(toeslag.huidige_maand, 1)
+
+    context.simulation_results = simulator.advance_months(
+        toeslag_id=context.toeslag_uuid,
+        months=maanden,
+        parameters=context.parameters,
+        start_month=start_month,
+    )
+
+    # Update context with new date
+    context.root_reference_date = simulator.current_date.isoformat()
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de datum wijzigt naar "{nieuwe_datum}" met automatische verwerking')
+def step_impl(context, nieuwe_datum):
+    """Change date and automatically process all months until that date"""
+    start_date = _parse_date(context.root_reference_date)
+    target_date = _parse_date(nieuwe_datum)
+
+    if target_date <= start_date:
+        return  # No processing needed
+
+    simulator = TimeSimulator(
+        services_factory=_create_services_factory(context),
+        toeslag_manager=context.services.toeslag_manager,
+        start_date=start_date,
+    )
+
+    # Calculate months between dates
+    toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+    start_month = max(toeslag.huidige_maand, start_date.month)
+    target_month = target_date.month
+
+    # Only process if target is within same year and after current month
+    if target_date.year == toeslag.berekeningsjaar and target_month > start_month:
+        context.simulation_results = simulator.advance_to_month(
+            toeslag_id=context.toeslag_uuid,
+            target_month=target_month,
+            parameters=context.parameters,
+        )
+
+    # Update context with new date
+    context.root_reference_date = nieuwe_datum
+    context.services = _create_services_factory(context)(nieuwe_datum)
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('het volledige jaar wordt verwerkt')
+def step_impl(context):
+    """Process the full year with automatic monthly calculations"""
+    start_date = _parse_date(context.root_reference_date)
+
+    simulator = TimeSimulator(
+        services_factory=_create_services_factory(context),
+        toeslag_manager=context.services.toeslag_manager,
+        start_date=start_date,
+    )
+
+    context.year_result = simulator.run_full_year(
+        toeslag_id=context.toeslag_uuid,
+        parameters=context.parameters,
+    )
+
+    # Update context
+    context.root_reference_date = simulator.current_date.isoformat()
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('een data wijziging plaatsvindt in maand {maand:d} voor "{velden}"')
+def step_impl(context, maand, velden):
+    """Simulate a data change that triggers recalculation"""
+    start_date = _parse_date(context.root_reference_date)
+    gewijzigde_velden = [v.strip() for v in velden.split(",")]
+
+    simulator = TimeSimulator(
+        services_factory=_create_services_factory(context),
+        toeslag_manager=context.services.toeslag_manager,
+        start_date=start_date,
+    )
+
+    context.data_change_result = simulator.inject_data_change(
+        toeslag_id=context.toeslag_uuid,
+        maand=maand,
+        parameters=context.parameters,
+        gewijzigde_data=gewijzigde_velden,
+    )
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@then('zijn er {aantal:d} maanden verwerkt')
+def step_impl(context, aantal):
+    """Check that N months have been processed"""
+    if hasattr(context, 'simulation_results'):
+        actual = len(context.simulation_results)
+    elif hasattr(context, 'year_result'):
+        actual = len(context.year_result.maanden)
+    else:
+        actual = len(context.toeslag.maandelijkse_berekeningen)
+
+    assertions.assertEqual(
+        actual, aantal,
+        f"Expected {aantal} months processed, but found {actual}"
+    )
+
+
+@then('is elke verwerkte maand herberekend en betaald')
+def step_impl(context):
+    """Verify each processed month has both a recalculation and payment"""
+    toeslag = context.toeslag
+    berekeningen = {b["maand"] for b in toeslag.maandelijkse_berekeningen}
+    betalingen = {b["maand"] for b in toeslag.maandelijkse_betalingen}
+
+    # All calculated months should also be paid
+    assertions.assertEqual(
+        berekeningen, betalingen,
+        f"Mismatch between calculated months {berekeningen} and paid months {betalingen}"
+    )
+
+
+# === Step-by-step time simulation ===
+
+
+@given('een tijdsimulator voor de toeslag')
+def step_impl(context):
+    """Initialize a time simulator for step-by-step processing"""
+    start_date = _parse_date(context.root_reference_date)
+
+    context.simulator = TimeSimulator(
+        services_factory=_create_services_factory(context),
+        toeslag_manager=context.services.toeslag_manager,
+        start_date=start_date,
+    )
+
+
+@when('de volgende maand wordt verwerkt')
+def step_impl(context):
+    """Process the next month using the simulator"""
+    if not hasattr(context, 'simulator'):
+        # Auto-create simulator if not present
+        start_date = _parse_date(context.root_reference_date)
+        context.simulator = TimeSimulator(
+            services_factory=_create_services_factory(context),
+            toeslag_manager=context.services.toeslag_manager,
+            start_date=start_date,
+        )
+
+    context.last_month_result = context.simulator.step(
+        toeslag_id=context.toeslag_uuid,
+        parameters=context.parameters,
+    )
+
+    # Update context
+    context.root_reference_date = context.simulator.current_date.isoformat()
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('maanden worden verwerkt tot "{doeldatum}"')
+def step_impl(context, doeldatum):
+    """Process all months until the target date"""
+    if not hasattr(context, 'simulator'):
+        start_date = _parse_date(context.root_reference_date)
+        context.simulator = TimeSimulator(
+            services_factory=_create_services_factory(context),
+            toeslag_manager=context.services.toeslag_manager,
+            start_date=start_date,
+        )
+
+    target_date = _parse_date(doeldatum)
+    context.simulation_results = context.simulator.step_to_date(
+        toeslag_id=context.toeslag_uuid,
+        target_date=target_date,
+        parameters=context.parameters,
+    )
+
+    # Update context
+    context.root_reference_date = context.simulator.current_date.isoformat()
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@then('is de huidige maand {maand:d}')
+def step_impl(context, maand):
+    """Check the current month of the toeslag"""
+    actual = context.toeslag.huidige_maand
+    assertions.assertEqual(
+        actual, maand,
+        f"Expected current month to be {maand}, but was {actual}"
+    )
+
+
+@then('is het laatst berekende bedrag {bedrag:d} eurocent')
+def step_impl(context, bedrag):
+    """Check the last calculated amount"""
+    if hasattr(context, 'last_month_result') and context.last_month_result:
+        actual = context.last_month_result.berekend_bedrag
+    else:
+        laatste = context.toeslag.maandelijkse_berekeningen[-1] if context.toeslag.maandelijkse_berekeningen else None
+        actual = laatste["berekend_bedrag"] if laatste else 0
+
+    assertions.assertEqual(
+        actual, bedrag,
+        f"Expected last calculated amount to be {bedrag}, but was {actual}"
+    )
+
+
+@then('is het laatst betaalde bedrag {bedrag:d} eurocent')
+def step_impl(context, bedrag):
+    """Check the last paid amount"""
+    if hasattr(context, 'last_month_result') and context.last_month_result:
+        actual = context.last_month_result.betaald_bedrag
+    else:
+        laatste = context.toeslag.maandelijkse_betalingen[-1] if context.toeslag.maandelijkse_betalingen else None
+        actual = laatste["betaald_bedrag"] if laatste else 0
+
+    assertions.assertEqual(
+        actual, bedrag,
+        f"Expected last paid amount to be {bedrag}, but was {actual}"
+    )
+
+
+@when('de datum wordt gezet op "{datum}"')
+def step_impl(context, datum):
+    """Set the date and automatically process all months until that date"""
+    target_date = _parse_date(datum)
+    start_date = _parse_date(context.root_reference_date)
+
+    # Create simulator
+    simulator = TimeSimulator(
+        services_factory=_create_services_factory(context),
+        toeslag_manager=context.services.toeslag_manager,
+        start_date=start_date,
+    )
+
+    # Process all months until target date
+    context.simulation_results = simulator.step_to_date(
+        toeslag_id=context.toeslag_uuid,
+        target_date=target_date,
+        parameters=context.parameters,
+    )
+
+    # Update context with new date
+    context.root_reference_date = datum
+    context.services = _create_services_factory(context)(datum)
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@then('zijn alle maanden tot en met {maand_naam} verwerkt')
+def step_impl(context, maand_naam):
+    """Verify all months up to and including the named month are processed"""
+    maand_mapping = {
+        "januari": 1, "februari": 2, "maart": 3, "april": 4,
+        "mei": 5, "juni": 6, "juli": 7, "augustus": 8,
+        "september": 9, "oktober": 10, "november": 11, "december": 12
+    }
+    expected_maand = maand_mapping.get(maand_naam.lower())
+    if expected_maand is None:
+        raise ValueError(f"Unknown month name: {maand_naam}")
+
+    # Check that all months from 1 to expected_maand are processed
+    berekeningen_maanden = {b["maand"] for b in context.toeslag.maandelijkse_berekeningen}
+    betalingen_maanden = {b["maand"] for b in context.toeslag.maandelijkse_betalingen}
+
+    expected_maanden = set(range(1, expected_maand + 1))
+
+    assertions.assertEqual(
+        berekeningen_maanden, expected_maanden,
+        f"Expected berekeningen for months {expected_maanden}, but found {berekeningen_maanden}"
+    )
+    assertions.assertEqual(
+        betalingen_maanden, expected_maanden,
+        f"Expected betalingen for months {expected_maanden}, but found {betalingen_maanden}"
+    )
