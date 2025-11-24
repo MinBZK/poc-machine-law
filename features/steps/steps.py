@@ -858,3 +858,365 @@ def step_impl(context, maanden):
         actual, expected,
         f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
     )
+
+
+# === AWIR Toeslag step definitions ===
+
+from machine.events.toeslag import ToeslagType, ToeslagStatus
+
+
+@when('de burger zorgtoeslag aanvraagt voor jaar {jaar:d}')
+def step_impl(context, jaar):
+    """Dien een zorgtoeslag aanvraag in via de toeslag_manager"""
+    bsn = context.parameters.get("BSN")
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=jaar,
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('de burger heeft zorgtoeslag aangevraagd voor jaar {jaar:d}')
+def step_impl(context, jaar):
+    """Setup: burger heeft al een zorgtoeslag aanvraag ingediend"""
+    bsn = context.parameters.get("BSN")
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=jaar,
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('de aanspraak is berekend met recht op toeslag')
+def step_impl(context):
+    """Setup: aanspraak is al berekend en burger heeft recht"""
+    # Bereken de toeslag via de zorgtoeslagwet
+    result = context.services.evaluate(
+        service="TOESLAGEN",
+        law="zorgtoeslagwet",
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+    )
+    context.result = result
+
+    # Update de toeslag met de berekende aanspraak
+    context.services.toeslag_manager.bereken_aanspraak(
+        toeslag_id=context.toeslag_uuid,
+        heeft_aanspraak=result.requirements_met,
+        berekend_jaarbedrag=result.output.get("hoogte_toeslag", 0),
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('de burger heeft een lopende zorgtoeslag voor jaar {jaar:d}')
+def step_impl(context, jaar):
+    """Setup: burger heeft een lopende zorgtoeslag (voorschot vastgesteld)"""
+    bsn = context.parameters.get("BSN")
+
+    # Aanvraag indienen
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=jaar,
+    )
+
+    # Bereken de toeslag
+    result = context.services.evaluate(
+        service="TOESLAGEN",
+        law="zorgtoeslagwet",
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+    )
+    context.result = result
+
+    # Aanspraak berekenen
+    context.services.toeslag_manager.bereken_aanspraak(
+        toeslag_id=context.toeslag_uuid,
+        heeft_aanspraak=result.requirements_met,
+        berekend_jaarbedrag=result.output.get("hoogte_toeslag", 0),
+    )
+
+    # Voorschot vaststellen
+    context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('de burger heeft een afgeronde zorgtoeslag voor jaar {jaar:d}')
+def step_impl(context, jaar):
+    """Setup: burger heeft een afgeronde zorgtoeslag (alle maanden doorlopen)"""
+    bsn = context.parameters.get("BSN")
+
+    # Aanvraag indienen
+    context.toeslag_uuid = context.services.toeslag_manager.dien_aanvraag_in(
+        bsn=bsn,
+        toeslag_type=ToeslagType.ZORGTOESLAG,
+        berekeningsjaar=jaar,
+    )
+
+    # Aanspraak berekenen (met standaard bedrag voor test)
+    context.services.toeslag_manager.bereken_aanspraak(
+        toeslag_id=context.toeslag_uuid,
+        heeft_aanspraak=True,
+        berekend_jaarbedrag=200000,  # €2000
+    )
+
+    # Voorschot vaststellen
+    context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@given('het totaal betaalde voorschot is {bedrag:d} eurocent')
+def step_impl(context, bedrag):
+    """Setup: stel het totaal betaalde bedrag in door maandbetalingen te simuleren"""
+    maandbedrag = bedrag // 12
+    rest = bedrag - (maandbedrag * 12)  # Handle rounding remainder
+    for maand in range(1, 13):
+        # Add remainder to the last month to ensure exact total
+        maand_betaling = maandbedrag + (rest if maand == 12 else 0)
+        context.services.toeslag_manager.betaal_maand(
+            toeslag_id=context.toeslag_uuid,
+            maand=maand,
+            betaald_bedrag=maand_betaling,
+        )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de aanspraak wordt berekend')
+def step_impl(context):
+    """Bereken de aanspraak op toeslag"""
+    # Bereken via de zorgtoeslagwet
+    result = context.services.evaluate(
+        service="TOESLAGEN",
+        law=context.toeslag.regeling,
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+    )
+    context.result = result
+
+    # Update de toeslag
+    context.services.toeslag_manager.bereken_aanspraak(
+        toeslag_id=context.toeslag_uuid,
+        heeft_aanspraak=result.requirements_met,
+        berekend_jaarbedrag=result.output.get("hoogte_toeslag", 0),
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de voorschotbeschikking wordt vastgesteld')
+def step_impl(context):
+    """Stel de voorschotbeschikking vast"""
+    context.services.toeslag_manager.stel_voorschot_vast(toeslag_id=context.toeslag_uuid)
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('maand {maand:d} wordt herberekend')
+def step_impl(context, maand):
+    """Voer maandelijkse herberekening uit"""
+    # Bereken via de wet
+    result = context.services.evaluate(
+        service="TOESLAGEN",
+        law=context.toeslag.regeling,
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+    )
+
+    # Bereken maandbedrag
+    maandbedrag = result.output.get("hoogte_toeslag", 0) // 12
+
+    context.services.toeslag_manager.herbereken_maand(
+        toeslag_id=context.toeslag_uuid,
+        maand=maand,
+        berekend_bedrag=maandbedrag,
+        trigger="schedule",
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('maand {maand:d} wordt betaald')
+def step_impl(context, maand):
+    """Voer maandelijkse betaling uit"""
+    context.services.toeslag_manager.betaal_maand(
+        toeslag_id=context.toeslag_uuid,
+        maand=maand,
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('alle 12 maanden worden doorlopen met herberekening en betaling')
+def step_impl(context):
+    """Doorloop alle 12 maanden met herberekening en betaling"""
+    result = context.services.evaluate(
+        service="TOESLAGEN",
+        law=context.toeslag.regeling,
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+    )
+    maandbedrag = result.output.get("hoogte_toeslag", 0) // 12
+
+    for maand in range(1, 13):
+        context.services.toeslag_manager.herbereken_maand(
+            toeslag_id=context.toeslag_uuid,
+            maand=maand,
+            berekend_bedrag=maandbedrag,
+            trigger="schedule",
+        )
+        context.services.toeslag_manager.betaal_maand(
+            toeslag_id=context.toeslag_uuid,
+            maand=maand,
+        )
+
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de definitieve beschikking wordt vastgesteld met jaarbedrag {bedrag:d} eurocent')
+def step_impl(context, bedrag):
+    """Stel de definitieve beschikking vast met specifiek bedrag"""
+    context.services.toeslag_manager.stel_definitief_vast(
+        toeslag_id=context.toeslag_uuid,
+        definitief_jaarbedrag=bedrag,
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de definitieve beschikking wordt vastgesteld')
+def step_impl(context):
+    """Stel de definitieve beschikking vast op basis van berekening"""
+    result = context.services.evaluate(
+        service="TOESLAGEN",
+        law=context.toeslag.regeling,
+        parameters=context.parameters,
+        reference_date=context.root_reference_date,
+    )
+
+    context.services.toeslag_manager.stel_definitief_vast(
+        toeslag_id=context.toeslag_uuid,
+        definitief_jaarbedrag=result.output.get("hoogte_toeslag", 0),
+    )
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@when('de vereffening wordt uitgevoerd')
+def step_impl(context):
+    """Voer de vereffening uit"""
+    context.services.toeslag_manager.vereffen(toeslag_id=context.toeslag_uuid)
+    context.toeslag = context.services.toeslag_manager.get_toeslag_by_id(context.toeslag_uuid)
+
+
+@then('is de toeslag status "{status}"')
+def step_impl(context, status):
+    """Controleer de toeslag status"""
+    expected_status = ToeslagStatus(status)
+    assertions.assertEqual(
+        context.toeslag.status, expected_status,
+        f"Expected toeslag status to be {status}, but was {context.toeslag.status.value}"
+    )
+
+
+@then('heeft de burger aanspraak op zorgtoeslag')
+def step_impl(context):
+    """Controleer of burger aanspraak heeft"""
+    assertions.assertTrue(
+        context.toeslag.heeft_aanspraak,
+        "Expected burger to have aanspraak on zorgtoeslag"
+    )
+
+
+@then('heeft de burger geen aanspraak op zorgtoeslag')
+def step_impl(context):
+    """Controleer of burger geen aanspraak heeft"""
+    assertions.assertFalse(
+        context.toeslag.heeft_aanspraak,
+        "Expected burger to NOT have aanspraak on zorgtoeslag"
+    )
+
+
+@then('is het voorschot maandbedrag groter dan 0')
+def step_impl(context):
+    """Controleer of voorschot maandbedrag > 0"""
+    assertions.assertGreater(
+        context.toeslag.voorschot_maandbedrag, 0,
+        f"Expected voorschot maandbedrag > 0, but was {context.toeslag.voorschot_maandbedrag}"
+    )
+
+
+@then('bevat de beschikkingen historie een "{beschikking_type}" beschikking')
+def step_impl(context, beschikking_type):
+    """Controleer of beschikkingen historie een bepaald type bevat"""
+    types = [b["type"] for b in context.toeslag.beschikkingen]
+    assertions.assertIn(
+        beschikking_type, types,
+        f"Expected beschikkingen to contain {beschikking_type}, but found {types}"
+    )
+
+
+@then('bevat de maandelijkse berekeningen een berekening voor maand {maand:d}')
+def step_impl(context, maand):
+    """Controleer of er een berekening is voor de maand"""
+    maanden = [b["maand"] for b in context.toeslag.maandelijkse_berekeningen]
+    assertions.assertIn(
+        maand, maanden,
+        f"Expected berekening for maand {maand}, but found {maanden}"
+    )
+
+
+@then('bevat de maandelijkse betalingen een betaling voor maand {maand:d}')
+def step_impl(context, maand):
+    """Controleer of er een betaling is voor de maand"""
+    maanden = [b["maand"] for b in context.toeslag.maandelijkse_betalingen]
+    assertions.assertIn(
+        maand, maanden,
+        f"Expected betaling for maand {maand}, but found {maanden}"
+    )
+
+
+@then('is de betaling gebaseerd op het voorschotbedrag')
+def step_impl(context):
+    """Controleer of laatste betaling gebaseerd is op voorschot"""
+    if context.toeslag.maandelijkse_betalingen:
+        laatste_betaling = context.toeslag.maandelijkse_betalingen[-1]
+        assertions.assertEqual(
+            laatste_betaling["basis"], "voorschot",
+            f"Expected betaling basis to be 'voorschot', but was {laatste_betaling['basis']}"
+        )
+
+
+@then('is het vereffening type "{vtype}"')
+def step_impl(context, vtype):
+    """Controleer het vereffening type"""
+    assertions.assertEqual(
+        context.toeslag.vereffening_type, vtype,
+        f"Expected vereffening type to be {vtype}, but was {context.toeslag.vereffening_type}"
+    )
+
+
+@then('is het vereffening bedrag {bedrag:d} eurocent')
+def step_impl(context, bedrag):
+    """Controleer het vereffening bedrag"""
+    assertions.assertEqual(
+        context.toeslag.vereffening_bedrag, bedrag,
+        f"Expected vereffening bedrag to be {bedrag}, but was {context.toeslag.vereffening_bedrag}"
+    )
+
+
+@then('bevat de maandelijkse berekeningen {aantal:d} berekeningen')
+def step_impl(context, aantal):
+    """Controleer het aantal maandelijkse berekeningen"""
+    actual = len(context.toeslag.maandelijkse_berekeningen)
+    assertions.assertEqual(
+        actual, aantal,
+        f"Expected {aantal} berekeningen, but found {actual}"
+    )
+
+
+@then('bevat de maandelijkse betalingen {aantal:d} betalingen')
+def step_impl(context, aantal):
+    """Controleer het aantal maandelijkse betalingen"""
+    actual = len(context.toeslag.maandelijkse_betalingen)
+    assertions.assertEqual(
+        actual, aantal,
+        f"Expected {aantal} betalingen, but found {actual}"
+    )

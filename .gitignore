@@ -27,3 +27,11 @@ machinev2/backend/backend
 __debug_bin*
 
 .claude
+.idea/
+nul
+
+# Symlink workaround folders (copied from submodule)
+laws/
+schema/
+law/
+script/validate.py

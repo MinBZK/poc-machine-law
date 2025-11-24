@@ -108,7 +108,7 @@
                            type="date"
                            value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
                 {% else %}
-                    {{ effective_date.strftime("%-d %B %Y") }}
+                    {{ effective_date.strftime("%d %B %Y") }}
                 {% endif %}
             </span>
         </div>

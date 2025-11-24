@@ -12,6 +12,7 @@ from .events.case.application import CaseManager
 from .events.case.processor import CaseProcessor
 from .events.claim.application import ClaimManager
 from .events.claim.processor import ClaimProcessor
+from .events.toeslag.application import ToeslagApplication
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -184,6 +185,10 @@ class Services:
             def __init__(self, env=None, **kwargs) -> None:
                 super().__init__(rules_engine=outer_self, env=env, **kwargs)
 
+        class WrappedToeslagApplication(ToeslagApplication):
+            def __init__(self, env=None, **kwargs) -> None:
+                super().__init__(rules_engine=outer_self, env=env, **kwargs)
+
         system = System(
             pipes=[[WrappedCaseManager, WrappedCaseProcessor], [WrappedClaimManager, WrappedClaimProcessor]]
         )
@@ -195,6 +200,9 @@ class Services:
         self.claim_manager = self.runner.get(WrappedClaimManager)
 
         self.claim_manager._case_manager = self.case_manager
+
+        # ToeslagApplication voor AWIR workflow state management
+        self.toeslag_manager = WrappedToeslagApplication()
 
     def __exit__(self):
         self.runner.stop()
