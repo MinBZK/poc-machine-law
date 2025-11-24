@@ -923,6 +923,9 @@ components:
           items:
             $ref: "#/components/schemas/SelectField"
           description: Selection criteria
+        wallet_attribute:
+          type: string
+          description: "Name of the wallet attribute on a claim"
 
     SelectField:
       type: object
