@@ -41,6 +41,7 @@ class Case:
     objection_status: CaseObjectionStatus | None = None
     appeal_status: dict[str, Any] = field(default_factory=dict)
     approved: bool | None = None
+    claim_ids: list[UUID] | None = None
 
     def can_object(self) -> bool:  # TODO: FIX
         if self.objection_status is None:

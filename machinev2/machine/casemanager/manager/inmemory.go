@@ -382,6 +382,16 @@ func (cm *InMemoryCaseManager) ObjectCase(ctx context.Context, caseID uuid.UUID,
 	return nil
 }
 
+// ObjectCase submits an objection for a case
+func (cm *InMemoryCaseManager) AddClaimToCase(ctx context.Context, caseID uuid.UUID, claimID uuid.UUID) error {
+	// Object to the case
+	if err := casemanager.AddClaimToCase(ctx, cm.commandBus, caseID, claimID); err != nil {
+		return fmt.Errorf("failed to add claim to case: %w", err)
+	}
+
+	return nil
+}
+
 // DetermineObjectionStatus determines objection status and periods
 func (cm *InMemoryCaseManager) DetermineObjectionStatus(
 	caseID uuid.UUID,

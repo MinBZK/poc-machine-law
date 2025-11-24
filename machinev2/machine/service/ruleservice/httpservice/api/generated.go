@@ -134,6 +134,7 @@ type Case struct {
 
 	// Bsn Burgerservicenummer of a Dutch citizen
 	Bsn           Bsn                    `json:"bsn"`
+	ClaimIds      *[]openapi_types.UUID  `json:"claim_ids,omitempty"`
 	ClaimedResult map[string]interface{} `json:"claimedResult"`
 
 	// Id Identifier of a case

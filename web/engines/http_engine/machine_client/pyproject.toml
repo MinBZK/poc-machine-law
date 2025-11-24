@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "law-as-code-client"
+name = "regel-recht-engine-api-client"
 version = "0.0.1"
-description = "A client library for accessing Law as Code"
+description = "A client library for accessing RegelRecht Engine API"
 authors = []
 readme = "README.md"
 packages = [
-    {include = "law_as_code_client"},
+    {include = "regel_recht_engine_api_client"},
 ]
-include = ["CHANGELOG.md", "law_as_code_client/py.typed"]
+include = ["CHANGELOG.md", "regel_recht_engine_api_client/py.typed"]
 
 
 [tool.poetry.dependencies]
