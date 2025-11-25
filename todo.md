@@ -1,5 +1,16 @@
 # TODO
 
+## User interface voor aanvraag en verwerken zaak + inzicht gebruiker
+
+## Admin Scherm voor ambtenaar om status van zaken te zien
+
+## Betalingen uitvoeren
+
+## Notification op de website als er een betaling of berekening is geweest
+
+- PDF's / emails??
+
+
 ## Ingangsdatum vs Aanvraagdatum
 
 De aanvraag datum is niet hetzelfde als de startdatum van de zorgtoeslag. Je mag tot 1 september voor het jaar ervoor toeslag aanvragen (AWIR Art. 15 lid 1).
