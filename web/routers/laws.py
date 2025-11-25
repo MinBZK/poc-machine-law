@@ -18,6 +18,44 @@ router = APIRouter(prefix="/laws", tags=["laws"])
 logger = logging.getLogger(__name__)
 
 
+def get_primary_amount_value(rule_spec: dict, output: dict) -> int:
+    """
+    Haal de som van primary output waarden op basis van citizen_relevance: primary.
+
+    Vervangt hardcoded veldnaam checks (hoogte_toeslag, subsidiebedrag)
+    met dynamische lookup uit de rule specification.
+
+    Args:
+        rule_spec: De rule specification dictionary uit YAML
+        output: De output dictionary van het evaluatie resultaat
+
+    Returns:
+        Som van primary amount/number output waarden, of 0 als geen gevonden
+    """
+    total = 0
+    output_definitions = rule_spec.get("properties", {}).get("output", [])
+
+    for output_def in output_definitions:
+        if output_def.get("citizen_relevance") != "primary":
+            continue
+
+        output_name = output_def.get("name")
+        output_type = output_def.get("type", "")
+
+        # Alleen numerieke types voor bedragberekening
+        if output_type not in ["amount", "number"]:
+            continue
+
+        value = output.get(output_name)
+        if value is not None:
+            try:
+                total += int(value)
+            except (ValueError, TypeError):
+                pass
+
+    return total
+
+
 def get_tile_template(service: str, law: str) -> str:
     """
     Get the appropriate tile template for the service and law.
@@ -188,9 +226,32 @@ async def submit_case(
         approved_claims_only=approved,
     )
 
-    case = case_manager.get_case_by_id(case_id)
-
+    # Get rule_spec for dynamic field detection in AWIR workflow
     rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+    # AWIR workflow for toeslagen: calculate eligibility and set voorschot/afwijzing
+    # This triggers events that will create messages via CaseProcessor
+    if service == "TOESLAGEN":
+        # Dynamically determine benefit amount using citizen_relevance: primary
+        # instead of hardcoded field names (hoogte_toeslag, subsidiebedrag, etc.)
+        berekend_jaarbedrag = get_primary_amount_value(rule_spec, result.output)
+        heeft_aanspraak = berekend_jaarbedrag > 0
+
+        # Calculate eligibility (AWIR Art. 16 lid 1)
+        case_manager.bereken_aanspraak(
+            case_id=case_id,
+            heeft_aanspraak=heeft_aanspraak,
+            berekend_jaarbedrag=berekend_jaarbedrag,
+        )
+
+        if heeft_aanspraak:
+            # Set voorschot (AWIR Art. 16) - triggers VoorschotBeschikkingVastgesteld event
+            case_manager.stel_voorschot_vast(case_id=case_id)
+        else:
+            # Reject (AWIR Art. 16 lid 4) - triggers Afgewezen event
+            case_manager.wijs_af(case_id=case_id, reden="Geen aanspraak op basis van berekening")
+
+    case = case_manager.get_case_by_id(case_id)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(
