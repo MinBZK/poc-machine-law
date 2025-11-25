@@ -1,0 +1,44 @@
+{% extends "partials/tiles/base_tile.html" %}
+{% block tile_content %}
+    {% include "partials/tiles/law/besluit_bijstandverlening_zelfstandigen/SZW/computation.html" %}
+    {% if result.algemene_bijstand_bedrag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+        {% if result.algemene_bijstand_bedrag != current_case.claimed_result.algemene_bijstand_bedrag %}
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
+                <p class="text-sm text-gray-600 mb-4">
+                    U vroeg eerder {{ (current_case.claimed_result.algemene_bijstand_bedrag / 100) | format_currency }} Bbz aan.
+                </p>
+                <button type="button"
+                        hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+                        hx-target="#shared-application-panel"
+                        hx-swap="innerHTML"
+                        class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                    Wijzig aanvraag
+                </button>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% block submit_button %}
+    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+            hx-target="#shared-application-panel"
+            hx-swap="innerHTML"
+            class="w-full px-6 py-3 bg-purple-600 text-white text-center rounded-md hover:bg-purple-700 transition-colors cursor-pointer">
+        Bbz aanvragen
+    </button>
+{% endblock %}
+{% block submitted_status %}
+    <p class="text-sm text-gray-600 text-center">
+        Heeft u vragen? Neem contact op met uw gemeente of kijk op <a href="https://www.rijksoverheid.nl/onderwerpen/bijstand-voor-zelfstandigen-bbz">rijksoverheid.nl/bbz</a>.
+    </p>
+{% endblock %}
+{% block approved_status %}
+    <p class="text-sm text-green-600 text-center">
+        Uw aanvraag is goedgekeurd. De bijstand wordt maandelijks uitgekeerd.
+    </p>
+{% endblock %}
+{% block not_eligible_questions %}
+    <p class="text-sm text-gray-600 text-center">
+        Heeft u vragen? Neem contact op met uw gemeente of kijk op <a href="https://www.rijksoverheid.nl/onderwerpen/bijstand-voor-zelfstandigen-bbz">rijksoverheid.nl/bbz</a>.
+    </p>
+{% endblock %}

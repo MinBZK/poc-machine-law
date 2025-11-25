@@ -284,6 +284,44 @@ def step_impl(context, amount):
     compare_euro_amount(actual_amount, amount)
 
 
+# Bbz 2004 specifieke steps
+@then('is de categorie_zelfstandige "{categorie}"')
+def step_impl(context, categorie):
+    actual_categorie = context.result.output["categorie_zelfstandige"]
+    assertions.assertEqual(
+        actual_categorie,
+        categorie,
+        f"Expected categorie_zelfstandige to be {categorie}, but was {actual_categorie}",
+    )
+
+
+@then('is de max_duur_maanden "{maanden}"')
+def step_impl(context, maanden):
+    actual_maanden = context.result.output["max_duur_maanden"]
+    expected_maanden = int(maanden)
+    assertions.assertEqual(
+        actual_maanden,
+        expected_maanden,
+        f"Expected max_duur_maanden to be {maanden}, but was {actual_maanden}",
+    )
+
+
+@then('is het bedrijfskapitaal_max "{amount}" euro')
+def step_impl(context, amount):
+    actual_amount = context.result.output["bedrijfskapitaal_max"]
+    compare_euro_amount(actual_amount, amount)
+
+
+@then('is het bedrijfskapitaal_type "{type}"')
+def step_impl(context, type):
+    actual_type = context.result.output["bedrijfskapitaal_type"]
+    assertions.assertEqual(
+        actual_type,
+        type,
+        f"Expected bedrijfskapitaal_type to be {type}, but was {actual_type}",
+    )
+
+
 @given("alle aanvragen worden beoordeeld")
 def step_impl(context):
     context.services.case_manager.SAMPLE_RATE = 1.0

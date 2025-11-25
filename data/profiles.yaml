@@ -223,6 +223,14 @@ profiles:
         vreemdelingenwet:
         - bsn: '100000001'
           verblijfsvergunning_type: null
+      SZW:
+        bbz_aanvraag:
+        - bsn: '100000001'
+          type_zelfstandige: GEVESTIGD
+          bedrijf_levensvatbaar: true
+          jaren_ondernemerschap: 3
+          uren_per_week: 40
+          beeindigingsdatum: null
   '999991905':
     name: Linda Strijps
     description: Moeder van twee jonge kinderen, werkt parttime, met NL Wallet

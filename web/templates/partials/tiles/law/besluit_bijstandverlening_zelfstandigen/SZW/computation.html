@@ -1,0 +1,74 @@
+<div>
+    {% if result.is_gerechtigd %}
+        <h4 class="text-sm font-medium text-gray-600 mb-2">U komt waarschijnlijk in aanmerking voor Bbz</h4>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-purple-600">{{ (result.algemene_bijstand_bedrag / 100) | format_currency }}</span>
+            <span class="ml-2 text-gray-600">per maand</span>
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </div>
+        <div class="mt-4 bg-gray-50 p-3 rounded-lg">
+            <h5 class="text-sm font-medium text-gray-700 mb-2">Specificatie Bbz</h5>
+            <div class="grid grid-cols-2 gap-1 text-sm">
+                <div class="text-gray-600">Categorie:</div>
+                <div class="text-right font-medium">
+                    {% if result.categorie_zelfstandige == 'GEVESTIGD' %}
+                        Gevestigde zelfstandige
+                    {% elif result.categorie_zelfstandige == 'BEGINNEND' %}
+                        Beginnende zelfstandige
+                    {% elif result.categorie_zelfstandige == 'OUDER' %}
+                        Oudere zelfstandige
+                    {% elif result.categorie_zelfstandige == 'BEEINDIGEND' %}
+                        Beeindigende zelfstandige
+                    {% else %}
+                        {{ result.categorie_zelfstandige }}
+                    {% endif %}
+                </div>
+                <div class="text-gray-600">Maximale duur:</div>
+                <div class="text-right font-medium">
+                    {% if result.max_duur_maanden == 0 %}
+                        Onbeperkt
+                    {% else %}
+                        {{ result.max_duur_maanden }} maanden
+                    {% endif %}
+                </div>
+                {% if result.bedrijfskapitaal_max > 0 %}
+                    <div class="text-gray-600 mt-2 pt-2 border-t border-gray-200">Max bedrijfskapitaal:</div>
+                    <div class="text-right font-medium mt-2 pt-2 border-t border-gray-200 text-purple-600">
+                        {{ (result.bedrijfskapitaal_max / 100) | format_currency }}
+                    </div>
+                    <div class="text-gray-600">Type:</div>
+                    <div class="text-right font-medium">
+                        {% if result.bedrijfskapitaal_type == 'LENING_RENTE' %}
+                            Rentedragende lening (8%)
+                        {% elif result.bedrijfskapitaal_type == 'LENING_RENTELOOS' %}
+                            Renteloze lening
+                        {% elif result.bedrijfskapitaal_type == 'OM_NIET' %}
+                            Bedrag om niet (gift)
+                        {% else %}
+                            {{ result.bedrijfskapitaal_type }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="text-gray-800 font-medium mt-2 pt-2 border-t border-gray-200">Maandelijkse bijstand:</div>
+                <div class="text-right font-medium mt-2 pt-2 border-t border-gray-200">
+                    {{ (result.algemene_bijstand_bedrag / 100) | format_currency }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            U komt waarschijnlijk niet in aanmerking voor Bbz.
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </h4>
+    {% endif %}
+</div>
