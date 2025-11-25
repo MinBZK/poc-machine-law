@@ -127,6 +127,10 @@ class PythonMachineService(EngineInterface):
         """Get the ToeslagApplication for managing toeslag workflows."""
         return self.services.toeslag_manager
 
+    def get_services(self):
+        """Get the underlying Services instance."""
+        return self.services
+
 
 def to_path_node(path_node) -> PathNode:
     return PathNode(

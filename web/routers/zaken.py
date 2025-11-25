@@ -1,16 +1,39 @@
 """Zaken router for workflow-based toeslag management"""
 
+import logging
 from datetime import date, datetime
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 
 from machine.events.toeslag.aggregate import ToeslagStatus, ToeslagType
-
-from web.dependencies import TODAY, get_machine_service, get_toeslag_manager, templates
+from machine.events.toeslag.timesimulator import TimeSimulator
+from web.dependencies import (
+    TODAY,
+    get_machine_service,
+    get_simulated_date,
+    get_toeslag_manager,
+    set_simulated_date,
+    templates,
+)
 from web.engines import EngineInterface
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/zaken", tags=["zaken"])
+
+# Finalized statuses that should not be processed during time simulation
+FINALIZED_STATUSES = {
+    ToeslagStatus.DEFINITIEF,
+    ToeslagStatus.VEREFFEND,
+    ToeslagStatus.AFGEWEZEN,
+    ToeslagStatus.BEEINDIGD,
+}
+
+
+def is_processable(toeslag) -> bool:
+    """Check if a toeslag should be processed during time simulation"""
+    return toeslag.status not in FINALIZED_STATUSES
 
 # Status badge mapping for display
 STATUS_BADGES = {
@@ -73,6 +96,7 @@ async def zaken_index(
     """List all toeslagen for a citizen"""
     # Get profile for display
     profile = machine_service.get_profile_data(bsn)
+    simulated_date = get_simulated_date(request)
 
     # Get all toeslagen for this BSN
     toeslagen = toeslag_manager.get_toeslagen_by_bsn(bsn)
@@ -105,6 +129,7 @@ async def zaken_index(
             "profile": profile,
             "toeslagen": toeslagen_display,
             "all_profiles": machine_service.get_all_profiles(),
+            "simulated_date": simulated_date.isoformat(),
         },
     )
 
@@ -117,9 +142,10 @@ async def zaken_aanvraag_form(
 ):
     """Show the aanvraag form"""
     profile = machine_service.get_profile_data(bsn)
+    simulated_date = get_simulated_date(request)
 
-    # Current year and next year as options
-    current_year = datetime.now().year
+    # Current year and next year as options (based on simulated date)
+    current_year = simulated_date.year
     years = [current_year, current_year + 1]
 
     # Evaluate zorgtoeslag to show expected amount
@@ -128,7 +154,7 @@ async def zaken_aanvraag_form(
             service="TOESLAGEN",
             law="zorgtoeslagwet",
             parameters={"BSN": bsn},
-            reference_date=TODAY,
+            reference_date=simulated_date.isoformat(),
         )
         expected_amount = result.output.get("hoogte_toeslag", 0)
         expected_amount_display = format_cents(expected_amount)
@@ -147,6 +173,7 @@ async def zaken_aanvraag_form(
             "expected_amount": expected_amount,
             "expected_amount_display": expected_amount_display,
             "all_profiles": machine_service.get_all_profiles(),
+            "simulated_date": simulated_date.isoformat(),
         },
     )
 
@@ -160,40 +187,43 @@ async def zaken_aanvraag_submit(
     toeslag_manager=Depends(get_toeslag_manager),
 ):
     """Submit a zorgtoeslag aanvraag"""
+    simulated_date = get_simulated_date(request)
+    simulated_date_str = simulated_date.isoformat()
+
     try:
-        # 1. Create toeslag via toeslag_manager
-        # Note: aanvraag_datum defaults to today in the aggregate
+        # 1. Create toeslag via toeslag_manager with simulated date
         toeslag_id = toeslag_manager.dien_aanvraag_in(
             bsn=bsn,
             toeslag_type=ToeslagType.ZORGTOESLAG,
             berekeningsjaar=berekeningsjaar,
+            aanvraag_datum=simulated_date_str,
         )
 
-        # 2. Calculate eligibility using rules engine
+        # 2. Calculate eligibility using rules engine with simulated date
         result = machine_service.evaluate(
             service="TOESLAGEN",
             law="zorgtoeslagwet",
             parameters={"BSN": bsn},
-            reference_date=TODAY,
+            reference_date=simulated_date_str,
         )
 
         # 3. Determine eligibility and amount
         berekend_jaarbedrag = result.output.get("hoogte_toeslag", 0)
         heeft_aanspraak = berekend_jaarbedrag > 0
 
-        # 4. Update toeslag with calculation result
-        # Note: berekening_datum defaults to today in the aggregate
+        # 4. Update toeslag with calculation result using simulated date
         toeslag_manager.bereken_aanspraak(
             toeslag_id=toeslag_id,
             heeft_aanspraak=heeft_aanspraak,
             berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=simulated_date_str,
         )
 
-        # 5. If eligible, automatically set voorschot
-        # Note: beschikking_datum defaults to today in the aggregate
+        # 5. If eligible, automatically set voorschot using simulated date
         if heeft_aanspraak:
             toeslag_manager.stel_voorschot_vast(
                 toeslag_id=toeslag_id,
+                beschikking_datum=simulated_date_str,
             )
 
         # 6. Redirect to detail page
@@ -205,7 +235,7 @@ async def zaken_aanvraag_submit(
     except ValueError as e:
         # Handle duplicate application error
         profile = machine_service.get_profile_data(bsn)
-        current_year = datetime.now().year
+        current_year = simulated_date.year
         return templates.TemplateResponse(
             "zaken/aanvraag.html",
             {
@@ -216,8 +246,90 @@ async def zaken_aanvraag_submit(
                 "current_year": current_year,
                 "error": str(e),
                 "all_profiles": machine_service.get_all_profiles(),
+                "simulated_date": simulated_date.isoformat(),
             },
         )
+
+
+@router.post("/simulate/reset")
+async def reset_simulation(
+    request: Request,
+    bsn: str = Form(...),
+    toeslag_id: str = Form(None),
+    reset_date: str = Form(None),
+    toeslag_manager=Depends(get_toeslag_manager),
+):
+    """Reset simulation date to aanvraag date or specified date"""
+    if reset_date:
+        new_date = date.fromisoformat(reset_date)
+    elif toeslag_id:
+        toeslag = toeslag_manager.get_toeslag_by_id(toeslag_id)
+        if toeslag and toeslag.aanvraag_datum:
+            new_date = date.fromisoformat(toeslag.aanvraag_datum)
+        else:
+            new_date = date.today()
+    else:
+        new_date = date.today()
+
+    set_simulated_date(request, new_date)
+    logger.warning(f"[SIMULATE] Reset date to {new_date}")
+
+    redirect_url = f"/zaken/{toeslag_id}?bsn={bsn}" if toeslag_id else f"/zaken/?bsn={bsn}"
+    return RedirectResponse(url=redirect_url, status_code=303)
+
+
+@router.post("/simulate")
+async def simulate_time(
+    request: Request,
+    target_date: str = Form(...),
+    bsn: str = Form(...),
+    toeslag_id: str = Form(None),
+    machine_service: EngineInterface = Depends(get_machine_service),
+    toeslag_manager=Depends(get_toeslag_manager),
+):
+    """Advance simulation date and process all non-finalized toeslagen"""
+    current_date = get_simulated_date(request)
+    target = date.fromisoformat(target_date)
+
+    logger.warning(f"[SIMULATE] current_date={current_date}, target={target}, bsn={bsn}, toeslag_id={toeslag_id}")
+
+    # Don't process if target is before or equal to current
+    if target <= current_date:
+        logger.warning(f"[SIMULATE] Target date not in future, just updating session")
+        set_simulated_date(request, target)
+        redirect_url = f"/zaken/{toeslag_id}?bsn={bsn}" if toeslag_id else f"/zaken/?bsn={bsn}"
+        return RedirectResponse(url=redirect_url, status_code=303)
+
+    # Get all non-finalized toeslagen for this BSN
+    toeslagen = toeslag_manager.get_toeslagen_by_bsn(bsn)
+    processable = [t for t in toeslagen if is_processable(t)]
+
+    logger.warning(f"[SIMULATE] Found {len(toeslagen)} toeslagen, {len(processable)} processable")
+
+    # Get the underlying services from machine_service for TimeSimulator
+    services = machine_service.get_services()
+
+    # Process each toeslag through time simulation
+    for toeslag in processable:
+        logger.warning(f"[SIMULATE] Processing toeslag {toeslag.id}: status={toeslag.status}, berekeningsjaar={toeslag.berekeningsjaar}")
+        simulator = TimeSimulator(
+            toeslag_manager=toeslag_manager,
+            start_date=current_date,
+            services=services,
+        )
+        results = simulator.step_to_date(
+            toeslag_id=str(toeslag.id),
+            target_date=target,
+            parameters={"BSN": bsn},
+        )
+        logger.warning(f"[SIMULATE] Processed {len(results)} months for toeslag {toeslag.id}")
+
+    # Update session with new date
+    set_simulated_date(request, target)
+
+    # Redirect back to detail page or index
+    redirect_url = f"/zaken/{toeslag_id}?bsn={bsn}" if toeslag_id else f"/zaken/?bsn={bsn}"
+    return RedirectResponse(url=redirect_url, status_code=303)
 
 
 @router.get("/{toeslag_id}")
@@ -230,6 +342,7 @@ async def zaken_detail(
 ):
     """Show toeslag detail with full timeline"""
     profile = machine_service.get_profile_data(bsn)
+    simulated_date = get_simulated_date(request)
 
     # Get toeslag by ID
     toeslag = toeslag_manager.get_toeslag_by_id(toeslag_id)
@@ -343,5 +456,6 @@ async def zaken_detail(
             "timeline": timeline,
             "format_cents": format_cents,
             "all_profiles": machine_service.get_all_profiles(),
+            "simulated_date": simulated_date.isoformat(),
         },
     )

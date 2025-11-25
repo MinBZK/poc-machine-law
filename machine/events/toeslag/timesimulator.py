@@ -79,35 +79,40 @@ class TimeSimulator:
 
     def __init__(
         self,
-        services_factory: Callable[[str], "Services"],
         toeslag_manager: "ToeslagApplication",
         start_date: date,
+        services_factory: Callable[[str], "Services"] | None = None,
+        services: "Services | None" = None,
     ) -> None:
         """
         Initialiseer de simulator.
 
         Args:
-            services_factory: Factory functie die een Services instance maakt voor een datum
             toeslag_manager: De ToeslagApplication voor state management
             start_date: Startdatum voor de simulatie
+            services_factory: Factory functie die een Services instance maakt voor een datum (optioneel)
+            services: Directe Services instance (optioneel, heeft voorrang boven factory)
         """
         self.services_factory = services_factory
+        self._services: "Services" | None = services
         self.toeslag_manager = toeslag_manager
         self.current_date = start_date
-        self._services: "Services" | None = None
 
     @property
     def services(self) -> "Services":
         """Huidige Services instance voor de huidige datum"""
         if self._services is None:
+            if self.services_factory is None:
+                raise ValueError("No services or services_factory provided")
             self._services = self.services_factory(self.current_date.isoformat())
         return self._services
 
     def _advance_date(self, months: int = 1) -> None:
         """Verschuif de huidige datum met N maanden"""
         self.current_date = self.current_date + relativedelta(months=months)
-        # Invalidate services cache - nieuwe datum vereist nieuwe Services
-        self._services = None
+        # Only invalidate if using factory - direct services instance blijft behouden
+        if self.services_factory is not None:
+            self._services = None
 
     def _evaluate_toeslag(
         self,
