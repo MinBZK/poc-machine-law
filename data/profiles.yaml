@@ -42,8 +42,8 @@ globalServices:
 profiles:
   '100000001':
     name: Merijn van der Meer
-    description: ZZP'er in de thuiszorg, alleenstaande ouder met twee jonge kinderen
-      waarvan één met chronische aandoening
+    description: ZZP'er in de thuiszorg met laag inkomen, alleenstaande ouder met twee jonge kinderen
+      waarvan één met chronische aandoening. Komt in aanmerking voor Bbz.
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -93,7 +93,7 @@ profiles:
         - bsn: '100000001'
           loon_uit_dienstbetrekking: 0
           uitkeringen_en_pensioenen: 0
-          winst_uit_onderneming: 1550000
+          winst_uit_onderneming: 600000
           resultaat_overige_werkzaamheden: 0
           eigen_woning: -85000
         box2:
@@ -102,26 +102,29 @@ profiles:
           vervreemdingsvoordelen: 0
         box3:
         - bsn: '100000001'
-          spaargeld: 580000
+          spaargeld: 500000
           beleggingen: 0
           onroerend_goed: 0
           schulden: 0
           buitenlands_inkomen: 0
         monthly_income:
         - bsn: '100000001'
-          bedrag: 129167
+          bedrag: 50000
         maandelijks_inkomen:
         - bsn: '100000001'
           bedrag: 0
         assets:
         - bsn: '100000001'
-          bedrag: 580000
+          bedrag: 500000
+        bezittingen:
+        - bsn: '100000001'
+          bedrag: 500000
         business_income:
         - bsn: '100000001'
-          bedrag: 1550000
+          bedrag: 600000
         bedrijfsinkomen:
         - bsn: '100000001'
-          bedrag: 1550000
+          bedrag: 600000
         buitenlands_inkomen:
         - bsn: '100000001'
           bedrag: 0
@@ -131,7 +134,7 @@ profiles:
           persoonsgebonden_aftrek: 320000
         belastingdienst_vermogen:
         - bsn: '100000001'
-          vermogen: 580000
+          vermogen: 500000
       KVK:
         inschrijvingen:
         - bsn: '100000001'
@@ -150,7 +153,7 @@ profiles:
           verzekerd_wia: false
         uwv_toetsingsinkomen:
         - bsn: '100000001'
-          toetsingsinkomen: 1550000
+          toetsingsinkomen: 600000
         uwv_werkgegevens:
         - bsn: '100000001'
           gemiddeld_uren_per_week: 0.0
