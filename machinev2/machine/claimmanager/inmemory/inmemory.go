@@ -419,3 +419,20 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(
 
 	return result, nil
 }
+
+func (cm *ClaimManager) Reset(ctx context.Context) error {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+
+	// Clear all indexes and claims
+	cm.serviceIndex = make(map[string][]uuid.UUID)
+	cm.caseIndex = make(map[uuid.UUID][]uuid.UUID)
+	cm.claimantIndex = make(map[string][]uuid.UUID)
+	cm.bsnIndex = make(map[string][]uuid.UUID)
+	cm.statusIndex = make(map[model.ClaimStatus][]uuid.UUID)
+	cm.bsnServiceLawIndex = make(map[string]map[string]uuid.UUID)
+	cm.claims = make(map[uuid.UUID]*model.Claim)
+
+	cm.logger.Info("claim manager reset complete")
+	return nil
+}

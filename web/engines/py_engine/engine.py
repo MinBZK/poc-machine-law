@@ -1,3 +1,5 @@
+import os
+import sys
 from datetime import date, datetime
 from typing import Any
 
@@ -122,6 +124,10 @@ class PythonMachineService(EngineInterface):
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source dataframe for a service and table."""
         self.services.set_source_dataframe(service, table, df)
+
+    def reset(self) -> None:
+        # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 def to_path_node(path_node) -> PathNode:

@@ -116,6 +116,12 @@ class EngineInterface(ABC):
         Set a dataframe in a table for a service
         """
 
+    @abstractmethod
+    def reset(self) -> None:
+        """
+        reset the engine data.
+        """
+
     def get_sorted_discoverable_service_laws(self, bsn: str) -> list[dict[str, Any]]:
         """
         Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.

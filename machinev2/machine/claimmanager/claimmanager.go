@@ -20,4 +20,6 @@ type ClaimManager interface {
 	GetClaimsByClaimant(ctx context.Context, claimant string, approved, includeRejected bool) ([]model.Claim, error)
 	GetClaimsByBSN(ctx context.Context, bsn string, approved, includeRejected bool) ([]model.Claim, error)
 	GetClaimByBSNServiceLaw(ctx context.Context, bsn, service, law string, approved, includeRejected bool) (map[string]model.Claim, error)
+
+	Reset(ctx context.Context) error
 }
