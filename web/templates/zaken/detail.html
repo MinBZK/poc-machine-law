@@ -176,6 +176,98 @@
             </div>
             {% endif %}
 
+            <!-- Verwachte gebeurtenissen (AWIR Workflow) -->
+            {% if toeslag.status in [CaseStatus.VOORSCHOT, CaseStatus.LOPEND, CaseStatus.DEFINITIEF] %}
+            <div class="bg-white rounded-lg shadow p-6 border-2 border-amber-200">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Wat kunt u verwachten?
+                </h3>
+                <ul class="space-y-3 text-sm">
+                    {% if toeslag.status in [CaseStatus.VOORSCHOT, CaseStatus.LOPEND] %}
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-medium text-gray-900">Maandelijkse uitbetalingen</span>
+                            <p class="text-gray-500 text-xs mt-0.5">
+                                Elke maand wordt uw toeslag opnieuw berekend en uitbetaald (AWIR Art. 22).
+                            </p>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if toeslag.status == CaseStatus.LOPEND and not toeslag.ib_aanslag_datum %}
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-medium text-gray-900">IB-aanslag ontvangst</span>
+                            <p class="text-gray-500 text-xs mt-0.5">
+                                Na ontvangst van uw IB-aanslag (rond 1 april) start de definitieve berekening (AWIR Art. 19).
+                            </p>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if toeslag.ib_aanslag_datum and toeslag.status == CaseStatus.LOPEND %}
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-medium text-gray-900">IB-aanslag ontvangen</span>
+                            <p class="text-gray-500 text-xs mt-0.5">
+                                Ontvangen op {{ toeslag.ib_aanslag_datum }}. Definitieve vaststelling volgt binnen 6 maanden.
+                            </p>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-medium text-gray-900">Definitieve vaststelling</span>
+                            <p class="text-gray-500 text-xs mt-0.5">
+                                Uiterlijk {{ toeslag.deadline_definitief }} ontvangt u de definitieve beschikking (AWIR Art. 19).
+                            </p>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if toeslag.status == CaseStatus.DEFINITIEF %}
+                    <li class="flex items-start">
+                        <span class="w-2 h-2 bg-purple-500 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-medium text-gray-900">Vereffening</span>
+                            <p class="text-gray-500 text-xs mt-0.5">
+                                Binnen 4 weken wordt het verschil tussen voorschot en definitief bedrag verrekend (AWIR Art. 24).
+                                {% if toeslag.definitief_jaarbedrag %}
+                                <br>Definitief bedrag: {{ format_cents(toeslag.definitief_jaarbedrag) }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+                <p class="mt-4 text-xs text-gray-400 border-t pt-3">
+                    Let op: Terugvorderingen onder de doelmatigheidsgrens van 116 worden niet ingevorderd (AWIR Art. 26a).
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Kwijtschelding indicator -->
+            {% if toeslag.status == CaseStatus.VEREFFEND and toeslag.vereffening_type == 'KWIJTGESCHOLDEN' %}
+            <div class="bg-white rounded-lg shadow p-6 border-2 border-green-200">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Terugvordering kwijtgescholden
+                </h3>
+                <p class="text-sm text-gray-600">
+                    {% if toeslag.kwijtschelding_reden %}
+                    {{ toeslag.kwijtschelding_reden }}
+                    {% else %}
+                    Op grond van AWIR Art. 26a (doelmatigheidsgrens) is de terugvordering kwijtgescholden.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+
             <!-- Time Simulation Controls -->
             <div class="bg-white rounded-lg shadow p-6 border-2 border-indigo-200">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">

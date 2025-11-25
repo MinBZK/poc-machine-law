@@ -1,13 +1,19 @@
 from eventsourcing.dispatch import singledispatchmethod
+from eventsourcing.persistence import Transcoder
 from eventsourcing.system import ProcessApplication
 
-from machine.events.case.aggregate import Case
+from machine.events.case.aggregate import Case, DateAsISOTranscoding
 
 
 class CaseProcessor(ProcessApplication):
     def __init__(self, rules_engine, **kwargs) -> None:
         super().__init__(**kwargs)
         self.rules_engine = rules_engine
+
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for date serialization."""
+        super().register_transcodings(transcoder)
+        transcoder.register(DateAsISOTranscoding())
 
     @singledispatchmethod
     def policy(self, domain_event, process_event) -> None:

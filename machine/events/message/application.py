@@ -44,6 +44,7 @@ class MessageManager(Application):
         inhoud: str,
         rechtsmiddel_info: str | None = None,
         law: str | None = None,
+        created_at=None,
     ) -> str:
         """
         Maak een nieuw bericht aan voor een burger.
@@ -56,6 +57,7 @@ class MessageManager(Application):
             inhoud: Inhoud van het bericht
             rechtsmiddel_info: Optionele rechtsmiddelenclausule (AWB Art. 3:45)
             law: Optionele wet identifier (bijv. "huurtoeslag", "zorgtoeslag")
+            created_at: Optional timestamp for the message creation (defaults to now)
 
         Returns:
             ID van het aangemaakte bericht
@@ -68,10 +70,11 @@ class MessageManager(Application):
             inhoud=inhoud,
             rechtsmiddel_info=rechtsmiddel_info,
             law=law,
+            created_at=created_at,
         )
 
         # Markeer direct als verzonden (AWB Art. 3:41)
-        message.mark_sent()
+        message.mark_sent(sent_at=created_at)
 
         self.save(message)
         self._index_message(message)

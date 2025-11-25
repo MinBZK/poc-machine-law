@@ -434,7 +434,13 @@ class Services:
                                     if parts[1] == "id":
                                         mapping[name] = str(aggregate.id)
                                     else:
-                                        mapping[name] = getattr(aggregate, parts[1], None)
+                                        attr_value = getattr(aggregate, parts[1], None)
+                                        # Convert date to datetime for created_at field
+                                        if name == "created_at" and isinstance(attr_value, date):
+                                            from datetime import datetime
+                                            mapping[name] = datetime.combine(attr_value, datetime.min.time())
+                                        else:
+                                            mapping[name] = attr_value
                                 elif len(parts) == 1:
                                     # Try definitions first, then rule output
                                     definitions = rule.properties.get("definitions", {})

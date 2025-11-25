@@ -1,12 +1,13 @@
 import json
 import random
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
 from eventsourcing.application import Application
+from eventsourcing.persistence import Transcoder, Transcoding
 
-from .aggregate import Case, CaseStatus
+from .aggregate import Case, CaseStatus, DateAsISOTranscoding
 
 
 class CaseManager(Application):
@@ -23,6 +24,11 @@ class CaseManager(Application):
         self.rules_engine = rules_engine
         self._case_index: dict[tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
         # self.follow()
+
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for date serialization."""
+        super().register_transcodings(transcoder)
+        transcoder.register(DateAsISOTranscoding())
 
     @staticmethod
     def _index_key(bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
@@ -449,8 +455,19 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def vereffen(self, case_id: str) -> str:
-        """Execute settlement (back-payment or recovery)"""
+    def vereffen(self, case_id: str) -> dict:
+        """
+        Execute settlement (back-payment or recovery).
+
+        Implements AWIR Art. 24 (verrekening) and Art. 26a (doelmatigheidsgrens).
+        Art. 26a: Terugvorderingen onder €116 worden niet ingevorderd.
+
+        Returns:
+            Dict with vereffening details: {"type": str, "bedrag": int, "case_id": str}
+        """
+        # Doelmatigheidsgrens according to AWIR Art. 26a
+        DOELMATIGHEIDSGRENS = 11600  # €116.00 in eurocent
+
         case = self.repository.get(UUID(case_id))
 
         # Calculate total paid amount from maandelijkse_betalingen
@@ -461,23 +478,74 @@ class CaseManager(Application):
         verschil = definitief - totaal_betaald
 
         # Determine vereffening type and bedrag
-        if verschil > 0:
+        # Apply doelmatigheidsgrens for terugvorderingen (Art. 26a AWIR)
+        if verschil < 0 and abs(verschil) < DOELMATIGHEIDSGRENS:
+            # Art. 26a: Terugvordering onder drempel wordt kwijtgescholden
+            case.terugvordering_kwijtgescholden(
+                oorspronkelijk_bedrag=abs(verschil),
+                reden=f"Art. 26a AWIR: Onder doelmatigheidsgrens (€{DOELMATIGHEIDSGRENS / 100:.2f})",
+            )
+            vereffening_type = "KWIJTGESCHOLDEN"
+            vereffening_bedrag = 0
+        elif verschil > 0:
             vereffening_type = "NABETALING"
             vereffening_bedrag = verschil
+            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
         elif verschil < 0:
             vereffening_type = "TERUGVORDERING"
             vereffening_bedrag = abs(verschil)
+            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
         else:
             vereffening_type = "GEEN"
             vereffening_bedrag = 0
+            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
 
-        case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
         self.save(case)
-        return str(case.id)
+        return {
+            "type": vereffening_type,
+            "bedrag": vereffening_bedrag,
+            "case_id": str(case.id),
+        }
 
     def beeindig(self, case_id: str, reden: str, einddatum: date | None = None) -> str:
         """End a toeslag"""
         case = self.repository.get(UUID(case_id))
         case.beeindig(reden=reden, einddatum=einddatum)
+        self.save(case)
+        return str(case.id)
+
+    def ontvang_ib_aanslag(
+        self,
+        case_id: str,
+        vastgesteld_inkomen: int,
+        aanslag_datum: date | None = None,
+    ) -> str:
+        """
+        Registreer ontvangst IB-aanslag (AWIR Art. 19 trigger).
+
+        Dit event triggert de definitieve vaststellingsprocedure:
+        - Deadline voor definitieve beschikking: 6 maanden na IB-aanslag
+        - Uiterlijk 31 december van het jaar volgend op het berekeningsjaar
+
+        Args:
+            case_id: ID van de case
+            vastgesteld_inkomen: Vastgesteld inkomen uit IB-aanslag (in eurocent)
+            aanslag_datum: Datum van de IB-aanslag (default: vandaag)
+
+        Returns:
+            Case ID
+        """
+        if aanslag_datum is None:
+            aanslag_datum = date.today()
+
+        # Deadline: 6 maanden na IB-aanslag
+        deadline = aanslag_datum + timedelta(days=180)
+
+        case = self.repository.get(UUID(case_id))
+        case.ib_aanslag_ontvangen(
+            vastgesteld_inkomen=vastgesteld_inkomen,
+            aanslag_datum=aanslag_datum,
+            deadline_definitief=deadline,
+        )
         self.save(case)
         return str(case.id)

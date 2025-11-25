@@ -322,7 +322,7 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                     </div>
                     <!-- Beoordeling Formulier -->
                     {% if case.status in ['IN_REVIEW', 'OBJECTED'] %}
-                        <div class="p-6" id="review-form-container">
+                        <div class="p-6 border-b border-gray-200" id="review-form-container">
                             <h2 class="text-lg font-semibold mb-4">Beoordelingsacties</h2>
                             <form hx-post="/admin/cases/{{ case.id }}/complete-review"
                                   hx-target="#review-form-container"
@@ -343,6 +343,160 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                     Beoordeling indienen
                                 </button>
                             </form>
+                        </div>
+                    {% endif %}
+                    <!-- AWIR Workflow Acties (Art. 19, 22, 24, 26a) -->
+                    {% if case.status in ['VOORSCHOT', 'LOPEND', 'DEFINITIEF'] %}
+                        <div class="p-6 border-b border-gray-200" id="awir-workflow-container">
+                            <h2 class="text-lg font-semibold mb-4">AWIR Workflow Acties</h2>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Handmatige acties voor de AWIR-workflow. Deze acties worden normaal automatisch
+                                uitgevoerd via tijdsimulatie.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Maand verwerken (Art. 22) -->
+                                {% if case.status in ['VOORSCHOT', 'LOPEND'] %}
+                                    <div class="bg-gray-50 p-4 rounded-md">
+                                        <h3 class="font-medium mb-2">Maand verwerken (Art. 22)</h3>
+                                        <p class="text-sm text-gray-600 mb-3">
+                                            Verwerk een maandelijkse herberekening en betaling.
+                                        </p>
+                                        <form method="POST"
+                                              action="/admin/cases/{{ case.id }}/verwerk-maand"
+                                              class="space-y-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Maand</label>
+                                                <select name="maand" class="w-full border rounded-md p-2">
+                                                    {% for m in range(1, 13) %}
+                                                        <option value="{{ m }}">{{ m }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <button type="submit"
+                                                    class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
+                                                Verwerk maand
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                                <!-- IB-aanslag ontvangen (Art. 19 trigger) -->
+                                {% if case.status == 'LOPEND' and not case.ib_aanslag_datum %}
+                                    <div class="bg-yellow-50 p-4 rounded-md">
+                                        <h3 class="font-medium mb-2">IB-aanslag ontvangen (Art. 19)</h3>
+                                        <p class="text-sm text-gray-600 mb-3">
+                                            Registreer ontvangst van de IB-aanslag. Dit start de definitieve
+                                            vaststellingsprocedure (deadline: 6 maanden).
+                                        </p>
+                                        <form method="POST"
+                                              action="/admin/cases/{{ case.id }}/ib-aanslag"
+                                              class="space-y-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Vastgesteld inkomen (eurocent)</label>
+                                                <input type="number"
+                                                       name="vastgesteld_inkomen"
+                                                       class="w-full border rounded-md p-2"
+                                                       placeholder="bijv. 2500000 (= 25.000)"
+                                                       required />
+                                            </div>
+                                            <button type="submit"
+                                                    class="w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 cursor-pointer">
+                                                Registreer IB-aanslag
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                                <!-- IB-aanslag ontvangen indicator -->
+                                {% if case.ib_aanslag_datum %}
+                                    <div class="bg-green-50 p-4 rounded-md">
+                                        <h3 class="font-medium mb-2">IB-aanslag ontvangen</h3>
+                                        <div class="text-sm space-y-1">
+                                            <p><span class="text-gray-600">Datum:</span> {{ case.ib_aanslag_datum }}</p>
+                                            <p><span class="text-gray-600">Vastgesteld inkomen:</span>
+                                                {{ "%.2f"|format(case.ib_aanslag_inkomen / 100) if case.ib_aanslag_inkomen else '-' }}</p>
+                                            <p><span class="text-gray-600">Deadline definitief:</span> {{ case.deadline_definitief }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <!-- Definitief vaststellen (Art. 19) -->
+                                {% if case.status == 'LOPEND' and case.ib_aanslag_datum %}
+                                    <div class="bg-orange-50 p-4 rounded-md">
+                                        <h3 class="font-medium mb-2">Definitief vaststellen (Art. 19)</h3>
+                                        <p class="text-sm text-gray-600 mb-3">
+                                            Stel de toeslag definitief vast op basis van het werkelijke inkomen.
+                                        </p>
+                                        <form method="POST"
+                                              action="/admin/cases/{{ case.id }}/definitief"
+                                              class="space-y-3">
+                                            <div>
+                                                <label class="block text-sm font-medium mb-1">Definitief jaarbedrag (eurocent)</label>
+                                                <input type="number"
+                                                       name="definitief_jaarbedrag"
+                                                       class="w-full border rounded-md p-2"
+                                                       placeholder="bijv. 120000 (= 1.200)"
+                                                       required />
+                                            </div>
+                                            <button type="submit"
+                                                    class="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 cursor-pointer">
+                                                Stel definitief vast
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                                <!-- Vereffening uitvoeren (Art. 24, 26a) -->
+                                {% if case.status == 'DEFINITIEF' %}
+                                    <div class="bg-purple-50 p-4 rounded-md">
+                                        <h3 class="font-medium mb-2">Vereffening uitvoeren (Art. 24, 26a)</h3>
+                                        <p class="text-sm text-gray-600 mb-3">
+                                            Voer de vereffening uit: nabetaling, terugvordering of kwijtschelding
+                                            (onder de doelmatigheidsgrens van 116).
+                                        </p>
+                                        {% if case.definitief_jaarbedrag %}
+                                            <p class="text-sm mb-3">
+                                                <span class="text-gray-600">Definitief jaarbedrag:</span>
+                                                {{ "%.2f"|format(case.definitief_jaarbedrag / 100) }}
+                                            </p>
+                                        {% endif %}
+                                        <form method="POST" action="/admin/cases/{{ case.id }}/vereffen">
+                                            <button type="submit"
+                                                    class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 cursor-pointer">
+                                                Voer vereffening uit
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                                <!-- Vereffening voltooid indicator -->
+                                {% if case.status == 'VEREFFEND' %}
+                                    <div class="bg-green-50 p-4 rounded-md col-span-2">
+                                        <h3 class="font-medium mb-2">Vereffening voltooid</h3>
+                                        <div class="text-sm space-y-1">
+                                            <p><span class="text-gray-600">Type:</span> {{ case.vereffening_type }}</p>
+                                            <p><span class="text-gray-600">Bedrag:</span>
+                                                {{ "%.2f"|format(case.vereffening_bedrag / 100) if case.vereffening_bedrag else '0.00' }}</p>
+                                            {% if case.kwijtschelding_reden %}
+                                                <p><span class="text-gray-600">Reden kwijtschelding:</span>
+                                                    {{ case.kwijtschelding_reden }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Vereffening status voor afgeronde zaken -->
+                    {% if case.status == 'VEREFFEND' and case.status not in ['VOORSCHOT', 'LOPEND', 'DEFINITIEF'] %}
+                        <div class="p-6 border-b border-gray-200">
+                            <h2 class="text-lg font-semibold mb-4">Vereffening Status</h2>
+                            <div class="bg-green-50 p-4 rounded-md">
+                                <div class="text-sm space-y-1">
+                                    <p><span class="text-gray-600">Type:</span> {{ case.vereffening_type }}</p>
+                                    <p><span class="text-gray-600">Bedrag:</span>
+                                        {{ "%.2f"|format(case.vereffening_bedrag / 100) if case.vereffening_bedrag else '0.00' }}</p>
+                                    {% if case.kwijtschelding_reden %}
+                                        <p><span class="text-gray-600">Reden kwijtschelding:</span>
+                                            {{ case.kwijtschelding_reden }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
