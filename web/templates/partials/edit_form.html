@@ -72,6 +72,16 @@
                                         <span x-text="value"></span>
                                     </div>
                                 </template>
+                                <template x-if="typeof value === 'object' && value !== null && !Array.isArray(value)">
+                                    <div class="space-y-2">
+                                        <template x-for="[objKey, objValue] in Object.entries(value)" :key="objKey">
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-sm font-medium text-gray-600 w-1/3" x-text="objKey.replace(/_/g, ' ')"></span>
+                                                <span class="text-gray-900 font-medium w-2/3" x-text="objValue"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
                                 <template x-if="Array.isArray(value) && value.length > 0 && typeof value[0] === 'object'">
                                     <div class="overflow-x-auto">
                                         <table class="min-w-full text-sm border border-gray-300">
@@ -151,6 +161,38 @@
                                            x-model="newValue"
                                            class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                            required>
+                                </template>
+                                <template x-if="typeof value === 'object' && value !== null && !Array.isArray(value)">
+                                    <div class="space-y-3">
+                                        <template x-for="[objKey, objValue] in Object.entries(value)" :key="objKey">
+                                            <div class="flex items-center space-x-3">
+                                                <label class="block text-sm font-medium text-gray-700 w-1/3" x-text="objKey.replace(/_/g, ' ')"></label>
+                                                <div class="w-2/3">
+                                                    <template x-if="typeof objValue === 'boolean'">
+                                                        <select class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                                x-model="newValue[objKey]">
+                                                            <option value="true">Ja</option>
+                                                            <option value="false">Nee</option>
+                                                        </select>
+                                                    </template>
+                                                    <template x-if="typeof objValue === 'number'">
+                                                        <input type="number"
+                                                               class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               x-model="newValue[objKey]">
+                                                    </template>
+                                                    <template x-if="typeof objValue === 'string'">
+                                                        <input type="text"
+                                                               class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                               x-model="newValue[objKey]">
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <input type="hidden"
+                                               id="new-value"
+                                               name="new_value"
+                                               :value="JSON.stringify(newValue)">
+                                    </div>
                                 </template>
                                 <template x-if="Array.isArray(value) && value.length > 0 && typeof value[0] === 'object'">
                                     <div class="space-y-3" @change="serializeTable()">
