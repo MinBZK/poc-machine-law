@@ -282,20 +282,34 @@ class MachineService(EngineInterface):
         with client as client:
             set_source_data_frame.sync_detailed(client=client, body=body)
 
-    async def reset(self) -> None:
-        import asyncio
+    def reset(self) -> None:
+        import time
+        from concurrent.futures import ThreadPoolExecutor
 
         def reset_service(service_name: str, service_config) -> None:
-            logger.debug(f"[MachineService] resetting {service_name}")
+            start_time = time.time()
+            logger.warning(f"[MachineService] resetting {service_name} - started at {start_time}")
             client = Client(base_url=service_config.domain)
             with client as client:
                 reset_engine.sync_detailed(client=client)
+            elapsed = time.time() - start_time
+            logger.warning(f"[MachineService] resetting {service_name} - completed in {elapsed:.3f}s")
 
         # Run all reset calls in parallel using threads
-        await asyncio.gather(
-            *[asyncio.to_thread(reset_service, service_name, service_config)
-              for service_name, service_config in self.service_routes.items()]
-        )
+        logger.warning(f"[MachineService] Starting parallel reset of {len(self.service_routes)} services")
+        overall_start = time.time()
+
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(reset_service, service_name, service_config)
+                for service_name, service_config in self.service_routes.items()
+            ]
+            # Wait for all to complete
+            for future in futures:
+                future.result()
+
+        overall_elapsed = time.time() - overall_start
+        logger.warning(f"[MachineService] All resets completed in {overall_elapsed:.3f}s total")
 
     async def __aenter__(self):
         await self.client.__aenter__()

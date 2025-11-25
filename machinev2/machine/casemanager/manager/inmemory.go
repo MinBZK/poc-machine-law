@@ -73,22 +73,23 @@ func initializeComponents(logger logger.Logger, recordEvent func(uuid.UUID, stri
 	}
 
 	// Create the command bus
-	commandBus = bus.NewCommandHandler()
+	cmdBus := bus.NewCommandHandler()
 
 	// Create the event indexer
 	eventIndexer = casemanager.NewEventIndexer(logger)
 
 	// Create the read repository for cases
-	caseRepo = memory.NewRepo()
-	caseRepo.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
+	m := memory.NewRepo()
+	m.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
 
+	caseRepo = m
 	// Set up the case manager
 	ctx := context.Background()
-	if err := casemanager.Setup(ctx, logger, eventStore, eventBus, eventBus, commandBus, caseRepo, recordEvent, eventIndexer); err != nil {
+	if err := casemanager.Setup(ctx, logger, eventStore, eventBus, eventBus, cmdBus, caseRepo, recordEvent, eventIndexer); err != nil {
 		log.Fatalf("could not set up case manager: %s", err)
 	}
 
-	return eventBus, observerBus, commandBus, caseRepo, eventIndexer
+	return eventBus, observerBus, cmdBus, caseRepo, eventIndexer
 }
 
 // New creates a new case manager with EventHorizon components.
