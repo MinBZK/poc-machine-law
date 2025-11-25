@@ -1,10 +1,11 @@
 import locale
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from config_loader import ConfigLoader
 from engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from engines.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory
+from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 # Load configuration
@@ -56,6 +57,24 @@ def get_claim_manager() -> ClaimManagerInterface:
 def get_machine_service() -> EngineInterface:
     """Dependency to get EngineInterface instance"""
     return machine_service
+
+
+def get_toeslag_manager():
+    """Dependency to get ToeslagApplication instance for toeslag workflows"""
+    return machine_service.get_toeslag_manager()
+
+
+def get_simulated_date(request: Request) -> date:
+    """Get the current simulated date from session, defaults to today"""
+    date_str = request.session.get("simulated_date")
+    if date_str:
+        return date.fromisoformat(date_str)
+    return date.today()
+
+
+def set_simulated_date(request: Request, new_date: date) -> None:
+    """Store the simulated date in session"""
+    request.session["simulated_date"] = new_date.isoformat()
 
 
 def set_engine_id(id: str):
