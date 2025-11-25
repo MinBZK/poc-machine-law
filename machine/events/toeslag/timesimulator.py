@@ -7,16 +7,18 @@ worden aangemaakt.
 """
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
+from typing import TYPE_CHECKING, Any
+
 from dateutil.relativedelta import relativedelta
-from typing import TYPE_CHECKING, Any, Callable
 
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
+    from machine.events.case.application import CaseManager
     from machine.service import Services
-    from .application import ToeslagApplication
 
 
 @dataclass
@@ -59,27 +61,27 @@ class TimeSimulator:
     Usage:
         simulator = TimeSimulator(
             services_factory=lambda date: Services(date),
-            toeslag_manager=context.services.toeslag_manager,
+            case_manager=context.services.case_manager,
             start_date=date(2025, 1, 1)
         )
 
         # Verwerk 6 maanden
         results = simulator.advance_months(
-            toeslag_id=toeslag_uuid,
+            case_id=case_uuid,
             months=6,
             parameters={"BSN": "123456789"}
         )
 
         # Of verwerk een heel jaar
         year_result = simulator.run_full_year(
-            toeslag_id=toeslag_uuid,
+            case_id=case_uuid,
             parameters={"BSN": "123456789"}
         )
     """
 
     def __init__(
         self,
-        toeslag_manager: "ToeslagApplication",
+        case_manager: "CaseManager",
         start_date: date,
         services_factory: Callable[[str], "Services"] | None = None,
         services: "Services | None" = None,
@@ -88,15 +90,16 @@ class TimeSimulator:
         Initialiseer de simulator.
 
         Args:
-            toeslag_manager: De ToeslagApplication voor state management
+            case_manager: De CaseManager voor state management
             start_date: Startdatum voor de simulatie
             services_factory: Factory functie die een Services instance maakt voor een datum (optioneel)
             services: Directe Services instance (optioneel, heeft voorrang boven factory)
         """
         self.services_factory = services_factory
-        self._services: "Services" | None = services
-        self.toeslag_manager = toeslag_manager
+        self._services: Services | None = services
+        self.case_manager = case_manager
         self.current_date = start_date
+        self._initial_start_date = start_date  # Store for reference in step_to_date
 
     @property
     def services(self) -> "Services":
@@ -114,9 +117,9 @@ class TimeSimulator:
         if self.services_factory is not None:
             self._services = None
 
-    def _evaluate_toeslag(
+    def _evaluate_case(
         self,
-        toeslag_id: str,
+        case_id: str,
         parameters: dict[str, Any],
     ) -> dict[str, Any]:
         """
@@ -125,13 +128,13 @@ class TimeSimulator:
         Returns:
             Dict met berekende waarden (hoogte_toeslag, heeft_recht, etc.)
         """
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-        if toeslag is None:
-            raise ValueError(f"Toeslag niet gevonden: {toeslag_id}")
+        case = self.case_manager.get_case_by_id(case_id)
+        if case is None:
+            raise ValueError(f"Case niet gevonden: {case_id}")
 
         result = self.services.evaluate(
             service="TOESLAGEN",
-            law=toeslag.regeling,
+            law=case.law,
             parameters=parameters,
             reference_date=self.current_date.isoformat(),
         )
@@ -144,7 +147,7 @@ class TimeSimulator:
 
     def process_month(
         self,
-        toeslag_id: str,
+        case_id: str,
         maand: int,
         parameters: dict[str, Any],
         trigger: str = "schedule",
@@ -154,7 +157,7 @@ class TimeSimulator:
         Verwerk een enkele maand: herberekening + betaling.
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             maand: Maandnummer (1-12)
             parameters: Parameters voor de rules engine (moet BSN bevatten)
             trigger: Trigger type ("schedule" of "data_change")
@@ -164,31 +167,28 @@ class TimeSimulator:
             MonthResult met de verwerkte gegevens
         """
         # Evalueer de toeslag voor deze maand
-        evaluation = self._evaluate_toeslag(toeslag_id, parameters)
+        evaluation = self._evaluate_case(case_id, parameters)
 
         # Bereken maandbedrag (jaarbedrag / 12)
         jaarbedrag = evaluation["hoogte_toeslag"]
         maandbedrag = jaarbedrag // 12 if jaarbedrag else 0
 
         # Herberekening registreren
-        self.toeslag_manager.herbereken_maand(
-            toeslag_id=toeslag_id,
+        self.case_manager.herbereken_maand(
+            case_id=case_id,
             maand=maand,
             berekend_bedrag=maandbedrag,
-            berekening_datum=self.current_date.isoformat(),
             trigger=trigger,
-            gewijzigde_data=gewijzigde_data or [],
         )
 
         # Betaling uitvoeren (op basis van voorschot, niet herberekening)
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-        betaald_bedrag = toeslag.voorschot_maandbedrag or maandbedrag
+        case = self.case_manager.get_case_by_id(case_id)
+        betaald_bedrag = case.voorschot_maandbedrag or maandbedrag
 
-        self.toeslag_manager.betaal_maand(
-            toeslag_id=toeslag_id,
+        self.case_manager.betaal_maand(
+            case_id=case_id,
             maand=maand,
             betaald_bedrag=betaald_bedrag,
-            betaal_datum=self.current_date.isoformat(),
         )
 
         return MonthResult(
@@ -202,7 +202,7 @@ class TimeSimulator:
 
     def advance_months(
         self,
-        toeslag_id: str,
+        case_id: str,
         months: int,
         parameters: dict[str, Any],
         start_month: int = 1,
@@ -211,7 +211,7 @@ class TimeSimulator:
         Laat tijd verstrijken voor N maanden met automatische verwerking.
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             months: Aantal maanden om te verwerken
             parameters: Parameters voor de rules engine
             start_month: Startmaand (1-12, default 1)
@@ -221,10 +221,10 @@ class TimeSimulator:
         """
         results = []
 
-        # Zorg dat de toeslag in LOPEND status is
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-        if toeslag.huidige_maand == 0:
-            self.toeslag_manager.start_maand(toeslag_id, start_month)
+        # Zorg dat de case in LOPEND status is
+        case = self.case_manager.get_case_by_id(case_id)
+        if case.huidige_maand == 0:
+            self.case_manager.start_maand(case_id, start_month)
 
         for i in range(months):
             maand = start_month + i
@@ -233,7 +233,7 @@ class TimeSimulator:
 
             # Verwerk deze maand
             result = self.process_month(
-                toeslag_id=toeslag_id,
+                case_id=case_id,
                 maand=maand,
                 parameters=parameters,
             )
@@ -247,7 +247,7 @@ class TimeSimulator:
 
     def advance_to_month(
         self,
-        toeslag_id: str,
+        case_id: str,
         target_month: int,
         parameters: dict[str, Any],
     ) -> list[MonthResult]:
@@ -255,22 +255,22 @@ class TimeSimulator:
         Verwerk alle maanden tot en met de doelmaand.
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             target_month: Doelmaand (1-12)
             parameters: Parameters voor de rules engine
 
         Returns:
             Lijst van MonthResult objecten
         """
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-        current_month = max(toeslag.huidige_maand, 1)
+        case = self.case_manager.get_case_by_id(case_id)
+        current_month = max(case.huidige_maand, 1)
 
         if target_month <= current_month:
             return []
 
         months_to_process = target_month - current_month + 1
         return self.advance_months(
-            toeslag_id=toeslag_id,
+            case_id=case_id,
             months=months_to_process,
             parameters=parameters,
             start_month=current_month,
@@ -278,24 +278,24 @@ class TimeSimulator:
 
     def run_full_year(
         self,
-        toeslag_id: str,
+        case_id: str,
         parameters: dict[str, Any],
     ) -> YearResult:
         """
         Verwerk een volledig toeslagjaar (12 maanden).
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             parameters: Parameters voor de rules engine
 
         Returns:
             YearResult met alle maandresultaten
         """
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-        year_result = YearResult(berekeningsjaar=toeslag.berekeningsjaar)
+        case = self.case_manager.get_case_by_id(case_id)
+        year_result = YearResult(berekeningsjaar=case.berekeningsjaar)
 
         month_results = self.advance_months(
-            toeslag_id=toeslag_id,
+            case_id=case_id,
             months=12,
             parameters=parameters,
             start_month=1,
@@ -308,7 +308,7 @@ class TimeSimulator:
 
     def inject_data_change(
         self,
-        toeslag_id: str,
+        case_id: str,
         maand: int,
         parameters: dict[str, Any],
         gewijzigde_data: list[str],
@@ -317,7 +317,7 @@ class TimeSimulator:
         Simuleer een data-wijziging die een herberekening triggert.
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             maand: Maand waarin de wijziging plaatsvindt
             parameters: Nieuwe parameters voor de berekening
             gewijzigde_data: Lijst van velden die gewijzigd zijn
@@ -326,7 +326,7 @@ class TimeSimulator:
             MonthResult van de herberekening
         """
         return self.process_month(
-            toeslag_id=toeslag_id,
+            case_id=case_id,
             maand=maand,
             parameters=parameters,
             trigger="data_change",
@@ -337,7 +337,7 @@ class TimeSimulator:
 
     def step(
         self,
-        toeslag_id: str,
+        case_id: str,
         parameters: dict[str, Any],
     ) -> MonthResult | None:
         """
@@ -346,27 +346,27 @@ class TimeSimulator:
         Gebruik dit om door de maanden te stappen in plaats van alles in één keer.
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             parameters: Parameters voor de rules engine
 
         Returns:
             MonthResult voor de verwerkte maand, of None als het jaar voorbij is
         """
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
+        case = self.case_manager.get_case_by_id(case_id)
 
         # Bepaal de volgende maand
-        next_month = toeslag.huidige_maand + 1 if toeslag.huidige_maand > 0 else 1
+        next_month = case.huidige_maand + 1 if case.huidige_maand > 0 else 1
 
         if next_month > 12:
             return None  # Jaar is voorbij
 
         # Start maand als dit de eerste is
-        if toeslag.huidige_maand == 0:
-            self.toeslag_manager.start_maand(toeslag_id, next_month)
+        if case.huidige_maand == 0:
+            self.case_manager.start_maand(case_id, next_month)
 
         # Verwerk de maand
         result = self.process_month(
-            toeslag_id=toeslag_id,
+            case_id=case_id,
             maand=next_month,
             parameters=parameters,
         )
@@ -376,30 +376,30 @@ class TimeSimulator:
 
         return result
 
-    def _log_workflow_state(self, toeslag_id: str, action: str = "") -> None:
+    def _log_workflow_state(self, case_id: str, action: str = "") -> None:
         """Log de huidige workflow state voor debugging"""
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-        berekende_maanden = sorted([b["maand"] for b in toeslag.maandelijkse_berekeningen])
-        betaalde_maanden = sorted([b["maand"] for b in toeslag.maandelijkse_betalingen])
-        aanvraag_datum = toeslag.aanvraag_datum if toeslag.aanvraag_datum else "onbekend"
+        case = self.case_manager.get_case_by_id(case_id)
+        berekende_maanden = sorted([b["maand"] for b in case.maandelijkse_berekeningen])
+        betaalde_maanden = sorted([b["maand"] for b in case.maandelijkse_betalingen])
+        created_at = case.created_at.date() if hasattr(case, "created_at") and case.created_at else "onbekend"
 
         logger.debug("╔══════════════════════════════════════════════════════════════")
         logger.debug(f"║ WORKFLOW STATE {action}")
         logger.debug("╠══════════════════════════════════════════════════════════════")
         logger.debug(f"║ Datum:           {self.current_date.isoformat()}")
-        logger.debug(f"║ Toeslag ID:      {toeslag_id[:8]}...")
-        logger.debug(f"║ Aanvraag datum:  {aanvraag_datum}")
-        logger.debug(f"║ Status:          {toeslag.status.value}")
-        logger.debug(f"║ Huidige maand:   {toeslag.huidige_maand}")
+        logger.debug(f"║ Case ID:         {case_id[:8]}...")
+        logger.debug(f"║ Created at:      {created_at}")
+        logger.debug(f"║ Status:          {case.status.value}")
+        logger.debug(f"║ Huidige maand:   {case.huidige_maand}")
         logger.debug(f"║ Berekend:        maanden {berekende_maanden}")
         logger.debug(f"║ Betaald:         maanden {betaalde_maanden}")
-        logger.debug(f"║ Voorschot/jaar:  €{(toeslag.voorschot_jaarbedrag or 0) / 100:.2f}")
-        logger.debug(f"║ Voorschot/mnd:   €{(toeslag.voorschot_maandbedrag or 0) / 100:.2f}")
+        logger.debug(f"║ Voorschot/jaar:  €{(case.voorschot_jaarbedrag or 0) / 100:.2f}")
+        logger.debug(f"║ Voorschot/mnd:   €{(case.voorschot_maandbedrag or 0) / 100:.2f}")
         logger.debug("╚══════════════════════════════════════════════════════════════")
 
     def step_to_date(
         self,
-        toeslag_id: str,
+        case_id: str,
         target_date: date,
         parameters: dict[str, Any],
     ) -> list[MonthResult]:
@@ -411,7 +411,7 @@ class TimeSimulator:
         deze aangemaakt (AWIR maandelijkse verwerking).
 
         Args:
-            toeslag_id: ID van de toeslag
+            case_id: ID van de case
             target_date: Doeldatum
             parameters: Parameters voor de rules engine
 
@@ -421,23 +421,23 @@ class TimeSimulator:
         from datetime import timedelta
 
         results = []
-        toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
+        case = self.case_manager.get_case_by_id(case_id)
 
         logger.debug("╔══════════════════════════════════════════════════════════════")
         logger.debug(f"║ TIME SIMULATION: {self.current_date} → {target_date}")
         logger.debug("╚══════════════════════════════════════════════════════════════")
 
         # Alleen verwerken als doeldatum binnen het berekeningsjaar valt
-        if target_date.year != toeslag.berekeningsjaar:
-            logger.debug(f"║ ⚠ Doeldatum {target_date.year} buiten berekeningsjaar {toeslag.berekeningsjaar}")
+        if target_date.year != case.berekeningsjaar:
+            logger.debug(f"║ ⚠ Doeldatum {target_date.year} buiten berekeningsjaar {case.berekeningsjaar}")
             return results
 
-        # Zorg dat de toeslag in LOPEND status is
-        if toeslag.huidige_maand == 0:
+        # Zorg dat de case in LOPEND status is
+        if case.huidige_maand == 0:
             logger.debug("║ → Transitie: VOORSCHOT → LOPEND (start maand 1)")
-            self.toeslag_manager.start_maand(toeslag_id, 1)
+            self.case_manager.start_maand(case_id, 1)
 
-        self._log_workflow_state(toeslag_id, "START")
+        self._log_workflow_state(case_id, "START")
 
         # Simuleer dag voor dag
         last_logged_month = 0
@@ -445,28 +445,31 @@ class TimeSimulator:
             current_month = self.current_date.month
 
             # Controleer of er al een berekening is voor deze maand
-            toeslag = self.toeslag_manager.get_toeslag_by_id(toeslag_id)
-            berekende_maanden = {b["maand"] for b in toeslag.maandelijkse_berekeningen}
+            case = self.case_manager.get_case_by_id(case_id)
+            berekende_maanden = {b["maand"] for b in case.maandelijkse_berekeningen}
 
-            # Verwerk alle gemiste maanden vanaf aanvraagdatum tot en met de huidige maand
-            # Als de aanvraag in een vorig jaar was, start vanaf maand 1 van het berekeningsjaar
-            aanvraag_date = date.fromisoformat(toeslag.aanvraag_datum) if toeslag.aanvraag_datum else None
-            if aanvraag_date and aanvraag_date.year < toeslag.berekeningsjaar:
-                aanvraag_maand = 1
-            else:
-                aanvraag_maand = aanvraag_date.month if aanvraag_date else 1
+            # Verwerk alle gemiste maanden vanaf de simulatie startdatum tot en met de huidige maand
+            # We gebruiken de _initial_start_date (bewaard bij initialisatie) in plaats van created_at
+            # omdat created_at de echte systeemtijd is, niet de gesimuleerde tijd
+            simulation_start = self._initial_start_date
+
+            # Start vanaf maand 1 als simulatie start voor het berekeningsjaar,
+            # anders gebruik de maand van de simulatie startdatum
+            aanvraag_maand = 1 if simulation_start.year < case.berekeningsjaar else simulation_start.month
             for maand in range(aanvraag_maand, current_month + 1):
                 if maand not in berekende_maanden:
                     logger.debug(f"╠─ Maand {maand}: geen berekening gevonden, triggering AWIR...")
                     # Nog geen berekening voor deze maand - voer AWIR maandverwerking uit
                     result = self.process_month(
-                        toeslag_id=toeslag_id,
+                        case_id=case_id,
                         maand=maand,
                         parameters=parameters,
                     )
                     results.append(result)
                     berekende_maanden.add(maand)
-                    logger.debug(f"╠─ Maand {maand}: berekend €{result.berekend_bedrag / 100:.2f}, betaald €{result.betaald_bedrag / 100:.2f}")
+                    logger.debug(
+                        f"╠─ Maand {maand}: berekend €{result.berekend_bedrag / 100:.2f}, betaald €{result.betaald_bedrag / 100:.2f}"
+                    )
 
             # Log bij maandovergang
             if current_month != last_logged_month:
@@ -475,7 +478,7 @@ class TimeSimulator:
             # Ga naar de volgende dag
             self.current_date = self.current_date + timedelta(days=1)
 
-        self._log_workflow_state(toeslag_id, "EINDE")
+        self._log_workflow_state(case_id, "EINDE")
         return results
 
     def __iter__(self):
