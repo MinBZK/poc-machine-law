@@ -13,6 +13,7 @@ from .machine_client.regel_recht_engine_api_client import Client
 
 logger = logging.getLogger(__name__)
 from .machine_client.regel_recht_engine_api_client.api.data_frames import set_source_data_frame
+from .machine_client.regel_recht_engine_api_client.api.engine import reset_engine
 from .machine_client.regel_recht_engine_api_client.api.law import (
     evaluate,
     rule_spec_get,
@@ -280,6 +281,15 @@ class MachineService(EngineInterface):
 
         with client as client:
             set_source_data_frame.sync_detailed(client=client, body=body)
+
+    def reset(self) -> None:
+        for service_name, service_config in self.service_routes.items():
+            logger.debug(f"[MachineService] resetting {service_name}")
+
+            client = Client(base_url=service_config.domain)
+
+            with client as client:
+                reset_engine.sync_detailed(client=client)
 
     async def __aenter__(self):
         await self.client.__aenter__()

@@ -1,5 +1,4 @@
 import os
-import sys
 from datetime import datetime
 from uuid import UUID
 
@@ -268,8 +267,7 @@ async def post_set_feature_flag(
 async def post_reset(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Reset the state of the application"""
 
-    # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    services.reset()
 
 
 @router.get("/{service}")
