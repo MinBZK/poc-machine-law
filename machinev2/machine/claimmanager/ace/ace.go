@@ -471,8 +471,10 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 	log = log.WithFields(logger.NewField("key", bewering.Key), logger.NewField("id", bewering.ID))
 	log.Info("create claim")
 
+	key := cm.convertOutputToSourceField(bewering.Key, bewering.Service, bewering.Law)
+
 	// Create real value in ACE
-	claimTypeName := cm.normalizeClaimType(bewering.Key)
+	claimTypeName := cm.normalizeClaimType(key)
 	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("create real claim: %w", err)
 	}
