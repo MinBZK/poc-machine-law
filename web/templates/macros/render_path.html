@@ -36,12 +36,11 @@
                 <ul class="list-disc pl-4 text-left">
                     {% for key, val in display_value.items() %}
                         {% if val is mapping %}
-                            <li>{{ key }}:
+                            <li>
+                                {{ key }}:
                                 <ul>
                                     {% for subkey, subval in val.items() %}
-                                        {% if subval is not none %}
-                                            <li>{{ subkey }}: {{ subval }}</li>
-                                        {% endif %}
+                                        {% if subval is not none %}<li>{{ subkey }}: {{ subval }}</li>{% endif %}
                                     {% endfor %}
                                 </ul>
                             </li>
