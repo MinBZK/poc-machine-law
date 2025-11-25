@@ -218,7 +218,7 @@
                     <input type="hidden" name="toeslag_id" value="{{ toeslag.id }}">
                     <button type="submit"
                             class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm">
-                        Reset naar aanvraagdatum ({{ toeslag.aanvraag_datum }})
+                        Reset naar aanvraagdatum ({{ aanvraag_datum_display }})
                     </button>
                 </form>
 
@@ -233,7 +233,7 @@
                 <dl class="space-y-2 text-sm">
                     <div>
                         <dt class="text-gray-500">Regeling</dt>
-                        <dd class="font-medium">{{ toeslag.regeling }}</dd>
+                        <dd class="font-medium">{{ type_label }}</dd>
                     </div>
                     <div>
                         <dt class="text-gray-500">AWIR Proces</dt>

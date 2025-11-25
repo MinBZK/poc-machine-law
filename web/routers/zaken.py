@@ -2,6 +2,7 @@
 
 import logging
 from datetime import date, datetime
+from itertools import groupby
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
@@ -176,6 +177,54 @@ async def zaken_aanvraag_form(
             "simulated_date": simulated_date.isoformat(),
         },
     )
+
+
+@router.post("/aanvraag")
+async def zaken_submit_aanvraag(
+    request: Request,
+    bsn: str = Form(...),
+    berekeningsjaar: int = Form(...),
+    machine_service: EngineInterface = Depends(get_machine_service),
+    case_manager=Depends(get_zaken_case_manager),
+):
+    """Verwerk zorgtoeslag aanvraag (AWIR Art. 15)"""
+    simulated_date = get_simulated_date(request)
+
+    # Evaluate zorgtoeslag
+    result = machine_service.evaluate(
+        service="TOESLAGEN",
+        law="zorgtoeslagwet",
+        parameters={"BSN": bsn, "berekeningsjaar": berekeningsjaar},
+        reference_date=simulated_date.isoformat(),
+    )
+
+    # Submit case via eventsourcing CaseManager
+    case_id = case_manager.submit_case(
+        bsn=bsn,
+        service_type="TOESLAGEN",
+        law="zorgtoeslagwet",
+        parameters={"BSN": bsn, "berekeningsjaar": berekeningsjaar},
+        claimed_result={},
+        approved_claims_only=False,
+    )
+
+    # AWIR workflow: bereken aanspraak
+    berekend_jaarbedrag = result.output.get("hoogte_toeslag", 0)
+    heeft_aanspraak = berekend_jaarbedrag > 0
+
+    case_manager.bereken_aanspraak(
+        case_id=case_id,
+        heeft_aanspraak=heeft_aanspraak,
+        berekend_jaarbedrag=berekend_jaarbedrag,
+    )
+
+    if heeft_aanspraak:
+        case_manager.stel_voorschot_vast(case_id=case_id)
+    else:
+        case_manager.wijs_af(case_id=case_id, reden="Geen aanspraak op basis van berekening")
+
+    # Redirect naar detail pagina
+    return RedirectResponse(url=f"/zaken/{case_id}?bsn={bsn}", status_code=303)
 
 
 @router.post("/simulate/reset")
@@ -393,19 +442,66 @@ async def zaken_detail(
 
     timeline.sort(key=get_sort_date)
 
+    # Calculate totals
+    totaal_berekend = sum(b.get("berekend_bedrag", 0) or 0 for b in berekeningen)
+    totaal_betaald = sum(b.get("betaald_bedrag", 0) or 0 for b in betalingen)
+
+    # Group timeline events by month
+    def get_month_key(event):
+        d = event.get("date")
+        if d is None:
+            return "Onbekend"
+        if isinstance(d, str):
+            try:
+                dt = datetime.fromisoformat(d)
+                return dt.strftime("%B %Y")
+            except ValueError:
+                return "Onbekend"
+        if isinstance(d, date):
+            return d.strftime("%B %Y")
+        return "Onbekend"
+
+    # Add display fields to events
+    for event in timeline:
+        event["date_formatted"] = event.get("date", "")
+        event_date = event.get("date")
+        if event_date:
+            try:
+                event_dt = datetime.fromisoformat(event_date).date() if isinstance(event_date, str) else event_date
+                event["is_past"] = event_dt <= simulated_date
+            except (ValueError, TypeError):
+                event["is_past"] = True
+        else:
+            event["is_past"] = True
+
+    # Group by month
+    grouped_timeline = [(k, list(g)) for k, g in groupby(timeline, key=get_month_key)]
+
+    # Get profile name
+    profile_name = profile.get("name", "") if profile else ""
+
+    # Get aanvraag datum for display
+    aanvraag_datum_display = case.created_at.date().isoformat() if case.created_at else None
+
     return templates.TemplateResponse(
         "zaken/detail.html",
         {
             "request": request,
             "bsn": bsn,
             "profile": profile,
+            "profile_name": profile_name,
             "toeslag": case,
             "type_label": get_type_label(case.law),
             "status_label": status_label,
             "status_color": status_color,
             "timeline": timeline,
+            "grouped_timeline": grouped_timeline,
+            "totaal_berekend": totaal_berekend,
+            "totaal_betaald": totaal_betaald,
+            "CaseStatus": CaseStatus,
             "format_cents": format_cents,
             "all_profiles": machine_service.get_all_profiles(),
             "simulated_date": simulated_date.isoformat(),
+            "aanvraag_datum_display": aanvraag_datum_display,
         },
     )
