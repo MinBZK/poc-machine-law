@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="mb-8">
+    <!-- Simulated date banner -->
+    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm text-indigo-700">
+                    <strong>Gesimuleerde datum:</strong> {{ simulated_date }}
+                </span>
+            </div>
+            <form action="/zaken/simulate/reset" method="post" class="flex items-center gap-2">
+                <input type="hidden" name="bsn" value="{{ bsn }}">
+                <input type="hidden" name="toeslag_id" value="{{ toeslag.id }}">
+                <input type="date" name="reset_date" value="{{ simulated_date }}"
+                       class="text-sm px-2 py-1 border border-indigo-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
+                <button type="submit"
+                        class="text-sm px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    Wijzig datum
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Back link -->
+    <a href="/zaken/?bsn={{ bsn }}" class="text-blue-600 hover:text-blue-800 inline-flex items-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Terug naar overzicht
+    </a>
+
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <div class="flex items-center">
+                    <h2 class="text-2xl font-semibold text-gray-900">{{ type_label }}</h2>
+                    <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                        {% if status_color == 'green' %}bg-green-100 text-green-800
+                        {% elif status_color == 'yellow' %}bg-yellow-100 text-yellow-800
+                        {% elif status_color == 'blue' %}bg-blue-100 text-blue-800
+                        {% elif status_color == 'purple' %}bg-purple-100 text-purple-800
+                        {% elif status_color == 'red' %}bg-red-100 text-red-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ status_label }}
+                    </span>
+                </div>
+                <p class="text-gray-500 mt-1">{{ toeslag.oid }}</p>
+            </div>
+            <div class="mt-4 md:mt-0 text-right">
+                <div class="text-sm text-gray-500">Berekeningsjaar</div>
+                <div class="text-2xl font-bold text-gray-900">{{ toeslag.berekeningsjaar }}</div>
+            </div>
+        </div>
+
+        <!-- Key metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t">
+            <div>
+                <div class="text-sm text-gray-500">Jaarbedrag (berekend)</div>
+                <div class="text-xl font-semibold text-gray-900">{{ format_cents(toeslag.berekend_jaarbedrag) }}</div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Voorschot (maand)</div>
+                <div class="text-xl font-semibold text-gray-900">{{ format_cents(toeslag.voorschot_maandbedrag) }}</div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Totaal betaald</div>
+                <div class="text-xl font-semibold text-gray-900">{{ format_cents(toeslag.totaal_betaald) }}</div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Aanvraagdatum</div>
+                <div class="text-xl font-semibold text-gray-900">{{ toeslag.aanvraag_datum }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Timeline -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-6">Tijdlijn</h3>
+
+                {% if timeline %}
+                <div class="flow-root">
+                    <ul class="-mb-8">
+                        {% for event in timeline %}
+                        <li>
+                            <div class="relative pb-8">
+                                {% if not loop.last %}
+                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                {% endif %}
+                                <div class="relative flex space-x-3">
+                                    <div>
+                                        <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white
+                                            {% if event.type == 'aanvraag' %}bg-blue-500
+                                            {% elif event.type == 'berekening' %}bg-green-500
+                                            {% elif event.type == 'beschikking' %}bg-purple-500
+                                            {% elif event.type == 'maand_berekening' %}bg-yellow-500
+                                            {% elif event.type == 'maand_betaling' %}bg-emerald-500
+                                            {% else %}bg-gray-400{% endif %}">
+                                            {% if event.icon == 'document' %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            {% elif event.icon == 'calculator' %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                            {% elif event.icon == 'x-circle' %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {% elif event.icon == 'document-check' %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {% elif event.icon == 'refresh' %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            {% elif event.icon == 'currency-euro' %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {% else %}
+                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="min-w-0 flex-1 pt-1.5">
+                                        <div class="flex justify-between">
+                                            <p class="text-sm font-medium text-gray-900">{{ event.label }}</p>
+                                            <p class="text-sm text-gray-500">{{ event.date }}</p>
+                                        </div>
+                                        {% if event.details %}
+                                        <div class="mt-2 text-sm text-gray-600">
+                                            <dl class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                                {% for key, value in event.details.items() %}
+                                                <dt class="text-gray-500">{{ key }}:</dt>
+                                                <dd class="font-medium">{{ value }}</dd>
+                                                {% endfor %}
+                                            </dl>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center py-8">Nog geen gebeurtenissen geregistreerd</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Side panels -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Monthly breakdown -->
+            {% if toeslag.maandelijkse_betalingen %}
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Maandelijkse betalingen</h3>
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left py-2 text-gray-500">Maand</th>
+                            <th class="text-right py-2 text-gray-500">Bedrag</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for betaling in toeslag.maandelijkse_betalingen %}
+                        <tr class="border-b last:border-0">
+                            <td class="py-2">Maand {{ betaling.maand }}</td>
+                            <td class="py-2 text-right font-medium">{{ format_cents(betaling.betaald_bedrag) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="border-t-2">
+                            <td class="py-2 font-semibold">Totaal</td>
+                            <td class="py-2 text-right font-bold">{{ format_cents(toeslag.totaal_betaald) }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Beschikkingen -->
+            {% if toeslag.beschikkingen %}
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Beschikkingen</h3>
+                <ul class="space-y-3">
+                    {% for beschikking in toeslag.beschikkingen %}
+                    <li class="border-l-4 border-purple-400 pl-3 py-1">
+                        <div class="text-sm font-medium text-gray-900">{{ beschikking.type }}</div>
+                        <div class="text-xs text-gray-500">{{ beschikking.datum }}</div>
+                        {% if beschikking.jaarbedrag %}
+                        <div class="text-sm text-gray-600">Jaarbedrag: {{ format_cents(beschikking.jaarbedrag) }}</div>
+                        {% endif %}
+                        {% if beschikking.maandbedrag %}
+                        <div class="text-sm text-gray-600">Maandbedrag: {{ format_cents(beschikking.maandbedrag) }}</div>
+                        {% endif %}
+                        {% if beschikking.bedrag %}
+                        <div class="text-sm text-gray-600">Bedrag: {{ format_cents(beschikking.bedrag) }}</div>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Time Simulation Controls -->
+            <div class="bg-white rounded-lg shadow p-6 border-2 border-indigo-200">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Tijd Simulatie
+                </h3>
+                <form action="/zaken/simulate" method="post" class="space-y-4">
+                    <input type="hidden" name="bsn" value="{{ bsn }}">
+                    <input type="hidden" name="toeslag_id" value="{{ toeslag.id }}">
+
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">Huidige datum</label>
+                        <div class="text-lg font-semibold text-gray-900">{{ simulated_date }}</div>
+                    </div>
+
+                    <div>
+                        <label for="target_date" class="block text-sm text-gray-500 mb-1">Simuleer naar datum</label>
+                        <input type="date"
+                               id="target_date"
+                               name="target_date"
+                               value="{{ simulated_date }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <button type="submit"
+                            class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Simuleer Tijdsverloop
+                    </button>
+                </form>
+
+                <!-- Reset button -->
+                <form action="/zaken/simulate/reset" method="post" class="mt-3">
+                    <input type="hidden" name="bsn" value="{{ bsn }}">
+                    <input type="hidden" name="toeslag_id" value="{{ toeslag.id }}">
+                    <button type="submit"
+                            class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm">
+                        Reset naar aanvraagdatum ({{ toeslag.aanvraag_datum }})
+                    </button>
+                </form>
+
+                <p class="mt-3 text-xs text-gray-500">
+                    Simuleert het verstrijken van tijd dag voor dag. Bij maandovergangen worden automatisch berekeningen en betalingen uitgevoerd.
+                </p>
+            </div>
+
+            <!-- Legal basis -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Wettelijke basis</h3>
+                <dl class="space-y-2 text-sm">
+                    <div>
+                        <dt class="text-gray-500">Regeling</dt>
+                        <dd class="font-medium">{{ toeslag.regeling }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">AWIR Proces</dt>
+                        <dd class="text-xs text-gray-600">
+                            Art. 15 - Aanvraag<br>
+                            Art. 16 - Voorschotbeschikking<br>
+                            Art. 19 - Definitieve beschikking<br>
+                            Art. 24 - Vereffening
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,6 +1,6 @@
 import json
 import random
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -114,27 +114,32 @@ class CaseManager(Application):
             )
 
         # Check if results match and if manual review is needed
-        results_match = self._results_match(claimed_result, verified_result)
-
-        if results_match and not needs_manual_review:
-            # Automatic approval
-            case.decide_automatically(
-                verified_result=verified_result,
-                parameters=parameters,
-                approved=True,
-            )
+        # For AWIR workflow (empty claimed_result), skip auto-routing - let the workflow steps handle it
+        if not claimed_result:
+            # AWIR workflow: keep in SUBMITTED status for later processing via bereken_aanspraak
+            pass
         else:
-            # Route to manual review with reason
-            reason = "Selected for manual review - " + (
-                "results differ" if not results_match else "random sample check"
-            )
+            results_match = self._results_match(claimed_result, verified_result)
 
-            case.select_for_manual_review(
-                verifier_id="SYSTEM",
-                reason=reason,
-                claimed_result=claimed_result,
-                verified_result=verified_result,
-            )
+            if results_match and not needs_manual_review:
+                # Automatic approval
+                case.decide_automatically(
+                    verified_result=verified_result,
+                    parameters=parameters,
+                    approved=True,
+                )
+            else:
+                # Route to manual review with reason
+                reason = "Selected for manual review - " + (
+                    "results differ" if not results_match else "random sample check"
+                )
+
+                case.select_for_manual_review(
+                    verifier_id="SYSTEM",
+                    reason=reason,
+                    claimed_result=claimed_result,
+                    verified_result=verified_result,
+                )
 
         # Save and index
         self.save(case)
@@ -364,3 +369,115 @@ class CaseManager(Application):
         events.sort(key=lambda x: str(x["timestamp"]))
 
         return events
+
+    # === AWIR Toeslag Methods ===
+    # These methods wrap the Case aggregate's toeslag lifecycle methods
+
+    def bereken_aanspraak(self, case_id: str, heeft_aanspraak: bool, berekend_jaarbedrag: int) -> str:
+        """Calculate entitlement for a toeslag case"""
+        case = self.repository.get(UUID(case_id))
+        case.bereken_aanspraak(
+            heeft_aanspraak=heeft_aanspraak,
+            berekend_jaarbedrag=berekend_jaarbedrag,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def wijs_af(self, case_id: str, reden: str) -> str:
+        """Reject a toeslag application"""
+        case = self.repository.get(UUID(case_id))
+        case.wijs_af(reden=reden)
+        self.save(case)
+        return str(case.id)
+
+    def stel_voorschot_vast(self, case_id: str, jaarbedrag: int | None = None, maandbedrag: int | None = None) -> str:
+        """Establish advance payment for a toeslag case"""
+        case = self.repository.get(UUID(case_id))
+        # Use provided amounts or calculate from berekend_jaarbedrag
+        jaar = jaarbedrag if jaarbedrag is not None else case.berekend_jaarbedrag
+        maand = maandbedrag if maandbedrag is not None else (jaar // 12 if jaar else 0)
+        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand)
+        self.save(case)
+        return str(case.id)
+
+    def start_maand(self, case_id: str, maand: int) -> str:
+        """Start a month for processing"""
+        case = self.repository.get(UUID(case_id))
+        case.start_maand(maand=maand)
+        self.save(case)
+        return str(case.id)
+
+    def herbereken_maand(self, case_id: str, maand: int, berekend_bedrag: int, trigger: str = "schedule") -> str:
+        """Recalculate monthly amount"""
+        case = self.repository.get(UUID(case_id))
+        case.herbereken_maand(
+            maand=maand,
+            berekend_bedrag=berekend_bedrag,
+            trigger=trigger,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def betaal_maand(
+        self, case_id: str, maand: int, betaald_bedrag: int | None = None, basis: str = "voorschot"
+    ) -> str:
+        """Process monthly payment"""
+        case = self.repository.get(UUID(case_id))
+        case.betaal_maand(
+            maand=maand,
+            betaald_bedrag=betaald_bedrag,
+            basis=basis,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def herzien_voorschot(self, case_id: str, nieuw_jaarbedrag: int, nieuw_maandbedrag: int, reden: str) -> str:
+        """Revise the advance payment"""
+        case = self.repository.get(UUID(case_id))
+        case.herzien_voorschot(
+            nieuw_jaarbedrag=nieuw_jaarbedrag,
+            nieuw_maandbedrag=nieuw_maandbedrag,
+            reden=reden,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def stel_definitief_vast(self, case_id: str, definitief_jaarbedrag: int) -> str:
+        """Establish final determination"""
+        case = self.repository.get(UUID(case_id))
+        case.stel_definitief_vast(definitief_jaarbedrag=definitief_jaarbedrag)
+        self.save(case)
+        return str(case.id)
+
+    def vereffen(self, case_id: str) -> str:
+        """Execute settlement (back-payment or recovery)"""
+        case = self.repository.get(UUID(case_id))
+
+        # Calculate total paid amount from maandelijkse_betalingen
+        totaal_betaald = sum(b.get("betaald_bedrag") or 0 for b in case.maandelijkse_betalingen)
+
+        # Calculate the difference
+        definitief = case.definitief_jaarbedrag or 0
+        verschil = definitief - totaal_betaald
+
+        # Determine vereffening type and bedrag
+        if verschil > 0:
+            vereffening_type = "NABETALING"
+            vereffening_bedrag = verschil
+        elif verschil < 0:
+            vereffening_type = "TERUGVORDERING"
+            vereffening_bedrag = abs(verschil)
+        else:
+            vereffening_type = "GEEN"
+            vereffening_bedrag = 0
+
+        case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
+        self.save(case)
+        return str(case.id)
+
+    def beeindig(self, case_id: str, reden: str, einddatum: date | None = None) -> str:
+        """End a toeslag"""
+        case = self.repository.get(UUID(case_id))
+        case.beeindig(reden=reden, einddatum=einddatum)
+        self.save(case)
+        return str(case.id)

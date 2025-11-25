@@ -123,6 +123,10 @@ class PythonMachineService(EngineInterface):
         """Set a source dataframe for a service and table."""
         self.services.set_source_dataframe(service, table, df)
 
+    def get_services(self):
+        """Get the underlying Services instance."""
+        return self.services
+
 
 def to_path_node(path_node) -> PathNode:
     return PathNode(
