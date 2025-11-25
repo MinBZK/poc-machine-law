@@ -59,9 +59,9 @@ def get_machine_service() -> EngineInterface:
     return machine_service
 
 
-def get_toeslag_manager():
-    """Dependency to get ToeslagApplication instance for toeslag workflows"""
-    return machine_service.get_toeslag_manager()
+def get_zaken_case_manager():
+    """Dependency to get CaseManager instance for toeslag/zaken workflows"""
+    return machine_service.get_services().case_manager
 
 
 def get_simulated_date(request: Request) -> date:

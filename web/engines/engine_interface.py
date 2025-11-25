@@ -117,15 +117,6 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
-    def get_toeslag_manager(self) -> Any:
-        """
-        Get the ToeslagApplication for managing toeslag workflows.
-
-        Returns:
-            ToeslagApplication instance for AWIR workflow management
-        """
-
-    @abstractmethod
     def get_services(self) -> Any:
         """
         Get the underlying Services instance.

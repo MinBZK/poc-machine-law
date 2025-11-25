@@ -123,10 +123,6 @@ class PythonMachineService(EngineInterface):
         """Set a source dataframe for a service and table."""
         self.services.set_source_dataframe(service, table, df)
 
-    def get_toeslag_manager(self):
-        """Get the ToeslagApplication for managing toeslag workflows."""
-        return self.services.toeslag_manager
-
     def get_services(self):
         """Get the underlying Services instance."""
         return self.services
