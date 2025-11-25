@@ -277,6 +277,17 @@ class MachineService(EngineInterface):
         with client as client:
             set_source_data_frame.sync_detailed(client=client, body=body)
 
+    def get_toeslag_manager(self):
+        """Get the ToeslagApplication for managing toeslag workflows.
+
+        Note: This is not available in the HTTP engine as the toeslag workflow
+        is managed by the Python engine's in-memory state.
+        """
+        raise NotImplementedError(
+            "ToeslagApplication is only available with the Python engine. "
+            "The HTTP engine does not support toeslag workflow management."
+        )
+
     async def __aenter__(self):
         await self.client.__aenter__()
         return self

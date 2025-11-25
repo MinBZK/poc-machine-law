@@ -58,6 +58,11 @@ def get_machine_service() -> EngineInterface:
     return machine_service
 
 
+def get_toeslag_manager():
+    """Dependency to get ToeslagApplication instance for toeslag workflows"""
+    return machine_service.get_toeslag_manager()
+
+
 def set_engine_id(id: str):
     global engine_id
     global case_manager
