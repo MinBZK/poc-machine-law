@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from web.dependencies import get_case_manager, get_claim_manager, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface
-from web.engines.http_engine.machine_client.law_as_code_client.errors import UnexpectedStatus
+from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 
 router = APIRouter(prefix="/edit", tags=["edit"])
 

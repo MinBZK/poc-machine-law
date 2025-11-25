@@ -21,6 +21,7 @@ type Case struct {
 	VerifiedResult     map[string]any
 	Parameters         map[string]any
 	RuleSpecID         uuid.UUID
+	ClaimIds           []uuid.UUID
 	AppealStatus       CaseAppealStatus
 	ObjectionStatus    CaseObjectionStatus
 }

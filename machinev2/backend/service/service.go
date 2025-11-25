@@ -63,7 +63,7 @@ func New(logr *slog.Logger, cfg *config.Config) (*Service, error) {
 
 	caseManager := manager.New(logr2)
 	// claimManager := inmemory.New(logr2, caseManager)
-	claimManager, err := ace.New(cfg.Organization, ruleResolver, cfg.ExternalClaimResolverEndpoint, logr2)
+	claimManager, err := ace.New(cfg.Organization, caseManager, ruleResolver, cfg.ExternalClaimResolverEndpoint, logr2)
 	if err != nil {
 		return nil, fmt.Errorf("claim manager new: %w", err)
 	}

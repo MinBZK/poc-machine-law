@@ -40,13 +40,7 @@ RUN npm ci && npm run build
 
 # Collect all required wallet files into a single directory
 WORKDIR /wallet-files
-RUN cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/button-reset.css . && \
-    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/reset.css . && \
-    cp /wallet/nl-wallet/wallet_core/demo/demo_index/assets/css/nav.css . && \
-    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/common.css . && \
-    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/page.css . && \
-    cp /wallet/nl-wallet/wallet_core/demo/demo_utils/assets/css/buttons-after.css . && \
-    cp /wallet/nl-wallet/wallet_web/dist/nl-wallet-web.iife.js .
+RUN cp /wallet/nl-wallet/wallet_web/dist/nl-wallet-web.iife.js .
 
 
 # Release stage: Development Python app with hot reloading

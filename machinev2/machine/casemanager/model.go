@@ -290,7 +290,7 @@ func (c *Case) CanAppeal() bool {
 // AddClaim records when a new claim is created for this case
 func (c *Case) AddClaim(claimID uuid.UUID) error {
 	if c.ClaimIDs == nil {
-		c.ClaimIDs = make([]uuid.UUID, 0)
+		c.ClaimIDs = make([]uuid.UUID, 0, 1)
 	}
 
 	// Check if claim already exists
@@ -302,23 +302,11 @@ func (c *Case) AddClaim(claimID uuid.UUID) error {
 
 	c.ClaimIDs = append(c.ClaimIDs, claimID)
 	c.UpdatedAt = time.Now()
+
 	return nil
 }
 
 // ApproveOrRejectClaim records when a claim is approved or rejected
 func (c *Case) ApproveOrRejectClaim(claimID uuid.UUID) error {
-	if c.ClaimIDs == nil {
-		c.ClaimIDs = make([]uuid.UUID, 0)
-	}
-
-	// Check if claim already exists
-	for _, id := range c.ClaimIDs {
-		if id == claimID {
-			return nil
-		}
-	}
-
-	c.ClaimIDs = append(c.ClaimIDs, claimID)
-	c.UpdatedAt = time.Now()
-	return nil
+	return c.AddClaim(claimID)
 }
