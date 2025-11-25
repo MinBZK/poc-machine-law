@@ -1,13 +1,8 @@
-from .aggregate import Toeslag, ToeslagStatus, ToeslagType, TOESLAG_TYPE_REGELING
-from .application import ToeslagApplication
-from .simulator import TimeSimulator, MonthResult, YearResult
+# Legacy module - Toeslag aggregate and application have been moved to Case aggregate
+# Only TimeSimulator remains here for time-based simulation
+from .simulator import MonthResult, TimeSimulator, YearResult
 
 __all__ = [
-    "Toeslag",
-    "ToeslagStatus",
-    "ToeslagType",
-    "TOESLAG_TYPE_REGELING",
-    "ToeslagApplication",
     "TimeSimulator",
     "MonthResult",
     "YearResult",
