@@ -14,6 +14,7 @@ from web.dependencies import (
     get_case_manager,
     get_claim_manager,
     get_machine_service,
+    get_message_manager,
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
@@ -24,7 +25,7 @@ from web.feature_flags import (
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
-from web.routers import admin, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet, zaken
+from web.routers import admin, berichten, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet, zaken
 
 app = FastAPI(title="RegelRecht")
 
@@ -54,6 +55,7 @@ app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 app.include_router(zaken.router)
+app.include_router(berichten.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="law"))
 # app.mount(
@@ -116,6 +118,7 @@ async def root(
     services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+    message_manager=Depends(get_message_manager),
 ):
     """Render the main dashboard page"""
     # Get the profile
@@ -142,6 +145,9 @@ async def root(
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
 
+    # Get unread message count for notification badge
+    unread_count = message_manager.get_unread_count(bsn) if message_manager else 0
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -158,6 +164,7 @@ async def root(
             "accepted_claims": accepted_claims,
             "now": datetime.now(),
             "effective_date": effective_date,  # Pass the parsed date parameter to the template
+            "unread_count": unread_count,  # For notification badge
         },
     )
 

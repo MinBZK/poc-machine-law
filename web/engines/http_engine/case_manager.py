@@ -251,6 +251,32 @@ class CaseManager(CaseManagerInterface):
 
             return to_events(response.parsed.data)
 
+    # === AWIR Toeslag Methods ===
+    # Note: These methods are not yet implemented in the HTTP backend
+
+    def bereken_aanspraak(
+        self,
+        case_id: UUID,
+        heeft_aanspraak: bool,
+        berekend_jaarbedrag: int,
+    ) -> UUID:
+        raise NotImplementedError("AWIR bereken_aanspraak not implemented in HTTP backend")
+
+    def wijs_af(
+        self,
+        case_id: UUID,
+        reden: str,
+    ) -> UUID:
+        raise NotImplementedError("AWIR wijs_af not implemented in HTTP backend")
+
+    def stel_voorschot_vast(
+        self,
+        case_id: UUID,
+        jaarbedrag: int | None = None,
+        maandbedrag: int | None = None,
+    ) -> UUID:
+        raise NotImplementedError("AWIR stel_voorschot_vast not implemented in HTTP backend")
+
     async def __aenter__(self):
         await self.client.__aenter__()
         return self

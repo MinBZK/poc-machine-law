@@ -64,6 +64,11 @@ def get_zaken_case_manager():
     return machine_service.get_services().case_manager
 
 
+def get_message_manager():
+    """Dependency to get MessageManager instance for berichten"""
+    return machine_service.get_services().message_manager
+
+
 def get_simulated_date(request: Request) -> date:
     """Get the current simulated date from session, defaults to today"""
     date_str = request.session.get("simulated_date")

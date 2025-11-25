@@ -144,6 +144,24 @@
                                     <a href="/?bsn={{ bsn }}"
                                        class="text-white hover:text-blue-200 font-medium">Dashboard</a>
                                 </li>
+                                <li>
+                                    <a href="/berichten?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium flex items-center relative">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="h-5 w-5 mr-1"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Berichten
+                                        {% if unread_count is defined and unread_count > 0 %}
+                                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                                {{ unread_count }}
+                                            </span>
+                                        {% endif %}
+                                    </a>
+                                </li>
                                 {% if chat_enabled %}
                                     <li>
                                         <a href="/chat?bsn={{ bsn }}"
@@ -277,6 +295,24 @@
                                 <li>
                                     <a href="/?bsn={{ bsn }}"
                                        class="block text-white hover:text-blue-200 font-medium py-2">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="/berichten?bsn={{ bsn }}"
+                                       class="block text-white hover:text-blue-200 font-medium py-2 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="h-5 w-5 mr-1"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Berichten
+                                        {% if unread_count is defined and unread_count > 0 %}
+                                            <span class="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                                {{ unread_count }}
+                                            </span>
+                                        {% endif %}
+                                    </a>
                                 </li>
                                 {% if chat_enabled %}
                                     <li>

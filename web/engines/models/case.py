@@ -4,12 +4,21 @@ from typing import Any
 from uuid import UUID
 
 
-@dataclass
 class CaseStatus(str, Enum):
+    # Application review states
     SUBMITTED = "SUBMITTED"
-    DECIDED = "DECIDED"
     IN_REVIEW = "IN_REVIEW"
+    DECIDED = "DECIDED"
     OBJECTED = "OBJECTED"
+
+    # Toeslag lifecycle states (AWIR process)
+    BEREKEND = "BEREKEND"  # Aanspraak berekend (AWIR Art. 16 lid 1)
+    VOORSCHOT = "VOORSCHOT"  # Voorschotbeschikking vastgesteld (AWIR Art. 16)
+    LOPEND = "LOPEND"  # Maandelijkse cyclus actief
+    DEFINITIEF = "DEFINITIEF"  # Definitieve beschikking (AWIR Art. 19)
+    VEREFFEND = "VEREFFEND"  # Vereffening uitgevoerd (AWIR Art. 24, 26a)
+    AFGEWEZEN = "AFGEWEZEN"  # Aanvraag afgewezen (AWIR Art. 16 lid 4)
+    BEEINDIGD = "BEEINDIGD"  # Toeslag beëindigd
 
 
 @dataclass

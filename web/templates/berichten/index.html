@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Berichtenbox</h1>
+            <p class="text-gray-600 mt-1">Uw berichten van de Belastingdienst/Toeslagen</p>
+        </div>
+        <a href="/?bsn={{ bsn }}"
+           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <svg class="h-5 w-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Terug naar dashboard
+        </a>
+    </div>
+
+    <!-- Unread count badge -->
+    {% if unread_count > 0 %}
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-blue-700">
+                    U heeft <strong>{{ unread_count }}</strong> ongelezen bericht{% if unread_count != 1 %}en{% endif %}.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Messages list -->
+    {% if messages %}
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+            {% for message in messages %}
+            <li>
+                <a href="/berichten/{{ message.id }}?bsn={{ bsn }}"
+                   class="block hover:bg-gray-50 {% if message.is_unread %}bg-blue-50{% endif %}">
+                    <div class="px-4 py-4 sm:px-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                {% if message.is_unread %}
+                                <span class="flex-shrink-0 h-2 w-2 rounded-full bg-blue-600 mr-3"></span>
+                                {% else %}
+                                <span class="flex-shrink-0 h-2 w-2 rounded-full bg-transparent mr-3"></span>
+                                {% endif %}
+                                <p class="text-sm font-medium text-gray-900 truncate {% if message.is_unread %}font-bold{% endif %}">
+                                    {{ message.onderwerp }}
+                                </p>
+                            </div>
+                            <div class="ml-2 flex-shrink-0 flex">
+                                {% if message.message_type.value == 'VOORSCHOT_BESCHIKKING' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Voorschot
+                                </span>
+                                {% elif message.message_type.value == 'DEFINITIEVE_BESCHIKKING' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Definitief
+                                </span>
+                                {% elif message.message_type.value == 'AFWIJZING' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Afwijzing
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-2 sm:flex sm:justify-between">
+                            <div class="sm:flex">
+                                <p class="flex items-center text-sm text-gray-500">
+                                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {{ message.created_at.strftime('%d %B %Y') }}
+                                </p>
+                            </div>
+                            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                                {% if message.is_beschikking %}
+                                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                </svg>
+                                Beschikking - bezwaar mogelijk
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <!-- Empty state -->
+    <div class="text-center py-12 bg-white rounded-lg shadow">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">Geen berichten</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            U heeft nog geen berichten ontvangen. Berichten verschijnen hier wanneer er beslissingen zijn genomen over uw toeslagen.
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Legal info -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+        <p class="font-medium text-gray-900 mb-2">Over uw berichten</p>
+        <p>
+            Conform de Algemene wet inkomensafhankelijke regelingen (AWIR) ontvangt u berichten over beschikkingen en besluiten.
+            Bij elke beschikking heeft u de mogelijkheid om bezwaar te maken binnen 6 weken na dagtekening (AWB Art. 3:45).
+        </p>
+    </div>
+</div>
+{% endblock %}

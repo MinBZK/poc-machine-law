@@ -12,6 +12,7 @@ from .events.case.application import CaseManager
 from .events.case.processor import CaseProcessor
 from .events.claim.application import ClaimManager
 from .events.claim.processor import ClaimProcessor
+from .events.message.application import MessageManager
 from .logging_config import IndentLogger
 from .utils import RuleResolver
 
@@ -184,8 +185,16 @@ class Services:
             def __init__(self, env=None, **kwargs) -> None:
                 super().__init__(rules_engine=outer_self, env=env, **kwargs)
 
+        class WrappedMessageManager(MessageManager):
+            def __init__(self, env=None, **kwargs) -> None:
+                super().__init__(env=env, **kwargs)
+
         system = System(
-            pipes=[[WrappedCaseManager, WrappedCaseProcessor], [WrappedClaimManager, WrappedClaimProcessor]]
+            pipes=[
+                [WrappedCaseManager, WrappedCaseProcessor],
+                [WrappedClaimManager, WrappedClaimProcessor],
+                [WrappedMessageManager],
+            ]
         )
 
         self.runner = SingleThreadedRunner(system)
@@ -193,6 +202,7 @@ class Services:
 
         self.case_manager = self.runner.get(WrappedCaseManager)
         self.claim_manager = self.runner.get(WrappedClaimManager)
+        self.message_manager = self.runner.get(WrappedMessageManager)
 
         self.claim_manager._case_manager = self.case_manager
 
@@ -405,17 +415,48 @@ class Services:
                     aggregate_id = str(event.originator_id)
                     aggregate = self.case_manager.get_case_by_id(aggregate_id)
                     parameters = {apply["name"]: aggregate}
-                    result = self.evaluate(rule.service, rule.law, parameters)
 
-                    # Apply updates back to aggregate
+                    # Apply updates - either from rule evaluation or direct mapping
                     for update in apply.get("update", []):
-                        mapping = {
-                            name: result.output.get(value[1:])  # Strip $ from value
-                            for name, value in update["mapping"].items()
-                        }
-                        # Apply directly on the event via method
-                        method = getattr(self.case_manager, update["method"])
-                        method(aggregate_id, **mapping)
+                        # Determine target manager (default to case_manager for backwards compat)
+                        target_name = update.get("target", "case_manager")
+                        target = self.message_manager if target_name == "message_manager" else self.case_manager
+
+                        # Build mapping - resolve $ references from aggregate
+                        mapping = {}
+                        for name, value in update["mapping"].items():
+                            if isinstance(value, str) and value.startswith("$"):
+                                # Handle nested references like $ZAAK.bsn
+                                parts = value[1:].split(".")
+                                if len(parts) == 2 and parts[0] == apply["name"]:
+                                    # Reference to aggregate field
+                                    # Special case: id needs to be converted to string
+                                    if parts[1] == "id":
+                                        mapping[name] = str(aggregate.id)
+                                    else:
+                                        mapping[name] = getattr(aggregate, parts[1], None)
+                                elif len(parts) == 1:
+                                    # Try definitions first, then rule output
+                                    definitions = rule.properties.get("definitions", {})
+                                    if parts[0] in definitions:
+                                        def_value = definitions[parts[0]]
+                                        if isinstance(def_value, dict):
+                                            mapping[name] = def_value.get("value", def_value)
+                                        else:
+                                            mapping[name] = def_value
+                                    else:
+                                        # Fall back to evaluating the rule
+                                        if "result" not in locals():
+                                            result = self.evaluate(rule.service, rule.law, parameters)
+                                        mapping[name] = result.output.get(parts[0])
+                                else:
+                                    mapping[name] = value
+                            else:
+                                mapping[name] = value
+
+                        # Apply via method on target
+                        method = getattr(target, update["method"])
+                        method(**mapping)
 
     @staticmethod
     def _matches_event(event, applies) -> bool:
