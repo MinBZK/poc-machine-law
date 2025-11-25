@@ -389,20 +389,20 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def wijs_af(self, case_id: str, reden: str) -> str:
+    def wijs_af(self, case_id: str, reden: str, afwijzing_datum: date | None = None) -> str:
         """Reject a toeslag application"""
         case = self.repository.get(UUID(case_id))
-        case.wijs_af(reden=reden)
+        case.wijs_af(reden=reden, afwijzing_datum=afwijzing_datum)
         self.save(case)
         return str(case.id)
 
-    def stel_voorschot_vast(self, case_id: str, jaarbedrag: int | None = None, maandbedrag: int | None = None) -> str:
+    def stel_voorschot_vast(self, case_id: str, jaarbedrag: int | None = None, maandbedrag: int | None = None, beschikking_datum: date | None = None) -> str:
         """Establish advance payment for a toeslag case"""
         case = self.repository.get(UUID(case_id))
         # Use provided amounts or calculate from berekend_jaarbedrag
         jaar = jaarbedrag if jaarbedrag is not None else case.berekend_jaarbedrag
         maand = maandbedrag if maandbedrag is not None else (jaar // 12 if jaar else 0)
-        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand)
+        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand, beschikking_datum=beschikking_datum)
         self.save(case)
         return str(case.id)
 
@@ -413,19 +413,21 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def herbereken_maand(self, case_id: str, maand: int, berekend_bedrag: int, trigger: str = "schedule") -> str:
+    def herbereken_maand(self, case_id: str, maand: int, berekend_bedrag: int, trigger: str = "schedule", berekening_datum: date | None = None, gewijzigde_data: list[str] | None = None) -> str:
         """Recalculate monthly amount"""
         case = self.repository.get(UUID(case_id))
         case.herbereken_maand(
             maand=maand,
             berekend_bedrag=berekend_bedrag,
             trigger=trigger,
+            berekening_datum=berekening_datum,
+            gewijzigde_data=gewijzigde_data,
         )
         self.save(case)
         return str(case.id)
 
     def betaal_maand(
-        self, case_id: str, maand: int, betaald_bedrag: int | None = None, basis: str = "voorschot"
+        self, case_id: str, maand: int, betaald_bedrag: int | None = None, basis: str = "voorschot", betaal_datum: date | None = None
     ) -> str:
         """Process monthly payment"""
         case = self.repository.get(UUID(case_id))
@@ -433,29 +435,31 @@ class CaseManager(Application):
             maand=maand,
             betaald_bedrag=betaald_bedrag,
             basis=basis,
+            betaal_datum=betaal_datum,
         )
         self.save(case)
         return str(case.id)
 
-    def herzien_voorschot(self, case_id: str, nieuw_jaarbedrag: int, nieuw_maandbedrag: int, reden: str) -> str:
+    def herzien_voorschot(self, case_id: str, nieuw_jaarbedrag: int, nieuw_maandbedrag: int, reden: str, herzien_datum: date | None = None) -> str:
         """Revise the advance payment"""
         case = self.repository.get(UUID(case_id))
         case.herzien_voorschot(
             nieuw_jaarbedrag=nieuw_jaarbedrag,
             nieuw_maandbedrag=nieuw_maandbedrag,
             reden=reden,
+            herzien_datum=herzien_datum,
         )
         self.save(case)
         return str(case.id)
 
-    def stel_definitief_vast(self, case_id: str, definitief_jaarbedrag: int) -> str:
+    def stel_definitief_vast(self, case_id: str, definitief_jaarbedrag: int, beschikking_datum: date | None = None) -> str:
         """Establish final determination"""
         case = self.repository.get(UUID(case_id))
-        case.stel_definitief_vast(definitief_jaarbedrag=definitief_jaarbedrag)
+        case.stel_definitief_vast(definitief_jaarbedrag=definitief_jaarbedrag, beschikking_datum=beschikking_datum)
         self.save(case)
         return str(case.id)
 
-    def vereffen(self, case_id: str) -> dict:
+    def vereffen(self, case_id: str, vereffening_datum: date | None = None) -> dict:
         """
         Execute settlement (back-payment or recovery).
 
@@ -490,15 +494,15 @@ class CaseManager(Application):
         elif verschil > 0:
             vereffening_type = "NABETALING"
             vereffening_bedrag = verschil
-            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
+            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag, vereffening_datum=vereffening_datum)
         elif verschil < 0:
             vereffening_type = "TERUGVORDERING"
             vereffening_bedrag = abs(verschil)
-            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
+            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag, vereffening_datum=vereffening_datum)
         else:
             vereffening_type = "GEEN"
             vereffening_bedrag = 0
-            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
+            case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag, vereffening_datum=vereffening_datum)
 
         self.save(case)
         return {

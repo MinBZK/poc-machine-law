@@ -185,6 +185,7 @@ class TimeSimulator:
             maand=maand,
             berekend_bedrag=maandbedrag,
             trigger=trigger,
+            berekening_datum=self.current_date,  # Use simulated date
         )
 
         # Betaling uitvoeren (op basis van voorschot, niet herberekening)
@@ -195,6 +196,7 @@ class TimeSimulator:
             case_id=case_id,
             maand=maand,
             betaald_bedrag=betaald_bedrag,
+            betaal_datum=self.current_date,  # Use simulated date
         )
 
         return MonthResult(
@@ -439,9 +441,12 @@ class TimeSimulator:
         # Stap 1: IB-aanslag simuleren (1 april volgend jaar)
         # =========================================================================
         ib_aanslag_datum = date(volgend_jaar, 4, 1)
+        # IB-aanslag kan worden ontvangen als case LOPEND of VOORSCHOT is
+        # VOORSCHOT: case heeft voorschot maar geen maandelijkse verwerking gehad
+        # LOPEND: case is in actieve maandelijkse cyclus
         if (
             current_date >= ib_aanslag_datum
-            and case.status == CaseStatus.LOPEND
+            and case.status in {CaseStatus.LOPEND, CaseStatus.VOORSCHOT}
             and case.ib_aanslag_datum is None
         ):
             # Simuleer IB-aanslag met herberekend inkomen
@@ -471,7 +476,7 @@ class TimeSimulator:
         if (
             hasattr(case, "ib_aanslag_datum")
             and case.ib_aanslag_datum is not None
-            and case.status == CaseStatus.LOPEND
+            and case.status in {CaseStatus.LOPEND, CaseStatus.VOORSCHOT}
             and hasattr(case, "deadline_definitief")
             and case.deadline_definitief is not None
             and current_date >= case.deadline_definitief
@@ -487,6 +492,7 @@ class TimeSimulator:
             self.case_manager.stel_definitief_vast(
                 case_id=case_id,
                 definitief_jaarbedrag=definitief_bedrag,
+                beschikking_datum=current_date,
             )
 
             # Genereer bericht voor burger
@@ -526,7 +532,7 @@ class TimeSimulator:
                 if current_date >= vereffening_deadline:
                     logger.debug(f"║ → Vereffening uitvoeren (deadline was {vereffening_deadline})")
 
-                    result = self.case_manager.vereffen(case_id=case_id)
+                    result = self.case_manager.vereffen(case_id=case_id, vereffening_datum=current_date)
 
                     # Genereer bericht voor burger
                     if result["type"] == "KWIJTGESCHOLDEN":
@@ -712,6 +718,7 @@ class TimeSimulator:
             inhoud=inhoud,
             rechtsmiddel_info=rechtsmiddel_info,
             law=case.law,
+            created_at=datetime.combine(self.current_date, datetime.min.time()),  # Use simulated date
         )
 
         logger.debug(f"║ → Bericht aangemaakt: {bericht_type} (ID: {message_id[:8]}...)")
