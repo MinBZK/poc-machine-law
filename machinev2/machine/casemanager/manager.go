@@ -41,4 +41,5 @@ type CaseManager interface {
 	// Lifecycle
 	Wait()
 	Close()
+	Reset(ctx context.Context) error
 }

@@ -16,6 +16,14 @@ func (service *Service) ResetEngine(ctx context.Context) error {
 		return fmt.Errorf("set input: %w", err)
 	}
 
+	if err := service.casemanager.Reset(ctx); err != nil {
+		return fmt.Errorf("case manager reset: %w", err)
+	}
+
+	if err := service.claimManager.Reset(ctx); err != nil {
+		return fmt.Errorf("case manager reset: %w", err)
+	}
+
 	service.logger.DebugContext(ctx, "engine reset done")
 
 	return nil

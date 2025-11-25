@@ -282,14 +282,20 @@ class MachineService(EngineInterface):
         with client as client:
             set_source_data_frame.sync_detailed(client=client, body=body)
 
-    def reset(self) -> None:
-        for service_name, service_config in self.service_routes.items():
+    async def reset(self) -> None:
+        import asyncio
+
+        def reset_service(service_name: str, service_config) -> None:
             logger.debug(f"[MachineService] resetting {service_name}")
-
             client = Client(base_url=service_config.domain)
-
             with client as client:
                 reset_engine.sync_detailed(client=client)
+
+        # Run all reset calls in parallel using threads
+        await asyncio.gather(
+            *[asyncio.to_thread(reset_service, service_name, service_config)
+              for service_name, service_config in self.service_routes.items()]
+        )
 
     async def __aenter__(self):
         await self.client.__aenter__()
