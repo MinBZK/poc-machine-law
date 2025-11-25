@@ -1,9 +1,24 @@
+from datetime import date
 from typing import Any
 from uuid import UUID
 
 from eventsourcing.application import Application
+from eventsourcing.persistence import Transcoder, Transcoding
 
 from .aggregate import Claim, ClaimStatus
+
+
+class DateAsISO(Transcoding):
+    """Transcoding for datetime.date objects to ISO format strings."""
+
+    type = date
+    name = "date_iso"
+
+    def encode(self, obj: date) -> str:
+        return obj.isoformat()
+
+    def decode(self, data: str) -> date:
+        return date.fromisoformat(data)
 
 
 class ClaimManager(Application):
@@ -23,6 +38,11 @@ class ClaimManager(Application):
         self._status_index: dict[ClaimStatus, list[str]] = {status: [] for status in ClaimStatus}
         self._bsn_service_law_index: dict[tuple[str, str, str], dict[str, str]] = {}  # (service, key) -> claim_id
         self._case_manager = None
+
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for date serialization."""
+        super().register_transcodings(transcoder)
+        transcoder.register(DateAsISO())
 
     def _index_claim(self, claim: Claim) -> None:
         """Add claim to all indexes"""

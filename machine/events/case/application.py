@@ -5,8 +5,22 @@ from decimal import Decimal
 from uuid import UUID
 
 from eventsourcing.application import Application
+from eventsourcing.persistence import Transcoder, Transcoding
 
 from .aggregate import Case, CaseStatus
+
+
+class DateAsISO(Transcoding):
+    """Transcoding for datetime.date objects to ISO format strings."""
+
+    type = date
+    name = "date_iso"
+
+    def encode(self, obj: date) -> str:
+        return obj.isoformat()
+
+    def decode(self, data: str) -> date:
+        return date.fromisoformat(data)
 
 
 class CaseManager(Application):
@@ -23,6 +37,11 @@ class CaseManager(Application):
         self.rules_engine = rules_engine
         self._case_index: dict[tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
         # self.follow()
+
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for date serialization."""
+        super().register_transcodings(transcoder)
+        transcoder.register(DateAsISO())
 
     @staticmethod
     def _index_key(bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
@@ -76,6 +95,7 @@ class CaseManager(Application):
         parameters: dict,
         claimed_result: dict,
         approved_claims_only: bool,
+        created_at: datetime | None = None,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
@@ -101,6 +121,7 @@ class CaseManager(Application):
                 verified_result=verified_result,
                 rulespec_uuid=result.rulespec_uuid,
                 approved_claims_only=approved_claims_only,
+                created_at=created_at,
             )
 
             needs_manual_review = random.random() < self.SAMPLE_RATE
@@ -373,12 +394,15 @@ class CaseManager(Application):
     # === AWIR Toeslag Methods ===
     # These methods wrap the Case aggregate's toeslag lifecycle methods
 
-    def bereken_aanspraak(self, case_id: str, heeft_aanspraak: bool, berekend_jaarbedrag: int) -> str:
+    def bereken_aanspraak(
+        self, case_id: str, heeft_aanspraak: bool, berekend_jaarbedrag: int, berekening_datum: date | None = None
+    ) -> str:
         """Calculate entitlement for a toeslag case"""
         case = self.repository.get(UUID(case_id))
         case.bereken_aanspraak(
             heeft_aanspraak=heeft_aanspraak,
             berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=berekening_datum,
         )
         self.save(case)
         return str(case.id)
@@ -390,13 +414,15 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def stel_voorschot_vast(self, case_id: str, jaarbedrag: int | None = None, maandbedrag: int | None = None) -> str:
+    def stel_voorschot_vast(
+        self, case_id: str, jaarbedrag: int | None = None, maandbedrag: int | None = None, beschikking_datum: date | None = None
+    ) -> str:
         """Establish advance payment for a toeslag case"""
         case = self.repository.get(UUID(case_id))
         # Use provided amounts or calculate from berekend_jaarbedrag
         jaar = jaarbedrag if jaarbedrag is not None else case.berekend_jaarbedrag
         maand = maandbedrag if maandbedrag is not None else (jaar // 12 if jaar else 0)
-        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand)
+        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand, beschikking_datum=beschikking_datum)
         self.save(case)
         return str(case.id)
 
@@ -407,19 +433,22 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def herbereken_maand(self, case_id: str, maand: int, berekend_bedrag: int, trigger: str = "schedule") -> str:
+    def herbereken_maand(
+        self, case_id: str, maand: int, berekend_bedrag: int, trigger: str = "schedule", berekening_datum: date | None = None
+    ) -> str:
         """Recalculate monthly amount"""
         case = self.repository.get(UUID(case_id))
         case.herbereken_maand(
             maand=maand,
             berekend_bedrag=berekend_bedrag,
             trigger=trigger,
+            berekening_datum=berekening_datum,
         )
         self.save(case)
         return str(case.id)
 
     def betaal_maand(
-        self, case_id: str, maand: int, betaald_bedrag: int | None = None, basis: str = "voorschot"
+        self, case_id: str, maand: int, betaald_bedrag: int | None = None, basis: str = "voorschot", betaal_datum: date | None = None
     ) -> str:
         """Process monthly payment"""
         case = self.repository.get(UUID(case_id))
@@ -427,6 +456,7 @@ class CaseManager(Application):
             maand=maand,
             betaald_bedrag=betaald_bedrag,
             basis=basis,
+            betaal_datum=betaal_datum,
         )
         self.save(case)
         return str(case.id)

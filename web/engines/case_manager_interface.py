@@ -72,6 +72,7 @@ class CaseManagerInterface(ABC):
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
         effective_date: datetime.date | None = None,
+        created_at: datetime.datetime | None = None,
     ) -> UUID:
         """
         Submit a case with information.
@@ -84,6 +85,7 @@ class CaseManagerInterface(ABC):
             claimed_result: dictionary containing the claimed result from the law
             approved_claims_only: Boolean only use approved claims while processing this case
             effective_date: Optional date on which the case, when accepted, should become effective
+            created_at: Optional datetime timestamp for when the case was created (for simulation)
 
         Returns:
             A Case containing the case information
@@ -140,4 +142,46 @@ class CaseManagerInterface(ABC):
 
         Returns:
             A List containen all events
+        """
+
+    @abstractmethod
+    def bereken_aanspraak(
+        self,
+        case_id: UUID,
+        heeft_aanspraak: bool,
+        berekend_jaarbedrag: int,
+        berekening_datum: datetime.date | None = None,
+    ) -> UUID:
+        """
+        Calculate entitlement for a toeslag case
+
+        Args:
+            case_id: UUID identifier of the specific case
+            heeft_aanspraak: Boolean indicating if citizen is entitled
+            berekend_jaarbedrag: Calculated yearly amount in eurocents
+            berekening_datum: Optional date for the calculation (defaults to today)
+
+        Returns:
+            The case id
+        """
+
+    @abstractmethod
+    def stel_voorschot_vast(
+        self,
+        case_id: UUID,
+        jaarbedrag: int | None = None,
+        maandbedrag: int | None = None,
+        beschikking_datum: datetime.date | None = None,
+    ) -> UUID:
+        """
+        Establish advance payment for a toeslag case
+
+        Args:
+            case_id: UUID identifier of the specific case
+            jaarbedrag: Optional yearly amount (uses berekend_jaarbedrag if not provided)
+            maandbedrag: Optional monthly amount (calculated from yearly if not provided)
+            beschikking_datum: Optional date for the besluit (defaults to today)
+
+        Returns:
+            The case id
         """

@@ -58,6 +58,7 @@ class CaseManager(CaseManagerInterface):
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
         effective_date: datetime.date | None = None,
+        created_at: datetime.datetime | None = None,
     ) -> UUID:
         # Note: The underlying machine.service library does not support effective_date yet
         # For now, we pass the existing parameters and ignore effective_date
@@ -68,6 +69,7 @@ class CaseManager(CaseManagerInterface):
             parameters=parameters,
             claimed_result=claimed_result,
             approved_claims_only=approved_claims_only,
+            created_at=created_at,
         )
 
     def complete_manual_review(
@@ -98,6 +100,38 @@ class CaseManager(CaseManagerInterface):
         events = self.case_manager.get_events(case_id)
         return to_events(events)
 
+    def bereken_aanspraak(
+        self,
+        case_id: UUID,
+        heeft_aanspraak: bool,
+        berekend_jaarbedrag: int,
+        berekening_datum: datetime.date | None = None,
+    ) -> UUID:
+        return UUID(
+            self.case_manager.bereken_aanspraak(
+                case_id=str(case_id),
+                heeft_aanspraak=heeft_aanspraak,
+                berekend_jaarbedrag=berekend_jaarbedrag,
+                berekening_datum=berekening_datum,
+            )
+        )
+
+    def stel_voorschot_vast(
+        self,
+        case_id: UUID,
+        jaarbedrag: int | None = None,
+        maandbedrag: int | None = None,
+        beschikking_datum: datetime.date | None = None,
+    ) -> UUID:
+        return UUID(
+            self.case_manager.stel_voorschot_vast(
+                case_id=str(case_id),
+                jaarbedrag=jaarbedrag,
+                maandbedrag=maandbedrag,
+                beschikking_datum=beschikking_datum,
+            )
+        )
+
 
 def to_case(case) -> Case:
     return Case(
@@ -114,6 +148,23 @@ def to_case(case) -> Case:
         approved=case.approved,
         objection_status=to_objection_status(getattr(case, "objection_status", None)),
         appeal_status=getattr(case, "appeal_status", None),
+        # AWIR lifecycle fields
+        created_at=getattr(case, "created_at", None),
+        berekeningsjaar=getattr(case, "berekeningsjaar", None),
+        heeft_aanspraak=getattr(case, "heeft_aanspraak", None),
+        berekend_jaarbedrag=getattr(case, "berekend_jaarbedrag", None),
+        berekening_datum=getattr(case, "berekening_datum", None),
+        voorschot_jaarbedrag=getattr(case, "voorschot_jaarbedrag", None),
+        voorschot_maandbedrag=getattr(case, "voorschot_maandbedrag", None),
+        huidige_maand=getattr(case, "huidige_maand", 0),
+        beschikkingen=getattr(case, "beschikkingen", None) or [],
+        maandelijkse_berekeningen=getattr(case, "maandelijkse_berekeningen", None) or [],
+        maandelijkse_betalingen=getattr(case, "maandelijkse_betalingen", None) or [],
+        definitieve_beschikking_datum=getattr(case, "definitieve_beschikking_datum", None),
+        definitief_jaarbedrag=getattr(case, "definitief_jaarbedrag", None),
+        vereffening_datum=getattr(case, "vereffening_datum", None),
+        vereffening_type=getattr(case, "vereffening_type", None),
+        vereffening_bedrag=getattr(case, "vereffening_bedrag", None),
     )
 
 

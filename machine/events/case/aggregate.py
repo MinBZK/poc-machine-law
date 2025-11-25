@@ -56,6 +56,7 @@ class Case(Aggregate):
         verified_result: dict,
         rulespec_uuid: str,
         approved_claims_only: bool,
+        created_at: datetime | None = None,
     ) -> None:
         self.claim_ids = None
         self.bsn = bsn
@@ -73,8 +74,8 @@ class Case(Aggregate):
         self.verifier_id = None
         self.objection_status = None
 
-        # Add created_at timestamp
-        self.created_at = datetime.now()
+        # Add created_at timestamp (use provided or default to now)
+        self.created_at = created_at or datetime.now()
 
         self.approved = None
         self.status = CaseStatus.SUBMITTED
@@ -83,6 +84,7 @@ class Case(Aggregate):
         # Berekende aanspraak
         self.heeft_aanspraak: bool | None = None
         self.berekend_jaarbedrag: int | None = None  # in eurocent
+        self.berekening_datum: date | None = None
 
         # Voorschot
         self.voorschot_jaarbedrag: int | None = None
@@ -107,6 +109,10 @@ class Case(Aggregate):
 
         # Berekeningsjaar (extracted from parameters or set separately)
         self.berekeningsjaar: int | None = parameters.get("berekeningsjaar")
+
+        # Year continuation tracking
+        self.vorig_jaar_case_id: str | None = None  # Link to previous year's case
+        self.vereffening_datum: date | None = None  # Date of settlement
 
     @event("Reset")
     def reset(
@@ -297,6 +303,7 @@ class Case(Aggregate):
         """Aanspraak op toeslag berekend (AWIR Art. 16 lid 1)"""
         self.heeft_aanspraak = heeft_aanspraak
         self.berekend_jaarbedrag = berekend_jaarbedrag
+        self.berekening_datum = berekening_datum or date.today()
         self.status = CaseStatus.BEREKEND
 
     @event("Afgewezen")
@@ -445,6 +452,7 @@ class Case(Aggregate):
         """Vereffening uitgevoerd (AWIR Art. 24, Art. 26a)"""
         self.vereffening_type = vereffening_type
         self.vereffening_bedrag = vereffening_bedrag
+        self.vereffening_datum = vereffening_datum or date.today()
         self.status = CaseStatus.VEREFFEND
 
         if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
@@ -452,7 +460,7 @@ class Case(Aggregate):
         self.beschikkingen.append(
             {
                 "type": f"VEREFFENING_{vereffening_type}",
-                "datum": vereffening_datum or date.today(),
+                "datum": self.vereffening_datum,
                 "bedrag": vereffening_bedrag,
             }
         )

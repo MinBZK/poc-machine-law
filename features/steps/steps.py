@@ -1622,3 +1622,160 @@ def step_impl(context, maand_naam):
         betalingen_maanden, expected_maanden,
         f"Expected betalingen for months {expected_maanden}, but found {betalingen_maanden}"
     )
+
+
+# === Year-End and Multi-Year Step Definitions ===
+
+from machine.events.toeslag.timesimulator import YearEndResult
+
+
+@then('is het jaar {jaar:d} afgerond met definitieve beschikking')
+def step_impl(context, jaar):
+    """Verify the year has been finalized with a definitieve beschikking"""
+    # The original case should be in DEFINITIEF or VEREFFEND state
+    case = context.case
+    assertions.assertEqual(
+        case.berekeningsjaar, jaar,
+        f"Expected case berekeningsjaar to be {jaar}, but was {case.berekeningsjaar}"
+    )
+    assertions.assertIn(
+        case.status, [CaseStatus.DEFINITIEF, CaseStatus.VEREFFEND],
+        f"Expected case status to be DEFINITIEF or VEREFFEND, but was {case.status.value}"
+    )
+    assertions.assertIsNotNone(
+        case.definitief_jaarbedrag,
+        "Expected definitief_jaarbedrag to be set"
+    )
+
+
+@then('is de oude toeslag status "{status}"')
+def step_impl(context, status):
+    """Check the status of the original (old year) toeslag"""
+    status_mapping = {
+        "AANVRAAG": CaseStatus.SUBMITTED,
+        "BEREKEND": CaseStatus.BEREKEND,
+        "VOORSCHOT": CaseStatus.VOORSCHOT,
+        "LOPEND": CaseStatus.LOPEND,
+        "DEFINITIEF": CaseStatus.DEFINITIEF,
+        "VEREFFEND": CaseStatus.VEREFFEND,
+        "AFGEWEZEN": CaseStatus.AFGEWEZEN,
+    }
+    expected_status = status_mapping.get(status) or CaseStatus(status)
+    assertions.assertEqual(
+        context.case.status, expected_status,
+        f"Expected old toeslag status to be {status}, but was {context.case.status.value}"
+    )
+
+
+@then('is er een nieuwe toeslag case aangemaakt voor jaar {jaar:d}')
+def step_impl(context, jaar):
+    """Verify a new case has been created for the specified year"""
+    bsn = context.parameters.get("BSN")
+
+    # Find the new case for the specified year
+    all_cases = context.services.case_manager.get_cases_by_bsn(bsn)
+    new_year_cases = [c for c in all_cases if c.berekeningsjaar == jaar]
+
+    assertions.assertTrue(
+        len(new_year_cases) > 0,
+        f"Expected a new case for year {jaar}, but none was found"
+    )
+
+    # Store the new case for further assertions
+    context.new_case = new_year_cases[0]
+    context.new_case_uuid = str(context.new_case.id)
+
+
+@then('is de nieuwe toeslag status "{status}"')
+def step_impl(context, status):
+    """Check the status of the new year toeslag"""
+    status_mapping = {
+        "AANVRAAG": CaseStatus.SUBMITTED,
+        "BEREKEND": CaseStatus.BEREKEND,
+        "VOORSCHOT": CaseStatus.VOORSCHOT,
+        "LOPEND": CaseStatus.LOPEND,
+        "DEFINITIEF": CaseStatus.DEFINITIEF,
+        "VEREFFEND": CaseStatus.VEREFFEND,
+        "AFGEWEZEN": CaseStatus.AFGEWEZEN,
+    }
+    expected_status = status_mapping.get(status) or CaseStatus(status)
+
+    new_case = context.new_case if hasattr(context, 'new_case') else None
+    assertions.assertIsNotNone(new_case, "No new case found in context")
+    assertions.assertEqual(
+        new_case.status, expected_status,
+        f"Expected new toeslag status to be {status}, but was {new_case.status.value}"
+    )
+
+
+@then('heeft de burger nog steeds aanspraak in het nieuwe jaar')
+def step_impl(context):
+    """Verify the citizen still has eligibility in the new year"""
+    new_case = context.new_case if hasattr(context, 'new_case') else None
+    assertions.assertIsNotNone(new_case, "No new case found in context")
+    assertions.assertTrue(
+        new_case.heeft_aanspraak,
+        "Expected burger to have aanspraak in new year"
+    )
+
+
+@then('bevat de nieuwe case maandelijkse berekeningen voor januari en februari')
+def step_impl(context):
+    """Verify the new case has monthly calculations for Jan and Feb"""
+    new_case = context.new_case if hasattr(context, 'new_case') else None
+    assertions.assertIsNotNone(new_case, "No new case found in context")
+
+    berekende_maanden = {b["maand"] for b in new_case.maandelijkse_berekeningen}
+    assertions.assertIn(1, berekende_maanden, "Expected berekening for month 1 (januari)")
+    assertions.assertIn(2, berekende_maanden, "Expected berekening for month 2 (februari)")
+
+
+@then('is de vereffening correct berekend')
+def step_impl(context):
+    """Verify the settlement has been calculated"""
+    case = context.case
+    assertions.assertIn(
+        case.status, [CaseStatus.DEFINITIEF, CaseStatus.VEREFFEND],
+        f"Expected case to be DEFINITIEF or VEREFFEND for vereffening, but was {case.status.value}"
+    )
+    assertions.assertIsNotNone(
+        case.vereffening_type,
+        "Expected vereffening_type to be set"
+    )
+    assertions.assertIn(
+        case.vereffening_type, ["NABETALING", "TERUGVORDERING", "GEEN"],
+        f"Unexpected vereffening_type: {case.vereffening_type}"
+    )
+
+
+@then('is het vereffening bedrag gelijk aan definitief minus betaald')
+def step_impl(context):
+    """Verify the settlement amount equals the difference between definitive and paid"""
+    case = context.case
+
+    # Calculate totals
+    totaal_betaald = sum(b.get("betaald_bedrag", 0) for b in case.maandelijkse_betalingen)
+    definitief = case.definitief_jaarbedrag or 0
+    expected_verschil = abs(definitief - totaal_betaald)
+
+    assertions.assertEqual(
+        case.vereffening_bedrag, expected_verschil,
+        f"Expected vereffening_bedrag to be {expected_verschil} (|{definitief} - {totaal_betaald}|), but was {case.vereffening_bedrag}"
+    )
+
+    # Also verify the type matches the direction
+    if definitief > totaal_betaald:
+        assertions.assertEqual(
+            case.vereffening_type, "NABETALING",
+            f"Expected NABETALING when definitief ({definitief}) > betaald ({totaal_betaald})"
+        )
+    elif definitief < totaal_betaald:
+        assertions.assertEqual(
+            case.vereffening_type, "TERUGVORDERING",
+            f"Expected TERUGVORDERING when definitief ({definitief}) < betaald ({totaal_betaald})"
+        )
+    else:
+        assertions.assertEqual(
+            case.vereffening_type, "GEEN",
+            f"Expected GEEN when definitief ({definitief}) == betaald ({totaal_betaald})"
+        )

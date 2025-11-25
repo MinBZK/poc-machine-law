@@ -25,170 +25,130 @@
         </div>
     </div>
 
-    <!-- Back link -->
-    <a href="/zaken/?bsn={{ bsn }}" class="text-blue-600 hover:text-blue-800 inline-flex items-center mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Terug naar overzicht
-    </a>
-
-    <!-- Header -->
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-                <div class="flex items-center">
-                    <h2 class="text-2xl font-semibold text-gray-900">{{ type_label }}</h2>
-                    <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                        {% if status_color == 'green' %}bg-green-100 text-green-800
-                        {% elif status_color == 'yellow' %}bg-yellow-100 text-yellow-800
-                        {% elif status_color == 'blue' %}bg-blue-100 text-blue-800
-                        {% elif status_color == 'purple' %}bg-purple-100 text-purple-800
-                        {% elif status_color == 'red' %}bg-red-100 text-red-800
-                        {% else %}bg-gray-100 text-gray-800{% endif %}">
-                        {{ status_label }}
-                    </span>
-                </div>
-                <p class="text-gray-500 mt-1">{{ toeslag.oid }}</p>
-            </div>
-            <div class="mt-4 md:mt-0 text-right">
-                <div class="text-sm text-gray-500">Berekeningsjaar</div>
-                <div class="text-2xl font-bold text-gray-900">{{ toeslag.berekeningsjaar }}</div>
-            </div>
+    <!-- Header with back link and user -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <a href="/zaken/?bsn={{ bsn }}" class="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Dashboard
+            </a>
+            <h1 class="text-xl font-semibold text-gray-900 mt-1">RegelRecht tijdlijn</h1>
         </div>
-
-        <!-- Key metrics -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t">
-            <div>
-                <div class="text-sm text-gray-500">Jaarbedrag (berekend)</div>
-                <div class="text-xl font-semibold text-gray-900">{{ format_cents(toeslag.berekend_jaarbedrag) }}</div>
-            </div>
-            <div>
-                <div class="text-sm text-gray-500">Voorschot (maand)</div>
-                <div class="text-xl font-semibold text-gray-900">{{ format_cents(toeslag.voorschot_maandbedrag) }}</div>
-            </div>
-            <div>
-                <div class="text-sm text-gray-500">Totaal betaald</div>
-                <div class="text-xl font-semibold text-gray-900">{{ format_cents(toeslag.totaal_betaald) }}</div>
-            </div>
-            <div>
-                <div class="text-sm text-gray-500">Aanvraagdatum</div>
-                <div class="text-xl font-semibold text-gray-900">{{ toeslag.aanvraag_datum }}</div>
-            </div>
+        <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span class="text-sm text-gray-600">{{ profile_name }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Timeline -->
+        <!-- Timeline (RegelRecht design) -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-6">Tijdlijn</h3>
-
-                {% if timeline %}
-                <div class="flow-root">
-                    <ul class="-mb-8">
-                        {% for event in timeline %}
-                        <li>
-                            <div class="relative pb-8">
-                                {% if not loop.last %}
-                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                {% endif %}
-                                <div class="relative flex space-x-3">
-                                    <div>
-                                        <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white
-                                            {% if event.type == 'aanvraag' %}bg-blue-500
-                                            {% elif event.type == 'berekening' %}bg-green-500
-                                            {% elif event.type == 'beschikking' %}bg-purple-500
-                                            {% elif event.type == 'maand_berekening' %}bg-yellow-500
-                                            {% elif event.type == 'maand_betaling' %}bg-emerald-500
-                                            {% else %}bg-gray-400{% endif %}">
-                                            {% if event.icon == 'document' %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            {% elif event.icon == 'calculator' %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                            {% elif event.icon == 'x-circle' %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {% elif event.icon == 'document-check' %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {% elif event.icon == 'refresh' %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                            </svg>
-                                            {% elif event.icon == 'currency-euro' %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {% else %}
-                                            <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="min-w-0 flex-1 pt-1.5">
-                                        <div class="flex justify-between">
-                                            <p class="text-sm font-medium text-gray-900">{{ event.label }}</p>
-                                            <p class="text-sm text-gray-500">{{ event.date }}</p>
-                                        </div>
-                                        {% if event.details %}
-                                        <div class="mt-2 text-sm text-gray-600">
-                                            <dl class="grid grid-cols-2 gap-x-4 gap-y-1">
-                                                {% for key, value in event.details.items() %}
-                                                <dt class="text-gray-500">{{ key }}:</dt>
-                                                <dd class="font-medium">{{ value }}</dd>
-                                                {% endfor %}
-                                            </dl>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                {% if grouped_timeline %}
+                {% for month, events in grouped_timeline %}
+                <!-- Month header -->
+                <div class="regelrecht-timeline__heading-row bg-gray-100 px-4 py-2 font-medium text-gray-700 border-l-4 border-blue-600">
+                    {{ month }}
                 </div>
+
+                <!-- Events for this month -->
+                {% for event in events %}
+                <div class="flex items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                     onclick="openEventPanel(this)"
+                     data-event-type="{{ event.type }}"
+                     data-event-label="{{ event.label }}"
+                     data-event-date="{{ event.date_formatted }}"
+                     data-event-details='{{ event.details | tojson if event.details else "{}" }}'>
+                    <!-- Status dot -->
+                    <div class="mr-4 flex-shrink-0">
+                        {% if event.is_past %}
+                        <span class="w-3 h-3 bg-blue-600 rounded-full inline-block"></span>
+                        {% else %}
+                        <span class="w-3 h-3 border-2 border-gray-400 rounded-full inline-block"></span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs text-gray-500">{{ event.date_formatted }}</div>
+                        <span class="text-blue-600 hover:underline">{{ event.label }}</span>
+                        {% if event.details %}
+                        <div class="text-sm text-gray-500 truncate">
+                            {% for key, value in event.details.items() %}
+                            {{ key }}: {{ value }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Chevron -->
+                    <div class="ml-4 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
                 {% else %}
-                <p class="text-gray-500 text-center py-8">Nog geen gebeurtenissen geregistreerd</p>
+                <div class="p-8 text-center text-gray-500">
+                    Nog geen gebeurtenissen geregistreerd
+                </div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Side panels -->
         <div class="lg:col-span-1 space-y-6">
-            <!-- Monthly breakdown -->
-            {% if toeslag.maandelijkse_betalingen %}
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Maandelijkse betalingen</h3>
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="text-left py-2 text-gray-500">Maand</th>
-                            <th class="text-right py-2 text-gray-500">Bedrag</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for betaling in toeslag.maandelijkse_betalingen %}
-                        <tr class="border-b last:border-0">
-                            <td class="py-2">Maand {{ betaling.maand }}</td>
-                            <td class="py-2 text-right font-medium">{{ format_cents(betaling.betaald_bedrag) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr class="border-t-2">
-                            <td class="py-2 font-semibold">Totaal</td>
-                            <td class="py-2 text-right font-bold">{{ format_cents(toeslag.totaal_betaald) }}</td>
-                        </tr>
-                    </tfoot>
-                </table>
+            <!-- Year Summary Card (shown when DEFINITIEF or VEREFFEND) -->
+            {% if toeslag.status in [CaseStatus.DEFINITIEF, CaseStatus.VEREFFEND] %}
+            <div class="bg-white rounded-lg shadow p-6 border-2 border-green-200">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Jaaroverzicht {{ toeslag.berekeningsjaar }}
+                </h3>
+                <dl class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <dt class="text-sm text-gray-500">Totaal berekend</dt>
+                        <dd class="text-sm font-medium text-gray-900">{{ format_cents(totaal_berekend) }}</dd>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <dt class="text-sm text-gray-500">Totaal betaald (voorschot)</dt>
+                        <dd class="text-sm font-medium text-gray-900">{{ format_cents(totaal_betaald) }}</dd>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <dt class="text-sm text-gray-500">Definitief jaarbedrag</dt>
+                        <dd class="text-sm font-medium text-gray-900">{{ format_cents(toeslag.definitief_jaarbedrag) }}</dd>
+                    </div>
+                    {% if toeslag.status == CaseStatus.VEREFFEND %}
+                    <div class="flex justify-between items-center py-2 bg-gray-50 rounded px-2 -mx-2">
+                        <dt class="text-sm font-medium text-gray-700">Vereffening</dt>
+                        <dd class="text-sm font-bold {% if toeslag.vereffening_type == 'NABETALING' %}text-green-600{% elif toeslag.vereffening_type == 'TERUGVORDERING' %}text-red-600{% else %}text-gray-600{% endif %}">
+                            {% if toeslag.vereffening_type == 'NABETALING' %}
+                            + {{ format_cents(toeslag.vereffening_bedrag) }}
+                            {% elif toeslag.vereffening_type == 'TERUGVORDERING' %}
+                            - {{ format_cents(toeslag.vereffening_bedrag) }}
+                            {% else %}
+                            Geen verschil
+                            {% endif %}
+                        </dd>
+                    </div>
+                    {% endif %}
+                </dl>
+                {% if toeslag.vereffening_datum %}
+                <p class="mt-4 text-xs text-gray-500">
+                    Vereffend op {{ toeslag.vereffening_datum }}
+                </p>
+                {% endif %}
             </div>
             {% endif %}
 
@@ -289,4 +249,97 @@
         </div>
     </div>
 </section>
+
+<!-- Slide-out panel overlay (invisible, just for click-to-close) -->
+<div id="panel-overlay" class="fixed inset-0 hidden z-40" onclick="closeEventPanel()"></div>
+
+<!-- Slide-out event detail panel -->
+<div id="event-panel" class="fixed top-0 right-0 h-full w-96 bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+    <div class="p-6 h-full flex flex-col">
+        <!-- Close button -->
+        <div class="flex justify-end mb-4">
+            <button onclick="closeEventPanel()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                &times; Sluit
+            </button>
+        </div>
+
+        <!-- Panel content -->
+        <h2 id="panel-title" class="text-xl font-semibold text-gray-900 mb-4"></h2>
+        <div id="panel-content" class="flex-1 text-gray-600 overflow-y-auto">
+            <!-- Event details will be populated here -->
+        </div>
+
+        <!-- Action buttons -->
+        <div id="panel-buttons" class="space-y-2 mt-6 pt-4 border-t">
+            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors">
+                Bekijk details
+            </button>
+            <button class="w-full border border-blue-600 text-blue-600 py-2 px-4 rounded hover:bg-blue-50 transition-colors">
+                Download PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEventPanel(element) {
+    const eventType = element.dataset.eventType;
+    const eventLabel = element.dataset.eventLabel;
+    const eventDate = element.dataset.eventDate;
+    const eventDetails = JSON.parse(element.dataset.eventDetails || '{}');
+
+    // Set panel title
+    document.getElementById('panel-title').textContent = eventLabel;
+
+    // Build panel content
+    let contentHtml = `<p class="text-sm text-gray-500 mb-4">${eventDate}</p>`;
+
+    // Add event type description
+    const descriptions = {
+        'aanvraag': 'Uw aanvraag is ontvangen en wordt verwerkt.',
+        'berekening': 'De berekening voor uw aanspraak is uitgevoerd.',
+        'beschikking': 'Een formele beschikking is verzonden.',
+        'maand_berekening': 'De maandelijkse herberekening is uitgevoerd.',
+        'maand_betaling': 'De maandelijkse betaling is verwerkt.',
+        'definitieve_beschikking': 'Het jaar is afgesloten met de definitieve beschikking. Het definitieve bedrag is vastgesteld op basis van uw werkelijke inkomen.',
+        'vereffening': 'De vereffening is uitgevoerd. Het verschil tussen voorschot en definitief bedrag is berekend en verwerkt.'
+    };
+
+    contentHtml += `<p class="mb-4">${descriptions[eventType] || 'Details van deze gebeurtenis.'}</p>`;
+
+    // Add details
+    if (Object.keys(eventDetails).length > 0) {
+        contentHtml += '<div class="bg-gray-50 rounded-lg p-4 mt-4">';
+        contentHtml += '<h3 class="text-sm font-medium text-gray-900 mb-2">Gegevens</h3>';
+        contentHtml += '<dl class="space-y-2 text-sm">';
+        for (const [key, value] of Object.entries(eventDetails)) {
+            contentHtml += `<div class="flex justify-between">`;
+            contentHtml += `<dt class="text-gray-500">${key}</dt>`;
+            contentHtml += `<dd class="font-medium text-gray-900">${value}</dd>`;
+            contentHtml += `</div>`;
+        }
+        contentHtml += '</dl></div>';
+    }
+
+    document.getElementById('panel-content').innerHTML = contentHtml;
+
+    // Show panel with animation
+    document.getElementById('event-panel').classList.remove('translate-x-full');
+    document.getElementById('panel-overlay').classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeEventPanel() {
+    document.getElementById('event-panel').classList.add('translate-x-full');
+    document.getElementById('panel-overlay').classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+// Close panel on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEventPanel();
+    }
+});
+</script>
 {% endblock %}
