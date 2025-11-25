@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
@@ -437,7 +437,6 @@ class Services:
                                         attr_value = getattr(aggregate, parts[1], None)
                                         # Convert date to datetime for created_at field
                                         if name == "created_at" and isinstance(attr_value, date):
-                                            from datetime import datetime
                                             mapping[name] = datetime.combine(attr_value, datetime.min.time())
                                         else:
                                             mapping[name] = attr_value
