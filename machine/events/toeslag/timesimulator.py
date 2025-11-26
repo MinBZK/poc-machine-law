@@ -719,15 +719,19 @@ class TimeSimulator:
             berekening_datum=start_date,
         )
 
-        # Always set voorschot (even if 0) to transition case to VOORSCHOT status
+        # Set voorschot to transition case to VOORSCHOT status
         # This allows time simulation to continue processing months
-        maandbedrag = berekend_jaarbedrag // 12 if heeft_aanspraak else 0
-        self.case_manager.stel_voorschot_vast(
-            case_id=new_case_id,
-            jaarbedrag=berekend_jaarbedrag if heeft_aanspraak else 0,
-            maandbedrag=maandbedrag,
-            beschikking_datum=start_date,
-        )
+        # Only set if there's no existing VOORSCHOT beschikking (prevent duplicate events)
+        new_case = self.case_manager.get_case_by_id(new_case_id)
+        has_voorschot = any(b.get("type") == "VOORSCHOT" for b in (new_case.beschikkingen or []))
+        if not has_voorschot:
+            maandbedrag = berekend_jaarbedrag // 12 if heeft_aanspraak else 0
+            self.case_manager.stel_voorschot_vast(
+                case_id=new_case_id,
+                jaarbedrag=berekend_jaarbedrag if heeft_aanspraak else 0,
+                maandbedrag=maandbedrag,
+                beschikking_datum=start_date,
+            )
 
         return new_case_id
 

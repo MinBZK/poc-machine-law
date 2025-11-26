@@ -277,8 +277,12 @@ async def submit_case(
         )
 
         if heeft_aanspraak:
-            # Set voorschot (AWIR Art. 16) - triggers VoorschotBeschikkingVastgesteld event
-            case_manager.stel_voorschot_vast(case_id=case_id, beschikking_datum=simulated_date)
+            # Check if there's already a VOORSCHOT beschikking (prevent duplicate events)
+            case = case_manager.get_case_by_id(case_id)
+            has_voorschot = any(b.get("type") == "VOORSCHOT" for b in (case.beschikkingen or []))
+            if not has_voorschot:
+                # Set voorschot (AWIR Art. 16) - triggers VoorschotBeschikkingVastgesteld event
+                case_manager.stel_voorschot_vast(case_id=case_id, beschikking_datum=simulated_date)
         else:
             # Reject (AWIR Art. 16 lid 4) - triggers Afgewezen event
             case_manager.wijs_af(case_id=case_id, reden="Geen aanspraak op basis van berekening")
