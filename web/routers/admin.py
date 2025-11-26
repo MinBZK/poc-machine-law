@@ -18,6 +18,7 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
+from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 from web.engines.models import CaseStatus
 from web.feature_flags import FeatureFlags
 from web.routers.laws import evaluate_law
@@ -33,6 +34,10 @@ def get_person_name(bsn: str, services: EngineInterface) -> str:
         profile_data = services.get_profile_data(bsn)
         if profile_data and "name" in profile_data:
             return profile_data["name"]
+    except UnexpectedStatus as e:
+        # Log the detailed error but still fallback to BSN
+        error_message = e.content.decode("utf-8") if e.content else "No response content"
+        print(f"Error getting profile for BSN {bsn}: {error_message}")
     except Exception:
         pass
     return bsn  # Fallback to BSN if name not found

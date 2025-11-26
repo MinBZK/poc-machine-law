@@ -10,6 +10,7 @@ from web.config_loader import ServiceRoutingConfig
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
 from .machine_client.regel_recht_engine_api_client import Client
+from .machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 
 logger = logging.getLogger(__name__)
 from .machine_client.regel_recht_engine_api_client.api.data_frames import set_source_data_frame
@@ -252,19 +253,26 @@ class MachineService(EngineInterface):
         # Service routing does not apply to individual profile lookups
         client = Client(base_url=self.base_url)
 
-        with client as client:
-            response = profile_get.sync_detailed(client=client, bsn=bsn, effective_date=effective_date)
-            content = response.parsed
+        try:
+            with client as client:
+                response = profile_get.sync_detailed(client=client, bsn=bsn, effective_date=effective_date)
+                content = response.parsed
 
-            # Handle different response types
-            if response.status_code == 200:
-                return profile_transform(content.data)
-            elif response.status_code == 404:
-                logger.warning(f"[MachineService] Profile not found for BSN: {bsn}")
-                return None
-            else:
-                logger.error(f"[MachineService] Error getting profile for BSN {bsn}: Status {response.status_code}")
-                return None
+                # Handle different response types
+                if response.status_code == 200:
+                    return profile_transform(content.data)
+                elif response.status_code == 404:
+                    logger.warning(f"[MachineService] Profile not found for BSN: {bsn}")
+                    return None
+                else:
+                    logger.error(f"[MachineService] Error getting profile for BSN {bsn}: Status {response.status_code}")
+                    return None
+        except UnexpectedStatus as e:
+            # Log the detailed error and re-raise with more context
+            error_message = e.content.decode("utf-8") if e.content else "No response content"
+            logger.error(f"[MachineService] Connection error getting profile for BSN {bsn}: {error_message}")
+            # Re-raise the exception so it can be handled by the calling code
+            raise
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         # Instantiate the API client with service-specific base URL
