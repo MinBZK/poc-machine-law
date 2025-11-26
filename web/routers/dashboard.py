@@ -60,6 +60,13 @@ LAW_MAPPING = {
         "type": "tax",
         "display_name": "Inkomstenbelasting",
     },
+    "beleidsregels_bijzondere_bijstand_amsterdam/woonkostentoeslag": {
+        "field": "woonkostentoeslag",
+        "per_month": True,  # Monthly amount
+        "type": "benefit",
+        "display_name": "Woonkostentoeslag",
+        "condition_field": "is_gerechtigd",  # Only count if this is True
+    },
 }
 
 

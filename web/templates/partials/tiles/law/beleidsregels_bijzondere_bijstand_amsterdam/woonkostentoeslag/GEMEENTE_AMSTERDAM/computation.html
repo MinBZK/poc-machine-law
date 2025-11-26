@@ -1,0 +1,39 @@
+<div>
+    {% if result.woonkostentoeslag %}
+        <h4 class="text-sm font-medium text-gray-600 mb-2">Uw woonkostentoeslag is waarschijnlijk</h4>
+        <div class="flex items-baseline">
+            <span class="text-4xl font-bold text-amber-600">{{ (result.woonkostentoeslag / 100) | format_currency }}</span>
+            <span class="ml-2 text-gray-600">per maand</span>
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </div>
+        {% if result.is_lening %}
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p class="text-sm text-amber-800">
+                    <span class="font-medium">Let op:</span> Deze toeslag wordt als lening verstrekt vanwege de overwaarde van uw woning.
+                </p>
+            </div>
+        {% endif %}
+        <div class="mt-4 bg-gray-50 p-3 rounded-lg">
+            <h5 class="text-sm font-medium text-gray-700 mb-2">Informatie</h5>
+            <p class="text-sm text-gray-600">
+                De woonkostentoeslag is bedoeld voor mensen met hoge woonlasten.
+                U kunt maximaal 12 maanden woonkostentoeslag ontvangen.
+            </p>
+        </div>
+    {% else %}
+        <h4 class="text-sm font-medium text-gray-500 mb-1">
+            U krijgt waarschijnlijk geen woonkostentoeslag.
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </h4>
+    {% endif %}
+</div>

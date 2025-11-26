@@ -1,0 +1,44 @@
+{% extends "partials/tiles/base_tile.html" %}
+{% block tile_content %}
+    {% include "partials/tiles/law/beleidsregels_bijzondere_bijstand_amsterdam/woonkostentoeslag/GEMEENTE_AMSTERDAM/computation.html" %}
+    {% if result.woonkostentoeslag and current_case and current_case.status in ['IN_REVIEW', 'DECIDED'] and current_case.claimed_result %}
+        {% if result.woonkostentoeslag != current_case.claimed_result.woonkostentoeslag %}
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h4 class="font-medium text-gray-900 mb-2">Verschil met eerdere aanvraag</h4>
+                <p class="text-sm text-gray-600 mb-4">
+                    U vroeg eerder {{ (current_case.claimed_result.woonkostentoeslag / 100) | format_currency }} woonkostentoeslag aan.
+                </p>
+                <button type="button"
+                        hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+                        hx-target="#shared-application-panel"
+                        hx-swap="innerHTML"
+                        class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                    Wijzig aanvraag
+                </button>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% block submit_button %}
+    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+            hx-target="#shared-application-panel"
+            hx-swap="innerHTML"
+            class="w-full px-6 py-3 bg-amber-600 text-white text-center rounded-md hover:bg-amber-700 transition-colors cursor-pointer">
+        Woonkostentoeslag aanvragen
+    </button>
+{% endblock %}
+{% block submitted_status %}
+    <p class="text-sm text-gray-600 text-center">
+        Heeft u vragen? Bel 14 020 of kijk op <a href="https://amsterdam.nl/bijzondere-bijstand" class="underline">amsterdam.nl/bijzondere-bijstand</a>.
+    </p>
+{% endblock %}
+{% block approved_status %}
+    <p class="text-sm text-green-600 text-center">
+        Uw aanvraag is goedgekeurd, uw woonkostentoeslag zal maandelijks worden uitgekeerd.
+    </p>
+{% endblock %}
+{% block not_eligible_questions %}
+    <p class="text-sm text-gray-600 text-center">
+        Heeft u vragen? Bel 14 020 of kijk op <a href="https://amsterdam.nl/bijzondere-bijstand" class="underline">amsterdam.nl/bijzondere-bijstand</a>.
+    </p>
+{% endblock %}
