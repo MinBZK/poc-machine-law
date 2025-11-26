@@ -23,48 +23,6 @@ router = APIRouter(prefix="/edit", tags=["edit"])
 logger = logging.getLogger(__name__)
 
 
-def _parse_form_value(value: str):
-    """
-    Parse a form value, handling all types including objects as single values.
-    This ensures that when object values are submitted, they are treated as single claims
-    with the complete object value rather than being broken down into multiple claims.
-    """
-    if not value:
-        return value
-    
-    try:
-        # Try parsing as JSON first (handles booleans, objects, arrays)
-        if value.lower() in ("true", "false"):
-            return value.lower() == "true"
-        # Try parsing as JSON array or object - keep as single value
-        elif value.startswith(("[", "{")):
-            try:
-                return json.loads(value)
-            except json.JSONDecodeError:
-                # If JSON parsing fails, keep original string
-                return value
-        # Try parsing as number
-        elif value.replace(".", "", 1).isdigit() or (
-            value.startswith("-") and value[1:].replace(".", "", 1).isdigit()
-        ):
-            return float(value) if "." in value else int(value)
-        # Try parsing as date
-        elif value and len(value.split("-")) == 3:
-            try:
-                from datetime import date
-
-                year, month, day = map(int, value.split("-"))
-                return date(year, month, day).isoformat()
-            except ValueError:
-                # If date parsing fails, keep original string
-                return value
-        else:
-            return value
-    except (json.JSONDecodeError, ValueError):
-        # If parsing fails, keep original string value
-        return value
-
-
 @router.get("/edit-form", response_class=HTMLResponse)
 async def get_edit_form(
     request: Request,
@@ -166,13 +124,70 @@ async def update_value(
         f"case_id: {case_id}, reason: {reason}, claimant: {claimant}"
     )
 
+    parsed_value = new_value
+    parsed_old_value = old_value
 
-    print(f"~~~~~~~~~~~~~~~~> Submitting claim with key {key} and new value {new_value}")
-    
+    # Parse new value
+    try:
+        # Try parsing as JSON first (handles booleans)
+        if new_value.lower() in ("true", "false"):
+            parsed_value = new_value.lower() == "true"
+        # Try parsing as JSON array or object
+        elif new_value.startswith(("[", "{")):
+            try:
+                parsed_value = json.loads(new_value)
+            except json.JSONDecodeError:
+                # If JSON parsing fails, keep original string
+                pass
+        # Try parsing as number
+        elif new_value.replace(".", "", 1).isdigit() or (
+            new_value.startswith("-") and new_value[1:].replace(".", "", 1).isdigit()
+        ):
+            parsed_value = float(new_value) if "." in new_value else int(new_value)
+        # Try parsing as date
+        elif new_value and len(new_value.split("-")) == 3:
+            try:
+                from datetime import date
 
-    # Parse new value - handle all types including objects as single values
-    parsed_value = _parse_form_value(new_value)
-    parsed_old_value = _parse_form_value(old_value)
+                year, month, day = map(int, new_value.split("-"))
+                parsed_value = date(year, month, day).isoformat()
+            except ValueError:
+                # If date parsing fails, keep original string
+                pass
+    except (json.JSONDecodeError, ValueError):
+        # If parsing fails, keep original string value
+        pass
+
+    # Parse old value using the same logic
+    try:
+        # Try parsing as JSON first (handles booleans)
+        if old_value.lower() in ("true", "false"):
+            parsed_old_value = old_value.lower() == "true"
+        # Try parsing as JSON array or object
+        elif old_value.startswith(("[", "{")):
+            try:
+                parsed_old_value = json.loads(old_value)
+            except json.JSONDecodeError:
+                # If JSON parsing fails, keep original string
+                pass
+        # Try parsing as number
+        elif old_value.replace(".", "", 1).isdigit() or (
+            old_value.startswith("-") and old_value[1:].replace(".", "", 1).isdigit()
+        ):
+            parsed_old_value = float(old_value) if "." in old_value else int(old_value)
+        # Try parsing as date
+        elif old_value and len(old_value.split("-")) == 3:
+            try:
+                from datetime import date
+
+                year, month, day = map(int, old_value.split("-"))
+                parsed_old_value = date(year, month, day).isoformat()
+            except ValueError:
+                # If date parsing fails, keep original string
+                pass
+    except (json.JSONDecodeError, ValueError):
+        # If parsing fails, keep original string value
+        pass
 
     # Note: No special handling needed for eurocent here, as the frontend already converts
     # the display value (e.g., €10.50) to the actual value in cents (1050) before submission
