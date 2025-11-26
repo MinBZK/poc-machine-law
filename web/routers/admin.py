@@ -426,6 +426,64 @@ async def complete_review(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/cases/{case_id}/process-berekend")
+async def process_berekend(
+    request: Request,
+    case_id: UUID,
+    action: str = Form(...),
+    reason: str = Form(""),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+    services: EngineInterface = Depends(get_machine_service),
+):
+    """Process a case in BEREKEND status - either approve (voorschot) or reject"""
+    try:
+        case = case_manager.get_case_by_id(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+
+        if case.status != CaseStatus.BEREKEND:
+            raise HTTPException(status_code=400, detail=f"Case moet status BEREKEND hebben, maar heeft status {case.status}")
+
+        # Get simulated date from request headers or use today
+        simulated_date_str = request.headers.get("X-Simulated-Date")
+        if simulated_date_str:
+            simulated_date = datetime.strptime(simulated_date_str, "%Y-%m-%d").date()
+        else:
+            from datetime import date as date_type
+            simulated_date = date_type.today()
+
+        if action == "voorschot":
+            # Stel voorschot vast (AWIR Art. 16)
+            case_manager.stel_voorschot_vast(case_id=case_id, beschikking_datum=simulated_date)
+            result_message = "Voorschot vastgesteld"
+        elif action == "afwijzen":
+            if not reason:
+                reason = "Afgewezen door ambtenaar"
+            case_manager.wijs_af(case_id=case_id, reden=reason)
+            result_message = f"Afgewezen: {reason}"
+        else:
+            raise HTTPException(status_code=400, detail=f"Onbekende actie: {action}")
+
+        # Return success message
+        return templates.TemplateResponse(
+            "admin/partials/event_detail.html",
+            {
+                "request": request,
+                "event": {
+                    "event_type": "Processed",
+                    "timestamp": datetime.now(),
+                    "data": {"action": action, "reason": reason, "result": result_message},
+                },
+                "is_first": True,
+            },
+        )
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/cases/{case_id}")
 async def view_case(
     request: Request,

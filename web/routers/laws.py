@@ -26,6 +26,69 @@ router = APIRouter(prefix="/laws", tags=["laws"])
 logger = logging.getLogger(__name__)
 
 
+def _check_awir_needs_review(
+    case,
+    current_jaarbedrag: int,
+    case_manager: CaseManagerInterface,
+    has_claims: bool = False,
+    claim_manager: ClaimManagerInterface | None = None,
+    bsn: str | None = None,
+    service: str | None = None,
+    law: str | None = None,
+) -> dict | None:
+    """
+    Check of een AWIR case handmatige review nodig heeft.
+    Bij ELK verschil t.o.v. vorig jaar OF claims (wijzigingen) → IN_REVIEW.
+
+    Args:
+        case: Het huidige Case object
+        current_jaarbedrag: Het berekende jaarbedrag voor dit jaar
+        case_manager: De CaseManager voor opvragen vorig jaar case
+        has_claims: Of er claims (wijzigingen door burger) zijn
+        claim_manager: De ClaimManager voor opvragen claims
+        bsn: BSN van de burger
+        service: Service type
+        law: Law identifier
+
+    Returns:
+        None als geen review nodig, anders dict met previous_result en reason
+    """
+    # Check 1: Zijn er claims (wijzigingen door de burger)?
+    if has_claims and claim_manager and bsn and service and law:
+        claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
+        relevant_claims = [
+            claim
+            for claim in claims
+            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
+        ]
+        if relevant_claims:
+            # Er zijn wijzigingen door de burger - naar review
+            claim_details = {claim.key: claim.new_value for claim in relevant_claims}
+            return {
+                "previous_result": {"wijzigingen": "brongegevens"},
+                "current_result": {"wijzigingen": claim_details},
+                "reason": "Wijziging in gegevens door burger doorgegeven",
+            }
+
+    # Check 2: Is er een vorig jaar case om mee te vergelijken?
+    vorig_jaar_case_id = getattr(case, "vorig_jaar_case_id", None)
+    if vorig_jaar_case_id:
+        vorig_jaar_case = case_manager.get_case_by_id(vorig_jaar_case_id)
+        if vorig_jaar_case:
+            # Vergelijk berekend jaarbedrag met vorig jaar
+            vorig_jaarbedrag = vorig_jaar_case.berekend_jaarbedrag or 0
+
+            # Bij ELK verschil → naar review
+            if current_jaarbedrag != vorig_jaarbedrag:
+                return {
+                    "previous_result": {"jaarbedrag": vorig_jaarbedrag},
+                    "current_result": {"jaarbedrag": current_jaarbedrag},
+                    "reason": "Wijziging in gegevens gedetecteerd t.o.v. vorig jaar",
+                }
+
+    return None
+
+
 def get_primary_amount_value(rule_spec: dict, output: dict) -> int:
     """
     Haal de som van primary output waarden op basis van citizen_relevance: primary.
@@ -276,15 +339,41 @@ async def submit_case(
             berekening_datum=simulated_date,
         )
 
-        if heeft_aanspraak:
-            # Check if there's already a VOORSCHOT beschikking (prevent duplicate events)
-            case = case_manager.get_case_by_id(case_id)
+        # Get the case to check for review requirements
+        case = case_manager.get_case_by_id(case_id)
+
+        # Check if manual review is needed due to changes vs previous year OR claims
+        # approved=False means claims were applied (burger has made changes)
+        has_claims = not approved
+        needs_review = _check_awir_needs_review(
+            case=case,
+            current_jaarbedrag=berekend_jaarbedrag,
+            case_manager=case_manager,
+            has_claims=has_claims,
+            claim_manager=claim_manager,
+            bsn=bsn,
+            service=service,
+            law=law,
+        )
+
+        if needs_review:
+            # Changes detected - route to manual review (IN_REVIEW)
+            reason = needs_review.get("reason", "Wijziging in gegevens gedetecteerd")
+            case_manager.select_for_manual_review(
+                case_id=case_id,
+                verifier_id="SYSTEM",
+                reason=reason,
+                claimed_result=needs_review.get("current_result", {}),
+                verified_result=needs_review.get("previous_result", {}),
+            )
+        elif heeft_aanspraak:
+            # No review needed and has entitlement - proceed to voorschot
             has_voorschot = any(b.get("type") == "VOORSCHOT" for b in (case.beschikkingen or []))
             if not has_voorschot:
                 # Set voorschot (AWIR Art. 16) - triggers VoorschotBeschikkingVastgesteld event
                 case_manager.stel_voorschot_vast(case_id=case_id, beschikking_datum=simulated_date)
         else:
-            # Reject (AWIR Art. 16 lid 4) - triggers Afgewezen event
+            # No entitlement - reject (AWIR Art. 16 lid 4)
             case_manager.wijs_af(case_id=case_id, reden="Geen aanspraak op basis van berekening")
 
     case = case_manager.get_case_by_id(case_id)

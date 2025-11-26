@@ -160,8 +160,8 @@ class Case(Aggregate):
     def select_for_manual_review(
         self, verifier_id: str, reason: str, claimed_result: dict, verified_result: dict
     ) -> None:
-        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.OBJECTED]:
-            raise ValueError("Can only add to review from submitted status or objection")
+        if self.status not in [CaseStatus.SUBMITTED, CaseStatus.OBJECTED, CaseStatus.BEREKEND]:
+            raise ValueError("Can only add to review from submitted, objection or berekend status")
         self.status = CaseStatus.IN_REVIEW
         self.verified_result = verified_result
         self.claimed_result = claimed_result

@@ -103,6 +103,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                             </svg>
                         </span>
+                        {% elif event.type == 'bericht' %}
+                        <!-- Envelope icon for berichten (indigo) -->
+                        <span class="w-6 h-6 bg-indigo-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </span>
                         {% elif event.is_past %}
                         <span class="w-3 h-3 bg-blue-600 rounded-full inline-block"></span>
                         {% else %}
@@ -126,6 +133,9 @@
                         <span class="text-orange-600 hover:underline">{{ event.label }}</span>
                         {% elif event.type == 'vereffening' %}
                         <span class="text-gray-700 font-medium hover:underline">{{ event.label }}</span>
+                        {% elif event.type == 'bericht' %}
+                        <span class="text-indigo-600 font-medium">{{ event.label }}</span>
+                        <a href="/berichten/{{ event.message_id }}?bsn={{ event.bsn }}" class="ml-2 text-sm text-indigo-500 hover:text-indigo-700 hover:underline">Ga naar bericht →</a>
                         {% else %}
                         <span class="text-blue-600 hover:underline">{{ event.label }}</span>
                         {% endif %}
@@ -212,7 +222,8 @@ function openEventPanel(element) {
         'herberekening': 'De maandelijkse herberekening is uitgevoerd op basis van actuele gegevens.',
         'betaling': 'Het maandelijkse voorschotbedrag is overgemaakt naar uw rekening.',
         'definitieve_beschikking': 'Het jaar is afgesloten met de definitieve beschikking. Het definitieve bedrag is vastgesteld op basis van uw werkelijke inkomen.',
-        'vereffening': 'De vereffening is uitgevoerd. Het verschil tussen voorschot en definitief bedrag is berekend en verwerkt.'
+        'vereffening': 'De vereffening is uitgevoerd. Het verschil tussen voorschot en definitief bedrag is berekend en verwerkt.',
+        'bericht': 'Er is een bericht naar u verstuurd over uw toeslag. U kunt dit bericht bekijken in uw berichtenbox.'
     };
 
     contentHtml += `<p class="mb-4">${descriptions[eventType] || 'Details van deze gebeurtenis.'}</p>`;

@@ -155,12 +155,13 @@ def serialize_details(details: dict) -> dict:
     return {k: serialize_value(v) for k, v in details.items()}
 
 
-def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
+def build_timeline_for_case(toeslag, format_cents_fn, messages: list = None) -> list[dict]:
     """Build timeline events for a single case.
 
     Args:
         toeslag: Case object
         format_cents_fn: Function to format cents as currency string
+        messages: Optional list of Message objects for this case
 
     Returns:
         List of timeline event dicts
@@ -247,11 +248,17 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
         # Use friendly label or fallback to formatted type
         label = BESCHIKKING_LABELS.get(beschikking_type, beschikking_type.replace("_", " ").title())
 
+        # For IB-aanslag, use different zaak_label (Inkomstenbelasting instead of Zorgtoeslag/etc)
+        if beschikking_type == "IB_AANSLAG_ONTVANGEN":
+            event_zaak_label = f"Inkomstenbelasting {berekeningsjaar}"
+        else:
+            event_zaak_label = zaak_label
+
         timeline.append({
             "type": "beschikking",
             "label": label,
             "date": beschikking_datum,
-            "zaak_label": zaak_label,
+            "zaak_label": event_zaak_label,
             "zaak_id": zaak_id,
             "details": details,
         })
@@ -351,6 +358,32 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
                 "Bedrag": format_cents_fn(vereffening_bedrag),
             }),
         })
+
+    # Add message events (berichten verstuurd)
+    if messages:
+        for message in messages:
+            message_datum = message.created_at
+            if isinstance(message_datum, datetime):
+                message_datum = message_datum.date().isoformat()
+            elif isinstance(message_datum, date):
+                message_datum = message_datum.isoformat()
+
+            # Use the message subject (onderwerp) as the label
+            message_label = f"Bericht verstuurd: {message.onderwerp}"
+
+            timeline.append({
+                "type": "bericht",
+                "label": message_label,
+                "date": message_datum,
+                "zaak_label": zaak_label,
+                "zaak_id": zaak_id,
+                "message_id": str(message.id),
+                "bsn": message.bsn,
+                "details": serialize_details({
+                    "Onderwerp": message.onderwerp,
+                    "Status": message.status.value if hasattr(message.status, "value") else str(message.status),
+                }),
+            })
 
     return timeline
 
@@ -523,7 +556,9 @@ async def zaken_tijdlijn(
         # Build combined timeline from all toeslagen
         timeline = []
         for case in toeslagen:
-            timeline.extend(build_timeline_for_case(case, format_cents))
+            # Get messages for this case
+            case_messages = message_manager.get_messages_by_case(str(case.id))
+            timeline.extend(build_timeline_for_case(case, format_cents, messages=case_messages))
 
         # Sort timeline by date
         def get_sort_date(event):
@@ -644,7 +679,9 @@ async def zaken_detail(
     # Build combined timeline from all related cases
     timeline = []
     for case in related_cases:
-        timeline.extend(build_timeline_for_case(case, format_cents))
+        # Get messages for this case
+        case_messages = message_manager.get_messages_for_case(str(case.id))
+        timeline.extend(build_timeline_for_case(case, format_cents, messages=case_messages))
 
     # Sort timeline by date
     def get_sort_date(event):
