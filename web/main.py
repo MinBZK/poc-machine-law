@@ -17,6 +17,7 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
+from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 from web.feature_flags import (
     is_change_wizard_enabled,
     is_chat_enabled,
@@ -123,9 +124,47 @@ async def root(
     except ValueError:
         effective_date = datetime.now()
 
-    profile = services.get_profile_data(bsn, effective_date=effective_date.date())
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
+    try:
+        profile = services.get_profile_data(bsn, effective_date=effective_date.date())
+        if not profile:
+            raise HTTPException(status_code=404, detail="Profile not found")
+    except UnexpectedStatus as e:
+        error_message = e.content.decode('utf-8') if e.content else 'No response content'
+        # Log the exception for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"UnexpectedStatus caught in main.py: status_code={e.status_code}, content={error_message}")
+        
+        # Instead of raising HTTPException, return an error template
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_title": "Verbindingsfout",
+                "error_message": f"Kan geen verbinding maken met de server: {error_message}",
+                "error_details": "Controleer of de backend service actief is en probeer het opnieuw.",
+                "bsn": bsn,
+            },
+            status_code=500
+        )
+    except Exception as e:
+        # Catch any other exceptions for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Unexpected exception in main.py: {type(e).__name__}: {e}", exc_info=True)
+        
+        # Return error template for any exception
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error_title": "Onverwachte fout",
+                "error_message": f"Er is een onverwachte fout opgetreden: {str(e)}",
+                "error_details": "Probeer het later opnieuw of neem contact op met de beheerder.",
+                "bsn": bsn,
+            },
+            status_code=500
+        )
 
     # Get accepted cases for this BSN
     all_cases = case_manager.get_cases_by_bsn(bsn)
