@@ -11,6 +11,7 @@ from machine.events.case.aggregate import CaseStatus
 from machine.events.toeslag.timesimulator import TimeSimulator
 from web.dependencies import (
     get_machine_service,
+    get_message_manager,
     get_simulated_date,
     get_zaken_case_manager,
     set_simulated_date,
@@ -225,6 +226,11 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
     # Add beschikkingen
     for beschikking in (toeslag.beschikkingen or []):
         beschikking_type = beschikking.get("type", "ONBEKEND")
+
+        # Skip DEFINITIEF - we add a separate, more detailed event for this below
+        if beschikking_type == "DEFINITIEF":
+            continue
+
         beschikking_datum = beschikking.get("datum")
         if isinstance(beschikking_datum, date):
             beschikking_datum = beschikking_datum.isoformat()
@@ -495,11 +501,13 @@ async def zaken_tijdlijn(
     bsn: str = "100000001",
     machine_service: EngineInterface = Depends(get_machine_service),
     case_manager=Depends(get_zaken_case_manager),
+    message_manager=Depends(get_message_manager),
 ):
     """Show combined multi-year timeline for all toeslagen for a BSN"""
     try:
         profile = machine_service.get_profile_data(bsn)
         simulated_date = get_simulated_date(request)
+        unread_count = message_manager.get_unread_count(bsn)
 
         # Get all toeslagen for this BSN
         all_cases = case_manager.get_cases_by_bsn(bsn)
@@ -567,6 +575,7 @@ async def zaken_tijdlijn(
                 "today": date.today().isoformat(),
                 "aanvraag_datum_display": aanvraag_datum_display,
                 "related_cases": toeslagen,
+                "unread_count": unread_count,
             },
         )
     except Exception as e:
@@ -581,10 +590,12 @@ async def zaken_detail(
     bsn: str = "100000001",
     machine_service: EngineInterface = Depends(get_machine_service),
     case_manager=Depends(get_zaken_case_manager),
+    message_manager=Depends(get_message_manager),
 ):
     """Show toeslag detail with full multi-year timeline"""
     profile = machine_service.get_profile_data(bsn)
     simulated_date = get_simulated_date(request)
+    unread_count = message_manager.get_unread_count(bsn)
 
     # Get case by ID
     toeslag = case_manager.get_case_by_id(case_id)
@@ -669,5 +680,6 @@ async def zaken_detail(
             "today": date.today().isoformat(),
             "aanvraag_datum_display": aanvraag_datum_display,
             "related_cases": related_cases,  # For multi-year display
+            "unread_count": unread_count,
         },
     )
