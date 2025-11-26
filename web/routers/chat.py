@@ -277,7 +277,7 @@ async def get_chat_page(
         if not profile:
             return HTMLResponse("Profile not found", status_code=404)
     except UnexpectedStatus as e:
-        error_message = e.content.decode('utf-8') if e.content else 'No response content'
+        error_message = e.content.decode("utf-8") if e.content else "No response content"
         return HTMLResponse(f"Server error: {error_message}", status_code=500)
 
     # Get available and configured LLM providers
@@ -372,7 +372,7 @@ async def websocket_endpoint(
                 manager.disconnect(client_id)
                 return
         except UnexpectedStatus as e:
-            error_message = e.content.decode('utf-8') if e.content else 'No response content'
+            error_message = e.content.decode("utf-8") if e.content else "No response content"
             error_msg = f"Server error getting profile for BSN {bsn}: {error_message}"
             print(error_msg)
             await websocket.send_text(json.dumps({"error": error_msg}))

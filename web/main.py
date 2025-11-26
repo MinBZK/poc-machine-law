@@ -129,12 +129,13 @@ async def root(
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
     except UnexpectedStatus as e:
-        error_message = e.content.decode('utf-8') if e.content else 'No response content'
+        error_message = e.content.decode("utf-8") if e.content else "No response content"
         # Log the exception for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"UnexpectedStatus caught in main.py: status_code={e.status_code}, content={error_message}")
-        
+
         # Instead of raising HTTPException, return an error template
         return templates.TemplateResponse(
             "error.html",
@@ -145,14 +146,15 @@ async def root(
                 "error_details": "Controleer of de backend service actief is en probeer het opnieuw.",
                 "bsn": bsn,
             },
-            status_code=500
+            status_code=500,
         )
     except Exception as e:
         # Catch any other exceptions for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Unexpected exception in main.py: {type(e).__name__}: {e}", exc_info=True)
-        
+
         # Return error template for any exception
         return templates.TemplateResponse(
             "error.html",
@@ -163,7 +165,7 @@ async def root(
                 "error_details": "Probeer het later opnieuw of neem contact op met de beheerder.",
                 "bsn": bsn,
             },
-            status_code=500
+            status_code=500,
         )
 
     # Get accepted cases for this BSN

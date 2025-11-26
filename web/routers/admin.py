@@ -36,7 +36,7 @@ def get_person_name(bsn: str, services: EngineInterface) -> str:
             return profile_data["name"]
     except UnexpectedStatus as e:
         # Log the detailed error but still fallback to BSN
-        error_message = e.content.decode('utf-8') if e.content else 'No response content'
+        error_message = e.content.decode("utf-8") if e.content else "No response content"
         print(f"Error getting profile for BSN {bsn}: {error_message}")
     except Exception:
         pass

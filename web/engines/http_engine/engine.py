@@ -269,7 +269,7 @@ class MachineService(EngineInterface):
                     return None
         except UnexpectedStatus as e:
             # Log the detailed error and re-raise with more context
-            error_message = e.content.decode('utf-8') if e.content else 'No response content'
+            error_message = e.content.decode("utf-8") if e.content else "No response content"
             logger.error(f"[MachineService] Connection error getting profile for BSN {bsn}: {error_message}")
             # Re-raise the exception so it can be handled by the calling code
             raise

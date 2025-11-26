@@ -102,9 +102,9 @@ def sync_detailed(
             **kwargs,
         )
     except httpx.ConnectError as e:
-        raise errors.UnexpectedStatus(0, f"Connection error: {str(e)}".encode('utf-8'))
+        raise errors.UnexpectedStatus(0, f"Connection error: {str(e)}".encode())
     except httpx.RequestError as e:
-        raise errors.UnexpectedStatus(0, f"Request error: {str(e)}".encode('utf-8'))
+        raise errors.UnexpectedStatus(0, f"Request error: {str(e)}".encode())
 
     return _build_response(client=client, response=response)
 
@@ -164,9 +164,9 @@ async def asyncio_detailed(
     try:
         response = await client.get_async_httpx_client().request(**kwargs)
     except httpx.ConnectError as e:
-        raise errors.UnexpectedStatus(0, f"Connection error: {str(e)}".encode('utf-8'))
+        raise errors.UnexpectedStatus(0, f"Connection error: {str(e)}".encode())
     except httpx.RequestError as e:
-        raise errors.UnexpectedStatus(0, f"Request error: {str(e)}".encode('utf-8'))
+        raise errors.UnexpectedStatus(0, f"Request error: {str(e)}".encode())
 
     return _build_response(client=client, response=response)
 
