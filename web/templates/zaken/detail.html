@@ -1,43 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="mb-8">
-    <!-- Simulated date banner -->
-    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sm text-indigo-700">
-                    <strong>Gesimuleerde datum:</strong> {{ simulated_date }}
-                </span>
-            </div>
-            <div class="flex items-center gap-2">
-                <form action="/zaken/simulate/reset" method="post" class="flex items-center gap-2">
-                    <input type="hidden" name="bsn" value="{{ bsn }}">
-                    <input type="hidden" name="case_id" value="{{ toeslag.id }}">
-                    <input type="hidden" name="reset_date" value="{{ today }}">
-                    <input type="hidden" name="redirect_url" value="{{ request.url }}">
-                    <button type="submit"
-                            class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-                        Reset naar vandaag
-                    </button>
-                </form>
-                <form action="/zaken/simulate/reset" method="post" class="flex items-center gap-2">
-                    <input type="hidden" name="bsn" value="{{ bsn }}">
-                    <input type="hidden" name="case_id" value="{{ toeslag.id }}">
-                    <input type="hidden" name="redirect_url" value="{{ request.url }}">
-                    <input type="date" name="reset_date" value="{{ simulated_date }}"
-                           class="text-sm px-2 py-1 border border-indigo-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
-                    <button type="submit"
-                            class="text-sm px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-                        Wijzig datum
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Header with back link -->
     <div class="flex items-center justify-between mb-6">
         <div>
