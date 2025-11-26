@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 
 from eventsourcing.domain import Aggregate, event
@@ -44,6 +44,7 @@ class Message(Aggregate):
         inhoud: str,
         rechtsmiddel_info: str | None = None,
         law: str | None = None,
+        datum: str | None = None,  # ISO date string (YYYY-MM-DD) for eventsourcing serialization
     ) -> None:
         self.bsn = bsn
         self.case_id = case_id
@@ -53,7 +54,17 @@ class Message(Aggregate):
         self.rechtsmiddel_info = rechtsmiddel_info
         self.law = law
         self.status = MessageStatus.CREATED
-        self.created_at = datetime.now()
+        # Use provided datum (from beschikking) or fall back to now
+        # datum is expected as ISO string (YYYY-MM-DD) for eventsourcing compatibility
+        if datum is not None:
+            if isinstance(datum, str):
+                self.created_at = datetime.fromisoformat(datum)
+            elif isinstance(datum, date) and not isinstance(datum, datetime):
+                self.created_at = datetime.combine(datum, datetime.min.time())
+            else:
+                self.created_at = datum
+        else:
+            self.created_at = datetime.now()
         self.sent_at: datetime | None = None
         self.read_at: datetime | None = None
 

@@ -90,6 +90,9 @@ class Case(Aggregate):
         self.voorschot_maandbedrag: int | None = None
         self.voorschot_beschikking_datum: date | None = None
 
+        # Afwijzing
+        self.afwijzing_datum: date | None = None
+
         # Maandelijkse gegevens
         self.huidige_maand: int = 0
         self.maandelijkse_berekeningen: list[dict[str, Any]] = []
@@ -323,12 +326,13 @@ class Case(Aggregate):
     ) -> None:
         """Aanvraag afgewezen wegens geen aanspraak (AWIR Art. 16 lid 4)"""
         self.status = CaseStatus.AFGEWEZEN
+        self.afwijzing_datum = afwijzing_datum or date.today()
         if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
             self.beschikkingen = []
         self.beschikkingen.append(
             {
                 "type": "AFWIJZING",
-                "datum": afwijzing_datum or date.today(),
+                "datum": self.afwijzing_datum,
                 "reden": reden,
             }
         )
@@ -582,3 +586,37 @@ class Case(Aggregate):
             if b["maand"] == maand:
                 return b
         return None
+
+    # =========================================================================
+    # Bericht onderwerp properties (voor YAML trigger mappings)
+    # =========================================================================
+
+    @property
+    def _law_display_name(self) -> str:
+        """Leesbare naam voor de wet (bijv. 'Zorgtoeslag' voor 'zorgtoeslagwet')"""
+        # Map law identifiers to readable names
+        law_names = {
+            "zorgtoeslagwet": "Zorgtoeslag",
+            "huurtoeslag": "Huurtoeslag",
+            "kinderopvangtoeslag": "Kinderopvangtoeslag",
+            "kindgebonden_budget": "Kindgebonden budget",
+        }
+        return law_names.get(self.law, self.law.replace("_", " ").title() if self.law else "Toeslag")
+
+    @property
+    def voorschot_onderwerp(self) -> str:
+        """Onderwerp voor voorschotbeschikking bericht"""
+        jaar = self.berekeningsjaar or (self.created_at.year if hasattr(self, "created_at") else "")
+        return f"Uw voorschotbeschikking {self._law_display_name} {jaar}"
+
+    @property
+    def afwijzing_onderwerp(self) -> str:
+        """Onderwerp voor afwijzingsbeschikking bericht"""
+        jaar = self.berekeningsjaar or (self.created_at.year if hasattr(self, "created_at") else "")
+        return f"Beslissing op uw aanvraag {self._law_display_name} {jaar}"
+
+    @property
+    def definitief_onderwerp(self) -> str:
+        """Onderwerp voor definitieve beschikking bericht"""
+        jaar = self.berekeningsjaar or (self.created_at.year if hasattr(self, "created_at") else "")
+        return f"Uw definitieve beschikking {self._law_display_name} {jaar}"

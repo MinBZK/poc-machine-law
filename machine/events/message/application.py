@@ -44,6 +44,7 @@ class MessageManager(Application):
         inhoud: str,
         rechtsmiddel_info: str | None = None,
         law: str | None = None,
+        datum=None,
     ) -> str:
         """
         Maak een nieuw bericht aan voor een burger.
@@ -56,6 +57,7 @@ class MessageManager(Application):
             inhoud: Inhoud van het bericht
             rechtsmiddel_info: Optionele rechtsmiddelenclausule (AWB Art. 3:45)
             law: Optionele wet identifier (bijv. "huurtoeslag", "zorgtoeslag")
+            datum: Optionele datum voor het bericht (van beschikking)
 
         Returns:
             ID van het aangemaakte bericht
@@ -68,6 +70,7 @@ class MessageManager(Application):
             inhoud=inhoud,
             rechtsmiddel_info=rechtsmiddel_info,
             law=law,
+            datum=datum,
         )
 
         # Markeer direct als verzonden (AWB Art. 3:41)

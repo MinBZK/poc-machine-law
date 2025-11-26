@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
@@ -447,7 +447,14 @@ class Services:
                                     if parts[1] == "id":
                                         mapping[name] = str(aggregate.id)
                                     else:
-                                        mapping[name] = getattr(aggregate, parts[1], None)
+                                        attr_value = getattr(aggregate, parts[1], None)
+                                        # Convert date/datetime to ISO string for eventsourcing serialization
+                                        if isinstance(attr_value, datetime):
+                                            mapping[name] = attr_value.isoformat()
+                                        elif isinstance(attr_value, date):
+                                            mapping[name] = attr_value.isoformat()
+                                        else:
+                                            mapping[name] = attr_value
                                 elif len(parts) == 1:
                                     # Try definitions first, then rule output
                                     definitions = rule.properties.get("definitions", {})
