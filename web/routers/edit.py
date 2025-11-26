@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from datetime import datetime
 
@@ -19,6 +20,7 @@ from web.engines import CaseManagerInterface, ClaimManagerInterface
 from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 
 router = APIRouter(prefix="/edit", tags=["edit"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/edit-form", response_class=HTMLResponse)
@@ -117,6 +119,11 @@ async def update_value(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle the value update by creating a claim"""
+    logger.warn(
+        f"Updating value - service: {service}, law: {law}, bsn: {bsn}, "
+        f"case_id: {case_id}, reason: {reason}, claimant: {claimant}"
+    )
+
     parsed_value = new_value
     parsed_old_value = old_value
 
@@ -303,6 +310,10 @@ async def update_missing_values(
 
     # Get form data
     form_data = await request.form()
+    logger.info(
+        f"Updating missing values - service: {service}, law: {law}, bsn: {bsn}, "
+        f"case_id: {case_id}, reason: {reason}, claimant: {claimant}"
+    )
 
     # Extract keys, values and types as lists
     keys_list = []

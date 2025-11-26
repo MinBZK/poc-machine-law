@@ -652,7 +652,7 @@ func (cm *ClaimManager) AddBeweringCaseID(ctx context.Context, txID string, bewe
 	}
 
 	if err := cm.caseManager.AddClaimToCase(ctx, caseID, beweringID); err != nil {
-		return fmt.Errorf("add claim: %w", err)
+		cm.logger.Warning("could not add claim to case", logger.NewField("err", err))
 	}
 
 	return nil
