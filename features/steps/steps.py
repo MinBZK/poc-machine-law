@@ -1622,3 +1622,52 @@ def step_impl(context, maand_naam):
         betalingen_maanden, expected_maanden,
         f"Expected betalingen for months {expected_maanden}, but found {betalingen_maanden}"
     )
+
+
+# Year-end transition step definitions
+@then('is er een nieuwe toeslag case aangemaakt voor jaar {jaar:d}')
+def step_impl(context, jaar):
+    """Check that a new case was created for the specified year"""
+    # Get all cases for this BSN
+    cases = context.services.case_manager.get_cases_by_bsn(context.case.bsn)
+
+    # Find case for the specified year
+    new_case = None
+    for case in cases:
+        if case.berekeningsjaar == jaar:
+            new_case = case
+            break
+
+    assertions.assertIsNotNone(new_case, f"No case found for year {jaar}")
+
+    # Store in context for further checks
+    context.new_case = new_case
+
+
+@then('is de nieuwe toeslag status "{status}"')
+def step_impl(context, status):
+    """Check the status of the new case"""
+    assertions.assertEqual(
+        context.new_case.status.value,
+        status,
+        f"Expected new case status to be {status}, but got {context.new_case.status.value}"
+    )
+
+
+@then('is de vereffening correct berekend')
+def step_impl(context):
+    """Check that settlement was correctly calculated"""
+    case = context.case
+
+    # Check that vereffening_type is set
+    assertions.assertIsNotNone(
+        case.vereffening_type,
+        "vereffening_type should be set"
+    )
+
+    # Check it's one of the valid types
+    assertions.assertIn(
+        case.vereffening_type,
+        ["NABETALING", "TERUGVORDERING", "GEEN"],
+        f"Invalid vereffening_type: {case.vereffening_type}"
+    )

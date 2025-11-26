@@ -207,7 +207,6 @@ async def submit_case(
     """Submit a new case"""
     law = unquote(law)
 
-    effective_date_str = request.query_params.get("date")
     law, result, parameters = evaluate_law(
         bsn,
         law,
@@ -215,18 +214,8 @@ async def submit_case(
         machine_service,
         approved=approved,
         claim_manager=claim_manager,
-        effective_date=effective_date_str,
+        effective_date=request.query_params.get("date"),
     )
-
-    # For TOESLAGEN, set berekeningsjaar based on effective date or current year
-    if service == "TOESLAGEN":
-        from datetime import datetime
-
-        if effective_date_str:
-            berekeningsjaar = datetime.strptime(effective_date_str, "%Y-%m-%d").year
-        else:
-            berekeningsjaar = datetime.now().year
-        parameters["berekeningsjaar"] = berekeningsjaar
 
     case_id = case_manager.submit_case(
         bsn=bsn,

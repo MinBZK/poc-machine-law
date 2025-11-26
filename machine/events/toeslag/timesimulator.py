@@ -14,13 +14,10 @@ from typing import TYPE_CHECKING, Any
 
 from dateutil.relativedelta import relativedelta
 
-from machine.events.case.aggregate import CaseStatus
-
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from machine.events.case.application import CaseManager
-    from machine.events.message.application import MessageManager
     from machine.service import Services
 
 
@@ -49,6 +46,19 @@ class YearResult:
         self.maanden.append(month_result)
         self.totaal_berekend += month_result.berekend_bedrag
         self.totaal_betaald += month_result.betaald_bedrag
+
+
+@dataclass
+class YearEndResult:
+    """Resultaat van jaar-einde verwerking"""
+
+    berekeningsjaar: int
+    totaal_berekend: int
+    totaal_betaald: int
+    definitief_jaarbedrag: int
+    vereffening_type: str  # NABETALING / TERUGVORDERING / GEEN
+    vereffening_bedrag: int
+    new_case_id: str | None = None
 
 
 class TimeSimulator:
@@ -88,7 +98,6 @@ class TimeSimulator:
         start_date: date,
         services_factory: Callable[[str], "Services"] | None = None,
         services: "Services | None" = None,
-        message_manager: "MessageManager | None" = None,
     ) -> None:
         """
         Initialiseer de simulator.
@@ -98,12 +107,10 @@ class TimeSimulator:
             start_date: Startdatum voor de simulatie
             services_factory: Factory functie die een Services instance maakt voor een datum (optioneel)
             services: Directe Services instance (optioneel, heeft voorrang boven factory)
-            message_manager: De MessageManager voor berichten generatie (optioneel)
         """
         self.services_factory = services_factory
         self._services: Services | None = services
         self.case_manager = case_manager
-        self.message_manager: MessageManager | None = message_manager
         self.current_date = start_date
         self._initial_start_date = start_date  # Store for reference in step_to_date
 
@@ -123,6 +130,8 @@ class TimeSimulator:
         if self.services_factory is not None:
             self._services = None
 
+    _eval_count = 0  # Class-level counter for debugging
+
     def _evaluate_case(
         self,
         case_id: str,
@@ -134,6 +143,9 @@ class TimeSimulator:
         Returns:
             Dict met berekende waarden (hoogte_toeslag, heeft_recht, etc.)
         """
+        TimeSimulator._eval_count += 1
+        logger.warning(f"[EVAL #{TimeSimulator._eval_count}] Evaluating case {case_id[:8]}... at {self.current_date}")
+
         case = self.case_manager.get_case_by_id(case_id)
         if case is None:
             raise ValueError(f"Case niet gevonden: {case_id}")
@@ -158,6 +170,7 @@ class TimeSimulator:
         parameters: dict[str, Any],
         trigger: str = "schedule",
         gewijzigde_data: list[str] | None = None,
+        process_date: date | None = None,
     ) -> MonthResult:
         """
         Verwerk een enkele maand: herberekening + betaling.
@@ -168,10 +181,14 @@ class TimeSimulator:
             parameters: Parameters voor de rules engine (moet BSN bevatten)
             trigger: Trigger type ("schedule" of "data_change")
             gewijzigde_data: Lijst van gewijzigde velden (bij data_change)
+            process_date: Datum voor berekening/betaling (default: self.current_date)
 
         Returns:
             MonthResult met de verwerkte gegevens
         """
+        # Gebruik process_date als gegeven, anders current_date
+        effective_date = process_date if process_date is not None else self.current_date
+
         # Evalueer de toeslag voor deze maand
         evaluation = self._evaluate_case(case_id, parameters)
 
@@ -185,7 +202,7 @@ class TimeSimulator:
             maand=maand,
             berekend_bedrag=maandbedrag,
             trigger=trigger,
-            berekening_datum=self.current_date,  # Use simulated date
+            berekening_datum=effective_date,
         )
 
         # Betaling uitvoeren (op basis van voorschot, niet herberekening)
@@ -196,12 +213,12 @@ class TimeSimulator:
             case_id=case_id,
             maand=maand,
             betaald_bedrag=betaald_bedrag,
-            betaal_datum=self.current_date,  # Use simulated date
+            betaal_datum=effective_date,
         )
 
         return MonthResult(
             maand=maand,
-            reference_date=self.current_date,
+            reference_date=effective_date,
             berekend_bedrag=maandbedrag,
             betaald_bedrag=betaald_bedrag,
             trigger=trigger,
@@ -405,342 +422,152 @@ class TimeSimulator:
         logger.debug(f"║ Voorschot/mnd:   €{(case.voorschot_maandbedrag or 0) / 100:.2f}")
         logger.debug("╚══════════════════════════════════════════════════════════════")
 
-    def _check_year_completion(
+    def process_year_end(
         self,
         case_id: str,
-        current_date: date,
-        parameters: dict[str, Any],
-    ) -> dict[str, Any] | None:
+        year_end_date: date,
+        definitief_inkomen: int | None = None,
+    ) -> YearEndResult:
         """
-        Controleer of jaarafsluiting nodig is en voer automatisch uit.
-
-        Workflow volgens AWIR:
-        1. Na berekeningsjaar (1 april volgend jaar): IB-aanslag simuleren
-        2. Na IB-aanslag + 6 maanden: Definitief vaststellen (Art. 19)
-        3. Na definitief + 4 weken: Vereffenen (Art. 24)
+        Process year-end settlement and final calculation.
 
         Args:
-            case_id: ID van de case
-            current_date: Huidige gesimuleerde datum
-            parameters: Parameters voor herberekening
+            case_id: ID of the case to process
+            year_end_date: Date of year-end processing
+            definitief_inkomen: Final definitive income (if provided, triggers re-evaluation)
 
         Returns:
-            Dict met uitgevoerde actie en details, of None als geen actie
+            YearEndResult with settlement details
         """
-        from datetime import timedelta
-
         case = self.case_manager.get_case_by_id(case_id)
 
-        # Skip als er geen berekeningsjaar is
-        if not hasattr(case, "berekeningsjaar") or case.berekeningsjaar is None:
-            return None
+        # Calculate totals from monthly data
+        totaal_berekend = sum(b.get("berekend_bedrag", 0) for b in case.maandelijkse_berekeningen)
+        totaal_betaald = sum(b.get("betaald_bedrag", 0) for b in case.maandelijkse_betalingen)
 
-        volgend_jaar = case.berekeningsjaar + 1
+        # Re-evaluate with definitief inkomen if provided
+        if definitief_inkomen is not None:
+            # Use definitief inkomen for final calculation
+            params_for_final = case.parameters.copy()
+            params_for_final["inkomen"] = definitief_inkomen
 
-        # =========================================================================
-        # Stap 1: IB-aanslag simuleren (1 april volgend jaar)
-        # =========================================================================
-        ib_aanslag_datum = date(volgend_jaar, 4, 1)
-        # IB-aanslag kan worden ontvangen als case LOPEND of VOORSCHOT is
-        # VOORSCHOT: case heeft voorschot maar geen maandelijkse verwerking gehad
-        # LOPEND: case is in actieve maandelijkse cyclus
-        if (
-            current_date >= ib_aanslag_datum
-            and case.status in {CaseStatus.LOPEND, CaseStatus.VOORSCHOT}
-            and case.ib_aanslag_datum is None
-        ):
-            # Simuleer IB-aanslag met herberekend inkomen
-            # We gebruiken het inkomen dat eerder is vastgesteld, of berekenen opnieuw
-            vastgesteld_inkomen = self._bereken_werkelijk_inkomen(case_id, parameters)
-
-            logger.debug(f"║ → IB-aanslag simulatie: €{vastgesteld_inkomen / 100:.2f} op {ib_aanslag_datum}")
-
-            self.case_manager.ontvang_ib_aanslag(
-                case_id=case_id,
-                vastgesteld_inkomen=vastgesteld_inkomen,
-                aanslag_datum=ib_aanslag_datum,
+            result = self.services.evaluate(
+                service="TOESLAGEN",
+                law=case.law,
+                parameters=params_for_final,
+                reference_date=year_end_date.isoformat(),
             )
-
-            return {
-                "actie": "IB_AANSLAG_ONTVANGEN",
-                "datum": ib_aanslag_datum,
-                "vastgesteld_inkomen": vastgesteld_inkomen,
-            }
-
-        # Refresh case na mogelijke IB-aanslag
-        case = self.case_manager.get_case_by_id(case_id)
-
-        # =========================================================================
-        # Stap 2: Definitief vaststellen (6 maanden na IB-aanslag)
-        # =========================================================================
-        if (
-            hasattr(case, "ib_aanslag_datum")
-            and case.ib_aanslag_datum is not None
-            and case.status in {CaseStatus.LOPEND, CaseStatus.VOORSCHOT}
-            and hasattr(case, "deadline_definitief")
-            and case.deadline_definitief is not None
-            and current_date >= case.deadline_definitief
-        ):
-            # Herbereken definitief bedrag op basis van werkelijk inkomen
-            definitief_bedrag = self._bereken_definitief_jaarbedrag(case_id, parameters)
-
-            logger.debug(
-                f"║ → Definitieve vaststelling: €{definitief_bedrag / 100:.2f} "
-                f"(deadline was {case.deadline_definitief})"
-            )
-
-            self.case_manager.stel_definitief_vast(
-                case_id=case_id,
-                definitief_jaarbedrag=definitief_bedrag,
-                beschikking_datum=current_date,
-            )
-
-            # Genereer bericht voor burger
-            self._create_workflow_bericht(
-                case_id=case_id,
-                bericht_type="DEFINITIEVE_BESCHIKKING",
-                details={"definitief_jaarbedrag": definitief_bedrag},
-            )
-
-            return {
-                "actie": "DEFINITIEF_VASTGESTELD",
-                "datum": current_date,
-                "definitief_jaarbedrag": definitief_bedrag,
-            }
-
-        # Refresh case na mogelijke definitieve vaststelling
-        case = self.case_manager.get_case_by_id(case_id)
-
-        # =========================================================================
-        # Stap 3: Vereffenen (4 weken na definitieve beschikking)
-        # =========================================================================
-        if case.status == CaseStatus.DEFINITIEF and case.vereffening_type is None:
-            # Bepaal datum van definitieve beschikking
-            definitief_datum = None
-            if hasattr(case, "beschikkingen") and case.beschikkingen:
-                for b in reversed(case.beschikkingen):
-                    if b.get("type") == "DEFINITIEF":
-                        definitief_datum = b.get("datum")
-                        break
-
-            if definitief_datum is None:
-                definitief_datum = case.definitieve_beschikking_datum
-
-            if definitief_datum is not None:
-                vereffening_deadline = definitief_datum + timedelta(weeks=4)
-
-                if current_date >= vereffening_deadline:
-                    logger.debug(f"║ → Vereffening uitvoeren (deadline was {vereffening_deadline})")
-
-                    result = self.case_manager.vereffen(case_id=case_id, vereffening_datum=current_date)
-
-                    # Genereer bericht voor burger
-                    if result["type"] == "KWIJTGESCHOLDEN":
-                        # Haal de oorspronkelijke case op voor het oorspronkelijke bedrag
-                        updated_case = self.case_manager.get_case_by_id(case_id)
-                        self._create_workflow_bericht(
-                            case_id=case_id,
-                            bericht_type="KWIJTSCHELDING_BESCHIKKING",
-                            details={
-                                "oorspronkelijk_bedrag": result.get("bedrag", 0),
-                                "kwijtschelding_reden": getattr(updated_case, "kwijtschelding_reden", "Art. 26a AWIR"),
-                            },
-                        )
-                    else:
-                        self._create_workflow_bericht(
-                            case_id=case_id,
-                            bericht_type="VEREFFENING_BESCHIKKING",
-                            details={
-                                "vereffening_type": result["type"],
-                                "vereffening_bedrag": result["bedrag"],
-                            },
-                        )
-
-                    return {
-                        "actie": "VEREFFEND",
-                        "datum": current_date,
-                        "vereffening_type": result["type"],
-                        "vereffening_bedrag": result["bedrag"],
-                    }
-
-        return None
-
-    def _bereken_werkelijk_inkomen(self, case_id: str, parameters: dict[str, Any]) -> int:
-        """
-        Bereken het werkelijke inkomen voor de IB-aanslag simulatie.
-
-        In een echte situatie zou dit inkomen van de Belastingdienst komen.
-        Voor de simulatie gebruiken we het inkomen uit de parameters of
-        een herberekening.
-
-        Returns:
-            Werkelijk inkomen in eurocent
-        """
-        # Gebruik het inkomen uit parameters als beschikbaar
-        if "inkomen" in parameters:
-            return parameters["inkomen"]
-
-        # Anders: haal uit de case of services
-        case = self.case_manager.get_case_by_id(case_id)
-
-        # Probeer uit de parameters van de oorspronkelijke aanvraag
-        if hasattr(case, "parameters") and case.parameters and "inkomen" in case.parameters:
-            return case.parameters["inkomen"]
-
-        # Fallback: evalueer opnieuw
-        evaluation = self._evaluate_case(case_id, parameters)
-        # Neem het toetsinginkomen uit de output als beschikbaar
-        if "toetsingsinkomen" in evaluation.get("output", {}):
-            return evaluation["output"]["toetsingsinkomen"]
-
-        # Laatste fallback: gebruik voorschot als basis
-        return case.voorschot_jaarbedrag or 0
-
-    def _bereken_definitief_jaarbedrag(self, case_id: str, parameters: dict[str, Any]) -> int:
-        """
-        Bereken het definitieve jaarbedrag op basis van werkelijk inkomen.
-
-        Dit is de herberekening die plaatsvindt bij definitieve vaststelling.
-
-        Returns:
-            Definitief jaarbedrag in eurocent
-        """
-        case = self.case_manager.get_case_by_id(case_id)
-
-        # Evalueer met het IB-aanslag inkomen als dat beschikbaar is
-        if hasattr(case, "ib_aanslag_inkomen") and case.ib_aanslag_inkomen is not None:
-            params = {**parameters, "inkomen": case.ib_aanslag_inkomen}
+            definitief_jaarbedrag = result.output.get("jaarbedrag", 0)
         else:
-            params = parameters
+            # Use original calculation
+            definitief_jaarbedrag = case.berekend_jaarbedrag
 
-        evaluation = self._evaluate_case(case_id, params)
-
-        return evaluation.get("hoogte_toeslag", 0)
-
-    def _create_workflow_bericht(
-        self,
-        case_id: str,
-        bericht_type: str,
-        details: dict[str, Any],
-    ) -> str | None:
-        """
-        Genereer een bericht voor een workflow stap.
-
-        Args:
-            case_id: ID van de case
-            bericht_type: Type bericht (DEFINITIEVE_BESCHIKKING, VEREFFENING_BESCHIKKING, etc.)
-            details: Details voor het bericht
-
-        Returns:
-            ID van het aangemaakte bericht, of None als message_manager niet beschikbaar is
-        """
-        if self.message_manager is None:
-            logger.debug("║ → Geen message_manager beschikbaar, bericht niet aangemaakt")
-            return None
-
-        case = self.case_manager.get_case_by_id(case_id)
-
-        # Bepaal onderwerp en inhoud op basis van type
-        if bericht_type == "DEFINITIEVE_BESCHIKKING":
-            onderwerp = f"Definitieve beschikking {case.law} {case.berekeningsjaar}"
-            definitief_bedrag = details.get("definitief_jaarbedrag", 0)
-            inhoud = (
-                f"Geachte heer/mevrouw,\n\n"
-                f"Hierbij ontvangt u de definitieve beschikking voor uw {case.law} over {case.berekeningsjaar}.\n\n"
-                f"Het definitief vastgestelde jaarbedrag is: €{definitief_bedrag / 100:.2f}\n\n"
-                f"Dit bedrag is berekend op basis van uw werkelijke inkomen zoals vastgesteld in uw IB-aanslag.\n\n"
-                f"Binnen 4 weken ontvangt u bericht over de vereffening.\n\n"
-                f"Met vriendelijke groet,\nBelastingdienst/Toeslagen"
-            )
-            rechtsmiddel_info = (
-                "Tegen deze beschikking kunt u binnen 6 weken bezwaar maken. "
-                "Zie voor meer informatie: www.toeslagen.nl/bezwaar"
-            )
-
-        elif bericht_type == "VEREFFENING_BESCHIKKING":
-            onderwerp = f"Vereffening {case.law} {case.berekeningsjaar}"
-            vereffening_type = details.get("vereffening_type", "GEEN")
-            vereffening_bedrag = details.get("vereffening_bedrag", 0)
-
-            if vereffening_type == "NABETALING":
-                inhoud = (
-                    f"Geachte heer/mevrouw,\n\n"
-                    f"Uit de vereffening van uw {case.law} over {case.berekeningsjaar} blijkt dat u recht heeft op "
-                    f"een nabetaling van €{vereffening_bedrag / 100:.2f}.\n\n"
-                    f"Dit bedrag wordt binnen 10 werkdagen op uw rekening gestort.\n\n"
-                    f"Met vriendelijke groet,\nBelastingdienst/Toeslagen"
-                )
-            elif vereffening_type == "TERUGVORDERING":
-                inhoud = (
-                    f"Geachte heer/mevrouw,\n\n"
-                    f"Uit de vereffening van uw {case.law} over {case.berekeningsjaar} blijkt dat u "
-                    f"€{vereffening_bedrag / 100:.2f} moet terugbetalen.\n\n"
-                    f"U ontvangt binnenkort een factuur met betalingsgegevens.\n\n"
-                    f"Met vriendelijke groet,\nBelastingdienst/Toeslagen"
-                )
-            else:
-                inhoud = (
-                    f"Geachte heer/mevrouw,\n\n"
-                    f"Uit de vereffening van uw {case.law} over {case.berekeningsjaar} blijkt dat "
-                    f"er geen verschil is tussen het voorschot en het definitieve bedrag.\n\n"
-                    f"Er volgt geen nabetaling of terugvordering.\n\n"
-                    f"Met vriendelijke groet,\nBelastingdienst/Toeslagen"
-                )
-            rechtsmiddel_info = (
-                "Tegen deze beschikking kunt u binnen 6 weken bezwaar maken. "
-                "Zie voor meer informatie: www.toeslagen.nl/bezwaar"
-            )
-
-        elif bericht_type == "KWIJTSCHELDING_BESCHIKKING":
-            onderwerp = f"Kwijtschelding terugvordering {case.law} {case.berekeningsjaar}"
-            oorspronkelijk_bedrag = details.get("oorspronkelijk_bedrag", 0)
-            inhoud = (
-                f"Geachte heer/mevrouw,\n\n"
-                f"Uit de vereffening van uw {case.law} over {case.berekeningsjaar} bleek een "
-                f"terugvordering van €{oorspronkelijk_bedrag / 100:.2f}.\n\n"
-                f"Omdat dit bedrag onder de doelmatigheidsgrens van €116,00 ligt, wordt deze "
-                f"terugvordering kwijtgescholden (AWIR Art. 26a).\n\n"
-                f"U hoeft niets terug te betalen.\n\n"
-                f"Met vriendelijke groet,\nBelastingdienst/Toeslagen"
-            )
-            rechtsmiddel_info = None  # Geen bezwaar tegen kwijtschelding nodig
-
-        else:
-            logger.warning(f"Onbekend bericht type: {bericht_type}")
-            return None
-
-        # Maak het bericht aan
-        message_id = self.message_manager.create_message(
-            bsn=case.bsn,
+        # Call stel_definitief_vast
+        self.case_manager.stel_definitief_vast(
             case_id=case_id,
-            message_type=bericht_type,
-            onderwerp=onderwerp,
-            inhoud=inhoud,
-            rechtsmiddel_info=rechtsmiddel_info,
-            law=case.law,
-            created_at=datetime.combine(self.current_date, datetime.min.time()),  # Use simulated date
+            definitief_jaarbedrag=definitief_jaarbedrag,
         )
 
-        logger.debug(f"║ → Bericht aangemaakt: {bericht_type} (ID: {message_id[:8]}...)")
-        return message_id
+        # Call vereffen to execute settlement
+        self.case_manager.vereffen(case_id=case_id)
+
+        # Reload case to get updated vereffening data
+        case = self.case_manager.get_case_by_id(case_id)
+
+        return YearEndResult(
+            berekeningsjaar=case.berekeningsjaar,
+            totaal_berekend=totaal_berekend,
+            totaal_betaald=totaal_betaald,
+            definitief_jaarbedrag=definitief_jaarbedrag,
+            vereffening_type=case.vereffening_type,
+            vereffening_bedrag=case.vereffening_bedrag,
+        )
+
+    def start_new_year(
+        self,
+        old_case_id: str,
+        new_year: int,
+        start_date: date,
+        updated_inkomen: int | None = None,
+    ) -> str:
+        """
+        Create and initialize a new case for the next year.
+
+        Args:
+            old_case_id: ID of the previous year's case
+            new_year: Year for the new case
+            start_date: Start date for the new case
+            updated_inkomen: Updated income for the new year (if different)
+
+        Returns:
+            ID of the newly created case
+        """
+        old_case = self.case_manager.get_case_by_id(old_case_id)
+
+        # Prepare parameters for new year
+        new_params = old_case.parameters.copy()
+        new_params["berekeningsjaar"] = new_year
+        if updated_inkomen is not None:
+            new_params["inkomen"] = updated_inkomen
+
+        # Create new case
+        new_case_id = self.case_manager.submit_case(
+            bsn=old_case.bsn,
+            service_type=old_case.service,
+            law=old_case.law,
+            parameters=new_params,
+            claimed_result={},  # AWIR workflow
+            approved_claims_only=old_case.approved_claims_only,
+        )
+
+        # Link to old case
+        new_case = self.case_manager.get_case_by_id(new_case_id)
+        new_case.vorig_jaar_case_id = str(old_case_id)
+        self.case_manager.save(new_case)
+
+        # Evaluate eligibility
+        result = self.services.evaluate(
+            service="TOESLAGEN",
+            law=old_case.law,
+            parameters=new_params,
+            reference_date=start_date.isoformat(),
+        )
+        heeft_aanspraak = result.output.get("heeft_aanspraak", False)
+        berekend_jaarbedrag = result.output.get("jaarbedrag", 0)
+
+        # Call bereken_aanspraak
+        self.case_manager.bereken_aanspraak(
+            case_id=new_case_id,
+            heeft_aanspraak=heeft_aanspraak,
+            berekend_jaarbedrag=berekend_jaarbedrag,
+        )
+
+        # Always set voorschot (even if 0) to transition case to VOORSCHOT status
+        # This allows time simulation to continue processing months
+        maandbedrag = berekend_jaarbedrag // 12 if heeft_aanspraak else 0
+        self.case_manager.stel_voorschot_vast(
+            case_id=new_case_id,
+            jaarbedrag=berekend_jaarbedrag if heeft_aanspraak else 0,
+            maandbedrag=maandbedrag,
+        )
+
+        return new_case_id
 
     def step_to_date(
         self,
         case_id: str,
         target_date: date,
         parameters: dict[str, Any],
-    ) -> list[MonthResult]:
+    ) -> list[MonthResult | YearEndResult]:
         """
-        Simuleer dag voor dag tot aan de doeldatum.
+        Simuleer maand voor maand tot aan de doeldatum.
 
-        Voor elke dag wordt gecontroleerd of er al een maandelijkse
-        berekening bestaat voor de huidige maand. Zo niet, dan wordt
-        deze aangemaakt (AWIR maandelijkse verwerking).
+        Voor elke maand wordt gecontroleerd of er al een maandelijkse
+        berekening bestaat. Zo niet, dan wordt deze aangemaakt
+        (AWIR maandelijkse verwerking).
 
-        Na het berekeningsjaar worden automatisch de volgende stappen uitgevoerd:
-        - IB-aanslag simulatie (1 april volgend jaar)
-        - Definitieve vaststelling (6 maanden na IB-aanslag)
-        - Vereffening (4 weken na definitieve beschikking)
+        Detecteert jaar grenzen en voert jaar-einde verwerking uit wanneer
+        de simulatie naar een volgend jaar gaat.
 
         Args:
             case_id: ID van de case
@@ -748,92 +575,104 @@ class TimeSimulator:
             parameters: Parameters voor de rules engine
 
         Returns:
-            Lijst van MonthResult objecten voor de verwerkte maanden
+            Lijst van MonthResult en YearEndResult objecten voor de verwerkte maanden
         """
-        from datetime import timedelta
-
-        results = []
-        year_completion_results = []
+        results: list[MonthResult | YearEndResult] = []
         case = self.case_manager.get_case_by_id(case_id)
 
         logger.debug("╔══════════════════════════════════════════════════════════════")
         logger.debug(f"║ TIME SIMULATION: {self.current_date} → {target_date}")
         logger.debug("╚══════════════════════════════════════════════════════════════")
 
-        # Zorg dat de case in LOPEND status is als we nog in het berekeningsjaar zijn
-        if case.huidige_maand == 0 and self.current_date.year == case.berekeningsjaar:
+        # Zorg dat de case in LOPEND status is
+        if case.huidige_maand == 0:
             logger.debug("║ → Transitie: VOORSCHOT → LOPEND (start maand 1)")
             self.case_manager.start_maand(case_id, 1)
 
         self._log_workflow_state(case_id, "START")
 
-        # Simuleer dag voor dag
-        last_logged_month = 0
+        # Iterate month by month (not day by day for performance)
         while self.current_date <= target_date:
             current_month = self.current_date.month
+            current_year = self.current_date.year
 
             # Controleer of er al een berekening is voor deze maand
             case = self.case_manager.get_case_by_id(case_id)
+            berekende_maanden = {b["maand"] for b in case.maandelijkse_berekeningen}
 
-            # =====================================================================
-            # Maandverwerking binnen berekeningsjaar
-            # =====================================================================
-            if self.current_date.year == case.berekeningsjaar and case.status == CaseStatus.LOPEND:
+            # Detecteer jaar grens: als we in een nieuw jaar zitten t.o.v. het berekeningsjaar
+            if case.berekeningsjaar is not None and current_year > case.berekeningsjaar:
+                logger.debug(f"╠─ JAAR GRENS GEDETECTEERD: {case.berekeningsjaar} → {current_year}")
+
+                # Process year-end for the old year
+                year_end_date = date(case.berekeningsjaar, 12, 31)
+                year_end_result = self.process_year_end(
+                    case_id=case_id,
+                    year_end_date=year_end_date,
+                    definitief_inkomen=parameters.get("definitief_inkomen"),
+                )
+                results.append(year_end_result)
+                logger.debug(
+                    f"╠─ Jaar-einde {case.berekeningsjaar}: vereffening={year_end_result.vereffening_type} "
+                    f"bedrag=€{year_end_result.vereffening_bedrag / 100:.2f}"
+                )
+
+                # Start new year
+                new_case_id = self.start_new_year(
+                    old_case_id=case_id,
+                    new_year=current_year,
+                    start_date=date(current_year, 1, 1),
+                    updated_inkomen=parameters.get("inkomen"),
+                )
+                logger.debug(f"╠─ Nieuw jaar {current_year} gestart: case_id={new_case_id[:8]}...")
+
+                # Store new case ID in year end result
+                year_end_result.new_case_id = new_case_id
+
+                # Switch to the new case
+                case_id = new_case_id
+                case = self.case_manager.get_case_by_id(case_id)
+
+                # Ensure new case is in LOPEND status
+                if case.huidige_maand == 0:
+                    self.case_manager.start_maand(case_id, 1)
+
+                # Refresh berekende_maanden for new case
                 berekende_maanden = {b["maand"] for b in case.maandelijkse_berekeningen}
 
-                # Verwerk alle gemiste maanden vanaf de simulatie startdatum tot en met de huidige maand
-                # We gebruiken de _initial_start_date (bewaard bij initialisatie) in plaats van created_at
-                # omdat created_at de echte systeemtijd is, niet de gesimuleerde tijd
-                simulation_start = self._initial_start_date
+            # Verwerk alle gemiste maanden vanaf de simulatie startdatum tot en met de huidige maand
+            # Gebruik de simulatie startdatum (niet case.created_at) om te bepalen vanaf welke maand
+            # verwerkt moet worden - case.created_at is de werkelijke aanmaaktijd, niet de gesimuleerde datum.
+            # Een case met simulatie startdatum in december hoeft alleen december te verwerken.
+            sim_start = self._initial_start_date
 
-                # Start vanaf maand 1 als simulatie start voor het berekeningsjaar,
-                # anders gebruik de maand van de simulatie startdatum
-                aanvraag_maand = 1 if simulation_start.year < case.berekeningsjaar else simulation_start.month
-                for maand in range(aanvraag_maand, current_month + 1):
-                    if maand not in berekende_maanden:
-                        logger.debug(f"╠─ Maand {maand}: geen berekening gevonden, triggering AWIR...")
-                        # Nog geen berekening voor deze maand - voer AWIR maandverwerking uit
-                        result = self.process_month(
-                            case_id=case_id,
-                            maand=maand,
-                            parameters=parameters,
-                        )
-                        results.append(result)
-                        berekende_maanden.add(maand)
-                        logger.debug(
-                            f"╠─ Maand {maand}: berekend €{result.berekend_bedrag / 100:.2f}, "
-                            f"betaald €{result.betaald_bedrag / 100:.2f}"
-                        )
+            # Start vanaf maand 1 als simulatie is gestart voor het berekeningsjaar,
+            # anders gebruik de maand van de simulatie startdatum
+            aanvraag_maand = 1 if case.berekeningsjaar and sim_start.year < case.berekeningsjaar else sim_start.month
+            for maand in range(aanvraag_maand, current_month + 1):
+                if maand not in berekende_maanden:
+                    logger.debug(f"╠─ Maand {maand}: geen berekening gevonden, triggering AWIR...")
+                    # Bepaal de eerste dag van deze maand als process_date
+                    # Gebruik current_year als berekeningsjaar None is (oude cases)
+                    jaar_voor_datum = case.berekeningsjaar if case.berekeningsjaar is not None else current_year
+                    maand_eerste = date(jaar_voor_datum, maand, 1)
+                    # Nog geen berekening voor deze maand - voer AWIR maandverwerking uit
+                    result = self.process_month(
+                        case_id=case_id,
+                        maand=maand,
+                        parameters=parameters,
+                        process_date=maand_eerste,
+                    )
+                    results.append(result)
+                    berekende_maanden.add(maand)
+                    logger.debug(
+                        f"╠─ Maand {maand}: berekend €{result.berekend_bedrag / 100:.2f}, betaald €{result.betaald_bedrag / 100:.2f}"
+                    )
 
-            # =====================================================================
-            # Jaarafsluiting check (IB-aanslag, definitief, vereffening)
-            # =====================================================================
-            year_completion_result = self._check_year_completion(
-                case_id=case_id,
-                current_date=self.current_date,
-                parameters=parameters,
-            )
-            if year_completion_result:
-                year_completion_results.append(year_completion_result)
-                logger.debug(f"╠─ Jaarafsluiting: {year_completion_result['actie']}")
-
-            # Log bij maandovergang
-            if current_month != last_logged_month:
-                last_logged_month = current_month
-
-            # Ga naar de volgende dag
-            self.current_date = self.current_date + timedelta(days=1)
+            # Jump to next month (instead of day by day for performance)
+            self.current_date = self.current_date + relativedelta(months=1)
 
         self._log_workflow_state(case_id, "EINDE")
-
-        # Log year completion results if any
-        if year_completion_results:
-            logger.debug("╔══════════════════════════════════════════════════════════════")
-            logger.debug("║ JAARAFSLUITING RESULTATEN:")
-            for result in year_completion_results:
-                logger.debug(f"║   - {result['actie']}: {result}")
-            logger.debug("╚══════════════════════════════════════════════════════════════")
-
         return results
 
     def __iter__(self):

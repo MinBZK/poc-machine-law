@@ -18,8 +18,6 @@ class MessageType(str, Enum):
 
     VOORSCHOT_BESCHIKKING = "VOORSCHOT_BESCHIKKING"  # AWIR Art. 16
     DEFINITIEVE_BESCHIKKING = "DEFINITIEVE_BESCHIKKING"  # AWIR Art. 19
-    VEREFFENING_BESCHIKKING = "VEREFFENING_BESCHIKKING"  # AWIR Art. 24
-    KWIJTSCHELDING_BESCHIKKING = "KWIJTSCHELDING_BESCHIKKING"  # AWIR Art. 26a
     AFWIJZING = "AFWIJZING"  # AWIR Art. 16 lid 4
 
 
@@ -46,7 +44,6 @@ class Message(Aggregate):
         inhoud: str,
         rechtsmiddel_info: str | None = None,
         law: str | None = None,
-        created_at: datetime | None = None,
     ) -> None:
         self.bsn = bsn
         self.case_id = case_id
@@ -56,15 +53,15 @@ class Message(Aggregate):
         self.rechtsmiddel_info = rechtsmiddel_info
         self.law = law
         self.status = MessageStatus.CREATED
-        self.created_at = created_at if created_at else datetime.now()
+        self.created_at = datetime.now()
         self.sent_at: datetime | None = None
         self.read_at: datetime | None = None
 
     @event("Sent")
-    def mark_sent(self, sent_at: datetime | None = None) -> None:
+    def mark_sent(self) -> None:
         """Bericht verzonden (AWB Art. 3:41 - bekendmaking)"""
         self.status = MessageStatus.SENT
-        self.sent_at = sent_at if sent_at else datetime.now()
+        self.sent_at = datetime.now()
 
     @event("Read")
     def mark_read(self) -> None:
@@ -88,7 +85,5 @@ class Message(Aggregate):
         return self.message_type in [
             MessageType.VOORSCHOT_BESCHIKKING,
             MessageType.DEFINITIEVE_BESCHIKKING,
-            MessageType.VEREFFENING_BESCHIKKING,
-            MessageType.KWIJTSCHELDING_BESCHIKKING,
             MessageType.AFWIJZING,
         ]

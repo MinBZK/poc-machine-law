@@ -1,5 +1,21 @@
+from datetime import date
+
 from eventsourcing.dispatch import singledispatchmethod
+from eventsourcing.persistence import Transcoder, Transcoding
 from eventsourcing.system import ProcessApplication
+
+
+class DateAsISO(Transcoding):
+    """Transcoding for datetime.date objects to ISO format strings."""
+
+    type = date
+    name = "date_iso"
+
+    def encode(self, obj: date) -> str:
+        return obj.isoformat()
+
+    def decode(self, data: str) -> date:
+        return date.fromisoformat(data)
 
 
 class ClaimProcessor(ProcessApplication):
@@ -9,6 +25,11 @@ class ClaimProcessor(ProcessApplication):
         super().__init__(**kwargs)
         self.rules_engine = rules_engine
         self._case_manager = None
+
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for date serialization."""
+        super().register_transcodings(transcoder)
+        transcoder.register(DateAsISO())
 
     @property
     def case_manager(self):

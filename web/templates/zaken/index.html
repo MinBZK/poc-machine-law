@@ -24,18 +24,9 @@
         </div>
     </div>
 
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h2 class="text-2xl font-semibold text-gray-900">Mijn Toeslagen</h2>
-            <p class="text-gray-600 mt-1">Overzicht van al uw toeslag aanvragen en lopende toeslagen</p>
-        </div>
-        <a href="/zaken/aanvraag?bsn={{ bsn }}"
-           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nieuwe aanvraag
-        </a>
+    <div class="mb-6">
+        <h2 class="text-2xl font-semibold text-gray-900">Mijn Toeslagen</h2>
+        <p class="text-gray-600 mt-1">Overzicht van al uw toeslag aanvragen en lopende toeslagen</p>
     </div>
 
     {% if toeslagen %}
@@ -101,14 +92,7 @@
             </svg>
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">Geen toeslagen gevonden</h3>
-        <p class="text-gray-500 mb-6">U heeft nog geen toeslag aangevraagd. Klik op de knop hieronder om een aanvraag te starten.</p>
-        <a href="/zaken/aanvraag?bsn={{ bsn }}"
-           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Toeslag aanvragen
-        </a>
+        <p class="text-gray-500">U heeft nog geen actieve toeslagen.</p>
     </div>
     {% endif %}
 </section>

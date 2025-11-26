@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime
 from typing import Any
 
 import pandas as pd
@@ -434,12 +434,7 @@ class Services:
                                     if parts[1] == "id":
                                         mapping[name] = str(aggregate.id)
                                     else:
-                                        attr_value = getattr(aggregate, parts[1], None)
-                                        # Convert date to datetime for created_at field
-                                        if name == "created_at" and isinstance(attr_value, date):
-                                            mapping[name] = datetime.combine(attr_value, datetime.min.time())
-                                        else:
-                                            mapping[name] = attr_value
+                                        mapping[name] = getattr(aggregate, parts[1], None)
                                 elif len(parts) == 1:
                                     # Try definitions first, then rule output
                                     definitions = rule.properties.get("definitions", {})

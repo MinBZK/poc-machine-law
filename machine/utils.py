@@ -12,7 +12,7 @@ try:
 except ImportError:
     from yaml import Loader
 
-BASE_DIR = "law"
+BASE_DIR = "submodules/regelrecht-laws/laws"
 
 
 # Cache for parsed YAML files

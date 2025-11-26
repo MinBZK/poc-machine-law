@@ -6,23 +6,6 @@ from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
 
 
-class DateAsISOTranscoding(Transcoding):
-    """Transcoding for datetime.date objects to ISO format strings."""
-
-    type = date
-    name = "date_iso"
-
-    def encode(self, obj: date) -> str:
-        return obj.isoformat()
-
-    def decode(self, data: str) -> date:
-        return date.fromisoformat(data)
-
-
-# Register the DateAsISO transcoding globally at module load time
-Transcoding.register(DateAsISOTranscoding)
-
-
 class CaseStatus(str, Enum):
     # Application review states
     SUBMITTED = "SUBMITTED"
@@ -101,9 +84,6 @@ class Case(Aggregate):
         self.heeft_aanspraak: bool | None = None
         self.berekend_jaarbedrag: int | None = None  # in eurocent
 
-        # Afwijzing
-        self.afwijzing_datum: date | None = None
-
         # Voorschot
         self.voorschot_jaarbedrag: int | None = None
         self.voorschot_maandbedrag: int | None = None
@@ -119,20 +99,18 @@ class Case(Aggregate):
         self.definitieve_beschikking_datum: date | None = None
 
         # Vereffening
-        self.vereffening_type: str | None = None  # NABETALING, TERUGVORDERING, GEEN, KWIJTGESCHOLDEN
+        self.vereffening_type: str | None = None  # NABETALING, TERUGVORDERING, GEEN
         self.vereffening_bedrag: int | None = None
-        self.kwijtschelding_reden: str | None = None
-
-        # IB-aanslag (Art. 19 AWIR)
-        self.ib_aanslag_inkomen: int | None = None
-        self.ib_aanslag_datum: date | None = None
-        self.deadline_definitief: date | None = None
+        self.vereffening_datum: date | None = None
 
         # Beschikkingen historie
         self.beschikkingen: list[dict[str, Any]] = []
 
         # Berekeningsjaar (extracted from parameters or set separately)
         self.berekeningsjaar: int | None = parameters.get("berekeningsjaar")
+
+        # Year transition tracking (voor multi-jaar toeslagen)
+        self.vorig_jaar_case_id: str | None = None
 
     @event("Reset")
     def reset(
@@ -333,13 +311,12 @@ class Case(Aggregate):
     ) -> None:
         """Aanvraag afgewezen wegens geen aanspraak (AWIR Art. 16 lid 4)"""
         self.status = CaseStatus.AFGEWEZEN
-        self.afwijzing_datum = afwijzing_datum or date.today()
         if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
             self.beschikkingen = []
         self.beschikkingen.append(
             {
                 "type": "AFWIJZING",
-                "datum": self.afwijzing_datum,
+                "datum": afwijzing_datum or date.today(),
                 "reden": reden,
             }
         )
@@ -488,64 +465,6 @@ class Case(Aggregate):
     def beeindig(self, reden: str, einddatum: date | None = None) -> None:
         """Toeslag beëindigd (bijv. geen voortzetting volgend jaar)"""
         self.status = CaseStatus.BEEINDIGD
-
-    @event("IBAanslagOntvangen")
-    def ib_aanslag_ontvangen(
-        self,
-        vastgesteld_inkomen: int,
-        aanslag_datum: date,
-        deadline_definitief: date,
-    ) -> None:
-        """
-        IB-aanslag ontvangen (AWIR Art. 19 trigger).
-
-        Dit event triggert de definitieve vaststellingsprocedure:
-        - 6 maanden na IB-aanslag moet definitieve beschikking zijn vastgesteld
-        - Uiterlijk 31 december van het jaar volgend op het berekeningsjaar
-        """
-        self.ib_aanslag_inkomen = vastgesteld_inkomen
-        self.ib_aanslag_datum = aanslag_datum
-        self.deadline_definitief = deadline_definitief
-
-        if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
-            self.beschikkingen = []
-        self.beschikkingen.append(
-            {
-                "type": "IB_AANSLAG_ONTVANGEN",
-                "datum": aanslag_datum,
-                "vastgesteld_inkomen": vastgesteld_inkomen,
-                "deadline_definitief": deadline_definitief,
-            }
-        )
-
-    @event("TerugvorderingKwijtgescholden")
-    def terugvordering_kwijtgescholden(
-        self,
-        oorspronkelijk_bedrag: int,
-        reden: str,
-        kwijtschelding_datum: date | None = None,
-    ) -> None:
-        """
-        Terugvordering kwijtgescholden (AWIR Art. 26a).
-
-        Art. 26a: Terugvorderingen onder de doelmatigheidsgrens (€116)
-        worden niet ingevorderd maar kwijtgescholden.
-        """
-        self.vereffening_type = "KWIJTGESCHOLDEN"
-        self.vereffening_bedrag = 0
-        self.kwijtschelding_reden = reden
-        self.status = CaseStatus.VEREFFEND
-
-        if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
-            self.beschikkingen = []
-        self.beschikkingen.append(
-            {
-                "type": "VEREFFENING_KWIJTGESCHOLDEN",
-                "datum": kwijtschelding_datum or date.today(),
-                "oorspronkelijk_bedrag": oorspronkelijk_bedrag,
-                "reden": reden,
-            }
-        )
 
     # =========================================================================
     # Toeslag helper properties

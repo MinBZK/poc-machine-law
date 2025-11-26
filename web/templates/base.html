@@ -162,6 +162,15 @@
                                         {% endif %}
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="/zaken/tijdlijn?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Tijdlijn
+                                    </a>
+                                </li>
                                 {% if chat_enabled %}
                                     <li>
                                         <a href="/chat?bsn={{ bsn }}"
@@ -180,8 +189,57 @@
                             </ul>
                         </nav>
                     </div>
-                    <!-- Right side: Desktop Profile & More menu -->
+                    <!-- Right side: Time Simulation, Profile & More menu -->
                     <div class="hidden lg:flex items-center space-x-2">
+                        <!-- Time Simulation Controls -->
+                        {% if simulated_date %}
+                        <div class="flex items-center space-x-2 bg-indigo-900/50 rounded-lg px-3 py-1.5 mr-2"
+                             x-data="{
+                                 targetDate: '{{ simulated_date }}',
+                                 getNextMonth() {
+                                     const currentDate = '{{ simulated_date }}';  // Read fresh from template
+                                     const parts = currentDate.split('-');
+                                     let year = parseInt(parts[0]);
+                                     let month = parseInt(parts[1]);
+                                     const day = parts[2];
+                                     month++;
+                                     if (month > 12) {
+                                         month = 1;
+                                         year++;
+                                     }
+                                     return `${year}-${String(month).padStart(2, '0')}-${day}`;
+                                 },
+                                 getCurrentPath() {
+                                     return window.location.pathname + window.location.search;
+                                 }
+                             }">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <input type="date"
+                                   x-model="targetDate"
+                                   class="bg-transparent text-white text-sm border-0 focus:ring-0 p-0 w-32 cursor-pointer"
+                                   style="color-scheme: dark;">
+                            <form action="/zaken/simulate" method="post" class="inline">
+                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                <input type="hidden" name="target_date" :value="targetDate">
+                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                <button type="submit"
+                                        class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded transition-colors">
+                                    Ga
+                                </button>
+                            </form>
+                            <form action="/zaken/simulate" method="post" class="inline">
+                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                <input type="hidden" name="target_date" :value="getNextMonth()">
+                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                <button type="submit"
+                                        class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded transition-colors whitespace-nowrap">
+                                    +1 maand
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
                         <!-- Desktop User Switcher -->
                         <div class="relative"
                              x-data="{ profileSelectorOpen: false, selectedProfile: '{{ bsn }}' }">
@@ -314,6 +372,15 @@
                                         {% endif %}
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="/zaken/tijdlijn?bsn={{ bsn }}"
+                                       class="block text-white hover:text-blue-200 font-medium py-2 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Tijdlijn
+                                    </a>
+                                </li>
                                 {% if chat_enabled %}
                                     <li>
                                         <a href="/chat?bsn={{ bsn }}"
@@ -328,6 +395,61 @@
                                             Chat
                                         </a>
                                     </li>
+                                {% endif %}
+                                <!-- Mobile Time Simulation Controls -->
+                                {% if simulated_date %}
+                                <li class="pt-4 border-t border-blue-800"
+                                    x-data="{
+                                        targetDate: '{{ simulated_date }}',
+                                        getNextMonth() {
+                                            const parts = this.targetDate.split('-');
+                                            let year = parseInt(parts[0]);
+                                            let month = parseInt(parts[1]);
+                                            const day = parts[2];
+                                            month++;
+                                            if (month > 12) {
+                                                month = 1;
+                                                year++;
+                                            }
+                                            return `${year}-${String(month).padStart(2, '0')}-${day}`;
+                                        },
+                                        getCurrentPath() {
+                                            return window.location.pathname + window.location.search;
+                                        }
+                                    }">
+                                    <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Tijd Simulatie
+                                    </div>
+                                    <div class="flex flex-col space-y-2 mt-2">
+                                        <input type="date"
+                                               x-model="targetDate"
+                                               class="bg-blue-800 text-white text-sm px-3 py-2 rounded border border-blue-700 focus:ring-indigo-500 focus:border-indigo-500"
+                                               style="color-scheme: dark;">
+                                        <div class="flex space-x-2">
+                                            <form action="/zaken/simulate" method="post" class="flex-1">
+                                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                                <input type="hidden" name="target_date" :value="targetDate">
+                                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                                <button type="submit"
+                                                        class="w-full text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded transition-colors">
+                                                    Ga naar datum
+                                                </button>
+                                            </form>
+                                            <form action="/zaken/simulate" method="post" class="flex-1">
+                                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                                <input type="hidden" name="target_date" :value="getNextMonth()">
+                                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                                <button type="submit"
+                                                        class="w-full text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded transition-colors">
+                                                    +1 maand
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
                                 {% endif %}
                                 <!-- More Menu for Mobile (Kebab Menu) -->
                                 <li class="pt-4 border-t border-blue-800"
