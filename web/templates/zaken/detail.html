@@ -86,7 +86,12 @@
 
                     <!-- Content -->
                     <div class="flex-1 min-w-0">
-                        <div class="text-xs text-gray-500">{{ event.date_formatted }}</div>
+                        <div class="text-xs text-gray-500">
+                            {{ event.date_formatted }}
+                            {% if event.zaak_label %}
+                            <span class="ml-2 px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{{ event.zaak_label }}</span>
+                            {% endif %}
+                        </div>
                         {% if event.type == 'betaling' %}
                         <span class="text-green-600 font-medium hover:underline">{{ event.label }}</span>
                         {% elif event.type in ['beschikking', 'definitieve_beschikking'] %}

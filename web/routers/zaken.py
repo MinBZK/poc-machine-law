@@ -544,6 +544,10 @@ async def zaken_tijdlijn(
         # Group timeline by month
         grouped_timeline = group_timeline_by_month(timeline, simulated_date)
 
+        # Check if there are multiple different toeslag types (laws)
+        unique_laws = set(c.law for c in toeslagen)
+        show_zaak_labels = len(unique_laws) > 1
+
         # Use the first toeslag for display purposes
         toeslag = toeslagen[0]
 
@@ -576,6 +580,7 @@ async def zaken_tijdlijn(
                 "aanvraag_datum_display": aanvraag_datum_display,
                 "related_cases": toeslagen,
                 "unread_count": unread_count,
+                "show_zaak_labels": show_zaak_labels,
             },
         )
     except Exception as e:
@@ -681,5 +686,6 @@ async def zaken_detail(
             "aanvraag_datum_display": aanvraag_datum_display,
             "related_cases": related_cases,  # For multi-year display
             "unread_count": unread_count,
+            "show_zaak_labels": False,  # Single law type, no need for labels
         },
     )
