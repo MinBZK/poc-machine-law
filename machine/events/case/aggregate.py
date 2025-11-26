@@ -119,6 +119,11 @@ class Case(Aggregate):
         # Year transition tracking (voor multi-jaar toeslagen)
         self.vorig_jaar_case_id: str | None = None
 
+    @event("LinkedToPreviousYear")
+    def link_to_previous_year(self, vorig_jaar_case_id: str) -> None:
+        """Link this case to the previous year's case (automatic continuation)"""
+        self.vorig_jaar_case_id = vorig_jaar_case_id
+
     @event("Reset")
     def reset(
         self,
@@ -343,14 +348,18 @@ class Case(Aggregate):
 
         if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
             self.beschikkingen = []
-        self.beschikkingen.append(
-            {
-                "type": "VOORSCHOT",
-                "datum": self.voorschot_beschikking_datum,
-                "jaarbedrag": jaarbedrag,
-                "maandbedrag": maandbedrag,
-            }
-        )
+
+        # Only add beschikking if there isn't already a VOORSCHOT beschikking
+        has_voorschot = any(b.get("type") == "VOORSCHOT" for b in self.beschikkingen)
+        if not has_voorschot:
+            self.beschikkingen.append(
+                {
+                    "type": "VOORSCHOT",
+                    "datum": self.voorschot_beschikking_datum,
+                    "jaarbedrag": jaarbedrag,
+                    "maandbedrag": maandbedrag,
+                }
+            )
 
     @event("MaandGestart")
     def start_maand(self, maand: int) -> None:

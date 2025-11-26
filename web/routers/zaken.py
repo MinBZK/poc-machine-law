@@ -172,11 +172,21 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
     # Get aanvraag_datum from created_at
     aanvraag_datum = toeslag.created_at.date().isoformat() if toeslag.created_at else None
 
-    # Add aanvraag event - include year in label for multi-year timelines
+    # Check if this is an automatic continuation from previous year
+    is_voortzetting = getattr(toeslag, "vorig_jaar_case_id", None) is not None
+
+    # Add aanvraag/voortzetting event - include year in label for multi-year timelines
     aanvraag_label_suffix = f" {berekeningsjaar}" if berekeningsjaar else ""
+    if is_voortzetting:
+        aanvraag_label = f"Toeslag voortgezet{aanvraag_label_suffix}"
+        event_type = "voortzetting"
+    else:
+        aanvraag_label = f"Aanvraag ingediend{aanvraag_label_suffix}"
+        event_type = "aanvraag"
+
     timeline.append({
-        "type": "aanvraag",
-        "label": f"Aanvraag ingediend{aanvraag_label_suffix}",
+        "type": event_type,
+        "label": aanvraag_label,
         "date": aanvraag_datum,
         "zaak_label": zaak_label,
         "zaak_id": zaak_id,
@@ -203,6 +213,15 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             }),
         })
 
+    # Beschikking type labels
+    BESCHIKKING_LABELS = {
+        "VOORSCHOT": "Voorschotbeschikking",
+        "DEFINITIEF": "Definitieve beschikking",
+        "AFWIJZING": "Afwijzingsbeschikking",
+        "HERZIEN_VOORSCHOT": "Herziene voorschotbeschikking",
+        "IB_AANSLAG_ONTVANGEN": "IB-aanslag ontvangen",
+    }
+
     # Add beschikkingen
     for beschikking in (toeslag.beschikkingen or []):
         beschikking_type = beschikking.get("type", "ONBEKEND")
@@ -219,14 +238,24 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             else:
                 details[k.replace("_", " ").title()] = serialize_value(v)
 
+        # Use friendly label or fallback to formatted type
+        label = BESCHIKKING_LABELS.get(beschikking_type, beschikking_type.replace("_", " ").title())
+
         timeline.append({
             "type": "beschikking",
-            "label": beschikking_type.replace("_", " ").title(),
+            "label": label,
             "date": beschikking_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
             "details": details,
         })
+
+    # Dutch month names for display
+    MAAND_NAMEN = {
+        1: "januari", 2: "februari", 3: "maart", 4: "april",
+        5: "mei", 6: "juni", 7: "juli", 8: "augustus",
+        9: "september", 10: "oktober", 11: "november", 12: "december",
+    }
 
     # Add monthly calculations
     for berekening in (toeslag.maandelijkse_berekeningen or []):
@@ -234,14 +263,17 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
         if isinstance(berekening_datum, date):
             berekening_datum = berekening_datum.isoformat()
 
+        maand_nr = berekening["maand"]
+        maand_naam = MAAND_NAMEN.get(maand_nr, str(maand_nr))
+
         timeline.append({
-            "type": "maand_berekening",
-            "label": f"Maand {berekening['maand']} herberekend",
+            "type": "herberekening",
+            "label": f"Herberekening {maand_naam}",
             "date": berekening_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
             "details": serialize_details({
-                "Maand": berekening["maand"],
+                "Maand": maand_naam.capitalize(),
                 "Berekend bedrag": format_cents_fn(berekening["berekend_bedrag"]),
             }),
         })
@@ -252,15 +284,19 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
         if isinstance(betaal_datum, date):
             betaal_datum = betaal_datum.isoformat()
 
+        maand_nr = betaling["maand"]
+        maand_naam = MAAND_NAMEN.get(maand_nr, str(maand_nr))
+        betaald_bedrag = format_cents_fn(betaling.get("betaald_bedrag"))
+
         timeline.append({
-            "type": "maand_betaling",
-            "label": f"Maand {betaling['maand']} betaald",
+            "type": "betaling",
+            "label": f"Betaling {maand_naam}",
             "date": betaal_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
             "details": serialize_details({
-                "Maand": betaling["maand"],
-                "Betaald bedrag": format_cents_fn(betaling.get("betaald_bedrag")),
+                "Maand": maand_naam.capitalize(),
+                "Bedrag": betaald_bedrag,
             }),
         })
 

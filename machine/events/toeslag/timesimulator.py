@@ -681,10 +681,11 @@ class TimeSimulator:
             aanvraag_datum=start_date,
         )
 
-        # Link to old case
-        new_case = self.case_manager.get_case_by_id(new_case_id)
-        new_case.vorig_jaar_case_id = str(old_case_id)
-        self.case_manager.save(new_case)
+        # Link to old case (automatic year continuation)
+        self.case_manager.link_to_previous_year(
+            case_id=new_case_id,
+            vorig_jaar_case_id=str(old_case_id),
+        )
 
         # Evaluate eligibility
         result = self.services.evaluate(
@@ -857,21 +858,36 @@ class TimeSimulator:
             # Maanden verwerken voor het huidige berekeningsjaar
             # Dit gebeurt ongeacht of oude jaren al vereffend zijn - uitbetaling gaat gewoon door
             if case.berekeningsjaar == current_year:
+                # Bepaal de aanvraagdatum voor de eerste betaling
+                case_created = case.created_at.date() if case.created_at else date(current_year, 1, 1)
+
                 for maand in range(aanvraag_maand, current_month + 1):
                     if maand not in berekende_maanden:
                         logger.debug(f"╠─ Maand {maand}: geen berekening gevonden, triggering AWIR...")
-                        maand_eerste = date(current_year, maand, 1)
+
+                        # Voor de aanvraagmaand: betaling op de 20e van de VOLGENDE maand
+                        # Voor latere maanden: betaling op de 20e van die maand
+                        if maand == case_created.month and current_year == case_created.year:
+                            # Aanvraagmaand: betaling in de volgende maand
+                            if maand < 12:
+                                process_date = date(current_year, maand + 1, 20)
+                            else:
+                                process_date = date(current_year + 1, 1, 20)
+                        else:
+                            # Normale maanden: betaling op de 20e van die maand
+                            process_date = date(current_year, maand, 20)
+
                         result = self.process_month(
                             case_id=case_id,
                             maand=maand,
                             parameters=parameters,
-                            process_date=maand_eerste,
+                            process_date=process_date,
                         )
                         results.append(result)
                         berekende_maanden.add(maand)
                         logger.debug(
                             f"╠─ Maand {maand}: berekend €{result.berekend_bedrag / 100:.2f}, "
-                            f"betaald €{result.betaald_bedrag / 100:.2f}"
+                            f"betaald €{result.betaald_bedrag / 100:.2f} (datum: {process_date})"
                         )
 
             # Jump to next month (instead of day by day for performance)

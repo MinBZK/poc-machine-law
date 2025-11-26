@@ -318,6 +318,13 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
+    def link_to_previous_year(self, case_id: str, vorig_jaar_case_id: str) -> str:
+        """Link a case to the previous year's case (for automatic year continuations)"""
+        case = self.repository.get(UUID(case_id))
+        case.link_to_previous_year(vorig_jaar_case_id=vorig_jaar_case_id)
+        self.save(case)
+        return str(case.id)
+
     # Query methods
     def can_appeal(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_appeal()

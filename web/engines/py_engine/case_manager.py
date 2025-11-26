@@ -173,6 +173,7 @@ def to_case(case) -> Case:
         vereffening_datum=getattr(case, "vereffening_datum", None),
         vereffening_type=getattr(case, "vereffening_type", None),
         vereffening_bedrag=getattr(case, "vereffening_bedrag", None),
+        vorig_jaar_case_id=getattr(case, "vorig_jaar_case_id", None),
     )
 
 

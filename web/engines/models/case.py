@@ -70,6 +70,9 @@ class Case:
     vereffening_type: str | None = None
     vereffening_bedrag: int | None = None
 
+    # Year transition tracking (for multi-year toeslagen)
+    vorig_jaar_case_id: str | None = None
+
     def can_object(self) -> bool:  # TODO: FIX
         if self.objection_status is None:
             return False
