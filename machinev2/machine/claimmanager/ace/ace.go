@@ -12,7 +12,6 @@ import (
 	"github.com/Khan/genqlient/graphql"
 	"github.com/google/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/ace/generated"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
@@ -43,7 +42,7 @@ type claimType struct {
 }
 
 // New creates a new ACE-backed claim manager
-func New(service string, caseManager casemanager.CaseManager, ruleResolver *ruleresolver.RuleResolve, endpoint string, logger logger.Logger) (claimmanager.ClaimManager, error) {
+func New(service string, caseManager casemanager.CaseManager, ruleResolver *ruleresolver.RuleResolve, endpoint string, logger logger.Logger) (*ClaimManager, error) {
 	clients := clients{
 		dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
 		ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
@@ -472,8 +471,10 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 	log = log.WithFields(logger.NewField("key", bewering.Key), logger.NewField("id", bewering.ID))
 	log.Info("create claim")
 
+	key := cm.convertOutputToSourceField(bewering.Key, bewering.Service, bewering.Law)
+
 	// Create real value in ACE
-	claimTypeName := cm.normalizeClaimType(bewering.Key)
+	claimTypeName := cm.normalizeClaimType(key)
 	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("create real claim: %w", err)
 	}
@@ -745,6 +746,19 @@ func buildOutputToSourceMap(spec ruleresolver.RuleSpec) map[string][]string {
 	}
 
 	return sourceFields
+}
+
+// Reset implements the ClaimManager interface.
+// Reloads claim types from the ACE schema to pick up any changes.
+func (cm *ClaimManager) Reset(ctx context.Context) error {
+	claimTypes, err := getClaimTypes(cm.clients.ddl)
+	if err != nil {
+		return fmt.Errorf("could not get claim types: %w", err)
+	}
+
+	cm.claimTypes = claimTypes
+
+	return nil
 }
 
 var ErrBeweringNotFound = errors.New("bewering_not_found")

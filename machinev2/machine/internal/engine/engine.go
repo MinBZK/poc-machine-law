@@ -862,7 +862,7 @@ func (re *RulesEngine) evaluateForeach(
 	operation ruleresolver.Action,
 	ruleCtx *contexter.RuleContext,
 ) (any, error) {
-	logr := logger.FromContext(ctx)
+	logr := logger.FromContext(ctx).WithField("operation", operation).WithField("subject", operation.Subject)
 
 	arrayData, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
 	if err != nil {
@@ -888,12 +888,14 @@ func (re *RulesEngine) evaluateForeach(
 		arrayItems = []any{arrayData}
 	}
 
-	var values []any
-	if operation.Combine == nil {
-		return nil, fmt.Errorf("combine operation not specified for FOREACH")
+	var combine string
+	if operation.Combine != nil {
+		combine = *operation.Combine
 	}
 
-	err = logr.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", *operation.Combine), func(ctx context.Context) error {
+	var values []any
+
+	err = logr.IndentBlock(ctx, fmt.Sprintf("Foreach(%s)", combine), func(ctx context.Context) error {
 		logr := logger.FromContext(ctx)
 
 		for _, item := range arrayItems {
@@ -948,8 +950,13 @@ func (re *RulesEngine) evaluateForeach(
 		return nil, err
 	}
 
-	// Apply combine operation
-	result := re.evaluateAggregateOps(ctx, *operation.Combine, values)
+	var result any = values
+
+	if operation.Combine != nil {
+		// Apply combine operation
+		result = re.evaluateAggregateOps(ctx, *operation.Combine, values)
+	}
+
 	logr.WithIndent().Debugf("Foreach result: %v", result)
 
 	return result, nil
