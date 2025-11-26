@@ -229,15 +229,15 @@ class ClaimManager(ClaimManagerInterface):
             content = response.parsed
 
             # Check if the response is successful (201) or an error (400/500)
-            if hasattr(content, 'data'):
+            if hasattr(content, "data"):
                 return content.data
-            elif hasattr(content, 'errors'):
+            elif hasattr(content, "errors"):
                 # Handle 400 error response
                 error_messages = [error.message for error in content.errors]
                 raise ValueError(f"Claim submission failed: {'; '.join(error_messages)}")
             else:
                 # Handle unexpected response format
-                raise ValueError(f"Unexpected response format from claim submission API")
+                raise ValueError("Unexpected response format from claim submission API")
 
     def reject_claim(self, claim_id: UUID, rejected_by: str, rejection_reason: str) -> None:
         """
