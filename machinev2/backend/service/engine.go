@@ -6,7 +6,9 @@ import (
 )
 
 // ResetEngine implements Servicer.
-func (service *Service) ResetEngine(ctx context.Context) error {
+func (service *Service) ResetEngine(_ context.Context) error {
+	ctx := context.Background()
+
 	service.logger.DebugContext(ctx, "resetting engine")
 	if err := service.service.Reset(ctx); err != nil {
 		return fmt.Errorf("reset: %w", err)
