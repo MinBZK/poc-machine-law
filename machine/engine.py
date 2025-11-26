@@ -262,7 +262,7 @@ class RulesEngine:
                     ]
                 }
             }
-            response = requests.post('http://localhost:9010/fld-zts-Zorgtoeslag-ws/rest/BerekenRechtEnHoogte', json=data)
+            response = requests.post('https://alef-service-demo.apps.digilab.network/fld-zts-Zorgtoeslag/rest/BerekenRechtEnHoogte', json=data)
 
             respJson = response.json()
 
@@ -307,7 +307,7 @@ class RulesEngine:
                     ]
                 }
             }
-            response = requests.post('http://localhost:9010/fld-hu-Huurtoeslag-ws/rest/BerekenRechtEnHoogte', json=data)
+            response = requests.post('https://alef-service-demo.apps.digilab.network/fld-hu-Huurtoeslag/rest/BerekenRechtEnHoogte', json=data)
 
             respJson = response.json()
 
