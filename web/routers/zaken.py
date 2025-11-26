@@ -81,7 +81,16 @@ def format_cents(cents: int | None) -> str:
     if cents is None:
         return "-"
     euros = cents / 100
-    return f"€ {euros:,.2f}".replace(",", ".").replace(".", ",", 1)
+    # Format with Dutch notation: period for thousands, comma for decimals
+    # First format with English notation, then swap: 1,834.24 -> 1.834,24
+    formatted = f"{euros:,.2f}"  # e.g., "1,834.24"
+    # Replace comma (thousand separator) with temporary marker
+    formatted = formatted.replace(",", "TEMP")  # "1TEMP834.24"
+    # Replace period (decimal separator) with comma
+    formatted = formatted.replace(".", ",")  # "1TEMP834,24"
+    # Replace temporary marker with period
+    formatted = formatted.replace("TEMP", ".")  # "1.834,24"
+    return f"€ {formatted}"
 
 
 @router.get("/")
@@ -389,12 +398,15 @@ async def zaken_detail(
             if isinstance(beschikking_datum, date):
                 beschikking_datum = beschikking_datum.isoformat()
 
-            # Convert any date values in details to strings
+            # Convert any date values in details to strings, format euro amounts
             details = {}
             for k, v in beschikking.items():
                 if k not in ["type", "datum"]:
                     if isinstance(v, date):
                         details[k] = v.isoformat()
+                    elif k in ["jaarbedrag", "maandbedrag", "bedrag"] and isinstance(v, (int, float)):
+                        # Format euro amounts
+                        details[k] = format_cents(v)
                     else:
                         details[k] = v
 
