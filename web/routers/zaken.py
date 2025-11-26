@@ -680,7 +680,7 @@ async def zaken_detail(
     timeline = []
     for case in related_cases:
         # Get messages for this case
-        case_messages = message_manager.get_messages_for_case(str(case.id))
+        case_messages = message_manager.get_messages_by_case(str(case.id))
         timeline.extend(build_timeline_for_case(case, format_cents, messages=case_messages))
 
     # Sort timeline by date
