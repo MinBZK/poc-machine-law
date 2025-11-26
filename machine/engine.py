@@ -9,6 +9,7 @@ import pandas as pd
 
 from .context import PathNode, RuleContext, TypeSpec, logger
 
+import requests
 
 class RulesEngine:
     """Rules engine for evaluating business rules"""
@@ -179,6 +180,7 @@ class RulesEngine:
     ) -> dict[str, Any]:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
+
         for p in self.parameter_specs:
             if p["required"] and p["name"] not in parameters:
                 logger.warning(f"Required parameter {p} not found in {parameters}")
@@ -238,6 +240,85 @@ class RulesEngine:
 
         if not output_values:
             logger.warning(f"No output values computed for {calculation_date} {requested_output}")
+
+        if (self.law == "zorgtoeslagwet"):
+            gezamenlijk_vermogen = parameters['gezamenlijk_vermogen']
+            gezamenlijk_jaarinkomen = parameters['gezamenlijk_jaarinkomen']
+
+            data = {
+                "request": {
+                "rekenjaar": 2025,"grondslagensets": [
+                        {
+                        "gezamenlijkJaarinkomen": [
+                            {
+                            "van": "2025-01-01","tot": "2026-01-01","waarde": gezamenlijk_jaarinkomen / 100
+                            }
+                        ],"gezamenlijkVermogen": [
+                            {
+                            "van": "2025-01-01","tot": "2026-01-01","waarde": gezamenlijk_vermogen / 100
+                            }
+                        ]
+                        }
+                    ]
+                }
+            }
+            response = requests.post('http://localhost:9010/fld-zts-Zorgtoeslag-ws/rest/BerekenRechtEnHoogte', json=data)
+
+            respJson = response.json()
+
+            subsidiebedrag = respJson['response']['berekeningen'][0]['jaartotaal']
+
+            requirements_met = subsidiebedrag > 0.0
+            
+            output_values['is_verzekerde_zorgtoeslag'] = {'value': True, 'type': 'boolean', 'description': 'Geeft aan of iemand recht heeft op zorgtoeslag', 'temporal': {'type': 'period', 'period_type': 'year'}}
+            output_values['hoogte_toeslag'] = {'value': subsidiebedrag * 100, 'type': 'decimal', 'description': 'De hoogte van de zorgtoeslag' }
+
+            context.missing_required = []
+
+        if (self.law == "wet_op_de_huurtoeslag"):
+            if (overwrite_input['huurprijs']):
+                huurprijs = overwrite_input['huurprijs']
+            else:
+                huurprijs = 0.0
+            gezamenlijk_vermogen = parameters['gezamenlijk_vermogen']
+
+            data = {
+                "request": {
+                "rekenjaar": 2025,"grondslagensets": [
+                        {
+                        "gezamenlijkJaarinkomen": [
+                            {
+                            "van": "2025-01-01","tot": "2026-01-01","waarde": "15000"
+                            }
+                        ],"gezamenlijkVermogen": [
+                            {
+                            "van": "2025-01-01","tot": "2026-01-01","waarde": gezamenlijk_vermogen / 100
+                            }
+                        ],"rekenhuur": [
+                            {
+                            "van": "2025-01-01","tot": "2026-01-01","waarde": huurprijs / 100
+                            }
+                        ],"soortHuishouden": [
+                            {
+                            "van": "2025-01-01","tot": "2026-01-01","waarde": "alleenstaand"
+                            }
+                        ]
+                        }
+                    ]
+                }
+            }
+            response = requests.post('http://localhost:9010/fld-hu-Huurtoeslag-ws/rest/BerekenRechtEnHoogte', json=data)
+
+            respJson = response.json()
+
+            subsidiebedrag = respJson['response']['berekeningen'][0]['jaartotaal']
+
+            requirements_met = subsidiebedrag > 0.0
+            
+            output_values['subsidiebedrag'] = {'value': subsidiebedrag, 'type': 'decimal', 'description': 'Subsidiebedrag per jaar'}
+            output_values['basishuur'] = {'value': huurprijs, 'type': 'decimal', 'description': 'Basishuur'}
+
+            context.missing_required = []
 
         return {
             "input": context.resolved_paths,

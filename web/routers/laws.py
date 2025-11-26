@@ -555,6 +555,10 @@ async def simulate_scenario(
         # Get all discoverable service laws
         discoverable_service_laws = machine_service.get_sorted_discoverable_service_laws(bsn)
 
+        # Tijdelijke variableen
+        gezamenlijk_vermogen = 0.0
+        box1_inkomen = 0.0
+
         # Evaluate all laws with the scenario data
         results = []
         for service_law in discoverable_service_laws:
@@ -562,19 +566,50 @@ async def simulate_scenario(
             law = service_law["law"]
 
             try:
+                parameters={"BSN": bsn}
+
+                if (law == "wet_inkomstenbelasting"):
+                    if ("spaargeld" in scenario_data):
+                        parameters['BOX3_SPAREN'] = scenario_data['spaargeld']
+                    if ('beleggingen' in scenario_data):
+                        parameters['BOX3_BELEGGEN'] = scenario_data['beleggingen']
+                    if ('schulden' in scenario_data):
+                        parameters['BOX3_SCHULDEN'] = scenario_data['schulden']
+                    if ('onroerend_goed' in scenario_data):
+                        parameters['BOX3_ONROEREND_GOED'] = scenario_data['onroerend_goed']
+
+                    if ('loon_uit_dienstbetrekking' in scenario_data):
+                        parameters['BOX1_DIENSTBETREKKING'] = scenario_data['loon_uit_dienstbetrekking']
+                    if ('winst_uit_onderneming' in scenario_data):
+                        parameters['BOX1_ONDERNEMING'] = scenario_data['winst_uit_onderneming']
+                    if ('uitkeringen_en_pensioenen' in scenario_data):
+                        parameters['BOX1_UITKERINGEN'] = scenario_data['uitkeringen_en_pensioenen']
+                    if ('resultaat_overige_werkzaamheden' in scenario_data):
+                        parameters['BOX1_OVERIGE_WERKZAAMHEDEN'] = scenario_data['resultaat_overige_werkzaamheden']
+
+                if (law == "wet_op_de_huurtoeslag"):
+                    # Dit gaat goed omdat wet_inkomstenbelasting eerst wordt uitgerekend :)
+                    # Maar de schoonheidsprijs gaat dit natuurlijk niet verdienen.
+                    parameters['gezamenlijk_vermogen'] = gezamenlijk_vermogen
+                if (law == "zorgtoeslagwet"):
+                    # Dit gaat goed omdat wet_inkomstenbelasting eerst wordt uitgerekend :)
+                    # Maar de schoonheidsprijs gaat dit natuurlijk niet verdienen.
+                    parameters['gezamenlijk_vermogen'] = gezamenlijk_vermogen 
+                    parameters['gezamenlijk_jaarinkomen'] = box1_inkomen  
+                # if (law == "wet_kinderopvang"):                
 
                 # Evaluate the law with scenario data as overwrite_input
                 result = machine_service.evaluate(
                     service=service,
                     law=law,
-                    parameters={"BSN": bsn},
+                    parameters=parameters,
                     reference_date=TODAY,
                     effective_date=effective_date,
                     approved=False,
                     overwrite_input=scenario_data,
                 ) 
 
-                if (law == "zorgtoeslagwet"):
+                """ if (law == "wet_op_de_huurtoeslag"):
                     print("-----------------------------")
                     print("INPUT:")
                     for key, value in result.input.items() :
@@ -588,23 +623,85 @@ async def simulate_scenario(
                     print(service)
 
                     print("OUTPUT")
-                    for key, value in result.output.items() :
-                        print(f"    {key}: {value}")
+                    print(result.output)
 
-                    result.output["hoogte_toeslag"] = 0
-                    result.output["is_verzekerde_zorgtoeslag"] = False
+                    # for key, value in result.output.items() :
+                    #    print(f"    {key}: {value}")
+
+                    # result.output["hoogte_toeslag"] = 0
+                    # result.output["is_verzekerde_zorgtoeslag"] = False
+
+                    huurprijs = scenario_data['huurprijs']
+
+                    print('huurprijs: ')
+                    print(huurprijs)
 
                     print("-----------------------------")
 
-                    data = {'name': 'Suzan', 'email': 'suzan@example.com'}
-                    response = requests.post('http://localhost:8000/laws/test', json=data)
-                    print(response.json())
+                    data = {
+                      "request": {
+                        "rekenjaar": 2025,"grondslagensets": [
+                                {
+                                "gezamenlijkJaarinkomen": [
+                                    {
+                                    "van": "2025-01-01","tot": "2026-01-01","waarde": "15000"
+                                    }
+                                ],"gezamenlijkVermogen": [
+                                    {
+                                    "van": "2025-01-01","tot": "2026-01-01","waarde": "20000"
+                                    }
+                                ],"rekenhuur": [
+                                    {
+                                    "van": "2025-01-01","tot": "2026-01-01","waarde": huurprijs / 100
+                                    }
+                                ],"soortHuishouden": [
+                                    {
+                                    "van": "2025-01-01","tot": "2026-01-01","waarde": "alleenstaand"
+                                    }
+                                ]
+                                }
+                            ]
+                        }
+                    }
+                    response = requests.post('http://localhost:9010/fld-hu-Huurtoeslag-ws/rest/BerekenRechtEnHoogte', json=data)
+
+                    respJson = response.json()
+
+                    print("---- repsonse ----")
+                    print(respJson)
+                    print("----------")
+                    print(respJson['response']['berekeningen'][0]['jaartotaal'])
+
+
+                    subsidiebedrag = respJson['response']['berekeningen'][0]['jaartotaal']
+
+                    result.output['subsidiebedrag'] = subsidiebedrag
+                    result.output['basishuur'] = huurprijs
+                    result.requirements_met = subsidiebedrag > 0.0
+                    result.missing_required = []
+
+                    print('###########') """
 
 
                 rule_spec = machine_service.get_rule_spec(law, TODAY, service)
 
                 # Extract thresholds from requirements (if any)
                 thresholds = extract_thresholds_from_spec(rule_spec, result.input)
+
+                if (law == "wet_inkomstenbelasting"):
+                    print("LAW: wet_inkomstenbelasting -> gezamenlijk_vermogen: ")
+                    print(result.output['gezamenlijk_vermogen'])
+                    gezamenlijk_vermogen = result.output['gezamenlijk_vermogen']
+                    print("LAW: wet_inkomstenbelasting -> box1 inkomen: ")
+                    print(result.output['box1_inkomen'])
+                    box1_inkomen = result.output['box1_inkomen']
+
+                if (law == "wet_kinderopvang"):
+                    print("LAW: wet_kinderopvang")
+                    print("input:")
+                    print(result.output)
+                    print("output:")
+                    print(result.output)
 
                 results.append(
                     {
