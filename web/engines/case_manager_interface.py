@@ -150,6 +150,7 @@ class CaseManagerInterface(ABC):
         case_id: UUID,
         heeft_aanspraak: bool,
         berekend_jaarbedrag: int,
+        berekening_datum: datetime.date | None = None,
     ) -> UUID:
         """
         Calculate entitlement for a toeslag case (AWIR Art. 16)
@@ -158,6 +159,7 @@ class CaseManagerInterface(ABC):
             case_id: UUID identifier of the case
             heeft_aanspraak: Whether the citizen has entitlement
             berekend_jaarbedrag: Calculated yearly amount in cents
+            berekening_datum: Optional date for the calculation (for time simulation)
 
         Returns:
             UUID of the updated case
@@ -186,6 +188,7 @@ class CaseManagerInterface(ABC):
         case_id: UUID,
         jaarbedrag: int | None = None,
         maandbedrag: int | None = None,
+        beschikking_datum: datetime.date | None = None,
     ) -> UUID:
         """
         Establish advance payment for a toeslag case (AWIR Art. 16)
@@ -194,6 +197,7 @@ class CaseManagerInterface(ABC):
             case_id: UUID identifier of the case
             jaarbedrag: Optional yearly amount override in cents
             maandbedrag: Optional monthly amount override in cents
+            beschikking_datum: Optional date for the beschikking (for time simulation)
 
         Returns:
             UUID of the updated case

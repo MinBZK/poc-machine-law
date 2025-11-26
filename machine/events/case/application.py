@@ -107,10 +107,15 @@ class CaseManager(Application):
         parameters: dict,
         claimed_result: dict,
         approved_claims_only: bool,
+        aanvraag_datum: date | None = None,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
         A case starts with the citizen's claimed result which is then verified.
+
+        Args:
+            aanvraag_datum: Optional date for the application (used for time simulation).
+                            If not provided, current system time is used.
         """
 
         result = self.rules_engine.evaluate(service_type, law, parameters, approved=True)
@@ -134,6 +139,7 @@ class CaseManager(Application):
                 verified_result=verified_result,
                 rulespec_uuid=result.rulespec_uuid,
                 approved_claims_only=approved_claims_only,
+                aanvraag_datum=aanvraag_datum,
             )
 
             needs_manual_review = random.random() < self.SAMPLE_RATE
@@ -418,12 +424,19 @@ class CaseManager(Application):
     # === AWIR Toeslag Methods ===
     # These methods wrap the Case aggregate's toeslag lifecycle methods
 
-    def bereken_aanspraak(self, case_id: str, heeft_aanspraak: bool, berekend_jaarbedrag: int) -> str:
+    def bereken_aanspraak(
+        self,
+        case_id: str,
+        heeft_aanspraak: bool,
+        berekend_jaarbedrag: int,
+        berekening_datum: date | None = None,
+    ) -> str:
         """Calculate entitlement for a toeslag case"""
         case = self.repository.get(UUID(case_id))
         case.bereken_aanspraak(
             heeft_aanspraak=heeft_aanspraak,
             berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=berekening_datum,
         )
         self.save(case)
         return str(case.id)
@@ -435,13 +448,19 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def stel_voorschot_vast(self, case_id: str, jaarbedrag: int | None = None, maandbedrag: int | None = None) -> str:
+    def stel_voorschot_vast(
+        self,
+        case_id: str,
+        jaarbedrag: int | None = None,
+        maandbedrag: int | None = None,
+        beschikking_datum: date | None = None,
+    ) -> str:
         """Establish advance payment for a toeslag case"""
         case = self.repository.get(UUID(case_id))
         # Use provided amounts or calculate from berekend_jaarbedrag
         jaar = jaarbedrag if jaarbedrag is not None else case.berekend_jaarbedrag
         maand = maandbedrag if maandbedrag is not None else (jaar // 12 if jaar else 0)
-        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand)
+        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand, beschikking_datum=beschikking_datum)
         self.save(case)
         return str(case.id)
 
@@ -501,14 +520,19 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
-    def stel_definitief_vast(self, case_id: str, definitief_jaarbedrag: int) -> str:
+    def stel_definitief_vast(
+        self,
+        case_id: str,
+        definitief_jaarbedrag: int,
+        beschikking_datum: date | None = None,
+    ) -> str:
         """Establish final determination"""
         case = self.repository.get(UUID(case_id))
-        case.stel_definitief_vast(definitief_jaarbedrag=definitief_jaarbedrag)
+        case.stel_definitief_vast(definitief_jaarbedrag=definitief_jaarbedrag, beschikking_datum=beschikking_datum)
         self.save(case)
         return str(case.id)
 
-    def vereffen(self, case_id: str) -> str:
+    def vereffen(self, case_id: str, vereffening_datum: date | None = None) -> str:
         """Execute settlement (back-payment or recovery)"""
         case = self.repository.get(UUID(case_id))
 
@@ -530,7 +554,11 @@ class CaseManager(Application):
             vereffening_type = "GEEN"
             vereffening_bedrag = 0
 
-        case.vereffen(vereffening_type=vereffening_type, vereffening_bedrag=vereffening_bedrag)
+        case.vereffen(
+            vereffening_type=vereffening_type,
+            vereffening_bedrag=vereffening_bedrag,
+            vereffening_datum=vereffening_datum,
+        )
         self.save(case)
         return str(case.id)
 
@@ -538,5 +566,32 @@ class CaseManager(Application):
         """End a toeslag"""
         case = self.repository.get(UUID(case_id))
         case.beeindig(reden=reden, einddatum=einddatum)
+        self.save(case)
+        return str(case.id)
+
+    def ontvang_ib_aanslag(
+        self,
+        case_id: str,
+        vastgesteld_inkomen: int,
+        aanslag_datum: date,
+    ) -> str:
+        """
+        Register receipt of IB-aanslag (AWIR Art. 19 trigger).
+
+        This triggers the definitieve vaststelling procedure:
+        - Deadline is 6 months after IB-aanslag receipt
+        """
+        from dateutil.relativedelta import relativedelta
+
+        case = self.repository.get(UUID(case_id))
+
+        # Calculate deadline: 6 months after IB-aanslag
+        deadline_definitief = aanslag_datum + relativedelta(months=6)
+
+        case.ib_aanslag_ontvangen(
+            vastgesteld_inkomen=vastgesteld_inkomen,
+            aanslag_datum=aanslag_datum,
+            deadline_definitief=deadline_definitief,
+        )
         self.save(case)
         return str(case.id)

@@ -56,6 +56,7 @@ class Case(Aggregate):
         verified_result: dict,
         rulespec_uuid: str,
         approved_claims_only: bool,
+        aanvraag_datum: date | None = None,
     ) -> None:
         self.claim_ids = None
         self.bsn = bsn
@@ -73,8 +74,8 @@ class Case(Aggregate):
         self.verifier_id = None
         self.objection_status = None
 
-        # Add created_at timestamp
-        self.created_at = datetime.now()
+        # Add created_at timestamp - use provided aanvraag_datum or current time
+        self.created_at = datetime.combine(aanvraag_datum, datetime.min.time()) if aanvraag_datum else datetime.now()
 
         self.approved = None
         self.status = CaseStatus.SUBMITTED
@@ -103,11 +104,17 @@ class Case(Aggregate):
         self.vereffening_bedrag: int | None = None
         self.vereffening_datum: date | None = None
 
+        # IB-aanslag (AWIR Art. 19)
+        self.ib_aanslag_inkomen: int | None = None
+        self.ib_aanslag_datum: date | None = None
+        self.deadline_definitief: date | None = None
+        self.kwijtschelding_reden: str | None = None
+
         # Beschikkingen historie
         self.beschikkingen: list[dict[str, Any]] = []
 
-        # Berekeningsjaar (extracted from parameters or set separately)
-        self.berekeningsjaar: int | None = parameters.get("berekeningsjaar")
+        # Berekeningsjaar (extracted from parameters, or derived from created_at)
+        self.berekeningsjaar: int | None = parameters.get("berekeningsjaar") or self.created_at.year
 
         # Year transition tracking (voor multi-jaar toeslagen)
         self.vorig_jaar_case_id: str | None = None
@@ -465,6 +472,64 @@ class Case(Aggregate):
     def beeindig(self, reden: str, einddatum: date | None = None) -> None:
         """Toeslag beëindigd (bijv. geen voortzetting volgend jaar)"""
         self.status = CaseStatus.BEEINDIGD
+
+    @event("IBAanslagOntvangen")
+    def ib_aanslag_ontvangen(
+        self,
+        vastgesteld_inkomen: int,
+        aanslag_datum: date,
+        deadline_definitief: date,
+    ) -> None:
+        """
+        IB-aanslag ontvangen (AWIR Art. 19 trigger).
+
+        Dit event triggert de definitieve vaststellingsprocedure:
+        - 6 maanden na IB-aanslag moet definitieve beschikking zijn vastgesteld
+        - Uiterlijk 31 december van het jaar volgend op het berekeningsjaar
+        """
+        self.ib_aanslag_inkomen = vastgesteld_inkomen
+        self.ib_aanslag_datum = aanslag_datum
+        self.deadline_definitief = deadline_definitief
+
+        if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
+            self.beschikkingen = []
+        self.beschikkingen.append(
+            {
+                "type": "IB_AANSLAG_ONTVANGEN",
+                "datum": aanslag_datum,
+                "vastgesteld_inkomen": vastgesteld_inkomen,
+                "deadline_definitief": deadline_definitief,
+            }
+        )
+
+    @event("TerugvorderingKwijtgescholden")
+    def terugvordering_kwijtgescholden(
+        self,
+        oorspronkelijk_bedrag: int,
+        reden: str,
+        kwijtschelding_datum: date | None = None,
+    ) -> None:
+        """
+        Terugvordering kwijtgescholden (AWIR Art. 26a).
+
+        Art. 26a: Terugvorderingen onder de doelmatigheidsgrens (€116)
+        worden niet ingevorderd maar kwijtgescholden.
+        """
+        self.vereffening_type = "KWIJTGESCHOLDEN"
+        self.vereffening_bedrag = 0
+        self.kwijtschelding_reden = reden
+        self.status = CaseStatus.VEREFFEND
+
+        if not hasattr(self, "beschikkingen") or self.beschikkingen is None:
+            self.beschikkingen = []
+        self.beschikkingen.append(
+            {
+                "type": "KWIJTSCHELDING",
+                "datum": kwijtschelding_datum or date.today(),
+                "oorspronkelijk_bedrag": oorspronkelijk_bedrag,
+                "reden": reden,
+            }
+        )
 
     # =========================================================================
     # Toeslag helper properties

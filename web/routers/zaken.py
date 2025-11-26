@@ -140,6 +140,20 @@ def group_timeline_by_month(timeline: list[dict], simulated_date: date) -> list[
     return [(k, list(g)) for k, g in groupby(timeline, key=get_month_key)]
 
 
+def serialize_value(v):
+    """Serialize a value for JSON, converting dates to ISO strings."""
+    if isinstance(v, date):
+        return v.isoformat()
+    if isinstance(v, datetime):
+        return v.isoformat()
+    return v
+
+
+def serialize_details(details: dict) -> dict:
+    """Serialize all values in a details dict for JSON compatibility."""
+    return {k: serialize_value(v) for k, v in details.items()}
+
+
 def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
     """Build timeline events for a single case.
 
@@ -158,33 +172,35 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
     # Get aanvraag_datum from created_at
     aanvraag_datum = toeslag.created_at.date().isoformat() if toeslag.created_at else None
 
-    # Add aanvraag event
+    # Add aanvraag event - include year in label for multi-year timelines
+    aanvraag_label_suffix = f" {berekeningsjaar}" if berekeningsjaar else ""
     timeline.append({
         "type": "aanvraag",
-        "label": "Aanvraag ingediend",
+        "label": f"Aanvraag ingediend{aanvraag_label_suffix}",
         "date": aanvraag_datum,
         "zaak_label": zaak_label,
         "zaak_id": zaak_id,
-        "details": {
+        "details": serialize_details({
             "BSN": toeslag.bsn,
             "Berekeningsjaar": toeslag.berekeningsjaar,
-        },
+        }),
     })
 
     # Add berekening event if calculated
     if toeslag.heeft_aanspraak is not None:
         berekening_datum_raw = getattr(toeslag, "berekening_datum", None)
         berekening_datum = berekening_datum_raw.isoformat() if berekening_datum_raw else aanvraag_datum
+        label_suffix = f" {berekeningsjaar}" if berekeningsjaar else ""
         timeline.append({
             "type": "berekening",
-            "label": "Aanspraak berekend" if toeslag.heeft_aanspraak else "Geen aanspraak",
+            "label": f"Aanspraak berekend{label_suffix}" if toeslag.heeft_aanspraak else f"Geen aanspraak{label_suffix}",
             "date": berekening_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
-            "details": {
+            "details": serialize_details({
                 "Heeft aanspraak": "Ja" if toeslag.heeft_aanspraak else "Nee",
                 "Jaarbedrag": format_cents_fn(toeslag.berekend_jaarbedrag),
-            },
+            }),
         })
 
     # Add beschikkingen
@@ -201,7 +217,7 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             if k in ["jaarbedrag", "maandbedrag", "bedrag"]:
                 details[k.replace("_", " ").title()] = format_cents_fn(v)
             else:
-                details[k.replace("_", " ").title()] = v
+                details[k.replace("_", " ").title()] = serialize_value(v)
 
         timeline.append({
             "type": "beschikking",
@@ -224,10 +240,10 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             "date": berekening_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
-            "details": {
+            "details": serialize_details({
                 "Maand": berekening["maand"],
                 "Berekend bedrag": format_cents_fn(berekening["berekend_bedrag"]),
-            },
+            }),
         })
 
     # Add monthly payments
@@ -242,10 +258,10 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             "date": betaal_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
-            "details": {
+            "details": serialize_details({
                 "Maand": betaling["maand"],
                 "Betaald bedrag": format_cents_fn(betaling.get("betaald_bedrag")),
-            },
+            }),
         })
 
     # Add definitieve beschikking event
@@ -266,11 +282,11 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             "date": definitief_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
-            "details": {
+            "details": serialize_details({
                 "Definitief jaarbedrag": format_cents_fn(definitief_jaarbedrag),
                 "Totaal berekend": format_cents_fn(totaal_berekend),
                 "Totaal betaald": format_cents_fn(totaal_betaald),
-            },
+            }),
         })
 
     # Add vereffening event
@@ -288,10 +304,10 @@ def build_timeline_for_case(toeslag, format_cents_fn) -> list[dict]:
             "date": vereffening_datum,
             "zaak_label": zaak_label,
             "zaak_id": zaak_id,
-            "details": {
+            "details": serialize_details({
                 "Type": vereffening_type,
                 "Bedrag": format_cents_fn(vereffening_bedrag),
-            },
+            }),
         })
 
     return timeline
@@ -445,76 +461,81 @@ async def zaken_tijdlijn(
     case_manager=Depends(get_zaken_case_manager),
 ):
     """Show combined multi-year timeline for all toeslagen for a BSN"""
-    profile = machine_service.get_profile_data(bsn)
-    simulated_date = get_simulated_date(request)
+    try:
+        profile = machine_service.get_profile_data(bsn)
+        simulated_date = get_simulated_date(request)
 
-    # Get all toeslagen for this BSN
-    all_cases = case_manager.get_cases_by_bsn(bsn)
-    toeslagen = [c for c in all_cases if c.service == "TOESLAGEN"]
+        # Get all toeslagen for this BSN
+        all_cases = case_manager.get_cases_by_bsn(bsn)
+        toeslagen = [c for c in all_cases if c.service == "TOESLAGEN"]
 
-    # If no toeslagen, redirect to zaken index
-    if not toeslagen:
-        return RedirectResponse(url=f"/zaken/?bsn={bsn}", status_code=303)
+        # If no toeslagen, redirect to zaken index
+        if not toeslagen:
+            return RedirectResponse(url=f"/zaken/?bsn={bsn}", status_code=303)
 
-    # Sort by berekeningsjaar to show oldest first (handle None values)
-    toeslagen.sort(key=lambda c: c.berekeningsjaar or (c.created_at.year if c.created_at else 0))
+        # Sort by berekeningsjaar to show oldest first (handle None values)
+        toeslagen.sort(key=lambda c: c.berekeningsjaar or (c.created_at.year if c.created_at else 0))
 
-    # Build combined timeline from all toeslagen
-    timeline = []
-    for case in toeslagen:
-        timeline.extend(build_timeline_for_case(case, format_cents))
+        # Build combined timeline from all toeslagen
+        timeline = []
+        for case in toeslagen:
+            timeline.extend(build_timeline_for_case(case, format_cents))
 
-    # Sort timeline by date
-    def get_sort_date(event):
-        d = event.get("date")
-        if d is None:
-            return datetime.min
-        if isinstance(d, str):
-            try:
-                return datetime.fromisoformat(d)
-            except ValueError:
+        # Sort timeline by date
+        def get_sort_date(event):
+            d = event.get("date")
+            if d is None:
                 return datetime.min
-        if isinstance(d, date):
-            return datetime.combine(d, datetime.min.time())
-        return datetime.min
+            if isinstance(d, str):
+                try:
+                    return datetime.fromisoformat(d)
+                except ValueError:
+                    return datetime.min
+            if isinstance(d, date):
+                return datetime.combine(d, datetime.min.time())
+            return datetime.min
 
-    timeline.sort(key=get_sort_date)
+        timeline.sort(key=get_sort_date)
 
-    # Group timeline by month
-    grouped_timeline = group_timeline_by_month(timeline, simulated_date)
+        # Group timeline by month
+        grouped_timeline = group_timeline_by_month(timeline, simulated_date)
 
-    # Use the first toeslag for display purposes
-    toeslag = toeslagen[0]
+        # Use the first toeslag for display purposes
+        toeslag = toeslagen[0]
 
-    # Get profile name
-    profile_name = profile.get("name", "") if profile else ""
+        # Get profile name
+        profile_name = profile.get("name", "") if profile else ""
 
-    # Get aanvraag datum for display (from first case)
-    aanvraag_datum_display = toeslag.created_at.date().isoformat() if toeslag.created_at else None
+        # Get aanvraag datum for display (from first case)
+        aanvraag_datum_display = toeslag.created_at.date().isoformat() if toeslag.created_at else None
 
-    return templates.TemplateResponse(
-        "zaken/detail.html",
-        {
-            "request": request,
-            "bsn": bsn,
-            "profile": profile,
-            "profile_name": profile_name,
-            "toeslag": toeslag,
-            "type_label": "Alle toeslagen",
-            "status_label": "",
-            "status_color": "",
-            "timeline": timeline,
-            "grouped_timeline": grouped_timeline,
-            "totaal_berekend": 0,
-            "totaal_betaald": 0,
-            "CaseStatus": CaseStatus,
-            "format_cents": format_cents,
-            "all_profiles": machine_service.get_all_profiles(),
-            "simulated_date": simulated_date.isoformat(),
-            "aanvraag_datum_display": aanvraag_datum_display,
-            "related_cases": toeslagen,
-        },
-    )
+        return templates.TemplateResponse(
+            "zaken/detail.html",
+            {
+                "request": request,
+                "bsn": bsn,
+                "profile": profile,
+                "profile_name": profile_name,
+                "toeslag": toeslag,
+                "type_label": "Alle toeslagen",
+                "status_label": "",
+                "status_color": "",
+                "timeline": timeline,
+                "grouped_timeline": grouped_timeline,
+                "totaal_berekend": 0,
+                "totaal_betaald": 0,
+                "CaseStatus": CaseStatus,
+                "format_cents": format_cents,
+                "all_profiles": machine_service.get_all_profiles(),
+                "simulated_date": simulated_date.isoformat(),
+                "today": date.today().isoformat(),
+                "aanvraag_datum_display": aanvraag_datum_display,
+                "related_cases": toeslagen,
+            },
+        )
+    except Exception as e:
+        logger.exception(f"[TIJDLIJN] Error in zaken_tijdlijn: {e}")
+        raise
 
 
 @router.get("/{case_id}")
@@ -609,6 +630,7 @@ async def zaken_detail(
             "format_cents": format_cents,
             "all_profiles": machine_service.get_all_profiles(),
             "simulated_date": simulated_date.isoformat(),
+            "today": date.today().isoformat(),
             "aanvraag_datum_display": aanvraag_datum_display,
             "related_cases": related_cases,  # For multi-year display
         },

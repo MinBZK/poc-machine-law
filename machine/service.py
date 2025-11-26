@@ -265,6 +265,19 @@ class Services:
 
         return flattened
 
+    def get_rule_spec(self, law: str, reference_date: str, service: str | None = None) -> dict:
+        """Get the rule specification for a given law and date.
+
+        Args:
+            law: The law identifier (e.g., "zorgtoeslagwet")
+            reference_date: The reference date in YYYY-MM-DD format
+            service: Optional service name to filter by
+
+        Returns:
+            The rule specification dictionary
+        """
+        return self.resolver.get_rule_spec(law, reference_date, service=service)
+
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
         return self.resolver.get_discoverable_service_laws(discoverable_by)
 

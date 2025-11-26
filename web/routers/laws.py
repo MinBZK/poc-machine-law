@@ -9,7 +9,15 @@ from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_factory import llm_factory
-from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
+from web.dependencies import (
+    TODAY,
+    get_case_manager,
+    get_claim_manager,
+    get_engine_id,
+    get_machine_service,
+    get_simulated_date,
+    templates,
+)
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
 
@@ -166,8 +174,27 @@ async def execute_law(
             },
         )
 
-    # Check if there's an existing case
-    existing_case = case_manager.get_case(bsn, service, law)
+    # Check if there's an existing case for the current simulated year
+    simulated_date = get_simulated_date(request)
+    simulated_year = simulated_date.year
+
+    # Get all cases for this BSN/service/law combination and find the most relevant one
+    all_cases = case_manager.get_cases_by_bsn(bsn)
+    relevant_cases = [c for c in all_cases if c.service == service and c.law == law]
+
+    # Find the case for the current year, or the most recent one
+    existing_case = None
+    for case in relevant_cases:
+        if getattr(case, "berekeningsjaar", None) == simulated_year:
+            existing_case = case
+            break
+    if not existing_case and relevant_cases:
+        # Fallback to most recent case (by berekeningsjaar or created_at)
+        relevant_cases.sort(
+            key=lambda c: c.berekeningsjaar if c.berekeningsjaar else (c.created_at.year if c.created_at else 0),
+            reverse=True,
+        )
+        existing_case = relevant_cases[0]
 
     # Get the appropriate template
     template_path = get_tile_template(service, law)
@@ -207,6 +234,9 @@ async def submit_case(
     """Submit a new case"""
     law = unquote(law)
 
+    # Get simulated date for time-based workflows
+    simulated_date = get_simulated_date(request)
+
     law, result, parameters = evaluate_law(
         bsn,
         law,
@@ -224,6 +254,7 @@ async def submit_case(
         parameters=parameters,
         claimed_result=result.output,
         approved_claims_only=approved,
+        effective_date=simulated_date,
     )
 
     # Get rule_spec for dynamic field detection in AWIR workflow
@@ -242,11 +273,12 @@ async def submit_case(
             case_id=case_id,
             heeft_aanspraak=heeft_aanspraak,
             berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=simulated_date,
         )
 
         if heeft_aanspraak:
             # Set voorschot (AWIR Art. 16) - triggers VoorschotBeschikkingVastgesteld event
-            case_manager.stel_voorschot_vast(case_id=case_id)
+            case_manager.stel_voorschot_vast(case_id=case_id, beschikking_datum=simulated_date)
         else:
             # Reject (AWIR Art. 16 lid 4) - triggers Afgewezen event
             case_manager.wijs_af(case_id=case_id, reden="Geen aanspraak op basis van berekening")

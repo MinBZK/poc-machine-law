@@ -59,8 +59,6 @@ class CaseManager(CaseManagerInterface):
         approved_claims_only: bool,
         effective_date: datetime.date | None = None,
     ) -> UUID:
-        # Note: The underlying machine.service library does not support effective_date yet
-        # For now, we pass the existing parameters and ignore effective_date
         return self.case_manager.submit_case(
             bsn=bsn,
             service_type=service,
@@ -68,6 +66,7 @@ class CaseManager(CaseManagerInterface):
             parameters=parameters,
             claimed_result=claimed_result,
             approved_claims_only=approved_claims_only,
+            aanvraag_datum=effective_date,
         )
 
     def complete_manual_review(
@@ -105,11 +104,13 @@ class CaseManager(CaseManagerInterface):
         case_id: UUID,
         heeft_aanspraak: bool,
         berekend_jaarbedrag: int,
+        berekening_datum: datetime.date | None = None,
     ) -> UUID:
         result = self.case_manager.bereken_aanspraak(
             case_id=str(case_id),
             heeft_aanspraak=heeft_aanspraak,
             berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=berekening_datum,
         )
         return UUID(result)
 
@@ -129,11 +130,13 @@ class CaseManager(CaseManagerInterface):
         case_id: UUID,
         jaarbedrag: int | None = None,
         maandbedrag: int | None = None,
+        beschikking_datum: datetime.date | None = None,
     ) -> UUID:
         result = self.case_manager.stel_voorschot_vast(
             case_id=str(case_id),
             jaarbedrag=jaarbedrag,
             maandbedrag=maandbedrag,
+            beschikking_datum=beschikking_datum,
         )
         return UUID(result)
 
