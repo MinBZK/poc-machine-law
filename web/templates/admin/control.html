@@ -18,7 +18,8 @@
             {# Reset Form #}
             <form hx-post="/admin/reset"
                   hx-trigger="submit"
-                  hx-on::after-request="var btn = document.getElementById('reset-submit'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.href = '/admin', 7000)"
+                  hx-on:htmx:before-request="var btn = document.getElementById('reset-submit'); btn.disabled = true;"
+                  hx-on:htmx:after-request="setTimeout(() => window.location.href = '/admin', 7000)"
                   class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
                 <h1 class="text-gray-900 text-3xl font-semibold mb-5">Reset de applicatie-state</h1>
                 <p class="mb-5">
@@ -30,10 +31,10 @@
                     ongedaan worden gemaakt.
                 </p>
                 <button id="reset-submit"
-                        class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 disabled:bg-red-400 cursor-pointer"
+                        class="group inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 cursor-pointer disabled:bg-red-300 disabled:cursor-not-allowed"
                         type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5 mr-2 -ml-1"
+                         class="w-5 h-5 mr-2 -ml-1 group-disabled:animate-spin"
                          viewBox="0 0 24 24">
                         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                         <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
