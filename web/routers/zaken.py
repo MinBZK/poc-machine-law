@@ -548,6 +548,19 @@ async def zaken_tijdlijn(
         unique_laws = set(c.law for c in toeslagen)
         show_zaak_labels = len(unique_laws) > 1
 
+        # Collect unique zaak labels with their IDs for filtering
+        unique_zaak_labels = {}
+        for event in timeline:
+            zaak_label = event.get("zaak_label")
+            zaak_id = event.get("zaak_id")
+            if zaak_label and zaak_id:
+                if zaak_label not in unique_zaak_labels:
+                    unique_zaak_labels[zaak_label] = zaak_id
+
+        # Sort by label (which includes year)
+        sorted_zaak_labels = sorted(unique_zaak_labels.items())
+        logger.info(f"[TIJDLIJN] Found {len(sorted_zaak_labels)} unique zaak labels: {sorted_zaak_labels}")
+
         # Use the first toeslag for display purposes
         toeslag = toeslagen[0]
 
@@ -581,6 +594,7 @@ async def zaken_tijdlijn(
                 "related_cases": toeslagen,
                 "unread_count": unread_count,
                 "show_zaak_labels": show_zaak_labels,
+                "zaak_labels": sorted_zaak_labels,
             },
         )
     except Exception as e:

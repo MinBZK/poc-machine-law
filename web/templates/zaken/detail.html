@@ -14,25 +14,51 @@
         </div>
     </div>
 
+    <!-- Zaak Filter Section -->
+    {% if zaak_labels and zaak_labels|length >= 1 %}
+    <div class="mb-4 flex flex-wrap gap-2">
+        <!-- "Alles" pill to show all -->
+        <button
+            id="alles-pill"
+            class="zaak-filter-pill px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border-2 bg-blue-600 text-white border-blue-600"
+            data-active="true"
+        >
+            Alles
+        </button>
+
+        {% for zaak_label, zaak_id in zaak_labels %}
+        <button
+            class="zaak-filter-pill px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border-2 bg-gray-100 text-gray-600 border-gray-300"
+            data-zaak-label="{{ zaak_label }}"
+            data-active="false"
+        >
+            {{ zaak_label }}
+        </button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="grid grid-cols-1 gap-6">
         <!-- Timeline (RegelRecht design) -->
         <div>
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 {% if grouped_timeline %}
                 {% for month, events in grouped_timeline %}
-                <!-- Month header -->
-                <div class="regelrecht-timeline__heading-row bg-gray-100 px-4 py-2 font-medium text-gray-700 border-l-4 border-blue-600">
-                    {{ month }}
-                </div>
+                <div data-month-group>
+                    <!-- Month header -->
+                    <div class="regelrecht-timeline__heading-row bg-gray-100 px-4 py-2 font-medium text-gray-700 border-l-4 border-blue-600">
+                        {{ month }}
+                    </div>
 
-                <!-- Events for this month -->
-                {% for event in events %}
-                <div class="flex items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
-                     onclick="openEventPanel(this)"
-                     data-event-type="{{ event.type }}"
-                     data-event-label="{{ event.label }}"
-                     data-event-date="{{ event.date_formatted }}"
-                     data-event-details='{{ event.details | tojson if event.details else "{}" }}'>
+                    <!-- Events for this month -->
+                    {% for event in events %}
+                    <div class="flex items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                         onclick="openEventPanel(this)"
+                         data-event-type="{{ event.type }}"
+                         data-event-label="{{ event.label }}"
+                         data-event-date="{{ event.date_formatted }}"
+                         data-event-details='{{ event.details | tojson if event.details else "{}" }}'
+                         data-event-zaak-label="{{ event.zaak_label }}"
                     <!-- Status indicator - icons per event type -->
                     <div class="mr-4 flex-shrink-0">
                         {% if event.type == 'betaling' %}
@@ -120,6 +146,7 @@
                     </div>
                 </div>
                 {% endfor %}
+                </div>
                 {% endfor %}
                 {% else %}
                 <div class="p-8 text-center text-gray-500">
@@ -222,6 +249,121 @@ function closeEventPanel() {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeEventPanel();
+    }
+});
+
+// Timeline filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const originalPills = document.querySelectorAll('.zaak-filter-pill[data-zaak-label]');
+    const pillContainer = document.querySelector('.mb-4.flex');
+    const allesPill = document.getElementById('alles-pill');
+    const timelineEvents = document.querySelectorAll('[data-event-zaak-label]');
+
+    // Group zaak labels by wet name (without year)
+    const wetGroups = {};
+    originalPills.forEach(pill => {
+        const fullLabel = pill.dataset.zaakLabel;
+        // Extract wet name by removing the year at the end
+        const wetName = fullLabel.replace(/\s+\d{4}$/, '');
+
+        if (!wetGroups[wetName]) {
+            wetGroups[wetName] = [];
+        }
+        wetGroups[wetName].push(fullLabel);
+    });
+
+    // Remove original pills
+    originalPills.forEach(pill => pill.remove());
+
+    // Create new grouped pills
+    const newPills = [];
+    Object.keys(wetGroups).sort().forEach(wetName => {
+        const button = document.createElement('button');
+        button.className = 'zaak-filter-pill px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border-2 bg-gray-100 text-gray-600 border-gray-300';
+        button.dataset.wetName = wetName;
+        button.dataset.zaakLabels = JSON.stringify(wetGroups[wetName]);
+        button.dataset.active = 'false';
+        button.textContent = wetName;
+        pillContainer.appendChild(button);
+        newPills.push(button);
+    });
+
+    function setActive(pill) {
+        pill.dataset.active = 'true';
+        pill.classList.remove('bg-gray-100', 'text-gray-600', 'border-gray-300');
+        pill.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+    }
+
+    function setInactive(pill) {
+        pill.dataset.active = 'false';
+        pill.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+        pill.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-300');
+    }
+
+    function filterTimeline() {
+        // Check if "Alles" is active
+        if (allesPill.dataset.active === 'true') {
+            // Show all events
+            timelineEvents.forEach(event => {
+                event.style.display = '';
+            });
+            // Show all month headers
+            document.querySelectorAll('[data-month-group]').forEach(monthGroup => {
+                monthGroup.style.display = '';
+            });
+        } else {
+            // Collect active labels from grouped pills
+            const activeLabels = new Set();
+            newPills.forEach(pill => {
+                if (pill.dataset.active === 'true') {
+                    const labels = JSON.parse(pill.dataset.zaakLabels);
+                    labels.forEach(label => activeLabels.add(label));
+                }
+            });
+
+            // Show/hide events based on active labels
+            timelineEvents.forEach(event => {
+                const eventLabel = event.dataset.eventZaakLabel;
+                event.style.display = activeLabels.has(eventLabel) ? '' : 'none';
+            });
+
+            // Hide empty month headers
+            document.querySelectorAll('[data-month-group]').forEach(monthGroup => {
+                const visibleEvents = monthGroup.querySelectorAll(
+                    '[data-event-zaak-label]:not([style*="display: none"])'
+                );
+                monthGroup.style.display = visibleEvents.length === 0 ? 'none' : '';
+            });
+        }
+    }
+
+    // Click handler for wet pills - activate only this one
+    newPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            // Deactivate "Alles"
+            setInactive(allesPill);
+
+            // Deactivate all other pills
+            newPills.forEach(p => setInactive(p));
+
+            // Activate clicked pill
+            setActive(pill);
+
+            filterTimeline();
+        });
+    });
+
+    // Click handler for "Alles" pill - show everything
+    if (allesPill) {
+        allesPill.addEventListener('click', () => {
+            // Deactivate all wet pills
+            newPills.forEach(p => setInactive(p));
+
+            // Activate "Alles"
+            setActive(allesPill);
+
+            filterTimeline();
+        });
     }
 });
 </script>
