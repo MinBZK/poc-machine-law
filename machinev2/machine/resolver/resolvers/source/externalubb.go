@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
@@ -72,6 +73,30 @@ func pascalCase(s string) string {
 	}
 
 	return s
+}
+
+func snakeCase(s string) string {
+	var result strings.Builder
+
+	for i, r := range s {
+		if i > 0 {
+			prevRune := rune(s[i-1])
+
+			// Add underscore if:
+			// 1. Current char is uppercase and previous was lowercase
+			// 2. Current char is a digit and previous was a letter
+			// 3. Current char is a letter and previous was a digit
+			if (unicode.IsUpper(r) && unicode.IsLower(prevRune)) ||
+				(unicode.IsDigit(r) && unicode.IsLetter(prevRune)) ||
+				(unicode.IsLetter(r) && unicode.IsDigit(prevRune)) {
+				result.WriteRune('_')
+			}
+		}
+
+		result.WriteRune(unicode.ToLower(r))
+	}
+
+	return result.String()
 }
 
 func solver(
@@ -145,6 +170,13 @@ func solveField(
 
 	if f.Source != nil && f.Source.TypeSpec != nil {
 		return typespec.Enforce(model.TypeSpec(*f.Source.TypeSpec), x), nil
+	}
+
+	if v, ok := x.(map[string]any); ok {
+		for key, value := range v {
+			// v[snakeCase(key)] = value
+			v[key] = value
+		}
 	}
 
 	return x, nil

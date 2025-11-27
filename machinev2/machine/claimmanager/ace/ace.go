@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/google/uuid"
@@ -410,11 +411,38 @@ func convert(role claimType, value any) string {
 		if x1, ok := x[role.ReferencedName]; ok {
 			val = convert(role, x1)
 		}
+		if x1, ok := x[snakeCase(role.ReferencedName)]; ok {
+			val = convert(role, x1)
+		}
 	default:
 		val = fmt.Sprintf("%v", x)
 	}
 
 	return val
+}
+
+func snakeCase(s string) string {
+	var result strings.Builder
+
+	for i, r := range s {
+		if i > 0 {
+			prevRune := rune(s[i-1])
+
+			// Add underscore if:
+			// 1. Current char is uppercase and previous was lowercase
+			// 2. Current char is a digit and previous was a letter
+			// 3. Current char is a letter and previous was a digit
+			if (unicode.IsUpper(r) && unicode.IsLower(prevRune)) ||
+				(unicode.IsDigit(r) && unicode.IsLetter(prevRune)) ||
+				(unicode.IsLetter(r) && unicode.IsDigit(prevRune)) {
+				result.WriteRune('_')
+			}
+		}
+
+		result.WriteRune(unicode.ToLower(r))
+	}
+
+	return result.String()
 }
 
 func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimType string, bsnID string, value any, t *time.Time) (string, error) {
@@ -530,7 +558,7 @@ func (cm *ClaimManager) extractProposedValue(values []*generated.ClaimAttributes
 	data := make(map[string]any)
 	for _, v := range values {
 		if _, ok := expectedFields[*v.Key]; ok {
-			data[*v.Key] = cm.translateClaimValue(*v.Key, *v.Value)
+			data[snakeCase(*v.Key)] = cm.translateClaimValue(*v.Key, *v.Value)
 		}
 	}
 
@@ -698,7 +726,7 @@ func (cm *ClaimManager) convertOutputToSourceField(key, svc, law string) string 
 
 	// Return the mapped field name, or the original key if no mapping exists
 	if sourceField, ok := outputToSource[key]; ok {
-		return sourceField[0]
+		return sourceField
 	}
 
 	return key
@@ -720,10 +748,8 @@ func (cm *ClaimManager) convertSourceToOutputField(key, svc, law string) string 
 	// Return the mapped field name, or the original key if no mapping exists
 
 	for k, v := range outputToSource {
-		for _, v1 := range v {
-			if v1 == key {
-				return k
-			}
+		if v == key {
+			return k
 		}
 	}
 
@@ -731,16 +757,16 @@ func (cm *ClaimManager) convertSourceToOutputField(key, svc, law string) string 
 }
 
 // buildOutputToSourceMap builds a mapping from output field names to source_reference field names.
-func buildOutputToSourceMap(spec ruleresolver.RuleSpec) map[string][]string {
+func buildOutputToSourceMap(spec ruleresolver.RuleSpec) map[string]string {
 	// Build a map of source names to their fields
-	sourceFields := make(map[string][]string)
+	sourceFields := make(map[string]string)
 	for _, source := range spec.Properties.Sources {
 		if source.SourceReference != nil {
 			if source.SourceReference.Fields != nil {
-				sourceFields[source.Name] = *source.SourceReference.Fields
+				sourceFields[source.Name] = source.SourceReference.Table
 			}
 			if source.SourceReference.Field != nil {
-				sourceFields[source.Name] = []string{*source.SourceReference.Field}
+				sourceFields[source.Name] = *source.SourceReference.Field
 			}
 		}
 	}

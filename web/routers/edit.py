@@ -198,19 +198,23 @@ async def update_value(
         # evidence_path = await save_evidence_file(evidence)
         pass
 
-    claim_id = claim_manager.submit_claim(
-        service=service,
-        key=key,
-        new_value=parsed_value,
-        reason=reason,
-        claimant=claimant,
-        case_id=case_id,
-        old_value=parsed_old_value,  # Now passing the old value properly
-        evidence_path=evidence_path,
-        law=law,
-        bsn=bsn,
-        auto_approve=auto_approve,
-    )
+    try:
+        claim_id = claim_manager.submit_claim(
+            service=service,
+            key=key,
+            new_value=parsed_value,
+            reason=reason,
+            claimant=claimant,
+            case_id=case_id,
+            old_value=parsed_old_value,  # Now passing the old value properly
+            evidence_path=evidence_path,
+            law=law,
+            bsn=bsn,
+            auto_approve=auto_approve,
+        )
+    except ValueError as e:
+        logger.error(f"Failed to submit claim: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Get details from form data if they exist
     from contextlib import suppress
@@ -385,18 +389,22 @@ async def update_missing_values(
             pass
 
         # Submit each claim individually
-        claim_manager.submit_claim(
-            service=service,
-            key=key,
-            new_value=parsed_value,
-            reason=f"{reason} (bulk update)",
-            claimant=claimant,
-            case_id=case_id,
-            evidence_path=None,
-            law=law,
-            bsn=bsn,
-            auto_approve=False,
-        )
+        try:
+            claim_manager.submit_claim(
+                service=service,
+                key=key,
+                new_value=parsed_value,
+                reason=f"{reason} (bulk update)",
+                claimant=claimant,
+                case_id=case_id,
+                evidence_path=None,
+                law=law,
+                bsn=bsn,
+                auto_approve=False,
+            )
+        except ValueError as e:
+            logger.error(f"Failed to submit claim for key {key}: {e}")
+            raise HTTPException(status_code=400, detail=f"Failed to submit claim for {key}: {str(e)}")
 
     response = templates.TemplateResponse(
         "partials/edit_success.html",
@@ -540,16 +548,23 @@ async def update_situation(
 
     # Add the claim(s) to the case
     for key, value in parameters.items():
-        claim_manager.submit_claim(
-            service=service,
-            key=key,
-            new_value=value,
-            reason=details,
-            claimant=bsn,
-            law=law,
-            bsn=bsn,
-            case_id=case_id,
-            # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
-        )
+        try:
+            claim_manager.submit_claim(
+                service=service,
+                key=key,
+                new_value=value,
+                reason=details,
+                claimant=bsn,
+                law=law,
+                bsn=bsn,
+                case_id=case_id,
+                # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
+            )
+        except ValueError as e:
+            logger.error(f"Failed to submit claim for key {key}: {e}")
+            return JSONResponse(
+                {"status": "error", "message": f"Failed to submit claim for {key}: {str(e)}"},
+                status_code=400,
+            )
 
     return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt"})
