@@ -290,7 +290,7 @@ profiles:
       BELASTINGDIENST:
         box1:
         - bsn: '999991905'
-          loon_uit_dienstbetrekking: 2000000
+          loon_uit_dienstbetrekking: 25000
           uitkeringen_en_pensioenen: 0
           winst_uit_onderneming: 0
           resultaat_overige_werkzaamheden: 0
