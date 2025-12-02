@@ -1,4 +1,5 @@
 import logging
+import urllib.parse
 from collections import defaultdict
 from datetime import date, datetime
 from typing import Any
@@ -93,8 +94,12 @@ class MachineService(EngineInterface):
 
         try:
             with client as client:
+                # URL encode service and law parameters
+                encoded_service = urllib.parse.quote_plus(service)
+                encoded_law = urllib.parse.quote_plus(law)
+
                 response = rule_spec_get.sync_detailed(
-                    client=client, service=service, law=law, reference_date=reference_date
+                    client=client, service=encoded_service, law=encoded_law, reference_date=reference_date
                 )
 
                 if response.status_code < 200 or response.status_code >= 300:

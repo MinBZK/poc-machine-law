@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/minbzk/poc-machine-law/machinev2/backend/handler/adapter"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/interface/api"
@@ -31,11 +32,16 @@ func (handler *Handler) ServiceLawsDiscoverableList(ctx context.Context, request
 
 // RuleSpecGet implements api.StrictServerInterface.
 func (handler *Handler) RuleSpecGet(ctx context.Context, request api.RuleSpecGetRequestObject) (api.RuleSpecGetResponseObject, error) {
-	spec, err := handler.servicer.GetRuleSpec(request.Params.Service, request.Params.Law, request.Params.ReferenceDate.Time)
+
+	law, _ := url.QueryUnescape(request.Params.Law)
+	service, _ := url.QueryUnescape(request.Params.Service)
+
+	spec, err := handler.servicer.GetRuleSpec(service, law, request.Params.ReferenceDate.Time)
 	if err != nil {
+		handler.logger.Warn("rule spec", "status_code", 400, "err", err)
 		return api.RuleSpecGet400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("get rule spec: %w", err)),
-		}, err
+		}, nil
 	}
 
 	return api.RuleSpecGet200JSONResponse{

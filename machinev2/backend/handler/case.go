@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 
 	"github.com/minbzk/poc-machine-law/machinev2/backend/handler/adapter"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/interface/api"
@@ -12,7 +13,17 @@ import (
 
 // CaseBasedOnBSNServiceLaw implements api.StrictServerInterface.
 func (handler *Handler) CaseBasedOnBSNServiceLaw(ctx context.Context, request api.CaseBasedOnBSNServiceLawRequestObject) (api.CaseBasedOnBSNServiceLawResponseObject, error) {
-	case_, err := handler.servicer.CaseGetBasedOnBSNServiceLaw(ctx, request.Bsn, request.Service, request.Law)
+	law, err := url.QueryUnescape(request.Law)
+	if err != nil {
+		return api.CaseBasedOnBSNServiceLaw400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("could not decode law"))}, nil
+	}
+
+	service, err := url.QueryUnescape(request.Service)
+	if err != nil {
+		return api.CaseBasedOnBSNServiceLaw400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("could not decode service"))}, nil
+	}
+
+	case_, err := handler.servicer.CaseGetBasedOnBSNServiceLaw(ctx, request.Bsn, service, law)
 	if err != nil {
 		if errors.Is(err, model.ErrCaseNotFound) {
 			return api.CaseBasedOnBSNServiceLaw404JSONResponse{
@@ -38,7 +49,17 @@ func (handler *Handler) CaseBasedOnBSNServiceLaw(ctx context.Context, request ap
 
 // CaseListBasedOnServiceLaw implements api.StrictServerInterface.
 func (handler *Handler) CaseListBasedOnServiceLaw(ctx context.Context, request api.CaseListBasedOnServiceLawRequestObject) (api.CaseListBasedOnServiceLawResponseObject, error) {
-	cases, err := handler.servicer.CaseListBasedOnServiceLaw(ctx, request.Service, request.Law)
+	law, err := url.QueryUnescape(request.Law)
+	if err != nil {
+		return api.CaseListBasedOnServiceLaw400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("could not decode law"))}, nil
+	}
+
+	service, err := url.QueryUnescape(request.Service)
+	if err != nil {
+		return api.CaseListBasedOnServiceLaw400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("could not decode service"))}, nil
+	}
+
+	cases, err := handler.servicer.CaseListBasedOnServiceLaw(ctx, service, law)
 	if err != nil {
 		return api.CaseListBasedOnServiceLaw400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("case list based on service & law: %w", err)),

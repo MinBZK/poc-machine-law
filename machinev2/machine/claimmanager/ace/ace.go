@@ -368,7 +368,12 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(ctx context.Context, bsn string,
 			return nil, fmt.Errorf("get bewering: %w", err)
 		}
 
-		if bewering.BSN == bsn && bewering.Law == law {
+		beweringBSN, err := cm.getBSNString(ctx, nil, bewering.BSN)
+		if err != nil {
+			return nil, fmt.Errorf("get bsn string: %w", err)
+		}
+
+		if strings.EqualFold(beweringBSN, bsn) && strings.EqualFold(bewering.Law, law) {
 			if cm.matchesStatusFilter(bewering, approved, includeRejected) {
 				result[bewering.Key] = *bewering
 			}
@@ -395,6 +400,29 @@ func (cm *ClaimManager) getBSN(ctx context.Context, txID *string, bsn string) (s
 	}
 
 	return data.GetClaimsBsn[0].Id, nil
+}
+
+func (cm *ClaimManager) getBSNString(ctx context.Context, txID *string, bsn string) (string, error) {
+	data, err := generated.ClaimAttributesByClaimID(ctx, cm.clients.grp, txID, bsn, time.Now())
+	if err != nil {
+		return "", fmt.Errorf("get claims by claim ID: %w", err)
+	}
+
+	if data.ClaimAttributesByClaimID == nil {
+		return "", errors.New("bsn not found")
+	}
+
+	if data.ClaimAttributesByClaimID.Name != "Bsn" {
+		return "", errors.New("invalid claim type")
+	}
+
+	for _, value := range data.ClaimAttributesByClaimID.Values {
+		if *value.Key == "bsn" {
+			return *value.Value, nil
+		}
+	}
+
+	return "", errors.New("bsn claim not found")
 }
 
 func convert(role claimType, value any) string {
