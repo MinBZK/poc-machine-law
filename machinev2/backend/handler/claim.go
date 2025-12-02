@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 
 	"github.com/minbzk/poc-machine-law/machinev2/backend/handler/adapter"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/interface/api"
@@ -37,12 +38,22 @@ func (handler *Handler) ClaimListBasedOnBSN(
 
 // ClaimListBasedOnBSNServiceLaw implements api.StrictServerInterface.
 func (handler *Handler) ClaimListBasedOnBSNServiceLaw(ctx context.Context, request api.ClaimListBasedOnBSNServiceLawRequestObject) (api.ClaimListBasedOnBSNServiceLawResponseObject, error) {
+	law, err := url.QueryUnescape(request.Law)
+	if err != nil {
+		return api.ClaimListBasedOnBSNServiceLaw400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("could not decode law"))}, nil
+	}
+
+	svc, err := url.QueryUnescape(request.Service)
+	if err != nil {
+		return api.ClaimListBasedOnBSNServiceLaw400JSONResponse{BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("could not decode service"))}, nil
+	}
+
 	filter := service.ClaimListFilter{
 		OnlyApproved:    request.Params.Approved,
 		IncludeRejected: request.Params.IncludeRejected,
 	}
 
-	claims, err := handler.servicer.ClaimListBasedOnBSNServiceLaw(ctx, request.Bsn, request.Service, request.Law, filter)
+	claims, err := handler.servicer.ClaimListBasedOnBSNServiceLaw(ctx, request.Bsn, svc, law, filter)
 	if err != nil {
 		return api.ClaimListBasedOnBSNServiceLaw400JSONResponse{
 			BadRequestErrorResponseJSONResponse: NewBadRequestErrorResponseObject(fmt.Errorf("claim list based on bsn: %w", err)),

@@ -1,4 +1,5 @@
 import logging
+import urllib.parse
 from typing import Any
 from uuid import UUID
 
@@ -156,11 +157,19 @@ class ClaimManager(ClaimManagerInterface):
         client = Client(base_url=service_base_url)
 
         with client as client:
+            # URL encode service and law parameters
+            encoded_service = urllib.parse.quote_plus(service)
+            encoded_law = urllib.parse.quote_plus(law)
+
             # If effective_date is provided, we need to manually add it as a query parameter
             if effective_date:
                 # Get the base kwargs and add effective_date parameter
                 kwargs = claim_list_based_on_bsn_service_law._get_kwargs(
-                    bsn=bsn, service=service, law=law, approved=approved, include_rejected=include_rejected
+                    bsn=bsn,
+                    service=encoded_service,
+                    law=encoded_law,
+                    approved=approved,
+                    include_rejected=include_rejected,
                 )
                 kwargs["params"]["effective_date"] = effective_date
                 response_raw = client.get_httpx_client().request(**kwargs)
@@ -169,8 +178,8 @@ class ClaimManager(ClaimManagerInterface):
                 response = claim_list_based_on_bsn_service_law.sync_detailed(
                     client=client,
                     bsn=bsn,
-                    service=service,
-                    law=law,
+                    service=encoded_service,
+                    law=encoded_law,
                     approved=approved,
                     include_rejected=include_rejected,
                 )
