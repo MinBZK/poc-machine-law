@@ -199,8 +199,16 @@ func (s *Services) Reset(ctx context.Context) error {
 	var errs error
 
 	for key := range s.services {
-		if err := s.services[key].Reset(ctx); err != nil {
-			errs = errors.Join(errs, err)
+		if s.HasOrganizationName() {
+			if strings.EqualFold(s.GetOrganizationName(), key) {
+				if err := s.services[key].Reset(ctx); err != nil {
+					errs = errors.Join(errs, err)
+				}
+			}
+		} else {
+			if err := s.services[key].Reset(ctx); err != nil {
+				errs = errors.Join(errs, err)
+			}
 		}
 	}
 

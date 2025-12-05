@@ -18,6 +18,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from web.dependencies import get_case_manager, get_claim_manager, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface
 from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
+from web.feature_flags import is_auto_approve_claims_enabled
 
 router = APIRouter(prefix="/edit", tags=["edit"])
 logger = logging.getLogger(__name__)
@@ -199,6 +200,9 @@ async def update_value(
         pass
 
     try:
+        # Check if auto-approval is globally enabled via feature flag
+        should_auto_approve = auto_approve or is_auto_approve_claims_enabled()
+
         claim_id = claim_manager.submit_claim(
             service=service,
             key=key,
@@ -210,7 +214,7 @@ async def update_value(
             evidence_path=evidence_path,
             law=law,
             bsn=bsn,
-            auto_approve=auto_approve,
+            auto_approve=should_auto_approve,
         )
     except ValueError as e:
         logger.error(f"Failed to submit claim: {e}")
@@ -400,7 +404,7 @@ async def update_missing_values(
                 evidence_path=None,
                 law=law,
                 bsn=bsn,
-                auto_approve=False,
+                auto_approve=is_auto_approve_claims_enabled(),
             )
         except ValueError as e:
             logger.error(f"Failed to submit claim for key {key}: {e}")
@@ -558,6 +562,7 @@ async def update_situation(
                 law=law,
                 bsn=bsn,
                 case_id=case_id,
+                auto_approve=is_auto_approve_claims_enabled(),
                 # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
             )
         except ValueError as e:

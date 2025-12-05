@@ -156,8 +156,7 @@ func (cm *ClaimManager) Submit(
 
 		// Auto-approve if requested
 		if autoApprove {
-			err = cm.approveInTransaction(ctx, txID, claim.ID, newValue, claimant, bsnID, effectiveDate)
-			if err != nil {
+			if err := cm.approveInTransaction(ctx, txID, beweringID, newValue, claimant, bsnID, effectiveDate); err != nil {
 				return fmt.Errorf("auto-approve: %w", err)
 			}
 		}
