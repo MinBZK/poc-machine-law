@@ -17,7 +17,7 @@ from web.dependencies import (
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
-from web.feature_flags import is_chat_enabled
+from web.feature_flags import is_auto_approve_claims_enabled, is_chat_enabled
 from web.utils import format_message
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -516,7 +516,7 @@ async def websocket_endpoint(
                                             claimant=f"CHAT_USER_{bsn}",
                                             law=service.law_path,
                                             bsn=bsn,
-                                            auto_approve=False,  # Don't auto-approve to ensure proper review
+                                            auto_approve=is_auto_approve_claims_enabled(),
                                         )
 
                                         # Update system prompt with new claim data
