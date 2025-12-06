@@ -464,25 +464,3 @@ async def view_case(
             "current_engine_id": get_engine_id(),
         },
     )
-
-
-@router.get("/claims/{claim_id}")
-async def view_claim(
-    request: Request,
-    claim_id: str,
-    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
-    case_manager: CaseManagerInterface = Depends(get_case_manager),
-):
-    """View details of a specific claim"""
-    claim = claim_manager.get_claim(claim_id)
-    if not claim:
-        raise HTTPException(status_code=404, detail="Claim not found")
-
-    # Get related case if it exists
-    related_case = None
-    if claim.case_id:
-        related_case = case_manager.get_case_by_id(claim.case_id)
-
-    return templates.TemplateResponse(
-        "admin/claim_detail.html", {"request": request, "claim": claim, "related_case": related_case}
-    )
