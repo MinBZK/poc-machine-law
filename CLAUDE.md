@@ -23,5 +23,5 @@
 
 ## Git Workflow
 - NEVER amend commits that failed to go through - make new commits instead
-- Run pre-commit hooks before committing to catch formatting issues
+- ALWAYS run `pre-commit run --all-files` BEFORE every commit (hooks don't auto-run in Claude's Bash environment)
 - Always check git status before committing to make sure you're working with the latest changes
