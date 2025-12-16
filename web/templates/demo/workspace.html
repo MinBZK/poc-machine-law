@@ -521,7 +521,12 @@
                             if (self.activeTab === 'presentatie' && !self.editingPresenterName) {
                                 if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
                                     e.preventDefault();
-                                    self.nextSlide();
+                                    // If on last slide, navigate to Wetten tab
+                                    if (self.currentSlide === self.totalSlides - 1) {
+                                        self.switchTab('laws');
+                                    } else {
+                                        self.nextSlide();
+                                    }
                                 } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
                                     e.preventDefault();
                                     self.prevSlide();
