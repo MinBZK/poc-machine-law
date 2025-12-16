@@ -110,20 +110,27 @@
                             </div>
                         </div>
 
-                        <!-- Slide 2: De huidige situatie -->
+                        <!-- Slide 2: Hoe het nu gaat -->
                         <div class="slide" x-show="currentSlide === 1" x-cloak>
-                            <div class="slide-content content-slide">
-                                <h2>De huidige situatie</h2>
-                                <ul class="slide-bullets">
-                                    <li>Wetten worden doorgaans vertaald naar software geschikt voor uitvoeringsorganisaties en processen die zij hanteren om de wet uit te voeren</li>
-                                    <li>Burger, wetgever, rechtspraak, beleidsdepartementen en zelfs uitvoerende organisaties worstelen met overzicht</li>
-                                    <li>Gevolgen van (systeem)veranderingen zijn moeilijk te overzien, moeilijk omgaan met complexiteit</li>
-                                </ul>
+                            <div class="slide-content content-slide centered-content">
+                                <h2>Hoe het nu gaat</h2>
+                                <p>Elke organisatie...</p>
+                                <p>...vertaalt de wet zelf naar software</p>
                             </div>
                         </div>
 
-                        <!-- Slide 3: Wat als... -->
+                        <!-- Slide 3: Het probleem -->
                         <div class="slide" x-show="currentSlide === 2" x-cloak>
+                            <div class="slide-content content-slide centered-content">
+                                <h2>Het probleem</h2>
+                                <p><strong>Niemand</strong> heeft overzicht</p>
+                                <p>Verandering = <strong>risico</strong></p>
+                                <p>Complexiteit <strong>onbeheersbaar</strong></p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Wat als... -->
+                        <div class="slide" x-show="currentSlide === 3" x-cloak>
                             <div class="slide-content content-slide centered-content">
                                 <p class="slide-italic">Wat als ...</p>
                                 <p>We <strong>beginnen met de wet</strong></p>
@@ -132,8 +139,8 @@
                             </div>
                         </div>
 
-                        <!-- Slide 4: Demo -->
-                        <div class="slide" x-show="currentSlide === 3" x-cloak>
+                        <!-- Slide 5: Demo -->
+                        <div class="slide" x-show="currentSlide === 4" x-cloak>
                             <div class="slide-content title-slide">
                                 <h1>Demo RegelRecht</h1>
                             </div>
@@ -444,7 +451,7 @@
                 maxLawTabs: 10,           // Maximum number of law tabs
                 // Presentation slide state
                 currentSlide: 0,
-                totalSlides: 4,
+                totalSlides: 5,
                 presenterName: localStorage.getItem('presenterName') || '',
                 editingPresenterName: false,
 
