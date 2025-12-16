@@ -845,13 +845,13 @@ func compareCaseCanAppeal(c *casemanager.Case) bool {
 func getCaseByID(ctx context.Context, cm casemanager.CaseManager, caseID uuid.UUID, fn func(c *casemanager.Case) bool) (*casemanager.Case, error) {
 	var err error
 	var c *casemanager.Case
-	for range 500 {
+	for range 100 {
 		c, err = cm.GetCaseByID(ctx, caseID)
 		if err == nil && c != nil && fn(c) {
 			return c, nil
 		}
 
-		time.Sleep(time.Microsecond) // Sleep a micro second to give the timemachine some time to process
+		time.Sleep(10 * time.Millisecond) // Sleep 10ms to give the timemachine some time to process
 	}
 
 	return nil, fmt.Errorf("failed to get case: %w: %w", errors.New("timeout"), err)
