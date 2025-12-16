@@ -93,9 +93,13 @@
                                 <p class="slide-subtitle">van wet naar digitale werking</p>
                                 <div class="slide-footer">
                                     <span x-text="new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
-                                    <div class="presenter-area" @dblclick="editingPresenterName = true" title="Dubbelklik om naam te wijzigen">
-                                        <span x-show="!editingPresenterName && presenterName" x-text="presenterName"></span>
-                                        <span x-show="!editingPresenterName && !presenterName" class="presenter-placeholder">[dubbelklik voor naam]</span>
+                                    <div class="presenter-area"
+                                         @dblclick="editingPresenterName = true"
+                                         title="Dubbelklik om naam te wijzigen">
+                                        <span x-show="!editingPresenterName && presenterName"
+                                              x-text="presenterName"></span>
+                                        <span x-show="!editingPresenterName && !presenterName"
+                                              class="presenter-placeholder">[dubbelklik voor naam]</span>
                                         <input x-show="editingPresenterName"
                                                x-model="presenterName"
                                                @keydown.enter="savePresenterName()"
@@ -109,17 +113,19 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Slide 2: Nu -->
                         <div class="slide" x-show="currentSlide === 1" x-cloak>
                             <div class="slide-content content-slide centered-content">
                                 <h2>Huidige Situatie</h2>
-                                <p>Iedere organisatie </p>
-                                <p>heeft een <strong>eigen interpretatie</strong> van de wet</p>
-                                <p>die landt in <strong>eigen software</strong></p>
+                                <p>Iedere organisatie</p>
+                                <p>
+                                    heeft een <strong>eigen interpretatie</strong> van de wet
+                                </p>
+                                <p>
+                                    die landt in <strong>eigen software</strong>
+                                </p>
                             </div>
                         </div>
-
                         <!-- Slide 3: Het probleem -->
                         <div class="slide" x-show="currentSlide === 2" x-cloak>
                             <div class="slide-content content-slide centered-content">
@@ -129,17 +135,21 @@
                                 <p>Onbeheersbaar</p>
                             </div>
                         </div>
-
                         <!-- Slide 4: Wat als... -->
                         <div class="slide" x-show="currentSlide === 3" x-cloak>
                             <div class="slide-content content-slide centered-content">
                                 <h2>Wat als</h2>
-                                <p>We <strong>beginnen met de wet</strong></p>
-                                <p>Deze <strong>machine uitvoerbaar</strong> maken</p>
-                                <p><strong>Openbaar</strong> publiceren</p>
+                                <p>
+                                    We <strong>beginnen met de wet</strong>
+                                </p>
+                                <p>
+                                    Deze <strong>machine uitvoerbaar</strong> maken
+                                </p>
+                                <p>
+                                    <strong>Openbaar</strong> publiceren
+                                </p>
                             </div>
                         </div>
-
                         <!-- Slide 5: Demo -->
                         <div class="slide" x-show="currentSlide === 4" x-cloak>
                             <div class="slide-content title-slide">
@@ -151,10 +161,8 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
-
                 <!-- Laws Tab Content (Embedded) -->
                 <div class="tab-content"
                      x-show="activeTab === 'laws'"
