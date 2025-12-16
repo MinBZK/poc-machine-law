@@ -1631,3 +1631,245 @@ body {
         font-size: 0.75rem;
     }
 }
+
+/* ============================================
+   Presentation Slides
+   ============================================ */
+
+.presentation-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: #154273;
+    padding: 0;
+}
+
+.presentation-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #154273 0%, #1e5a9e 100%);
+    color: white;
+    padding: 4rem;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.slide[style*="display: none"],
+.slide[style*="display:none"] {
+    display: none !important;
+    visibility: hidden;
+}
+
+.slide[style*="display: none"] *,
+.slide[style*="display:none"] * {
+    display: none !important;
+    visibility: hidden;
+}
+
+.slide-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Title Slide */
+.title-slide {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.title-slide h1 {
+    font-size: 12rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+.slide-subtitle {
+    font-size: 4rem;
+    font-weight: 300;
+    opacity: 0.9;
+    font-style: italic;
+}
+
+.slide-footer {
+    position: absolute;
+    bottom: 3rem;
+    left: 4rem;
+    right: 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.8rem;
+    opacity: 0.9;
+}
+
+.presenter-area {
+    min-width: 250px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.presenter-area:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.presenter-placeholder {
+    opacity: 0.5;
+    font-style: italic;
+}
+
+.presenter-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    outline: none;
+    padding: 0.5rem 1rem;
+    width: 250px;
+}
+
+.presenter-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Content Slide */
+.content-slide {
+    padding: 4rem 6rem;
+    justify-content: center;
+}
+
+.content-slide h2 {
+    font-size: 5rem;
+    font-weight: 400;
+    margin-bottom: 3rem;
+    color: white;
+}
+
+/* Slide Bullets */
+.slide-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.slide-bullets li {
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: 2.5rem;
+    font-size: 2.5rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.slide-bullets li::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 3rem;
+}
+
+/* Centered Content Slide */
+.centered-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 8rem;
+}
+
+.centered-content p {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+.centered-content .slide-italic {
+    font-style: italic;
+    opacity: 0.9;
+    margin-bottom: 3rem;
+}
+
+.centered-content strong {
+    font-weight: 600;
+}
+
+
+/* Presentation Responsive */
+@media (max-width: 1024px) {
+    .slide {
+        padding: 2rem;
+    }
+
+    .title-slide h1 {
+        font-size: 3rem;
+    }
+
+    .slide-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .slide-right h2 {
+        font-size: 1.8rem;
+    }
+
+    .slide-bullets li {
+        font-size: 1rem;
+    }
+
+    .slide-text-left p {
+        font-size: 1.4rem;
+    }
+
+    .slide-icon {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .two-column {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .slide-left {
+        order: 2;
+    }
+
+    .slide-icons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .slide-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .title-slide h1 {
+        font-size: 2.5rem;
+    }
+
+    .slide-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
