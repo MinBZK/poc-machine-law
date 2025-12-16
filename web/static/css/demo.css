@@ -1700,6 +1700,17 @@ body {
     font-style: italic;
 }
 
+.slide-disclaimers {
+    margin-top: 4rem;
+    opacity: 0.8;
+}
+
+.slide-disclaimers p {
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 0.8rem;
+}
+
 .slide-footer {
     position: absolute;
     bottom: 3rem;
@@ -1755,7 +1766,7 @@ body {
 .content-slide h2 {
     font-size: 5rem;
     font-weight: 400;
-    margin-bottom: 3rem;
+    margin-bottom: 5rem;
     color: white;
 }
 
