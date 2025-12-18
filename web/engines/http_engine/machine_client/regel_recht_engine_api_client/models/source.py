@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -63,3 +63,6 @@ class Source:
 
     def __contains__(self, key: str) -> bool:
         return key in self.additional_properties
+
+    def get(self, key: str, default: Any = None) -> Union[list["SourceAdditionalPropertyItem"], Any]:
+        return self.additional_properties.get(key, default)
