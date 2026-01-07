@@ -121,9 +121,42 @@ def get_profile_properties(profile: dict) -> list[str]:
     is_entrepreneur = False
     if "KVK" in profile["sources"]:
         kvk_data = profile["sources"]["KVK"]
-        if any(entry.get("waarde") for entry in kvk_data.get("is_entrepreneur", [])):
+
+        # Check bestuurders (for DGA, directeur, etc.)
+        # NOTE: In the real KVK API, functionarissen/bestuurders data comes from
+        # KVK Dataservice Inschrijving (separate product), not from Basisprofiel API.
+        # For this POC we simplified by including bestuurders directly in profiles.
+        if "bestuurders" in kvk_data:
+            for bestuurder in kvk_data["bestuurders"]:
+                functie = bestuurder.get("functie")
+                if functie == "directeur_grootaandeelhouder":
+                    is_entrepreneur = True
+                    properties.append("💼 DGA")
+                    break
+                elif functie == "directeur":
+                    is_entrepreneur = True
+                    properties.append("💼 Directeur")
+                    break
+        # Check rechtsvorm from inschrijvingen (for ZZP/VOF/Maatschap)
+        elif "inschrijvingen" in kvk_data:
+            for entry in kvk_data["inschrijvingen"]:
+                rechtsvorm = entry.get("rechtsvorm")
+                if rechtsvorm == "EENMANSZAAK":
+                    is_entrepreneur = True
+                    properties.append("💼 ZZP'er")
+                    break
+                elif rechtsvorm == "VOF":
+                    is_entrepreneur = True
+                    properties.append("💼 Vennoot")
+                    break
+                elif rechtsvorm == "MAATSCHAP":
+                    is_entrepreneur = True
+                    properties.append("💼 Maat")
+                    break
+        # Fallback to is_entrepreneur flag
+        elif any(entry.get("waarde") for entry in kvk_data.get("is_entrepreneur", [])):
             is_entrepreneur = True
-            properties.append("💼 ZZP'er")
+            properties.append("💼 Ondernemer")
 
     if "UWV" in profile["sources"]:
         uwv_data = profile["sources"]["UWV"]

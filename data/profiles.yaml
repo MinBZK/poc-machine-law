@@ -3014,3 +3014,166 @@ profiles:
           polis_status: ACTIEF
           verdrag_status: GEEN
           zorg_type: BASIS
+  '999999990':
+    name: Claudia van Dam
+    description: DGA en eigenaar van Koffiezaak Bakkie Pleur B.V. in Rotterdam West
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '999999990'
+          geboortedatum: '1994-03-20'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 31
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Agniesestraat 22A, 3032TL Rotterdam
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '999999990'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+          kinderen: []
+        verblijfplaats:
+        - bsn: '999999990'
+          straat: Agniesestraat
+          huisnummer: 22A
+          postcode: 3032TL
+          woonplaats: Rotterdam
+          type: WOONADRES
+        CHILDREN_DATA:
+        - bsn: '999999990'
+          kinderen: []
+      BELASTINGDIENST:
+        box1:
+        - bsn: '999999990'
+          loon_uit_dienstbetrekking: 3600000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '999999990'
+          dividend: 1500000
+          vervreemding_aandelen: 0
+        box3:
+        - bsn: '999999990'
+          spaargeld: 5000000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '999999990'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '999999990'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '999999990'
+          bedrag: 300000
+        maandelijks_inkomen:
+        - bsn: '999999990'
+          bedrag: 300000
+        assets:
+        - bsn: '999999990'
+          bedrag: 5000000
+        bezittingen:
+        - bsn: '999999990'
+          bedrag: 5000000
+        business_income:
+        - bsn: '999999990'
+          bedrag: 0
+        bedrijfsinkomen:
+        - bsn: '999999990'
+          bedrag: 0
+      KVK:
+        # NOTE: In the real KVK API, functionarissen/bestuurders data comes from
+        # KVK Dataservice Inschrijving (separate product), not from Basisprofiel API.
+        # For this POC we simplified by including bestuurders directly in profiles.
+        # Sources:
+        #   - https://developers.kvk.nl/nl/documentation/basisprofiel-api
+        #   - https://developers.kvk.nl/nl/documentation/vestigingsprofiel-api
+        #   - https://www.kvk.nl/producten-bestellen/kvk-dataservice-inschrijving/
+        bestuurders:
+        - kvk_nummer: '85234567'
+          bsn: '999999990'
+          functie: directeur_grootaandeelhouder
+          bevoegdheid: zelfstandig
+          aanvangsdatum: '2025-01-15'
+        is_entrepreneur:
+        - bsn: '999999990'
+          waarde: true
+        is_active_entrepreneur:
+        - bsn: '999999990'
+          waarde: true
+      UWV:
+        arbeidsverhoudingen:
+        - bsn: '999999990'
+          dienstverband_type: GEEN
+          verzekerd_ww: false
+          verzekerd_wia: false
+      RVZ:
+        verzekeringen:
+        - bsn: '999999990'
+          polis_status: ACTIEF
+          verdrag_status: GEEN
+          zorg_type: BASIS
+  '85234567':
+    name: Koffiezaak Bakkie Pleur B.V.
+    description: Koffiezaak in Rotterdam West, Nieuwe Binnenweg. Heeft terras met 8 zitplaatsen.
+    type: onderneming
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      KVK:
+        organisaties:
+        - kvk_nummer: '85234567'
+          vestigingsnummer: '000051234567'
+          rsin: '862345678'
+          handelsnaam: Koffiezaak Bakkie Pleur B.V.
+          rechtsvorm: BV
+          datum_oprichting: '2025-01-15'
+          status: ACTIEF
+          activiteit: Horeca
+          sbi_code: '56102'
+          sbi_omschrijving: Cafés
+          is_active: true
+        vestigingen:
+        - vestigingsnummer: '000051234567'
+          kvk_nummer: '85234567'
+          straat: Nieuwe Binnenweg
+          huisnummer: '225A'
+          postcode: 3021GC
+          plaats: Rotterdam
+          gemeente_code: '0599'
+          type_inrichting: koffiezaak
+          heeft_terras: true
+          terras_zitplaatsen: 12
+          terras_oppervlakte_m2: 15
+          binnen_zitplaatsen: 25
+          schenkt_alcohol: false
+          heeft_muziek: false
+          personeel_voltijd: 2
+          personeel_deeltijd: 0
+        bestuurders:
+        - kvk_nummer: '85234567'
+          bsn: '999999990'
+          naam: Claudia van Dam
+          functie: directeur_grootaandeelhouder
+          bevoegdheid: zelfstandig
+          aanvangsdatum: '2025-01-15'
+        is_entrepreneur:
+        - kvk_nummer: '85234567'
+          waarde: true
+        is_active_entrepreneur:
+        - kvk_nummer: '85234567'
+          waarde: true
