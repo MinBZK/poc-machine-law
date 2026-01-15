@@ -88,6 +88,26 @@ profiles:
           - geboortedatum: '2022-01-01'
             zorgbehoefte: true
             kind_bsn: '200000002'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '100000001'
+          bsn_kind: '200000001'
+          naam_kind: Kind 1 van der Meer
+          geboortedatum_kind: '2020-01-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-01-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '100000001'
+          bsn_kind: '200000002'
+          naam_kind: Kind 2 van der Meer
+          geboortedatum_kind: '2022-01-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2022-01-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '100000001'
@@ -1377,6 +1397,17 @@ profiles:
           kinderen:
           - geboortedatum: '2011-08-30'
             kind_bsn: '200000005'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '100000003'
+          bsn_kind: '200000005'
+          naam_kind: Elif Yilmaz
+          geboortedatum_kind: '2011-08-30'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2011-08-30'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '100000003'
