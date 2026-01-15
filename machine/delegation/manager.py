@@ -85,49 +85,29 @@ class DelegationManager:
             if not result.output.get("heeft_vertegenwoordigingsbevoegdheid", False):
                 return delegations
 
-            # Get the arrays from the law output
+            # Get the arrays directly from the law output - all business logic is in YAML
             # These are all parallel arrays with the same length
             kvk_nummers = result.output.get("kvk_nummers", [])
             handelsnamen = result.output.get("handelsnamen", [])
             functies = result.output.get("functies", [])
-            bevoegdheden = result.output.get("bevoegdheden", [])
-
-            # Get the permission definitions from the law specification
-            # These are defined in the YAML under properties.definitions
-            law_spec = self.services.get_law("KVK", "machtigingenwet")
-            definitions = law_spec.get("properties", {}).get("definitions", {}) if law_spec else {}
-
-            # Permission mappings from the law (Art. 2:1 Awb, Art. 2:240 lid 3 BW)
-            volledige_rechten = definitions.get(
-                "VOLLEDIGE_BEVOEGDHEID_RECHTEN", ["LEZEN", "CLAIMS_INDIENEN", "BESLUITEN_ONTVANGEN"]
-            )
-            beperkte_rechten = definitions.get("BEPERKTE_BEVOEGDHEID_RECHTEN", ["LEZEN"])
+            rechten_per_bedrijf = result.output.get("rechten_per_bedrijf", [])
 
             # Create a delegation for each business
             for i, kvk_nummer in enumerate(kvk_nummers):
                 if kvk_nummer is None:
                     continue
 
-                # Get business name (fallback to KVK number if not available)
-                business_name = (
-                    handelsnamen[i] if i < len(handelsnamen) and handelsnamen[i] else f"Bedrijf {kvk_nummer}"
-                )
-
-                # Get function (fallback to ONBEKEND if not available)
-                functie = functies[i] if i < len(functies) and functies[i] else "ONBEKEND"
-
-                # Get bevoegdheid and determine permissions based on law definitions
-                # Art. 2:240 lid 3 BW: VOLLEDIG = onbeperkt, BEPERKT = statutaire beperkingen
-                bevoegdheid = bevoegdheden[i] if i < len(bevoegdheden) and bevoegdheden[i] else "BEPERKT"
-                permissions = volledige_rechten if bevoegdheid == "VOLLEDIG" else beperkte_rechten
-
                 delegation = Delegation(
                     subject_id=str(kvk_nummer),
                     subject_type="BUSINESS",
-                    subject_name=business_name,
-                    delegation_type=functie,
-                    permissions=list(permissions),  # Ensure it's a new list
-                    valid_from=date(2020, 1, 1),  # Default - could be from law output
+                    subject_name=(
+                        handelsnamen[i] if i < len(handelsnamen) and handelsnamen[i] else f"Bedrijf {kvk_nummer}"
+                    ),
+                    delegation_type=functies[i] if i < len(functies) and functies[i] else "ONBEKEND",
+                    permissions=(
+                        list(rechten_per_bedrijf[i]) if i < len(rechten_per_bedrijf) and rechten_per_bedrijf[i] else []
+                    ),
+                    valid_from=date(2020, 1, 1),
                     valid_until=None,
                 )
                 delegations.append(delegation)

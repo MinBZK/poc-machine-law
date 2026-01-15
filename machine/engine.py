@@ -274,6 +274,9 @@ class RulesEngine:
                 raw_result = self._evaluate_operation(action, context)
             elif "value" in action:
                 raw_result = self._evaluate_value(action["value"], context)
+            elif "subject" in action:
+                # Direct subject assignment (e.g., subject: "$SOURCE.field")
+                raw_result = self._evaluate_value(action["subject"], context)
             else:
                 raw_result = None
 
@@ -418,7 +421,12 @@ class RulesEngine:
                     result = self._evaluate_value(value_to_evaluate, item_context)
                     context.missing_required = context.missing_required or item_context.missing_required
                     context.path = item_context.path
-                    values.extend(result if isinstance(result, list) else [result])
+                    # When combine is specified, flatten results for aggregation
+                    # When combine is not specified, keep results as separate items (supports nested arrays)
+                    if combine:
+                        values.extend(result if isinstance(result, list) else [result])
+                    else:
+                        values.append(result)
             logger.debug(f"Foreach values: {values}")
             result = self._evaluate_aggregate_ops(combine, values) if combine else values
             logger.debug(f"Foreach result: {result}")
@@ -660,6 +668,18 @@ class RulesEngine:
             result = subject is None
             node.details["subject_value"] = subject
             logger.debug(f"IS_NULL result: {result}")
+
+        elif op_type == "EXISTS":
+            subject = self._evaluate_value(operation["subject"], context)
+            # EXISTS returns True if subject is not None and not empty
+            if subject is None:
+                result = False
+            elif isinstance(subject, list | tuple | dict) or hasattr(subject, "__len__"):
+                result = len(subject) > 0
+            else:
+                result = bool(subject)
+            node.details["subject_value"] = subject
+            logger.debug(f"EXISTS result: {result}")
 
         elif op_type == "AND":
             with logger.indent_block("AND"):

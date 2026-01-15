@@ -196,7 +196,12 @@ class RuleContext:
                             logger.warning(f"Value is None, could not resolve value ${path}: None")
                             node.result = None
                             return None
-                        if isinstance(value, dict):
+                        if isinstance(value, list):
+                            # Map over list items to extract the property from each
+                            value = [
+                                item.get(p) if isinstance(item, dict) else getattr(item, p, None) for item in value
+                            ]
+                        elif isinstance(value, dict):
                             value = value.get(p)
                         elif hasattr(value, p):
                             value = getattr(value, p)
@@ -330,7 +335,8 @@ class RuleContext:
                                 df = self.sources[table]
 
                         if df is not None:
-                            result = self._resolve_from_source(source_ref, table, df)
+                            expected_type = spec.get("type")
+                            result = self._resolve_from_source(source_ref, table, df, expected_type)
                             logger.debug(f"Resolving from SOURCE {table}: {result}")
                             node.result = result
                             node.resolve_type = "SOURCE"
@@ -509,7 +515,7 @@ class RuleContext:
 
         return type_spec_copy
 
-    def _resolve_from_source(self, source_ref, table, df):
+    def _resolve_from_source(self, source_ref, table, df, expected_type=None):
         if "select_on" in source_ref:
             for select_on in source_ref["select_on"]:
                 value = self.resolve_value(select_on["value"])
@@ -517,6 +523,9 @@ class RuleContext:
                 if isinstance(value, dict) and "operation" in value and value["operation"] == "IN":
                     allowed_values = self.resolve_value(value["values"])
                     df = df[df[select_on["name"]].isin(allowed_values)]
+                elif isinstance(value, list):
+                    # When value is a list, use isin() to match any of the values
+                    df = df[df[select_on["name"]].isin(value)]
                 else:
                     df = df[df[select_on["name"]] == value]
 
@@ -541,7 +550,8 @@ class RuleContext:
         if result is None:
             return None
         if len(result) == 0:
-            return None
+            # For array types, return empty list instead of None
+            return [] if expected_type == "array" else None
 
         # Clean NaN values from the result
         result = clean_nan_value(result)
@@ -549,6 +559,10 @@ class RuleContext:
         # Check if result became None after cleaning
         if result is None:
             return None
+
+        # If the expected type is array, always return a list
+        if expected_type == "array":
+            return result if isinstance(result, list) else [result]
 
         # Smart deduplication: if all values are identical (e.g., global data duplicated per profile),
         # deduplicate to a single value
