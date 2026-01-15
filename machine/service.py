@@ -374,6 +374,20 @@ class Services:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
 
+    def get_law(self, service: str, law: str, reference_date: str | None = None) -> dict[str, Any] | None:
+        """Get the law specification for a given service and law.
+
+        Args:
+            service: Name of the service (e.g., "KVK")
+            law: Name of the law (e.g., "machtigingenwet")
+            reference_date: Reference date for rule version (YYYY-MM-DD)
+
+        Returns:
+            The law specification dictionary, or None if not found
+        """
+        reference_date = reference_date or self.root_reference_date
+        return self.resolver.get_rule_spec(law, reference_date, service=service)
+
     def evaluate(
         self,
         service: str,

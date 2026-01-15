@@ -49,10 +49,7 @@ class Delegation:
         if reference_date < self.valid_from:
             return False
 
-        if self.valid_until is not None and reference_date > self.valid_until:
-            return False
-
-        return True
+        return not (self.valid_until is not None and reference_date > self.valid_until)
 
 
 @dataclass
