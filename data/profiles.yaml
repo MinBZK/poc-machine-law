@@ -2130,6 +2130,12 @@ profiles:
           status: ACTIEF
           functie: EIGENAAR
           bevoegdheid: VOLLEDIG
+        is_entrepreneur:
+        - bsn: '999993656'
+          waarde: true
+        is_active_entrepreneur:
+        - bsn: '999993656'
+          waarde: true
   '999993657':
     name: Emma Visser
     description: Persoon met medische ontheffing, recht op bijstand zonder re-integratieverplichting
