@@ -138,10 +138,17 @@ profiles:
       KVK:
         inschrijvingen:
         - bsn: '100000001'
+          kvk_nummer: '12345678'
+          handelsnaam: Thuiszorg Van der Meer
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Thuiszorg
           is_active_entrepreneur: true
+        functionarissen:
+        - bsn: '100000001'
+          kvk_nummer: '12345678'
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
         is_entrepreneur:
         - bsn: '100000001'
           waarde: true
@@ -1396,10 +1403,17 @@ profiles:
       KVK:
         inschrijvingen:
         - bsn: '100000003'
+          kvk_nummer: '87654321'
+          handelsnaam: Yilmaz Bouw
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Bouwwerkzaamheden
           is_active_entrepreneur: true
+        functionarissen:
+        - bsn: '100000003'
+          kvk_nummer: '87654321'
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
         is_entrepreneur:
         - bsn: '100000003'
           waarde: true

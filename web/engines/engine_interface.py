@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
+
+if TYPE_CHECKING:
+    from machine.service import Services
 
 
 @dataclass
@@ -122,16 +125,33 @@ class EngineInterface(ABC):
         reset the engine data.
         """
 
-    def get_sorted_discoverable_service_laws(self, bsn: str) -> list[dict[str, Any]]:
+    def get_services(self) -> "Services | None":
         """
-        Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.
+        Get the underlying Services instance.
+
+        This method allows access to the underlying Services for features
+        that need direct access to service providers (e.g., delegation).
+
+        Returns:
+            Services instance if available (internal Python engine),
+            None if not available (HTTP engine).
+        """
+        return None
+
+    def get_sorted_discoverable_service_laws(self, bsn: str, discoverable_by: str = "CITIZEN") -> list[dict[str, Any]]:
+        """
+        Return laws discoverable by citizens or businesses, sorted by actual calculated impact.
         Uses simple caching to improve performance and stability.
+
+        Args:
+            bsn: The BSN of the person (or KVK number when acting on behalf of a business)
+            discoverable_by: Either "CITIZEN" or "BUSINESS" to filter which laws to show
 
         Laws will be sorted by their calculated financial impact for this person
         based on outputs marked with citizen_relevance: primary in their YAML definitions.
         """
         # Get basic discoverable laws from the resolver
-        discoverable_laws = self.get_discoverable_service_laws()
+        discoverable_laws = self.get_discoverable_service_laws(discoverable_by=discoverable_by)
 
         # Initialize cache if it doesn't exist
         if not hasattr(self, "_impact_cache") or not self._impact_cache:

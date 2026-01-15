@@ -258,16 +258,20 @@ class Services:
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
         return self.resolver.get_discoverable_service_laws(discoverable_by)
 
-    def get_sorted_discoverable_service_laws(self, bsn):
+    def get_sorted_discoverable_service_laws(self, bsn, discoverable_by="CITIZEN"):
         """
-        Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.
+        Return laws discoverable by citizens or businesses, sorted by actual calculated impact.
         Uses simple caching to improve performance and stability.
+
+        Args:
+            bsn: The BSN of the person (or KVK number when acting on behalf of a business)
+            discoverable_by: Either "CITIZEN" or "BUSINESS" to filter which laws to show
 
         Laws will be sorted by their calculated financial impact for this person
         based on outputs marked with citizen_relevance: primary in their YAML definitions.
         """
         # Get basic discoverable laws from the resolver
-        discoverable_laws = self.get_discoverable_service_laws()
+        discoverable_laws = self.get_discoverable_service_laws(discoverable_by=discoverable_by)
 
         # Initialize cache if it doesn't exist
         if not hasattr(self, "_impact_cache") or not self._impact_cache:

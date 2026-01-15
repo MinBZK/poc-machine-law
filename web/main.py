@@ -21,11 +21,12 @@ from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors
 from web.feature_flags import (
     is_change_wizard_enabled,
     is_chat_enabled,
+    is_delegation_enabled,
     is_effective_date_adjustment_enabled,
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
-from web.routers import admin, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet
+from web.routers import admin, chat, dashboard, delegation, demo, edit, importer, laws, mcp, simulation, wallet
 
 app = FastAPI(title="RegelRecht")
 
@@ -54,6 +55,7 @@ app.include_router(importer.router)
 app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
+app.include_router(delegation.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="law"))
 # app.mount(
@@ -182,6 +184,31 @@ async def root(
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
 
+    # Get delegation context from session
+    delegation_context = None
+    delegations = []
+    if is_delegation_enabled():
+        from machine.delegation.manager import DelegationManager
+        from web.routers.delegation import DELEGATION_SESSION_KEY
+
+        session_data = request.session.get(DELEGATION_SESSION_KEY)
+        if session_data:
+            from machine.delegation.models import DelegationContext
+
+            delegation_context = DelegationContext.from_dict(session_data)
+
+        # Get available delegations for the user
+        try:
+            delegation_manager = DelegationManager(services.get_services())
+            delegations = delegation_manager.get_delegations_for_user(bsn)
+        except Exception:
+            pass  # Delegation service not available
+
+    # Determine discoverable type based on delegation context
+    discoverable_by = "CITIZEN"
+    if delegation_context and delegation_context.subject_type == "BUSINESS":
+        discoverable_by = "BUSINESS"
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -189,12 +216,17 @@ async def root(
             "profile": profile,
             "bsn": bsn,
             "all_profiles": services.get_all_profiles(),
-            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
+            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(
+                bsn, discoverable_by=discoverable_by
+            ),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
             "adjustable_effective_date_enabled": is_effective_date_adjustment_enabled(),
             "total_income_widget_enabled": is_total_income_widget_enabled(),
+            "delegation_enabled": is_delegation_enabled(),
+            "delegation_context": delegation_context,
+            "delegations": delegations,
             "accepted_claims": accepted_claims,
             "now": datetime.now(),
             "effective_date": effective_date,  # Pass the parsed date parameter to the template
