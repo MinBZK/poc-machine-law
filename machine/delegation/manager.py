@@ -9,12 +9,9 @@ and uses a standard interface to parse the results into Delegation objects.
 
 import logging
 from datetime import date, datetime
-from typing import TYPE_CHECKING
 
 from machine.delegation.models import Delegation, DelegationContext
-
-if TYPE_CHECKING:
-    from machine.service import Services
+from machine.service import Services
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +37,7 @@ class DelegationManager:
         services: The Services instance for rule evaluation
     """
 
-    def __init__(self, services: "Services"):
+    def __init__(self, services: Services):
         """Initialize the DelegationManager.
 
         Args:

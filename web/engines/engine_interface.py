@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pandas as pd
 
-if TYPE_CHECKING:
-    from machine.service import Services
+from machine.service import Services
 
 
 @dataclass
@@ -125,7 +124,7 @@ class EngineInterface(ABC):
         reset the engine data.
         """
 
-    def get_services(self) -> "Services | None":
+    def get_services(self) -> Services | None:
         """
         Get the underlying Services instance.
 
