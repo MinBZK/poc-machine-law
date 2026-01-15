@@ -197,6 +197,11 @@ async def root(
 
             delegation_context = DelegationContext.from_dict(session_data)
 
+            # Clear delegation context if the BSN changed (user switched profiles)
+            if delegation_context.actor_bsn != bsn:
+                del request.session[DELEGATION_SESSION_KEY]
+                delegation_context = None
+
         # Get available delegations for the user
         try:
             delegation_manager = DelegationManager(services.get_services())
