@@ -143,12 +143,43 @@ profiles:
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Thuiszorg
-          is_active_entrepreneur: true
+        - bsn: '100000001'
+          kvk_nummer: '99001122'
+          handelsnaam: Zorggroep Nederland VOF
+          rechtsvorm: VOF
+          status: ACTIEF
+          activiteit: Zorgdiensten
+        - bsn: '100000001'
+          kvk_nummer: '88776655'
+          handelsnaam: Healthcare Holdings BV
+          rechtsvorm: BV
+          status: ACTIEF
+          activiteit: Holding
         functionarissen:
+        # Eigenaar van eigen eenmanszaak - HEEFT vertegenwoordigingsbevoegdheid
         - bsn: '100000001'
           kvk_nummer: '12345678'
+          handelsnaam: Thuiszorg Van der Meer
+          rechtsvorm: EENMANSZAAK
+          status: ACTIEF
           functie: EIGENAAR
           bevoegdheid: VOLLEDIG
+        # Vennoot in VOF - HEEFT vertegenwoordigingsbevoegdheid (beperkt)
+        - bsn: '100000001'
+          kvk_nummer: '99001122'
+          handelsnaam: Zorggroep Nederland VOF
+          rechtsvorm: VOF
+          status: ACTIEF
+          functie: VENNOOT
+          bevoegdheid: BEPERKT
+        # Commissaris van BV - GEEN vertegenwoordigingsbevoegdheid (toezichthouder)
+        - bsn: '100000001'
+          kvk_nummer: '88776655'
+          handelsnaam: Healthcare Holdings BV
+          rechtsvorm: BV
+          status: ACTIEF
+          functie: COMMISSARIS
+          bevoegdheid: GEEN
         is_entrepreneur:
         - bsn: '100000001'
           waarde: true
@@ -1408,10 +1439,12 @@ profiles:
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Bouwwerkzaamheden
-          is_active_entrepreneur: true
         functionarissen:
         - bsn: '100000003'
           kvk_nummer: '87654321'
+          handelsnaam: Yilmaz Bouw
+          rechtsvorm: EENMANSZAAK
+          status: ACTIEF
           functie: EIGENAAR
           bevoegdheid: VOLLEDIG
         is_entrepreneur:
@@ -2084,9 +2117,19 @@ profiles:
       KVK:
         inschrijvingen:
         - bsn: '999993656'
+          kvk_nummer: '55667788'
+          handelsnaam: Peter Bakker Webdesign
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Webdesign
+        functionarissen:
+        - bsn: '999993656'
+          kvk_nummer: '55667788'
+          handelsnaam: Peter Bakker Webdesign
+          rechtsvorm: EENMANSZAAK
+          status: ACTIEF
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
   '999993657':
     name: Emma Visser
     description: Persoon met medische ontheffing, recht op bijstand zonder re-integratieverplichting

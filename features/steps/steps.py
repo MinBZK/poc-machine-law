@@ -924,3 +924,27 @@ def step_impl(context, field, value):
         expected_str, actual_str,
         f"Expected {field} to contain {expected_str}, but it was {actual_str}"
     )
+
+
+@then('bevat de output "{field}" niet de waarde "{value}"')
+def step_impl(context, field, value):
+    """Check if an output array field does NOT contain a specific value."""
+    actual = context.result.output.get(field, [])
+    expected = parse_value(value)
+    # Convert to strings for comparison (handles mixed int/string arrays)
+    actual_str = [str(x) for x in actual]
+    expected_str = str(expected)
+    assertions.assertNotIn(
+        expected_str, actual_str,
+        f"Expected {field} to NOT contain {expected_str}, but it was {actual_str}"
+    )
+
+
+@then('is de output "{field}" leeg')
+def step_impl(context, field):
+    """Check if an output array field is empty."""
+    actual = context.result.output.get(field, [])
+    assertions.assertEqual(
+        len(actual), 0,
+        f"Expected {field} to be empty, but it was {actual}"
+    )

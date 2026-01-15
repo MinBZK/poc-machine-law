@@ -420,6 +420,14 @@ class RulesEngine:
                         if f"current_{i}" not in item_context.local:
                             item_context.local[f"current_{i}"] = item
                             break
+
+                    # Check where clause if present - skip item if condition is not met
+                    if "where" in operation:
+                        where_result = self._evaluate_value(operation["where"], item_context)
+                        if not where_result:
+                            logger.debug(f"Skipping item due to where clause: {item}")
+                            continue
+
                     value_to_evaluate = (
                         operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
                     )
