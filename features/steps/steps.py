@@ -896,3 +896,31 @@ def step_impl(context, maanden):
         actual, expected,
         f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
     )
+
+
+@then('heeft de output "{field}" waarde "{value}"')
+def step_impl(context, field, value):
+    """Check if an output field has a specific value."""
+    actual = context.result.output.get(field)
+    expected = parse_value(value)
+    # Treat None as False for boolean comparisons
+    if expected is False and actual is None:
+        actual = False
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected {field} to be {expected}, but was {actual}"
+    )
+
+
+@then('bevat de output "{field}" waarde "{value}"')
+def step_impl(context, field, value):
+    """Check if an output array field contains a specific value."""
+    actual = context.result.output.get(field, [])
+    expected = parse_value(value)
+    # Convert to strings for comparison (handles mixed int/string arrays)
+    actual_str = [str(x) for x in actual]
+    expected_str = str(expected)
+    assertions.assertIn(
+        expected_str, actual_str,
+        f"Expected {field} to contain {expected_str}, but it was {actual_str}"
+    )

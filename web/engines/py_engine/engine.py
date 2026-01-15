@@ -18,7 +18,7 @@ class PythonMachineService(EngineInterface):
     """
 
     def __init__(self, services: Services):
-        self._services = services
+        self.services = services
 
     def get_services(self) -> Services:
         """
@@ -27,7 +27,7 @@ class PythonMachineService(EngineInterface):
         Returns:
             The Services instance used by this engine.
         """
-        return self._services
+        return self.services
 
     def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any]:
         """
@@ -73,7 +73,7 @@ class PythonMachineService(EngineInterface):
         if not rule_spec:
             raise HTTPException(status_code=400, detail="Invalid law specified")
 
-        result = self._services.evaluate(
+        result = self.services.evaluate(
             service=service,
             law=law,
             parameters=parameters,
@@ -102,7 +102,7 @@ class PythonMachineService(EngineInterface):
         from web.feature_flags import FeatureFlags
 
         # Get discoverable laws from the service
-        all_laws = self._services.get_discoverable_service_laws(discoverable_by)
+        all_laws = self.services.get_discoverable_service_laws(discoverable_by)
 
         # Filter based on feature flags
         result = {}
@@ -128,11 +128,11 @@ class PythonMachineService(EngineInterface):
         Returns:
             Dictionary containing the rule specification
         """
-        return self._services.resolver.get_rule_spec(law, reference_date, service)
+        return self.services.resolver.get_rule_spec(law, reference_date, service)
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source dataframe for a service and table."""
-        self._services.set_source_dataframe(service, table, df)
+        self.services.set_source_dataframe(service, table, df)
 
     def reset(self) -> None:
         # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application

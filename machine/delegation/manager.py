@@ -79,11 +79,10 @@ class DelegationManager:
         return delegations
 
     def _evaluate_delegation_law(self, service: str, law: str, bsn: str, reference_date: date) -> list[Delegation]:
-        """Evaluate any delegation provider law using the standard interface.
+        """Evaluate a delegation provider law using the standard interface.
 
         This method evaluates a single delegation law and parses its output
-        using the standard delegation provider interface. All business logic
-        including fallback values is defined in the YAML law specification.
+        using the standard delegation provider interface.
 
         Args:
             service: The service name (e.g., "KVK")
@@ -108,8 +107,6 @@ class DelegationManager:
             if not result.output.get("heeft_delegaties", False):
                 return delegations
 
-            # Read standard interface outputs - NO FALLBACKS IN PYTHON
-            # All fallback logic is defined in the YAML law specification
             subject_ids = result.output.get("subject_ids", [])
             subject_names = result.output.get("subject_names", [])
             subject_types = result.output.get("subject_types", [])
@@ -118,19 +115,18 @@ class DelegationManager:
             valid_from_dates = result.output.get("valid_from_dates", [])
             valid_until_dates = result.output.get("valid_until_dates", [])
 
-            # Create a delegation for each subject
             for i, subject_id in enumerate(subject_ids):
                 if subject_id is None:
                     continue
 
                 delegation = Delegation(
                     subject_id=str(subject_id),
-                    subject_type=subject_types[i] if i < len(subject_types) else "UNKNOWN",
-                    subject_name=subject_names[i] if i < len(subject_names) else str(subject_id),
-                    delegation_type=delegation_types[i] if i < len(delegation_types) else "UNKNOWN",
-                    permissions=list(permissions[i]) if i < len(permissions) and permissions[i] else [],
-                    valid_from=self._parse_date(valid_from_dates[i] if i < len(valid_from_dates) else None),
-                    valid_until=self._parse_date(valid_until_dates[i] if i < len(valid_until_dates) else None),
+                    subject_type=subject_types[i],
+                    subject_name=subject_names[i],
+                    delegation_type=delegation_types[i],
+                    permissions=list(permissions[i]) if permissions[i] else [],
+                    valid_from=self._parse_date(valid_from_dates[i]),
+                    valid_until=self._parse_date(valid_until_dates[i]),
                 )
                 delegations.append(delegation)
 

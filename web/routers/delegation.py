@@ -88,7 +88,6 @@ async def get_current_context(request: Request, bsn: str):
 
 @router.get("/api/list")
 async def list_delegations(
-    request: Request,
     bsn: str,
     machine_service: EngineInterface = Depends(get_machine_service),
 ):

@@ -206,8 +206,11 @@ async def root(
         try:
             delegation_manager = DelegationManager(services.get_services())
             delegations = delegation_manager.get_delegations_for_user(bsn)
-        except Exception:
-            pass  # Delegation service not available
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to get delegations for user {bsn}: {e}")
 
     # Determine discoverable type based on delegation context
     discoverable_by = "CITIZEN"
