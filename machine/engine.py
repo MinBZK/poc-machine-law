@@ -409,8 +409,13 @@ class RulesEngine:
             for item in array_data:
                 with logger.indent_block(f"Item {item}"):
                     item_context = copy(context)
+                    # Create a new local dict to avoid polluting the parent context
+                    item_context.local = dict(context.local)
                     if isinstance(item, dict):
                         item_context.local.update(item)
+                    # Add 'current' as an alias that always refers to the current item
+                    item_context.local["current"] = item
+                    # Also set current_N for nested FOREACH compatibility
                     for i in range(100):
                         if f"current_{i}" not in item_context.local:
                             item_context.local[f"current_{i}"] = item
@@ -707,6 +712,21 @@ class RulesEngine:
                 result = any(bool(v) for v in values)
             node.details["evaluated_values"] = values
             logger.debug(f"Result {list(values)} OR: {result}")
+
+        elif op_type == "COALESCE":
+            # Returns the first non-null value from the list (lazy evaluation)
+            with logger.indent_block("COALESCE"):
+                result = None
+                evaluated_values = []
+                for v in operation["values"]:
+                    r = self._evaluate_value(v, context)
+                    evaluated_values.append(r)
+                    if r is not None:
+                        result = r
+                        logger.debug(f"Non-null value found in COALESCE: {r}")
+                        break
+            node.details["evaluated_values"] = evaluated_values
+            logger.debug(f"COALESCE result: {result}")
 
         elif "_DATE" in op_type:
             values = [self._evaluate_value(v, context) for v in operation["values"]]
