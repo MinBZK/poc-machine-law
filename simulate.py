@@ -1933,6 +1933,64 @@ class LawSimulator:
 
         return breakdowns
 
+    def export_for_synthesis(self, results_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Export simulation results in format suitable for law synthesis.
+
+        Returns a DataFrame with input features and target variables for
+        training ML models to synthesize simplified laws.
+
+        Input features:
+        - age, income, net_worth, rent_amount
+        - has_partner, has_children, children_count, youngest_child_age
+        - housing_type, is_student
+
+        Target variables (for harmonized toeslag):
+        - zorgtoeslag_eligible, zorgtoeslag_amount
+        - huurtoeslag_eligible, huurtoeslag_amount
+        - kindgebonden_budget_eligible, kindgebonden_budget_amount
+        """
+        # Input features
+        input_features = [
+            "age",
+            "income",
+            "net_worth",
+            "rent_amount",
+            "has_partner",
+            "has_children",
+            "children_count",
+            "youngest_child_age",
+            "housing_type",
+            "is_student",
+        ]
+
+        # Target variables for the three toeslagen we want to harmonize
+        target_variables = [
+            "zorgtoeslag_eligible",
+            "zorgtoeslag_amount",
+            "huurtoeslag_eligible",
+            "huurtoeslag_amount",
+            "kindgebonden_budget_eligible",
+            "kindgebonden_budget_amount",
+        ]
+
+        # Select columns that exist in the results
+        available_columns = [col for col in input_features + target_variables if col in results_df.columns]
+
+        synthesis_df = results_df[available_columns].copy()
+
+        # Handle missing values
+        if "youngest_child_age" in synthesis_df.columns:
+            synthesis_df["youngest_child_age"] = synthesis_df["youngest_child_age"].fillna(-1)
+
+        if "rent_amount" in synthesis_df.columns:
+            synthesis_df["rent_amount"] = synthesis_df["rent_amount"].fillna(0)
+
+        if "children_count" in synthesis_df.columns:
+            synthesis_df["children_count"] = synthesis_df["children_count"].fillna(0)
+
+        return synthesis_df
+
     def get_summary_with_breakdowns(self, results_df, simulation_date):
         """Generate summary statistics with demographic breakdowns for web API."""
         # Calculate summary statistics

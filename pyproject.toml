@@ -31,6 +31,7 @@ dependencies = [
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
+    "scikit-learn>=1.8.0",
     "tavily-python>=0.5.1",
     "tqdm>=4.67.1",
     "uvicorn>=0.40.0",
