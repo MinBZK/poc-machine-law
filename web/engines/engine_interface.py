@@ -130,8 +130,17 @@ class EngineInterface(ABC):
         Laws will be sorted by their calculated financial impact for this person
         based on outputs marked with citizen_relevance: primary in their YAML definitions.
         """
-        # Get basic discoverable laws from the resolver
-        discoverable_laws = self.get_discoverable_service_laws()
+        # Get basic discoverable laws from the resolver (both CITIZEN and BUSINESS)
+        discoverable_laws = self.get_discoverable_service_laws("CITIZEN")
+        business_laws = self.get_discoverable_service_laws("BUSINESS")
+
+        # Merge business laws into discoverable_laws dict
+        if business_laws:
+            for service, laws in business_laws.items():
+                if service in discoverable_laws:
+                    discoverable_laws[service].extend(laws)
+                else:
+                    discoverable_laws[service] = laws
 
         # Initialize cache if it doesn't exist
         if not hasattr(self, "_impact_cache") or not self._impact_cache:
@@ -151,14 +160,18 @@ class EngineInterface(ABC):
             # Create cache key
             cache_key = f"{bsn}:{service}:{law}:{current_date}"
 
-            # Check cache first
-            if cache_key in self._impact_cache:
-                law_info["impact_value"] = self._impact_cache[cache_key]
-                continue
-
             try:
-                # Get the rule spec to check for citizen_relevance markings
+                # Get the rule spec to check for citizen_relevance markings (always needed for discoverable field)
                 rule_spec = self.get_rule_spec(law, current_date, service=service)
+
+                # Add discoverable field from rule spec if available
+                if rule_spec and "discoverable" in rule_spec:
+                    law_info["discoverable"] = rule_spec["discoverable"]
+
+                # Check cache for impact value
+                if cache_key in self._impact_cache:
+                    law_info["impact_value"] = self._impact_cache[cache_key]
+                    continue
 
                 # Run the law for this person and get results
                 result = self.evaluate(service=service, law=law, parameters={"BSN": bsn}, reference_date=current_date)

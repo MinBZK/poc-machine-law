@@ -42,8 +42,8 @@ globalServices:
 profiles:
   '100000001':
     name: Merijn van der Meer
-    description: ZZP'er in de thuiszorg met laag inkomen, alleenstaande ouder met twee jonge kinderen
-      waarvan één met chronische aandoening. Komt in aanmerking voor Bbz.
+    description: ZZP'er in de thuiszorg met laag inkomen, alleenstaande ouder met twee jonge kinderen waarvan één met chronische
+      aandoening. Komt in aanmerking voor Bbz.
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -141,10 +141,7 @@ profiles:
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Thuiszorg
-          is_active_entrepreneur: true
-        is_entrepreneur:
-        - bsn: '100000001'
-          waarde: true
+          kvk_nummer: '90000000'
       UWV:
         arbeidsverhoudingen:
         - bsn: '100000001'
@@ -1122,8 +1119,7 @@ profiles:
           bedrag: 0
   '100000002':
     name: Maria Rodriguez
-    description: Alleenstaande moeder, parttime werkend in de horeca met onregelmatige
-      uren, vraagt alleen huurtoeslag aan
+    description: Alleenstaande moeder, parttime werkend in de horeca met onregelmatige uren, vraagt alleen huurtoeslag aan
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1291,17 +1287,10 @@ profiles:
         vreemdelingenwet:
         - bsn: '100000002'
           verblijfsvergunning_type: null
-      KVK:
-        is_entrepreneur:
-        - bsn: '100000002'
-          waarde: false
-        is_active_entrepreneur:
-        - bsn: '100000002'
-          waarde: false
+      KVK: {}
   '100000003':
     name: Omar Yilmaz
-    description: ZZP'er in de bouwsector met sterk fluctuerend inkomen, moeite met
-      administratie en lage tarieven
+    description: ZZP'er in de bouwsector met sterk fluctuerend inkomen, moeite met administratie en lage tarieven
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1399,13 +1388,7 @@ profiles:
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Bouwwerkzaamheden
-          is_active_entrepreneur: true
-        is_entrepreneur:
-        - bsn: '100000003'
-          waarde: true
-        is_active_entrepreneur:
-        - bsn: '100000003'
-          waarde: true
+          kvk_nummer: '90000001'
       UWV:
         arbeidsverhoudingen:
         - bsn: '100000003'
@@ -1488,8 +1471,8 @@ profiles:
           verblijfsvergunning_type: null
   '100000004':
     name: Fatima el Hassan
-    description: Bijstandsgerechtigde met gedeeltelijke arbeidsongeschiktheid, ontvangt
-      alle toeslagen maar komt moeilijk rond
+    description: Bijstandsgerechtigde met gedeeltelijke arbeidsongeschiktheid, ontvangt alle toeslagen maar komt moeilijk
+      rond
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1610,17 +1593,10 @@ profiles:
         residence_permit_type:
         - bsn: '100000004'
           type: PERMANENT
-      KVK:
-        is_entrepreneur:
-        - bsn: '100000004'
-          waarde: false
-        is_active_entrepreneur:
-        - bsn: '100000004'
-          waarde: false
+      KVK: {}
   '300000001':
     name: Sophie Jansen
-    description: Recent werkloos geworden alleenstaande moeder, 1 kind, in aanmerking
-      voor WW en kindgebonden budget met ALO-kop
+    description: Recent werkloos geworden alleenstaande moeder, 1 kind, in aanmerking voor WW en kindgebonden budget met ALO-kop
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1777,17 +1753,10 @@ profiles:
         vreemdelingenwet:
         - bsn: '300000001'
           verblijfsvergunning_type: null
-      KVK:
-        is_entrepreneur:
-        - bsn: '300000001'
-          waarde: false
-        is_active_entrepreneur:
-        - bsn: '300000001'
-          waarde: false
+      KVK: {}
   '999993653':
     name: Jan Jansen
-    description: Jongere met part-time baan naast MBO opleiding, komt in aanmerking
-      voor zorgtoeslag
+    description: Jongere met part-time baan naast MBO opleiding, komt in aanmerking voor zorgtoeslag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2073,6 +2042,7 @@ profiles:
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Webdesign
+          kvk_nummer: '90000002'
   '999993657':
     name: Emma Visser
     description: Persoon met medische ontheffing, recht op bijstand zonder re-integratieverplichting
@@ -2277,8 +2247,7 @@ profiles:
           einddatum: '2025-08-31'
   '999993660':
     name: Lisa de Jong
-    description: Werkende ouder met jong kind, komt in aanmerking voor inkomensafhankelijke
-      combinatiekorting
+    description: Werkende ouder met jong kind, komt in aanmerking voor inkomensafhankelijke combinatiekorting
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2350,8 +2319,7 @@ profiles:
           zorg_type: BASIS
   '777777777':
     name: Fatima Al-Zahra
-    description: Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor
-      huurtoeslag
+    description: Alleenstaande met laag inkomen en hoge huur, komt in aanmerking voor huurtoeslag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3016,7 +2984,7 @@ profiles:
           zorg_type: BASIS
   '999999990':
     name: Claudia van Dam
-    description: DGA en eigenaar van Koffiezaak Bakkie Pleur B.V. in Rotterdam West
+    description: Eigenaar van Koffiezaak Bakkie Pleur in Rotterdam West
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3053,14 +3021,14 @@ profiles:
       BELASTINGDIENST:
         box1:
         - bsn: '999999990'
-          loon_uit_dienstbetrekking: 3600000
+          loon_uit_dienstbetrekking: 0
           uitkeringen_en_pensioenen: 0
-          winst_uit_onderneming: 0
+          winst_uit_onderneming: 5100000
           resultaat_overige_werkzaamheden: 0
           eigen_woning: 0
         box2:
         - bsn: '999999990'
-          dividend: 1500000
+          dividend: 0
           vervreemding_aandelen: 0
         box3:
         - bsn: '999999990'
@@ -3078,10 +3046,10 @@ profiles:
           persoonsgebonden_aftrek: 0
         monthly_income:
         - bsn: '999999990'
-          bedrag: 300000
+          bedrag: 425000
         maandelijks_inkomen:
         - bsn: '999999990'
-          bedrag: 300000
+          bedrag: 425000
         assets:
         - bsn: '999999990'
           bedrag: 5000000
@@ -3090,30 +3058,20 @@ profiles:
           bedrag: 5000000
         business_income:
         - bsn: '999999990'
-          bedrag: 0
+          bedrag: 5100000
         bedrijfsinkomen:
         - bsn: '999999990'
-          bedrag: 0
+          bedrag: 5100000
       KVK:
-        # NOTE: In the real KVK API, functionarissen/bestuurders data comes from
-        # KVK Dataservice Inschrijving (separate product), not from Basisprofiel API.
-        # For this POC we simplified by including bestuurders directly in profiles.
-        # Sources:
-        #   - https://developers.kvk.nl/nl/documentation/basisprofiel-api
-        #   - https://developers.kvk.nl/nl/documentation/vestigingsprofiel-api
-        #   - https://www.kvk.nl/producten-bestellen/kvk-dataservice-inschrijving/
-        bestuurders:
-        - kvk_nummer: '85234567'
-          bsn: '999999990'
-          functie: directeur_grootaandeelhouder
-          bevoegdheid: zelfstandig
-          aanvangsdatum: '2025-01-15'
-        is_entrepreneur:
+        inschrijvingen:
         - bsn: '999999990'
-          waarde: true
-        is_active_entrepreneur:
-        - bsn: '999999990'
-          waarde: true
+          rechtsvorm: EENMANSZAAK
+          functie: EIGENAAR
+          status: ACTIEF
+          activiteit: Horeca
+          kvk_nummer: '85234567'
+          naam: Koffiezaak Bakkie Pleur #Dubbel
+          sbi_omschrijving: Cafés #Dubbel
       UWV:
         arbeidsverhoudingen:
         - bsn: '999999990'
@@ -3127,7 +3085,7 @@ profiles:
           verdrag_status: GEEN
           zorg_type: BASIS
   '85234567':
-    name: Koffiezaak Bakkie Pleur B.V.
+    name: Koffiezaak Bakkie Pleur
     description: Koffiezaak in Rotterdam West, Nieuwe Binnenweg. Heeft terras met 8 zitplaatsen.
     type: onderneming
     sources:
@@ -3139,22 +3097,24 @@ profiles:
         - kvk_nummer: '85234567'
           vestigingsnummer: '000051234567'
           rsin: '862345678'
-          handelsnaam: Koffiezaak Bakkie Pleur B.V.
-          rechtsvorm: BV
+          handelsnaam: Koffiezaak Bakkie Pleur
+          rechtsvorm: EENMANSZAAK
           datum_oprichting: '2025-01-15'
           status: ACTIEF
           activiteit: Horeca
           sbi_code: '56102'
           sbi_omschrijving: Cafés
           is_active: true
+          aantal_werknemers: 2
+          datum_telling: '2025-01-01'
         vestigingen:
         - vestigingsnummer: '000051234567'
           kvk_nummer: '85234567'
           straat: Nieuwe Binnenweg
-          huisnummer: '225A'
+          huisnummer: 225A
           postcode: 3021GC
           plaats: Rotterdam
-          gemeente_code: '0599'
+          gemeente_code: 0599
           type_inrichting: koffiezaak
           heeft_terras: true
           terras_zitplaatsen: 12
@@ -3164,16 +3124,26 @@ profiles:
           heeft_muziek: false
           personeel_voltijd: 2
           personeel_deeltijd: 0
-        bestuurders:
+      GEMEENTE_ROTTERDAM:
+        personen_vog:
+        - bsn: '999999990'
+          heeft_geldige_vog: true
+          afgiftedatum: '2024-12-01'
+        personen_curatele:
+        - bsn: '999999990'
+          onder_curatele: false
+        ontheffingen_geluid:
         - kvk_nummer: '85234567'
-          bsn: '999999990'
-          naam: Claudia van Dam
-          functie: directeur_grootaandeelhouder
-          bevoegdheid: zelfstandig
-          aanvangsdatum: '2025-01-15'
-        is_entrepreneur:
+          aantal_verleend: 3
+          jaar: 2025
+        geluidsklachten:
         - kvk_nummer: '85234567'
-          waarde: true
-        is_active_entrepreneur:
-        - kvk_nummer: '85234567'
-          waarde: true
+          heeft_actieve_klachten: false
+      KADASTER:
+        bag_verblijfsobjecten:
+        - postcode: 3021GC
+          huisnummer: 225A
+          gebruiksdoel: bijeenkomstfunctie
+          oppervlakte: 150
+          bouwjaar: 1920
+          status: Verblijfsobject in gebruik
