@@ -49,21 +49,24 @@ class DelegationManager:
         """Get all delegations available for a user.
 
         This method discovers all DELEGATION_PROVIDER laws and evaluates each one
-        to find all entities the user can act on behalf of.
+        to find all entities the user can act on behalf of. This includes:
+        - SELF delegation (from minderjarigheid law) representing the user acting as themselves
+        - BUSINESS delegations (from machtigingenwet) for businesses the user can represent
+        - CITIZEN delegations (from gezag law) for children the user has authority over
 
         Args:
             bsn: The BSN of the user to check delegations for
             reference_date: The date to check validity for. Defaults to today.
 
         Returns:
-            List of Delegation objects representing valid delegations
+            List of Delegation objects representing valid delegations (SELF first, then others)
         """
         if reference_date is None:
             reference_date = date.today()
 
         delegations: list[Delegation] = []
 
-        # Discover all delegation provider laws
+        # Discover and evaluate all delegation provider laws
         delegation_laws = self.services.get_discoverable_service_laws("DELEGATION_PROVIDER")
 
         for service, laws in delegation_laws.items():
@@ -75,6 +78,9 @@ class DelegationManager:
                     reference_date=reference_date,
                 )
                 delegations.extend(law_delegations)
+
+        # Sort to put SELF delegation first
+        delegations.sort(key=lambda d: (d.subject_type != "SELF", d.subject_name or ""))
 
         return delegations
 
@@ -157,6 +163,40 @@ class DelegationManager:
             except ValueError:
                 return None
         return None
+
+    def get_user_permissions(self, bsn: str, reference_date: date | None = None) -> list[str]:
+        """Get the permissions for a user acting as themselves.
+
+        This method finds the SELF delegation for the user and returns its permissions.
+        The SELF delegation is provided by the minderjarigheid law which determines
+        permissions based on age and handlichting status.
+
+        Args:
+            bsn: The BSN of the user to check permissions for
+            reference_date: The date to check for. Defaults to today.
+
+        Returns:
+            List of permission strings (e.g., ["LEZEN", "CLAIMS_INDIENEN"])
+        """
+        # Default to restricted permissions for safety - if we can't determine
+        # the user's age/status, assume they're a minor
+        restricted_permissions = ["LEZEN"]
+
+        delegations = self.get_delegations_for_user(bsn, reference_date)
+
+        # Find the SELF delegation
+        for delegation in delegations:
+            if delegation.subject_type == "SELF":
+                # Use explicit None check - empty list means restricted, not default
+                # If permissions is None (shouldn't happen), default to restricted for safety
+                if delegation.permissions is not None:
+                    return delegation.permissions if delegation.permissions else restricted_permissions
+                logger.warning(f"SELF delegation for BSN {bsn} has None permissions, defaulting to restricted")
+                return restricted_permissions
+
+        # No SELF delegation found - default to restricted for safety
+        logger.warning(f"No SELF delegation found for BSN {bsn}, defaulting to restricted permissions")
+        return restricted_permissions
 
     def can_act_on_behalf(
         self,

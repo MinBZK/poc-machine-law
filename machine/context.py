@@ -174,6 +174,18 @@ class RuleContext:
 
         try:
             with logger.indent_block(f"Resolving {path}"):
+                # Recursively resolve arrays
+                if isinstance(path, list):
+                    resolved = [self.resolve_value(item) for item in path]
+                    node.result = resolved
+                    return resolved
+
+                # Recursively resolve dicts
+                if isinstance(path, dict):
+                    resolved = {k: self.resolve_value(v) for k, v in path.items()}
+                    node.result = resolved
+                    return resolved
+
                 if not isinstance(path, str) or not path.startswith("$"):
                     node.result = path
                     return path

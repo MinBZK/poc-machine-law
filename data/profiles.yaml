@@ -338,6 +338,26 @@ profiles:
             geboortedatum: '2020-06-10'
           - kind_bsn: '999992740'
             geboortedatum: '2022-08-15'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '999991905'
+          bsn_kind: '999991723'
+          naam_kind: Kind 1 Strijps
+          geboortedatum_kind: '2020-06-10'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-06-10'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '999991905'
+          bsn_kind: '999992740'
+          naam_kind: Kind 2 Strijps
+          geboortedatum_kind: '2022-08-15'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2022-08-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       UWV:
         dienstverbanden:
         - bsn: '999991905'
@@ -1223,6 +1243,26 @@ profiles:
             kind_bsn: '200000003'
           - geboortedatum: '2017-03-22'
             kind_bsn: '200000004'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '100000002'
+          bsn_kind: '200000003'
+          naam_kind: Kind Rodriguez 1
+          geboortedatum_kind: '2014-05-15'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2014-05-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '100000002'
+          bsn_kind: '200000004'
+          naam_kind: Kind Rodriguez 2
+          geboortedatum_kind: '2017-03-22'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2017-03-22'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '100000002'

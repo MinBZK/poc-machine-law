@@ -9,7 +9,7 @@
                     U vroeg eerder {{ (current_case.claimed_result.jaarbedrag / 100) | format_currency }} kinderopvangtoeslag aan.
                 </p>
                 <button type="button"
-                        hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
+                        hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
                         hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
@@ -20,12 +20,16 @@
     {% endif %}
 {% endblock %}
 {% block submit_button %}
-    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=application"
-            hx-target="#shared-application-panel"
-            hx-swap="innerHTML"
-            class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
-        Kinderopvangtoeslag aanvragen
-    </button>
+    {% if can_submit_claims|default(true) %}
+        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                hx-target="#shared-application-panel"
+                hx-swap="innerHTML"
+                class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
+            Kinderopvangtoeslag aanvragen
+        </button>
+    {% else %}
+        {% include "partials/tiles/components/minor_blocked_message.html" %}
+    {% endif %}
 {% endblock %}
 {% block approved_status %}
     <p class="text-sm text-green-600 text-center">
