@@ -653,9 +653,12 @@ class RulesEngine:
                 subject = self._evaluate_value(operation["subject"], context)
                 allowed_values = self._evaluate_value(operation.get("values", []), context)
 
-                result = subject in (
-                    allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
-                )
+                # Ensure allowed_values is a list/set for membership testing
+                allowed_set = allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
+
+                # If subject is a list, check if ANY element is in allowed_values
+                result = any(s in allowed_set for s in subject) if isinstance(subject, list) else subject in allowed_set
+
                 if op_type == "NOT_IN":
                     result = not result
 
