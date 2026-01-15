@@ -7,9 +7,9 @@ This router provides endpoints for:
 """
 
 from fastapi import APIRouter, Depends, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 
-from web.dependencies import get_machine_service, templates
+from web.dependencies import get_machine_service
 from web.engines import EngineInterface
 from web.feature_flags import is_delegation_enabled
 
@@ -36,32 +36,6 @@ def get_current_delegation_context(request: Request):
     if session_data:
         return DelegationContext.from_dict(session_data)
     return None
-
-
-@router.get("/", response_class=HTMLResponse)
-async def delegation_overview(
-    request: Request,
-    bsn: str,
-    machine_service: EngineInterface = Depends(get_machine_service),
-):
-    """Show an overview of all delegations available for the user."""
-    if not is_delegation_enabled():
-        return RedirectResponse(url=f"/?bsn={bsn}")
-
-    delegation_manager = get_delegation_manager(machine_service)
-    delegations = delegation_manager.get_delegations_for_user(bsn)
-    current_context = get_current_delegation_context(request)
-
-    return templates.TemplateResponse(
-        "delegation/overview.html",
-        {
-            "request": request,
-            "bsn": bsn,
-            "delegations": delegations,
-            "current_context": current_context,
-            "delegation_enabled": True,
-        },
-    )
 
 
 @router.post("/switch")
