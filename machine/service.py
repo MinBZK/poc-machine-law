@@ -258,16 +258,20 @@ class Services:
     def get_discoverable_service_laws(self, discoverable_by="CITIZEN"):
         return self.resolver.get_discoverable_service_laws(discoverable_by)
 
-    def get_sorted_discoverable_service_laws(self, bsn):
+    def get_sorted_discoverable_service_laws(self, bsn, discoverable_by="CITIZEN"):
         """
-        Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.
+        Return laws discoverable by citizens or businesses, sorted by actual calculated impact.
         Uses simple caching to improve performance and stability.
+
+        Args:
+            bsn: The BSN of the person (or KVK number when acting on behalf of a business)
+            discoverable_by: Either "CITIZEN" or "BUSINESS" to filter which laws to show
 
         Laws will be sorted by their calculated financial impact for this person
         based on outputs marked with citizen_relevance: primary in their YAML definitions.
         """
         # Get basic discoverable laws from the resolver
-        discoverable_laws = self.get_discoverable_service_laws()
+        discoverable_laws = self.get_discoverable_service_laws(discoverable_by=discoverable_by)
 
         # Initialize cache if it doesn't exist
         if not hasattr(self, "_impact_cache") or not self._impact_cache:
@@ -369,6 +373,20 @@ class Services:
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
+
+    def get_law(self, service: str, law: str, reference_date: str | None = None) -> dict[str, Any] | None:
+        """Get the law specification for a given service and law.
+
+        Args:
+            service: Name of the service (e.g., "KVK")
+            law: Name of the law (e.g., "machtigingenwet")
+            reference_date: Reference date for rule version (YYYY-MM-DD)
+
+        Returns:
+            The law specification dictionary, or None if not found
+        """
+        reference_date = reference_date or self.root_reference_date
+        return self.resolver.get_rule_spec(law, reference_date, service=service)
 
     def evaluate(
         self,

@@ -70,7 +70,7 @@
             </div>
         {% else %}
             <!-- Standard panel submit button -->
-            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}"
                   hx-target="#tile-{{ law|replace('/', '-') }}"
                   hx-swap="outerHTML"
                   hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"

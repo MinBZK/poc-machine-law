@@ -99,13 +99,14 @@ async def execute_law(
     law: str,
     bsn: str,
     date: str = None,
+    can_submit_claims: bool = True,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Execute a law and render its result"""
 
-    logger.warn(f"[LAWS] execute {service} {law}")
+    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims})")
 
     try:
         law = unquote(law)
@@ -142,6 +143,7 @@ async def execute_law(
         template_path,
         {
             "bsn": bsn,
+            "effective_bsn": bsn,  # For tile templates
             "request": request,
             "law": law,
             "service": service,
@@ -151,6 +153,7 @@ async def execute_law(
             "requirements_met": result.requirements_met,
             "missing_required": result.missing_required,
             "current_case": existing_case,
+            "can_submit_claims": can_submit_claims,
         },
     )
 

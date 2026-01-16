@@ -279,6 +279,22 @@ class MachineService(EngineInterface):
             # Re-raise the exception so it can be handled by the calling code
             raise
 
+    def get_business_profile(self, kvk_nummer: str) -> dict[str, Any] | None:
+        """
+        Get business profile data for a specific KVK number.
+
+        Note: The HTTP API does not currently have a business profile endpoint.
+        This method returns None until the API is extended to support business profiles.
+
+        Args:
+            kvk_nummer: KVK registration number for the business
+
+        Returns:
+            None (API endpoint not available)
+        """
+        logger.warning(f"[MachineService] get_business_profile not available via HTTP API for KVK: {kvk_nummer}")
+        return None
+
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         # Instantiate the API client with service-specific base URL
         service_base_url = self._get_base_url_for_service(service)
