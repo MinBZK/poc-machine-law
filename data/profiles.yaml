@@ -339,12 +339,12 @@ profiles:
           - kind_bsn: '999992740'
             geboortedatum: '2022-08-15'
         gezag_relaties:
-        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        # Art. 1:253b BW: gezamenlijk gezag met Peter-Jan van der Meijden (999993872)
         - bsn_gezagdrager: '999991905'
           bsn_kind: '999991723'
           naam_kind: Kind 1 Strijps
           geboortedatum_kind: '2020-06-10'
-          type_gezag: OUDERLIJK_GEZAG
+          type_gezag: GEZAMENLIJK_GEZAG
           datum_ingang: '2020-06-10'
           datum_einde: null
           status: ACTIEF
@@ -353,7 +353,7 @@ profiles:
           bsn_kind: '999992740'
           naam_kind: Kind 2 Strijps
           geboortedatum_kind: '2022-08-15'
-          type_gezag: OUDERLIJK_GEZAG
+          type_gezag: GEZAMENLIJK_GEZAG
           datum_ingang: '2022-08-15'
           datum_einde: null
           status: ACTIEF
@@ -1776,6 +1776,17 @@ profiles:
           kinderen:
           - geboortedatum: '2018-06-12'
             kind_bsn: '200000006'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '300000001'
+          bsn_kind: '200000006'
+          naam_kind: Kind van Sophie Jansen
+          geboortedatum_kind: '2018-06-12'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2018-06-12'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '300000001'
@@ -2450,6 +2461,17 @@ profiles:
           kinderen:
           - geboortedatum: '2020-01-01'
             kind_bsn: '200000007'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '999993660'
+          bsn_kind: '200000007'
+          naam_kind: Kind van Lisa de Jong
+          geboortedatum_kind: '2020-01-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-01-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '999993660'
@@ -2596,6 +2618,26 @@ profiles:
         - kind_bsn: '222222222'
           geboortedatum: '2022-07-15'
           naam: Emma de Jong
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '888888888'
+          bsn_kind: '111111111'
+          naam_kind: Sem de Jong
+          geboortedatum_kind: '2020-03-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-03-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '888888888'
+          bsn_kind: '222222222'
+          naam_kind: Emma de Jong
+          geboortedatum_kind: '2022-07-15'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2022-07-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       UWV:
         dienstverbanden:
         - bsn: '888888888'
@@ -2675,6 +2717,26 @@ profiles:
             geboortedatum: '2020-06-10'
           - kind_bsn: '999992740'
             geboortedatum: '2022-08-15'
+        gezag_relaties:
+        # Art. 1:253b BW: gezamenlijk gezag met Linda Strijps (999991905)
+        - bsn_gezagdrager: '999993872'
+          bsn_kind: '999991723'
+          naam_kind: Kind 1 Strijps
+          geboortedatum_kind: '2020-06-10'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2020-06-10'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '999993872'
+          bsn_kind: '999992740'
+          naam_kind: Kind 2 Strijps
+          geboortedatum_kind: '2022-08-15'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2022-08-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       UWV:
         dienstverbanden:
         - bsn: '999993872'
