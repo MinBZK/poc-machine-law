@@ -75,6 +75,19 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
+    def get_business_profile(self, kvk_nummer: str) -> dict[str, Any] | None:
+        """
+        Get business profile data for a specific KVK number.
+
+        Args:
+            kvk_nummer: KVK registration number for the business
+
+        Returns:
+            Dictionary containing business data (handelsnaam, rechtsvorm, activiteit, status)
+            or None if not found
+        """
+
+    @abstractmethod
     def evaluate(
         self,
         service: str,

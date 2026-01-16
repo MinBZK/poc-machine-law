@@ -53,6 +53,45 @@ class PythonMachineService(EngineInterface):
         profiles_path = project_root / "data" / "profiles.yaml"
         return load_profiles_from_yaml(profiles_path)
 
+    def get_business_profile(self, kvk_nummer: str) -> dict[str, Any] | None:
+        """
+        Get business profile data for a specific KVK number.
+
+        Args:
+            kvk_nummer: KVK registration number for the business
+
+        Returns:
+            Dictionary containing business data (handelsnaam, rechtsvorm, activiteit, status)
+            or None if not found
+        """
+        # Get the KVK service
+        if "KVK" not in self.services.services:
+            return None
+
+        kvk_service = self.services.services["KVK"]
+
+        # Look up in the inschrijvingen table
+        if "inschrijvingen" not in kvk_service.source_dataframes:
+            return None
+
+        df = kvk_service.source_dataframes["inschrijvingen"]
+
+        # Find the business by KVK nummer
+        matches = df[df["kvk_nummer"] == kvk_nummer]
+
+        if matches.empty:
+            return None
+
+        # Return the first match as a dictionary
+        row = matches.iloc[0]
+        return {
+            "kvk_nummer": row.get("kvk_nummer"),
+            "handelsnaam": row.get("handelsnaam"),
+            "rechtsvorm": row.get("rechtsvorm"),
+            "activiteit": row.get("activiteit"),
+            "status": row.get("status"),
+        }
+
     def evaluate(
         self,
         service: str,

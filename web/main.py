@@ -207,6 +207,17 @@ async def root(
             status_code=500,
         )
 
+    # Fetch business profile if acting on behalf of a business
+    business_profile = None
+    if delegation_context and delegation_context.subject_type == "BUSINESS":
+        try:
+            business_profile = services.get_business_profile(delegation_context.subject_id)
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to get business profile for KVK {delegation_context.subject_id}: {e}")
+
     # Get accepted cases for the effective BSN
     all_cases = case_manager.get_cases_by_bsn(effective_bsn)
     accepted_cases = [case for case in all_cases if case.status.value == "DECIDED" and case.approved is True]
@@ -275,6 +286,7 @@ async def root(
             "effective_date": effective_date,  # Pass the parsed date parameter to the template
             "user_permissions": user_permissions,
             "can_submit_claims": can_submit_claims,
+            "business_profile": business_profile,
         },
     )
 
