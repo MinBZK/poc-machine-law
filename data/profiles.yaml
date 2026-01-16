@@ -3146,6 +3146,108 @@ profiles:
         - bsn: '200000007'
           bedrag: 0
           land: GEEN
+  '400000001':
+    name: Maria van den Berg
+    description: Voogd van haar neefje Daan na overlijden van zijn ouders (Art. 1:295 BW)
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400000001'
+          geboortedatum: '1972-09-14'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 53
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Oudegracht 85, 3511AD Utrecht
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '400000001'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+        verblijfplaats:
+        - bsn: '400000001'
+          straat: Oudegracht
+          huisnummer: '85'
+          postcode: 3511AD
+          woonplaats: Utrecht
+          type: WOONADRES
+        gezag_relaties:
+        # Art. 1:295 BW: voogdij door niet-ouder (tante)
+        - bsn_gezagdrager: '400000001'
+          bsn_kind: '400000002'
+          naam_kind: Daan van der Berg
+          geboortedatum_kind: '2013-04-22'
+          type_gezag: VOOGDIJ
+          datum_ingang: '2021-08-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+      BELASTINGDIENST:
+        box1:
+        - bsn: '400000001'
+          loon_uit_dienstbetrekking: 4200000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box3:
+        - bsn: '400000001'
+          spaargeld: 2500000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '400000001'
+          bedrag: 0
+          land: GEEN
+  '400000002':
+    name: Daan van der Berg
+    description: Minderjarige onder voogdij van tante Maria (BSN 400000001)
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400000002'
+          geboortedatum: '2013-04-22'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 12
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Oudegracht 85, 3511AD Utrecht
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '400000002'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+        verblijfplaats:
+        - bsn: '400000002'
+          straat: Oudegracht
+          huisnummer: '85'
+          postcode: 3511AD
+          woonplaats: Utrecht
+          type: WOONADRES
+      BELASTINGDIENST:
+        box3:
+        - bsn: '400000002'
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '400000002'
+          bedrag: 0
+          land: GEEN
   '999993670':
     name: Jan Pietersen
     description: Partner van Maria Pietersen, nog geen AOW-leeftijd
