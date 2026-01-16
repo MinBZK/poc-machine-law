@@ -131,6 +131,10 @@
 <section class="mb-8 bg-white rounded-lg shadow">
     <div class="p-6">
         {% if delegation_context and delegation_context.subject_type == "BUSINESS" and business_profile %}
+            <!-- Delegation indicator for BUSINESS -->
+            <div class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                Namens bedrijf · {{ delegation_context.delegation_type }}
+            </div>
             <!-- Business Profile Section -->
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -220,6 +224,21 @@
                 </div>
             </div>
         {% elif profile.sources.RvIG %}
+            <!-- Delegation indicator for CITIZEN delegations -->
+            {% if delegation_context and delegation_context.subject_type == "CITIZEN" %}
+                <div class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                    Namens {{ delegation_context.subject_name }} ·
+                    {% if delegation_context.delegation_type == "VOOGDIJ" %}
+                        Voogdij
+                    {% elif delegation_context.delegation_type == "OUDERLIJK_GEZAG" %}
+                        Ouderlijk gezag
+                    {% elif delegation_context.delegation_type == "GEZAMENLIJK_GEZAG" %}
+                        Gezamenlijk gezag
+                    {% else %}
+                        {{ delegation_context.delegation_type }}
+                    {% endif %}
+                </div>
+            {% endif %}
             <!-- Personal Profile Section -->
             <div class="flex items-center justify-between mb-4">
                 <div>
