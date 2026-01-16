@@ -20,7 +20,7 @@ repos:
       - id: detect-private-key
         exclude: '^wallet/verification_server/ca\.regelrecht\.reader\.key\.pem$'
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.3
+    rev: v0.14.11
     hooks:
       - id: ruff
       - id: ruff-format
