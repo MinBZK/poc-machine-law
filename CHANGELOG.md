@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-01-19)
+
+### Chores
+
+- Sync VERSION file to 1.0.5
+  ([`7d80754`](https://github.com/MinBZK/poc-machine-law/commit/7d80754307bddc30819a1ad5231803799c1fe6d2))
+
+### Features
+
+- Profile properties ([#278](https://github.com/MinBZK/poc-machine-law/pull/278),
+  [`47e554b`](https://github.com/MinBZK/poc-machine-law/commit/47e554ba4188b7799c49387809dcba6aa4d40611))
+
+
 ## v1.0.5 (2026-01-19)
 
 ### Bug Fixes
