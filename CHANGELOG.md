@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.0.5 (2026-01-19)
+
+### Bug Fixes
+
+- Remove link to claim details, since it results in an error
+  ([#309](https://github.com/MinBZK/poc-machine-law/pull/309),
+  [`4742a33`](https://github.com/MinBZK/poc-machine-law/commit/4742a33dd4eea8d783dec6249870969134806859))
+
+### Chores
+
+- Sync VERSION file to 1.0.4
+  ([`afd38c3`](https://github.com/MinBZK/poc-machine-law/commit/afd38c3d876cfd3e079312fbab4d8b82dcf65a69))
+
+
 ## v1.0.4 (2026-01-19)
 
 ### Bug Fixes
