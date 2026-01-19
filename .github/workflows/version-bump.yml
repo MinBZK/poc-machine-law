@@ -38,15 +38,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Run semantic-release to bump version in pyproject.toml
           semantic-release version --no-vcs-release
 
-          # Check if there are changes to commit
-          if git diff --quiet pyproject.toml VERSION; then
+          # Check if pyproject.toml was updated
+          if git diff --quiet pyproject.toml; then
             echo "No version changes detected"
           else
-            echo "Version bumped, committing changes"
+            # Extract version from pyproject.toml and sync to VERSION file
+            VERSION=$(grep -oP 'version = "\K[^"]+' pyproject.toml | head -1)
+            echo "$VERSION" > VERSION
+
+            echo "Version bumped to $VERSION, committing changes"
             git add pyproject.toml VERSION
-            VERSION=$(cat VERSION)
             git commit -m "chore(release): ${VERSION}"
             git tag "v${VERSION}"
             git push origin main --tags
