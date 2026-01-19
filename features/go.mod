@@ -5,7 +5,7 @@ go 1.25.3
 replace github.com/minbzk/poc-machine-law/machinev2/machine => ../machinev2/machine
 
 require (
-	github.com/cucumber/godog v0.15.0
+	github.com/cucumber/godog v0.15.1
 	github.com/google/uuid v1.6.0
 	github.com/minbzk/poc-machine-law/machinev2/machine v0.0.0-20250311082128-0b97b4006c7b
 	github.com/sirupsen/logrus v1.9.4
@@ -39,7 +39,7 @@ require (
 	github.com/oapi-codegen/runtime v1.1.2 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.31 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
