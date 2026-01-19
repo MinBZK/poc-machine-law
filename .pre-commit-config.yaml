@@ -13,6 +13,7 @@ repos:
       - id: conventional-pre-commit
         stages: [commit-msg]
         args:
+          - --verbose
           - feat
           - fix
           - docs
