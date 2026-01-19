@@ -1,11 +1,27 @@
 import locale
 from datetime import datetime
+from importlib.metadata import version as get_version
 from pathlib import Path
 
 from config_loader import ConfigLoader
 from engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from engines.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory
 from fastapi.templating import Jinja2Templates
+
+
+def get_app_version() -> str:
+    """Get the application version from package metadata or VERSION file."""
+    try:
+        return get_version("poc-machine-law")
+    except Exception:
+        # Fallback to VERSION file if package is not installed
+        version_file = Path(__file__).parent.parent / "VERSION"
+        if version_file.exists():
+            return version_file.read_text().strip()
+        return "0.0.0"
+
+
+APP_VERSION = get_app_version()
 
 # Load configuration
 config_loader = ConfigLoader()
@@ -141,6 +157,9 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
         return str(value)
 
     templates.env.filters["format_value"] = format_value
+
+    # Add global variables
+    templates.env.globals["app_version"] = APP_VERSION
 
     return templates
 
