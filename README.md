@@ -158,6 +158,11 @@ Installeer alle dependencies:
 uv sync
 ```
 
+Installeer pre-commit hooks (inclusief commit message validatie):
+```bash
+./script/setup-hooks.sh
+```
+
 Run behavior tests:
 ```bash
 script/test-behaviour
