@@ -33,7 +33,7 @@ dependencies = [
     "requests>=2.32.3",
     "tavily-python>=0.5.1",
     "tqdm>=4.67.1",
-    "uvicorn<0.36.0",
+    "uvicorn<0.41.0",
     "websockets>=15.0.1",
 ]
 
