@@ -34,6 +34,7 @@ class Case:
         approved (Union[Unset, bool]):
         objection_status (Union[Unset, CaseObjectionStatus]): Parameters to set the objection status
         appeal_status (Union[Unset, CaseAppealStatus]): Parameters to set the objection status
+        claim_ids (Union[Unset, list[UUID]]):
     """
 
     id: UUID
@@ -49,6 +50,7 @@ class Case:
     approved: Union[Unset, bool] = UNSET
     objection_status: Union[Unset, "CaseObjectionStatus"] = UNSET
     appeal_status: Union[Unset, "CaseAppealStatus"] = UNSET
+    claim_ids: Union[Unset, list[UUID]] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -82,6 +84,13 @@ class Case:
         if not isinstance(self.appeal_status, Unset):
             appeal_status = self.appeal_status.to_dict()
 
+        claim_ids: Union[Unset, list[str]] = UNSET
+        if not isinstance(self.claim_ids, Unset):
+            claim_ids = []
+            for claim_ids_item_data in self.claim_ids:
+                claim_ids_item = str(claim_ids_item_data)
+                claim_ids.append(claim_ids_item)
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -104,6 +113,8 @@ class Case:
             field_dict["objectionStatus"] = objection_status
         if appeal_status is not UNSET:
             field_dict["appealStatus"] = appeal_status
+        if claim_ids is not UNSET:
+            field_dict["claim_ids"] = claim_ids
 
         return field_dict
 
@@ -149,6 +160,13 @@ class Case:
         else:
             appeal_status = CaseAppealStatus.from_dict(_appeal_status)
 
+        claim_ids = []
+        _claim_ids = d.pop("claim_ids", UNSET)
+        for claim_ids_item_data in _claim_ids or []:
+            claim_ids_item = UUID(claim_ids_item_data)
+
+            claim_ids.append(claim_ids_item)
+
         case = cls(
             id=id,
             bsn=bsn,
@@ -163,6 +181,7 @@ class Case:
             approved=approved,
             objection_status=objection_status,
             appeal_status=appeal_status,
+            claim_ids=claim_ids,
         )
 
         case.additional_properties = d

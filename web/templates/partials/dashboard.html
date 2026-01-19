@@ -101,13 +101,22 @@
             </p>
         </div>
         <div class="flex items-center space-x-2">
-            <span class="text-sm text-gray-600">Datum: {{ formatted_date }}</span>
+            <span class="text-sm text-gray-600">Datum:
+                {% if adjustable_effective_date_enabled %}
+                    <input id="date-input"
+                           class="bg-white px-2 py-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           type="date"
+                           value="{{ request.query_params.get('date') if request.query_params.get('date') else now.strftime('%Y-%m-%d') }}">
+                {% else %}
+                    {{ effective_date.strftime("%-d %B %Y") }}
+                {% endif %}
+            </span>
         </div>
     </div>
 </section>
 <!-- Total Income Widget -->
 {% if total_income_widget_enabled %}
-    <div hx-get="/dashboard/total-net-income?bsn={{ bsn }}"
+    <div hx-get="/dashboard/total-net-income?bsn={{ effective_bsn|default(bsn) }}{% if request.query_params.get('date') %}&date={{ request.query_params.get("date") }}{% endif %}"
          hx-trigger="load"
          hx-swap="outerHTML">
         <div class="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-100 overflow-hidden">
@@ -121,213 +130,327 @@
 <!-- templates/partials/dashboard.html -->
 <section class="mb-8 bg-white rounded-lg shadow">
     <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
-                <div class="text-sm text-gray-600 mt-1">
-                    BSN: {{ bsn }} | Geboortedatum: {{
-                    profile.sources.RvIG.personen[0].geboortedatum|format_date }}
-                </div>
+        {% if delegation_context and delegation_context.subject_type == "BUSINESS" and business_profile %}
+            <!-- Delegation indicator for BUSINESS -->
+            <div class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                Namens bedrijf · {{ delegation_context.delegation_type }}
             </div>
-            <button class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
-                    onclick="document.getElementById('profile-details').classList.toggle('hidden')">
-                <span class="mr-2">Bekijk alle gegevens</span>
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="h-5 w-5"
-                     viewBox="0 0 20 20"
-                     fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>
-        <!-- Uitklapbare sectie -->
-        <div id="profile-details" class="hidden">
-            <div class="border-t pt-4 mt-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Persoonsgegevens -->
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
-                        <dl class="space-y-2">
-                            <div>
-                                <dt class="text-sm text-gray-600">Nationaliteit</dt>
-                                <dd>
-                                    {{ accepted_claims["nationaliteit"] or profile.sources.RvIG.personen[0].nationaliteit }}
-                                </dd>
-                            </div>
-                            {% if accepted_claims["verblijfplaats"] %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">
-                                        {% if accepted_claims["verblijfplaats"].type == "BRIEFADRES" %}
-                                            Briefadres
-                                        {% else %}
-                                            Woonadres
-                                        {% endif %}
-                                    </dt>
-                                    <dd>
-                                        {{ accepted_claims["verblijfplaats"].straat }} {{
-                                        accepted_claims["verblijfplaats"].huisnummer }}
-                                    </dd>
-                                    <dd>
-                                        {{ accepted_claims["verblijfplaats"].postcode }} {{
-                                        accepted_claims["verblijfplaats"].woonplaats }}
-                                    </dd>
-                                </div>
-                            {% elif accepted_claims["verblijfsadres"] %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">Verblijfplaats</dt>
-                                    <dd>
-                                        {{ accepted_claims["verblijfsadres"] }}
-                                    </dd>
-                                </div>
-                            {% elif profile.sources.RvIG.get('verblijfplaats') %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">
-                                        {% if profile.sources.RvIG.verblijfplaats[0].type ==
-                                            "BRIEFADRES" %}
-                                            Briefadres
-                                        {% else %}
-                                            Woonadres
-                                        {% endif %}
-                                    </dt>
-                                    <dd>
-                                        {{ profile.sources.RvIG.verblijfplaats[0].straat }} {{
-                                        profile.sources.RvIG.verblijfplaats[0].huisnummer }}
-                                    </dd>
-                                    <dd>
-                                        {{ profile.sources.RvIG.verblijfplaats[0].postcode }} {{
-                                        profile.sources.RvIG.verblijfplaats[0].woonplaats }}
-                                    </dd>
-                                </div>
-                            {% elif profile.sources.RvIG.personen[0].verblijfsadres %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">Verblijfplaats</dt>
-                                    <dd>
-                                        {{ profile.sources.RvIG.personen[0].verblijfsadres }}
-                                    </dd>
-                                </div>
-                            {% endif %}
-                            {% if profile.sources.RvIG.relaties and
-                                profile.sources.RvIG.relaties[0].partnerschap_type != "GEEN" %}
-                                <div>
-                                    <dt class="text-sm text-gray-600">Partnerschap</dt>
-                                    <dd>
-                                        {{ profile.sources.RvIG.relaties[0].partnerschap_type }}
-                                    </dd>
-                                </div>
-                            {% endif %}
-                        </dl>
+            <!-- Business Profile Section -->
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="font-semibold text-lg">{{ business_profile.handelsnaam }}</h3>
+                    <div class="text-sm text-gray-600 mt-1">
+                        KVK: {{ delegation_context.subject_id }} | {{ business_profile.rechtsvorm }}
                     </div>
-                    <!-- Inkomen -->
-                    {% if profile.sources.BELASTINGDIENST and
-                        profile.sources.BELASTINGDIENST.box1 %}
+                </div>
+                <button class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
+                        onclick="document.getElementById('profile-details').classList.toggle('hidden')">
+                    <span class="mr-2">Bekijk alle gegevens</span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Uitklapbare sectie for business -->
+            <div id="profile-details" class="hidden">
+                <div class="border-t pt-4 mt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Bedrijfsgegevens -->
                         <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">Inkomen</h4>
-                            <dl class="space-y-2">
-                                {% if
-                                    accepted_claims["BOX1_DIENSTBETREKKING"] or
-                                    profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
-                                    %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Inkomen uit werk</dt>
-                                        <dd>
-                                            {{
-                                            ((accepted_claims["BOX1_DIENSTBETREKKING"] or profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking)
-                                            / 100) | format_currency }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                                {% if
-                                    accepted_claims["BOX1_ONDERNEMING"] or
-                                    profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Winst uit onderneming</dt>
-                                        <dd>
-                                            {{
-                                            ((accepted_claims["BOX1_ONDERNEMING"] or profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming)
-                                            / 100) | format_currency }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                                {% if accepted_claims["BOX3_SPAREN"] or
-                                    (profile.sources.BELASTINGDIENST.box3 and
-                                    profile.sources.BELASTINGDIENST.box3[0].spaargeld) %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Spaargeld</dt>
-                                        <dd>
-                                            {{ ((accepted_claims["BOX3_SPAREN"] or profile.sources.BELASTINGDIENST.box3[0].spaargeld) / 100) |
-                                            format_currency }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                            </dl>
-                        </div>
-                    {% endif %}
-                    <!-- Opleiding -->
-                    {% if profile.sources.DUO and profile.sources.DUO.inschrijvingen %}
-                        <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">Opleiding</h4>
+                            <h4 class="font-semibold text-gray-900 mb-3">Bedrijfsgegevens</h4>
                             <dl class="space-y-2">
                                 <div>
-                                    <dt class="text-sm text-gray-600">Onderwijssoort</dt>
+                                    <dt class="text-sm text-gray-600">KVK-nummer</dt>
                                     <dd>
-                                        {{ profile.sources.DUO.inschrijvingen[0].onderwijssoort }}
+                                        {{ delegation_context.subject_id }}
                                     </dd>
                                 </div>
-                                {% if profile.sources.DUO.inschrijvingen[0].niveau %}
+                                <div>
+                                    <dt class="text-sm text-gray-600">Handelsnaam</dt>
+                                    <dd>
+                                        {{ business_profile.handelsnaam }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm text-gray-600">Rechtsvorm</dt>
+                                    <dd>
+                                        {{ business_profile.rechtsvorm }}
+                                    </dd>
+                                </div>
+                                {% if business_profile.activiteit %}
                                     <div>
-                                        <dt class="text-sm text-gray-600">Niveau</dt>
+                                        <dt class="text-sm text-gray-600">Activiteit</dt>
                                         <dd>
-                                            Niveau {{ profile.sources.DUO.inschrijvingen[0].niveau }}
+                                            {{ business_profile.activiteit }}
                                         </dd>
                                     </div>
                                 {% endif %}
+                                <div>
+                                    <dt class="text-sm text-gray-600">Status</dt>
+                                    <dd>
+                                        {{ business_profile.status }}
+                                    </dd>
+                                </div>
                             </dl>
                         </div>
-                    {% endif %}
-                    <!-- Werk en Re-integratie -->
-                    {% if profile.sources.GEMEENTE_AMSTERDAM and
-                        profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie %}
+                        <!-- Vertegenwoordiger -->
                         <div>
-                            <h4 class="font-semibold text-gray-900 mb-3">Werk & Re-integratie</h4>
+                            <h4 class="font-semibold text-gray-900 mb-3">Vertegenwoordiger</h4>
                             <dl class="space-y-2">
                                 <div>
-                                    <dt class="text-sm text-gray-600">Arbeidsvermogen</dt>
+                                    <dt class="text-sm text-gray-600">Naam</dt>
                                     <dd>
-                                        {{
-                                        profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].arbeidsvermogen
-                                        }}
+                                        {{ profile.name }}
                                     </dd>
                                 </div>
-                                {% if
-                                    profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
-                                    %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Re-integratietraject</dt>
-                                        <dd>
-                                            {{
-                                            profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
-                                            }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
-                                {% if
-                                    profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
-                                    %}
-                                    <div>
-                                        <dt class="text-sm text-gray-600">Ontheffing</dt>
-                                        <dd>
-                                            {{
-                                            profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
-                                            }}
-                                        </dd>
-                                    </div>
-                                {% endif %}
+                                <div>
+                                    <dt class="text-sm text-gray-600">BSN</dt>
+                                    <dd>
+                                        {{ bsn }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm text-gray-600">Functie</dt>
+                                    <dd>
+                                        {{ delegation_context.delegation_type }}
+                                    </dd>
+                                </div>
                             </dl>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% elif profile.sources.RvIG %}
+            <!-- Delegation indicator for CITIZEN delegations -->
+            {% if delegation_context and delegation_context.subject_type == "CITIZEN" %}
+                <div class="mb-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                    Namens {{ delegation_context.subject_name }} ·
+                    {% if delegation_context.delegation_type == "VOOGDIJ" %}
+                        Voogdij
+                    {% elif delegation_context.delegation_type == "OUDERLIJK_GEZAG" %}
+                        Ouderlijk gezag
+                    {% elif delegation_context.delegation_type == "GEZAMENLIJK_GEZAG" %}
+                        Gezamenlijk gezag
+                    {% else %}
+                        {{ delegation_context.delegation_type }}
+                    {% endif %}
+                </div>
+            {% endif %}
+            <!-- Personal Profile Section -->
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="font-semibold text-lg">{{ profile.name }}</h3>
+                    <div class="text-sm text-gray-600 mt-1">
+                        BSN: {{ bsn }} | Geboortedatum: {{
+                        profile.sources.RvIG.personen[0].geboortedatum|format_date }}
+                    </div>
+                </div>
+                <button class="text-blue-600 hover:text-blue-800 flex items-center cursor-pointer"
+                        onclick="document.getElementById('profile-details').classList.toggle('hidden')">
+                    <span class="mr-2">Bekijk alle gegevens</span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         viewBox="0 0 20 20"
+                         fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Uitklapbare sectie -->
+            <div id="profile-details" class="hidden">
+                <div class="border-t pt-4 mt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Persoonsgegevens -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
+                            <dl class="space-y-2">
+                                <div>
+                                    <dt class="text-sm text-gray-600">Nationaliteit</dt>
+                                    <dd>
+                                        {{ accepted_claims["nationaliteit"] or profile.sources.RvIG.personen[0].nationaliteit }}
+                                    </dd>
+                                </div>
+                                {% if accepted_claims["verblijfplaats"] %}
+                                    <div>
+                                        <dt class="text-sm text-gray-600">
+                                            {% if accepted_claims["verblijfplaats"].type == "BRIEFADRES" %}
+                                                Briefadres
+                                            {% else %}
+                                                Woonadres
+                                            {% endif %}
+                                        </dt>
+                                        <dd>
+                                            {{ accepted_claims["verblijfplaats"].straat }} {{
+                                            accepted_claims["verblijfplaats"].huisnummer }}
+                                        </dd>
+                                        <dd>
+                                            {{ accepted_claims["verblijfplaats"].postcode }} {{
+                                            accepted_claims["verblijfplaats"].woonplaats }}
+                                        </dd>
+                                    </div>
+                                {% elif accepted_claims["verblijfsadres"] %}
+                                    <div>
+                                        <dt class="text-sm text-gray-600">Verblijfplaats</dt>
+                                        <dd>
+                                            {{ accepted_claims["verblijfsadres"] }}
+                                        </dd>
+                                    </div>
+                                {% elif profile.sources.RvIG.get('verblijfplaats') %}
+                                    <div>
+                                        <dt class="text-sm text-gray-600">
+                                            {% if profile.sources.RvIG.verblijfplaats[0].type ==
+                                                "BRIEFADRES" %}
+                                                Briefadres
+                                            {% else %}
+                                                Woonadres
+                                            {% endif %}
+                                        </dt>
+                                        <dd>
+                                            {{ profile.sources.RvIG.verblijfplaats[0].straat }} {{
+                                            profile.sources.RvIG.verblijfplaats[0].huisnummer }}
+                                        </dd>
+                                        <dd>
+                                            {{ profile.sources.RvIG.verblijfplaats[0].postcode }} {{
+                                            profile.sources.RvIG.verblijfplaats[0].woonplaats }}
+                                        </dd>
+                                    </div>
+                                {% elif profile.sources.RvIG.personen[0].verblijfsadres %}
+                                    <div>
+                                        <dt class="text-sm text-gray-600">Verblijfplaats</dt>
+                                        <dd>
+                                            {{ profile.sources.RvIG.personen[0].verblijfsadres }}
+                                        </dd>
+                                    </div>
+                                {% endif %}
+                                {% if profile.sources.RvIG.relaties and
+                                    profile.sources.RvIG.relaties[0].partnerschap_type != "GEEN" %}
+                                    <div>
+                                        <dt class="text-sm text-gray-600">Partnerschap</dt>
+                                        <dd>
+                                            {{ profile.sources.RvIG.relaties[0].partnerschap_type }}
+                                        </dd>
+                                    </div>
+                                {% endif %}
+                            </dl>
+                        </div>
+                        <!-- Inkomen -->
+                        {% if profile.sources.BELASTINGDIENST and
+                            profile.sources.BELASTINGDIENST.box1 %}
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Inkomen</h4>
+                                <dl class="space-y-2">
+                                    {% if
+                                        accepted_claims["BOX1_DIENSTBETREKKING"] or
+                                        profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking
+                                        %}
+                                        <div>
+                                            <dt class="text-sm text-gray-600">Inkomen uit werk</dt>
+                                            <dd>
+                                                {{
+                                                ((accepted_claims["BOX1_DIENSTBETREKKING"] or profile.sources.BELASTINGDIENST.box1[0].loon_uit_dienstbetrekking)
+                                                / 100) | format_currency }}
+                                            </dd>
+                                        </div>
+                                    {% endif %}
+                                    {% if
+                                        accepted_claims["BOX1_ONDERNEMING"] or
+                                        profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming %}
+                                        <div>
+                                            <dt class="text-sm text-gray-600">Winst uit onderneming</dt>
+                                            <dd>
+                                                {{
+                                                ((accepted_claims["BOX1_ONDERNEMING"] or profile.sources.BELASTINGDIENST.box1[0].winst_uit_onderneming)
+                                                / 100) | format_currency }}
+                                            </dd>
+                                        </div>
+                                    {% endif %}
+                                    {% if accepted_claims["BOX3_SPAREN"] or
+                                        (profile.sources.BELASTINGDIENST.box3 and
+                                        profile.sources.BELASTINGDIENST.box3[0].spaargeld) %}
+                                        <div>
+                                            <dt class="text-sm text-gray-600">Spaargeld</dt>
+                                            <dd>
+                                                {{ ((accepted_claims["BOX3_SPAREN"] or profile.sources.BELASTINGDIENST.box3[0].spaargeld) / 100) |
+                                                format_currency }}
+                                            </dd>
+                                        </div>
+                                    {% endif %}
+                                </dl>
+                            </div>
+                        {% endif %}
+                        <!-- Opleiding -->
+                        {% if profile.sources.DUO and profile.sources.DUO.inschrijvingen %}
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Opleiding</h4>
+                                <dl class="space-y-2">
+                                    <div>
+                                        <dt class="text-sm text-gray-600">Onderwijssoort</dt>
+                                        <dd>
+                                            {{ profile.sources.DUO.inschrijvingen[0].onderwijssoort }}
+                                        </dd>
+                                    </div>
+                                    {% if profile.sources.DUO.inschrijvingen[0].niveau %}
+                                        <div>
+                                            <dt class="text-sm text-gray-600">Niveau</dt>
+                                            <dd>
+                                                Niveau {{ profile.sources.DUO.inschrijvingen[0].niveau }}
+                                            </dd>
+                                        </div>
+                                    {% endif %}
+                                </dl>
+                            </div>
+                        {% endif %}
+                        <!-- Werk en Re-integratie -->
+                        {% if profile.sources.GEMEENTE_AMSTERDAM and
+                            profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie %}
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Werk & Re-integratie</h4>
+                                <dl class="space-y-2">
+                                    <div>
+                                        <dt class="text-sm text-gray-600">Arbeidsvermogen</dt>
+                                        <dd>
+                                            {{
+                                            profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].arbeidsvermogen
+                                            }}
+                                        </dd>
+                                    </div>
+                                    {% if
+                                        profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
+                                        %}
+                                        <div>
+                                            <dt class="text-sm text-gray-600">Re-integratietraject</dt>
+                                            <dd>
+                                                {{
+                                                profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].re_integratie_traject
+                                                }}
+                                            </dd>
+                                        </div>
+                                    {% endif %}
+                                    {% if
+                                        profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
+                                        %}
+                                        <div>
+                                            <dt class="text-sm text-gray-600">Ontheffing</dt>
+                                            <dd>
+                                                {{
+                                                profile.sources.GEMEENTE_AMSTERDAM.werk_en_re_integratie[0].ontheffing_reden
+                                                }}
+                                            </dd>
+                                        </div>
+                                    {% endif %}
+                                </dl>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <h4 class="font-semibold text-gray-900 mb-3">Persoonsgegevens</h4>
+            <p>Geen profieldata gevonden.</p>
+        {% endif %}
     </div>
 </section>
 <!-- Laws Grid -->
@@ -335,7 +458,7 @@
     <h3 class="font-semibold text-lg mb-4">Berekende regelingen</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
         {% for law in discoverable_service_laws %}
-            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ bsn }}"
+            <div hx-get="/laws/execute?service={{ law['service'] }}&law={{ law['law']|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if request.query_params.get('date') %}&date={{ request.query_params.get("date") }}{% endif %}&can_submit_claims={{ can_submit_claims|default(true) }}"
                  hx-trigger="load"
                  hx-swap="outerHTML"
                  class="h-full bg-white rounded-lg shadow">{% include "partials/loading.html" %}</div>
@@ -484,7 +607,7 @@
                                     class="cursor-pointer rounded bg-gray-200 px-4 py-2 font-medium text-gray-700 hover:bg-gray-300 focus:outline-none">
                                 Terug
                             </button>
-                            <button type="button"
+                            <button type="submit"
                                     id="next-btn"
                                     class="cursor-pointer rounded bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none">
                                 Volgende
@@ -541,6 +664,17 @@
     </div>
 </section>
 <script>
+  // Date selector handling
+  const dateInput = document.getElementById('date-input');
+  if (dateInput) {
+    dateInput.addEventListener('change', function () {
+      const selectedDate = this.value;
+      const url = new URL(window.location.href);
+      url.searchParams.set('date', selectedDate);
+      window.location.href = url.toString();
+    });
+  }
+
   // Toast notification functions
   function showToast(message, type = "success") {
     const toastContainer = document.getElementById("toast-container");
@@ -597,133 +731,133 @@
           [
             {
               type: "input",
-              name: "BOX1_DIENSTBETREKKING",
+              name: "loon_uit_dienstbetrekking",
               label: "Box 1: Loon uit dienstbetrekking",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarloon…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box1', [{}])[0].loon_uit_dienstbetrekking | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
             {
               type: "input",
-              name: "BOX1_UITKERINGEN",
+              name: "uitkeringen_en_pensioenen",
               label: "Box 1: Uitkeringen en pensioenen",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box1', [{}])[0].uitkeringen_en_pensioenen | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
             {
               type: "input",
-              name: "BOX1_ONDERNEMING",
+              name: "winst_uit_onderneming",
               label: "Box 1: Winst uit onderneming",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box1', [{}])[0].winst_uit_onderneming | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
             {
               type: "input",
-              name: "BOX1_OVERIGE_WERKZAAMHEDEN",
+              name: "resultaat_overige_werkzaamheden",
               label: "Box 1: Resultaat overige werkzaamheden",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box1', [{}])[0].resultaat_overige_werkzaamheden | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
             {
               type: "input",
-              name: "BOX1_EIGEN_WONING",
+              name: "eigen_woning",
               label: "Box 1: Inkomsten uit eigen woning",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box1', [{}])[0].eigen_woning | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
 
             {
               type: "input",
-              name: "BOX2_DIVIDEND",
+              name: "reguliere_voordelen",
               label: "Box 2: Reguliere voordelen (dividend)",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box2', [{}])[0].reguliere_voordelen | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
             {
               type: "input",
-              name: "BOX2_AANDELEN",
+              name: "vervreemdingsvoordelen",
               label: "Box 2: Vervreemdingsvoordelen (verkoop aanmerkelijk belang)",
               inputType: "number",
-              placeholder: "Nieuw bruto jaarbedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box2', [{}])[0].vervreemdingsvoordelen | default(0)) / 100) | int }}" || 'Nieuw bruto jaarbedrag…',
             },
 
             {
               type: "input",
-              name: "BOX3_SPAREN",
+              name: "spaargeld",
               label: "Box 3: Spaargeld",
               inputType: "number",
-              placeholder: "Nieuw bedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box3', [{}])[0].spaargeld | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
             },
             {
               type: "input",
-              name: "BOX3_BELEGGEN",
+              name: "beleggingen",
               label: "Box 3: Beleggingen",
               inputType: "number",
-              placeholder: "Nieuw bedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box3', [{}])[0].beleggingen | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
             },
             {
               type: "input",
-              name: "BOX3_ONROEREND_GOED",
+              name: "onroerend_goed",
               label: "Box 3: Onroerend goed",
               inputType: "number",
-              placeholder: "Nieuw bedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box3', [{}])[0].onroerend_goed | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
             },
             {
               type: "input",
-              name: "BOX3_SCHULDEN",
+              name: "schulden",
               label: "Box 3: Schulden",
               inputType: "number",
-              placeholder: "Nieuw bedrag…",
+              placeholder: "{{ ((profile.sources.BELASTINGDIENST.get('box3', [{}])[0].schulden | default(0)) / 100) | int }}" || 'Nieuw bedrag…',
             },
 
-            { type: "input", label: "Ingangsdatum", inputType: "date" },
+            { type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" },
           ],
         ],
         woonadres: [
-          [
-            {
-              type: "select",
-              name: "situation_move_change_type",
-              label: "Type adreswijziging",
-              options: [
-                { value: "verhuizing", label: "Verhuizing", icon: "move" },
-                { value: "correctie", label: "Correctie", icon: "edit" },
-              ],
-            },
-          ],
+          // [
+          //   {
+          //     type: "select",
+          //     name: "situation_move_change_type",
+          //     label: "Type adreswijziging",
+          //     options: [
+          //       { value: "verhuizing", label: "Verhuizing", icon: "move" },
+          //       { value: "correctie", label: "Correctie", icon: "edit" },
+          //     ],
+          //   },
+          // ],
           [
             {
               type: "input",
-              name: "ADRES.straat",
+              name: "adres.straat",
               label: "Nieuwe straatnaam",
               inputType: "text",
-              placeholder: "Straatnaam…",
+              placeholder: "{{ profile.sources.RvIG.verblijfplaats[0].straat }}" || 'Straatnaam…',
             },
             {
               type: "input",
-              name: "ADRES.huisnummer",
+              name: "adres.huisnummer",
               label: "Nieuw huisnummer",
               inputType: "text",
-              placeholder: "Huisnummer…",
+              placeholder: "{{ profile.sources.RvIG.verblijfplaats[0].huisnummer }}" || 'Huisnummer…',
             },
             {
               type: "input",
-              name: "ADRES.postcode",
+              name: "adres.postcode",
               label: "Nieuwe postcode",
               inputType: "text",
-              placeholder: "Postcode…",
+              placeholder: "{{ profile.sources.RvIG.verblijfplaats[0].postcode }}" || 'Postcode…',
             },
             {
               type: "input",
-              name: "ADRES.woonplaats",
+              name: "adres.woonplaats",
               label: "Nieuwe woonplaats",
               inputType: "text",
-              placeholder: "Woonplaats…",
+              placeholder: "{{ profile.sources.RvIG.verblijfplaats[0].woonplaats }}" || 'Woonplaats…',
             },
           ],
           // [
           //   {
           //     type: "select",
-          //     name: "ADRES.type",
+          //     name: "adres.type",
           //     label: "Wat voor soort woning is dit?",
           //     options: [
           //       { value: "koopwoning", label: "Koopwoning", icon: "buy" },
@@ -731,25 +865,32 @@
           //     ],
           //   },
           // ],
-          [{ type: "input", label: "Ingangsdatum", inputType: "date" }],
+          [{ type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" }],
         ],
         huurprijs: [
           [
             {
               type: "input",
-              name: "HUURPRIJS",
+              name: "huurprijs",
               label: "Nieuwe huurprijs",
               inputType: "number",
               placeholder: "Voer de nieuwe huurprijs in…",
             },
             {
               type: "input",
-              name: "SUBSIDIABELE_SERVICEKOSTEN",
+              name: "servicekosten",
+              label: "Servicekosten",
+              inputType: "number",
+              placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
+            },
+            {
+              type: "input",
+              name: "subsidiabele_servicekosten",
               label: "Subsidiabele servicekosten",
               inputType: "number",
               placeholder: "Voer de nieuwe maandelijkse servicekosten in…",
             },
-            { type: "input", label: "Ingangsdatum", inputType: "date" },
+            { type: "input", name: "effective_date", label: "Ingangsdatum", inputType: "date" },
           ],
         ],
         huishouden: [
@@ -796,7 +937,7 @@
           [
             {
               type: "input",
-              name: "",
+              name: "effective_date",
               label: "Ingangsdatum",
               inputType: "date",
             },
@@ -804,7 +945,9 @@
         ],
       };
 
-      this.init();
+      if (document.getElementById("wizard-form")) {
+        this.init();
+      }
     }
 
     init() {
@@ -821,10 +964,24 @@
         .addEventListener("click", () => this.prevStep());
       document
         .getElementById("next-btn")
-        .addEventListener("click", () => this.nextStep());
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          this.nextStep();
+        });
       document.getElementById("wizard-form").addEventListener("submit", (e) => {
         e.preventDefault();
-        this.submitWizard();
+
+        // Check which button was clicked or if it's the final step
+        const nextBtn = document.getElementById("next-btn");
+        const submitBtn = document.getElementById("submit-btn");
+
+        if (!submitBtn.classList.contains("hidden")) {
+          // Final step - submit the wizard
+          this.submitWizard();
+        } else {
+          // Not final step - go to next step
+          this.nextStep();
+        }
       });
 
       // Show initial step
@@ -912,32 +1069,30 @@
         }
       });
 
-      // Handle final step (details textarea)
+      const nextBtn = document.getElementById("next-btn");
+      const submitBtn = document.getElementById("submit-btn");
+
       if (stepIndex === this.stepsByType[this.selectedType].length - 1) {
-        const detailsDiv = document.createElement("div");
-        detailsDiv.innerHTML = `
-          <label for="change-details" class="mb-2 block font-medium">Details van de wijziging</label>
-          <textarea id="change-details" rows="4" class="w-full rounded border border-gray-300 bg-white px-3 py-2 focus:border-blue-500 focus:outline-none" placeholder="Beschrijf hier de details van de wijziging…">${this.answers["details"] || ""}</textarea>
-        `;
-
-        const textarea = detailsDiv.querySelector("textarea");
-        textarea.addEventListener("input", (e) => {
-          this.answers["details"] = e.target.value;
-        });
-
-        stepContent.appendChild(detailsDiv);
-
-        // Show submit button instead of next button
-        document.getElementById("next-btn").classList.add("hidden");
-        document.getElementById("submit-btn").classList.remove("hidden");
+        // Final step: disable next button and show submit button
+        nextBtn.disabled = true;
+        nextBtn.classList.add("hidden");
+        submitBtn.classList.remove("hidden");
       } else {
-        document.getElementById("next-btn").classList.remove("hidden");
-        document.getElementById("submit-btn").classList.add("hidden");
+        // Not final step: enable next button and hide submit button
+        nextBtn.disabled = false;
+        nextBtn.classList.remove("hidden");
+        submitBtn.classList.add("hidden");
       }
 
       // Handle back button visibility
       document.getElementById("prev-btn").style.display =
         this.currentStep > 0 ? "block" : "none";
+
+      // Focus the first input in the step if it exists
+      const firstInput = document.getElementById("wizard-input-0");
+      if (firstInput) {
+        firstInput.focus();
+      }
     }
 
     nextStep() {

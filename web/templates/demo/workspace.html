@@ -19,19 +19,24 @@
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
                 <div class="tab"
+                     :class="{ 'active': activeTab === 'presentatie' }"
+                     @click="switchTab('presentatie')">
+                    <span class="tab-label">Presentatie</span>
+                </div>
+                <div class="tab"
                      :class="{ 'active': activeTab === 'laws' }"
                      @click="switchTab('laws')">
                     <span class="tab-label">Wetten</span>
                 </div>
                 <div class="tab"
-                     :class="{ 'active': activeTab === 'features' }"
-                     @click="switchTab('features')">
-                    <span class="tab-label">Scenarios</span>
-                </div>
-                <div class="tab"
                      :class="{ 'active': activeTab === 'graph' }"
                      @click="switchTab('graph')">
                     <span class="tab-label">Graaf analyse</span>
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'features' }"
+                     @click="switchTab('features')">
+                    <span class="tab-label">Scenarios</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'simulatie' }"
@@ -76,6 +81,88 @@
             </div>
             <!-- Tab Content Container -->
             <div class="tab-content-wrapper">
+                <!-- Presentation Tab Content -->
+                <div class="tab-content presentation-content"
+                     x-show="activeTab === 'presentatie'"
+                     x-cloak>
+                    <div class="presentation-container">
+                        <!-- Slide 1: Title -->
+                        <div class="slide" x-show="currentSlide === 0" x-cloak>
+                            <div class="slide-content title-slide">
+                                <h1>RegelRecht</h1>
+                                <p class="slide-subtitle">van wet naar digitale werking</p>
+                                <div class="slide-footer">
+                                    <span x-text="new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
+                                    <div class="presenter-area"
+                                         @dblclick="editingPresenterName = true"
+                                         title="Dubbelklik om naam te wijzigen">
+                                        <span x-show="!editingPresenterName && presenterName"
+                                              x-text="presenterName"></span>
+                                        <span x-show="!editingPresenterName && !presenterName"
+                                              class="presenter-placeholder">[dubbelklik voor naam]</span>
+                                        <input x-show="editingPresenterName"
+                                               x-model="presenterName"
+                                               @keydown.enter="savePresenterName()"
+                                               @blur="savePresenterName()"
+                                               @keydown.escape="editingPresenterName = false"
+                                               x-ref="presenterInput"
+                                               class="presenter-input"
+                                               placeholder="Uw naam">
+                                    </div>
+                                    <span>Bureau Architectuur, BZK</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2: Nu -->
+                        <div class="slide" x-show="currentSlide === 1" x-cloak>
+                            <div class="slide-content content-slide centered-content">
+                                <h2>Huidige Situatie</h2>
+                                <p>Iedere organisatie</p>
+                                <p>
+                                    heeft een <strong>eigen interpretatie</strong> van de wet
+                                </p>
+                                <p>
+                                    die landt in <strong>eigen software</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Slide 3: Het probleem -->
+                        <div class="slide" x-show="currentSlide === 2" x-cloak>
+                            <div class="slide-content content-slide centered-content">
+                                <h2>Het gevolg</h2>
+                                <p>Geen overzicht</p>
+                                <p>Onvoorspelbaar</p>
+                                <p>Onbeheersbaar</p>
+                            </div>
+                        </div>
+                        <!-- Slide 4: Wat als... -->
+                        <div class="slide" x-show="currentSlide === 3" x-cloak>
+                            <div class="slide-content content-slide centered-content">
+                                <h2>Wat als</h2>
+                                <p>
+                                    We <strong>beginnen met de wet</strong>
+                                </p>
+                                <p>
+                                    Deze <strong>machine uitvoerbaar</strong> maken
+                                </p>
+                                <p>
+                                    <strong>Openbaar</strong> publiceren
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Slide 5: Demo -->
+                        <div class="slide" x-show="currentSlide === 4" x-cloak>
+                            <div class="slide-content title-slide">
+                                <h1>Demo RegelRecht</h1>
+                                <div class="slide-disclaimers">
+                                    <p>Proof of concept</p>
+                                    <p>Compleet verhaal, geen eindproduct</p>
+                                    <p>We maken beleid door te doen</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Laws Tab Content (Embedded) -->
                 <div class="tab-content"
                      x-show="activeTab === 'laws'"
@@ -364,7 +451,7 @@
 
         function workspaceData() {
             return {
-                activeTab: 'laws',
+                activeTab: 'presentatie',
                 lawsContent: '',
                 featuresContent: '',
                 lawsLoaded: false,
@@ -376,6 +463,11 @@
                 activeLawTabId: null,     // Currently active law tab ID
                 nextLawTabId: 1,          // Auto-incrementing ID for law tabs
                 maxLawTabs: 10,           // Maximum number of law tabs
+                // Presentation slide state
+                currentSlide: 0,
+                totalSlides: 5,
+                presenterName: localStorage.getItem('presenterName') || '',
+                editingPresenterName: false,
 
                 init() {
                     // Initialize theme
@@ -403,7 +495,7 @@
 
                     // Check URL hash first
                     const hash = window.location.hash.substring(1);
-                    const validTabs = ['laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'];
+                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'];
 
                     if (hash && validTabs.includes(hash)) {
                         this.activeTab = hash;
@@ -442,27 +534,54 @@
                         this.isFullscreen = !!document.fullscreenElement;
                     });
 
-                    // Listen for Ctrl-R / Cmd-R to refresh only the active iframe
-                    document.addEventListener('keydown', (e) => {
-                        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-                            e.preventDefault(); // Prevent full page refresh
-
-                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'];
-
-                            if (iframeTabs.includes(this.activeTab)) {
-                                // Find and reload the active iframe
-                                const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${this.activeTab}'"] iframe`);
-                                if (iframe) {
-                                    iframe.src = iframe.src; // Reload iframe
-                                    console.log(`Refreshed iframe: ${this.activeTab}`);
+                    // Listen for keyboard events (prevent duplicate listeners)
+                    if (!window._workspaceKeydownHandler) {
+                        const self = this;
+                        window._workspaceKeydownHandler = (e) => {
+                            // Presentation slide navigation
+                            if (self.activeTab === 'presentatie' && !self.editingPresenterName) {
+                                if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                                    e.preventDefault();
+                                    // If on last slide, navigate to Wetten tab
+                                    if (self.currentSlide === self.totalSlides - 1) {
+                                        self.switchTab('laws');
+                                    } else {
+                                        self.nextSlide();
+                                    }
+                                } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                                    e.preventDefault();
+                                    self.prevSlide();
+                                } else if (e.key === 'Home') {
+                                    e.preventDefault();
+                                    self.goToSlide(0);
+                                } else if (e.key === 'End') {
+                                    e.preventDefault();
+                                    self.goToSlide(self.totalSlides - 1);
                                 }
-                            } else {
-                                // For embedded content tabs (laws, features), reload content
-                                this.loadTabContent(this.activeTab);
-                                console.log(`Refreshed content: ${this.activeTab}`);
                             }
-                        }
-                    });
+
+                            // Ctrl-R / Cmd-R to refresh only the active iframe
+                            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                                e.preventDefault(); // Prevent full page refresh
+
+                                const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'];
+
+                                if (iframeTabs.includes(self.activeTab)) {
+                                    // Find and reload the active iframe
+                                    const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${self.activeTab}'"] iframe`);
+                                    if (iframe) {
+                                        iframe.src = iframe.src; // Reload iframe
+                                        console.log(`Refreshed iframe: ${self.activeTab}`);
+                                    }
+                                } else {
+                                    // For embedded content tabs (laws, features), reload content
+                                    self.loadTabContent(self.activeTab);
+                                    console.log(`Refreshed content: ${self.activeTab}`);
+                                }
+                            }
+                        };
+                        document.addEventListener('keydown', window._workspaceKeydownHandler);
+                    }
 
                     // Listen for postMessage from iframes when Ctrl-R is pressed inside them
                     window.addEventListener('message', (e) => {
@@ -511,6 +630,30 @@
                     document.documentElement.setAttribute('data-theme', this.theme);
                     localStorage.setItem('theme', this.theme);
                     console.log('Theme switched to:', this.theme);
+                },
+
+                // Presentation slide navigation
+                nextSlide() {
+                    if (this.currentSlide < this.totalSlides - 1) {
+                        this.currentSlide++;
+                    }
+                },
+
+                prevSlide() {
+                    if (this.currentSlide > 0) {
+                        this.currentSlide--;
+                    }
+                },
+
+                goToSlide(n) {
+                    if (n >= 0 && n < this.totalSlides) {
+                        this.currentSlide = n;
+                    }
+                },
+
+                savePresenterName() {
+                    localStorage.setItem('presenterName', this.presenterName);
+                    this.editingPresenterName = false;
                 },
 
                 switchTab(tab) {

@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -20,6 +21,7 @@ type Case struct {
 	VerifiedResult     map[string]any
 	Parameters         map[string]any
 	RuleSpecID         uuid.UUID
+	ClaimIds           []uuid.UUID
 	AppealStatus       CaseAppealStatus
 	ObjectionStatus    CaseObjectionStatus
 }
@@ -50,6 +52,7 @@ type CaseSubmit struct {
 	ApprovedClaimsOnly bool
 	ClaimedResult      map[string]any
 	Parameters         map[string]any
+	EffectiveDate      *time.Time
 }
 
 type CaseReview struct {

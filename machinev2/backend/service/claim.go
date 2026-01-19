@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/looplab/eventhorizon/uuid"
 	"github.com/minbzk/poc-machine-law/machinev2/backend/model"
@@ -103,6 +104,13 @@ func (service *Service) ClaimSubmit(ctx context.Context, claim model.ClaimSubmit
 		evidencePath = *claim.EvidencePath
 	}
 
+	var effectiveDate time.Time
+	if claim.EffectiveDate != nil {
+		effectiveDate = *claim.EffectiveDate
+	} else {
+		effectiveDate = time.Now()
+	}
+
 	claimID, err := service.claimManager.Submit(
 		ctx,
 		claim.Service,
@@ -116,6 +124,7 @@ func (service *Service) ClaimSubmit(ctx context.Context, claim model.ClaimSubmit
 		oldValue,
 		evidencePath,
 		autoApprove,
+		effectiveDate,
 	)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("submit claim: %w", err)

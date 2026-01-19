@@ -1,6 +1,8 @@
 package casemanager
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	eh "github.com/looplab/eventhorizon"
 )
@@ -25,6 +27,7 @@ const (
 	CommandAddToManualReview         eh.CommandType = "AddToManualReview"
 	CommandCompleteManualReview      eh.CommandType = "CompleteManualReview"
 	CommandObjectToCase              eh.CommandType = "ObjectToCase"
+	CommandAddClaimToCase            eh.CommandType = "AddClaimToCase"
 	CommandSetObjectionStatus        eh.CommandType = "SetObjectionStatus"
 	CommandSetObjectionAdmissibility eh.CommandType = "SetObjectionAdmissibility"
 	CommandSetAppealStatus           eh.CommandType = "SetAppealStatus"
@@ -38,6 +41,7 @@ const (
 	CaseAddedToManualReviewEvent          eh.EventType = "AddedToManualReview"
 	CaseDecidedEvent                      eh.EventType = "Decided"
 	CaseObjectedEvent                     eh.EventType = "Objected"
+	CaseAddClaimEvent                     eh.EventType = "AddClaim"
 	ObjectionStatusDeterminedEvent        eh.EventType = "ObjectionStatusDetermined"
 	ObjectionAdmissibilityDeterminedEvent eh.EventType = "ObjectionAdmissibilityDetermined"
 	AppealStatusDeterminedEvent           eh.EventType = "AppealStatusDetermined"
@@ -54,6 +58,7 @@ type SubmitCaseCommand struct {
 	VerifiedResult     map[string]any `json:"verified_result" eh:"optional"`
 	RulespecID         uuid.UUID      `json:"rulespec_uuid"`
 	ApprovedClaimsOnly bool           `json:"approved_claims_only"`
+	EffectiveDate      *time.Time     `json:"effective_date,omitempty" eh:"optional"`
 }
 
 // CommandType returns the type of the command.
@@ -184,6 +189,26 @@ func (c ObjectToCaseCommand) AggregateID() uuid.UUID {
 
 // AggregateType returns the type of the aggregate that the command can be handled by.
 func (c ObjectToCaseCommand) AggregateType() eh.AggregateType {
+	return "Case"
+}
+
+type AddClaimToCaseCommand struct {
+	ID      uuid.UUID `json:"id"`
+	ClaimID uuid.UUID `json:"claimId"`
+}
+
+// CommandType returns the type of the command.
+func (c AddClaimToCaseCommand) CommandType() eh.CommandType {
+	return CommandAddClaimToCase
+}
+
+// AggregateID returns the ID of the aggregate that the command should be handled by.
+func (c AddClaimToCaseCommand) AggregateID() uuid.UUID {
+	return c.ID
+}
+
+// AggregateType returns the type of the aggregate that the command can be handled by.
+func (c AddClaimToCaseCommand) AggregateType() eh.AggregateType {
 	return "Case"
 }
 

@@ -15,27 +15,11 @@
             {% include "admin/partials/llm_providers.html" %}
             <div id="feature-flags">{% include "admin/partials/feature_flags.html" %}</div>
             <div id="law-feature-flags">{% include "admin/partials/law_feature_flags.html" %}</div>
-            {# Wallet Storage Reset #}
-            <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
-                <h1 class="text-gray-900 text-3xl font-semibold mb-5">Wallet Local Storage</h1>
-                <p class="mb-5">Reset alle wallet gegevens die lokaal opgeslagen zijn in de browser.</p>
-                <button id="clear-wallet-storage"
-                        onclick="clearWalletStorage()"
-                        class="inline-flex items-center px-6 py-3 bg-yellow-600 text-white text-center rounded-md hover:bg-yellow-700 transition-colors align-middle mr-3 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5 mr-2 -ml-1"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Clear Wallet Storage
-                </button>
-            </div>
             {# Reset Form #}
             <form hx-post="/admin/reset"
                   hx-trigger="submit"
-                  hx-on::after-request="var btn = document.getElementById('reset-submit'); btn.disabled = true; btn.innerText = 'Bezig met resetten…'; setTimeout(() => window.location.href = '/admin', 7000)"
+                  hx-on:htmx:before-request="var btn = document.getElementById('reset-submit'); btn.disabled = true;"
+                  hx-on:htmx:after-request="setTimeout(() => window.location.href = '/admin', 7000)"
                   class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600">
                 <h1 class="text-gray-900 text-3xl font-semibold mb-5">Reset de applicatie-state</h1>
                 <p class="mb-5">
@@ -47,10 +31,10 @@
                     ongedaan worden gemaakt.
                 </p>
                 <button id="reset-submit"
-                        class="inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 disabled:bg-red-400 cursor-pointer"
+                        class="group inline-flex items-center px-6 py-3 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors align-middle mr-3 cursor-pointer disabled:bg-red-300 disabled:cursor-not-allowed"
                         type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5 mr-2 -ml-1"
+                         class="w-5 h-5 mr-2 -ml-1 group-disabled:animate-spin"
                          viewBox="0 0 24 24">
                         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                         <path d="M19.933 13.041a8 8 0 1 1-9.925-8.788c3.899-1 7.935 1.007 9.425 4.747" />
@@ -60,58 +44,6 @@
                     Reset state
                 </button>
             </form>
-            <script>
-            function clearWalletStorage() {
-                try {
-                    // Get all keys from sessionStorage
-                    const keys = Object.keys(sessionStorage);
-
-                    // Filter and remove wallet data keys
-                    const walletKeys = keys.filter(key => key.startsWith('walletData-'));
-
-                    walletKeys.forEach(key => {
-                        sessionStorage.removeItem(key);
-                    });
-
-                    // Show success notification
-                    const notification = document.createElement('div');
-                    notification.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50';
-                    notification.innerHTML = `
-                        <div class="flex items-center">
-                            <svg class="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <p>Wallet storage cleared (${walletKeys.length} items removed)</p>
-                        </div>
-                    `;
-                    document.body.appendChild(notification);
-
-                    // Remove notification after 3 seconds
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 3000);
-                } catch (error) {
-                    console.error('Error clearing wallet storage:', error);
-
-                    // Show error notification
-                    const notification = document.createElement('div');
-                    notification.className = 'fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md z-50';
-                    notification.innerHTML = `
-                        <div class="flex items-center">
-                            <svg class="h-6 w-6 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            <p>Error clearing wallet storage</p>
-                        </div>
-                    `;
-                    document.body.appendChild(notification);
-
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 3000);
-                }
-            }
-            </script>
         </div>
     </div>
 {% endblock %}

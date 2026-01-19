@@ -12,6 +12,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/inmemory"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -28,9 +29,11 @@ func TestService(t *testing.T) {
 
 	caseManager := manager.New(logger)
 	claimManager := inmemory.New(logger, caseManager)
+	ruleResolver, err := ruleresolver.New()
+	require.NoError(t, err)
 
 	// Initialize services with current date
-	services, err := serviceprovider.New(logger, time.Now(), caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
+	services, err := serviceprovider.New(logger, time.Now(), caseManager, claimManager, ruleResolver, serviceprovider.WithRuleServiceInMemory())
 	require.NoError(t, err)
 
 	caseManager.SetService(services)
@@ -119,7 +122,8 @@ func TestService(t *testing.T) {
 		"GEMEENTE_AMSTERDAM",
 		"participatiewet/bijstand",
 		evalParams,
-		"",
+		nil,
+		nil,
 		nil,
 		"",
 		true,
@@ -166,9 +170,11 @@ func BenchmarkService(b *testing.B) {
 
 	caseManager := manager.New(logger)
 	claimManager := inmemory.New(logger, caseManager)
+	ruleResolver, err := ruleresolver.New()
+	b.Errorf("new services: %v", err)
 
 	// Initialize services with current date
-	services, err := serviceprovider.New(logger, time.Now(), caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
+	services, err := serviceprovider.New(logger, time.Now(), caseManager, claimManager, ruleResolver, serviceprovider.WithRuleServiceInMemory())
 	if err != nil {
 		b.Errorf("new services: %v", err)
 	}
@@ -262,7 +268,8 @@ func BenchmarkService(b *testing.B) {
 			"GEMEENTE_AMSTERDAM",
 			"participatiewet/bijstand",
 			evalParams,
-			"",
+			nil,
+			nil,
 			nil,
 			"",
 			true,

@@ -1,6 +1,7 @@
 import logging
+import urllib.parse
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import httpx
@@ -9,13 +10,19 @@ import pandas as pd
 from web.config_loader import ServiceRoutingConfig
 
 from ..engine_interface import EngineInterface, PathNode, RuleResult
-from .machine_client.law_as_code_client import Client
+from .machine_client.regel_recht_engine_api_client import Client
+from .machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 
 logger = logging.getLogger(__name__)
-from .machine_client.law_as_code_client.api.data_frames import set_source_data_frame
-from .machine_client.law_as_code_client.api.law import evaluate, rule_spec_get, service_laws_discoverable_list
-from .machine_client.law_as_code_client.api.profile import profile_get, profile_list
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.api.data_frames import set_source_data_frame
+from .machine_client.regel_recht_engine_api_client.api.engine import reset_engine
+from .machine_client.regel_recht_engine_api_client.api.law import (
+    evaluate,
+    rule_spec_get,
+    service_laws_discoverable_list,
+)
+from .machine_client.regel_recht_engine_api_client.api.profile import profile_get, profile_list
+from .machine_client.regel_recht_engine_api_client.models import (
     DataFrame,
     Evaluate,
     EvaluateBody,
@@ -25,13 +32,13 @@ from .machine_client.law_as_code_client.models import (
     ProfileSources,
     SetSourceDataFrameBody,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     PathNode as ApiPathNode,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     ResponseEvaluateSchema as ApiRuleResult,
 )
-from .machine_client.law_as_code_client.types import UNSET
+from .machine_client.regel_recht_engine_api_client.types import UNSET
 
 
 class MachineService(EngineInterface):
@@ -87,8 +94,12 @@ class MachineService(EngineInterface):
 
         try:
             with client as client:
+                # URL encode service and law parameters
+                encoded_service = urllib.parse.quote_plus(service)
+                encoded_law = urllib.parse.quote_plus(law)
+
                 response = rule_spec_get.sync_detailed(
-                    client=client, service=service, law=law, reference_date=reference_date
+                    client=client, service=encoded_service, law=encoded_law, reference_date=reference_date
                 )
 
                 if response.status_code < 200 or response.status_code >= 300:
@@ -107,6 +118,7 @@ class MachineService(EngineInterface):
         law: str,
         parameters: dict[str, Any],
         reference_date: str | None = None,
+        effective_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
@@ -125,7 +137,10 @@ class MachineService(EngineInterface):
         )
 
         if reference_date:
-            data.date = datetime.strptime(reference_date, "%Y-%m-%d").date()
+            data.reference_date = datetime.strptime(reference_date, "%Y-%m-%d").date()
+
+        if effective_date:
+            data.effective_date = datetime.strptime(effective_date, "%Y-%m-%d").date()
 
         if overwrite_input:
             data.input_ = EvaluateInput.from_dict(overwrite_input)
@@ -188,7 +203,10 @@ class MachineService(EngineInterface):
 
             return result
 
-    def get_all_profiles(self) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
+        if effective_date is None:
+            effective_date = UNSET
+
         # When service routing is enabled and configured to query all services
         service_routing_config = getattr(self, "_service_routing_config", None)
         query_all = (
@@ -206,7 +224,7 @@ class MachineService(EngineInterface):
                 )
                 client = Client(base_url=service_config.domain)
                 with client as client:
-                    response = profile_list.sync_detailed(client=client)
+                    response = profile_list.sync_detailed(client=client, effective_date=effective_date)
                     content = response.parsed
 
                     for item in content.data:
@@ -223,7 +241,7 @@ class MachineService(EngineInterface):
         client = Client(base_url=self.base_url)
 
         with client as client:
-            response = profile_list.sync_detailed(client=client)
+            response = profile_list.sync_detailed(client=client, effective_date=effective_date)
             content = response.parsed
 
             result = {}
@@ -232,16 +250,50 @@ class MachineService(EngineInterface):
 
             return result
 
-    def get_profile_data(self, bsn: str) -> dict[str, Any] | None:
+    def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any] | None:
+        if effective_date is None:
+            effective_date = UNSET
+
         # Always use default base_url for profile data (profiles are centralized)
         # Service routing does not apply to individual profile lookups
         client = Client(base_url=self.base_url)
 
-        with client as client:
-            response = profile_get.sync_detailed(client=client, bsn=bsn)
-            content = response.parsed
+        try:
+            with client as client:
+                response = profile_get.sync_detailed(client=client, bsn=bsn, effective_date=effective_date)
+                content = response.parsed
 
-            return profile_transform(content.data)
+                # Handle different response types
+                if response.status_code == 200:
+                    return profile_transform(content.data)
+                elif response.status_code == 404:
+                    logger.warning(f"[MachineService] Profile not found for BSN: {bsn}")
+                    return None
+                else:
+                    logger.error(f"[MachineService] Error getting profile for BSN {bsn}: Status {response.status_code}")
+                    return None
+        except UnexpectedStatus as e:
+            # Log the detailed error and re-raise with more context
+            error_message = e.content.decode("utf-8") if e.content else "No response content"
+            logger.error(f"[MachineService] Connection error getting profile for BSN {bsn}: {error_message}")
+            # Re-raise the exception so it can be handled by the calling code
+            raise
+
+    def get_business_profile(self, kvk_nummer: str) -> dict[str, Any] | None:
+        """
+        Get business profile data for a specific KVK number.
+
+        Note: The HTTP API does not currently have a business profile endpoint.
+        This method returns None until the API is extended to support business profiles.
+
+        Args:
+            kvk_nummer: KVK registration number for the business
+
+        Returns:
+            None (API endpoint not available)
+        """
+        logger.warning(f"[MachineService] get_business_profile not available via HTTP API for KVK: {kvk_nummer}")
+        return None
 
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         # Instantiate the API client with service-specific base URL
@@ -258,6 +310,35 @@ class MachineService(EngineInterface):
 
         with client as client:
             set_source_data_frame.sync_detailed(client=client, body=body)
+
+    def reset(self) -> None:
+        import time
+        from concurrent.futures import ThreadPoolExecutor
+
+        def reset_service(service_name: str, service_config) -> None:
+            start_time = time.time()
+            logger.warning(f"[MachineService] resetting {service_name} - started at {start_time}")
+            client = Client(base_url=service_config.domain)
+            with client as client:
+                reset_engine.sync_detailed(client=client)
+            elapsed = time.time() - start_time
+            logger.warning(f"[MachineService] resetting {service_name} - completed in {elapsed:.3f}s")
+
+        # Run all reset calls in parallel using threads
+        logger.warning(f"[MachineService] Starting parallel reset of {len(self.service_routes)} services")
+        overall_start = time.time()
+
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(reset_service, service_name, service_config)
+                for service_name, service_config in self.service_routes.items()
+            ]
+            # Wait for all to complete
+            for future in futures:
+                future.result()
+
+        overall_elapsed = time.time() - overall_start
+        logger.warning(f"[MachineService] All resets completed in {overall_elapsed:.3f}s total")
 
     async def __aenter__(self):
         await self.client.__aenter__()

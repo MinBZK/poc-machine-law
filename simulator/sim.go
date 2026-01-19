@@ -21,6 +21,7 @@ import (
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/inmemory"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/dataframe"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/service/serviceprovider"
 )
 
@@ -191,8 +192,12 @@ func (ls *LawSimulator) SetupTestData(ctx context.Context, date time.Time, peopl
 	for persons := range people {
 		caseManager := manager.New(logger)
 		claimManager := inmemory.New(logger, caseManager)
+		ruleResolver, err := ruleresolver.New()
+		if err != nil {
+			return fmt.Errorf("new ruleresolver: %w", err)
+		}
 
-		services, err := serviceprovider.New(logger, date, caseManager, claimManager, serviceprovider.WithRuleServiceInMemory())
+		services, err := serviceprovider.New(logger, date, caseManager, claimManager, ruleResolver, serviceprovider.WithRuleServiceInMemory())
 		if err != nil {
 			return fmt.Errorf("new services: %w", err)
 		}
@@ -351,7 +356,8 @@ func (ls *LawSimulator) SimulatePerson(res Res) error {
 			"TOESLAGEN",
 			"zorgtoeslagwet",
 			params,
-			ls.SimulationDate.Format("2006-01-02"),
+			&ls.SimulationDate,
+			&ls.SimulationDate,
 			nil,
 			"",
 			false,
@@ -367,7 +373,8 @@ func (ls *LawSimulator) SimulatePerson(res Res) error {
 			"SVB",
 			"algemene_ouderdomswet",
 			params,
-			ls.SimulationDate.Format("2006-01-02"),
+			&ls.SimulationDate,
+			&ls.SimulationDate,
 			nil,
 			"",
 			false,

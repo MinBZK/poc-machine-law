@@ -8,19 +8,25 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/google/uuid"
-	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/casemanager"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/claimmanager/ace/generated"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/logger"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/model"
+	"github.com/minbzk/poc-machine-law/machinev2/machine/ruleresolver"
 )
 
 // ClaimManager implements the claimmanager interface using ACE
 type ClaimManager struct {
-	logger  logger.Logger
-	clients clients
+	logger       logger.Logger
+	clients      clients
+	caseManager  casemanager.CaseManager
+	claimTypes   claimTypes
+	ruleResolver *ruleresolver.RuleResolve
+	service      string
 }
 
 type clients struct {
@@ -29,16 +35,58 @@ type clients struct {
 	grp graphql.Client
 }
 
+type claimTypes map[string][]claimType
+type claimType struct {
+	Name           string
+	ReferencedName string
+	ReferencedType string
+}
+
 // New creates a new ACE-backed claim manager
-func New(endpoint string, logger logger.Logger) claimmanager.ClaimManager {
-	return &ClaimManager{
-		logger: logger,
-		clients: clients{
-			dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
-			ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
-			grp: graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
-		},
+func New(service string, caseManager casemanager.CaseManager, ruleResolver *ruleresolver.RuleResolve, endpoint string, logger logger.Logger) (*ClaimManager, error) {
+	clients := clients{
+		dml: graphql.NewClient(endpoint+"/gql/dml/v0", http.DefaultClient),
+		ddl: graphql.NewClient(endpoint+"/gql/ddl/v0", http.DefaultClient),
+		grp: graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
 	}
+
+	claimTypes, err := getClaimTypes(clients.ddl)
+	if err != nil {
+		return nil, fmt.Errorf("could not get claim types: %w", err)
+	}
+
+	return &ClaimManager{
+		logger:       logger,
+		caseManager:  caseManager,
+		clients:      clients,
+		claimTypes:   claimTypes,
+		ruleResolver: ruleResolver,
+		service:      service,
+	}, nil
+}
+
+func getClaimTypes(client graphql.Client) (claimTypes, error) {
+	data, err := generated.GetClaimTypes(context.Background(), client)
+	if err != nil {
+		return nil, nil
+	}
+
+	claimTypes := claimTypes{}
+
+	for _, ctype := range data.ClaimTypes {
+		name := *ctype.Name
+		claimTypes[name] = make([]claimType, 0, len(ctype.Roles))
+
+		for _, role := range ctype.Roles {
+			claimTypes[name] = append(claimTypes[name], claimType{
+				Name:           *role.Name,
+				ReferencedName: *role.ReferencedName,
+				ReferencedType: string(*role.ReferencedType),
+			})
+		}
+	}
+
+	return claimTypes, nil
 }
 
 // Submit submits a new claim to ACE
@@ -55,9 +103,11 @@ func (cm *ClaimManager) Submit(
 	oldValue any,
 	evidencePath string,
 	autoApprove bool,
+	effectiveDate time.Time,
 ) (uuid.UUID, error) {
 	// Create internal claim
 	claim := model.NewClaim(service, key, newValue, reason, claimant, law, bsn, caseID, oldValue, evidencePath)
+	key = cm.convertOutputToSourceField(key, service, law)
 
 	if err := cm.transaction(ctx, func(ctx context.Context, txID string) error {
 		// Get or create BSN claim
@@ -66,27 +116,24 @@ func (cm *ClaimManager) Submit(
 			return fmt.Errorf("get BSN: %w", err)
 		}
 
-		beweringID, err := cm.addBewering(ctx, txID, bsnID, reason, law, key)
+		beweringID, err := cm.addBewering(ctx, txID, bsnID, reason, law, key, effectiveDate)
 		if err != nil {
 			return fmt.Errorf("add bewering: %w", err)
 		}
 
-		// Add ValidFrom annotation to proposed claim (valid from now)
-		now := claim.CreatedAt
-
 		// Add BeweringStatus as "PENDING"
-		if err := cm.addBeweringStatus(ctx, txID, beweringID, "PENDING", &now); err != nil {
+		if err := cm.addBeweringStatus(ctx, txID, beweringID, "PENDING", &effectiveDate); err != nil {
 			return fmt.Errorf("add bewering status: %w", err)
 		}
 
 		// Create proposed value in ACE
 		claimTypeName := cm.normalizeClaimType(key) + "Proposed"
-		proposedID, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, newValue, &now)
+		proposedID, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, newValue, &effectiveDate)
 		if err != nil {
 			return fmt.Errorf("create proposed claim: %w", err)
 		}
 
-		if err = cm.AddBeweringProposed(ctx, txID, beweringID, proposedID, &now); err != nil {
+		if err = cm.AddBeweringProposed(ctx, txID, beweringID, proposedID, &effectiveDate); err != nil {
 			return fmt.Errorf("add bewering proposed: %w", err)
 		}
 
@@ -101,10 +148,15 @@ func (cm *ClaimManager) Submit(
 			// }
 		}
 
+		if caseID != uuid.Nil {
+			if err := cm.AddBeweringCaseID(ctx, txID, beweringID, caseID, &effectiveDate); err != nil {
+				return fmt.Errorf("add bewering case: %w", err)
+			}
+		}
+
 		// Auto-approve if requested
 		if autoApprove {
-			err = cm.approveInTransaction(ctx, txID, claim.ID, newValue, claimant, bsnID)
-			if err != nil {
+			if err := cm.approveInTransaction(ctx, txID, beweringID, newValue, claimant, bsnID, effectiveDate); err != nil {
 				return fmt.Errorf("auto-approve: %w", err)
 			}
 		}
@@ -125,7 +177,7 @@ func (cm *ClaimManager) Approve(ctx context.Context, claimID uuid.UUID, verifica
 			return fmt.Errorf("get bewering: %w", err)
 		}
 
-		if err := cm.approveInTransaction(ctx, txID, bewering.ID, verification.Value, verification.By, bewering.BSN); err != nil {
+		if err := cm.approveInTransaction(ctx, txID, bewering.ID, verification.Value, verification.By, bewering.BSN, time.Now()); err != nil {
 			return err
 		}
 
@@ -190,7 +242,7 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 
 	m := &model.Claim{
 		ID:      claimID,
-		Service: "TOESLAGEN",
+		Service: cm.service,
 	}
 
 	for _, value := range bewering.Values {
@@ -206,10 +258,19 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 		}
 	}
 
+	m.Key = cm.convertSourceToOutputField(m.Key, cm.service, m.Law)
+
 	for _, value := range bewering.Subvalues {
 		switch value.Name {
 		case "Bewering/Status":
 			m.Status = model.ClaimStatus(*value.Values[0].Value)
+		case "Bewering/case":
+			caseID, err := uuid.Parse(*value.Values[0].Value)
+			if err != nil {
+				return nil, fmt.Errorf("cannot parse case ID: %w", err)
+			}
+
+			m.CaseID = caseID
 		}
 	}
 
@@ -220,17 +281,21 @@ func (cm *ClaimManager) get(ctx context.Context, txID *string, claimID uuid.UUID
 
 	proposedClaims := response.GetClaimsBeweringProposed
 
-	for _, v := range proposedClaims {
-		claim, err := generated.ClaimAttributesByClaimID(ctx, cm.clients.grp, txID, *v.Roles.Proposed, time.Now())
+	// Process proposed claims - we expect at most one proposed claim per bewering
+	for _, proposedClaim := range proposedClaims {
+		claimAttrs, err := generated.ClaimAttributesByClaimID(ctx, cm.clients.grp, txID, *proposedClaim.Roles.Proposed, time.Now())
 		if err != nil {
 			return nil, fmt.Errorf("get claims bewering: %w", err)
 		}
 
-		for _, value := range claim.ClaimAttributesByClaimID.Values {
-			if *value.Key == "amountEurocent" {
-				m.NewValue, _ = strconv.Atoi(*value.Value)
-			}
+		claimTypeName := strings.TrimSuffix(claimAttrs.ClaimAttributesByClaimID.Name, "Proposed")
+		claimType, ok := cm.claimTypes[claimTypeName]
+		if !ok {
+			return nil, fmt.Errorf("could not find claim type: %s", claimTypeName)
 		}
+
+		values := claimAttrs.ClaimAttributesByClaimID.Values
+		m.NewValue = cm.extractProposedValue(values, claimType)
 	}
 
 	return m, nil
@@ -302,7 +367,12 @@ func (cm *ClaimManager) GetClaimByBSNServiceLaw(ctx context.Context, bsn string,
 			return nil, fmt.Errorf("get bewering: %w", err)
 		}
 
-		if bewering.BSN == bsn && bewering.Law == law {
+		beweringBSN, err := cm.getBSNString(ctx, nil, bewering.BSN)
+		if err != nil {
+			return nil, fmt.Errorf("get bsn string: %w", err)
+		}
+
+		if strings.EqualFold(beweringBSN, bsn) && strings.EqualFold(bewering.Law, law) {
 			if cm.matchesStatusFilter(bewering, approved, includeRejected) {
 				result[bewering.Key] = *bewering
 			}
@@ -331,13 +401,96 @@ func (cm *ClaimManager) getBSN(ctx context.Context, txID *string, bsn string) (s
 	return data.GetClaimsBsn[0].Id, nil
 }
 
+func (cm *ClaimManager) getBSNString(ctx context.Context, txID *string, bsn string) (string, error) {
+	data, err := generated.ClaimAttributesByClaimID(ctx, cm.clients.grp, txID, bsn, time.Now())
+	if err != nil {
+		return "", fmt.Errorf("get claims by claim ID: %w", err)
+	}
+
+	if data.ClaimAttributesByClaimID == nil {
+		return "", errors.New("bsn not found")
+	}
+
+	if data.ClaimAttributesByClaimID.Name != "Bsn" {
+		return "", errors.New("invalid claim type")
+	}
+
+	for _, value := range data.ClaimAttributesByClaimID.Values {
+		if *value.Key == "bsn" {
+			return *value.Value, nil
+		}
+	}
+
+	return "", errors.New("bsn claim not found")
+}
+
+func convert(role claimType, value any) string {
+	var val string
+	// Handle float values, since '%v' formats large numbers using scientific notatio
+	switch x := value.(type) {
+	case int:
+		val = strconv.Itoa(x)
+	case float32:
+		val = strconv.FormatFloat(float64(x), 'f', -1, 32)
+	case float64:
+		val = strconv.FormatFloat(x, 'f', -1, 64)
+	case map[string]any:
+		if x1, ok := x[role.ReferencedName]; ok {
+			val = convert(role, x1)
+		}
+		if x1, ok := x[snakeCase(role.ReferencedName)]; ok {
+			val = convert(role, x1)
+		}
+	default:
+		val = fmt.Sprintf("%v", x)
+	}
+
+	return val
+}
+
+func snakeCase(s string) string {
+	var result strings.Builder
+
+	for i, r := range s {
+		if i > 0 {
+			prevRune := rune(s[i-1])
+
+			// Add underscore if:
+			// 1. Current char is uppercase and previous was lowercase
+			// 2. Current char is a digit and previous was a letter
+			// 3. Current char is a letter and previous was a digit
+			if (unicode.IsUpper(r) && unicode.IsLower(prevRune)) ||
+				(unicode.IsDigit(r) && unicode.IsLetter(prevRune)) ||
+				(unicode.IsLetter(r) && unicode.IsDigit(prevRune)) {
+				result.WriteRune('_')
+			}
+		}
+
+		result.WriteRune(unicode.ToLower(r))
+	}
+
+	return result.String()
+}
+
 func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimType string, bsnID string, value any, t *time.Time) (string, error) {
 	cm.logger.Info("create ace claim", logger.NewField("claimType", claimType), logger.NewField("bsn", bsnID), logger.NewField("value", value))
-	response, err := generated.AddClaim(ctx, cm.clients.ddl, &txID, claimType, []generated.TagInput{
-		{Name: "Bsn", Value: bsnID},
-		{Name: "amountEurocent", Value: fmt.Sprintf("%v", value)},
-	})
 
+	input := []generated.TagInput{
+		{Name: "Bsn", Value: bsnID},
+	}
+
+	cType, ok := cm.claimTypes[claimType]
+	if !ok {
+		return "", fmt.Errorf("could not retrieve claim type: %s", claimType)
+	}
+
+	for _, role := range cType {
+		if role.ReferencedType == "LabelType" {
+			input = append(input, generated.TagInput{Name: role.Name, Value: convert(role, value)})
+		}
+	}
+
+	response, err := generated.AddClaim(ctx, cm.clients.ddl, &txID, claimType, input)
 	if err != nil {
 		return "", err
 	}
@@ -356,7 +509,7 @@ func (cm *ClaimManager) createACEClaim(ctx context.Context, txID string, claimTy
 	return response.AddClaim, nil
 }
 
-func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, claimID uuid.UUID, verifiedValue any, verifiedBy string, bsnID string) error {
+func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, claimID uuid.UUID, verifiedValue any, verifiedBy string, bsnID string, effectiveDate time.Time) error {
 	log := cm.logger.WithFields(
 		logger.NewField("tx", txID),
 		logger.NewField("claimID", claimID),
@@ -364,8 +517,6 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 		logger.NewField("by", verifiedBy),
 		logger.NewField("bsn", bsnID),
 	)
-
-	approvalTime := time.Now()
 
 	bewering, err := cm.get(ctx, &txID, claimID)
 	if err != nil {
@@ -375,20 +526,22 @@ func (cm *ClaimManager) approveInTransaction(ctx context.Context, txID string, c
 	log = log.WithFields(logger.NewField("key", bewering.Key), logger.NewField("id", bewering.ID))
 	log.Info("create claim")
 
+	key := cm.convertOutputToSourceField(bewering.Key, bewering.Service, bewering.Law)
+
 	// Create real value in ACE
-	claimTypeName := cm.normalizeClaimType(bewering.Key)
-	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &approvalTime); err != nil {
+	claimTypeName := cm.normalizeClaimType(key)
+	if _, err := cm.createACEClaim(ctx, txID, claimTypeName, bsnID, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("create real claim: %w", err)
 	}
 
 	log.Info("add bewering status")
 
-	if err := cm.addBeweringStatus(ctx, txID, bewering.ID, "APPROVED", &approvalTime); err != nil {
+	if err := cm.addBeweringStatus(ctx, txID, bewering.ID, "APPROVED", &effectiveDate); err != nil {
 		return fmt.Errorf("add bewering status: %w", err)
 	}
 
 	log.Info("add verified")
-	if err := cm.addVerified(ctx, txID, bewering.ID, verifiedBy, bewering.NewValue, &approvalTime); err != nil {
+	if err := cm.addVerified(ctx, txID, bewering.ID, verifiedBy, bewering.NewValue, &effectiveDate); err != nil {
 		return fmt.Errorf("add verified: %w", err)
 	}
 
@@ -406,6 +559,52 @@ func (cm *ClaimManager) normalizeClaimType(key string) string {
 	return strings.Join(parts, "")
 }
 
+// extractProposedValue extracts the proposed value from claim attributes.
+// If the claim has only BSN + one value, it returns that single value.
+// Otherwise, it returns a map of all non-BSN values.
+func (cm *ClaimManager) extractProposedValue(values []*generated.ClaimAttributesByClaimIDClaimAttributesByClaimIDSampleResultValues, claimType []claimType) any {
+	// Build a set of expected field names from the claim type (excluding BSN)
+	expectedFields := make(map[string]struct{})
+	for _, ct := range claimType {
+		if ct.ReferencedName != "Bsn" {
+			expectedFields[ct.ReferencedName] = struct{}{}
+		}
+	}
+
+	// Simple case: only BSN + one other value (len == 2)
+	// Return the single non-BSN value directly
+	if len(values) == 2 {
+		for _, v := range values {
+			if *v.Key != "Bsn" {
+				return cm.translateClaimValue(*v.Key, *v.Value)
+			}
+		}
+	}
+
+	// Complex case: multiple values - return as a map
+	data := make(map[string]any)
+	for _, v := range values {
+		if _, ok := expectedFields[*v.Key]; ok {
+			data[snakeCase(*v.Key)] = cm.translateClaimValue(*v.Key, *v.Value)
+		}
+	}
+
+	return data
+}
+
+// translateClaimValue converts string values to their appropriate types
+func (cm *ClaimManager) translateClaimValue(key, value string) any {
+	switch key {
+	case "amountEurocent":
+		if v, err := strconv.Atoi(value); err == nil {
+			return v
+		}
+		return value
+	default:
+		return value
+	}
+}
+
 func (cm *ClaimManager) matchesStatusFilter(claim *model.Claim, approved bool, includeRejected bool) bool {
 	if approved {
 		return claim.Status == model.ClaimStatusApproved
@@ -418,8 +617,7 @@ func (cm *ClaimManager) matchesStatusFilter(claim *model.Claim, approved bool, i
 	return claim.Status == model.ClaimStatusApproved || claim.Status == model.ClaimStatusPending
 }
 
-func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string) (uuid.UUID, error) {
-
+func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID string, reason, law, key string, effectiveDate time.Time) (uuid.UUID, error) {
 	// Create Bewering (claim tracking) in ACE
 	beweringResp, err := generated.AddBewering(ctx, cm.clients.dml, &txID, bsnID, &reason, &law, &key)
 	if err != nil {
@@ -431,7 +629,7 @@ func (cm *ClaimManager) addBewering(ctx context.Context, txID string, bsnID stri
 		return uuid.Nil, fmt.Errorf("bewerings uuid parse: %w", err)
 	}
 
-	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, beweringResp.AddBewering, time.Now()); err != nil {
+	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, beweringResp.AddBewering, effectiveDate); err != nil {
 		return uuid.Nil, fmt.Errorf("add annotation valid from: %w", err)
 	}
 
@@ -475,8 +673,8 @@ func (cm *ClaimManager) addBeweringStatus(ctx context.Context, txID string, bewe
 	return nil
 }
 
-func (cm *ClaimManager) AddBeweringProposed(ctx context.Context, txID string, beweringID uuid.UUID, realID string, approvedAt *time.Time) error {
-	resp, err := generated.AddBeweringProposed(ctx, cm.clients.dml, &txID, beweringID.String(), realID)
+func (cm *ClaimManager) AddBeweringProposed(ctx context.Context, txID string, beweringID uuid.UUID, proposedID string, approvedAt *time.Time) error {
+	resp, err := generated.AddBeweringProposed(ctx, cm.clients.dml, &txID, beweringID.String(), proposedID)
 	if err != nil {
 		return fmt.Errorf("update bewering referentie: %w", err)
 	}
@@ -488,6 +686,28 @@ func (cm *ClaimManager) AddBeweringProposed(ctx context.Context, txID string, be
 
 	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, *resp.AddBeweringProposed, approvedTime); err != nil {
 		return fmt.Errorf("add annotation valid from to real claim: %w", err)
+	}
+
+	return nil
+}
+
+func (cm *ClaimManager) AddBeweringCaseID(ctx context.Context, txID string, beweringID uuid.UUID, caseID uuid.UUID, approvedAt *time.Time) error {
+	resp, err := generated.AddBeweringCase(ctx, cm.clients.dml, &txID, beweringID.String(), caseID.String())
+	if err != nil {
+		return fmt.Errorf("update bewering case: %w", err)
+	}
+
+	approvedTime := time.Now()
+	if approvedAt != nil {
+		approvedTime = *approvedAt
+	}
+
+	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, *resp.AddBeweringCase, approvedTime); err != nil {
+		return fmt.Errorf("add annotation valid from to real claim: %w", err)
+	}
+
+	if err := cm.caseManager.AddClaimToCase(ctx, caseID, beweringID); err != nil {
+		cm.logger.Warning("could not add claim to case", logger.NewField("err", err))
 	}
 
 	return nil
@@ -515,6 +735,81 @@ func (cm *ClaimManager) addBeweringCase(ctx context.Context, txID string, claimI
 	if _, err := generated.AddAnnotationValidFrom(ctx, cm.clients.dml, &txID, *resp.AddBeweringCase, time.Now()); err != nil {
 		return fmt.Errorf("add annotation valid from to real claim: %w", err)
 	}
+
+	return nil
+}
+
+// convertOutputToSourceField converts an output field name to its source field name.
+func (cm *ClaimManager) convertOutputToSourceField(key, svc, law string) string {
+	// Get the rule spec
+	spec, err := cm.ruleResolver.GetRuleSpec(law, time.Now(), svc)
+	if err != nil {
+		// If we can't get the spec, just return the original key
+		return key
+	}
+
+	// Build the mapping
+	outputToSource := buildOutputToSourceMap(spec)
+
+	// Return the mapped field name, or the original key if no mapping exists
+	if sourceField, ok := outputToSource[key]; ok {
+		return sourceField
+	}
+
+	return key
+}
+
+// convertSourceToOutputField converts a source field name to its output field name(s).
+func (cm *ClaimManager) convertSourceToOutputField(key, svc, law string) string {
+	// Get the rule spec
+	spec, err := cm.ruleResolver.GetRuleSpec(law, time.Now(), svc)
+	if err != nil {
+		// If we can't get the spec, just return the original key
+		return key
+	}
+
+	// Build the mapping
+	outputToSource := buildOutputToSourceMap(spec)
+
+	// Reverse the mapping to find output names
+	// Return the mapped field name, or the original key if no mapping exists
+
+	for k, v := range outputToSource {
+		if v == key {
+			return k
+		}
+	}
+
+	return key
+}
+
+// buildOutputToSourceMap builds a mapping from output field names to source_reference field names.
+func buildOutputToSourceMap(spec ruleresolver.RuleSpec) map[string]string {
+	// Build a map of source names to their fields
+	sourceFields := make(map[string]string)
+	for _, source := range spec.Properties.Sources {
+		if source.SourceReference != nil {
+			if source.SourceReference.Fields != nil {
+				sourceFields[source.Name] = source.SourceReference.Table
+			}
+			if source.SourceReference.Field != nil {
+				sourceFields[source.Name] = *source.SourceReference.Field
+			}
+		}
+	}
+
+	return sourceFields
+}
+
+// Reset implements the ClaimManager interface.
+// Reloads claim types from the ACE schema to pick up any changes.
+func (cm *ClaimManager) Reset(ctx context.Context) error {
+	claimTypes, err := getClaimTypes(cm.clients.ddl)
+	if err != nil {
+		return fmt.Errorf("could not get claim types: %w", err)
+	}
+
+	cm.claimTypes = claimTypes
 
 	return nil
 }

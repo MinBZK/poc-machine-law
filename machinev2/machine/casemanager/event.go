@@ -20,6 +20,7 @@ func RegisterEvents() {
 	eh.RegisterEventData(CaseAddedToManualReviewEvent, func() eh.EventData { return &CaseAddedToManualReview{} })
 	eh.RegisterEventData(CaseDecidedEvent, func() eh.EventData { return &CaseDecided{} })
 	eh.RegisterEventData(CaseObjectedEvent, func() eh.EventData { return &CaseObjected{} })
+	eh.RegisterEventData(CaseAddClaimEvent, func() eh.EventData { return &CaseAddClaim{} })
 	eh.RegisterEventData(ObjectionStatusDeterminedEvent, func() eh.EventData { return &ObjectionStatusDetermined{} })
 	eh.RegisterEventData(ObjectionAdmissibilityDeterminedEvent, func() eh.EventData { return &ObjectionAdmissibilityDetermined{} })
 	eh.RegisterEventData(AppealStatusDeterminedEvent, func() eh.EventData { return &AppealStatusDetermined{} })
@@ -35,6 +36,7 @@ type CaseSubmitted struct {
 	VerifiedResult     map[string]any `json:"verified_result"`
 	RulespecUUID       uuid.UUID      `json:"rulespec_uuid"`
 	ApprovedClaimsOnly bool           `json:"approved_claims_only"`
+	EffectiveDate      *time.Time     `json:"effective_date,omitempty"`
 }
 
 // CaseReset is an event for when a case is reset.
@@ -71,6 +73,10 @@ type CaseDecided struct {
 // CaseObjected is an event for when an objection is raised for a case.
 type CaseObjected struct {
 	Reason string `json:"reason"`
+}
+
+type CaseAddClaim struct {
+	ClaimID uuid.UUID `json:"claimID"`
 }
 
 // ObjectionStatusDetermined is an event for when objection status is determined.

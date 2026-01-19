@@ -154,11 +154,12 @@ func (f Field) GetBase() BaseField {
 
 // SourceReference defines how to reference a data source
 type SourceReference struct {
-	SourceType string        `yaml:"source_type,omitempty"`
-	Table      string        `yaml:"table,omitempty"`
-	Field      *string       `yaml:"field,omitempty"`
-	Fields     *[]string     `yaml:"fields,omitempty"`
-	SelectOn   []SelectField `yaml:"select_on,omitempty"`
+	SourceType      string        `yaml:"source_type,omitempty"`
+	Table           string        `yaml:"table,omitempty"`
+	Field           *string       `yaml:"field,omitempty"`
+	Fields          *[]string     `yaml:"fields,omitempty"`
+	SelectOn        []SelectField `yaml:"select_on,omitempty"`
+	WalletAttribute *string       `yaml:"wallet_attribute,omitempty"`
 }
 
 // SelectField defines selection criteria

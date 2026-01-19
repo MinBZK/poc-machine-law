@@ -40,11 +40,17 @@ type InMemoryCaseManager struct {
 
 var ErrCaseNotFound = errors.New("case_not_found")
 
-// New creates a new case manager with EventHorizon components.
-func New(logger logger.Logger) *InMemoryCaseManager {
+// initializeComponents creates and initializes all EventHorizon components
+func initializeComponents(logger logger.Logger, recordEvent func(uuid.UUID, string, map[string]any)) (
+	eventBus eh.EventBus,
+	observerBus eh.EventBus,
+	commandBus eh.CommandHandler,
+	caseRepo eh.ReadWriteRepo,
+	eventIndexer *casemanager.EventIndexer,
+) {
 	// Create the event buses
-	eventBus := localEventBus.NewEventBus()
-	observerBus := localEventBus.NewEventBus()
+	eventBus = localEventBus.NewEventBus()
+	observerBus = localEventBus.NewEventBus()
 
 	// Handle errors from the event buses
 	go func() {
@@ -67,31 +73,36 @@ func New(logger logger.Logger) *InMemoryCaseManager {
 	}
 
 	// Create the command bus
-	commandBus := bus.NewCommandHandler()
+	cmdBus := bus.NewCommandHandler()
 
-	eventIndexer := casemanager.NewEventIndexer(logger)
+	// Create the event indexer
+	eventIndexer = casemanager.NewEventIndexer(logger)
 
 	// Create the read repository for cases
-	caseRepo := memory.NewRepo()
-	caseRepo.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
+	m := memory.NewRepo()
+	m.SetEntityFactory(func() eh.Entity { return &casemanager.Case{} })
 
-	cm := &InMemoryCaseManager{
-		logger:       logger.WithName("case_manager"),
-		caseIndex:    make(map[string]uuid.UUID),
-		SampleRate:   0.10, // 10% sample rate
-		commandBus:   commandBus,
-		caseRepo:     caseRepo,
-		eventBus:     eventBus,
-		observerBus:  observerBus,
-		wg:           &sync.WaitGroup{},
-		eventIndexer: eventIndexer,
-	}
-
+	caseRepo = m
 	// Set up the case manager
 	ctx := context.Background()
-	if err := casemanager.Setup(ctx, logger, eventStore, eventBus, eventBus, commandBus, caseRepo, cm.recordEvent, eventIndexer); err != nil {
+	if err := casemanager.Setup(ctx, logger, eventStore, eventBus, eventBus, cmdBus, caseRepo, recordEvent, eventIndexer); err != nil {
 		log.Fatalf("could not set up case manager: %s", err)
 	}
+
+	return eventBus, observerBus, cmdBus, caseRepo, eventIndexer
+}
+
+// New creates a new case manager with EventHorizon components.
+func New(logger logger.Logger) *InMemoryCaseManager {
+	cm := &InMemoryCaseManager{
+		logger:     logger.WithName("case_manager"),
+		caseIndex:  make(map[string]uuid.UUID),
+		SampleRate: 0.10, // 10% sample rate
+		wg:         &sync.WaitGroup{},
+	}
+
+	// Initialize all components
+	cm.eventBus, cm.observerBus, cm.commandBus, cm.caseRepo, cm.eventIndexer = initializeComponents(logger, cm.recordEvent)
 
 	return cm
 }
@@ -249,6 +260,7 @@ func (cm *InMemoryCaseManager) SubmitCase(
 	parameters map[string]any,
 	claimedResult map[string]any,
 	approvedClaimsOnly bool,
+	effectiveDate *time.Time,
 ) (uuid.UUID, error) {
 
 	// Verify using rules engine
@@ -257,7 +269,8 @@ func (cm *InMemoryCaseManager) SubmitCase(
 		serviceType,
 		law,
 		parameters,
-		"", // Use default reference date
+		nil, // Use default reference date
+		nil,
 		nil,
 		"",
 		true,
@@ -287,6 +300,7 @@ func (cm *InMemoryCaseManager) SubmitCase(
 			verifiedResult,
 			result.RulespecUUID,
 			approvedClaimsOnly,
+			effectiveDate,
 		)
 		if err != nil {
 			return uuid.Nil, fmt.Errorf("failed to submit case: %w", err)
@@ -374,6 +388,16 @@ func (cm *InMemoryCaseManager) ObjectCase(ctx context.Context, caseID uuid.UUID,
 	// Object to the case
 	if err := casemanager.ObjectToCase(ctx, cm.commandBus, caseID, reason); err != nil {
 		return fmt.Errorf("failed to object to case: %w", err)
+	}
+
+	return nil
+}
+
+// ObjectCase submits an objection for a case
+func (cm *InMemoryCaseManager) AddClaimToCase(ctx context.Context, caseID uuid.UUID, claimID uuid.UUID) error {
+	// Object to the case
+	if err := casemanager.AddClaimToCase(ctx, cm.commandBus, caseID, claimID); err != nil {
+		return fmt.Errorf("failed to add claim to case: %w", err)
 	}
 
 	return nil
@@ -621,4 +645,28 @@ func (cm *InMemoryCaseManager) Close() {
 	cm.wg.Wait()
 	cm.eventBus.Close()
 	cm.observerBus.Close()
+}
+
+func (cm *InMemoryCaseManager) Reset(ctx context.Context) error {
+	// Wait for any pending operations to complete
+	cm.wg.Wait()
+
+	// Close existing event buses
+	cm.eventBus.Close()
+	cm.observerBus.Close()
+
+	// Lock for the duration of reset
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+
+	// Clear the case index
+	cm.caseIndex = make(map[string]uuid.UUID)
+
+	// Create new wait group
+	cm.wg = &sync.WaitGroup{}
+
+	// Reinitialize all components using shared initialization logic
+	cm.eventBus, cm.observerBus, cm.commandBus, cm.caseRepo, cm.eventIndexer = initializeComponents(cm.logger, cm.recordEvent)
+
+	return nil
 }

@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
+
+from machine.service import Services
 
 
 @dataclass
@@ -52,7 +54,7 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
-    def get_profile_data(self, bsn: str) -> dict[str, Any]:
+    def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any]:
         """
         Get profile data for a specific BSN.
 
@@ -64,12 +66,25 @@ class EngineInterface(ABC):
         """
 
     @abstractmethod
-    def get_all_profiles(self) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
         """
         Get all available profiles.
 
         Returns:
             Dictionary mapping BSNs to profile data
+        """
+
+    @abstractmethod
+    def get_business_profile(self, kvk_nummer: str) -> dict[str, Any] | None:
+        """
+        Get business profile data for a specific KVK number.
+
+        Args:
+            kvk_nummer: KVK registration number for the business
+
+        Returns:
+            Dictionary containing business data (handelsnaam, rechtsvorm, activiteit, status)
+            or None if not found
         """
 
     @abstractmethod
@@ -79,6 +94,7 @@ class EngineInterface(ABC):
         law: str,
         parameters: dict[str, Any],
         reference_date: str | None = None,
+        effective_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
@@ -91,6 +107,7 @@ class EngineInterface(ABC):
             law: Name of the law (e.g., "zorgtoeslagwet")
             parameters: Context data for service provider
             reference_date: Reference date for rule version (YYYY-MM-DD)
+            effective_date: The temporal context of the input data being evaluated (YYYY-MM-DD)
             overwrite_input: Optional overrides for input values
             requested_output: Optional specific output field to calculate
             approved: Whether this evaluation is for an approved claim
@@ -114,16 +131,39 @@ class EngineInterface(ABC):
         Set a dataframe in a table for a service
         """
 
-    def get_sorted_discoverable_service_laws(self, bsn: str) -> list[dict[str, Any]]:
+    @abstractmethod
+    def reset(self) -> None:
         """
-        Return laws discoverable by citizens, sorted by actual calculated impact for this specific person.
+        reset the engine data.
+        """
+
+    def get_services(self) -> Services | None:
+        """
+        Get the underlying Services instance.
+
+        This method allows access to the underlying Services for features
+        that need direct access to service providers (e.g., delegation).
+
+        Returns:
+            Services instance if available (internal Python engine),
+            None if not available (HTTP engine).
+        """
+        return None
+
+    def get_sorted_discoverable_service_laws(self, bsn: str, discoverable_by: str = "CITIZEN") -> list[dict[str, Any]]:
+        """
+        Return laws discoverable by citizens or businesses, sorted by actual calculated impact.
         Uses simple caching to improve performance and stability.
+
+        Args:
+            bsn: The BSN of the person (or KVK number when acting on behalf of a business)
+            discoverable_by: Either "CITIZEN" or "BUSINESS" to filter which laws to show
 
         Laws will be sorted by their calculated financial impact for this person
         based on outputs marked with citizen_relevance: primary in their YAML definitions.
         """
         # Get basic discoverable laws from the resolver
-        discoverable_laws = self.get_discoverable_service_laws()
+        discoverable_laws = self.get_discoverable_service_laws(discoverable_by=discoverable_by)
 
         # Initialize cache if it doesn't exist
         if not hasattr(self, "_impact_cache") or not self._impact_cache:

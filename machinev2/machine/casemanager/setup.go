@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	eh "github.com/looplab/eventhorizon"
@@ -69,6 +70,7 @@ func Setup(
 		CommandAddToManualReview,
 		CommandCompleteManualReview,
 		CommandObjectToCase,
+		CommandAddClaimToCase,
 		CommandSetObjectionStatus,
 		CommandSetObjectionAdmissibility,
 		CommandSetAppealStatus,
@@ -98,6 +100,11 @@ func Setup(
 		return fmt.Errorf("could not add logger to event bus: %w", err)
 	}
 
+	// Add a projector as an updator
+	if err := local.AddHandler(ctx, eh.MatchAll{}, NewCasesProjector(caseRepo)); err != nil {
+		return fmt.Errorf("could not add logger to event bus: %w", err)
+	}
+
 	for _, handler := range handlers {
 		if err := local.AddHandler(ctx, eh.MatchAll{}, handler); err != nil {
 			return fmt.Errorf("could not add logger to event bus: %w", err)
@@ -120,6 +127,7 @@ func SubmitCase(
 	verifiedResult map[string]any,
 	rulespecID uuid.UUID,
 	approvedClaimsOnly bool,
+	effectiveDate *time.Time,
 ) (uuid.UUID, error) {
 	// Create a unique ID for the case
 	id := uuid.New()
@@ -135,6 +143,7 @@ func SubmitCase(
 		VerifiedResult:     verifiedResult,
 		RulespecID:         rulespecID,
 		ApprovedClaimsOnly: approvedClaimsOnly,
+		EffectiveDate:      effectiveDate,
 	}
 
 	// Execute the command
@@ -239,6 +248,24 @@ func ObjectToCase(
 
 	if err := commandBus.HandleCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("could not object to case: %w", err)
+	}
+
+	return nil
+}
+
+func AddClaimToCase(
+	ctx context.Context,
+	commandBus eh.CommandHandler,
+	caseID uuid.UUID,
+	claimID uuid.UUID,
+) error {
+	cmd := AddClaimToCaseCommand{
+		ID:      caseID,
+		ClaimID: claimID,
+	}
+
+	if err := commandBus.HandleCommand(ctx, cmd); err != nil {
+		return fmt.Errorf("could not add claim to case: %w", err)
 	}
 
 	return nil

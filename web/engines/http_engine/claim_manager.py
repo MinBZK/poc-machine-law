@@ -1,4 +1,5 @@
 import logging
+import urllib.parse
 from typing import Any
 from uuid import UUID
 
@@ -8,17 +9,17 @@ from web.config_loader import ServiceRoutingConfig
 
 from ..claim_manager_interface import ClaimManagerInterface
 from ..models import Claim
-from .machine_client.law_as_code_client import Client
+from .machine_client.regel_recht_engine_api_client import Client
 
 logger = logging.getLogger(__name__)
-from .machine_client.law_as_code_client.api.claim import (
+from .machine_client.regel_recht_engine_api_client.api.claim import (
     claim_approve,
     claim_list_based_on_bsn,
     claim_list_based_on_bsn_service_law,
     claim_reject,
     claim_submit,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     ClaimApprove,
     ClaimApproveBody,
     ClaimReject,
@@ -26,7 +27,7 @@ from .machine_client.law_as_code_client.models import (
     ClaimSubmit,
     ClaimSubmitBody,
 )
-from .machine_client.law_as_code_client.types import UNSET
+from .machine_client.regel_recht_engine_api_client.types import UNSET
 
 
 class ClaimManager(ClaimManagerInterface):
@@ -60,7 +61,9 @@ class ClaimManager(ClaimManagerInterface):
 
         return self.base_url
 
-    def get_claims_by_bsn(self, bsn: str, approved: bool = False, include_rejected: bool = False) -> list[Claim]:
+    def get_claims_by_bsn(
+        self, bsn: str, approved: bool = False, include_rejected: bool = False, effective_date: str | None = None
+    ) -> list[Claim]:
         """
         Retrieves case information using the embedded Python machine.service library.
 
@@ -86,9 +89,19 @@ class ClaimManager(ClaimManagerInterface):
                 try:
                     client = Client(base_url=service_config.domain)
                     with client as client:
-                        response = claim_list_based_on_bsn.sync_detailed(
-                            client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
-                        )
+                        # If effective_date is provided, we need to manually add it as a query parameter
+                        if effective_date:
+                            # Get the base kwargs and add effective_date parameter
+                            kwargs = claim_list_based_on_bsn._get_kwargs(
+                                bsn=bsn, approved=approved, include_rejected=include_rejected
+                            )
+                            kwargs["params"]["effective_date"] = effective_date
+                            response_raw = client.get_httpx_client().request(**kwargs)
+                            response = claim_list_based_on_bsn._build_response(client=client, response=response_raw)
+                        else:
+                            response = claim_list_based_on_bsn.sync_detailed(
+                                client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
+                            )
                         claims = to_claims(response.parsed.data)
                         all_claims.extend(claims)
                 except Exception as e:
@@ -102,14 +115,30 @@ class ClaimManager(ClaimManagerInterface):
         client = Client(base_url=self.base_url)
 
         with client as client:
-            response = claim_list_based_on_bsn.sync_detailed(
-                client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
-            )
+            # If effective_date is provided, we need to manually add it as a query parameter
+            if effective_date:
+                # Get the base kwargs and add effective_date parameter
+                kwargs = claim_list_based_on_bsn._get_kwargs(
+                    bsn=bsn, approved=approved, include_rejected=include_rejected
+                )
+                kwargs["params"]["effective_date"] = effective_date
+                response_raw = client.get_httpx_client().request(**kwargs)
+                response = claim_list_based_on_bsn._build_response(client=client, response=response_raw)
+            else:
+                response = claim_list_based_on_bsn.sync_detailed(
+                    client=client, bsn=bsn, approved=approved, include_rejected=include_rejected
+                )
 
             return to_claims(response.parsed.data)
 
     def get_claim_by_bsn_service_law(
-        self, bsn: str, service: str, law: str, approved: bool = False, include_rejected: bool = False
+        self,
+        bsn: str,
+        service: str,
+        law: str,
+        approved: bool = False,
+        include_rejected: bool = False,
+        effective_date: str | None = None,
     ) -> dict[UUID:Claim]:
         """
         Retrieves case information using the embedded Python machine.service library.
@@ -128,9 +157,32 @@ class ClaimManager(ClaimManagerInterface):
         client = Client(base_url=service_base_url)
 
         with client as client:
-            response = claim_list_based_on_bsn_service_law.sync_detailed(
-                client=client, bsn=bsn, service=service, law=law, approved=approved, include_rejected=include_rejected
-            )
+            # URL encode service and law parameters
+            encoded_service = urllib.parse.quote_plus(service)
+            encoded_law = urllib.parse.quote_plus(law)
+
+            # If effective_date is provided, we need to manually add it as a query parameter
+            if effective_date:
+                # Get the base kwargs and add effective_date parameter
+                kwargs = claim_list_based_on_bsn_service_law._get_kwargs(
+                    bsn=bsn,
+                    service=encoded_service,
+                    law=encoded_law,
+                    approved=approved,
+                    include_rejected=include_rejected,
+                )
+                kwargs["params"]["effective_date"] = effective_date
+                response_raw = client.get_httpx_client().request(**kwargs)
+                response = claim_list_based_on_bsn_service_law._build_response(client=client, response=response_raw)
+            else:
+                response = claim_list_based_on_bsn_service_law.sync_detailed(
+                    client=client,
+                    bsn=bsn,
+                    service=encoded_service,
+                    law=encoded_law,
+                    approved=approved,
+                    include_rejected=include_rejected,
+                )
 
             return to_dict_claims(response.parsed.data.additional_properties)
 
@@ -185,7 +237,16 @@ class ClaimManager(ClaimManagerInterface):
             response = claim_submit.sync_detailed(client=client, body=body)
             content = response.parsed
 
-            return content.data
+            # Check if the response is successful (201) or an error (400/500)
+            if hasattr(content, "data"):
+                return content.data
+            elif hasattr(content, "errors"):
+                # Handle 400 error response
+                error_messages = [error.message for error in content.errors]
+                raise ValueError(f"Claim submission failed: {'; '.join(error_messages)}")
+            else:
+                # Handle unexpected response format
+                raise ValueError("Unexpected response format from claim submission API")
 
     def reject_claim(self, claim_id: UUID, rejected_by: str, rejection_reason: str) -> None:
         """

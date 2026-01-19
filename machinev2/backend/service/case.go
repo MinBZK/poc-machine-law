@@ -65,6 +65,7 @@ func (service *Service) CaseSubmit(ctx context.Context, case_ model.CaseSubmit) 
 		case_.Parameters,
 		case_.ClaimedResult,
 		case_.ApprovedClaimsOnly,
+		case_.EffectiveDate,
 	)
 
 	if err != nil {
@@ -94,6 +95,7 @@ func (service *Service) CaseObject(ctx context.Context, case_ model.CaseObject) 
 func ToCase(case_ *casemanager.Case) model.Case {
 	return model.Case{
 		ID:                 case_.ID,
+		ClaimIds:           case_.ClaimIDs,
 		Service:            case_.Service,
 		Law:                case_.Law,
 		BSN:                case_.BSN,

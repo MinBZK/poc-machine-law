@@ -115,6 +115,13 @@ func (p *CaseProjector) Project(ctx context.Context, event eh.Event, entity eh.E
 		c.Status = CaseStatusObjected
 		c.Reason = data.Reason
 		c.UpdatedAt = time.Now()
+	case CaseAddClaimEvent:
+		data, ok := event.Data().(*CaseAddClaim)
+		if !ok {
+			return nil, fmt.Errorf("projector: invalid event data type: %v", event.Data())
+		}
+
+		c.ClaimIDs = append(c.ClaimIDs, data.ClaimID)
 
 	case ObjectionStatusDeterminedEvent:
 		data, ok := event.Data().(*ObjectionStatusDetermined)
@@ -211,7 +218,7 @@ func (p *CasesProjector) HandleEvent(ctx context.Context, event eh.Event) error 
 	case CaseSubmittedEvent, CaseResetEvent, CaseAutomaticallyDecidedEvent,
 		CaseAddedToManualReviewEvent, CaseDecidedEvent, CaseObjectedEvent,
 		ObjectionStatusDeterminedEvent, ObjectionAdmissibilityDeterminedEvent,
-		AppealStatusDeterminedEvent:
+		AppealStatusDeterminedEvent, CaseAddClaimEvent:
 		// Continue handling
 	default:
 		// Skip other event types

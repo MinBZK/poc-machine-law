@@ -49,6 +49,7 @@ type Case struct {
 	AppealStatus       CaseAppealStatus    `json:"appeal_status,omitempty"`
 	Approved           *bool               `json:"approved,omitempty"`
 	Status             CaseStatus          `json:"status"`
+	EffectiveDate      time.Time           `json:"effective_date"`
 	CreatedAt          time.Time           `json:"created_at"`
 	UpdatedAt          time.Time           `json:"updated_at"`
 }
@@ -82,6 +83,7 @@ func NewCase(
 	verifiedResult map[string]any,
 	rulespecUUID uuid.UUID,
 	approvedClaimsOnly bool,
+	effectiveDate time.Time,
 ) *Case {
 	now := time.Now()
 	return &Case{
@@ -96,6 +98,7 @@ func NewCase(
 		VerifiedResult:     verifiedResult,
 		Parameters:         parameters,
 		Status:             CaseStatusSubmitted,
+		EffectiveDate:      effectiveDate,
 		CreatedAt:          now,
 		UpdatedAt:          now,
 	}
@@ -287,7 +290,7 @@ func (c *Case) CanAppeal() bool {
 // AddClaim records when a new claim is created for this case
 func (c *Case) AddClaim(claimID uuid.UUID) error {
 	if c.ClaimIDs == nil {
-		c.ClaimIDs = make([]uuid.UUID, 0)
+		c.ClaimIDs = make([]uuid.UUID, 0, 1)
 	}
 
 	// Check if claim already exists
@@ -299,23 +302,11 @@ func (c *Case) AddClaim(claimID uuid.UUID) error {
 
 	c.ClaimIDs = append(c.ClaimIDs, claimID)
 	c.UpdatedAt = time.Now()
+
 	return nil
 }
 
 // ApproveOrRejectClaim records when a claim is approved or rejected
 func (c *Case) ApproveOrRejectClaim(claimID uuid.UUID) error {
-	if c.ClaimIDs == nil {
-		c.ClaimIDs = make([]uuid.UUID, 0)
-	}
-
-	// Check if claim already exists
-	for _, id := range c.ClaimIDs {
-		if id == claimID {
-			return nil
-		}
-	}
-
-	c.ClaimIDs = append(c.ClaimIDs, claimID)
-	c.UpdatedAt = time.Now()
-	return nil
+	return c.AddClaim(claimID)
 }

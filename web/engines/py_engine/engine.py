@@ -1,4 +1,6 @@
-from datetime import datetime
+import os
+import sys
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
@@ -18,7 +20,16 @@ class PythonMachineService(EngineInterface):
     def __init__(self, services: Services):
         self.services = services
 
-    def get_profile_data(self, bsn: str) -> dict[str, Any]:
+    def get_services(self) -> Services:
+        """
+        Get the underlying Services instance.
+
+        Returns:
+            The Services instance used by this engine.
+        """
+        return self.services
+
+    def get_profile_data(self, bsn: str, effective_date: date | None = None) -> dict[str, Any]:
         """
         Get profile data for a specific BSN.
 
@@ -31,7 +42,7 @@ class PythonMachineService(EngineInterface):
         profiles = self.get_all_profiles()
         return profiles.get(bsn)
 
-    def get_all_profiles(self) -> dict[str, dict[str, Any]]:
+    def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
         """
         Get all available profiles.
 
@@ -42,12 +53,52 @@ class PythonMachineService(EngineInterface):
         profiles_path = project_root / "data" / "profiles.yaml"
         return load_profiles_from_yaml(profiles_path)
 
+    def get_business_profile(self, kvk_nummer: str) -> dict[str, Any] | None:
+        """
+        Get business profile data for a specific KVK number.
+
+        Args:
+            kvk_nummer: KVK registration number for the business
+
+        Returns:
+            Dictionary containing business data (handelsnaam, rechtsvorm, activiteit, status)
+            or None if not found
+        """
+        # Get the KVK service
+        if "KVK" not in self.services.services:
+            return None
+
+        kvk_service = self.services.services["KVK"]
+
+        # Look up in the inschrijvingen table
+        if "inschrijvingen" not in kvk_service.source_dataframes:
+            return None
+
+        df = kvk_service.source_dataframes["inschrijvingen"]
+
+        # Find the business by KVK nummer
+        matches = df[df["kvk_nummer"] == kvk_nummer]
+
+        if matches.empty:
+            return None
+
+        # Return the first match as a dictionary
+        row = matches.iloc[0]
+        return {
+            "kvk_nummer": row.get("kvk_nummer"),
+            "handelsnaam": row.get("handelsnaam"),
+            "rechtsvorm": row.get("rechtsvorm"),
+            "activiteit": row.get("activiteit"),
+            "status": row.get("status"),
+        }
+
     def evaluate(
         self,
         service: str,
         law: str,
         parameters: dict[str, Any],
         reference_date: str | None = None,
+        effective_date: str | None = None,
         overwrite_input: dict[str, Any] | None = None,
         requested_output: str | None = None,
         approved: bool = False,
@@ -121,6 +172,10 @@ class PythonMachineService(EngineInterface):
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source dataframe for a service and table."""
         self.services.set_source_dataframe(service, table, df)
+
+    def reset(self) -> None:
+        # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 def to_path_node(path_node) -> PathNode:

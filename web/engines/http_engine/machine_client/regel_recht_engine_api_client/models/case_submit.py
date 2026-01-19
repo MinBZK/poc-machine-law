@@ -1,8 +1,12 @@
+import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+from dateutil.parser import isoparse
+
+from ..types import UNSET, Unset
 
 T = TypeVar("T", bound="CaseSubmit")
 
@@ -18,6 +22,8 @@ class CaseSubmit:
         parameters (Any):
         claimed_result (Any):
         approved_claims_only (bool):
+        effective_date (Union[Unset, datetime.date]): The date on which the case, when accepted, should become
+            effective. Defaults to the moment of acceptance. Example: 2025-01-31.
     """
 
     bsn: str
@@ -26,6 +32,7 @@ class CaseSubmit:
     parameters: Any
     claimed_result: Any
     approved_claims_only: bool
+    effective_date: Union[Unset, datetime.date] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -41,6 +48,10 @@ class CaseSubmit:
 
         approved_claims_only = self.approved_claims_only
 
+        effective_date: Union[Unset, str] = UNSET
+        if not isinstance(self.effective_date, Unset):
+            effective_date = self.effective_date.isoformat()
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -53,6 +64,8 @@ class CaseSubmit:
                 "approvedClaimsOnly": approved_claims_only,
             }
         )
+        if effective_date is not UNSET:
+            field_dict["effective_date"] = effective_date
 
         return field_dict
 
@@ -71,6 +84,13 @@ class CaseSubmit:
 
         approved_claims_only = d.pop("approvedClaimsOnly")
 
+        _effective_date = d.pop("effective_date", UNSET)
+        effective_date: Union[Unset, datetime.date]
+        if isinstance(_effective_date, Unset):
+            effective_date = UNSET
+        else:
+            effective_date = isoparse(_effective_date).date()
+
         case_submit = cls(
             bsn=bsn,
             service=service,
@@ -78,6 +98,7 @@ class CaseSubmit:
             parameters=parameters,
             claimed_result=claimed_result,
             approved_claims_only=approved_claims_only,
+            effective_date=effective_date,
         )
 
         case_submit.additional_properties = d

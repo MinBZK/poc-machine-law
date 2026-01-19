@@ -7,6 +7,7 @@ require (
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/gdexlab/go-render v1.0.1
 	github.com/google/uuid v1.6.0
+	github.com/gookit/goutil v0.7.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/looplab/eventhorizon v0.16.0
 	github.com/oapi-codegen/runtime v1.1.2
@@ -51,6 +52,7 @@ require (
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/telemetry v0.0.0-20251028164327-d7a2859f34e8 // indirect
+	golang.org/x/term v0.36.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251103181224-f26f9409b101 // indirect
@@ -61,3 +63,5 @@ require (
 )
 
 exclude google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1
+
+tool github.com/Khan/genqlient/generate

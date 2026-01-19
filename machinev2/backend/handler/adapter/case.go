@@ -18,6 +18,7 @@ func ToCaseSubmit(record api.CaseSubmit) model.CaseSubmit {
 
 func FromCase(case_ model.Case) api.Case {
 	return api.Case{
+		ClaimIds:           &case_.ClaimIds,
 		Approved:           case_.Approved,
 		ApprovedClaimsOnly: case_.ApprovedClaimsOnly,
 		Bsn:                case_.BSN,

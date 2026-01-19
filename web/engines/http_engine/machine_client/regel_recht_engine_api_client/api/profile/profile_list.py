@@ -1,3 +1,4 @@
+import datetime
 from http import HTTPStatus
 from typing import Any, Optional, Union
 
@@ -5,19 +6,29 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.profile_get_response_200 import ProfileGetResponse200
-from ...models.profile_get_response_400 import ProfileGetResponse400
-from ...models.profile_get_response_404 import ProfileGetResponse404
-from ...models.profile_get_response_500 import ProfileGetResponse500
-from ...types import Response
+from ...models.profile_list_response_200 import ProfileListResponse200
+from ...models.profile_list_response_400 import ProfileListResponse400
+from ...models.profile_list_response_500 import ProfileListResponse500
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
-    bsn: str,
+    *,
+    effective_date: Union[Unset, datetime.date] = UNSET,
 ) -> dict[str, Any]:
+    params: dict[str, Any] = {}
+
+    json_effective_date: Union[Unset, str] = UNSET
+    if not isinstance(effective_date, Unset):
+        json_effective_date = effective_date.isoformat()
+    params["effective_date"] = json_effective_date
+
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": f"/profiles/{bsn}",
+        "url": "/profiles",
+        "params": params,
     }
 
     return _kwargs
@@ -25,21 +36,17 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
+) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     if response.status_code == 200:
-        response_200 = ProfileGetResponse200.from_dict(response.json())
+        response_200 = ProfileListResponse200.from_dict(response.json())
 
         return response_200
     if response.status_code == 400:
-        response_400 = ProfileGetResponse400.from_dict(response.json())
+        response_400 = ProfileListResponse400.from_dict(response.json())
 
         return response_400
-    if response.status_code == 404:
-        response_404 = ProfileGetResponse404.from_dict(response.json())
-
-        return response_404
     if response.status_code == 500:
-        response_500 = ProfileGetResponse500.from_dict(response.json())
+        response_500 = ProfileListResponse500.from_dict(response.json())
 
         return response_500
     if client.raise_on_unexpected_status:
@@ -50,7 +57,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
+) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -60,25 +67,25 @@ def _build_response(
 
 
 def sync_detailed(
-    bsn: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Response[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
+    effective_date: Union[Unset, datetime.date] = UNSET,
+) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
 
     Args:
-        bsn (str): Burgerservicenummer of a Dutch citizen Example: 111222333.
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]
+        Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]
     """
 
     kwargs = _get_kwargs(
-        bsn=bsn,
+        effective_date=effective_date,
     )
 
     response = client.get_httpx_client().request(
@@ -89,49 +96,49 @@ def sync_detailed(
 
 
 def sync(
-    bsn: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
+    effective_date: Union[Unset, datetime.date] = UNSET,
+) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
 
     Args:
-        bsn (str): Burgerservicenummer of a Dutch citizen Example: 111222333.
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]
+        Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]
     """
 
     return sync_detailed(
-        bsn=bsn,
         client=client,
+        effective_date=effective_date,
     ).parsed
 
 
 async def asyncio_detailed(
-    bsn: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Response[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
+    effective_date: Union[Unset, datetime.date] = UNSET,
+) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
 
     Args:
-        bsn (str): Burgerservicenummer of a Dutch citizen Example: 111222333.
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]
+        Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]
     """
 
     kwargs = _get_kwargs(
-        bsn=bsn,
+        effective_date=effective_date,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -140,26 +147,26 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    bsn: str,
     *,
     client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]]:
+    effective_date: Union[Unset, datetime.date] = UNSET,
+) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
     """Get all profiles
 
     Args:
-        bsn (str): Burgerservicenummer of a Dutch citizen Example: 111222333.
+        effective_date (Union[Unset, datetime.date]):  Example: 2025-01-31.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ProfileGetResponse200, ProfileGetResponse400, ProfileGetResponse404, ProfileGetResponse500]
+        Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]
     """
 
     return (
         await asyncio_detailed(
-            bsn=bsn,
             client=client,
+            effective_date=effective_date,
         )
     ).parsed

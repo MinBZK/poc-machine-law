@@ -13,10 +13,17 @@
         </div>
         <div class="law-list" id="law-list">
             {% for directory, laws in grouped_laws.items() %}
-                <div class="law-directory">
+                {% set has_active = laws|selectattr('path', 'equalto', law_path)|list|length > 0 %}
+                <div class="law-directory {% if not has_active %}collapsed{% endif %}">
                     <div class="directory-header" onclick="toggleDirectory(this)">
-                        <span class="directory-icon">▼</span>
-                        <span class="directory-name">{{ directory or "Root" }}</span>
+                        <span class="directory-icon">
+                            {% if has_active %}
+                                ▼
+                            {% else %}
+                                ▶
+                            {% endif %}
+                        </span>
+                        <span class="directory-name">{{ (directory or "Root").replace('_', ' ').title() }}</span>
                         <span class="directory-count">({{ laws|length }})</span>
                     </div>
                     <div class="directory-laws">

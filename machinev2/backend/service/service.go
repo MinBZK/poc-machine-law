@@ -56,11 +56,19 @@ func New(logr *slog.Logger, cfg *config.Config) (*Service, error) {
 
 	logr2 := logger.New("service", os.Stdout, logrus.DebugLevel)
 
+	ruleResolver, err := ruleresolver.New()
+	if err != nil {
+		return nil, fmt.Errorf("new rule resolver: %w", err)
+	}
+
 	caseManager := manager.New(logr2)
 	// claimManager := inmemory.New(logr2, caseManager)
-	claimManager := ace.New(cfg.ExternalClaimResolverEndpoint, logr2)
+	claimManager, err := ace.New(cfg.Organization, caseManager, ruleResolver, cfg.ExternalClaimResolverEndpoint, logr2)
+	if err != nil {
+		return nil, fmt.Errorf("claim manager new: %w", err)
+	}
 
-	services, err := machine.New(logr2, time.Now(), caseManager, claimManager, options...)
+	services, err := machine.New(logr2, time.Now(), caseManager, claimManager, ruleResolver, options...)
 	if err != nil {
 		return nil, fmt.Errorf("new services: %w", err)
 	}
@@ -135,7 +143,7 @@ type Servicer interface {
 	Profile(ctx context.Context, bsn string) (model.Profile, error)
 
 	ServiceLawsDiscoverableList(ctx context.Context, discoverableBy string) ([]model.Service, error)
-	GetRuleSpec(service, law string, referenceDate string) (ruleresolver.RuleSpec, error)
+	GetRuleSpec(service, law string, referenceDate time.Time) (ruleresolver.RuleSpec, error)
 
 	ClaimListBasedOnBSN(ctx context.Context, bsn string, filter ClaimListFilter) ([]model.Claim, error)
 	ClaimListBasedOnBSNServiceLaw(ctx context.Context, bsn, service, law string, filter ClaimListFilter) (map[string]model.Claim, error)
@@ -184,8 +192,8 @@ func (service *Service) ServiceLawsDiscoverableList(ctx context.Context, discove
 	return services, nil
 }
 
-func (service *Service) GetRuleSpec(svc, law string, referenceDate string) (ruleresolver.RuleSpec, error) {
-	rule, err := service.service.RuleResolver.GetRuleSpec(law, referenceDate, svc)
+func (service *Service) GetRuleSpec(svc, law string, referenceDate time.Time) (ruleresolver.RuleSpec, error) {
+	rule, err := service.service.GetRuleResolver().GetRuleSpec(law, referenceDate, svc)
 	if err != nil {
 		return ruleresolver.RuleSpec{}, fmt.Errorf("get rule spec: %w", err)
 	}

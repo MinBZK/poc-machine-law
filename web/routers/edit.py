@@ -1,5 +1,7 @@
 import json
+import logging
 import re
+from datetime import datetime
 
 from fastapi import (
     APIRouter,
@@ -15,8 +17,11 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from web.dependencies import get_case_manager, get_claim_manager, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface
+from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
+from web.feature_flags import is_auto_approve_claims_enabled
 
 router = APIRouter(prefix="/edit", tags=["edit"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/edit-form", response_class=HTMLResponse)
@@ -115,6 +120,11 @@ async def update_value(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle the value update by creating a claim"""
+    logger.warn(
+        f"Updating value - service: {service}, law: {law}, bsn: {bsn}, "
+        f"case_id: {case_id}, reason: {reason}, claimant: {claimant}"
+    )
+
     parsed_value = new_value
     parsed_old_value = old_value
 
@@ -189,19 +199,26 @@ async def update_value(
         # evidence_path = await save_evidence_file(evidence)
         pass
 
-    claim_id = claim_manager.submit_claim(
-        service=service,
-        key=key,
-        new_value=parsed_value,
-        reason=reason,
-        claimant=claimant,
-        case_id=case_id,
-        old_value=parsed_old_value,  # Now passing the old value properly
-        evidence_path=evidence_path,
-        law=law,
-        bsn=bsn,
-        auto_approve=auto_approve,
-    )
+    try:
+        # Check if auto-approval is globally enabled via feature flag
+        should_auto_approve = auto_approve or is_auto_approve_claims_enabled()
+
+        claim_id = claim_manager.submit_claim(
+            service=service,
+            key=key,
+            new_value=parsed_value,
+            reason=reason,
+            claimant=claimant,
+            case_id=case_id,
+            old_value=parsed_old_value,  # Now passing the old value properly
+            evidence_path=evidence_path,
+            law=law,
+            bsn=bsn,
+            auto_approve=should_auto_approve,
+        )
+    except ValueError as e:
+        logger.error(f"Failed to submit claim: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Get details from form data if they exist
     from contextlib import suppress
@@ -301,6 +318,10 @@ async def update_missing_values(
 
     # Get form data
     form_data = await request.form()
+    logger.info(
+        f"Updating missing values - service: {service}, law: {law}, bsn: {bsn}, "
+        f"case_id: {case_id}, reason: {reason}, claimant: {claimant}"
+    )
 
     # Extract keys, values and types as lists
     keys_list = []
@@ -372,18 +393,22 @@ async def update_missing_values(
             pass
 
         # Submit each claim individually
-        claim_manager.submit_claim(
-            service=service,
-            key=key,
-            new_value=parsed_value,
-            reason=f"{reason} (bulk update)",
-            claimant=claimant,
-            case_id=case_id,
-            evidence_path=None,
-            law=law,
-            bsn=bsn,
-            auto_approve=False,
-        )
+        try:
+            claim_manager.submit_claim(
+                service=service,
+                key=key,
+                new_value=parsed_value,
+                reason=f"{reason} (bulk update)",
+                claimant=claimant,
+                case_id=case_id,
+                evidence_path=None,
+                law=law,
+                bsn=bsn,
+                auto_approve=is_auto_approve_claims_enabled(),
+            )
+        except ValueError as e:
+            logger.error(f"Failed to submit claim for key {key}: {e}")
+            raise HTTPException(status_code=400, detail=f"Failed to submit claim for {key}: {str(e)}")
 
     response = templates.TemplateResponse(
         "partials/edit_success.html",
@@ -410,96 +435,124 @@ async def update_situation(
     Update a person's situation based on wizard input from the dashboard.
     Submits the updated situation as a new claim via the claim manager.
     """
-    try:
-        situation_type = payload.get("type")
-        details = payload.get("details", "")
-        bsn = payload.get("bsn")  # IMPROVE: get from session?
 
-        if not all([situation_type, bsn]):
+    situation_type = payload.get("type")
+    details = payload.get("details", "")
+    bsn = payload.get("bsn")  # IMPROVE: get from session?
+
+    if not all([situation_type, bsn]):
+        return JSONResponse(
+            {"status": "error", "message": "situation_type and bsn are required"},
+            status_code=400,
+        )
+
+    # Prepare parameters for the case, using all payload fields except meta
+    parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn")}
+
+    # Split the payload into multiple claims and assign them to the same case
+    match situation_type:
+        case "inkomen":
+            service = "BELASTINGDIENST"
+            law = "wet_inkomstenbelasting"
+        case "woonadres":
+            service = "RvIG"
+            law = "wet_brp"
+
+            # Set the correct claims
+            verblijfplaats = {"type": "WOONADRES"}
+
+            # Only set address attributes if the corresponding parameters exist
+            if "adres.straat" in parameters:
+                verblijfplaats["straat"] = parameters["adres.straat"]
+            if "adres.huisnummer" in parameters:
+                verblijfplaats["huisnummer"] = parameters["adres.huisnummer"]
+            if "adres.postcode" in parameters:
+                verblijfplaats["postcode"] = parameters["adres.postcode"]
+            if "adres.woonplaats" in parameters:
+                verblijfplaats["woonplaats"] = parameters["adres.woonplaats"]
+
+            parameters["verblijfplaats"] = verblijfplaats
+            parameters["land_verblijf"] = "NEDERLAND"
+
+            # Build verblijfsadres only from available parameters
+            address_parts = []
+            if "adres.straat" in parameters and "adres.huisnummer" in parameters:
+                address_parts.append(f"{parameters['adres.straat']} {parameters['adres.huisnummer']}")
+            if "adres.postcode" in parameters and "adres.woonplaats" in parameters:
+                address_parts.append(f"{parameters['adres.postcode']} {parameters['adres.woonplaats']}")
+
+            if address_parts:
+                parameters["verblijfsadres"] = ", ".join(address_parts)
+
+            # Remove address fields that are no longer used (and do not correspond to claims) from parameters
+            for k in ["adres.straat", "adres.huisnummer", "adres.postcode", "adres.woonplaats"]:
+                parameters.pop(k, None)
+        case "huurprijs":
+            service = "TOESLAGEN"
+            law = "wet_op_de_huurtoeslag"
+        case "huishouden":
+            service = "RvIG"
+            law = "wet_brp"
+
+            match payload.get("situation_household_change_type"):
+                case "scheiden":
+                    parameters["partner_bsn"] = None
+                    parameters["partnerschap_type"] = "GEEN"
+
+                # Show an error message for other household changes. IMPROVE: handle more household change types
+                case _:
+                    return JSONResponse(
+                        {"status": "error", "message": "Deze flow is nog niet ondersteund."},
+                        status_code=400,
+                    )
+
+            parameters.pop("situation_household_change_type", None)
+        case _:
             return JSONResponse(
-                {"status": "error", "message": "situation_type and bsn are required"},
+                {"status": "error", "message": f"unrecognized type: {situation_type}"},
                 status_code=400,
             )
 
-        # Prepare parameters for the case, using all payload fields except meta
-        parameters = {k: v for k, v in payload.items() if k not in ("type", "bsn")}
+    # Get the effective_date from the parameters and parse it
+    effective_date_str = parameters.pop("effective_date", None)
+    effective_date = datetime.strptime(effective_date_str, "%Y-%m-%d").date() if effective_date_str else None
 
-        # Split the payload into multiple claims and assign them to the same case
-        match situation_type:
-            case "inkomen":
-                service = "BELASTINGDIENST"
-                law = "wet_inkomstenbelasting"
-            case "woonadres":
-                service = "RvIG"
-                law = "wet_brp"
-
-                # Change sources
-                parameters["ADRES"] = {
-                    "straat": parameters["ADRES.straat"],
-                    "huisnummer": parameters["ADRES.huisnummer"],
-                    "postcode": parameters["ADRES.postcode"],
-                    "woonplaats": parameters["ADRES.woonplaats"],
-                    "type": "WOONADRES",
-                }
-                parameters["VERBLIJFSADRES"] = parameters[
-                    "ADRES.woonplaats"
-                ]  # Note: somehow only the city is used in the case system
-                parameters["LAND_VAN_VERBLIJF"] = "NEDERLAND"
-
-                # Change outputs accordingly
-                parameters["verblijfsadres"] = (
-                    f"{parameters['ADRES.straat']} {parameters['ADRES.huisnummer']}, {parameters['ADRES.postcode']} {parameters['ADRES.woonplaats']}"
-                )
-                parameters["woonplaats"] = parameters["ADRES.woonplaats"]
-                parameters["postadres"] = parameters["verblijfsadres"]
-                parameters["heeft_vast_adres"] = True
-
-                # Remove address fields from parameters after grouping them
-                for k in ["ADRES.straat", "ADRES.huisnummer", "ADRES.postcode", "ADRES.woonplaats", "ADRES.type"]:
-                    parameters.pop(k, None)
-            case "huurprijs":
-                service = "TOESLAGEN"
-                law = "wet_op_de_huurtoeslag"
-            case "huishouden":
-                service = "RvIG"
-                law = "wet_brp"
-
-                match payload.get("situation_household_change_type"):
-                    case "scheiden":
-                        # Change sources
-                        parameters["PARTNERTYPE"] = "GEEN"
-                        parameters["PARTNER_BSN"] = None
-                        parameters["PARTNER_GEBOORTEDATUM"] = None
-
-                        # Change outputs accordingly
-                        parameters["heeft_partner"] = False
-                        parameters["partner_bsn"] = None
-                        parameters["partner_geboortedatum"] = None
-
-                    # Show an error message for other household changes. IMPROVE: handle more household change types
-                    case _:
-                        return JSONResponse(
-                            {"status": "error", "message": "Deze flow is nog niet ondersteund."},
-                            status_code=400,
-                        )
-            case _:
-                return JSONResponse(
-                    {"status": "error", "message": f"unrecognized type: {situation_type}"},
-                    status_code=400,
-                )
-
-        # Create a case
+    # Create a case
+    try:
         case_id = case_manager.submit_case(
             bsn=bsn,
             service=service,
             law=law,
-            parameters=parameters,
+            parameters=parameters
+            | {
+                "BSN": bsn
+            },  # The Go engine expects the BSN to be present (with uppercase) in the case parameters, so we add it
             claimed_result=parameters,  # IMPROVE: other value?
             approved_claims_only=False,  # IMPROVE: or True?
+            effective_date=effective_date,
+        )
+    except UnexpectedStatus as e:
+        return JSONResponse(
+            {
+                "status": "error",
+                "message": f"Server error: {e.status_code}. Response: {e.content.decode('utf-8') if e.content else 'No response content'}",
+            },
+            status_code=500,
+        )
+    except json.JSONDecodeError as e:
+        return JSONResponse(
+            {"status": "error", "message": f"Invalid JSON response from server: {str(e)}"},
+            status_code=500,
+        )
+    except Exception as e:
+        return JSONResponse(
+            {"status": "error", "message": f"Unexpected error: {str(e)}"},
+            status_code=500,
         )
 
-        # Add the claim(s) to the case
-        for key, value in parameters.items():
+    # Add the claim(s) to the case
+    for key, value in parameters.items():
+        try:
             claim_manager.submit_claim(
                 service=service,
                 key=key,
@@ -509,11 +562,14 @@ async def update_situation(
                 law=law,
                 bsn=bsn,
                 case_id=case_id,
+                auto_approve=is_auto_approve_claims_enabled(),
                 # old_value: Any | None = None, # IMPROVE: fetch old value from existing situation or case if existing?
             )
+        except ValueError as e:
+            logger.error(f"Failed to submit claim for key {key}: {e}")
+            return JSONResponse(
+                {"status": "error", "message": f"Failed to submit claim for {key}: {str(e)}"},
+                status_code=400,
+            )
 
-        return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt", "case_id": case_id})
-    except Exception as e:
-        print(f"Exception in update_situation: {e}")
-
-        return JSONResponse({"status": "error", "message": "Unknown error"}, status_code=400)
+    return JSONResponse({"status": "ok", "message": "Situatie bijgewerkt"})

@@ -11,11 +11,13 @@ from web.dependencies import (
     TODAY,
     get_case_manager,
     get_claim_manager,
+    get_engine_id,
     get_machine_service,
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
-from web.feature_flags import is_chat_enabled
+from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
+from web.feature_flags import is_auto_approve_claims_enabled, is_chat_enabled
 from web.utils import format_message
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -133,6 +135,7 @@ async def handle_application_display(
                 missing_required=result.missing_required,
                 in_chat_panel=True,
                 registry_service_name=registry_service_name,  # Pass the registry service name for submission
+                current_engine_id=get_engine_id(),
             )
 
             # Send the application panel to the client
@@ -269,9 +272,13 @@ async def get_chat_page(
             "partials/feature_disabled.html", {"request": request, "feature_name": "Chat", "return_url": f"/?bsn={bsn}"}
         )
 
-    profile = services.get_profile_data(bsn)
-    if not profile:
-        return HTMLResponse("Profile not found", status_code=404)
+    try:
+        profile = services.get_profile_data(bsn)
+        if not profile:
+            return HTMLResponse("Profile not found", status_code=404)
+    except UnexpectedStatus as e:
+        error_message = e.content.decode("utf-8") if e.content else "No response content"
+        return HTMLResponse(f"Server error: {error_message}", status_code=500)
 
     # Get available and configured LLM providers
     available_providers = LLMFactory.get_available_providers()
@@ -355,10 +362,18 @@ async def websocket_endpoint(
         # Get LLM provider from request or use default
         selected_provider = connection_data.get("provider") or LLMFactory.get_provider()
 
-        profile = services.get_profile_data(bsn)
+        try:
+            profile = services.get_profile_data(bsn)
 
-        if not profile:
-            error_msg = f"Profile not found for BSN: {bsn}"
+            if not profile:
+                error_msg = f"Profile not found for BSN: {bsn}"
+                print(error_msg)
+                await websocket.send_text(json.dumps({"error": error_msg}))
+                manager.disconnect(client_id)
+                return
+        except UnexpectedStatus as e:
+            error_message = e.content.decode("utf-8") if e.content else "No response content"
+            error_msg = f"Server error getting profile for BSN {bsn}: {error_message}"
             print(error_msg)
             await websocket.send_text(json.dumps({"error": error_msg}))
             manager.disconnect(client_id)
@@ -501,7 +516,7 @@ async def websocket_endpoint(
                                             claimant=f"CHAT_USER_{bsn}",
                                             law=service.law_path,
                                             bsn=bsn,
-                                            auto_approve=False,  # Don't auto-approve to ensure proper review
+                                            auto_approve=is_auto_approve_claims_enabled(),
                                         )
 
                                         # Update system prompt with new claim data

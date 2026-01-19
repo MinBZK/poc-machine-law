@@ -1,6 +1,6 @@
 openapi: "3.0.3"
 info:
-  title: Law as Code
+  title: RegelRecht Engine API
   version: 0.0.1
 servers:
   - url: https://rvig-engine.bzlg.apps.digilab.network/v0
@@ -10,7 +10,15 @@ servers:
   - url: https://toeslagen-engine.bzlg.apps.digilab.network/v0
     description: Production server (Fictieve Dienst Toeslagen)
   - url: https://uwv-engine.bzlg.apps.digilab.network/v0
-    description: Production server (Fictieve UWV)
+    description: Production server (Fictief UWV)
+  - url: https://rvz-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictief Register Zorgverzekeringen)
+  - url: https://svb-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve Sociale Verzekeringsbank)
+  - url: https://ind-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictieve IND)
+  - url: https://vws-engine.bzlg.apps.digilab.network/v0
+    description: Production server (Fictief Ministerie van VWS)
   - url: http://rvig-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictief RvIG)
   - url: http://bd-engine.127-0-0-1.nip.io:8080/v0
@@ -18,7 +26,15 @@ servers:
   - url: http://toeslagen-engine.127-0-0-1.nip.io:8080/v0
     description: Local development server (Fictieve Dienst Toeslagen)
   - url: http://uwv-engine.127-0-0-1.nip.io:8080/v0
-    description: Local development server (Fictieve UWV)
+    description: Local development server (Fictief UWV)
+  - url: http://rvz-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictief Register Zorgverzekeringen)
+  - url: http://svb-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve Sociale Verzekeringsbank)
+  - url: http://ind-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictieve IND)
+  - url: http://vws-engine.127-0-0-1.nip.io:8080/v0
+    description: Local development server (Fictief Ministerie van VWS)
 tags:
   - name: Law
   - name: Profile
@@ -46,6 +62,8 @@ paths:
         - Profile
       description: Get all profiles
       operationId: profileList
+      parameters:
+        - $ref: "#/components/parameters/queryEffectiveDate"
       responses:
         "200":
           $ref: "#/components/responses/ResponseProfileList"
@@ -61,6 +79,7 @@ paths:
       operationId: profileGet
       parameters:
         - $ref: "#/components/parameters/pathBSN"
+        - $ref: "#/components/parameters/queryEffectiveDate"
       responses:
         "200":
           $ref: "#/components/responses/ProfileResponse"
@@ -425,10 +444,15 @@ components:
         parameters:
           type: object
           additionalProperties: true
-        date:
+        effectiveDate:
           type: string
           format: date
-          description: Can be used to overwrite the date used by the service
+          description: Can be used to set the effective execution date
+          example: "2025-01-31"
+        referenceDate:
+          type: string
+          format: date
+          description: Can be used to set the reference date of data
           example: "2025-01-31"
         input:
           type: object
@@ -445,6 +469,7 @@ components:
       example:
         service: "TOESLAGEN"
         law: "zorgtoeslagwet"
+        parameters: { "BSN": "100000001" }
     ResponseEvaluateSchema:
       description: Evaluate response
       type: object
@@ -452,9 +477,24 @@ components:
         output:
           type: object
           additionalProperties: true
+          example:
+            "hoogte_toeslag": 123456
+            "is_verzekerde_zorgtoeslag": true
         input:
           type: object
           additionalProperties: true
+          example:
+            "$DREMPELINKOMEN_ALLEENSTAANDE": 3971900,
+            "$HEEFT_PARTNER": false,
+            "$INKOMEN": 1234500,
+            "$IS_VERZEKERDE": true,
+            "$LEEFTIJD": 35,
+            "$MINIMUM_LEEFTIJD": 18,
+            "$PERCENTAGE_DREMPELINKOMEN_ALLEENSTAAND": 0.01896,
+            "$STANDAARDPREMIE": 211200,
+            "$VERMOGEN": 123400,
+            "$VERMOGENSGRENS_ALLEENSTAANDE": 14189600,
+            "$prev_january_first": "2024-01-01"
         requirementsMet:
           type: boolean
           description: Will be true when all requirements where met
@@ -465,6 +505,7 @@ components:
         missingRequired:
           type: boolean
           description: Will be true when a required value is missing
+          example: false
         path:
           $ref: "#/components/schemas/PathNode"
       required:
@@ -858,15 +899,6 @@ components:
 
       description: Output field extending BaseField
 
-    Field:
-      type: object
-      properties:
-        input:
-          $ref: "#/components/schemas/InputField"
-        source:
-          $ref: "#/components/schemas/SourceField"
-      description: Field containing input or source field
-
     SourceReference:
       type: object
       properties:
@@ -891,6 +923,9 @@ components:
           items:
             $ref: "#/components/schemas/SelectField"
           description: Selection criteria
+        wallet_attribute:
+          type: string
+          description: "Name of the wallet attribute on a claim"
 
     SelectField:
       type: object
@@ -1029,10 +1064,6 @@ components:
         - $ref: "#/components/schemas/Requirement"
         - $ref: "#/components/schemas/Action"
 
-    VariableReference:
-      type: object
-      description: Variable reference (structure not fully defined)
-      additionalProperties: true
     Claim:
       description: Claim
       type: object
@@ -1051,7 +1082,6 @@ components:
           type: string
         caseId:
           $ref: "#/components/schemas/caseID"
-          nullable: true
         newValue: {}
         reason:
           type: string
@@ -1176,6 +1206,11 @@ components:
           additionalProperties: true
         approvedClaimsOnly:
           type: boolean
+        effective_date:
+          type: string
+          format: date
+          example: "2025-01-31"
+          description: The date on which the case, when accepted, should become effective. Defaults to the moment of acceptance.
     CaseReview:
       type: object
       required:
@@ -1250,6 +1285,11 @@ components:
           $ref: "#/components/schemas/CaseObjectionStatus"
         appealStatus:
           $ref: "#/components/schemas/CaseAppealStatus"
+        claim_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
     CaseObjectionStatus:
       description: Parameters to set the objection status
       type: object
@@ -1370,6 +1410,15 @@ components:
       schema:
         type: string
         example: zorgtoeslagwet
+    queryEffectiveDate:
+      name: effective_date
+      in: query
+      description: Can be used to set the effective execution date
+      schema:
+        type: string
+        format: date
+        example: "2025-01-31"
+      required: false
     queryOnlyApproved:
       name: approved
       in: query

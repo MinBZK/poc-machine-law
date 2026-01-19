@@ -1,3 +1,4 @@
+import datetime
 import logging
 import urllib.parse
 from typing import Any
@@ -9,10 +10,10 @@ from web.config_loader import ServiceRoutingConfig
 
 from ..case_manager_interface import CaseManagerInterface
 from ..models import Case, CaseObjectionStatus, CaseStatus, Event
-from .machine_client.law_as_code_client import Client
+from .machine_client.regel_recht_engine_api_client import Client
 
 logger = logging.getLogger(__name__)
-from .machine_client.law_as_code_client.api.case import (
+from .machine_client.regel_recht_engine_api_client.api.case import (
     case_based_on_bsn_service_law,
     case_get,
     case_list_based_on_bsn,
@@ -22,10 +23,10 @@ from .machine_client.law_as_code_client.api.case import (
     case_submit,
     event_list_based_on_case_id,
 )
-from .machine_client.law_as_code_client.api.events import (
+from .machine_client.regel_recht_engine_api_client.api.events import (
     event_list,
 )
-from .machine_client.law_as_code_client.models import (
+from .machine_client.regel_recht_engine_api_client.models import (
     CaseObject,
     CaseObjectBody,
     CaseReview,
@@ -33,7 +34,7 @@ from .machine_client.law_as_code_client.models import (
     CaseSubmit,
     CaseSubmitBody,
 )
-from .machine_client.law_as_code_client.types import UNSET, Unset
+from .machine_client.regel_recht_engine_api_client.types import UNSET, Unset
 
 
 class CaseManager(CaseManagerInterface):
@@ -176,6 +177,7 @@ class CaseManager(CaseManagerInterface):
         parameters: dict[str, Any],
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
+        effective_date: datetime.date | None = None,
     ) -> UUID:
         # Instantiate the API client with service-specific base URL
         service_base_url = self._get_base_url_for_service(service)
@@ -188,6 +190,7 @@ class CaseManager(CaseManagerInterface):
             parameters=parameters,
             claimed_result=claimed_result,
             approved_claims_only=approved_claims_only,
+            effective_date=effective_date if effective_date is not None else UNSET,
         )
         body = CaseSubmitBody(data=data)
 
@@ -265,6 +268,7 @@ def get_value(val: Unset | Any, default: Any = None) -> bool:
 def to_case(case) -> Case:
     return Case(
         id=case.id,
+        claim_ids=case.claim_ids,
         bsn=case.bsn,
         service=case.service,
         law=case.law,

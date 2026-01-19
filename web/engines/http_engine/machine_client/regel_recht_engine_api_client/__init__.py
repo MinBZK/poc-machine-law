@@ -1,4 +1,4 @@
-"""A client library for accessing Law as Code"""
+"""A client library for accessing RegelRecht Engine API"""
 
 from .client import AuthenticatedClient, Client
 

@@ -1,5 +1,4 @@
 import os
-import sys
 from datetime import datetime
 from uuid import UUID
 
@@ -8,6 +7,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from starlette.responses import RedirectResponse
 
 from explain.llm_factory import LLMFactory
+from machine.utils import RuleResolver
 from web.config_loader import ConfigLoader
 from web.dependencies import (
     get_case_manager,
@@ -18,12 +18,14 @@ from web.dependencies import (
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
+from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors import UnexpectedStatus
 from web.engines.models import CaseStatus
 from web.feature_flags import FeatureFlags
 from web.routers.laws import evaluate_law
 
 config_loader = ConfigLoader()
 llm_factory = LLMFactory()
+rule_resolver = RuleResolver()
 
 
 def get_person_name(bsn: str, services: EngineInterface) -> str:
@@ -32,6 +34,10 @@ def get_person_name(bsn: str, services: EngineInterface) -> str:
         profile_data = services.get_profile_data(bsn)
         if profile_data and "name" in profile_data:
             return profile_data["name"]
+    except UnexpectedStatus as e:
+        # Log the detailed error but still fallback to BSN
+        error_message = e.content.decode("utf-8") if e.content else "No response content"
+        print(f"Error getting profile for BSN {bsn}: {error_message}")
     except Exception:
         pass
     return bsn  # Fallback to BSN if name not found
@@ -266,8 +272,7 @@ async def post_set_feature_flag(
 async def post_reset(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Reset the state of the application"""
 
-    # Restart the application. Note: the state of the application is stored in such a complicated way in memory that it is easier to just restart the application
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    services.reset()
 
 
 @router.get("/{service}")
@@ -278,13 +283,11 @@ async def admin_dashboard(
     case_manager: CaseManagerInterface = Depends(get_case_manager),
 ):
     """Main admin dashboard view"""
-    discoverable_laws = services.get_discoverable_service_laws("CITIZEN") | services.get_discoverable_service_laws(
-        "BUSINESS"
-    )
-    available_services = list(discoverable_laws.keys())
+    all_laws = rule_resolver.get_service_laws()
+    available_services = list(all_laws.keys())
 
     # Get cases for selected service
-    service_laws = discoverable_laws.get(service, [])
+    service_laws = all_laws.get(service, [])
     service_cases = {}
     for law in service_laws:
         cases = case_manager.get_cases_by_law(service, law)
@@ -381,6 +384,11 @@ async def complete_review(
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Complete manual review of a case"""
+
+    # Provide a fallback reason if none is provided
+    if not reason:
+        reason = "(No reason provided)"
+
     try:
         case_manager.complete_manual_review(case_id=case_id, verifier_id="ADMIN", approved=decision, reason=reason)
 
@@ -453,6 +461,7 @@ async def view_case(
             "claim_map": claim_map,
             "claim_ids": claim_ids,
             "person_name": person_name,
+            "current_engine_id": get_engine_id(),
         },
     )
 

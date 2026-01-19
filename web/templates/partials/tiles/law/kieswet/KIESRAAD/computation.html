@@ -8,7 +8,7 @@
         {% else %}
             <p class="text-4xl font-bold text-pink-600 mt-2">GEEN stemrecht</p>
         {% endif %}
-        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&default_tab=explanation"
+        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=explanation"
                 hx-target="#shared-application-panel"
                 hx-swap="innerHTML"
                 class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">

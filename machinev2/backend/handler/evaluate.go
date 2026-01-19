@@ -14,19 +14,25 @@ import (
 func (handler *Handler) Evaluate(ctx context.Context, request api.EvaluateRequestObject) (api.EvaluateResponseObject, error) {
 	handler.logger.Debug("evaluate", "params", request.Body.Data)
 
-	var date *time.Time
-	if request.Body.Data.Date != nil {
-		date = &request.Body.Data.Date.Time
+	var effectiveDate *time.Time
+	if request.Body.Data.EffectiveDate != nil {
+		effectiveDate = &request.Body.Data.EffectiveDate.Time
+	}
+
+	var referenceDate *time.Time
+	if request.Body.Data.ReferenceDate != nil {
+		referenceDate = &request.Body.Data.ReferenceDate.Time
 	}
 
 	result, err := handler.servicer.Evaluate(ctx, model.Evaluate{
-		Law:        request.Body.Data.Law,
-		Service:    request.Body.Data.Service,
-		Parameters: request.Body.Data.Parameters,
-		Date:       date,
-		Input:      request.Body.Data.Input,
-		Output:     request.Body.Data.Output,
-		Approved:   request.Body.Data.Approved,
+		Law:           request.Body.Data.Law,
+		Service:       request.Body.Data.Service,
+		Parameters:    request.Body.Data.Parameters,
+		EffectiveDate: effectiveDate,
+		ReferenceDate: referenceDate,
+		Input:         request.Body.Data.Input,
+		Output:        request.Body.Data.Output,
+		Approved:      request.Body.Data.Approved,
 	})
 
 	if err != nil {

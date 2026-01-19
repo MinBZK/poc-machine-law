@@ -42,8 +42,8 @@ globalServices:
 profiles:
   '100000001':
     name: Merijn van der Meer
-    description: ZZP'er in de thuiszorg, alleenstaande ouder met twee jonge kinderen
-      waarvan één met chronische aandoening
+    description: ZZP'er in de thuiszorg met laag inkomen, alleenstaande ouder met twee jonge kinderen
+      waarvan één met chronische aandoening. Komt in aanmerking voor Bbz.
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -88,12 +88,32 @@ profiles:
           - geboortedatum: '2022-01-01'
             zorgbehoefte: true
             kind_bsn: '200000002'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '100000001'
+          bsn_kind: '200000001'
+          naam_kind: Kind 1 van der Meer
+          geboortedatum_kind: '2020-01-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-01-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '100000001'
+          bsn_kind: '200000002'
+          naam_kind: Kind 2 van der Meer
+          geboortedatum_kind: '2022-01-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2022-01-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '100000001'
           loon_uit_dienstbetrekking: 0
           uitkeringen_en_pensioenen: 0
-          winst_uit_onderneming: 1550000
+          winst_uit_onderneming: 600000
           resultaat_overige_werkzaamheden: 0
           eigen_woning: -85000
         box2:
@@ -102,26 +122,29 @@ profiles:
           vervreemdingsvoordelen: 0
         box3:
         - bsn: '100000001'
-          spaargeld: 580000
+          spaargeld: 500000
           beleggingen: 0
           onroerend_goed: 0
           schulden: 0
           buitenlands_inkomen: 0
         monthly_income:
         - bsn: '100000001'
-          bedrag: 129167
+          bedrag: 50000
         maandelijks_inkomen:
         - bsn: '100000001'
           bedrag: 0
         assets:
         - bsn: '100000001'
-          bedrag: 580000
+          bedrag: 500000
+        bezittingen:
+        - bsn: '100000001'
+          bedrag: 500000
         business_income:
         - bsn: '100000001'
-          bedrag: 1550000
+          bedrag: 600000
         bedrijfsinkomen:
         - bsn: '100000001'
-          bedrag: 1550000
+          bedrag: 600000
         buitenlands_inkomen:
         - bsn: '100000001'
           bedrag: 0
@@ -131,14 +154,52 @@ profiles:
           persoonsgebonden_aftrek: 320000
         belastingdienst_vermogen:
         - bsn: '100000001'
-          vermogen: 580000
+          vermogen: 500000
       KVK:
         inschrijvingen:
         - bsn: '100000001'
+          kvk_nummer: '12345678'
+          handelsnaam: Thuiszorg Van der Meer
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Thuiszorg
-          is_active_entrepreneur: true
+        - bsn: '100000001'
+          kvk_nummer: '99001122'
+          handelsnaam: Zorggroep Nederland VOF
+          rechtsvorm: VOF
+          status: ACTIEF
+          activiteit: Zorgdiensten
+        - bsn: '100000001'
+          kvk_nummer: '88776655'
+          handelsnaam: Healthcare Holdings BV
+          rechtsvorm: BV
+          status: ACTIEF
+          activiteit: Holding
+        functionarissen:
+        # Eigenaar van eigen eenmanszaak - HEEFT vertegenwoordigingsbevoegdheid
+        - bsn: '100000001'
+          kvk_nummer: '12345678'
+          handelsnaam: Thuiszorg Van der Meer
+          rechtsvorm: EENMANSZAAK
+          status: ACTIEF
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
+        # Vennoot in VOF - HEEFT vertegenwoordigingsbevoegdheid (beperkt)
+        - bsn: '100000001'
+          kvk_nummer: '99001122'
+          handelsnaam: Zorggroep Nederland VOF
+          rechtsvorm: VOF
+          status: ACTIEF
+          functie: VENNOOT
+          bevoegdheid: BEPERKT
+        # Commissaris van BV - GEEN vertegenwoordigingsbevoegdheid (toezichthouder)
+        - bsn: '100000001'
+          kvk_nummer: '88776655'
+          handelsnaam: Healthcare Holdings BV
+          rechtsvorm: BV
+          status: ACTIEF
+          functie: COMMISSARIS
+          bevoegdheid: GEEN
         is_entrepreneur:
         - bsn: '100000001'
           waarde: true
@@ -150,7 +211,7 @@ profiles:
           verzekerd_wia: false
         uwv_toetsingsinkomen:
         - bsn: '100000001'
-          toetsingsinkomen: 1550000
+          toetsingsinkomen: 600000
         uwv_werkgegevens:
         - bsn: '100000001'
           gemiddeld_uren_per_week: 0.0
@@ -223,6 +284,14 @@ profiles:
         vreemdelingenwet:
         - bsn: '100000001'
           verblijfsvergunning_type: null
+      SZW:
+        bbz_aanvraag:
+        - bsn: '100000001'
+          type_zelfstandige: GEVESTIGD
+          bedrijf_levensvatbaar: true
+          jaren_ondernemerschap: 3
+          uren_per_week: 40
+          beeindigingsdatum: null
   '999991905':
     name: Linda Strijps
     description: Moeder van twee jonge kinderen, werkt parttime, met NL Wallet
@@ -269,11 +338,31 @@ profiles:
             geboortedatum: '2020-06-10'
           - kind_bsn: '999992740'
             geboortedatum: '2022-08-15'
+        gezag_relaties:
+        # Art. 1:253b BW: gezamenlijk gezag met Peter-Jan van der Meijden (999993872)
+        - bsn_gezagdrager: '999991905'
+          bsn_kind: '999991723'
+          naam_kind: Kind 1 Strijps
+          geboortedatum_kind: '2020-06-10'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2020-06-10'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '999991905'
+          bsn_kind: '999992740'
+          naam_kind: Kind 2 Strijps
+          geboortedatum_kind: '2022-08-15'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2022-08-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       UWV:
         dienstverbanden:
         - bsn: '999991905'
-          start_date: '2024-01-01'
-          end_date: '2024-12-31'
+          start_date: '2018-01-01'
+          end_date: '2025-12-31'
           uren_per_week: 24
           worked_hours: 1248
       BELASTINGDIENST:
@@ -1154,6 +1243,26 @@ profiles:
             kind_bsn: '200000003'
           - geboortedatum: '2017-03-22'
             kind_bsn: '200000004'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '100000002'
+          bsn_kind: '200000003'
+          naam_kind: Kind Rodriguez 1
+          geboortedatum_kind: '2014-05-15'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2014-05-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '100000002'
+          bsn_kind: '200000004'
+          naam_kind: Kind Rodriguez 2
+          geboortedatum_kind: '2017-03-22'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2017-03-22'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '100000002'
@@ -1328,6 +1437,17 @@ profiles:
           kinderen:
           - geboortedatum: '2011-08-30'
             kind_bsn: '200000005'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '100000003'
+          bsn_kind: '200000005'
+          naam_kind: Elif Yilmaz
+          geboortedatum_kind: '2011-08-30'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2011-08-30'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '100000003'
@@ -1385,10 +1505,19 @@ profiles:
       KVK:
         inschrijvingen:
         - bsn: '100000003'
+          kvk_nummer: '87654321'
+          handelsnaam: Yilmaz Bouw
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Bouwwerkzaamheden
-          is_active_entrepreneur: true
+        functionarissen:
+        - bsn: '100000003'
+          kvk_nummer: '87654321'
+          handelsnaam: Yilmaz Bouw
+          rechtsvorm: EENMANSZAAK
+          status: ACTIEF
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
         is_entrepreneur:
         - bsn: '100000003'
           waarde: true
@@ -1647,6 +1776,17 @@ profiles:
           kinderen:
           - geboortedatum: '2018-06-12'
             kind_bsn: '200000006'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '300000001'
+          bsn_kind: '200000006'
+          naam_kind: Kind van Sophie Jansen
+          geboortedatum_kind: '2018-06-12'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2018-06-12'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '300000001'
@@ -2059,9 +2199,25 @@ profiles:
       KVK:
         inschrijvingen:
         - bsn: '999993656'
+          kvk_nummer: '55667788'
+          handelsnaam: Peter Bakker Webdesign
           rechtsvorm: EENMANSZAAK
           status: ACTIEF
           activiteit: Webdesign
+        functionarissen:
+        - bsn: '999993656'
+          kvk_nummer: '55667788'
+          handelsnaam: Peter Bakker Webdesign
+          rechtsvorm: EENMANSZAAK
+          status: ACTIEF
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
+        is_entrepreneur:
+        - bsn: '999993656'
+          waarde: true
+        is_active_entrepreneur:
+        - bsn: '999993656'
+          waarde: true
   '999993657':
     name: Emma Visser
     description: Persoon met medische ontheffing, recht op bijstand zonder re-integratieverplichting
@@ -2305,6 +2461,17 @@ profiles:
           kinderen:
           - geboortedatum: '2020-01-01'
             kind_bsn: '200000007'
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '999993660'
+          bsn_kind: '200000007'
+          naam_kind: Kind van Lisa de Jong
+          geboortedatum_kind: '2020-01-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-01-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       BELASTINGDIENST:
         box1:
         - bsn: '999993660'
@@ -2451,6 +2618,26 @@ profiles:
         - kind_bsn: '222222222'
           geboortedatum: '2022-07-15'
           naam: Emma de Jong
+        gezag_relaties:
+        # Art. 1:245 BW: ouderlijk gezag over minderjarige kinderen
+        - bsn_gezagdrager: '888888888'
+          bsn_kind: '111111111'
+          naam_kind: Sem de Jong
+          geboortedatum_kind: '2020-03-01'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2020-03-01'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '888888888'
+          bsn_kind: '222222222'
+          naam_kind: Emma de Jong
+          geboortedatum_kind: '2022-07-15'
+          type_gezag: OUDERLIJK_GEZAG
+          datum_ingang: '2022-07-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       UWV:
         dienstverbanden:
         - bsn: '888888888'
@@ -2530,6 +2717,26 @@ profiles:
             geboortedatum: '2020-06-10'
           - kind_bsn: '999992740'
             geboortedatum: '2022-08-15'
+        gezag_relaties:
+        # Art. 1:253b BW: gezamenlijk gezag met Linda Strijps (999991905)
+        - bsn_gezagdrager: '999993872'
+          bsn_kind: '999991723'
+          naam_kind: Kind 1 Strijps
+          geboortedatum_kind: '2020-06-10'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2020-06-10'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+        - bsn_gezagdrager: '999993872'
+          bsn_kind: '999992740'
+          naam_kind: Kind 2 Strijps
+          geboortedatum_kind: '2022-08-15'
+          type_gezag: GEZAMENLIJK_GEZAG
+          datum_ingang: '2022-08-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
       UWV:
         dienstverbanden:
         - bsn: '999993872'
@@ -2937,6 +3144,108 @@ profiles:
           buitenlands_inkomen: 0
         buitenlands_inkomen:
         - bsn: '200000007'
+          bedrag: 0
+          land: GEEN
+  '400000001':
+    name: Maria van den Berg
+    description: Voogd van haar neefje Daan na overlijden van zijn ouders (Art. 1:295 BW)
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400000001'
+          geboortedatum: '1972-09-14'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 53
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Oudegracht 85, 3511AD Utrecht
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '400000001'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+        verblijfplaats:
+        - bsn: '400000001'
+          straat: Oudegracht
+          huisnummer: '85'
+          postcode: 3511AD
+          woonplaats: Utrecht
+          type: WOONADRES
+        gezag_relaties:
+        # Art. 1:295 BW: voogdij door niet-ouder (tante)
+        - bsn_gezagdrager: '400000001'
+          bsn_kind: '400000002'
+          naam_kind: Daan van der Berg
+          geboortedatum_kind: '2013-04-22'
+          type_gezag: VOOGDIJ
+          datum_ingang: '2021-08-15'
+          datum_einde: null
+          status: ACTIEF
+          heeft_handlichting: false
+      BELASTINGDIENST:
+        box1:
+        - bsn: '400000001'
+          loon_uit_dienstbetrekking: 4200000
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 0
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box3:
+        - bsn: '400000001'
+          spaargeld: 2500000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '400000001'
+          bedrag: 0
+          land: GEEN
+  '400000002':
+    name: Daan van der Berg
+    description: Minderjarige onder voogdij van tante Maria (BSN 400000001)
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400000002'
+          geboortedatum: '2013-04-22'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 12
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Oudegracht 85, 3511AD Utrecht
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '400000002'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+        verblijfplaats:
+        - bsn: '400000002'
+          straat: Oudegracht
+          huisnummer: '85'
+          postcode: 3511AD
+          woonplaats: Utrecht
+          type: WOONADRES
+      BELASTINGDIENST:
+        box3:
+        - bsn: '400000002'
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '400000002'
           bedrag: 0
           land: GEEN
   '999993670':

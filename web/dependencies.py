@@ -13,14 +13,12 @@ config_loader = ConfigLoader()
 # Set Dutch locale
 try:
     locale.setlocale(locale.LC_ALL, "nl_NL.UTF-8")
-    locale.setlocale(
-        locale.LC_MONETARY, "it_IT.UTF-8"
-    )  # Use Italian locale for monetary formatting, which is similar to Dutch but has better thousand separators and places the minus sign correctly
+    locale.setlocale(locale.LC_MONETARY, "nl_NL.UTF-8")
 except locale.Error:
     # Fallback for CI environments where Dutch locale might not be installed
     try:
         locale.setlocale(locale.LC_ALL, "nl_NL")
-        locale.setlocale(locale.LC_MONETARY, "it_IT")  # See comment above
+        locale.setlocale(locale.LC_MONETARY, "nl_NL")
     except locale.Error:
         try:
             # Try C.UTF-8 which is often available in Docker/CI
@@ -112,7 +110,11 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
 
         # Use locale.currency for proper formatting. Note: on some systems, the locale definitions use 'Eu' as the currency symbol instead of the actual euro sign €, so we replace it
         try:
-            return locale.currency(value, grouping=True).replace("Eu", "€")
+            formatted = locale.currency(value, grouping=True).replace("Eu", "€")
+            # Dutch locale puts minus at the end (€ 500,00-), fix to put it at the front (-€ 500,00)
+            if formatted.endswith("-"):
+                formatted = "-" + formatted[:-1]
+            return formatted
         except (ValueError, locale.Error):
             # Fallback to manual formatting if locale doesn't support currency formatting
             # Format with Dutch conventions: . for thousands, , for decimals
@@ -125,6 +127,20 @@ def setup_jinja_env(directory: str) -> Jinja2Templates:
             return f"{sign}€ {formatted}"
 
     templates.env.filters["format_currency"] = format_currency
+
+    def format_value(value) -> str:
+        """Format a value for display, handling dicts and other types nicely."""
+        if value is None:
+            return ""
+        if isinstance(value, dict):
+            # Format dict as readable key-value pairs
+            parts = [f"{k}: {v}" for k, v in value.items()]
+            return ", ".join(parts)
+        if isinstance(value, list):
+            return ", ".join(str(v) for v in value)
+        return str(value)
+
+    templates.env.filters["format_value"] = format_value
 
     return templates
 

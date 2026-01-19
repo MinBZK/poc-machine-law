@@ -36,7 +36,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer"} else parse_value(v)
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "bsn_gezagdrager", "bsn_kind"} else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)
@@ -282,6 +282,44 @@ def step_impl(context, amount):
 def step_impl(context, amount):
     actual_amount = context.result.output["startkapitaal"]
     compare_euro_amount(actual_amount, amount)
+
+
+# Bbz 2004 specifieke steps
+@then('is de categorie_zelfstandige "{categorie}"')
+def step_impl(context, categorie):
+    actual_categorie = context.result.output["categorie_zelfstandige"]
+    assertions.assertEqual(
+        actual_categorie,
+        categorie,
+        f"Expected categorie_zelfstandige to be {categorie}, but was {actual_categorie}",
+    )
+
+
+@then('is de max_duur_maanden "{maanden}"')
+def step_impl(context, maanden):
+    actual_maanden = context.result.output["max_duur_maanden"]
+    expected_maanden = int(maanden)
+    assertions.assertEqual(
+        actual_maanden,
+        expected_maanden,
+        f"Expected max_duur_maanden to be {maanden}, but was {actual_maanden}",
+    )
+
+
+@then('is het bedrijfskapitaal_max "{amount}" euro')
+def step_impl(context, amount):
+    actual_amount = context.result.output["bedrijfskapitaal_max"]
+    compare_euro_amount(actual_amount, amount)
+
+
+@then('is het bedrijfskapitaal_type "{type}"')
+def step_impl(context, type):
+    actual_type = context.result.output["bedrijfskapitaal_type"]
+    assertions.assertEqual(
+        actual_type,
+        type,
+        f"Expected bedrijfskapitaal_type to be {type}, but was {actual_type}",
+    )
 
 
 @given("alle aanvragen worden beoordeeld")
@@ -857,4 +895,56 @@ def step_impl(context, maanden):
     assertions.assertEqual(
         actual, expected,
         f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
+    )
+
+
+@then('heeft de output "{field}" waarde "{value}"')
+def step_impl(context, field, value):
+    """Check if an output field has a specific value."""
+    actual = context.result.output.get(field)
+    expected = parse_value(value)
+    # Treat None as False for boolean comparisons
+    if expected is False and actual is None:
+        actual = False
+    assertions.assertEqual(
+        actual, expected,
+        f"Expected {field} to be {expected}, but was {actual}"
+    )
+
+
+@then('bevat de output "{field}" waarde "{value}"')
+def step_impl(context, field, value):
+    """Check if an output array field contains a specific value."""
+    actual = context.result.output.get(field, [])
+    expected = parse_value(value)
+    # Convert to strings for comparison (handles mixed int/string arrays)
+    actual_str = [str(x) for x in actual]
+    expected_str = str(expected)
+    assertions.assertIn(
+        expected_str, actual_str,
+        f"Expected {field} to contain {expected_str}, but it was {actual_str}"
+    )
+
+
+@then('bevat de output "{field}" niet de waarde "{value}"')
+def step_impl(context, field, value):
+    """Check if an output array field does NOT contain a specific value."""
+    actual = context.result.output.get(field, [])
+    expected = parse_value(value)
+    # Convert to strings for comparison (handles mixed int/string arrays)
+    actual_str = [str(x) for x in actual]
+    expected_str = str(expected)
+    assertions.assertNotIn(
+        expected_str, actual_str,
+        f"Expected {field} to NOT contain {expected_str}, but it was {actual_str}"
+    )
+
+
+@then('is de output "{field}" leeg')
+def step_impl(context, field):
+    """Check if an output array field is empty."""
+    actual = context.result.output.get(field, [])
+    assertions.assertEqual(
+        len(actual), 0,
+        f"Expected {field} to be empty, but it was {actual}"
     )

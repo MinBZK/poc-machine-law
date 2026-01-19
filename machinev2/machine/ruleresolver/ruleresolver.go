@@ -25,17 +25,25 @@ var (
 	ruleSpecCache             sync.Map
 )
 
-// RuleResolver handles rule resolution and lookup
-type RuleResolver struct {
-	RulesDir                  string
-	Rules                     []RuleSpec
-	LawsByService             map[string]map[string]struct{}
-	DiscoverableLawsByService map[string]map[string]map[string]struct{}
+// RuleResolve handles rule resolution and lookup
+type RuleResolve struct {
+	rulesDir                  string
+	rules                     []RuleSpec
+	lawsByService             map[string]map[string]struct{}
+	discoverableLawsByService map[string]map[string]map[string]struct{}
 	mu                        sync.RWMutex
 }
 
+type RuleResolver interface {
+	RulesDataFrame() []map[string]any
+	GetRules() []RuleSpec
+	GetRuleSpec(law string, referenceDate time.Time, service string) (RuleSpec, error)
+	GetServiceLaws() map[string][]string
+	GetDiscoverableServiceLaws(discoverableBy string) map[string][]string
+}
+
 // New creates a new rule resolver
-func New() (resolver *RuleResolver, err error) {
+func New() (resolver *RuleResolve, err error) {
 	once.Do(func() {
 		ruleSpec, lawsByService, discoverableLawsByService, err = rulesLoad(LawBaseDir)
 		if err != nil {
@@ -53,11 +61,11 @@ func New() (resolver *RuleResolver, err error) {
 		return nil, fmt.Errorf("rules not loaded yet")
 	}
 
-	return &RuleResolver{
-		RulesDir:                  LawBaseDir,
-		Rules:                     ruleSpec,
-		LawsByService:             lawsByService,
-		DiscoverableLawsByService: discoverableLawsByService,
+	return &RuleResolve{
+		rulesDir:                  LawBaseDir,
+		rules:                     ruleSpec,
+		lawsByService:             lawsByService,
+		discoverableLawsByService: discoverableLawsByService,
 	}, nil
 }
 
@@ -142,14 +150,18 @@ func rulesLoad(dir string) ([]RuleSpec, map[string]map[string]struct{}, map[stri
 	return rules, lawsByService, lawsByServiceWithDiscoverable, nil
 }
 
+func (r *RuleResolve) GetRules() []RuleSpec {
+	return r.rules
+}
+
 // GetServiceLaws returns a map of services to their laws
-func (r *RuleResolver) GetServiceLaws() map[string][]string {
+func (r *RuleResolve) GetServiceLaws() map[string][]string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	result := make(map[string][]string, len(r.LawsByService))
+	result := make(map[string][]string, len(r.lawsByService))
 
-	for service, laws := range r.LawsByService {
+	for service, laws := range r.lawsByService {
 		lawsList := make([]string, 0, len(laws))
 		for law := range laws {
 			lawsList = append(lawsList, law)
@@ -161,13 +173,13 @@ func (r *RuleResolver) GetServiceLaws() map[string][]string {
 }
 
 // GetDiscoverableServiceLaws returns a map of discoverable services to their laws
-func (r *RuleResolver) GetDiscoverableServiceLaws(discoverableBy string) map[string][]string {
+func (r *RuleResolve) GetDiscoverableServiceLaws(discoverableBy string) map[string][]string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	result := make(map[string][]string, 0)
 
-	if serviceMap, ok := r.DiscoverableLawsByService[discoverableBy]; ok {
+	if serviceMap, ok := r.discoverableLawsByService[discoverableBy]; ok {
 		for service, laws := range serviceMap {
 			lawsList := make([]string, 0, len(laws))
 			for law := range laws {
@@ -181,20 +193,15 @@ func (r *RuleResolver) GetDiscoverableServiceLaws(discoverableBy string) map[str
 }
 
 // FindRule finds the applicable rule for a given law and reference date
-func (r *RuleResolver) FindRule(law, referenceDate string, service string) (RuleSpec, error) {
+func (r *RuleResolve) FindRule(law string, referenceDate time.Time, service string) (RuleSpec, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	refDate, err := time.Parse("2006-01-02", referenceDate)
-	if err != nil {
-		return RuleSpec{}, fmt.Errorf("invalid reference date: %s", referenceDate)
-	}
-
 	// Filter rules for the given law
 	var lawRules []RuleSpec
-	for _, rule := range r.Rules {
+	for _, rule := range r.rules {
 		if rule.Law == law {
-			if service == "" || rule.Service == service {
+			if service == "" || strings.EqualFold(strings.ToLower(rule.Service), strings.ToLower(service)) {
 				lawRules = append(lawRules, rule)
 			}
 		}
@@ -207,13 +214,13 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 	// Find the most recent valid rule before the reference date
 	var validRules []RuleSpec
 	for _, rule := range lawRules {
-		if !rule.ValidFrom.After(refDate) {
+		if !rule.ValidFrom.After(referenceDate) {
 			validRules = append(validRules, rule)
 		}
 	}
 
 	if len(validRules) == 0 {
-		return RuleSpec{}, fmt.Errorf("no valid rules found for law %s at date %s", law, referenceDate)
+		return RuleSpec{}, fmt.Errorf("no valid rules found for law %s at date %s", law, referenceDate.Format(time.RFC3339))
 	}
 
 	// Return the most recently valid rule
@@ -228,7 +235,7 @@ func (r *RuleResolver) FindRule(law, referenceDate string, service string) (Rule
 }
 
 // GetRuleSpec gets the rule specification as a map
-func (r *RuleResolver) GetRuleSpec(law, referenceDate string, service string) (RuleSpec, error) {
+func (r *RuleResolve) GetRuleSpec(law string, referenceDate time.Time, service string) (RuleSpec, error) {
 	rule, err := r.FindRule(law, referenceDate, service)
 	if err != nil {
 		return RuleSpec{}, err
@@ -263,13 +270,13 @@ func deptr[T any](a *T, def T) T {
 }
 
 // RulesDataFrame returns a slice of maps representing all rules
-func (r *RuleResolver) RulesDataFrame() []map[string]any {
+func (r *RuleResolve) RulesDataFrame() []map[string]any {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	result := make([]map[string]any, 0, len(r.Rules))
+	result := make([]map[string]any, 0, len(r.rules))
 
-	for _, rule := range r.Rules {
+	for _, rule := range r.rules {
 		ruleData := map[string]any{
 			"path":            rule.Path,
 			"decision_type":   deptr(rule.DecisionType, ""),

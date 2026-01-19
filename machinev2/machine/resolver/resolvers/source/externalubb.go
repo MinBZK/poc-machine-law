@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/minbzk/poc-machine-law/machinev2/machine/internal/typespec"
@@ -20,14 +21,16 @@ import (
 )
 
 type ubbResolver struct {
-	propertySpec map[string]ruleresolver.Field
-	client       graphql.Client
+	propertySpec  map[string]ruleresolver.Field
+	client        graphql.Client
+	effectiveDate time.Time
 }
 
-func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field) *ubbResolver {
+func newUBBResolver(endpoint string, propertySpec map[string]ruleresolver.Field, effectiveDate time.Time) *ubbResolver {
 	return &ubbResolver{
-		client:       graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
-		propertySpec: propertySpec,
+		client:        graphql.NewClient(endpoint+"/gql/grp/v0", http.DefaultClient),
+		propertySpec:  propertySpec,
+		effectiveDate: effectiveDate,
 	}
 
 }
@@ -43,7 +46,7 @@ func (c ubbResolver) do(ctx context.Context, key string, table string, field str
 
 	f := c.propertySpec[key]
 
-	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), time.Now())
+	resp, err := machine.ClaimAttributesByObjectID(ctx, c.client, filters[0].Value.(string), c.effectiveDate)
 	if err != nil {
 		return nil, fmt.Errorf("claim attributes object id: %w", err)
 	}
@@ -72,22 +75,44 @@ func pascalCase(s string) string {
 	return s
 }
 
+func snakeCase(s string) string {
+	var result strings.Builder
+
+	for i, r := range s {
+		if i > 0 {
+			prevRune := rune(s[i-1])
+
+			// Add underscore if:
+			// 1. Current char is uppercase and previous was lowercase
+			// 2. Current char is a digit and previous was a letter
+			// 3. Current char is a letter and previous was a digit
+			if (unicode.IsUpper(r) && unicode.IsLower(prevRune)) ||
+				(unicode.IsDigit(r) && unicode.IsLetter(prevRune)) ||
+				(unicode.IsLetter(r) && unicode.IsDigit(prevRune)) {
+				result.WriteRune('_')
+			}
+		}
+
+		result.WriteRune(unicode.ToLower(r))
+	}
+
+	return result.String()
+}
+
 func solver(
 	logr logger.Logger,
 	table, field string,
 	values []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult,
 	f ruleresolver.Field,
 ) (any, error) {
-
 	for _, value := range values {
-		// logr.Debug("VALUE", logger.NewField("value", value))
-
 		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(field)) ||
-			strings.EqualFold(pascalCase(field), strings.ToLower(value.Name)) {
+			strings.EqualFold(strings.ToLower(value.Name), pascalCase(field)) {
 			return solveField(logr, value, f)
 		}
 
-		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) {
+		if strings.EqualFold(strings.ToLower(value.Name), strings.ToLower(table)) ||
+			strings.EqualFold(strings.ToLower(value.Name), pascalCase(table)) {
 			return solver(logr, table, field, conv(value.Values), f)
 		}
 	}
@@ -102,6 +127,7 @@ func conv(
 
 	for idx := range values {
 		v = append(v, machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResult{
+			Name: values[idx].Key,
 			Values: []machine.ClaimAttributesByObjectIDClaimAttributesByObjectIDSampleResultSubvaluesSampleResultValues{
 				{
 					Key:   values[idx].Key,
@@ -125,12 +151,12 @@ func solveField(
 
 	switch v.Key {
 	case "date":
-		t, err := strconv.Atoi(v.Value)
+		t, err := time.Parse(time.DateOnly, v.Value)
 		if err != nil {
 			return nil, fmt.Errorf("could not parse date: %w", err)
 		}
 
-		x = time.Unix(int64(t), 0)
+		x = t
 	case "eurocent", "amountEurocent":
 		t, err := strconv.Atoi(v.Value)
 		if err != nil {
@@ -144,6 +170,13 @@ func solveField(
 
 	if f.Source != nil && f.Source.TypeSpec != nil {
 		return typespec.Enforce(model.TypeSpec(*f.Source.TypeSpec), x), nil
+	}
+
+	if v, ok := x.(map[string]any); ok {
+		for key, value := range v {
+			// v[snakeCase(key)] = value
+			v[key] = value
+		}
 	}
 
 	return x, nil
