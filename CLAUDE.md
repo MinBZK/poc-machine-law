@@ -25,6 +25,7 @@
 - NEVER amend commits that failed to go through - make new commits instead
 - ALWAYS run `pre-commit run --all-files` BEFORE every commit (hooks don't auto-run in Claude's Bash environment)
 - Always check git status before committing to make sure you're working with the latest changes
+- Install commit-msg hook: `pre-commit install --hook-type commit-msg` (enforces conventional commits)
 
 ## Commit Message Convention (Semantic Versioning)
 
