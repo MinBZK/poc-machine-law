@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.0.4 (2026-01-19)
+
+### Bug Fixes
+
+- Make nest_asyncio lazy to support uvicorn 0.40.0
+  ([#331](https://github.com/MinBZK/poc-machine-law/pull/331),
+  [`df5280b`](https://github.com/MinBZK/poc-machine-law/commit/df5280bd22728aef15e8860a634d329e4af695fb))
+
+### Chores
+
+- Sync VERSION file to 1.0.3
+  ([`d5754f6`](https://github.com/MinBZK/poc-machine-law/commit/d5754f61552bd8009bf5eab36e3212c08fd34dbe))
+
+
 ## v1.0.3 (2026-01-19)
 
 ### Bug Fixes
