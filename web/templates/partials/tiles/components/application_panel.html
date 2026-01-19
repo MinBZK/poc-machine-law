@@ -7,7 +7,7 @@
          x-init="$nextTick(() => { show = true })"
          @click.away="$dispatch('close-panel')"
          @keydown.escape="show = false; $dispatch('close-panel')"
-         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved=false"
+         hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved=false"
          hx-trigger="edit-dialog-closed from:body"
          hx-target="#application-panel"
          hx-swap="innerHTML"
@@ -44,7 +44,7 @@
                             <input type="checkbox"
                                    class="sr-only peer"
                                    {% if request.query_params.get('approved', 'false') == 'false' %}checked{% endif %}
-                                   hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ 'true' if request.query_params.get('approved', 'false') == 'false' else 'false' }}"
+                                   hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ 'true' if request.query_params.get('approved', 'false') == 'false' else 'false' }}"
                                    hx-target="#application-panel"
                                    hx-swap="innerHTML"
                                    hx-trigger="change">
@@ -76,7 +76,7 @@
                          x-transition:leave-start="opacity-100 transform translate-y-0"
                          x-transition:leave-end="opacity-0 transform -translate-y-2"
                          class="mt-4">
-                        <div hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&approved={{ request.query_params.get('approved', 'false') }}"
+                        <div hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}"
                              hx-trigger="intersect once"
                              hx-swap="innerHTML"
                              hx-target="#explanation-content">

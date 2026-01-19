@@ -24,6 +24,7 @@ class FeatureFlags:
         "ADJUSTABLE_EFFECTIVE_DATE": False,  # Adjustable effective date is disabled by default
         "TOTAL_INCOME_WIDGET": False,  # Total income dashboard widget is disabled by default
         "AUTO_APPROVE_CLAIMS": False,  # Auto-approve claims for demos is disabled by default
+        "DELEGATION": False,  # Delegation feature (act on behalf of) is disabled by default
     }
 
     @classmethod
@@ -166,3 +167,8 @@ def is_total_income_widget_enabled() -> bool:
 def is_auto_approve_claims_enabled() -> bool:
     """Check if auto-approval of claims for demos is enabled."""
     return FeatureFlags.is_enabled("AUTO_APPROVE_CLAIMS")
+
+
+def is_delegation_enabled() -> bool:
+    """Check if the delegation feature (act on behalf of) is enabled."""
+    return FeatureFlags.is_enabled("DELEGATION")

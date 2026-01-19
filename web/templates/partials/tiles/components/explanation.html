@@ -20,7 +20,7 @@
                     {% for provider in providers %}
                         <div class="border-t border-gray-100"></div>
                         <a href="#"
-                           hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}&provider={{ provider.name }}"
+                           hx-get="/laws/explanation?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&provider={{ provider.name }}"
                            hx-target="#explanation-panel"
                            hx-swap="outerHTML"
                            hx-indicator="#explanation-loading"

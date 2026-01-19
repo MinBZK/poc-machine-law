@@ -21,11 +21,12 @@ from web.engines.http_engine.machine_client.regel_recht_engine_api_client.errors
 from web.feature_flags import (
     is_change_wizard_enabled,
     is_chat_enabled,
+    is_delegation_enabled,
     is_effective_date_adjustment_enabled,
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
-from web.routers import admin, chat, dashboard, demo, edit, importer, laws, mcp, simulation, wallet
+from web.routers import admin, chat, dashboard, delegation, demo, edit, importer, laws, mcp, simulation, wallet
 
 app = FastAPI(title="RegelRecht")
 
@@ -54,6 +55,7 @@ app.include_router(importer.router)
 app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
+app.include_router(delegation.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="law"))
 # app.mount(
@@ -118,14 +120,51 @@ async def root(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
-    # Get the profile
+    # Parse effective date
     try:
         effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
     except ValueError:
         effective_date = datetime.now()
 
+    # Get delegation context from session FIRST (before loading profile)
+    delegation_context = None
+    delegations = []
+    delegation_manager = None
+    if is_delegation_enabled():
+        from machine.delegation.manager import DelegationManager
+        from web.routers.delegation import DELEGATION_SESSION_KEY
+
+        delegation_manager = DelegationManager(services.get_services())
+
+        session_data = request.session.get(DELEGATION_SESSION_KEY)
+        if session_data:
+            from machine.delegation.models import DelegationContext
+
+            delegation_context = DelegationContext.from_dict(session_data)
+
+            # Clear delegation context if the BSN changed (user switched profiles)
+            if delegation_context.actor_bsn != bsn:
+                del request.session[DELEGATION_SESSION_KEY]
+                delegation_context = None
+
+        # Get available delegations for the user
+        try:
+            delegations = delegation_manager.get_delegations_for_user(bsn)
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to get delegations for user {bsn}: {e}")
+
+    # Determine effective BSN for data fetching
+    # When acting on behalf of a CITIZEN (child), use the child's BSN
+    effective_bsn = bsn
+    if delegation_context and delegation_context.subject_type == "CITIZEN":
+        effective_bsn = delegation_context.subject_id
+
+    # Get the profile using effective BSN
     try:
-        profile = services.get_profile_data(bsn, effective_date=effective_date.date())
+        profile = services.get_profile_data(effective_bsn, effective_date=effective_date.date())
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
     except UnexpectedStatus as e:
@@ -168,19 +207,60 @@ async def root(
             status_code=500,
         )
 
-    # Get accepted cases for this BSN
-    all_cases = case_manager.get_cases_by_bsn(bsn)
+    # Fetch business profile if acting on behalf of a business
+    business_profile = None
+    if delegation_context and delegation_context.subject_type == "BUSINESS":
+        try:
+            business_profile = services.get_business_profile(delegation_context.subject_id)
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to get business profile for KVK {delegation_context.subject_id}: {e}")
+
+    # Get accepted cases for the effective BSN
+    all_cases = case_manager.get_cases_by_bsn(effective_bsn)
     accepted_cases = [case for case in all_cases if case.status.value == "DECIDED" and case.approved is True]
 
     # Build accepted_claims: {key: new_value} for claims belonging to accepted cases only
     accepted_claims = {}
     for case in accepted_cases:
         claims = claim_manager.get_claim_by_bsn_service_law(
-            bsn, case.service, case.law, approved=False
+            effective_bsn, case.service, case.law, approved=False
         )  # IMPROVE: use approved=True?
         if claims:
             for key, claim in claims.items():
                 accepted_claims[key] = claim.new_value
+
+    # Determine discoverable type based on delegation context
+    discoverable_by = "CITIZEN"
+    if delegation_context and delegation_context.subject_type == "BUSINESS":
+        discoverable_by = "BUSINESS"
+
+    # Determine user permissions (only when delegation is enabled)
+    # Default: full permissions
+    user_permissions = ["LEZEN", "CLAIMS_INDIENEN", "BESLUITEN_ONTVANGEN"]
+    can_submit_claims = True
+
+    if is_delegation_enabled() and delegation_manager:
+        if delegation_context:
+            # When acting on behalf of someone, use delegation permissions
+            # Note: Use explicit None check to avoid empty list being falsy
+            user_permissions = (
+                delegation_context.permissions if delegation_context.permissions is not None else user_permissions
+            )
+        else:
+            # When acting as yourself, get permissions from SELF delegation
+            try:
+                user_permissions = delegation_manager.get_user_permissions(effective_bsn, effective_date.date())
+            except Exception as e:
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Failed to get user permissions for {effective_bsn}: {e}")
+
+        # Check if user can submit claims
+        can_submit_claims = "CLAIMS_INDIENEN" in user_permissions
 
     return templates.TemplateResponse(
         "index.html",
@@ -188,16 +268,25 @@ async def root(
             "request": request,
             "profile": profile,
             "bsn": bsn,
+            "effective_bsn": effective_bsn,
             "all_profiles": services.get_all_profiles(),
-            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(bsn),
+            "discoverable_service_laws": services.get_sorted_discoverable_service_laws(
+                effective_bsn, discoverable_by=discoverable_by
+            ),
             "wallet_enabled": is_wallet_enabled(),
             "chat_enabled": is_chat_enabled(),
             "change_wizard_enabled": is_change_wizard_enabled(),
             "adjustable_effective_date_enabled": is_effective_date_adjustment_enabled(),
             "total_income_widget_enabled": is_total_income_widget_enabled(),
+            "delegation_enabled": is_delegation_enabled(),
+            "delegation_context": delegation_context,
+            "delegations": delegations,
             "accepted_claims": accepted_claims,
             "now": datetime.now(),
             "effective_date": effective_date,  # Pass the parsed date parameter to the template
+            "user_permissions": user_permissions,
+            "can_submit_claims": can_submit_claims,
+            "business_profile": business_profile,
         },
     )
 

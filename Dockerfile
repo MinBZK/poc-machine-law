@@ -1,7 +1,6 @@
 ## Build Stage 1: build the SvelteKit app
 FROM node:24-alpine3.21 AS node_builder
 
-# Install corepack and pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy and build analysis/laws

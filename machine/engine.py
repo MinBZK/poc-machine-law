@@ -274,6 +274,9 @@ class RulesEngine:
                 raw_result = self._evaluate_operation(action, context)
             elif "value" in action:
                 raw_result = self._evaluate_value(action["value"], context)
+            elif "subject" in action:
+                # Direct subject assignment (e.g., subject: "$SOURCE.field")
+                raw_result = self._evaluate_value(action["subject"], context)
             else:
                 raw_result = None
 
@@ -406,19 +409,37 @@ class RulesEngine:
             for item in array_data:
                 with logger.indent_block(f"Item {item}"):
                     item_context = copy(context)
+                    # Create a new local dict to avoid polluting the parent context
+                    item_context.local = dict(context.local)
                     if isinstance(item, dict):
                         item_context.local.update(item)
+                    # Add 'current' as an alias that always refers to the current item
+                    item_context.local["current"] = item
+                    # Also set current_N for nested FOREACH compatibility
                     for i in range(100):
                         if f"current_{i}" not in item_context.local:
                             item_context.local[f"current_{i}"] = item
                             break
+
+                    # Check where clause if present - skip item if condition is not met
+                    if "where" in operation:
+                        where_result = self._evaluate_value(operation["where"], item_context)
+                        if not where_result:
+                            logger.debug(f"Skipping item due to where clause: {item}")
+                            continue
+
                     value_to_evaluate = (
                         operation["value"][0] if isinstance(operation["value"], list) else operation["value"]
                     )
                     result = self._evaluate_value(value_to_evaluate, item_context)
                     context.missing_required = context.missing_required or item_context.missing_required
                     context.path = item_context.path
-                    values.extend(result if isinstance(result, list) else [result])
+                    # When combine is specified, flatten results for aggregation
+                    # When combine is not specified, keep results as separate items (supports nested arrays)
+                    if combine:
+                        values.extend(result if isinstance(result, list) else [result])
+                    else:
+                        values.append(result)
             logger.debug(f"Foreach values: {values}")
             result = self._evaluate_aggregate_ops(combine, values) if combine else values
             logger.debug(f"Foreach result: {result}")
@@ -640,9 +661,12 @@ class RulesEngine:
                 subject = self._evaluate_value(operation["subject"], context)
                 allowed_values = self._evaluate_value(operation.get("values", []), context)
 
-                result = subject in (
-                    allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
-                )
+                # Ensure allowed_values is a list/set for membership testing
+                allowed_set = allowed_values if isinstance(allowed_values, list | dict | set) else [allowed_values]
+
+                # If subject is a list, check if ANY element is in allowed_values
+                result = any(s in allowed_set for s in subject) if isinstance(subject, list) else subject in allowed_set
+
                 if op_type == "NOT_IN":
                     result = not result
 
@@ -660,6 +684,18 @@ class RulesEngine:
             result = subject is None
             node.details["subject_value"] = subject
             logger.debug(f"IS_NULL result: {result}")
+
+        elif op_type == "EXISTS":
+            subject = self._evaluate_value(operation["subject"], context)
+            # EXISTS returns True if subject is not None and not empty
+            if subject is None:
+                result = False
+            elif isinstance(subject, list | tuple | dict) or hasattr(subject, "__len__"):
+                result = len(subject) > 0
+            else:
+                result = bool(subject)
+            node.details["subject_value"] = subject
+            logger.debug(f"EXISTS result: {result}")
 
         elif op_type == "AND":
             with logger.indent_block("AND"):
@@ -687,6 +723,21 @@ class RulesEngine:
                 result = any(bool(v) for v in values)
             node.details["evaluated_values"] = values
             logger.debug(f"Result {list(values)} OR: {result}")
+
+        elif op_type == "COALESCE":
+            # Returns the first non-null value from the list (lazy evaluation)
+            with logger.indent_block("COALESCE"):
+                result = None
+                evaluated_values = []
+                for v in operation["values"]:
+                    r = self._evaluate_value(v, context)
+                    evaluated_values.append(r)
+                    if r is not None:
+                        result = r
+                        logger.debug(f"Non-null value found in COALESCE: {r}")
+                        break
+            node.details["evaluated_values"] = evaluated_values
+            logger.debug(f"COALESCE result: {result}")
 
         elif "_DATE" in op_type:
             values = [self._evaluate_value(v, context) for v in operation["values"]]
