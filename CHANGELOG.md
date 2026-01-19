@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.0.3 (2026-01-19)
+
+### Bug Fixes
+
+- Update dependencies to address security vulnerabilities
+  ([#330](https://github.com/MinBZK/poc-machine-law/pull/330),
+  [`bea80ee`](https://github.com/MinBZK/poc-machine-law/commit/bea80ee23a5c0091b19333599251d4850a43836d))
+
+### Chores
+
+- Sync VERSION file to 1.0.2
+  ([`6b35d3d`](https://github.com/MinBZK/poc-machine-law/commit/6b35d3d92f1fe160f852b16f50d8719f15a2c262))
+
+
 ## v1.0.2 (2026-01-19)
 
 ### Bug Fixes
