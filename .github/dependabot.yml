@@ -1,10 +1,99 @@
 version: 2
 updates:
+  # Docker
   - package-ecosystem: docker
     directory: "/"
     schedule:
       interval: weekly
+
+  # GitHub Actions
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # Python (uv)
+  - package-ecosystem: uv
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      python-minor-patch:
+        update-types:
+          - minor
+          - patch
+
+  # Go modules
+  - package-ecosystem: gomod
+    directory: "/features"
+    schedule:
+      interval: weekly
+    groups:
+      go-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: gomod
+    directory: "/lac-to-regelspraak"
+    schedule:
+      interval: weekly
+    groups:
+      go-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: gomod
+    directory: "/machinev2/backend"
+    schedule:
+      interval: weekly
+    groups:
+      go-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: gomod
+    directory: "/machinev2/machine"
+    schedule:
+      interval: weekly
+    groups:
+      go-deps:
+        patterns:
+          - "*"
+  - package-ecosystem: gomod
+    directory: "/simulator"
+    schedule:
+      interval: weekly
+    groups:
+      go-deps:
+        patterns:
+          - "*"
+
+  # npm/pnpm for frontend apps
+  - package-ecosystem: npm
+    directory: "/analysis/graph"
+    schedule:
+      interval: weekly
+    groups:
+      npm-minor-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: npm
+    directory: "/analysis/laws"
+    schedule:
+      interval: weekly
+    groups:
+      npm-minor-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: npm
+    directory: "/importer"
+    schedule:
+      interval: weekly
+    groups:
+      npm-minor-patch:
+        update-types:
+          - minor
+          - patch
