@@ -96,6 +96,7 @@ async def get_edit_form(
             "value": parsed_value,
             "law": law,
             "bsn": bsn,
+            "claimant": bsn,  # Use BSN as the claimant
             "show_approve": show_approve,
             "claim_data": claim_data,
             "details": parsed_details,
