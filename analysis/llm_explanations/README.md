@@ -1,6 +1,6 @@
-# Scripts
+# LLM Explanations Research
 
-This directory contains utility scripts for the machine-law project.
+This directory contains tools for research on LLM-generated explanations of machine law decisions.
 
 ## extract_explanations.py
 
@@ -21,42 +21,42 @@ cd /path/to/machine-law
 export ANTHROPIC_API_KEY="your-key-here"
 
 # Run extraction for all profiles and laws
-uv run python script/extract_explanations.py
+uv run python analysis/llm_explanations/extract_explanations.py
 ```
 
 ### Usage Examples
 
 ```bash
 # List available profiles (no API key needed)
-uv run python script/extract_explanations.py --list-profiles
+uv run python analysis/llm_explanations/extract_explanations.py --list-profiles
 
 # List available laws (no API key needed for listing)
-uv run python script/extract_explanations.py --list-laws
+uv run python analysis/llm_explanations/extract_explanations.py --list-laws
 
 # Extract all combinations (uses Claude Haiku 4.5 by default - fast & cheap)
-uv run python script/extract_explanations.py
+uv run python analysis/llm_explanations/extract_explanations.py
 
 # Use a different model
-uv run python script/extract_explanations.py --model sonnet  # More capable
-uv run python script/extract_explanations.py --model opus    # Most capable
+uv run python analysis/llm_explanations/extract_explanations.py --model sonnet  # More capable
+uv run python analysis/llm_explanations/extract_explanations.py --model opus    # Most capable
 
 # Extract explanations for specific laws only
-uv run python script/extract_explanations.py --laws zorgtoeslag huurtoeslag
+uv run python analysis/llm_explanations/extract_explanations.py --laws zorgtoeslag huurtoeslag
 
 # Extract for specific profiles (BSN numbers)
-uv run python script/extract_explanations.py --profiles 100000001 100000002
+uv run python analysis/llm_explanations/extract_explanations.py --profiles 100000001 100000002
 
 # Combine filters
-uv run python script/extract_explanations.py --laws zorgtoeslag --profiles 100000001
+uv run python analysis/llm_explanations/extract_explanations.py --laws zorgtoeslag --profiles 100000001
 
 # Save to a specific output file
-uv run python script/extract_explanations.py --output research_data.jsonl
+uv run python analysis/llm_explanations/extract_explanations.py --output research_data.jsonl
 
 # Quiet mode (less verbose output)
-uv run python script/extract_explanations.py --quiet
+uv run python analysis/llm_explanations/extract_explanations.py --quiet
 
 # Pass API key as argument instead of environment variable
-uv run python script/extract_explanations.py --api-key "sk-ant-..."
+uv run python analysis/llm_explanations/extract_explanations.py --api-key "sk-ant-..."
 ```
 
 ### Model Selection

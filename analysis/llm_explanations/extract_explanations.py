@@ -13,16 +13,16 @@ Output format:
 Usage (run from project root):
     # With Anthropic API key:
     export ANTHROPIC_API_KEY="your-key-here"
-    uv run python script/extract_explanations.py
+    uv run python analysis/llm_explanations/extract_explanations.py
 
     # Or pass key as argument:
-    uv run python script/extract_explanations.py --api-key "your-key-here"
+    uv run python analysis/llm_explanations/extract_explanations.py --api-key "your-key-here"
 
     # Limit to specific laws or profiles:
-    uv run python script/extract_explanations.py --laws zorgtoeslag huurtoeslag --profiles 100000001
+    uv run python analysis/llm_explanations/extract_explanations.py --laws zorgtoeslag huurtoeslag --profiles 100000001
 
     # Save to specific output file:
-    uv run python script/extract_explanations.py --output my_explanations.jsonl
+    uv run python analysis/llm_explanations/extract_explanations.py --output my_explanations.jsonl
 """
 
 import argparse
@@ -34,7 +34,8 @@ from datetime import datetime
 from pathlib import Path
 
 # Add project root and web directory to path for proper imports
-PROJECT_ROOT = Path(__file__).parent.parent
+# From analysis/llm_explanations/ we need to go up two levels
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "web"))
 
@@ -131,13 +132,13 @@ def create_explanation_prompt(service_name: str, result: dict, profile: dict, bs
     prompt = f"""Ik heb zojuist een berekening uitgevoerd voor de regeling '{service_name}'.
 
 Burgerprofiel:
-- Naam: {profile.get('name', 'Onbekend')}
-- Beschrijving: {profile.get('description', 'Geen beschrijving')}
+- Naam: {profile.get("name", "Onbekend")}
+- Beschrijving: {profile.get("description", "Geen beschrijving")}
 - BSN: {bsn}
 
 Resultaat van de berekening:
-- Voldoet aan voorwaarden: {'Ja' if requirements_met else 'Nee'}
-- Ontbrekende essentiële gegevens: {'Ja' if missing_required else 'Nee'}
+- Voldoet aan voorwaarden: {"Ja" if requirements_met else "Nee"}
+- Ontbrekende essentiële gegevens: {"Ja" if missing_required else "Nee"}
 - Uitkomst: {json.dumps(output, indent=2, ensure_ascii=False)}
 
 Korte uitleg van het systeem: {explanation}
@@ -226,9 +227,8 @@ def extract_explanations(
     client = anthropic.Anthropic(api_key=actual_api_key)
 
     # Import after setting up environment
-    from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service
-
     from explain.mcp_connector import MCPLawConnector
+    from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_machine_service
 
     # Initialize services
     if verbose:
@@ -425,7 +425,7 @@ def extract_explanations(
             1 for r in results if (r.get("calculation_result") or {}).get("requirements_met") is True
         )
 
-        print(f"\nStatistics:")
+        print("\nStatistics:")
         print(f"  Successful explanations: {successful}")
         print(f"  Errors: {errors}")
         print(f"  Requirements met: {met_requirements}/{successful}")
@@ -440,23 +440,23 @@ def main():
         epilog="""
 Examples:
     # Extract all combinations (uses haiku by default):
-    uv run python script/extract_explanations.py
+    uv run python analysis/llm_explanations/extract_explanations.py
 
     # Use a different model:
-    uv run python script/extract_explanations.py --model sonnet
-    uv run python script/extract_explanations.py --model opus
+    uv run python analysis/llm_explanations/extract_explanations.py --model sonnet
+    uv run python analysis/llm_explanations/extract_explanations.py --model opus
 
     # Extract specific laws only:
-    uv run python script/extract_explanations.py --laws zorgtoeslag huurtoeslag
+    uv run python analysis/llm_explanations/extract_explanations.py --laws zorgtoeslag huurtoeslag
 
     # Extract for specific profiles:
-    uv run python script/extract_explanations.py --profiles 100000001 100000002
+    uv run python analysis/llm_explanations/extract_explanations.py --profiles 100000001 100000002
 
     # Save to specific file:
-    uv run python script/extract_explanations.py --output my_results.jsonl
+    uv run python analysis/llm_explanations/extract_explanations.py --output my_results.jsonl
 
     # Quiet mode (less output):
-    uv run python script/extract_explanations.py --quiet
+    uv run python analysis/llm_explanations/extract_explanations.py --quiet
 """,
     )
 
@@ -490,9 +490,8 @@ Examples:
             if args.api_key:
                 os.environ["ANTHROPIC_API_KEY"] = args.api_key
 
-            from web.dependencies import get_case_manager, get_claim_manager, get_machine_service
-
             from explain.mcp_connector import MCPLawConnector
+            from web.dependencies import get_case_manager, get_claim_manager, get_machine_service
 
             services = get_machine_service()
             case_manager = get_case_manager()
