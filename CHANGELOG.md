@@ -2,6 +2,46 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-01-20)
+
+### Bug Fixes
+
+- Update kernenergiewet feature tests to pass all parameters directly
+  ([#212](https://github.com/MinBZK/poc-machine-law/pull/212),
+  [`bcbf50b`](https://github.com/MinBZK/poc-machine-law/commit/bcbf50bae1db671ea5df734def7d1b4b63730c5f))
+
+### Chores
+
+- Sync VERSION file to 1.1.2
+  ([`54bd240`](https://github.com/MinBZK/poc-machine-law/commit/54bd2403adea4a5abbcef51df404f90ce4ffcd37))
+
+- Update regelrecht-laws submodule ([#212](https://github.com/MinBZK/poc-machine-law/pull/212),
+  [`bcbf50b`](https://github.com/MinBZK/poc-machine-law/commit/bcbf50bae1db671ea5df734def7d1b4b63730c5f))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#338](https://github.com/MinBZK/poc-machine-law/pull/338),
+  [`4aaed6b`](https://github.com/MinBZK/poc-machine-law/commit/4aaed6bbafdeee1a57e5381792da088ea01022a8))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#337](https://github.com/MinBZK/poc-machine-law/pull/337),
+  [`872e840`](https://github.com/MinBZK/poc-machine-law/commit/872e8401115dbed5249506beef59ddd5f8fcdeea))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#336](https://github.com/MinBZK/poc-machine-law/pull/336),
+  [`4f96357`](https://github.com/MinBZK/poc-machine-law/commit/4f9635713442372d5cd12dbc9a62ce035e559196))
+
+### Documentation
+
+- Add RFC process and rules language selection RFC
+  ([`7463233`](https://github.com/MinBZK/poc-machine-law/commit/74632338802cf8c61f68e6f36de7a03103c905ea))
+
+### Features
+
+- Add Kernenergiewet test scenarios and generic step definitions
+  ([#212](https://github.com/MinBZK/poc-machine-law/pull/212),
+  [`bcbf50b`](https://github.com/MinBZK/poc-machine-law/commit/bcbf50bae1db671ea5df734def7d1b4b63730c5f))
+
+
 ## v1.1.2 (2026-01-20)
 
 ### Bug Fixes
