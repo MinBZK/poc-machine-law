@@ -13,9 +13,24 @@ from .events.case.processor import CaseProcessor
 from .events.claim.application import ClaimManager
 from .events.claim.processor import ClaimProcessor
 from .logging_config import IndentLogger
+from .nrml.rules_engine import NrmlRulesEngine
 from .utils import RuleResolver
 
 logger = IndentLogger(logging.getLogger("service"))
+
+
+class EngineFactory:
+    """Factory class for creating RulesEngine instances"""
+
+    @staticmethod
+    def create_engine(spec: dict, service_provider: Any) -> RulesEngine | NrmlRulesEngine:
+        """Create a RulesEngine instance with the given specification and service provider"""
+
+        # TODO: For now the existence of a schema means we are dealing with a JSON (NRML) file. Find a more direct way to determine this
+        if spec.get("$schema"):
+            return NrmlRulesEngine(spec=spec, service_provider=service_provider)
+        else:
+            return RulesEngine(spec=spec, service_provider=service_provider)
 
 
 @dataclass
@@ -80,11 +95,14 @@ class RuleService:
             spec = self.resolver.get_rule_spec(law, reference_date, service=self.service_name)
             if not spec:
                 raise ValueError(f"No rules found for law '{law}' at date '{reference_date}'")
-            if spec.get("service") != self.service_name:
+
+            # Service is not part of the NRML spec, lets see if we can do without.
+            if self.service_name != "NRML" and spec.get("service") != self.service_name:
                 raise ValueError(
                     f"Rule spec service '{spec.get('service')}' does not match service '{self.service_name}'"
                 )
-            engine = RulesEngine(spec=spec, service_provider=self.services)
+
+            engine = EngineFactory.create_engine(spec=spec, service_provider=self.services)
             self._engines[law][reference_date] = engine
             engines_cache[cache_key] = engine
 
@@ -373,6 +391,9 @@ class Services:
     def set_source_dataframe(self, service: str, table: str, df: pd.DataFrame) -> None:
         """Set a source DataFrame for a service"""
         self.services[service].set_source_dataframe(table, df)
+        # TODO: NRML is not a service on a specific domain, but for a specific rule system.
+        #  this might make the services with specific context obsolete
+        self.services["NRML"].set_source_dataframe(table, df)
 
     def get_law(self, service: str, law: str, reference_date: str | None = None) -> dict[str, Any] | None:
         """Get the law specification for a given service and law.

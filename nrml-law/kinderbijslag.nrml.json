@@ -1,0 +1,552 @@
+
+{
+  "$schema": "https://example.com/toka-corrected-schema.json",
+  "version": "1.0",
+  "language": "nl",
+  "metadata": {
+    "version": "1.0",
+    "language": "nl",
+    "created": "2025-01-09",
+    "description": "kinderbijslag_nrml",
+    "legal_basis": "Algemene Kinderbijslagwet"
+  },
+  "inputs": {
+    "kinderen" : {
+      "target": {
+        "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+      }
+    }
+  },
+  "outputs": {
+    "aantal_jonge_kinderen": {
+      "source": {
+        "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/1100dac1-6d75-498a-b5db-6b4faacf77b0"
+      }
+    }
+  },
+  "facts": {
+    "43d7495f-da13-4bbf-a485-676cbfe7cedc": {
+      "name": {
+        "nl": "aanvrager",
+        "en": "applicant"
+      },
+      "definite_article": {
+        "nl": "de",
+        "en": "the"
+      },
+      "animated": true,
+      "items": {
+        "47b9bf9b-e998-421a-8725-3e2335c9c234": {
+          "name": {
+            "nl": "kind",
+            "en": "child"
+          },
+          "article": {
+            "nl": "een",
+            "en": "a"
+          },
+          "plural": {
+            "nl": "kinderen",
+            "en": "children"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "arguments": [
+                {
+                  "uuid": "f226fee4-93e6-4dfc-910e-922183a6dc29",
+                  "name": {
+                    "nl": "ouder",
+                    "en": "parent"
+                  },
+                  "cardinality": "one",
+                  "objectType": {
+                    "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                  }
+                },
+                {
+                  "uuid": "47b9bf9b-e998-421a-8725-3e2335c9c234",
+                  "name": {
+                    "nl": "kind",
+                    "en": "child"
+                  },
+                  "plural": {
+                    "nl": "kinderen",
+                    "en": "children"
+                  },
+                  "cardinality": "many",
+                  "objectType": {
+                    "$ref": "#/facts/01290a59-b6d1-4caa-9d51-f53e632ac36f"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "01290a59-b6d1-4caa-9d51-f53e632ac36f": {
+      "name": {
+        "nl": "kind",
+        "en": "child"
+      },
+      "definite_article": {
+        "nl": "het",
+        "en": "the"
+      },
+      "animated": true,
+      "items": {
+        "0fe3c5a2-a33a-4a98-9abc-a98929783499": {
+          "name": {
+            "nl": "leeftijd",
+            "en": "age"
+          },
+          "article": {
+            "nl": "de",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "integer",
+              "unit": "jaar"
+            }
+          ]
+        },
+        "14b7e607-8eee-496d-a7d8-faeb0cdd5332": {
+          "name": {
+            "nl": "kinderbijslag bedrag",
+            "en": "child benefit amount"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "decimal",
+              "unit": "€",
+              "precision": 2
+            }
+          ]
+        }
+      }
+    },
+    "28b83711-2080-469f-be02-ae8f963affb9": {
+      "name": {
+        "nl": "berekening",
+        "en": "calculation"
+      },
+      "definite_article": {
+        "nl": "de",
+        "en": "the"
+      },
+      "animated": false,
+      "items": {
+        "49922b15-650f-40e5-bc55-5b42f3cf1940": {
+          "name": {
+            "nl": "bedrag per jong kind",
+            "en": "amount per young child"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "decimal",
+              "unit": "€",
+              "precision": 2
+            },
+            {
+              "validFrom": "2018",
+              "target": [
+                {
+                  "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/49922b15-650f-40e5-bc55-5b42f3cf1940"
+                }
+              ],
+              "value": {
+                "value": 250.5,
+                "unit": "€"
+              }
+            }
+          ]
+        },
+        "3e06fe6f-adaa-40c1-822e-8a9fb3438250": {
+          "name": {
+            "nl": "bedrag per oud kind",
+            "en": "amount per old child"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "decimal",
+              "unit": "€",
+              "precision": 2
+            },
+            {
+              "validFrom": "2018",
+              "target": [
+                {
+                  "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/3e06fe6f-adaa-40c1-822e-8a9fb3438250"
+                }
+              ],
+              "value": {
+                "value": 300.75,
+                "unit": "€"
+              }
+            }
+          ]
+        },
+        "1100dac1-6d75-498a-b5db-6b4faacf77b0": {
+          "name": {
+            "nl": "aantal jongere kinderen",
+            "en": "number of younger children"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "integer",
+              "target": [
+                {
+                  "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                },
+                {
+                  "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/1100dac1-6d75-498a-b5db-6b4faacf77b0"
+                }
+              ],
+              "expression": {
+            "type": "aggregation",
+                "function": "count",
+                "expression": [
+                  {
+                    "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+                  }
+                ],
+                "condition": {
+                  "type": "comparison",
+                  "operator": "lessThanOrEqual",
+                  "arguments": [
+                    [
+                      {
+                        "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+                      },
+                      {
+                        "$ref": "#/facts/01290a59-b6d1-4caa-9d51-f53e632ac36f/items/0fe3c5a2-a33a-4a98-9abc-a98929783499"
+                      }
+                    ],
+                    {
+                      "value": 10
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "067f3bb2-1f8b-47ef-bcdb-957a2b42c13e": {
+          "name": {
+            "nl": "aantal oudere kinderen",
+            "en": "number of older children"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "integer",
+              "target": [
+                {
+                  "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                },
+                {
+                  "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/067f3bb2-1f8b-47ef-bcdb-957a2b42c13e"
+                }
+              ],
+              "expression": {
+                "type": "aggregation",
+                "function": "count",
+                "expression": [
+                  {
+                    "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+                  }
+                ],
+                "condition": {
+                  "type": "allOf",
+                  "conditions": [
+                    {
+                      "type": "comparison",
+                      "operator": "greaterThan",
+                      "arguments": [
+                        [
+                          {
+                            "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+                          },
+                          {
+                            "$ref": "#/facts/01290a59-b6d1-4caa-9d51-f53e632ac36f/items/0fe3c5a2-a33a-4a98-9abc-a98929783499"
+                          }
+                        ],
+                        {
+                          "value": 10
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comparison",
+                      "operator": "lessThanOrEqual",
+                      "arguments": [
+                        [
+                          {
+                            "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+                          },
+                          {
+                            "$ref": "#/facts/01290a59-b6d1-4caa-9d51-f53e632ac36f/items/0fe3c5a2-a33a-4a98-9abc-a98929783499"
+                          }
+                        ],
+                        {
+                          "value": 18
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "f9bf5ac5-9112-4d6d-b857-cbc8283c683e": {
+          "name": {
+            "nl": "totaal kinderbijslag bedrag",
+            "en": "total child benefit amount"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "decimal",
+              "unit": "€",
+              "precision": 2
+            },
+            {
+              "validFrom": "2018",
+              "target": [
+                {
+                  "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                },
+                {
+                  "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/f9bf5ac5-9112-4d6d-b857-cbc8283c683e"
+                }
+              ],
+              "expression": {
+                "type": "arithmetic",
+                "operator": "add",
+                "arguments": [
+                  {
+                    "type": "arithmetic",
+                    "operator": "multiply",
+                    "arguments": [
+                      [
+                        {
+                          "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                        },
+                        {
+                          "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/1100dac1-6d75-498a-b5db-6b4faacf77b0"
+                        }
+                      ],
+                      [
+                        {
+                          "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/49922b15-650f-40e5-bc55-5b42f3cf1940"
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "type": "arithmetic",
+                    "operator": "multiply",
+                    "arguments": [
+                      [
+                        {
+                          "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                        },
+                        {
+                          "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/067f3bb2-1f8b-47ef-bcdb-957a2b42c13e"
+                        }
+                      ],
+                      [
+                        {
+                          "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/3e06fe6f-adaa-40c1-822e-8a9fb3438250"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "15830980-b159-4d51-88e2-db582a85895f": {
+      "name": {
+        "nl": "proces",
+        "en": "process"
+      },
+      "definite_article": {
+        "nl": "het",
+        "en": "the"
+      },
+      "animated": false,
+      "items": {
+        "db91fdf3-8c8d-44a8-987d-02e8bffc39e5": {
+          "name": {
+            "nl": "brief versturen",
+            "en": "send letter"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "boolean"
+            },
+            {
+              "validFrom": "2018",
+              "target": [
+                {
+                  "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                },
+                {
+                  "$ref": "#/facts/15830980-b159-4d51-88e2-db582a85895f/items/db91fdf3-8c8d-44a8-987d-02e8bffc39e5"
+                }
+              ],
+              "value": {
+                "value": true
+              },
+              "condition": {
+                "type": "comparison",
+                "operator": "greaterThan",
+                "arguments": [
+                  [
+                    {
+                      "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                    },
+                    {
+                      "$ref": "#/facts/28b83711-2080-469f-be02-ae8f963affb9/items/f9bf5ac5-9112-4d6d-b857-cbc8283c683e"
+                    }
+                  ],
+                  {
+                    "value": 0
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "ded72b17-170c-405f-856b-d8a6119bec95": {
+          "name": {
+            "nl": "aantal kinderen",
+            "en": "number of children"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "numeric",
+              "subtype": "integer",
+              "target": [
+                {
+                  "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                },
+                {
+                  "$ref": "#/facts/15830980-b159-4d51-88e2-db582a85895f/items/ded72b17-170c-405f-856b-d8a6119bec95"
+                }
+              ],
+              "expression": {
+                "type": "aggregation",
+                "function": "count",
+                "expression": [
+                  {
+                    "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc/items/47b9bf9b-e998-421a-8725-3e2335c9c234"
+                  }
+                ],
+                "default": {
+                  "value": 0
+                }
+              }
+            }
+          ]
+        },
+        "4e15747a-9238-4462-82a5-548a03cc8c61": {
+          "name": {
+            "nl": "risico alarm",
+            "en": "risk alarm"
+          },
+          "article": {
+            "nl": "het",
+            "en": "the"
+          },
+          "versions": [
+            {
+              "validFrom": "2018",
+              "type": "boolean"
+            },
+            {
+              "validFrom": "2018",
+              "target": [
+                {
+                  "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                },
+                {
+                  "$ref": "#/facts/15830980-b159-4d51-88e2-db582a85895f/items/4e15747a-9238-4462-82a5-548a03cc8c61"
+                }
+              ],
+              "value": {
+                "value": true
+              },
+              "condition": {
+                "type": "comparison",
+                "operator": "greaterThan",
+                "arguments": [
+                  [
+                    {
+                      "$ref": "#/facts/43d7495f-da13-4bbf-a485-676cbfe7cedc"
+                    },
+                    {
+                      "$ref": "#/facts/15830980-b159-4d51-88e2-db582a85895f/items/ded72b17-170c-405f-856b-d8a6119bec95"
+                    }
+                  ],
+                  {
+                    "value": 6
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

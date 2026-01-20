@@ -1,0 +1,126 @@
+{
+  "version": "3.0",
+  "language": "nl",
+  "metadata": {"description": "test_count_expression"},
+  "inputs": {
+    "kinderen": {"type": {"$ref": "#/facts/child"}, "properties": {"age": "#/facts/child/items/age"}},
+    "aanvrager": {"type": {"$ref": "#/facts/applicant"}}
+  },
+  "outputs": {
+    "young_children_count": {"source": {"$ref": "#/facts/calculated/items/young_children_count"}}
+  },
+  "facts": {
+    "applicant": {
+      "name": {"nl": "aanvrager", "en": "applicant"},
+      "definite_article": {"nl": "de", "en": "the"},
+      "items": {}
+    },
+    "child": {
+      "name": {"nl": "kind", "en": "child"},
+      "definite_article": {"nl": "het", "en": "the"},
+      "items": {
+        "age": {
+          "name": {"nl": "leeftijd", "en": "age"},
+          "article": {"nl": "de", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "numeric",
+              "subtype": "integer",
+              "unit": "jaar"
+            }
+          ]
+        }
+      }
+    },
+    "kinderen_van": {
+      "name": {"nl": "kinderen van", "en": "children of"},
+      "definite_article": {"nl": "de", "en": "the"},
+      "items": {
+        "relatie_definitie": {
+          "name": {"nl": "kind", "en": "child"},
+          "article": {"nl": "een", "en": "a"},
+          "plural": {"nl": "kinderen", "en": "children"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "arguments": [
+                {
+                  "uuid": "parent-arg",
+                  "name": {"nl": "ouder", "en": "parent"},
+                  "cardinality": "one",
+                  "objectType": {"$ref": "#/facts/applicant"}
+                },
+                {
+                  "uuid": "child-arg",
+                  "name": {"nl": "kind", "en": "child"},
+                  "plural": {"nl": "kinderen", "en": "children"},
+                  "cardinality": "many",
+                  "objectType": {"$ref": "#/facts/child"}
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "constants": {
+      "name": {
+        "nl": "Constanten"
+      },
+      "items": {
+        "max-leeftijd-value": {
+          "name": {
+            "nl": "Maximum leeftijd"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "type": "number",
+              "value": 10
+            }
+          ]
+        }
+      }
+    },
+    "calculated": {
+      "name": {"nl": "berekend", "en": "calculated"},
+      "definite_article": {"nl": "het", "en": "the"},
+      "items": {
+        "young_children_count": {
+          "name": {"nl": "aantal jongere kinderen", "en": "number of younger children"},
+          "article": {"nl": "het", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "numeric",
+              "subtype": "integer",
+              "target": [
+                {"$ref": "#/facts/applicant"},
+                {"$ref": "#/facts/calculated/items/young_children_count"}
+              ],
+              "expression": {
+                "type": "aggregation",
+                "function": "count",
+                "expression": [
+                  {"$ref": "#/facts/kinderen_van/items/relatie_definitie"}
+                ],
+                "condition": {
+                  "type": "comparison",
+                  "operator": "lessThanOrEqual",
+                  "arguments": [
+                    [
+                      {"$ref": "#/facts/child"},
+                      {"$ref": "#/facts/child/items/age"}
+                    ],
+                    {"$ref": "#/facts/constants/items/max-leeftijd-value"}
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
