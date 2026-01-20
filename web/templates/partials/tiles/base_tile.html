@@ -40,7 +40,7 @@
                     {% if not current_case %}
                         {% block submit_button %}
                             {% if can_submit_claims|default(true) %}
-                                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=application"
                                         hx-target="#shared-application-panel"
                                         hx-swap="innerHTML"
                                         class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
@@ -154,7 +154,7 @@
                         Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.
                     </p>
                     {% if can_submit_claims|default(true) %}
-                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=application"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
                                 class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
@@ -189,7 +189,7 @@
                     <div class="flex items-center">
                         <h4 class="text-sm font-medium text-gray-500 mb-1">
                             U komt waarschijnlijk niet in aanmerking
-                            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=explanation"
+                            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=explanation"
                                     hx-target="#shared-application-panel"
                                     hx-swap="innerHTML"
                                     class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
@@ -205,7 +205,7 @@
                         een aanvraag indienen.
                     </p>
                     {% if can_submit_claims|default(true) %}
-                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=application"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
                                 class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">

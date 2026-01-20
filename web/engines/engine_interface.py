@@ -162,22 +162,8 @@ class EngineInterface(ABC):
         Laws will be sorted by their calculated financial impact for this person
         based on outputs marked with citizen_relevance: primary in their YAML definitions.
         """
-<<<<<<< HEAD
-        # Get basic discoverable laws from the resolver (both CITIZEN and BUSINESS)
-        discoverable_laws = self.get_discoverable_service_laws("CITIZEN")
-        business_laws = self.get_discoverable_service_laws("BUSINESS")
-
-        # Merge business laws into discoverable_laws dict
-        if business_laws:
-            for service, laws in business_laws.items():
-                if service in discoverable_laws:
-                    discoverable_laws[service].extend(laws)
-                else:
-                    discoverable_laws[service] = laws
-=======
         # Get basic discoverable laws from the resolver
         discoverable_laws = self.get_discoverable_service_laws(discoverable_by=discoverable_by)
->>>>>>> main
 
         # Initialize cache if it doesn't exist
         if not hasattr(self, "_impact_cache") or not self._impact_cache:

@@ -40,12 +40,14 @@ def evaluate_law(
     approved: bool = True,
     claim_manager: ClaimManagerInterface | None = None,
     effective_date: str | None = None,
+    kvk_nummer: str | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
-    """Evaluate a law for a given BSN"""
+    """Evaluate a law for a given BSN or KVK number (for business laws)"""
 
-    logger.warn(f"evalute law {service} {law} for {bsn}")
+    logger.warn(f"evalute law {service} {law} for {bsn} (kvk_nummer={kvk_nummer})")
 
-    parameters = {"BSN": bsn}
+    # For business laws, use KVK_NUMMER as the primary parameter
+    parameters = {"KVK_NUMMER": kvk_nummer} if kvk_nummer else {"BSN": bsn}
     overwrite_input = None
 
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
@@ -99,6 +101,7 @@ async def execute_law(
     law: str,
     bsn: str,
     date: str = None,
+    kvk_nummer: str = None,
     can_submit_claims: bool = True,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -106,12 +109,19 @@ async def execute_law(
 ):
     """Execute a law and render its result"""
 
-    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims})")
+    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims}, kvk_nummer={kvk_nummer})")
 
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager, effective_date=date
+            bsn,
+            law,
+            service,
+            machine_service,
+            approved=False,
+            claim_manager=claim_manager,
+            effective_date=date,
+            kvk_nummer=kvk_nummer,
         )
 
     except Exception as e:
@@ -144,6 +154,7 @@ async def execute_law(
         {
             "bsn": bsn,
             "effective_bsn": bsn,  # For tile templates
+            "kvk_nummer": kvk_nummer,  # For business law tiles
             "request": request,
             "law": law,
             "service": service,
@@ -388,6 +399,7 @@ async def application_panel(
     law: str,
     bsn: str,
     approved: bool = False,
+    kvk_nummer: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
@@ -403,6 +415,7 @@ async def application_panel(
             approved=approved,
             claim_manager=claim_manager,
             effective_date=request.query_params.get("date"),
+            kvk_nummer=kvk_nummer,
         )
 
         value_tree = machine_service.extract_value_tree(result.path)
@@ -425,6 +438,7 @@ async def application_panel(
                 "requirements_met": result.requirements_met,
                 "path": value_tree,
                 "bsn": bsn,
+                "kvk_nummer": kvk_nummer,
                 "current_case": existing_case,
                 "claim_map": claim_map,
                 "missing_required": result.missing_required,

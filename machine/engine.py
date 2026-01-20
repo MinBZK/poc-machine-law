@@ -30,6 +30,11 @@ class RulesEngine:
         """Build mapping of property paths to their specifications"""
         specs = {}
 
+        # Add parameter properties (so missing required parameters show in the form)
+        for param in properties.get("parameters", []):
+            if "name" in param:
+                specs[param["name"]] = param
+
         # Add input properties
         for prop in properties.get("input", []):
             if "name" in prop:
@@ -179,9 +184,41 @@ class RulesEngine:
     ) -> dict[str, Any]:
         """Evaluate rules using service context and sources"""
         parameters = parameters or {}
+
+        # Debug logging for parameters
+        print(f"\n{'=' * 60}")
+        print(f"[ENGINE] Evaluating: {self.service_name} / {self.law}")
+        print(f"{'=' * 60}")
+        print(f"[ENGINE] Parameters provided: {parameters}")
+
+        # Check required parameters
+        missing_required_params = False
+        required_params = []
+        optional_params = []
+        missing_params = []
+        provided_params = []
+
         for p in self.parameter_specs:
-            if p["required"] and p["name"] not in parameters:
-                logger.warning(f"Required parameter {p} not found in {parameters}")
+            param_name = p["name"]
+            is_required = p.get("required", False)
+            is_provided = param_name in parameters
+
+            if is_required:
+                required_params.append(param_name)
+                if is_provided:
+                    provided_params.append(param_name)
+                else:
+                    missing_params.append(param_name)
+                    missing_required_params = True
+            else:
+                optional_params.append(param_name)
+
+        print(f"[ENGINE] Required parameters: {required_params}")
+        print(f"[ENGINE] Optional parameters: {optional_params}")
+        print(f"[ENGINE] Provided: {provided_params}")
+        print(f"[ENGINE] MISSING REQUIRED: {missing_params}")
+        print(f"[ENGINE] missing_required_params = {missing_required_params}")
+        print(f"{'=' * 60}\n")
 
         logger.debug(f"Evaluating rules for {self.service_name} {self.law} ({calculation_date} {requested_output})")
         root = PathNode(type="root", name="evaluation", result=None)
@@ -208,6 +245,10 @@ class RulesEngine:
             claims=claims,
             approved=approved,
         )
+
+        # Set missing_required if required parameters were not provided
+        if missing_required_params:
+            context.missing_required = True
 
         # Check requirements
         requirements_node = PathNode(type="requirements", name="Check all requirements", result=None)

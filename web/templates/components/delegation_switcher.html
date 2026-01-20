@@ -65,37 +65,36 @@
              class="absolute right-0 mt-2 w-[350px] bg-white rounded-md shadow-lg z-50 py-1 text-sm max-h-96 overflow-y-auto">
             <!-- Header -->
             <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">Handelen namens</div>
-            <!-- Delegations -->
+            <!-- Mezelf option - always shown first -->
+            <form action="/delegation/reset" method="POST" class="block">
+                <input type="hidden" name="bsn" value="{{ bsn }}">
+                <button type="submit"
+                        class="w-full flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 text-left {% if not delegation_context %}bg-blue-50{% endif %}">
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5 text-gray-500"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-grow">
+                        <div class="font-medium text-gray-900">Mezelf</div>
+                        <div class="text-xs text-gray-500">Burger</div>
+                    </div>
+                    {% if not delegation_context %}
+                        <div class="ml-auto">
+                            <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    {% endif %}
+                </button>
+            </form>
+            <!-- Other delegations (BUSINESS, CITIZEN) -->
             {% for delegation in delegations %}
-                {% if delegation.subject_type == 'SELF' %}
-                    <!-- SELF delegation - reset to own context -->
-                    <form action="/delegation/reset" method="POST" class="block">
-                        <input type="hidden" name="bsn" value="{{ bsn }}">
-                        <button type="submit"
-                                class="w-full flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 text-left {% if not delegation_context %}bg-blue-50{% endif %}">
-                            <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     class="h-5 w-5 text-gray-500"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <div class="ml-3 flex-grow">
-                                <div class="font-medium text-gray-900">Mezelf</div>
-                                <div class="text-xs text-gray-500">Mijn eigen zaken</div>
-                            </div>
-                            {% if not delegation_context %}
-                                <div class="ml-auto">
-                                    <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            {% endif %}
-                        </button>
-                    </form>
-                {% else %}
+                {% if delegation.subject_type != 'SELF' %}
                     <!-- Other delegations (BUSINESS, CITIZEN) -->
                     <form action="/delegation/switch" method="POST" class="block">
                         <input type="hidden" name="bsn" value="{{ bsn }}">
