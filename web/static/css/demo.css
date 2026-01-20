@@ -1207,6 +1207,8 @@ body {
     flex-direction: column;
     background-color: var(--bg-secondary);
     overflow: visible;
+    position: relative;
+    z-index: 1; /* Below the fixed poc-ribbon (10000) */
 }
 
 /* Tab Bar (Browser-like) */
@@ -1467,6 +1469,34 @@ body {
     pointer-events: none;
 }
 
+/* Proof of Concept Ribbon */
+.poc-ribbon {
+    position: fixed;
+    z-index: 10000; /* Same as tab-bar, below menu-dropdown-fixed (10001) */
+    width: 180px;
+    top: 30px;
+    right: -50px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 5px 0;
+    background-color: #FACC15;
+    color: black;
+    transform: rotate(45deg) translateZ(1px); /* translateZ forces GPU compositing layer */
+    transform-origin: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    will-change: transform; /* Hint to browser for compositing */
+    backface-visibility: hidden; /* Additional compositing hint */
+}
+
+.poc-ribbon:hover {
+    background-color: #EAB308;
+}
+
 /* ========================================
    Law Tab Bar (Second Row)
    ======================================== */
@@ -1623,6 +1653,8 @@ body {
     background-color: var(--bg-primary);
     position: relative;
     margin-top: var(--spacing-xs);
+    z-index: 1; /* Explicit z-index to contain iframe stacking */
+    isolation: isolate; /* Creates a new stacking context */
 }
 
 .tab-content {

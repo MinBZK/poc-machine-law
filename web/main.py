@@ -14,6 +14,7 @@ from web.dependencies import (
     get_case_manager,
     get_claim_manager,
     get_machine_service,
+    is_demo_mode,
     templates,
 )
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
@@ -287,6 +288,7 @@ async def root(
             "user_permissions": user_permissions,
             "can_submit_claims": can_submit_claims,
             "business_profile": business_profile,
+            "demo_mode": is_demo_mode(request),
         },
     )
 

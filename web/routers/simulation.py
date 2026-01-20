@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from simulate import LawSimulator
-from web.dependencies import templates
+from web.dependencies import is_demo_mode, templates
 from web.law_parameters import get_default_law_parameters_subprocess
 
 logger = logging.getLogger(__name__)
@@ -97,6 +97,7 @@ async def simulation_page(request: Request):
             "default_params": default_params,
             "law_params": law_params,
             "all_profiles": {},  # Empty dict for compatibility with base template
+            "demo_mode": is_demo_mode(request),
         },
     )
 

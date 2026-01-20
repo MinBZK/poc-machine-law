@@ -15,6 +15,9 @@
         </style>
     </head>
     <body>
+        <!-- Proof of Concept Ribbon (overlays iframes) -->
+        <button onclick="localStorage.removeItem('regelrecht-banner-dismissed'); location.reload();"
+                class="poc-ribbon">Proof of Concept</button>
         <div class="workspace-container" x-data="workspaceData()" x-init="init()">
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
@@ -190,13 +193,16 @@
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'burger'"
                      x-cloak>
-                    <iframe src="/" frameborder="0" class="tab-iframe" title="Burger.nl"></iframe>
+                    <iframe src="/?demo=true"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Burger.nl"></iframe>
                 </div>
                 <!-- Zaaksysteem Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'zaaksysteem'"
                      x-cloak>
-                    <iframe src="/admin/TOESLAGEN"
+                    <iframe src="/admin/TOESLAGEN?demo=true"
                             frameborder="0"
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
@@ -205,7 +211,7 @@
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'simulatie'"
                      x-cloak>
-                    <iframe src="/simulation/"
+                    <iframe src="/simulation/?demo=true"
                             frameborder="0"
                             class="tab-iframe"
                             title="Simulatie"></iframe>

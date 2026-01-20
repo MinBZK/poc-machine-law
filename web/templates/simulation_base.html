@@ -51,11 +51,13 @@
                                 </a>
                             </h1>
                         </div>
-                        <!-- Right side: Navigation menu -->
-                        <div class="flex items-center">
-                            <!-- Shared dropdown menu -->
-                            {% include "admin/partials/navigation_menu.html" %}
-                        </div>
+                        {% if not demo_mode %}
+                            <!-- Right side: Navigation menu -->
+                            <div class="flex items-center">
+                                <!-- Shared dropdown menu -->
+                                {% include "admin/partials/navigation_menu.html" %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </header>

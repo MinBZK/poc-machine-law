@@ -14,6 +14,7 @@ from web.dependencies import (
     get_claim_manager,
     get_engine_id,
     get_machine_service,
+    is_demo_mode,
     set_engine_id,
     templates,
 )
@@ -139,6 +140,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "current_provider": current_provider,
             "feature_flags": feature_flags,
             "law_flags": law_flags,
+            "demo_mode": is_demo_mode(request),
         },
     )
 
@@ -311,6 +313,7 @@ async def admin_dashboard(
             "available_services": available_services,
             "service_laws": service_laws,
             "service_cases": service_cases,
+            "demo_mode": is_demo_mode(request),
         },
     )
 
@@ -469,5 +472,6 @@ async def view_case(
             "claim_ids": claim_ids,
             "person_name": person_name,
             "current_engine_id": get_engine_id(),
+            "demo_mode": is_demo_mode(request),
         },
     )
