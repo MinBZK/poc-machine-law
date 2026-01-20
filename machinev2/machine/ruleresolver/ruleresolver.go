@@ -226,7 +226,7 @@ func (r *RuleResolve) FindRule(law string, referenceDate time.Time, service stri
 	// Return the most recently valid rule
 	result := validRules[0]
 	for _, rule := range validRules[1:] {
-		if rule.ValidFrom.Time.After(result.ValidFrom.Time) {
+		if rule.ValidFrom.After(result.ValidFrom) {
 			result = rule
 		}
 	}
