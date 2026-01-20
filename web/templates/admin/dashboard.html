@@ -20,7 +20,9 @@
                             {% endfor %}
                         </select>
                     </div>
-                    {% include "admin/partials/navigation_menu.html" %}
+                    {% if not demo_mode %}
+                        {% include "admin/partials/navigation_menu.html" %}
+                    {% endif %}
                 </div>
             </div>
         </div>
