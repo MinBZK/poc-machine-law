@@ -1269,7 +1269,7 @@ body {
     margin-left: auto;
     position: relative;
     align-self: center;
-    z-index: 9999;
+    z-index: 10001; /* Above ribbon (10000) and same as dropdown */
 }
 
 .menu-toggle {
