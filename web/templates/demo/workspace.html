@@ -221,6 +221,10 @@
                  x-cloak
                  @click.away="menuOpen = false"
                  class="menu-dropdown-fixed">
+                <!-- Feature Flags Section -->
+                <div class="menu-section-title">Feature Flags</div>
+                <div id="demo-feature-flags">{% include "demo/partials/feature_flags.html" %}</div>
+                <div class="menu-divider"></div>
                 <!-- Fullscreen Toggle -->
                 <button @click="toggleFullscreen(); menuOpen = false" class="menu-item">
                     <span x-show="!isFullscreen">⛶ Volledig scherm</span>
@@ -248,6 +252,9 @@
                         Reset state
                     </button>
                 </form>
+                <div class="menu-divider"></div>
+                <!-- Version info (bottom, dim) -->
+                <div class="menu-version">v{{ version }}</div>
             </div>
         </div>
         <!-- JavaScript -->

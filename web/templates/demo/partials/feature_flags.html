@@ -1,0 +1,12 @@
+{% for name, enabled in feature_flags.items() %}
+<div class="menu-feature-flag">
+    <span class="flag-label">{{ name.replace('_', ' ').title() }}</span>
+    <button class="toggle-btn-mini {{ 'enabled' if enabled else '' }}"
+            hx-post="/admin/set-feature-flag"
+            hx-target="#demo-feature-flags"
+            hx-swap="innerHTML"
+            hx-vals='{"flag_name": "{{ name }}", "value": "{{ '0' if enabled else '1' }}", "source": "demo"}'>
+        <div class="toggle-knob"></div>
+    </button>
+</div>
+{% endfor %}

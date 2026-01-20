@@ -1372,6 +1372,101 @@ body {
     flex-shrink: 0;
 }
 
+/* Menu Divider */
+.menu-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: var(--spacing-sm) 0;
+}
+
+/* Menu Section Title */
+.menu-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--spacing-sm) var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+}
+
+/* Menu Version Display */
+.menu-version {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    text-align: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Feature Flag Item in Menu */
+.menu-feature-flag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-xs) var(--spacing-md);
+    gap: var(--spacing-sm);
+}
+
+.menu-feature-flag .flag-label {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Mini Toggle Button for Menu */
+.toggle-btn-mini {
+    width: 36px;
+    height: 20px;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.toggle-btn-mini:hover {
+    border-color: var(--text-tertiary);
+}
+
+.toggle-btn-mini:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.toggle-btn-mini .toggle-knob {
+    width: 14px;
+    height: 14px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn-mini.enabled {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.toggle-btn-mini.enabled .toggle-knob {
+    transform: translateX(16px);
+}
+
+/* HTMX loading state for toggle */
+.toggle-btn-mini.htmx-request {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 /* ========================================
    Law Tab Bar (Second Row)
    ======================================== */

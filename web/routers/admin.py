@@ -233,6 +233,7 @@ async def post_set_feature_flag(
     request: Request,
     flag_name: str = Form(...),
     value: str = Form(...),
+    source: str = Form(default="admin"),
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Set the value of a feature flag and return updated partial"""
@@ -253,8 +254,14 @@ async def post_set_feature_flag(
             return templates.TemplateResponse(
                 "/admin/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}
             )
+        elif source == "demo":
+            # Return demo-specific partial for feature flags
+            feature_flags = FeatureFlags.get_all()
+            return templates.TemplateResponse(
+                "demo/partials/feature_flags.html", {"request": request, "feature_flags": feature_flags}
+            )
         else:
-            # Regular feature flag
+            # Regular feature flag from admin
             feature_flags = FeatureFlags.get_all()
 
             # Return only the feature flags partial
