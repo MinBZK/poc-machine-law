@@ -1,30 +1,29 @@
-{% macro render_law_drawer(section_name, section_label, laws, badge_class) %}
+{% macro render_law_trigger(section_name, section_label, laws, badge_class) %}
     {% if laws %}
         <div class="law-drawer-trigger"
-             @click="activeDrawer = activeDrawer === '{{ section_name }}' ? null : '{{ section_name }}'"
+             @mouseenter="activeDrawer = '{{ section_name }}'"
              :class="{ 'active': activeDrawer === '{{ section_name }}' }">
             <span>{{ section_label }}</span>
             <span class="law-badge {{ badge_class }}">{{ laws|length }}</span>
-            <span class="law-arrow">→</span>
+            <span class="law-arrow">‹</span>
         </div>
     {% endif %}
 {% endmacro %}
-{% macro render_drawer_content(section_name, section_label, laws) %}
+{% macro render_drawer_panel(section_name, section_label, laws, badge_class) %}
     {% if laws %}
-        <div class="law-drawer-panel"
+        <div class="law-side-drawer"
              x-show="activeDrawer === '{{ section_name }}'"
-             x-transition:enter="drawer-enter"
-             x-transition:enter-start="drawer-enter-start"
-             x-transition:enter-end="drawer-enter-end"
-             x-transition:leave="drawer-leave"
-             x-transition:leave-start="drawer-leave-start"
-             x-transition:leave-end="drawer-leave-end"
-             @click.outside="activeDrawer = null">
-            <div class="drawer-header">
-                <button @click="activeDrawer = null" class="drawer-back">← Terug</button>
-                <span class="drawer-title">{{ section_label }}</span>
+             x-transition:enter="slide-enter"
+             x-transition:enter-start="slide-enter-start"
+             x-transition:enter-end="slide-enter-end"
+             x-transition:leave="slide-leave"
+             x-transition:leave-start="slide-leave-start"
+             x-transition:leave-end="slide-leave-end">
+            <div class="drawer-title">
+                <span>{{ section_label }}</span>
+                <span class="law-badge {{ badge_class }}">{{ laws|length }}</span>
             </div>
-            <div class="drawer-content">
+            <div class="drawer-laws">
                 {% for service, service_laws in laws.items() %}
                     <div class="law-service-group">
                         <span class="law-service-name">{{ service|replace('_', ' ') |title }}</span>
@@ -47,25 +46,31 @@
         </div>
     {% endif %}
 {% endmacro %}
-<div class="law-drawers" x-data="{ activeDrawer: null }">
-    <!-- Drawer triggers (main menu items) -->
-    <div class="law-drawer-menu" x-show="!activeDrawer">
-        {{ render_law_drawer('citizen', 'Burger', law_flags.citizen, 'blue') }}
-        {{ render_law_drawer('business', 'Bedrijven', law_flags.business, 'green') }}
-        {{ render_law_drawer('delegation', 'Delegatie', law_flags.delegation, 'purple') }}
+<div class="law-drawers-container"
+     x-data="{ activeDrawer: null }"
+     @mouseleave="activeDrawer = null">
+    <!-- Side drawer panels (appear to the left) -->
+    <div class="law-side-panels">
+        {{ render_drawer_panel('citizen', 'Burger', law_flags.citizen, 'blue') }}
+        {{ render_drawer_panel('business', 'Bedrijven', law_flags.business, 'green') }}
+        {{ render_drawer_panel('delegation', 'Delegatie', law_flags.delegation, 'purple') }}
     </div>
-    <!-- Drawer panels (slide in to replace menu) -->
-    {{ render_drawer_content('citizen', 'Burger', law_flags.citizen) }}
-    {{ render_drawer_content('business', 'Bedrijven', law_flags.business) }}
-    {{ render_drawer_content('delegation', 'Delegatie', law_flags.delegation) }}
+    <!-- Main menu triggers -->
+    <div class="law-drawer-menu">
+        {{ render_law_trigger('citizen', 'Burger', law_flags.citizen, 'blue') }}
+        {{ render_law_trigger('business', 'Bedrijven', law_flags.business, 'green') }}
+        {{ render_law_trigger('delegation', 'Delegatie', law_flags.delegation, 'purple') }}
+    </div>
 </div>
 <style>
-.law-drawers {
+.law-drawers-container {
+    display: flex;
     position: relative;
 }
 .law-drawer-menu {
     display: flex;
     flex-direction: column;
+    min-width: 140px;
 }
 .law-drawer-trigger {
     display: flex;
@@ -77,11 +82,9 @@
     color: var(--text-primary, #333);
     transition: background 0.15s;
 }
-.law-drawer-trigger:hover {
-    background: var(--hover-bg, rgba(0,0,0,0.05));
-}
+.law-drawer-trigger:hover,
 .law-drawer-trigger.active {
-    background: var(--active-bg, rgba(0,0,0,0.08));
+    background: var(--hover-bg, rgba(0,0,0,0.05));
 }
 .law-badge {
     font-size: 10px;
@@ -95,48 +98,43 @@
 .law-arrow {
     margin-left: auto;
     opacity: 0.5;
-    font-size: 12px;
+    font-size: 14px;
 }
 
-/* Drawer panel */
-.law-drawer-panel {
+/* Side panels */
+.law-side-panels {
     position: absolute;
+    right: 100%;
     top: 0;
-    left: 0;
-    right: 0;
-    background: var(--menu-bg, white);
-    min-height: 100%;
+    margin-right: 4px;
 }
-.drawer-header {
+.law-side-drawer {
+    background: var(--menu-bg, white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 220px;
+    max-width: 280px;
+    overflow: hidden;
+}
+.drawer-title {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border-color, #eee);
-}
-.drawer-back {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--text-secondary, #666);
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-.drawer-back:hover {
-    background: var(--hover-bg, rgba(0,0,0,0.05));
-}
-.drawer-title {
     font-weight: 600;
     font-size: 13px;
 }
-.drawer-content {
+.drawer-laws {
     padding: 8px 12px;
-    max-height: 280px;
+    max-height: 300px;
     overflow-y: auto;
 }
 .law-service-group {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+}
+.law-service-group:last-child {
+    margin-bottom: 0;
 }
 .law-service-name {
     display: block;
@@ -145,7 +143,7 @@
     color: var(--text-muted, #888);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 .law-toggle-row {
     display: flex;
@@ -166,11 +164,11 @@
     color: var(--text-muted, #999);
 }
 
-/* Transitions */
-.drawer-enter { transition: transform 0.15s ease-out, opacity 0.15s ease-out; }
-.drawer-enter-start { transform: translateX(20px); opacity: 0; }
-.drawer-enter-end { transform: translateX(0); opacity: 1; }
-.drawer-leave { transition: transform 0.1s ease-in, opacity 0.1s ease-in; }
-.drawer-leave-start { transform: translateX(0); opacity: 1; }
-.drawer-leave-end { transform: translateX(20px); opacity: 0; }
+/* Slide transitions */
+.slide-enter { transition: transform 0.15s ease-out, opacity 0.15s ease-out; }
+.slide-enter-start { transform: translateX(10px); opacity: 0; }
+.slide-enter-end { transform: translateX(0); opacity: 1; }
+.slide-leave { transition: transform 0.1s ease-in, opacity 0.1s ease-in; }
+.slide-leave-start { transform: translateX(0); opacity: 1; }
+.slide-leave-end { transform: translateX(10px); opacity: 0; }
 </style>
