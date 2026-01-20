@@ -5,6 +5,7 @@ ci:
   autofix_prs: false
   submodules: true
   skip: [check-submodule-uptodate]
+  autoupdate_commit_msg: 'chore: pre-commit autoupdate'
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
