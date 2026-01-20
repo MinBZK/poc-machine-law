@@ -1,94 +1,158 @@
-{% macro render_law_section(section_name, section_label, laws, badge_class) %}
-{% if laws %}
-<div class="law-section" x-data="{ open: false }">
-    <button @click="open = !open" class="law-section-header">
-        <span>{{ section_label }}</span>
-        <span class="law-badge {{ badge_class }}">{{ laws|length }}</span>
-        <span class="law-chevron" :class="{ 'rotated': open }">▸</span>
-    </button>
-    <div x-show="open" x-collapse class="law-section-content">
-        {% for service, service_laws in laws.items() %}
-        <div class="law-service-group">
-            <span class="law-service-name">{{ service|replace('_', ' ')|title }}</span>
-            {% for law_name, enabled in service_laws.items() %}
-            {% set sanitized_law_name = law_name|replace('/', '__') %}
-            <div class="law-toggle-row">
-                <span class="law-name {{ 'disabled' if not enabled }}">{{ law_name|replace('_', ' ')|truncate(25) }}</span>
-                <button class="toggle-btn-mini {{ 'enabled' if enabled else '' }}"
-                        hx-post="/admin/set-feature-flag"
-                        hx-target="#demo-law-flags"
-                        hx-swap="innerHTML"
-                        hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}", "source": "demo-law"}'>
-                    <div class="toggle-knob"></div>
-                </button>
-            </div>
-            {% endfor %}
+{% macro render_law_drawer(section_name, section_label, laws, badge_class) %}
+    {% if laws %}
+        <div class="law-drawer-trigger"
+             @click="activeDrawer = activeDrawer === '{{ section_name }}' ? null : '{{ section_name }}'"
+             :class="{ 'active': activeDrawer === '{{ section_name }}' }">
+            <span>{{ section_label }}</span>
+            <span class="law-badge {{ badge_class }}">{{ laws|length }}</span>
+            <span class="law-arrow">→</span>
         </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
+    {% endif %}
 {% endmacro %}
-
-{{ render_law_section('citizen', 'Burger', law_flags.citizen, 'blue') }}
-{{ render_law_section('business', 'Bedrijven', law_flags.business, 'green') }}
-{{ render_law_section('delegation', 'Delegatie', law_flags.delegation, 'purple') }}
-
+{% macro render_drawer_content(section_name, section_label, laws) %}
+    {% if laws %}
+        <div class="law-drawer-panel"
+             x-show="activeDrawer === '{{ section_name }}'"
+             x-transition:enter="drawer-enter"
+             x-transition:enter-start="drawer-enter-start"
+             x-transition:enter-end="drawer-enter-end"
+             x-transition:leave="drawer-leave"
+             x-transition:leave-start="drawer-leave-start"
+             x-transition:leave-end="drawer-leave-end"
+             @click.outside="activeDrawer = null">
+            <div class="drawer-header">
+                <button @click="activeDrawer = null" class="drawer-back">← Terug</button>
+                <span class="drawer-title">{{ section_label }}</span>
+            </div>
+            <div class="drawer-content">
+                {% for service, service_laws in laws.items() %}
+                    <div class="law-service-group">
+                        <span class="law-service-name">{{ service|replace('_', ' ') |title }}</span>
+                        {% for law_name, enabled in service_laws.items() %}
+                            {% set sanitized_law_name = law_name|replace('/', '__') %}
+                            <div class="law-toggle-row">
+                                <span class="law-name {{ 'disabled' if not enabled }}">{{ law_name|replace('_', ' ') }}</span>
+                                <button class="toggle-btn-mini {{ 'enabled' if enabled else '' }}"
+                                        hx-post="/admin/set-feature-flag"
+                                        hx-target="#demo-law-flags"
+                                        hx-swap="innerHTML"
+                                        hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}", "source": "demo-law"}'>
+                                    <div class="toggle-knob"></div>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+<div class="law-drawers" x-data="{ activeDrawer: null }">
+    <!-- Drawer triggers (main menu items) -->
+    <div class="law-drawer-menu" x-show="!activeDrawer">
+        {{ render_law_drawer('citizen', 'Burger', law_flags.citizen, 'blue') }}
+        {{ render_law_drawer('business', 'Bedrijven', law_flags.business, 'green') }}
+        {{ render_law_drawer('delegation', 'Delegatie', law_flags.delegation, 'purple') }}
+    </div>
+    <!-- Drawer panels (slide in to replace menu) -->
+    {{ render_drawer_content('citizen', 'Burger', law_flags.citizen) }}
+    {{ render_drawer_content('business', 'Bedrijven', law_flags.business) }}
+    {{ render_drawer_content('delegation', 'Delegatie', law_flags.delegation) }}
+</div>
 <style>
-.law-section {
-    margin-bottom: 4px;
+.law-drawers {
+    position: relative;
 }
-.law-section-header {
+.law-drawer-menu {
+    display: flex;
+    flex-direction: column;
+}
+.law-drawer-trigger {
     display: flex;
     align-items: center;
     gap: 6px;
-    width: 100%;
-    padding: 6px 8px;
-    background: transparent;
-    border: none;
+    padding: 8px 12px;
     cursor: pointer;
-    font-size: 12px;
-    color: var(--text-secondary, #666);
+    font-size: 13px;
+    color: var(--text-primary, #333);
+    transition: background 0.15s;
 }
-.law-section-header:hover {
+.law-drawer-trigger:hover {
     background: var(--hover-bg, rgba(0,0,0,0.05));
+}
+.law-drawer-trigger.active {
+    background: var(--active-bg, rgba(0,0,0,0.08));
 }
 .law-badge {
     font-size: 10px;
-    padding: 1px 5px;
-    border-radius: 8px;
+    padding: 2px 6px;
+    border-radius: 10px;
     font-weight: 500;
 }
 .law-badge.blue { background: #dbeafe; color: #1e40af; }
 .law-badge.green { background: #dcfce7; color: #166534; }
 .law-badge.purple { background: #f3e8ff; color: #6b21a8; }
-.law-chevron {
+.law-arrow {
     margin-left: auto;
-    transition: transform 0.2s;
-    font-size: 10px;
+    opacity: 0.5;
+    font-size: 12px;
 }
-.law-chevron.rotated { transform: rotate(90deg); }
-.law-section-content {
-    padding: 4px 8px 8px 16px;
-    max-height: 200px;
+
+/* Drawer panel */
+.law-drawer-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--menu-bg, white);
+    min-height: 100%;
+}
+.drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+.drawer-back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.drawer-back:hover {
+    background: var(--hover-bg, rgba(0,0,0,0.05));
+}
+.drawer-title {
+    font-weight: 600;
+    font-size: 13px;
+}
+.drawer-content {
+    padding: 8px 12px;
+    max-height: 280px;
     overflow-y: auto;
 }
 .law-service-group {
-    margin-bottom: 6px;
+    margin-bottom: 12px;
 }
 .law-service-name {
+    display: block;
     font-size: 10px;
     font-weight: 600;
     color: var(--text-muted, #888);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-bottom: 6px;
 }
 .law-toggle-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 3px 0;
-    font-size: 11px;
+    padding: 4px 0;
+    font-size: 12px;
 }
 .law-name {
     flex: 1;
@@ -96,8 +160,17 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text-primary, #333);
+    margin-right: 8px;
 }
 .law-name.disabled {
     color: var(--text-muted, #999);
 }
+
+/* Transitions */
+.drawer-enter { transition: transform 0.15s ease-out, opacity 0.15s ease-out; }
+.drawer-enter-start { transform: translateX(20px); opacity: 0; }
+.drawer-enter-end { transform: translateX(0); opacity: 1; }
+.drawer-leave { transition: transform 0.1s ease-in, opacity 0.1s ease-in; }
+.drawer-leave-start { transform: translateX(0); opacity: 1; }
+.drawer-leave-end { transform: translateX(20px); opacity: 0; }
 </style>
