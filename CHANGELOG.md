@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.1.2 (2026-01-20)
+
+### Bug Fixes
+
+- Show objection/appeal options for rejected cases regardless of requirements_met
+  ([#89](https://github.com/MinBZK/poc-machine-law/pull/89),
+  [`9b6b9b7`](https://github.com/MinBZK/poc-machine-law/commit/9b6b9b76b35780f7932e452e611a63f5a93ad444))
+
+### Chores
+
+- Configure pre-commit.ci to use conventional commits
+  ([#334](https://github.com/MinBZK/poc-machine-law/pull/334),
+  [`b498c4d`](https://github.com/MinBZK/poc-machine-law/commit/b498c4dda488e14001dff00b2784bcdb281467fd))
+
+- Pre-commit autoupdate ([#335](https://github.com/MinBZK/poc-machine-law/pull/335),
+  [`42edb9b`](https://github.com/MinBZK/poc-machine-law/commit/42edb9b667c31b8de24a7eab3b6faf99cfb26fba))
+
+- Sync VERSION file to 1.1.1
+  ([`528238d`](https://github.com/MinBZK/poc-machine-law/commit/528238d6a06e6ec9943e794efe1af6f42ea100d5))
+
+
 ## v1.1.1 (2026-01-20)
 
 ### Bug Fixes
