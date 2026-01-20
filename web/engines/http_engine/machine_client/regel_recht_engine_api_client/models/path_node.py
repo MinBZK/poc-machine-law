@@ -29,11 +29,11 @@ class PathNode:
 
     type_: str
     name: str
-    result: Union[Unset, Any] = UNSET
-    resolve_type: Union[Unset, str] = UNSET
-    required: Union[Unset, bool] = UNSET
+    result: Unset | Any = UNSET
+    resolve_type: Unset | str = UNSET
+    required: Unset | bool = UNSET
     details: Union[Unset, "PathNodeDetails"] = UNSET
-    children: Union[Unset, list["PathNode"]] = UNSET
+    children: Unset | list["PathNode"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -47,11 +47,11 @@ class PathNode:
 
         required = self.required
 
-        details: Union[Unset, dict[str, Any]] = UNSET
+        details: Unset | dict[str, Any] = UNSET
         if not isinstance(self.details, Unset):
             details = self.details.to_dict()
 
-        children: Union[Unset, list[dict[str, Any]]] = UNSET
+        children: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.children, Unset):
             children = []
             for children_item_data in self.children:
@@ -95,7 +95,7 @@ class PathNode:
         required = d.pop("required", UNSET)
 
         _details = d.pop("details", UNSET)
-        details: Union[Unset, PathNodeDetails]
+        details: Unset | PathNodeDetails
         if isinstance(_details, Unset):
             details = UNSET
         else:

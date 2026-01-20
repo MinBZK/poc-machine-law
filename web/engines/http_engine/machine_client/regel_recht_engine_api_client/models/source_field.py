@@ -36,7 +36,7 @@ class SourceField:
     type_: str
     type_spec: Union[Unset, "TypeSpec"] = UNSET
     temporal: Union[Unset, "Temporal"] = UNSET
-    required: Union[None, Unset, bool] = UNSET
+    required: None | Unset | bool = UNSET
     source_reference: Union[Unset, "SourceReference"] = UNSET
     service_reference: Union[Unset, "ServiceReference"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -48,25 +48,25 @@ class SourceField:
 
         type_ = self.type_
 
-        type_spec: Union[Unset, dict[str, Any]] = UNSET
+        type_spec: Unset | dict[str, Any] = UNSET
         if not isinstance(self.type_spec, Unset):
             type_spec = self.type_spec.to_dict()
 
-        temporal: Union[Unset, dict[str, Any]] = UNSET
+        temporal: Unset | dict[str, Any] = UNSET
         if not isinstance(self.temporal, Unset):
             temporal = self.temporal.to_dict()
 
-        required: Union[None, Unset, bool]
+        required: None | Unset | bool
         if isinstance(self.required, Unset):
             required = UNSET
         else:
             required = self.required
 
-        source_reference: Union[Unset, dict[str, Any]] = UNSET
+        source_reference: Unset | dict[str, Any] = UNSET
         if not isinstance(self.source_reference, Unset):
             source_reference = self.source_reference.to_dict()
 
-        service_reference: Union[Unset, dict[str, Any]] = UNSET
+        service_reference: Unset | dict[str, Any] = UNSET
         if not isinstance(self.service_reference, Unset):
             service_reference = self.service_reference.to_dict()
 
@@ -107,37 +107,37 @@ class SourceField:
         type_ = d.pop("type")
 
         _type_spec = d.pop("type_spec", UNSET)
-        type_spec: Union[Unset, TypeSpec]
+        type_spec: Unset | TypeSpec
         if isinstance(_type_spec, Unset):
             type_spec = UNSET
         else:
             type_spec = TypeSpec.from_dict(_type_spec)
 
         _temporal = d.pop("temporal", UNSET)
-        temporal: Union[Unset, Temporal]
+        temporal: Unset | Temporal
         if isinstance(_temporal, Unset):
             temporal = UNSET
         else:
             temporal = Temporal.from_dict(_temporal)
 
-        def _parse_required(data: object) -> Union[None, Unset, bool]:
+        def _parse_required(data: object) -> None | Unset | bool:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, bool], data)
+            return cast(None | Unset | bool, data)
 
         required = _parse_required(d.pop("required", UNSET))
 
         _source_reference = d.pop("source_reference", UNSET)
-        source_reference: Union[Unset, SourceReference]
+        source_reference: Unset | SourceReference
         if isinstance(_source_reference, Unset):
             source_reference = UNSET
         else:
             source_reference = SourceReference.from_dict(_source_reference)
 
         _service_reference = d.pop("service_reference", UNSET)
-        service_reference: Union[Unset, ServiceReference]
+        service_reference: Unset | ServiceReference
         if isinstance(_service_reference, Unset):
             service_reference = UNSET
         else:

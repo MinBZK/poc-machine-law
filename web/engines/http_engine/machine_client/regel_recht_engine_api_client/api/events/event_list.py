@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -21,8 +21,8 @@ def _get_kwargs() -> dict[str, Any]:
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[EventListResponse200, EventListResponse400, EventListResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> EventListResponse200 | EventListResponse400 | EventListResponse500 | None:
     if response.status_code == 200:
         response_200 = EventListResponse200.from_dict(response.json())
 
@@ -42,8 +42,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[EventListResponse200, EventListResponse400, EventListResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[EventListResponse200 | EventListResponse400 | EventListResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -54,8 +54,8 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Response[Union[EventListResponse200, EventListResponse400, EventListResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Response[EventListResponse200 | EventListResponse400 | EventListResponse500]:
     """Get a list of events
 
     Raises:
@@ -77,8 +77,8 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[EventListResponse200, EventListResponse400, EventListResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> EventListResponse200 | EventListResponse400 | EventListResponse500 | None:
     """Get a list of events
 
     Raises:
@@ -96,8 +96,8 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Response[Union[EventListResponse200, EventListResponse400, EventListResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Response[EventListResponse200 | EventListResponse400 | EventListResponse500]:
     """Get a list of events
 
     Raises:
@@ -117,8 +117,8 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[EventListResponse200, EventListResponse400, EventListResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> EventListResponse200 | EventListResponse400 | EventListResponse500 | None:
     """Get a list of events
 
     Raises:

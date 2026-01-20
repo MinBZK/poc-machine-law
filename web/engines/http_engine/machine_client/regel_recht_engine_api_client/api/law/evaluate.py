@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -33,8 +33,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[EvaluateResponse201, EvaluateResponse400, EvaluateResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> EvaluateResponse201 | EvaluateResponse400 | EvaluateResponse500 | None:
     if response.status_code == 201:
         response_201 = EvaluateResponse201.from_dict(response.json())
 
@@ -54,8 +54,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[EvaluateResponse201, EvaluateResponse400, EvaluateResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[EvaluateResponse201 | EvaluateResponse400 | EvaluateResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -66,9 +66,9 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: EvaluateBody,
-) -> Response[Union[EvaluateResponse201, EvaluateResponse400, EvaluateResponse500]]:
+) -> Response[EvaluateResponse201 | EvaluateResponse400 | EvaluateResponse500]:
     """Evaluate the law
 
     Args:
@@ -95,9 +95,9 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: EvaluateBody,
-) -> Optional[Union[EvaluateResponse201, EvaluateResponse400, EvaluateResponse500]]:
+) -> EvaluateResponse201 | EvaluateResponse400 | EvaluateResponse500 | None:
     """Evaluate the law
 
     Args:
@@ -119,9 +119,9 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: EvaluateBody,
-) -> Response[Union[EvaluateResponse201, EvaluateResponse400, EvaluateResponse500]]:
+) -> Response[EvaluateResponse201 | EvaluateResponse400 | EvaluateResponse500]:
     """Evaluate the law
 
     Args:
@@ -146,9 +146,9 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: EvaluateBody,
-) -> Optional[Union[EvaluateResponse201, EvaluateResponse400, EvaluateResponse500]]:
+) -> EvaluateResponse201 | EvaluateResponse400 | EvaluateResponse500 | None:
     """Evaluate the law
 
     Args:

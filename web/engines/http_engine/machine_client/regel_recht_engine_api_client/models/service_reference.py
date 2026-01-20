@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -26,7 +26,7 @@ class ServiceReference:
     service: str
     field: str
     law: str
-    parameters: Union[Unset, list["Parameter"]] = UNSET
+    parameters: Unset | list["Parameter"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -36,7 +36,7 @@ class ServiceReference:
 
         law = self.law
 
-        parameters: Union[Unset, list[dict[str, Any]]] = UNSET
+        parameters: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.parameters, Unset):
             parameters = []
             for parameters_item_data in self.parameters:

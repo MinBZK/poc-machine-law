@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -24,11 +24,11 @@ class SourceReference:
         select_on (Union[Unset, list['SelectField']]): Selection criteria
     """
 
-    source_type: Union[Unset, str] = UNSET
-    table: Union[Unset, str] = UNSET
-    field: Union[None, Unset, str] = UNSET
-    fields: Union[None, Unset, list[str]] = UNSET
-    select_on: Union[Unset, list["SelectField"]] = UNSET
+    source_type: Unset | str = UNSET
+    table: Unset | str = UNSET
+    field: None | Unset | str = UNSET
+    fields: None | Unset | list[str] = UNSET
+    select_on: Unset | list["SelectField"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -36,13 +36,13 @@ class SourceReference:
 
         table = self.table
 
-        field: Union[None, Unset, str]
+        field: None | Unset | str
         if isinstance(self.field, Unset):
             field = UNSET
         else:
             field = self.field
 
-        fields: Union[None, Unset, list[str]]
+        fields: None | Unset | list[str]
         if isinstance(self.fields, Unset):
             fields = UNSET
         elif isinstance(self.fields, list):
@@ -51,7 +51,7 @@ class SourceReference:
         else:
             fields = self.fields
 
-        select_on: Union[Unset, list[dict[str, Any]]] = UNSET
+        select_on: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.select_on, Unset):
             select_on = []
             for select_on_item_data in self.select_on:
@@ -83,16 +83,16 @@ class SourceReference:
 
         table = d.pop("table", UNSET)
 
-        def _parse_field(data: object) -> Union[None, Unset, str]:
+        def _parse_field(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         field = _parse_field(d.pop("field", UNSET))
 
-        def _parse_fields(data: object) -> Union[None, Unset, list[str]]:
+        def _parse_fields(data: object) -> None | Unset | list[str]:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -105,7 +105,7 @@ class SourceReference:
                 return fields_type_0
             except:  # noqa: E722
                 pass
-            return cast(Union[None, Unset, list[str]], data)
+            return cast(None | Unset | list[str], data)
 
         fields = _parse_fields(d.pop("fields", UNSET))
 

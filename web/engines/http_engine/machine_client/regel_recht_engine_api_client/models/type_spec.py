@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -21,34 +21,34 @@ class TypeSpec:
     """
 
     type_: str
-    unit: Union[None, Unset, str] = UNSET
-    precision: Union[None, Unset, int] = UNSET
-    min_: Union[None, Unset, float] = UNSET
-    max_: Union[None, Unset, float] = UNSET
+    unit: None | Unset | str = UNSET
+    precision: None | Unset | int = UNSET
+    min_: None | Unset | float = UNSET
+    max_: None | Unset | float = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         type_ = self.type_
 
-        unit: Union[None, Unset, str]
+        unit: None | Unset | str
         if isinstance(self.unit, Unset):
             unit = UNSET
         else:
             unit = self.unit
 
-        precision: Union[None, Unset, int]
+        precision: None | Unset | int
         if isinstance(self.precision, Unset):
             precision = UNSET
         else:
             precision = self.precision
 
-        min_: Union[None, Unset, float]
+        min_: None | Unset | float
         if isinstance(self.min_, Unset):
             min_ = UNSET
         else:
             min_ = self.min_
 
-        max_: Union[None, Unset, float]
+        max_: None | Unset | float
         if isinstance(self.max_, Unset):
             max_ = UNSET
         else:
@@ -77,39 +77,39 @@ class TypeSpec:
         d = dict(src_dict)
         type_ = d.pop("type")
 
-        def _parse_unit(data: object) -> Union[None, Unset, str]:
+        def _parse_unit(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         unit = _parse_unit(d.pop("unit", UNSET))
 
-        def _parse_precision(data: object) -> Union[None, Unset, int]:
+        def _parse_precision(data: object) -> None | Unset | int:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, int], data)
+            return cast(None | Unset | int, data)
 
         precision = _parse_precision(d.pop("precision", UNSET))
 
-        def _parse_min_(data: object) -> Union[None, Unset, float]:
+        def _parse_min_(data: object) -> None | Unset | float:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, float], data)
+            return cast(None | Unset | float, data)
 
         min_ = _parse_min_(d.pop("min", UNSET))
 
-        def _parse_max_(data: object) -> Union[None, Unset, float]:
+        def _parse_max_(data: object) -> None | Unset | float:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, float], data)
+            return cast(None | Unset | float, data)
 
         max_ = _parse_max_(d.pop("max", UNSET))
 

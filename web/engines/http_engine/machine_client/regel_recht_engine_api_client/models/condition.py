@@ -33,11 +33,11 @@ class Condition:
     def to_dict(self) -> dict[str, Any]:
         from ..models.action import Action
 
-        test: Union[Unset, dict[str, Any]] = UNSET
+        test: Unset | dict[str, Any] = UNSET
         if not isinstance(self.test, Unset):
             test = self.test.to_dict()
 
-        then: Union[Any, Unset, dict[str, Any]]
+        then: Any | Unset | dict[str, Any]
         if isinstance(self.then, Unset):
             then = UNSET
         elif isinstance(self.then, Action):
@@ -45,7 +45,7 @@ class Condition:
         else:
             then = self.then
 
-        else_: Union[Any, Unset, dict[str, Any]]
+        else_: Any | Unset | dict[str, Any]
         if isinstance(self.else_, Unset):
             else_ = UNSET
         elif isinstance(self.else_, Action):
@@ -71,7 +71,7 @@ class Condition:
 
         d = dict(src_dict)
         _test = d.pop("test", UNSET)
-        test: Union[Unset, Action]
+        test: Unset | Action
         if isinstance(_test, Unset):
             test = UNSET
         else:

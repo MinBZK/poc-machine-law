@@ -30,48 +30,48 @@ class Properties:
         applies (Union[Unset, list['Apply']]): Application rules
     """
 
-    parameters: Union[Unset, list["BaseField"]] = UNSET
-    sources: Union[Unset, list["SourceField"]] = UNSET
-    input_: Union[Unset, list["InputField"]] = UNSET
-    output: Union[Unset, list["OutputField"]] = UNSET
+    parameters: Unset | list["BaseField"] = UNSET
+    sources: Unset | list["SourceField"] = UNSET
+    input_: Unset | list["InputField"] = UNSET
+    output: Unset | list["OutputField"] = UNSET
     definitions: Union[Unset, "PropertiesDefinitions"] = UNSET
-    applies: Union[Unset, list["Apply"]] = UNSET
+    applies: Unset | list["Apply"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        parameters: Union[Unset, list[dict[str, Any]]] = UNSET
+        parameters: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.parameters, Unset):
             parameters = []
             for parameters_item_data in self.parameters:
                 parameters_item = parameters_item_data.to_dict()
                 parameters.append(parameters_item)
 
-        sources: Union[Unset, list[dict[str, Any]]] = UNSET
+        sources: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.sources, Unset):
             sources = []
             for sources_item_data in self.sources:
                 sources_item = sources_item_data.to_dict()
                 sources.append(sources_item)
 
-        input_: Union[Unset, list[dict[str, Any]]] = UNSET
+        input_: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.input_, Unset):
             input_ = []
             for input_item_data in self.input_:
                 input_item = input_item_data.to_dict()
                 input_.append(input_item)
 
-        output: Union[Unset, list[dict[str, Any]]] = UNSET
+        output: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.output, Unset):
             output = []
             for output_item_data in self.output:
                 output_item = output_item_data.to_dict()
                 output.append(output_item)
 
-        definitions: Union[Unset, dict[str, Any]] = UNSET
+        definitions: Unset | dict[str, Any] = UNSET
         if not isinstance(self.definitions, Unset):
             definitions = self.definitions.to_dict()
 
-        applies: Union[Unset, list[dict[str, Any]]] = UNSET
+        applies: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.applies, Unset):
             applies = []
             for applies_item_data in self.applies:
@@ -135,7 +135,7 @@ class Properties:
             output.append(output_item)
 
         _definitions = d.pop("definitions", UNSET)
-        definitions: Union[Unset, PropertiesDefinitions]
+        definitions: Unset | PropertiesDefinitions
         if isinstance(_definitions, Unset):
             definitions = UNSET
         else:

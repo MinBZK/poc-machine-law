@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -23,13 +23,13 @@ class CaseAppealStatus:
         court_type (Union[Unset, str]):
     """
 
-    possible: Union[Unset, bool] = UNSET
-    not_possible_reason: Union[Unset, str] = UNSET
-    appeal_period: Union[Unset, int] = UNSET
-    direct_appeal: Union[Unset, bool] = UNSET
-    direct_appeal_reason: Union[Unset, str] = UNSET
-    competent_court: Union[Unset, str] = UNSET
-    court_type: Union[Unset, str] = UNSET
+    possible: Unset | bool = UNSET
+    not_possible_reason: Unset | str = UNSET
+    appeal_period: Unset | int = UNSET
+    direct_appeal: Unset | bool = UNSET
+    direct_appeal_reason: Unset | str = UNSET
+    competent_court: Unset | str = UNSET
+    court_type: Unset | str = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:

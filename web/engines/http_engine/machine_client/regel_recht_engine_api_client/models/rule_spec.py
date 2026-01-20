@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 from uuid import UUID
 
 from attrs import define as _attrs_define
@@ -46,13 +46,13 @@ class RuleSpec:
     service: str
     description: str
     properties: "Properties"
-    law_type: Union[None, Unset, str] = UNSET
-    legal_character: Union[None, Unset, str] = UNSET
-    decision_type: Union[None, Unset, str] = UNSET
-    discoverable: Union[None, Unset, str] = UNSET
-    references: Union[Unset, list["Reference"]] = UNSET
-    requirements: Union[Unset, list["Requirement"]] = UNSET
-    actions: Union[Unset, list["Action"]] = UNSET
+    law_type: None | Unset | str = UNSET
+    legal_character: None | Unset | str = UNSET
+    decision_type: None | Unset | str = UNSET
+    discoverable: None | Unset | str = UNSET
+    references: Unset | list["Reference"] = UNSET
+    requirements: Unset | list["Requirement"] = UNSET
+    actions: Unset | list["Action"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -70,45 +70,45 @@ class RuleSpec:
 
         properties = self.properties.to_dict()
 
-        law_type: Union[None, Unset, str]
+        law_type: None | Unset | str
         if isinstance(self.law_type, Unset):
             law_type = UNSET
         else:
             law_type = self.law_type
 
-        legal_character: Union[None, Unset, str]
+        legal_character: None | Unset | str
         if isinstance(self.legal_character, Unset):
             legal_character = UNSET
         else:
             legal_character = self.legal_character
 
-        decision_type: Union[None, Unset, str]
+        decision_type: None | Unset | str
         if isinstance(self.decision_type, Unset):
             decision_type = UNSET
         else:
             decision_type = self.decision_type
 
-        discoverable: Union[None, Unset, str]
+        discoverable: None | Unset | str
         if isinstance(self.discoverable, Unset):
             discoverable = UNSET
         else:
             discoverable = self.discoverable
 
-        references: Union[Unset, list[dict[str, Any]]] = UNSET
+        references: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.references, Unset):
             references = []
             for references_item_data in self.references:
                 references_item = references_item_data.to_dict()
                 references.append(references_item)
 
-        requirements: Union[Unset, list[dict[str, Any]]] = UNSET
+        requirements: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.requirements, Unset):
             requirements = []
             for requirements_item_data in self.requirements:
                 requirements_item = requirements_item_data.to_dict()
                 requirements.append(requirements_item)
 
-        actions: Union[Unset, list[dict[str, Any]]] = UNSET
+        actions: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.actions, Unset):
             actions = []
             for actions_item_data in self.actions:
@@ -167,39 +167,39 @@ class RuleSpec:
 
         properties = Properties.from_dict(d.pop("properties"))
 
-        def _parse_law_type(data: object) -> Union[None, Unset, str]:
+        def _parse_law_type(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         law_type = _parse_law_type(d.pop("law_type", UNSET))
 
-        def _parse_legal_character(data: object) -> Union[None, Unset, str]:
+        def _parse_legal_character(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         legal_character = _parse_legal_character(d.pop("legal_character", UNSET))
 
-        def _parse_decision_type(data: object) -> Union[None, Unset, str]:
+        def _parse_decision_type(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         decision_type = _parse_decision_type(d.pop("decision_type", UNSET))
 
-        def _parse_discoverable(data: object) -> Union[None, Unset, str]:
+        def _parse_discoverable(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         discoverable = _parse_discoverable(d.pop("discoverable", UNSET))
 

@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -33,8 +33,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CaseSubmitResponse201 | CaseSubmitResponse400 | CaseSubmitResponse500 | None:
     if response.status_code == 201:
         response_201 = CaseSubmitResponse201.from_dict(response.json())
 
@@ -54,8 +54,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CaseSubmitResponse201 | CaseSubmitResponse400 | CaseSubmitResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -66,9 +66,9 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseSubmitBody,
-) -> Response[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
+) -> Response[CaseSubmitResponse201 | CaseSubmitResponse400 | CaseSubmitResponse500]:
     """Submit a case
 
     Args:
@@ -95,9 +95,9 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseSubmitBody,
-) -> Optional[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
+) -> CaseSubmitResponse201 | CaseSubmitResponse400 | CaseSubmitResponse500 | None:
     """Submit a case
 
     Args:
@@ -119,9 +119,9 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseSubmitBody,
-) -> Response[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
+) -> Response[CaseSubmitResponse201 | CaseSubmitResponse400 | CaseSubmitResponse500]:
     """Submit a case
 
     Args:
@@ -146,9 +146,9 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseSubmitBody,
-) -> Optional[Union[CaseSubmitResponse201, CaseSubmitResponse400, CaseSubmitResponse500]]:
+) -> CaseSubmitResponse201 | CaseSubmitResponse400 | CaseSubmitResponse500 | None:
     """Submit a case
 
     Args:

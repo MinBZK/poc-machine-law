@@ -22,12 +22,12 @@ class Requirement:
         or_ (Union[None, Unset, list[Union['Action', 'Requirement']]]): Any requirement must be met (OR logic)
     """
 
-    all_: Union[None, Unset, list[Union["Action", "Requirement"]]] = UNSET
-    or_: Union[None, Unset, list[Union["Action", "Requirement"]]] = UNSET
+    all_: None | Unset | list[Union["Action", "Requirement"]] = UNSET
+    or_: None | Unset | list[Union["Action", "Requirement"]] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        all_: Union[None, Unset, list[dict[str, Any]]]
+        all_: None | Unset | list[dict[str, Any]]
         if isinstance(self.all_, Unset):
             all_ = UNSET
         elif isinstance(self.all_, list):
@@ -44,7 +44,7 @@ class Requirement:
         else:
             all_ = self.all_
 
-        or_: Union[None, Unset, list[dict[str, Any]]]
+        or_: None | Unset | list[dict[str, Any]]
         if isinstance(self.or_, Unset):
             or_ = UNSET
         elif isinstance(self.or_, list):
@@ -77,7 +77,7 @@ class Requirement:
 
         d = dict(src_dict)
 
-        def _parse_all_(data: object) -> Union[None, Unset, list[Union["Action", "Requirement"]]]:
+        def _parse_all_(data: object) -> None | Unset | list[Union["Action", "Requirement"]]:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -111,11 +111,11 @@ class Requirement:
                 return all_type_0
             except:  # noqa: E722
                 pass
-            return cast(Union[None, Unset, list[Union["Action", "Requirement"]]], data)
+            return cast(None | Unset | list[Union["Action", "Requirement"]], data)
 
         all_ = _parse_all_(d.pop("all", UNSET))
 
-        def _parse_or_(data: object) -> Union[None, Unset, list[Union["Action", "Requirement"]]]:
+        def _parse_or_(data: object) -> None | Unset | list[Union["Action", "Requirement"]]:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -149,7 +149,7 @@ class Requirement:
                 return or_type_0
             except:  # noqa: E722
                 pass
-            return cast(Union[None, Unset, list[Union["Action", "Requirement"]]], data)
+            return cast(None | Unset | list[Union["Action", "Requirement"]], data)
 
         or_ = _parse_or_(d.pop("or", UNSET))
 

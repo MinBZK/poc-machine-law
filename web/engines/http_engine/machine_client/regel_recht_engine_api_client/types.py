@@ -2,7 +2,7 @@
 
 from collections.abc import MutableMapping
 from http import HTTPStatus
-from typing import BinaryIO, Generic, Literal, Optional, TypeVar
+from typing import BinaryIO, Generic, Literal, TypeVar
 
 from attrs import define
 
@@ -14,7 +14,7 @@ class Unset:
 
 UNSET: Unset = Unset()
 
-FileJsonType = tuple[Optional[str], BinaryIO, Optional[str]]
+FileJsonType = tuple[str | None, BinaryIO, str | None]
 
 
 @define
@@ -22,8 +22,8 @@ class File:
     """Contains information for file uploads"""
 
     payload: BinaryIO
-    file_name: Optional[str] = None
-    mime_type: Optional[str] = None
+    file_name: str | None = None
+    mime_type: str | None = None
 
     def to_tuple(self) -> FileJsonType:
         """Return a tuple representation that httpx will accept for multipart/form-data"""
@@ -40,7 +40,7 @@ class Response(Generic[T]):
     status_code: HTTPStatus
     content: bytes
     headers: MutableMapping[str, str]
-    parsed: Optional[T]
+    parsed: T | None
 
 
 __all__ = ["UNSET", "File", "FileJsonType", "Response", "Unset"]
