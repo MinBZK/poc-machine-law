@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.1.1 (2026-01-20)
+
+### Bug Fixes
+
+- Update regelrecht-laws submodule with huurtoeslag fix
+  ([#333](https://github.com/MinBZK/poc-machine-law/pull/333),
+  [`f2525fa`](https://github.com/MinBZK/poc-machine-law/commit/f2525fac43cb5d4f22d5b9e882949d0720f35390))
+
+### Chores
+
+- Sync VERSION file to 1.1.0
+  ([`e66e2e7`](https://github.com/MinBZK/poc-machine-law/commit/e66e2e79cb8c96bc358224cd947632eb9bf01393))
+
+
 ## v1.1.0 (2026-01-19)
 
 ### Chores
