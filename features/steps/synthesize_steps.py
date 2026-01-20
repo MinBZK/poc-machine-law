@@ -75,7 +75,8 @@ def step_check_requirements(context):
     # Check for operation keywords
     yaml_str = yaml.dump(context.yaml_spec["requirements"])
     assert any(
-        op in yaml_str for op in ["LESS_OR_EQUAL", "GREATER_THAN", "GREATER_OR_EQUAL", "LESS_THAN", "EQUALS", "or", "all"]
+        op in yaml_str
+        for op in ["LESS_OR_EQUAL", "GREATER_THAN", "GREATER_OR_EQUAL", "LESS_THAN", "EQUALS", "or", "all"]
     )
 
 
@@ -163,7 +164,9 @@ def step_genereer_uitleg(context):
     for i, rule in enumerate(context.model.eligibility_rules, 1):
         lines.append(f"### Situatie {i}")
         for condition in rule.conditions:
-            parts = condition.replace("<=", " <= ").replace(">=", " >= ").replace(">", " > ").replace("<", " < ").split()
+            parts = (
+                condition.replace("<=", " <= ").replace(">=", " >= ").replace(">", " > ").replace("<", " < ").split()
+            )
             feature = parts[0]
             feature_text = feature_nl.get(feature, feature)
             lines.append(f"- {feature_text}: {' '.join(parts[1:])}")
