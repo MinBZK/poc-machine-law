@@ -1,0 +1,103 @@
+{% macro render_law_section(section_name, section_label, laws, badge_class) %}
+{% if laws %}
+<div class="law-section" x-data="{ open: false }">
+    <button @click="open = !open" class="law-section-header">
+        <span>{{ section_label }}</span>
+        <span class="law-badge {{ badge_class }}">{{ laws|length }}</span>
+        <span class="law-chevron" :class="{ 'rotated': open }">▸</span>
+    </button>
+    <div x-show="open" x-collapse class="law-section-content">
+        {% for service, service_laws in laws.items() %}
+        <div class="law-service-group">
+            <span class="law-service-name">{{ service|replace('_', ' ')|title }}</span>
+            {% for law_name, enabled in service_laws.items() %}
+            {% set sanitized_law_name = law_name|replace('/', '__') %}
+            <div class="law-toggle-row">
+                <span class="law-name {{ 'disabled' if not enabled }}">{{ law_name|replace('_', ' ')|truncate(25) }}</span>
+                <button class="toggle-btn-mini {{ 'enabled' if enabled else '' }}"
+                        hx-post="/admin/set-feature-flag"
+                        hx-target="#demo-law-flags"
+                        hx-swap="innerHTML"
+                        hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}", "source": "demo-law"}'>
+                    <div class="toggle-knob"></div>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endmacro %}
+
+{{ render_law_section('citizen', 'Burger', law_flags.citizen, 'blue') }}
+{{ render_law_section('business', 'Bedrijven', law_flags.business, 'green') }}
+{{ render_law_section('delegation', 'Delegatie', law_flags.delegation, 'purple') }}
+
+<style>
+.law-section {
+    margin-bottom: 4px;
+}
+.law-section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 6px 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+}
+.law-section-header:hover {
+    background: var(--hover-bg, rgba(0,0,0,0.05));
+}
+.law-badge {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+.law-badge.blue { background: #dbeafe; color: #1e40af; }
+.law-badge.green { background: #dcfce7; color: #166534; }
+.law-badge.purple { background: #f3e8ff; color: #6b21a8; }
+.law-chevron {
+    margin-left: auto;
+    transition: transform 0.2s;
+    font-size: 10px;
+}
+.law-chevron.rotated { transform: rotate(90deg); }
+.law-section-content {
+    padding: 4px 8px 8px 16px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.law-service-group {
+    margin-bottom: 6px;
+}
+.law-service-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted, #888);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.law-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 11px;
+}
+.law-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-primary, #333);
+}
+.law-name.disabled {
+    color: var(--text-muted, #999);
+}
+</style>
