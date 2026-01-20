@@ -132,18 +132,28 @@ class PythonMachineService(EngineInterface):
             path=to_path_node(result.path),
         )
 
-    def get_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
+    def get_discoverable_service_laws(
+        self, discoverable_by="CITIZEN", filter_disabled: bool = True
+    ) -> dict[str, list[str]]:
         """
         Get laws discoverable by citizens using the embedded Python machine.service library.
 
-        Filters laws based on feature flags if they exist.
-        """
-        from web.feature_flags import FeatureFlags
+        Args:
+            discoverable_by: The type of entity discovering laws (CITIZEN, BUSINESS, DELEGATION_PROVIDER)
+            filter_disabled: If True, filter out laws disabled via feature flags. Set to False for admin UI.
 
+        Returns:
+            Dictionary mapping service names to lists of law names
+        """
         # Get discoverable laws from the service
         all_laws = self.services.get_discoverable_service_laws(discoverable_by)
 
+        if not filter_disabled:
+            return all_laws
+
         # Filter based on feature flags
+        from web.feature_flags import FeatureFlags
+
         result = {}
         for service, laws in all_laws.items():
             result[service] = []
@@ -154,15 +164,6 @@ class PythonMachineService(EngineInterface):
                     result[service].append(law)
 
         return result
-
-    def get_all_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
-        """
-        Get all discoverable laws without feature flag filtering (for admin UI).
-
-        This method returns all laws regardless of their enabled/disabled status,
-        allowing the admin UI to show toggles for disabled laws.
-        """
-        return self.services.get_discoverable_service_laws(discoverable_by)
 
     def get_rule_spec(self, law: str, reference_date: str, service: str) -> dict[str, Any]:
         """

@@ -128,9 +128,9 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     feature_flags = FeatureFlags.get_all()
 
     # Get all discoverable laws for each type (without feature flag filtering for admin UI)
-    citizen_laws = services.get_all_discoverable_service_laws("CITIZEN")
-    business_laws = services.get_all_discoverable_service_laws("BUSINESS")
-    delegation_laws = services.get_all_discoverable_service_laws("DELEGATION_PROVIDER")
+    citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
+    business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
+    delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
 
     # Get the feature flags for each law type
     law_flags = {
@@ -258,9 +258,9 @@ async def post_set_feature_flag(
         # Check if it's a law feature flag
         if flag_name.startswith(FeatureFlags.LAW_PREFIX):
             # Get all discoverable laws for each type (without feature flag filtering for admin UI)
-            citizen_laws = services.get_all_discoverable_service_laws("CITIZEN")
-            business_laws = services.get_all_discoverable_service_laws("BUSINESS")
-            delegation_laws = services.get_all_discoverable_service_laws("DELEGATION_PROVIDER")
+            citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
+            business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
+            delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
 
             # Get the feature flags for each law type
             law_flags = {
