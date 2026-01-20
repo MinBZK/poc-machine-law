@@ -2,6 +2,52 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-01-20)
+
+### Bug Fixes
+
+- Ensure menu button appears above PoC ribbon
+  ([#339](https://github.com/MinBZK/poc-machine-law/pull/339),
+  [`05bef74`](https://github.com/MinBZK/poc-machine-law/commit/05bef74e5659ff103bc33e8cb22337f220d9afa0))
+
+- Format feature_flags partial and disable chat by default
+  ([#339](https://github.com/MinBZK/poc-machine-law/pull/339),
+  [`05bef74`](https://github.com/MinBZK/poc-machine-law/commit/05bef74e5659ff103bc33e8cb22337f220d9afa0))
+
+- Hide kebab menu in zaaksysteem when in demo mode
+  ([#339](https://github.com/MinBZK/poc-machine-law/pull/339),
+  [`05bef74`](https://github.com/MinBZK/poc-machine-law/commit/05bef74e5659ff103bc33e8cb22337f220d9afa0))
+
+- Remove PoC ribbon from demo mode due to z-index issues
+  ([#339](https://github.com/MinBZK/poc-machine-law/pull/339),
+  [`05bef74`](https://github.com/MinBZK/poc-machine-law/commit/05bef74e5659ff103bc33e8cb22337f220d9afa0))
+
+### Chores
+
+- Sync VERSION file to 1.2.0
+  ([`225d7db`](https://github.com/MinBZK/poc-machine-law/commit/225d7db019c75795f047af1fc1f69982df2c7955))
+
+### Features
+
+- Add demo mode with PoC ribbon and hidden menus
+  ([#339](https://github.com/MinBZK/poc-machine-law/pull/339),
+  [`05bef74`](https://github.com/MinBZK/poc-machine-law/commit/05bef74e5659ff103bc33e8cb22337f220d9afa0))
+
+- Add VERSION and feature flags to demo menu
+  ([#339](https://github.com/MinBZK/poc-machine-law/pull/339),
+  [`05bef74`](https://github.com/MinBZK/poc-machine-law/commit/05bef74e5659ff103bc33e8cb22337f220d9afa0))
+
+### Testing
+
+- Add Archiefwet 1995 BDD tests and step definitions
+  ([#220](https://github.com/MinBZK/poc-machine-law/pull/220),
+  [`b98e67a`](https://github.com/MinBZK/poc-machine-law/commit/b98e67ac5fbfbe4111f3a53dbedd63fa6e111f7d))
+
+- Add BDD tests for ACICT and AWB Article 1:1 laws
+  ([#208](https://github.com/MinBZK/poc-machine-law/pull/208),
+  [`7e38395`](https://github.com/MinBZK/poc-machine-law/commit/7e383957e2adf162120b46428879e5ff6e9c51a7))
+
+
 ## v1.2.0 (2026-01-20)
 
 ### Bug Fixes
