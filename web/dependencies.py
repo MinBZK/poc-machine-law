@@ -6,6 +6,7 @@ from pathlib import Path
 from config_loader import ConfigLoader
 from engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface
 from engines.factory import CaseManagerFactory, ClaimManagerFactory, MachineFactory
+from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 
@@ -98,6 +99,11 @@ set_engine_id(engine.id)
 
 def get_engine_id() -> str:
     return engine_id
+
+
+def is_demo_mode(request: Request) -> bool:
+    """Check if the request is in demo mode (embedded in /demo workspace)."""
+    return request.query_params.get("demo", "").lower() in ("true", "1", "yes")
 
 
 def setup_jinja_env(directory: str) -> Jinja2Templates:
