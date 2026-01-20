@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -36,8 +36,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[CaseReviewResponse200, CaseReviewResponse400, CaseReviewResponse404, CaseReviewResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CaseReviewResponse200 | CaseReviewResponse400 | CaseReviewResponse404 | CaseReviewResponse500 | None:
     if response.status_code == 200:
         response_200 = CaseReviewResponse200.from_dict(response.json())
 
@@ -61,8 +61,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[CaseReviewResponse200, CaseReviewResponse400, CaseReviewResponse404, CaseReviewResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CaseReviewResponse200 | CaseReviewResponse400 | CaseReviewResponse404 | CaseReviewResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -74,9 +74,9 @@ def _build_response(
 def sync_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseReviewBody,
-) -> Response[Union[CaseReviewResponse200, CaseReviewResponse400, CaseReviewResponse404, CaseReviewResponse500]]:
+) -> Response[CaseReviewResponse200 | CaseReviewResponse400 | CaseReviewResponse404 | CaseReviewResponse500]:
     """Complete a manual review for a case
 
      Submit a verification decision for a case that requires manual review
@@ -108,9 +108,9 @@ def sync_detailed(
 def sync(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseReviewBody,
-) -> Optional[Union[CaseReviewResponse200, CaseReviewResponse400, CaseReviewResponse404, CaseReviewResponse500]]:
+) -> CaseReviewResponse200 | CaseReviewResponse400 | CaseReviewResponse404 | CaseReviewResponse500 | None:
     """Complete a manual review for a case
 
      Submit a verification decision for a case that requires manual review
@@ -137,9 +137,9 @@ def sync(
 async def asyncio_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseReviewBody,
-) -> Response[Union[CaseReviewResponse200, CaseReviewResponse400, CaseReviewResponse404, CaseReviewResponse500]]:
+) -> Response[CaseReviewResponse200 | CaseReviewResponse400 | CaseReviewResponse404 | CaseReviewResponse500]:
     """Complete a manual review for a case
 
      Submit a verification decision for a case that requires manual review
@@ -169,9 +169,9 @@ async def asyncio_detailed(
 async def asyncio(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseReviewBody,
-) -> Optional[Union[CaseReviewResponse200, CaseReviewResponse400, CaseReviewResponse404, CaseReviewResponse500]]:
+) -> CaseReviewResponse200 | CaseReviewResponse400 | CaseReviewResponse404 | CaseReviewResponse500 | None:
     """Complete a manual review for a case
 
      Submit a verification decision for a case that requires manual review

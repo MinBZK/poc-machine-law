@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -13,7 +13,7 @@ from ...types import UNSET, Response, Unset
 
 def _get_kwargs(
     *,
-    discoverable_by: Union[Unset, str] = UNSET,
+    discoverable_by: Unset | str = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
@@ -31,14 +31,13 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[
-    Union[
-        ServiceLawsDiscoverableListResponse200,
-        ServiceLawsDiscoverableListResponse400,
-        ServiceLawsDiscoverableListResponse500,
-    ]
-]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> (
+    ServiceLawsDiscoverableListResponse200
+    | ServiceLawsDiscoverableListResponse400
+    | ServiceLawsDiscoverableListResponse500
+    | None
+):
     if response.status_code == 200:
         response_200 = ServiceLawsDiscoverableListResponse200.from_dict(response.json())
 
@@ -58,13 +57,11 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+    *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    Union[
-        ServiceLawsDiscoverableListResponse200,
-        ServiceLawsDiscoverableListResponse400,
-        ServiceLawsDiscoverableListResponse500,
-    ]
+    ServiceLawsDiscoverableListResponse200
+    | ServiceLawsDiscoverableListResponse400
+    | ServiceLawsDiscoverableListResponse500
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -76,14 +73,12 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-    discoverable_by: Union[Unset, str] = UNSET,
+    client: AuthenticatedClient | Client,
+    discoverable_by: Unset | str = UNSET,
 ) -> Response[
-    Union[
-        ServiceLawsDiscoverableListResponse200,
-        ServiceLawsDiscoverableListResponse400,
-        ServiceLawsDiscoverableListResponse500,
-    ]
+    ServiceLawsDiscoverableListResponse200
+    | ServiceLawsDiscoverableListResponse400
+    | ServiceLawsDiscoverableListResponse500
 ]:
     """Get all discoverable service & laws
 
@@ -112,15 +107,14 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
-    discoverable_by: Union[Unset, str] = UNSET,
-) -> Optional[
-    Union[
-        ServiceLawsDiscoverableListResponse200,
-        ServiceLawsDiscoverableListResponse400,
-        ServiceLawsDiscoverableListResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+    discoverable_by: Unset | str = UNSET,
+) -> (
+    ServiceLawsDiscoverableListResponse200
+    | ServiceLawsDiscoverableListResponse400
+    | ServiceLawsDiscoverableListResponse500
+    | None
+):
     """Get all discoverable service & laws
 
     Args:
@@ -143,14 +137,12 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-    discoverable_by: Union[Unset, str] = UNSET,
+    client: AuthenticatedClient | Client,
+    discoverable_by: Unset | str = UNSET,
 ) -> Response[
-    Union[
-        ServiceLawsDiscoverableListResponse200,
-        ServiceLawsDiscoverableListResponse400,
-        ServiceLawsDiscoverableListResponse500,
-    ]
+    ServiceLawsDiscoverableListResponse200
+    | ServiceLawsDiscoverableListResponse400
+    | ServiceLawsDiscoverableListResponse500
 ]:
     """Get all discoverable service & laws
 
@@ -177,15 +169,14 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
-    discoverable_by: Union[Unset, str] = UNSET,
-) -> Optional[
-    Union[
-        ServiceLawsDiscoverableListResponse200,
-        ServiceLawsDiscoverableListResponse400,
-        ServiceLawsDiscoverableListResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+    discoverable_by: Unset | str = UNSET,
+) -> (
+    ServiceLawsDiscoverableListResponse200
+    | ServiceLawsDiscoverableListResponse400
+    | ServiceLawsDiscoverableListResponse500
+    | None
+):
     """Get all discoverable service & laws
 
     Args:

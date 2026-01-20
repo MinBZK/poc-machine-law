@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union
+from typing import Any, TypeVar
 from uuid import UUID
 
 from attrs import define as _attrs_define
@@ -39,9 +39,9 @@ class Claim:
     reason: str
     claimant: str
     status: ClaimStatus
-    case_id: Union[Unset, UUID] = UNSET
-    old_value: Union[Unset, Any] = UNSET
-    evidence_path: Union[Unset, str] = UNSET
+    case_id: Unset | UUID = UNSET
+    old_value: Unset | Any = UNSET
+    evidence_path: Unset | str = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -63,7 +63,7 @@ class Claim:
 
         status = self.status.value
 
-        case_id: Union[Unset, str] = UNSET
+        case_id: Unset | str = UNSET
         if not isinstance(self.case_id, Unset):
             case_id = str(self.case_id)
 
@@ -117,7 +117,7 @@ class Claim:
         status = ClaimStatus(d.pop("status"))
 
         _case_id = d.pop("caseId", UNSET)
-        case_id: Union[Unset, UUID]
+        case_id: Unset | UUID
         if isinstance(_case_id, Unset):
             case_id = UNSET
         else:

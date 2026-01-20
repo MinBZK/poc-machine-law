@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -26,15 +26,14 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[
-    Union[
-        CaseBasedOnBSNServiceLawResponse200,
-        CaseBasedOnBSNServiceLawResponse400,
-        CaseBasedOnBSNServiceLawResponse404,
-        CaseBasedOnBSNServiceLawResponse500,
-    ]
-]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> (
+    CaseBasedOnBSNServiceLawResponse200
+    | CaseBasedOnBSNServiceLawResponse400
+    | CaseBasedOnBSNServiceLawResponse404
+    | CaseBasedOnBSNServiceLawResponse500
+    | None
+):
     if response.status_code == 200:
         response_200 = CaseBasedOnBSNServiceLawResponse200.from_dict(response.json())
 
@@ -58,14 +57,12 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+    *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    Union[
-        CaseBasedOnBSNServiceLawResponse200,
-        CaseBasedOnBSNServiceLawResponse400,
-        CaseBasedOnBSNServiceLawResponse404,
-        CaseBasedOnBSNServiceLawResponse500,
-    ]
+    CaseBasedOnBSNServiceLawResponse200
+    | CaseBasedOnBSNServiceLawResponse400
+    | CaseBasedOnBSNServiceLawResponse404
+    | CaseBasedOnBSNServiceLawResponse500
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -80,14 +77,12 @@ def sync_detailed(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        CaseBasedOnBSNServiceLawResponse200,
-        CaseBasedOnBSNServiceLawResponse400,
-        CaseBasedOnBSNServiceLawResponse404,
-        CaseBasedOnBSNServiceLawResponse500,
-    ]
+    CaseBasedOnBSNServiceLawResponse200
+    | CaseBasedOnBSNServiceLawResponse400
+    | CaseBasedOnBSNServiceLawResponse404
+    | CaseBasedOnBSNServiceLawResponse500
 ]:
     """Get a case based on bsn, service and law
 
@@ -122,15 +117,14 @@ def sync(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        CaseBasedOnBSNServiceLawResponse200,
-        CaseBasedOnBSNServiceLawResponse400,
-        CaseBasedOnBSNServiceLawResponse404,
-        CaseBasedOnBSNServiceLawResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    CaseBasedOnBSNServiceLawResponse200
+    | CaseBasedOnBSNServiceLawResponse400
+    | CaseBasedOnBSNServiceLawResponse404
+    | CaseBasedOnBSNServiceLawResponse500
+    | None
+):
     """Get a case based on bsn, service and law
 
     Args:
@@ -159,14 +153,12 @@ async def asyncio_detailed(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        CaseBasedOnBSNServiceLawResponse200,
-        CaseBasedOnBSNServiceLawResponse400,
-        CaseBasedOnBSNServiceLawResponse404,
-        CaseBasedOnBSNServiceLawResponse500,
-    ]
+    CaseBasedOnBSNServiceLawResponse200
+    | CaseBasedOnBSNServiceLawResponse400
+    | CaseBasedOnBSNServiceLawResponse404
+    | CaseBasedOnBSNServiceLawResponse500
 ]:
     """Get a case based on bsn, service and law
 
@@ -199,15 +191,14 @@ async def asyncio(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        CaseBasedOnBSNServiceLawResponse200,
-        CaseBasedOnBSNServiceLawResponse400,
-        CaseBasedOnBSNServiceLawResponse404,
-        CaseBasedOnBSNServiceLawResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    CaseBasedOnBSNServiceLawResponse200
+    | CaseBasedOnBSNServiceLawResponse400
+    | CaseBasedOnBSNServiceLawResponse404
+    | CaseBasedOnBSNServiceLawResponse500
+    | None
+):
     """Get a case based on bsn, service and law
 
     Args:

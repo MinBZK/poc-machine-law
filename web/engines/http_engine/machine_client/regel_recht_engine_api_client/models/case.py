@@ -47,10 +47,10 @@ class Case:
     approved_claims_only: bool
     rulespec_id: UUID
     status: CaseStatus
-    approved: Union[Unset, bool] = UNSET
+    approved: Unset | bool = UNSET
     objection_status: Union[Unset, "CaseObjectionStatus"] = UNSET
     appeal_status: Union[Unset, "CaseAppealStatus"] = UNSET
-    claim_ids: Union[Unset, list[UUID]] = UNSET
+    claim_ids: Unset | list[UUID] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -76,15 +76,15 @@ class Case:
 
         approved = self.approved
 
-        objection_status: Union[Unset, dict[str, Any]] = UNSET
+        objection_status: Unset | dict[str, Any] = UNSET
         if not isinstance(self.objection_status, Unset):
             objection_status = self.objection_status.to_dict()
 
-        appeal_status: Union[Unset, dict[str, Any]] = UNSET
+        appeal_status: Unset | dict[str, Any] = UNSET
         if not isinstance(self.appeal_status, Unset):
             appeal_status = self.appeal_status.to_dict()
 
-        claim_ids: Union[Unset, list[str]] = UNSET
+        claim_ids: Unset | list[str] = UNSET
         if not isinstance(self.claim_ids, Unset):
             claim_ids = []
             for claim_ids_item_data in self.claim_ids:
@@ -147,14 +147,14 @@ class Case:
         approved = d.pop("approved", UNSET)
 
         _objection_status = d.pop("objectionStatus", UNSET)
-        objection_status: Union[Unset, CaseObjectionStatus]
+        objection_status: Unset | CaseObjectionStatus
         if isinstance(_objection_status, Unset):
             objection_status = UNSET
         else:
             objection_status = CaseObjectionStatus.from_dict(_objection_status)
 
         _appeal_status = d.pop("appealStatus", UNSET)
-        appeal_status: Union[Unset, CaseAppealStatus]
+        appeal_status: Unset | CaseAppealStatus
         if isinstance(_appeal_status, Unset):
             appeal_status = UNSET
         else:

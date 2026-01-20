@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -24,15 +24,14 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[
-    Union[
-        CaseListBasedOnBSNResponse200,
-        CaseListBasedOnBSNResponse400,
-        CaseListBasedOnBSNResponse404,
-        CaseListBasedOnBSNResponse500,
-    ]
-]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> (
+    CaseListBasedOnBSNResponse200
+    | CaseListBasedOnBSNResponse400
+    | CaseListBasedOnBSNResponse404
+    | CaseListBasedOnBSNResponse500
+    | None
+):
     if response.status_code == 200:
         response_200 = CaseListBasedOnBSNResponse200.from_dict(response.json())
 
@@ -56,14 +55,12 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+    *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    Union[
-        CaseListBasedOnBSNResponse200,
-        CaseListBasedOnBSNResponse400,
-        CaseListBasedOnBSNResponse404,
-        CaseListBasedOnBSNResponse500,
-    ]
+    CaseListBasedOnBSNResponse200
+    | CaseListBasedOnBSNResponse400
+    | CaseListBasedOnBSNResponse404
+    | CaseListBasedOnBSNResponse500
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -76,14 +73,12 @@ def _build_response(
 def sync_detailed(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        CaseListBasedOnBSNResponse200,
-        CaseListBasedOnBSNResponse400,
-        CaseListBasedOnBSNResponse404,
-        CaseListBasedOnBSNResponse500,
-    ]
+    CaseListBasedOnBSNResponse200
+    | CaseListBasedOnBSNResponse400
+    | CaseListBasedOnBSNResponse404
+    | CaseListBasedOnBSNResponse500
 ]:
     """Get all cases based on a bsn
 
@@ -112,15 +107,14 @@ def sync_detailed(
 def sync(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        CaseListBasedOnBSNResponse200,
-        CaseListBasedOnBSNResponse400,
-        CaseListBasedOnBSNResponse404,
-        CaseListBasedOnBSNResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    CaseListBasedOnBSNResponse200
+    | CaseListBasedOnBSNResponse400
+    | CaseListBasedOnBSNResponse404
+    | CaseListBasedOnBSNResponse500
+    | None
+):
     """Get all cases based on a bsn
 
     Args:
@@ -143,14 +137,12 @@ def sync(
 async def asyncio_detailed(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        CaseListBasedOnBSNResponse200,
-        CaseListBasedOnBSNResponse400,
-        CaseListBasedOnBSNResponse404,
-        CaseListBasedOnBSNResponse500,
-    ]
+    CaseListBasedOnBSNResponse200
+    | CaseListBasedOnBSNResponse400
+    | CaseListBasedOnBSNResponse404
+    | CaseListBasedOnBSNResponse500
 ]:
     """Get all cases based on a bsn
 
@@ -177,15 +169,14 @@ async def asyncio_detailed(
 async def asyncio(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        CaseListBasedOnBSNResponse200,
-        CaseListBasedOnBSNResponse400,
-        CaseListBasedOnBSNResponse404,
-        CaseListBasedOnBSNResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    CaseListBasedOnBSNResponse200
+    | CaseListBasedOnBSNResponse400
+    | CaseListBasedOnBSNResponse404
+    | CaseListBasedOnBSNResponse500
+    | None
+):
     """Get all cases based on a bsn
 
     Args:

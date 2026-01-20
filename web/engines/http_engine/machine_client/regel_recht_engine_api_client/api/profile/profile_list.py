@@ -1,6 +1,6 @@
 import datetime
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -14,11 +14,11 @@ from ...types import UNSET, Response, Unset
 
 def _get_kwargs(
     *,
-    effective_date: Union[Unset, datetime.date] = UNSET,
+    effective_date: Unset | datetime.date = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
-    json_effective_date: Union[Unset, str] = UNSET
+    json_effective_date: Unset | str = UNSET
     if not isinstance(effective_date, Unset):
         json_effective_date = effective_date.isoformat()
     params["effective_date"] = json_effective_date
@@ -35,8 +35,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> ProfileListResponse200 | ProfileListResponse400 | ProfileListResponse500 | None:
     if response.status_code == 200:
         response_200 = ProfileListResponse200.from_dict(response.json())
 
@@ -56,8 +56,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[ProfileListResponse200 | ProfileListResponse400 | ProfileListResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -68,9 +68,9 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-    effective_date: Union[Unset, datetime.date] = UNSET,
-) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
+    client: AuthenticatedClient | Client,
+    effective_date: Unset | datetime.date = UNSET,
+) -> Response[ProfileListResponse200 | ProfileListResponse400 | ProfileListResponse500]:
     """Get all profiles
 
     Args:
@@ -97,9 +97,9 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
-    effective_date: Union[Unset, datetime.date] = UNSET,
-) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
+    client: AuthenticatedClient | Client,
+    effective_date: Unset | datetime.date = UNSET,
+) -> ProfileListResponse200 | ProfileListResponse400 | ProfileListResponse500 | None:
     """Get all profiles
 
     Args:
@@ -121,9 +121,9 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-    effective_date: Union[Unset, datetime.date] = UNSET,
-) -> Response[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
+    client: AuthenticatedClient | Client,
+    effective_date: Unset | datetime.date = UNSET,
+) -> Response[ProfileListResponse200 | ProfileListResponse400 | ProfileListResponse500]:
     """Get all profiles
 
     Args:
@@ -148,9 +148,9 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
-    effective_date: Union[Unset, datetime.date] = UNSET,
-) -> Optional[Union[ProfileListResponse200, ProfileListResponse400, ProfileListResponse500]]:
+    client: AuthenticatedClient | Client,
+    effective_date: Unset | datetime.date = UNSET,
+) -> ProfileListResponse200 | ProfileListResponse400 | ProfileListResponse500 | None:
     """Get all profiles
 
     Args:

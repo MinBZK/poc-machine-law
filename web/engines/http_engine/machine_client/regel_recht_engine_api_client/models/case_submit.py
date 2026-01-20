@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -32,7 +32,7 @@ class CaseSubmit:
     parameters: Any
     claimed_result: Any
     approved_claims_only: bool
-    effective_date: Union[Unset, datetime.date] = UNSET
+    effective_date: Unset | datetime.date = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -48,7 +48,7 @@ class CaseSubmit:
 
         approved_claims_only = self.approved_claims_only
 
-        effective_date: Union[Unset, str] = UNSET
+        effective_date: Unset | str = UNSET
         if not isinstance(self.effective_date, Unset):
             effective_date = self.effective_date.isoformat()
 
@@ -85,7 +85,7 @@ class CaseSubmit:
         approved_claims_only = d.pop("approvedClaimsOnly")
 
         _effective_date = d.pop("effective_date", UNSET)
-        effective_date: Union[Unset, datetime.date]
+        effective_date: Unset | datetime.date
         if isinstance(_effective_date, Unset):
             effective_date = UNSET
         else:

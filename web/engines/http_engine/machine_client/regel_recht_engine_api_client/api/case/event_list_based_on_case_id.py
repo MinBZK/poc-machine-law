@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -25,15 +25,14 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[
-    Union[
-        EventListBasedOnCaseIDResponse200,
-        EventListBasedOnCaseIDResponse400,
-        EventListBasedOnCaseIDResponse404,
-        EventListBasedOnCaseIDResponse500,
-    ]
-]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> (
+    EventListBasedOnCaseIDResponse200
+    | EventListBasedOnCaseIDResponse400
+    | EventListBasedOnCaseIDResponse404
+    | EventListBasedOnCaseIDResponse500
+    | None
+):
     if response.status_code == 200:
         response_200 = EventListBasedOnCaseIDResponse200.from_dict(response.json())
 
@@ -57,14 +56,12 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+    *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    Union[
-        EventListBasedOnCaseIDResponse200,
-        EventListBasedOnCaseIDResponse400,
-        EventListBasedOnCaseIDResponse404,
-        EventListBasedOnCaseIDResponse500,
-    ]
+    EventListBasedOnCaseIDResponse200
+    | EventListBasedOnCaseIDResponse400
+    | EventListBasedOnCaseIDResponse404
+    | EventListBasedOnCaseIDResponse500
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -77,14 +74,12 @@ def _build_response(
 def sync_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        EventListBasedOnCaseIDResponse200,
-        EventListBasedOnCaseIDResponse400,
-        EventListBasedOnCaseIDResponse404,
-        EventListBasedOnCaseIDResponse500,
-    ]
+    EventListBasedOnCaseIDResponse200
+    | EventListBasedOnCaseIDResponse400
+    | EventListBasedOnCaseIDResponse404
+    | EventListBasedOnCaseIDResponse500
 ]:
     """Get a list of events based on a case id
 
@@ -113,15 +108,14 @@ def sync_detailed(
 def sync(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        EventListBasedOnCaseIDResponse200,
-        EventListBasedOnCaseIDResponse400,
-        EventListBasedOnCaseIDResponse404,
-        EventListBasedOnCaseIDResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    EventListBasedOnCaseIDResponse200
+    | EventListBasedOnCaseIDResponse400
+    | EventListBasedOnCaseIDResponse404
+    | EventListBasedOnCaseIDResponse500
+    | None
+):
     """Get a list of events based on a case id
 
     Args:
@@ -144,14 +138,12 @@ def sync(
 async def asyncio_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        EventListBasedOnCaseIDResponse200,
-        EventListBasedOnCaseIDResponse400,
-        EventListBasedOnCaseIDResponse404,
-        EventListBasedOnCaseIDResponse500,
-    ]
+    EventListBasedOnCaseIDResponse200
+    | EventListBasedOnCaseIDResponse400
+    | EventListBasedOnCaseIDResponse404
+    | EventListBasedOnCaseIDResponse500
 ]:
     """Get a list of events based on a case id
 
@@ -178,15 +170,14 @@ async def asyncio_detailed(
 async def asyncio(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        EventListBasedOnCaseIDResponse200,
-        EventListBasedOnCaseIDResponse400,
-        EventListBasedOnCaseIDResponse404,
-        EventListBasedOnCaseIDResponse500,
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    EventListBasedOnCaseIDResponse200
+    | EventListBasedOnCaseIDResponse400
+    | EventListBasedOnCaseIDResponse404
+    | EventListBasedOnCaseIDResponse500
+    | None
+):
     """Get a list of events based on a case id
 
     Args:

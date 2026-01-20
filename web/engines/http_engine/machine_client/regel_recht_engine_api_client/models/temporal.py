@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -20,27 +20,27 @@ class Temporal:
     """
 
     type_: str
-    period_type: Union[None, Unset, str] = UNSET
-    reference: Union[None, Unset, str] = UNSET
-    immutable_after: Union[None, Unset, str] = UNSET
+    period_type: None | Unset | str = UNSET
+    reference: None | Unset | str = UNSET
+    immutable_after: None | Unset | str = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         type_ = self.type_
 
-        period_type: Union[None, Unset, str]
+        period_type: None | Unset | str
         if isinstance(self.period_type, Unset):
             period_type = UNSET
         else:
             period_type = self.period_type
 
-        reference: Union[None, Unset, str]
+        reference: None | Unset | str
         if isinstance(self.reference, Unset):
             reference = UNSET
         else:
             reference = self.reference
 
-        immutable_after: Union[None, Unset, str]
+        immutable_after: None | Unset | str
         if isinstance(self.immutable_after, Unset):
             immutable_after = UNSET
         else:
@@ -67,30 +67,30 @@ class Temporal:
         d = dict(src_dict)
         type_ = d.pop("type")
 
-        def _parse_period_type(data: object) -> Union[None, Unset, str]:
+        def _parse_period_type(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         period_type = _parse_period_type(d.pop("period_type", UNSET))
 
-        def _parse_reference(data: object) -> Union[None, Unset, str]:
+        def _parse_reference(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         reference = _parse_reference(d.pop("reference", UNSET))
 
-        def _parse_immutable_after(data: object) -> Union[None, Unset, str]:
+        def _parse_immutable_after(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         immutable_after = _parse_immutable_after(d.pop("immutable_after", UNSET))
 

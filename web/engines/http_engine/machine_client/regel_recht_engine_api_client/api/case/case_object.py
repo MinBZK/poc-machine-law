@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -36,8 +36,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[CaseObjectResponse200, CaseObjectResponse400, CaseObjectResponse404, CaseObjectResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CaseObjectResponse200 | CaseObjectResponse400 | CaseObjectResponse404 | CaseObjectResponse500 | None:
     if response.status_code == 200:
         response_200 = CaseObjectResponse200.from_dict(response.json())
 
@@ -61,8 +61,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[CaseObjectResponse200, CaseObjectResponse400, CaseObjectResponse404, CaseObjectResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CaseObjectResponse200 | CaseObjectResponse400 | CaseObjectResponse404 | CaseObjectResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -74,9 +74,9 @@ def _build_response(
 def sync_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseObjectBody,
-) -> Response[Union[CaseObjectResponse200, CaseObjectResponse400, CaseObjectResponse404, CaseObjectResponse500]]:
+) -> Response[CaseObjectResponse200 | CaseObjectResponse400 | CaseObjectResponse404 | CaseObjectResponse500]:
     """Object to a decision on a case
 
      Submit a objection to a decision of a case
@@ -108,9 +108,9 @@ def sync_detailed(
 def sync(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseObjectBody,
-) -> Optional[Union[CaseObjectResponse200, CaseObjectResponse400, CaseObjectResponse404, CaseObjectResponse500]]:
+) -> CaseObjectResponse200 | CaseObjectResponse400 | CaseObjectResponse404 | CaseObjectResponse500 | None:
     """Object to a decision on a case
 
      Submit a objection to a decision of a case
@@ -137,9 +137,9 @@ def sync(
 async def asyncio_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseObjectBody,
-) -> Response[Union[CaseObjectResponse200, CaseObjectResponse400, CaseObjectResponse404, CaseObjectResponse500]]:
+) -> Response[CaseObjectResponse200 | CaseObjectResponse400 | CaseObjectResponse404 | CaseObjectResponse500]:
     """Object to a decision on a case
 
      Submit a objection to a decision of a case
@@ -169,9 +169,9 @@ async def asyncio_detailed(
 async def asyncio(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: CaseObjectBody,
-) -> Optional[Union[CaseObjectResponse200, CaseObjectResponse400, CaseObjectResponse404, CaseObjectResponse500]]:
+) -> CaseObjectResponse200 | CaseObjectResponse400 | CaseObjectResponse404 | CaseObjectResponse500 | None:
     """Object to a decision on a case
 
      Submit a objection to a decision of a case

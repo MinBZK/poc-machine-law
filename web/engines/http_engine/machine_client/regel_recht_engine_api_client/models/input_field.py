@@ -35,7 +35,7 @@ class InputField:
     service_reference: "ServiceReference"
     type_spec: Union[Unset, "TypeSpec"] = UNSET
     temporal: Union[Unset, "Temporal"] = UNSET
-    required: Union[None, Unset, bool] = UNSET
+    required: None | Unset | bool = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -47,15 +47,15 @@ class InputField:
 
         service_reference = self.service_reference.to_dict()
 
-        type_spec: Union[Unset, dict[str, Any]] = UNSET
+        type_spec: Unset | dict[str, Any] = UNSET
         if not isinstance(self.type_spec, Unset):
             type_spec = self.type_spec.to_dict()
 
-        temporal: Union[Unset, dict[str, Any]] = UNSET
+        temporal: Unset | dict[str, Any] = UNSET
         if not isinstance(self.temporal, Unset):
             temporal = self.temporal.to_dict()
 
-        required: Union[None, Unset, bool]
+        required: None | Unset | bool
         if isinstance(self.required, Unset):
             required = UNSET
         else:
@@ -96,25 +96,25 @@ class InputField:
         service_reference = ServiceReference.from_dict(d.pop("service_reference"))
 
         _type_spec = d.pop("type_spec", UNSET)
-        type_spec: Union[Unset, TypeSpec]
+        type_spec: Unset | TypeSpec
         if isinstance(_type_spec, Unset):
             type_spec = UNSET
         else:
             type_spec = TypeSpec.from_dict(_type_spec)
 
         _temporal = d.pop("temporal", UNSET)
-        temporal: Union[Unset, Temporal]
+        temporal: Unset | Temporal
         if isinstance(_temporal, Unset):
             temporal = UNSET
         else:
             temporal = Temporal.from_dict(_temporal)
 
-        def _parse_required(data: object) -> Union[None, Unset, bool]:
+        def _parse_required(data: object) -> None | Unset | bool:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, bool], data)
+            return cast(None | Unset | bool, data)
 
         required = _parse_required(d.pop("required", UNSET))
 
