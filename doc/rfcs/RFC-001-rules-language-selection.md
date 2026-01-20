@@ -10,7 +10,7 @@ During the proof-of-concept phase, we developed and tested a custom YAML-based l
 
 ## Decision
 
-**Continue with and formalize the custom YAML-based rules language, with optional future conversion capabilities from existing rules languages.**
+**Continue with and formalize the custom YAML-based rules language ("RegelRecht YAML"), with optional future conversion capabilities from existing rules languages.**
 
 The language:
 - Uses YAML syntax for structure and human readability
@@ -226,6 +226,26 @@ ineligible_reason(Person, "te jong") :-
 - Would require significant investment to adopt
 - Formal verification capabilities valuable but not immediate need
 
+### Regelspraak / RuleSpeak (Adoption: Low)
+**Strengths**:
+- Controlled natural language approach readable by non-programmers
+- Rules expressed in structured Dutch/English sentences
+- Lower barrier for legal experts to review and validate
+- Bridges gap between legal text and executable rules
+
+**Context**:
+- RuleSpeak originated from SBVR (Semantics of Business Vocabulary and Rules)
+- Regelspraak is a Dutch adaptation of controlled natural language principles
+- Used in some Dutch government contexts for rule documentation
+- Focus on human readability over machine execution
+
+**Fit assessment**:
+- Strong for documentation and stakeholder communication
+- Requires translation layer to executable code
+- Less precise semantics than formal languages
+- Complementary approach rather than primary execution language
+- Could inform human-readable rule documentation alongside YAML
+
 ### Other Logic Programming Options
 **Answer Set Programming (ASP)** (Adoption: Low): Handles non-monotonic reasoning common in legal rules; primarily research-focused
 
@@ -241,3 +261,5 @@ ineligible_reason(Person, "te jong") :-
 - [Catala](https://catala-lang.org/) - Programming language for law
 - [Souffle](https://souffle-lang.github.io/) - High-performance Datalog engine
 - [PyDatalog](https://github.com/pcarbonn/pyDatalog) - Python Datalog implementation
+- [RuleSpeak](http://www.rulespeak.com/) - Controlled natural language for business rules
+- [SBVR](https://www.omg.org/spec/SBVR/) - Semantics of Business Vocabulary and Rules

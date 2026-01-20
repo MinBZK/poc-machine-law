@@ -15,7 +15,7 @@ Machine Law needs structured documentation for design decisions, architectural c
 ```markdown
 # RFC-NNN: Title
 
-**Status:** [Proposed | Accepted | Rejected | Superseded]
+**Status:** [Draft | Proposed | Accepted | Rejected | Superseded]
 **Date:** YYYY-MM-DD
 **Authors:** Name(s)
 
@@ -30,7 +30,7 @@ Benefits, tradeoffs, alternatives
 ```
 
 **Numbering**: Sequential (RFC-000 reserved for process, RFC-001+)
-**Statuses**: Proposed, Accepted, Rejected, Superseded
+**Statuses**: Draft, Proposed, Accepted, Rejected, Superseded
 
 ## Why
 
