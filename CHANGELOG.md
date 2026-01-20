@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-01-20)
+
+### Chores
+
+- Sync VERSION file to 1.3.0
+  ([`07de281`](https://github.com/MinBZK/poc-machine-law/commit/07de281fa4560b47987fb40355ee62128dac259b))
+
+### Features
+
+- Increase huurtoeslag profile income for better demo
+  ([#340](https://github.com/MinBZK/poc-machine-law/pull/340),
+  [`6ecf3f9`](https://github.com/MinBZK/poc-machine-law/commit/6ecf3f9dd96bcbe50754e54e3b94f170060eabab))
+
+
 ## v1.3.0 (2026-01-20)
 
 ### Bug Fixes
