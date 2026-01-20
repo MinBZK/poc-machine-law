@@ -101,7 +101,9 @@ class SynthesisValidator:
         # Check if validation passed
         passed = self._check_passed(metrics)
 
-        return ValidationReport(metrics=metrics, problematic_cases=problematic, recommendations=recommendations, passed=passed)
+        return ValidationReport(
+            metrics=metrics, problematic_cases=problematic, recommendations=recommendations, passed=passed
+        )
 
     def _calculate_metrics(
         self,

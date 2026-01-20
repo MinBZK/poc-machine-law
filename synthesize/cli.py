@@ -175,7 +175,9 @@ def explain_command(args: argparse.Namespace) -> int:
         lines.append("")
         for condition in rule.conditions:
             # Parse and translate condition
-            parts = condition.replace("<=", " <= ").replace(">=", " >= ").replace(">", " > ").replace("<", " < ").split()
+            parts = (
+                condition.replace("<=", " <= ").replace(">=", " >= ").replace(">", " > ").replace("<", " < ").split()
+            )
             feature = parts[0]
             operator = parts[1]
             value = parts[2]
