@@ -75,6 +75,13 @@ def step_impl(context, bsn):
 def step_impl(context, date):
     context.parameters["VERKIEZINGSDATUM"] = date
 
+@given('een gevraagde uitvoer "{output}"')
+def step_impl(context, output):
+    context.requested_output = output
+
+@given('de parameter "{parameter}" is "{value}"')
+def step_impl(context, parameter, value):
+    context.parameters[parameter] = value
 
 def evaluate_law(context, service, law, approved=True):
     context.result = context.services.evaluate(
@@ -83,6 +90,7 @@ def evaluate_law(context, service, law, approved=True):
         parameters=context.parameters,
         reference_date=context.root_reference_date,
         overwrite_input=context.test_data,
+        requested_output=context.requested_output,
         approved=approved
     )
 
@@ -277,6 +285,19 @@ def step_impl(context, amount):
     actual_amount = context.result.output["woonkostentoeslag"]
     compare_euro_amount(actual_amount, amount)
 
+@then('heeft Nederlandse nationaliteit')
+def step_impl(context):
+    is_dutch = context.result.output["heeft_nederlandse_nationaliteit"]
+    assertions.assertTrue(is_dutch)
+
+@then('heeft geen Nederlandse nationaliteit')
+def step_impl(context):
+    is_dutch = context.result.output["heeft_nederlandse_nationaliteit"]
+    assertions.assertFalse(is_dutch)
+
+@then('heeft output {output} met waarde {value}')
+def step_impl(context, output, value):
+    assertions.assertEqual(str(context.result.output[output]), str(value))
 
 @then('is het startkapitaal "{amount}" euro')
 def step_impl(context, amount):

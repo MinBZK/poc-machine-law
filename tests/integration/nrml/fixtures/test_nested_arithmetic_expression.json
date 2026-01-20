@@ -1,0 +1,114 @@
+{
+  "version": "3.0",
+  "language": "nl",
+  "metadata": {
+    "description": "test_nested_arithmetic_expression"
+  },
+  "inputs": {},
+  "outputs": {
+    "result": {
+      "source": {
+        "$ref": "#/facts/calculated/items/complex_calculation"
+      }
+    }
+  },
+  "facts": {
+    "calculated": {
+      "name": {
+        "nl": "Berekend"
+      },
+      "items": {
+        "complex_calculation": {
+          "name": {
+            "nl": "Complexe berekening"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "target": [
+                {
+                  "$ref": "#/facts/result/items/result_value"
+                }
+              ],
+              "expression": {
+                "type": "arithmetic",
+                "operator": "subtract",
+                "arguments": [
+                  {
+                    "type": "arithmetic",
+                    "operator": "add",
+                    "arguments": [
+                      {
+                        "type": "arithmetic",
+                        "operator": "multiply",
+                        "arguments": [
+                          {
+                            "value": 2
+                          },
+                          {
+                            "value": 5
+                          }
+                        ]
+                      },
+                      {
+                        "value": 10
+                      }
+                    ]
+                  },
+                  {
+                    "type": "arithmetic",
+                    "operator": "divide",
+                    "arguments": [
+                      {
+                        "type": "arithmetic",
+                        "operator": "min",
+                        "arguments": [
+                          {
+                            "value": 4
+                          },
+                          {
+                            "value": 6
+                          }
+                        ]
+                      },
+                      {
+                        "type": "arithmetic",
+                        "operator": "max",
+                        "arguments": [
+                          {
+                            "value": 1
+                          },
+                          {
+                            "value": 2
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "result": {
+      "name": {
+        "nl": "Resultaat"
+      },
+      "items": {
+        "result_value": {
+          "name": {
+            "nl": "Resultaat waarde"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "type": "number"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

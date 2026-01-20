@@ -11,6 +11,20 @@ def before_all(context) -> None:
     log_level = context.config.userdata.get("log_level", "DEBUG")
     context.loggers = configure_logging(log_level)
 
+    # Check if UI tests are explicitly excluded via command-line tags
+    tag_expression = context.config.tags
+    if tag_expression:
+        tag_str = str(tag_expression)
+        # Behave converts ~@ui to -ui in the string representation
+        if "-ui" in tag_str or "not ui" in tag_str:
+            print("UI tests excluded via tags - skipping web server startup")
+            return
+
+    # If no exclusion, we'll start the server on-demand in before_scenario if needed
+    # For now, don't start the server here
+    print("Web server will start on-demand if needed")
+    return
+
     # Start the web server once for all tests that need it
     # Check if server is already running
     server_running = False
@@ -89,6 +103,57 @@ def before_scenario(context, scenario) -> None:
     context.test_data = {}
     context.parameters = {}
     context.result = None
+    context.requested_output = None
+
+    # Start web server on-demand if this is a UI test
+    # Check both scenario tags and feature tags
+    all_tags = list(scenario.tags) + (list(scenario.feature.tags) if hasattr(scenario, "feature") else [])
+    has_ui_tag = any(tag == "ui" for tag in all_tags)
+    if has_ui_tag and not hasattr(context, "web_server_process"):
+        print(f"Starting web server for UI test: {scenario.name}")
+        import os
+
+        # Check if server is already running
+        server_running = False
+        try:
+            response = requests.get("http://localhost:8000", timeout=2)
+            if response.status_code == 200:
+                server_running = True
+                print("Web server is already running")
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            pass
+
+        if not server_running:
+            print("Starting web server...")
+            env = os.environ.copy()
+            if "LANG" not in env:
+                env["LANG"] = "nl_NL.UTF-8"
+            if "LC_ALL" not in env:
+                env["LC_ALL"] = "nl_NL.UTF-8"
+
+            if os.getenv("CI"):
+                context.web_server_process = subprocess.Popen(
+                    ["uv", "run", "web/main.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env
+                )
+            else:
+                context.web_server_process = subprocess.Popen(
+                    ["uv", "run", "web/main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env
+                )
+
+            # Wait for server to be ready
+            max_retries = 30
+            for i in range(max_retries):
+                try:
+                    response = requests.get("http://localhost:8000", timeout=1)
+                    if response.status_code == 200:
+                        print(f"Web server started successfully after {i + 1} attempts")
+                        break
+                except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+                    time.sleep(1)
+            else:
+                if hasattr(context, "web_server_process"):
+                    context.web_server_process.terminate()
+                raise AssertionError("Failed to start web server after 30 seconds")
 
 
 def after_scenario(context, scenario) -> None:

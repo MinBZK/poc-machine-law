@@ -1,0 +1,180 @@
+{
+  "version": "3.0",
+  "language": "nl",
+  "metadata": {"description": "test_count_with_characteristic"},
+  "inputs": {
+    "kinderen": {"type": {"$ref": "#/facts/child"}, "properties": {"age": "#/facts/child/items/age"}},
+    "aanvrager": {"type": {"$ref": "#/facts/applicant"}}
+  },
+  "outputs": {
+    "total_benefit": {"source": {"$ref": "#/facts/calculated/items/total_benefit"}}
+  },
+  "facts": {
+    "applicant": {
+      "name": {"nl": "aanvrager", "en": "applicant"},
+      "definite_article": {"nl": "de", "en": "the"},
+      "items": {}
+    },
+    "child": {
+      "name": {"nl": "kind", "en": "child"},
+      "definite_article": {"nl": "het", "en": "the"},
+      "items": {
+        "age": {
+          "name": {"nl": "leeftijd", "en": "age"},
+          "article": {"nl": "de", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "numeric",
+              "subtype": "integer",
+              "unit": "jaar"
+            }
+          ]
+        },
+        "jong-kind": {
+          "name": {"nl": "jong kind", "en": "young child"},
+          "article": {"nl": "een", "en": "a"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "characteristic"
+            }
+          ]
+        }
+      }
+    },
+    "kinderen_van": {
+      "name": {"nl": "kinderen van", "en": "children of"},
+      "definite_article": {"nl": "de", "en": "the"},
+      "items": {
+        "relatie_definitie": {
+          "name": {"nl": "kind", "en": "child"},
+          "article": {"nl": "een", "en": "a"},
+          "plural": {"nl": "kinderen", "en": "children"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "arguments": [
+                {
+                  "uuid": "parent-arg",
+                  "name": {"nl": "ouder", "en": "parent"},
+                  "cardinality": "one",
+                  "objectType": {"$ref": "#/facts/applicant"}
+                },
+                {
+                  "uuid": "child-arg",
+                  "name": {"nl": "kind", "en": "child"},
+                  "plural": {"nl": "kinderen", "en": "children"},
+                  "cardinality": "many",
+                  "objectType": {"$ref": "#/facts/child"}
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "constants": {
+      "name": {"nl": "constanten", "en": "constants"},
+      "definite_article": {"nl": "de", "en": "the"},
+      "items": {
+        "benefit_per_child": {
+          "name": {"nl": "bedrag per kind", "en": "benefit per child"},
+          "article": {"nl": "het", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "numeric",
+              "subtype": "decimal",
+              "unit": "euro",
+              "value": 250.50
+            }
+          ]
+        }
+      }
+    },
+    "calculated": {
+      "name": {"nl": "berekend", "en": "calculated"},
+      "definite_article": {"nl": "het", "en": "the"},
+      "items": {
+        "assign_young_child": {
+          "name": {"nl": "toewijzen jong kind kenmerk", "en": "assign young child characteristic"},
+          "article": {"nl": "het", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "target": [
+                {"$ref": "#/facts/child"},
+                {"$ref": "#/facts/child/items/jong-kind"}
+              ],
+              "condition": {
+                "type": "comparison",
+                "operator": "lessThanOrEqual",
+                "arguments": [
+                  [
+                    {"$ref": "#/facts/child"},
+                    {"$ref": "#/facts/child/items/age"}
+                  ],
+                  {"value": 10}
+                ]
+              }
+            }
+          ]
+        },
+        "young_children_count": {
+          "name": {"nl": "aantal jongere kinderen", "en": "number of younger children"},
+          "article": {"nl": "het", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "numeric",
+              "subtype": "integer",
+              "target": [
+                {"$ref": "#/facts/applicant"},
+                {"$ref": "#/facts/calculated/items/young_children_count"}
+              ],
+              "expression": {
+                "type": "aggregation",
+                "function": "count",
+                "expression": [
+                  {"$ref": "#/facts/kinderen_van/items/relatie_definitie"}
+                ],
+                "condition": {
+                  "type": "exists",
+                  "characteristic": [
+                    {"$ref": "#/facts/child"},
+                    {"$ref": "#/facts/child/items/jong-kind"}
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "total_benefit": {
+          "name": {"nl": "totale bijdrage", "en": "total benefit"},
+          "article": {"nl": "de", "en": "the"},
+          "versions": [
+            {
+              "validFrom": "2018-01-01",
+              "type": "numeric",
+              "subtype": "decimal",
+              "unit": "euro",
+              "target": [
+                {"$ref": "#/facts/applicant"},
+                {"$ref": "#/facts/calculated/items/total_benefit"}
+              ],
+              "expression": {
+                "type": "arithmetic",
+                "operator": "multiply",
+                "arguments": [
+                  {"$ref": "#/facts/calculated/items/young_children_count"},
+                  {"$ref": "#/facts/constants/items/benefit_per_child"}
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

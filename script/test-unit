@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+
+# Run unit tests with pytest
+echo "Running unit tests..."
+uv run pytest tests/unit/ -v --cov=machine --cov-report=term-missing --cov-report=html

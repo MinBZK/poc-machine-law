@@ -1,0 +1,41 @@
+{
+  "version": "3.0",
+  "language": "nl",
+  "metadata": {
+    "description": "test_passthrough"
+  },
+  "inputs": {
+    "my_input": {
+      "target": {
+        "$ref": "#/facts/data/items/input-value"
+      }
+    }
+  },
+  "outputs": {
+    "my_output": {
+      "source": {
+        "$ref": "#/facts/data/items/input-value"
+      }
+    }
+  },
+  "facts": {
+    "data": {
+      "name": {
+        "nl": "Data"
+      },
+      "items": {
+        "input-value": {
+          "name": {
+            "nl": "Input waarde"
+          },
+          "versions": [
+            {
+              "validFrom": "2020-01-01",
+              "type": "text"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

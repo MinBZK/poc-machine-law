@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
@@ -13,21 +14,21 @@ except ImportError:
     from yaml import Loader
 
 BASE_DIR = "law"
+NRML_BASE_DIR = "nrml-law"
 
 
-# Cache for parsed YAML files
-_yaml_cache = {}
+# Cache for parsed files
+_file_cache = {}
 
 
-def load_yaml_cached(file_path: str) -> dict:
+def load_file_cached(file_path: str) -> dict:
     """Load YAML file with caching for better performance"""
-    if file_path in _yaml_cache:
-        return _yaml_cache[file_path]
+    if file_path in _file_cache:
+        return _file_cache[file_path]
 
     with open(file_path) as f:
-        data = yaml.load(f, Loader=Loader)
-
-    _yaml_cache[file_path] = data
+        data = json.load(f) if file_path.endswith(".json") else yaml.load(f, Loader=Loader)
+    _file_cache[file_path] = data
     return data
 
 
@@ -48,7 +49,7 @@ class RuleSpec:
     @classmethod
     def from_yaml(cls, path: str) -> "RuleSpec":
         """Create RuleSpec from a YAML file path"""
-        data = load_yaml_cached(path)
+        data = load_file_cached(path)
 
         return cls(
             path=path,
@@ -66,6 +67,59 @@ class RuleSpec:
             properties=data.get("properties", {}),
         )
 
+    @classmethod
+    def from_json(cls, path: str) -> "RuleSpec":
+        """Create RuleSpec from a JSON file path"""
+        data = load_file_cached(path)
+
+        # Extract metadata for rule properties
+        metadata = data.get("metadata", {})
+
+        # Use filename without extension as law name if not in metadata
+        law_name = metadata.get("description", Path(path).stem.replace(".nrml", ""))
+
+        # Extract validFrom from facts if available, otherwise use placeholder
+        valid_from_str = None
+        facts = data.get("facts", {})
+        for fact_id, fact_data in facts.items():
+            items = fact_data.get("items", {})
+            for item_id, item_data in items.items():
+                versions = item_data.get("versions", [])
+                if versions and "validFrom" in versions[0]:
+                    valid_from_str = versions[0]["validFrom"]
+                    break
+            if valid_from_str:
+                break
+
+        # Parse the date or use a default
+        if valid_from_str:
+            try:
+                # Try parsing as full date first
+                valid_from = datetime.strptime(valid_from_str, "%Y-%m-%d")
+            except ValueError:
+                # If that fails, try parsing as year only
+                try:
+                    valid_from = datetime.strptime(valid_from_str, "%Y")
+                except ValueError:
+                    # If both fail, use default
+                    valid_from = datetime(2020, 1, 1)
+        else:
+            valid_from = datetime(2020, 1, 1)
+
+        return cls(
+            path=path,
+            decision_type=metadata.get("decision_type", "TOEKENNING"),
+            law_type=metadata.get("law_type", "FORMELE_WET"),
+            legal_character=metadata.get("legal_character", "BESCHIKKING"),
+            uuid=metadata.get("uuid", f"json-{Path(path).stem}"),
+            name=metadata.get("name", law_name),
+            law=metadata.get("description", law_name),
+            discoverable=metadata.get("discoverable", ""),
+            valid_from=valid_from,
+            service=metadata.get("service", "NRML"),
+            properties=metadata,
+        )
+
 
 class RuleResolver:
     def __init__(self) -> None:
@@ -79,15 +133,28 @@ class RuleResolver:
 
     def _load_rules(self) -> None:
         """Load all rule specifications from the rules directory"""
-        # Use Path.rglob to find all .yaml and .yml files recursively
+        # Use Path.rglob to find all .yaml, .yml files from law directory
         yaml_files = list(self.rules_dir.rglob("*.yaml")) + list(self.rules_dir.rglob("*.yml"))
 
+        # Load JSON files from nrml-law directory
+        nrml_dir = Path(NRML_BASE_DIR)
+        json_files = list(nrml_dir.rglob("*.json")) if nrml_dir.exists() else []
+
+        # Load YAML files
         for path in yaml_files:
             try:
                 rule = RuleSpec.from_yaml(str(path))
                 self.rules.append(rule)
             except Exception as e:
-                print(f"Error loading rule from {path}: {e}")
+                print(f"Error loading YAML rule from {path}: {e}")
+
+        # Load JSON files
+        for path in json_files:
+            try:
+                rule = RuleSpec.from_json(str(path))
+                self.rules.append(rule)
+            except Exception as e:
+                print(f"Error loading JSON rule from {path}: {e}")
 
         self.laws_by_service = defaultdict(set)
         self.discoverable_laws_by_service = defaultdict(lambda: defaultdict(set))
@@ -141,7 +208,7 @@ class RuleResolver:
         if not rule:
             raise ValueError(f"No rule found for {law} at {reference_date}")
 
-        return load_yaml_cached(rule.path)
+        return load_file_cached(rule.path)
 
     def rules_dataframe(self) -> pd.DataFrame:
         """Convert the list of RuleSpec objects into a pandas DataFrame."""
