@@ -148,31 +148,79 @@
                         <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens.</h4>
                     </div>
                 </div>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-2">Gegevens aanleveren</h4>
-                    <p class="text-sm text-gray-600 mb-4">
-                        Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.
-                    </p>
-                    {% if can_submit_claims|default(true) %}
-                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
-                                hx-target="#shared-application-panel"
-                                hx-swap="innerHTML"
-                                class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
-                            Gegevens aanleveren
-                        </button>
-                    {% else %}
-                        <p class="text-sm text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 inline-block mr-1 text-gray-400"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                            Vraag je ouder of voogd om gegevens aan te leveren.
-                        </p>
+                {# Handle case status - show objection/appeal options if case was decided #}
+                {% if current_case and current_case.status == 'DECIDED' and not current_case.approved %}
+                    {% if not current_case.can_object() %}
+                        <div class="space-y-4">
+                            <div class="bg-red-50 border border-red-100 rounded-lg p-4">
+                                <p class="text-red-800">
+                                    Uw aanvraag is afgekeurd. U kunt niet in bezwaar want
+                                    {{ current_case.objection_status.not_possible_reason }}
+                                </p>
+                            </div>
+                            {% if current_case.can_appeal() %}
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot beroep</h4>
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        U kunt wel in beroep gaan. Dit kan tot {{ current_case.appeal_status.appeal_period }}
+                                        weken na het besluit.
+                                    </p>
+                                    <button type="button"
+                                            onclick="showAppealDialog('{{ current_case.id }}')"
+                                            class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                                        Ga in beroep bij {{ current_case.appeal_status.competent_court|replace('_', ' ') |title }}
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <p class="text-sm text-gray-800">
+                                        U kunt ook niet in beroep gaan want
+                                        {{ current_case.appeal_status.not_possible_reason }}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% elif current_case.can_object() %}
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot bezwaar</h4>
+                            <p class="text-sm text-gray-600 mb-4">
+                                U kunt binnen {{ current_case.objection_status.objection_period }} weken
+                                bezwaar maken tegen dit besluit.
+                            </p>
+                            <button type="button"
+                                    onclick="showAppealDialog('{{ current_case.id }}')"
+                                    class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                                Ga in bezwaar
+                            </button>
+                        </div>
                     {% endif %}
-                </div>
+                {% else %}
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2">Gegevens aanleveren</h4>
+                        <p class="text-sm text-gray-600 mb-4">
+                            Om te weten of u in aanmerking komt zijn extra gegevens nodig. Die kunt u hier aanleveren.
+                        </p>
+                        {% if can_submit_claims|default(true) %}
+                            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                                    hx-target="#shared-application-panel"
+                                    hx-swap="innerHTML"
+                                    class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
+                                Gegevens aanleveren
+                            </button>
+                        {% else %}
+                            <p class="text-sm text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-4 w-4 inline-block mr-1 text-gray-400"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                Vraag je ouder of voogd om gegevens aan te leveren.
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         {% else %}
             <div class="flex-grow space-y-6">
@@ -198,32 +246,80 @@
                         </h4>
                     </div>
                 </div>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid om toch aan te vragen</h4>
-                    <p class="text-sm text-gray-600 mb-4">
-                        U lijkt niet in aanmerking te komen voor deze regeling. Als u denkt dat u toch recht heeft kunt u
-                        een aanvraag indienen.
-                    </p>
-                    {% if can_submit_claims|default(true) %}
-                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
-                                hx-target="#shared-application-panel"
-                                hx-swap="innerHTML"
-                                class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
-                            Toch aanvragen
-                        </button>
-                    {% else %}
-                        <p class="text-sm text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="h-4 w-4 inline-block mr-1 text-gray-400"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                            Vraag je ouder of voogd om een aanvraag te doen.
-                        </p>
+                {# Handle case status - show objection/appeal options if case was decided #}
+                {% if current_case and current_case.status == 'DECIDED' and not current_case.approved %}
+                    {% if not current_case.can_object() %}
+                        <div class="space-y-4">
+                            <div class="bg-red-50 border border-red-100 rounded-lg p-4">
+                                <p class="text-red-800">
+                                    Uw aanvraag is afgekeurd. U kunt niet in bezwaar want
+                                    {{ current_case.objection_status.not_possible_reason }}
+                                </p>
+                            </div>
+                            {% if current_case.can_appeal() %}
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot beroep</h4>
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        U kunt wel in beroep gaan. Dit kan tot {{ current_case.appeal_status.appeal_period }}
+                                        weken na het besluit.
+                                    </p>
+                                    <button type="button"
+                                            onclick="showAppealDialog('{{ current_case.id }}')"
+                                            class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                                        Ga in beroep bij {{ current_case.appeal_status.competent_court|replace('_', ' ') |title }}
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <p class="text-sm text-gray-800">
+                                        U kunt ook niet in beroep gaan want
+                                        {{ current_case.appeal_status.not_possible_reason }}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% elif current_case.can_object() %}
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot bezwaar</h4>
+                            <p class="text-sm text-gray-600 mb-4">
+                                U kunt binnen {{ current_case.objection_status.objection_period }} weken
+                                bezwaar maken tegen dit besluit.
+                            </p>
+                            <button type="button"
+                                    onclick="showAppealDialog('{{ current_case.id }}')"
+                                    class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                                Ga in bezwaar
+                            </button>
+                        </div>
                     {% endif %}
-                </div>
+                {% else %}
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid om toch aan te vragen</h4>
+                        <p class="text-sm text-gray-600 mb-4">
+                            U lijkt niet in aanmerking te komen voor deze regeling. Als u denkt dat u toch recht heeft kunt u
+                            een aanvraag indienen.
+                        </p>
+                        {% if can_submit_claims|default(true) %}
+                            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                                    hx-target="#shared-application-panel"
+                                    hx-swap="innerHTML"
+                                    class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
+                                Toch aanvragen
+                            </button>
+                        {% else %}
+                            <p class="text-sm text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-4 w-4 inline-block mr-1 text-gray-400"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                Vraag je ouder of voogd om een aanvraag te doen.
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     </div>
