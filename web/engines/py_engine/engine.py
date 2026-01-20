@@ -155,6 +155,15 @@ class PythonMachineService(EngineInterface):
 
         return result
 
+    def get_all_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
+        """
+        Get all discoverable laws without feature flag filtering (for admin UI).
+
+        This method returns all laws regardless of their enabled/disabled status,
+        allowing the admin UI to show toggles for disabled laws.
+        """
+        return self.services.get_discoverable_service_laws(discoverable_by)
+
     def get_rule_spec(self, law: str, reference_date: str, service: str) -> dict[str, Any]:
         """
         Get the rule specification for a specific law.

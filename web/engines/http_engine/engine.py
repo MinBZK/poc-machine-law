@@ -203,6 +203,51 @@ class MachineService(EngineInterface):
 
             return result
 
+    def get_all_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
+        """
+        Get all discoverable laws without feature flag filtering (for admin UI).
+
+        This method returns all laws regardless of their enabled/disabled status,
+        allowing the admin UI to show toggles for disabled laws.
+        """
+        result = defaultdict(set)
+
+        # When service routing is enabled, query all configured services
+        if self.service_routing_enabled and self.service_routes:
+            for service_name, service_config in self.service_routes.items():
+                client = Client(base_url=service_config.domain)
+                with client as client:
+                    response = service_laws_discoverable_list.sync_detailed(
+                        client=client, discoverable_by=discoverable_by
+                    )
+                    content = response.parsed
+
+                    for item in content.data:
+                        for law in item.laws:
+                            # No feature flag filtering - include all laws
+                            result[item.name].add(law.name)
+
+                    logger.debug(
+                        f"[MachineService] Found {len(content.data)} services with all laws from {service_name}"
+                    )
+
+            logger.debug(f"[MachineService] Total discoverable services (all laws): {len(result)}")
+            return result
+
+        # Default behavior: query single base_url
+        client = Client(base_url=self.base_url)
+
+        with client as client:
+            response = service_laws_discoverable_list.sync_detailed(client=client, discoverable_by=discoverable_by)
+            content = response.parsed
+
+            for item in content.data:
+                for law in item.laws:
+                    # No feature flag filtering - include all laws
+                    result[item.name].add(law.name)
+
+            return result
+
     def get_all_profiles(self, effective_date: date | None = None) -> dict[str, dict[str, Any]]:
         if effective_date is None:
             effective_date = UNSET
