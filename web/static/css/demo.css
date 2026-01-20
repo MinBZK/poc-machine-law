@@ -1269,7 +1269,8 @@ body {
     margin-left: auto;
     position: relative;
     align-self: center;
-    z-index: 10001; /* Above ribbon (10000) and same as dropdown */
+    z-index: 10002; /* Above ribbon (10000) */
+    transform: translateZ(2px); /* Force compositing layer above ribbon */
 }
 
 .menu-toggle {
@@ -1312,7 +1313,7 @@ body {
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.1);
-    z-index: 10000;
+    z-index: 10001; /* Above ribbon (10000), below dropdown (10002) */
 }
 
 /* Menu Dropdown - Fixed position to appear over iframes */
@@ -1325,8 +1326,9 @@ body {
     border-radius: 0.375rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 200px;
-    z-index: 10001;
+    z-index: 10002; /* Above ribbon (10000) */
     overflow: hidden;
+    transform: translateZ(2px); /* Force compositing layer above ribbon */
 }
 
 /* Menu Items */
