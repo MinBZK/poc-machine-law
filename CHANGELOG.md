@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.6.1 (2026-01-21)
+
+### Bug Fixes
+
+- Unwrap double-wrapped arrays for array type fields
+  ([#344](https://github.com/MinBZK/poc-machine-law/pull/344),
+  [`1c176c6`](https://github.com/MinBZK/poc-machine-law/commit/1c176c642c3380ac66ddfc3232ccbc6b4c0c0419))
+
+### Chores
+
+- Sync VERSION file to 1.6.0
+  ([`58f4a9a`](https://github.com/MinBZK/poc-machine-law/commit/58f4a9aee2d22b6e233df222173fc69871979122))
+
+
 ## v1.6.0 (2026-01-21)
 
 ### Bug Fixes
