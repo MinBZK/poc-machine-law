@@ -574,6 +574,9 @@ class RuleContext:
 
         # If the expected type is array, always return a list
         if expected_type == "array":
+            # Unwrap double-wrapped arrays (e.g., [[{...}]] from df[field].tolist() where field contains lists)
+            if isinstance(result, list) and len(result) == 1 and isinstance(result[0], list):
+                return result[0]
             return result if isinstance(result, list) else [result]
 
         # Smart deduplication: if all values are identical (e.g., global data duplicated per profile),
