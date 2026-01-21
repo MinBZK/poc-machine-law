@@ -48,7 +48,8 @@ func TestFeatures(t *testing.T) {
 			Format: "pretty", // pretty, progress, cucumber, events, junit
 			// ShowStepDefinitions: false,
 			Paths:    []string{"../submodules/regelrecht-laws/laws"},
-			TestingT: t, // Testing instance that will run subtests.
+			Tags:     "~@skip-go", // Skip tests tagged with @skip-go (Go engine doesn't support all services)
+			TestingT: t,           // Testing instance that will run subtests.
 		},
 	}
 
