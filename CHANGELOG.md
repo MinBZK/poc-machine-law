@@ -2,6 +2,66 @@
 
 <!-- version list -->
 
+## v1.5.0 (2026-01-21)
+
+### Bug Fixes
+
+- Admin law toggles now show disabled laws and all law types
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Use inline expanding submenus for demo law toggles
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+### Chores
+
+- Hide nav menu in demo mode, rename Admin beheer to Admin
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Hide proof of concept banner in demo mode
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Remove law toggles from demo workspace
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Sync VERSION file to 1.4.0
+  ([`d29c886`](https://github.com/MinBZK/poc-machine-law/commit/d29c886c89f08ac2fedcaadfe4c9ea83f6f2565e))
+
+- Trigger CI rerun ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+### Features
+
+- Add Admin menu item with temporary dismissable tab
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Add compact law toggles to demo menu ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+### Refactoring
+
+- Remove duplicate code in law toggles template
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Side-panel drawer for demo law toggles
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Use drawer menu style for demo law toggles
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+- Use filter_disabled param instead of separate method
+  ([#341](https://github.com/MinBZK/poc-machine-law/pull/341),
+  [`da916ae`](https://github.com/MinBZK/poc-machine-law/commit/da916aec28f79a9977ca4cef4303a429e9044663))
+
+
 ## v1.4.0 (2026-01-20)
 
 ### Chores
