@@ -44,6 +44,9 @@ profiles:
     name: Merijn van der Meer
     description: ZZP'er in de thuiszorg met laag inkomen, alleenstaande ouder met twee jonge kinderen
       waarvan één met chronische aandoening. Komt in aanmerking voor Bbz.
+    properties:
+      - Ouderlijk gezag
+      - Ondernemer
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -295,6 +298,8 @@ profiles:
   '999991905':
     name: Linda Strijps
     description: Moeder van twee jonge kinderen, werkt parttime, met NL Wallet
+    properties:
+      - Gezamenlijk gezag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1202,6 +1207,8 @@ profiles:
     name: Maria Rodriguez
     description: Alleenstaande moeder, parttime werkend in de horeca met onregelmatige
       uren, vraagt alleen huurtoeslag aan
+    properties:
+      - Ouderlijk gezag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1400,6 +1407,9 @@ profiles:
     name: Omar Yilmaz
     description: ZZP'er in de bouwsector met sterk fluctuerend inkomen, moeite met
       administratie en lage tarieven
+    properties:
+      - Gezamenlijk gezag
+      - Ondernemer
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -1739,6 +1749,8 @@ profiles:
     name: Sophie Jansen
     description: Recent werkloos geworden alleenstaande moeder, 1 kind, in aanmerking
       voor WW en kindgebonden budget met ALO-kop
+    properties:
+      - Ouderlijk gezag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2141,6 +2153,8 @@ profiles:
   '999993656':
     name: Peter Bakker
     description: ZZP'er met laag inkomen, recht op aanvullende bijstand en startkapitaal
+    properties:
+      - Ondernemer
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2424,6 +2438,8 @@ profiles:
     name: Lisa de Jong
     description: Werkende ouder met jong kind, komt in aanmerking voor inkomensafhankelijke
       combinatiekorting
+    properties:
+      - Ouderlijk gezag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2579,6 +2595,8 @@ profiles:
   '888888888':
     name: Sarah de Boer
     description: Alleenstaande ouder met kinderopvang, komt in aanmerking voor kinderopvangtoeslag
+    properties:
+      - Ouderlijk gezag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2674,6 +2692,8 @@ profiles:
   '999993872':
     name: Peter-Jan van der Meijden
     description: Vader van twee jonge kinderen, eigen woning
+    properties:
+      - Gezamenlijk gezag
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2788,6 +2808,8 @@ profiles:
   '999991723':
     name: Kind 1 Strijps
     description: Kind van Linda Strijps en Peter-Jan van der Meijden
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2828,6 +2850,8 @@ profiles:
   '999992740':
     name: Kind 2 Strijps
     description: Kind van Linda Strijps en Peter-Jan van der Meijden
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2868,6 +2892,8 @@ profiles:
   '200000001':
     name: Kind van Merijn van der Meer
     description: Kind van Merijn van der Meer (BSN 100000001)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2908,6 +2934,8 @@ profiles:
   '200000002':
     name: Kind van Merijn van der Meer
     description: Kind van Merijn van der Meer (BSN 100000001)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2949,6 +2977,8 @@ profiles:
   '200000003':
     name: Kind van Maria Rodriguez
     description: Kind van Maria Rodriguez (BSN 100000002)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -2989,6 +3019,8 @@ profiles:
   '200000004':
     name: Kind van Maria Rodriguez
     description: Kind van Maria Rodriguez (BSN 100000002)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3029,6 +3061,8 @@ profiles:
   '200000005':
     name: Kind van Omar Yilmaz
     description: Kind van Omar Yilmaz (BSN 100000003)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3069,6 +3103,8 @@ profiles:
   '200000006':
     name: Kind van Sophie Jansen
     description: Kind van Sophie Jansen (BSN 300000001)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3109,6 +3145,8 @@ profiles:
   '200000007':
     name: Kind van Lisa de Jong
     description: Kind van Lisa de Jong (BSN 999993660)
+    properties:
+      - Minderjarig
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3149,6 +3187,8 @@ profiles:
   '400000001':
     name: Maria van den Berg
     description: Voogd van haar neefje Daan na overlijden van zijn ouders (Art. 1:295 BW)
+    properties:
+      - Voogdij
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3211,6 +3251,9 @@ profiles:
   '400000002':
     name: Daan van der Berg
     description: Minderjarige onder voogdij van tante Maria (BSN 400000001)
+    properties:
+      - Minderjarig
+      - Onder voogdij
     sources:
       CBS: *id001
       KIESRAAD: *id002
