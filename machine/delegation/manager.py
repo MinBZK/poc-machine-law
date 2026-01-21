@@ -79,6 +79,40 @@ class DelegationManager:
                 )
                 delegations.extend(law_delegations)
 
+        # Merge multiple SELF delegations into one with intersected permissions
+        self_delegations = [d for d in delegations if d.subject_type == "SELF"]
+        other_delegations = [d for d in delegations if d.subject_type != "SELF"]
+
+        if self_delegations:
+            # Merge permissions by intersection (most restrictive wins)
+            merged_permissions: set[str] = (
+                set(self_delegations[0].permissions) if self_delegations[0].permissions else set()
+            )
+            for d in self_delegations[1:]:
+                if d.permissions:
+                    merged_permissions = merged_permissions.intersection(set(d.permissions))
+
+            # Ensure at least LEZEN
+            if not merged_permissions:
+                merged_permissions = {"LEZEN"}
+
+            # Create single merged SELF delegation
+            permission_order = ["LEZEN", "CLAIMS_INDIENEN", "BESLUITEN_ONTVANGEN"]
+            ordered_permissions = [p for p in permission_order if p in merged_permissions]
+
+            merged_self = Delegation(
+                subject_id=self_delegations[0].subject_id,
+                subject_type="SELF",
+                subject_name="Mezelf",
+                delegation_type="EIGEN_ZAKEN",
+                permissions=ordered_permissions,
+                valid_from=None,
+                valid_until=None,
+            )
+            delegations = [merged_self] + other_delegations
+        else:
+            delegations = other_delegations
+
         # Sort to put SELF delegation first
         delegations.sort(key=lambda d: (d.subject_type != "SELF", d.subject_name or ""))
 
