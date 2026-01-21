@@ -359,7 +359,10 @@ class MachineService(EngineInterface):
     def profile_transform(self, profile: Profile) -> dict[str, Any]:
         p = profile.to_dict()
         p["sources"] = source_transform(profile.sources)
-        p["properties"] = super().get_profile_properties(p)
+        # Merge static properties from profile with dynamically generated ones
+        static_properties = p.get("properties", []) or []
+        dynamic_properties = super().get_profile_properties(p)
+        p["properties"] = static_properties + dynamic_properties
         return p
 
 
