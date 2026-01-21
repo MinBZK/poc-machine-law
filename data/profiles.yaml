@@ -3435,6 +3435,15 @@ profiles:
           residence_address: Zorgcentrum De Heuvel, 3511AA Utrecht
           has_fixed_address: true
           household_size: 1
+      RECHTSPRAAK:
+        # Art. 1:378-391 BW: Sophie is onder curatele - zij is de curandus
+        curatele_registraties:
+        - bsn_curator: '400100001'
+          bsn_curandus: '500000001'
+          naam_curandus: Sophie van Dam
+          datum_ingang: '2022-01-15'
+          datum_einde: null
+          status: ACTIEF
 
   # Profile: Person under beschermingsbewind
   '500000002':
@@ -3743,9 +3752,10 @@ profiles:
   # Profile: Wilsonbekwame patient
   '500000008':
     name: Gerda Groen-van Dijk
-    description: Wilsonbekwaam verklaard
+    description: Wilsonbekwaam verklaard, onder curatele
     properties:
       - Wilsonbekwaam
+      - Onder curatele
     sources:
       CBS: *id001
       KIESRAAD: *id002
@@ -3768,6 +3778,15 @@ profiles:
           partnerschap_type: HUWELIJK
           partner_bsn: '400100006'
           has_partner: true
+      RECHTSPRAAK:
+        # Art. 1:378-391 BW: Gerda is onder curatele - haar echtgenoot is curator
+        curatele_registraties:
+        - bsn_curator: '400100006'
+          bsn_curandus: '500000008'
+          naam_curandus: Gerda Groen-van Dijk
+          datum_ingang: '2024-01-10'
+          datum_einde: null
+          status: ACTIEF
 
   # Profile: Person with ended curatele (for testing inactive status)
   '400100007':
@@ -3825,3 +3844,285 @@ profiles:
           residence_address: Wycker Brugstraat 5, 6221EA Maastricht
           has_fixed_address: true
           household_size: 1
+
+  # ===== Extended Business Delegation Profiles =====
+  # Test profiles for various Dutch business types (rechtsvormen)
+
+  # Profile: NV Bestuurder (Art. 2:130 BW)
+  '600000001':
+    name: Marieke Bestuurder-NV
+    description: Bestuurder van een beursgenoteerde NV
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000001'
+          geboortedatum: '1975-03-12'
+          verblijfsadres: Amsterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 50
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Herengracht 100, 1015BS Amsterdam
+          has_fixed_address: true
+          household_size: 2
+      KVK:
+        inschrijvingen:
+        - bsn: '600000001'
+          kvk_nummer: '90000001'
+          handelsnaam: Grote Holding NV
+          rechtsvorm: NV
+          status: ACTIEF
+          activiteit: Holding en financiering
+        functionarissen:
+        - bsn: '600000001'
+          kvk_nummer: '90000001'
+          handelsnaam: Grote Holding NV
+          rechtsvorm: NV
+          status: ACTIEF
+          functie: BESTUURDER
+          bevoegdheid: VOLLEDIG
+
+  # Profile: Stichting Bestuurder (Art. 2:291 BW)
+  '600000002':
+    name: Jan Stichtingsvoorzitter
+    description: Voorzitter van een goededoelenstichting
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000002'
+          geboortedatum: '1968-08-20'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 57
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Oudegracht 200, 3511PE Utrecht
+          has_fixed_address: true
+          household_size: 3
+      KVK:
+        inschrijvingen:
+        - bsn: '600000002'
+          kvk_nummer: '90000003'
+          handelsnaam: Stichting Goede Doelen
+          rechtsvorm: STICHTING
+          status: ACTIEF
+          activiteit: Goede doelen en fondsenwerving
+        functionarissen:
+        - bsn: '600000002'
+          kvk_nummer: '90000003'
+          handelsnaam: Stichting Goede Doelen
+          rechtsvorm: STICHTING
+          status: ACTIEF
+          functie: BESTUURDER
+          bevoegdheid: VOLLEDIG
+
+  # Profile: Vereniging Voorzitter (Art. 2:45 BW)
+  '600000003':
+    name: Pieter Sportvoorzitter
+    description: Voorzitter van een sportvereniging
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000003'
+          geboortedatum: '1980-05-15'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 45
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Coolsingel 50, 3011AD Rotterdam
+          has_fixed_address: true
+          household_size: 4
+      KVK:
+        inschrijvingen:
+        - bsn: '600000003'
+          kvk_nummer: '90000005'
+          handelsnaam: Sportvereniging De Hoop
+          rechtsvorm: VERENIGING
+          status: ACTIEF
+          activiteit: Sport en recreatie
+        functionarissen:
+        - bsn: '600000003'
+          kvk_nummer: '90000005'
+          handelsnaam: Sportvereniging De Hoop
+          rechtsvorm: VERENIGING
+          status: ACTIEF
+          functie: VOORZITTER
+          bevoegdheid: VOLLEDIG
+
+  # Profile: Cooperatie Bestuurder (Art. 2:53a BW)
+  '600000004':
+    name: Anna Boerencooperatie
+    description: Bestuurder van een agrarische cooperatie
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000004'
+          geboortedatum: '1972-11-30'
+          verblijfsadres: Groningen
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 53
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Grote Markt 1, 9711LV Groningen
+          has_fixed_address: true
+          household_size: 2
+      KVK:
+        inschrijvingen:
+        - bsn: '600000004'
+          kvk_nummer: '90000007'
+          handelsnaam: Cooperatie Boeren U.A.
+          rechtsvorm: COOPERATIE
+          status: ACTIEF
+          activiteit: Agrarische dienstverlening
+        functionarissen:
+        - bsn: '600000004'
+          kvk_nummer: '90000007'
+          handelsnaam: Cooperatie Boeren U.A.
+          rechtsvorm: COOPERATIE
+          status: ACTIEF
+          functie: BESTUURDER
+          bevoegdheid: VOLLEDIG
+
+  # Profile: Maatschap Maat (Art. 7A:1655 BW)
+  '600000005':
+    name: Erik Advocaat-Maat
+    description: Maat in een advocatenmaatschap
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000005'
+          geboortedatum: '1978-02-28'
+          verblijfsadres: Den Haag
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 47
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Lange Voorhout 10, 2514EA Den Haag
+          has_fixed_address: true
+          household_size: 3
+      KVK:
+        inschrijvingen:
+        - bsn: '600000005'
+          kvk_nummer: '90000008'
+          handelsnaam: Advocatenmaatschap Recht
+          rechtsvorm: MAATSCHAP
+          status: ACTIEF
+          activiteit: Juridische dienstverlening
+        functionarissen:
+        - bsn: '600000005'
+          kvk_nummer: '90000008'
+          handelsnaam: Advocatenmaatschap Recht
+          rechtsvorm: MAATSCHAP
+          status: ACTIEF
+          functie: MAAT
+          bevoegdheid: VOLLEDIG
+
+  # Profile: CV Beherend Vennoot (Art. 19 WvK)
+  '600000006':
+    name: Lisa Beherend-CV
+    description: Beherend vennoot van een commanditaire vennootschap
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000006'
+          geboortedatum: '1985-07-10'
+          verblijfsadres: Eindhoven
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 40
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Stratumseind 100, 5611EN Eindhoven
+          has_fixed_address: true
+          household_size: 1
+      KVK:
+        inschrijvingen:
+        - bsn: '600000006'
+          kvk_nummer: '90000009'
+          handelsnaam: Investeer CV
+          rechtsvorm: COMMANDITAIRE_VENNOOTSCHAP
+          status: ACTIEF
+          activiteit: Investeringen en beleggingen
+        functionarissen:
+        - bsn: '600000006'
+          kvk_nummer: '90000009'
+          handelsnaam: Investeer CV
+          rechtsvorm: COMMANDITAIRE_VENNOOTSCHAP
+          status: ACTIEF
+          functie: BEHEREND_VENNOOT
+          bevoegdheid: VOLLEDIG
+
+  # Profile: CV Commanditair Vennoot - GEEN delegatie (Art. 20 WvK)
+  '600000007':
+    name: Kees Stille-Vennoot
+    description: Commanditair (stille) vennoot in een CV - heeft GEEN vertegenwoordigingsbevoegdheid
+    properties: []
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '600000007'
+          geboortedatum: '1965-12-01'
+          verblijfsadres: Maastricht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 60
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Vrijthof 15, 6211LE Maastricht
+          has_fixed_address: true
+          household_size: 2
+      KVK:
+        inschrijvingen:
+        - bsn: '600000007'
+          kvk_nummer: '90000010'
+          handelsnaam: Kapitaal CV
+          rechtsvorm: COMMANDITAIRE_VENNOOTSCHAP
+          status: ACTIEF
+          activiteit: Investeringen (stille vennoot)
+        functionarissen:
+        - bsn: '600000007'
+          kvk_nummer: '90000010'
+          handelsnaam: Kapitaal CV
+          rechtsvorm: COMMANDITAIRE_VENNOOTSCHAP
+          status: ACTIEF
+          functie: COMMANDITAIR_VENNOOT
+          bevoegdheid: GEEN
