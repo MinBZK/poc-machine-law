@@ -5,14 +5,13 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
-from web.dependencies import get_machine_service, templates
-from web.engines import EngineInterface
+from web.dependencies import templates
 from web.feature_flags import FeatureFlags
 
 router = APIRouter(prefix="/demo", tags=["demo"])
@@ -126,7 +125,7 @@ async def _run_behave_async(run_id: str, feature_path: str, line_number: int | N
 
 
 @router.get("/", response_class=HTMLResponse)
-async def demo_index(request: Request, services: EngineInterface = Depends(get_machine_service)) -> HTMLResponse:
+async def demo_index(request: Request) -> HTMLResponse:
     """Show tabbed workspace interface."""
     # Read VERSION file
     version_file = Path("VERSION")
@@ -135,24 +134,12 @@ async def demo_index(request: Request, services: EngineInterface = Depends(get_m
     # Get feature flags (system flags only, not law-specific)
     feature_flags = FeatureFlags.get_all()
 
-    # Get law flags for all three types (without filtering for admin/demo UI)
-    citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
-    business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
-    delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
-
-    law_flags = {
-        "citizen": FeatureFlags.get_law_flags(citizen_laws),
-        "business": FeatureFlags.get_law_flags(business_laws),
-        "delegation": FeatureFlags.get_law_flags(delegation_laws),
-    }
-
     return templates.TemplateResponse(
         "demo/workspace.html",
         {
             "request": request,
             "version": version,
             "feature_flags": feature_flags,
-            "law_flags": law_flags,
         },
     )
 

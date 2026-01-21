@@ -269,15 +269,10 @@ async def post_set_feature_flag(
                 "delegation": FeatureFlags.get_law_flags(delegation_laws),
             }
 
-            # Return appropriate partial based on source
-            if source == "demo-law":
-                return templates.TemplateResponse(
-                    "demo/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}
-                )
-            else:
-                return templates.TemplateResponse(
-                    "/admin/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}
-                )
+            # Return only the law feature flags partial
+            return templates.TemplateResponse(
+                "/admin/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}
+            )
         elif source == "demo":
             # Return demo-specific partial for feature flags
             feature_flags = FeatureFlags.get_all()
