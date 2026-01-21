@@ -2,6 +2,50 @@
 
 <!-- version list -->
 
+## v1.6.0 (2026-01-21)
+
+### Bug Fixes
+
+- Deduplicate SELF delegations in get_delegations_for_user
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Merge SELF delegation permissions using intersection
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Merge static profile properties with dynamic ones
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Skip handelingsonbekwaamheid tests in Go engine
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+### Chores
+
+- Sync VERSION file to 1.5.0
+  ([`e992cce`](https://github.com/MinBZK/poc-machine-law/commit/e992cce67a631b8bacc0e08cd3c61e45bce0f3d7))
+
+- Update regelrecht-laws submodule to latest main
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+### Features
+
+- Add 8 Dutch delegation law feature files with test scenarios
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Add badges for ouderlijk gezag, ondernemer, and minderjarig profiles
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Add extended business delegation tests and handelingsonbekwaamheid
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+
 ## v1.5.0 (2026-01-21)
 
 ### Bug Fixes
