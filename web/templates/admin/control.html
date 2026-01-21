@@ -6,7 +6,9 @@
         <div class="bg-white shadow">
             <div class="px-6 py-4 flex justify-between items-center">
                 <h1 class="text-2xl font-bold">Configuratie Panel</h1>
-                {% include "admin/partials/navigation_menu.html" %}
+                {% if not demo_mode %}
+                    {% include "admin/partials/navigation_menu.html" %}
+                {% endif %}
             </div>
         </div>
         {# Main content #}

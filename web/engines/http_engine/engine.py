@@ -155,15 +155,28 @@ class MachineService(EngineInterface):
 
             return to_rule_result(response.parsed.data)
 
-    def get_discoverable_service_laws(self, discoverable_by="CITIZEN") -> dict[str, list[str]]:
+    def get_discoverable_service_laws(
+        self, discoverable_by="CITIZEN", filter_disabled: bool = True
+    ) -> dict[str, list[str]]:
         """
         Get laws discoverable by citizens using HTTP calls to the Go backend service.
 
-        Filters laws based on feature flags if they exist.
+        Args:
+            discoverable_by: The type of entity discovering laws (CITIZEN, BUSINESS, DELEGATION_PROVIDER)
+            filter_disabled: If True, filter out laws disabled via feature flags. Set to False for admin UI.
+
+        Returns:
+            Dictionary mapping service names to sets of law names
         """
         from web.feature_flags import FeatureFlags
 
         result = defaultdict(set)
+
+        def should_include_law(service_name: str, law_name: str) -> bool:
+            """Check if law should be included based on filter_disabled flag."""
+            if not filter_disabled:
+                return True
+            return FeatureFlags.is_law_enabled(service_name, law_name)
 
         # When service routing is enabled, query all configured services
         if self.service_routing_enabled and self.service_routes:
@@ -177,9 +190,7 @@ class MachineService(EngineInterface):
 
                     for item in content.data:
                         for law in item.laws:
-                            # Check if the law is enabled in feature flags
-                            # If flag doesn't exist, law is enabled by default
-                            if FeatureFlags.is_law_enabled(item.name, law.name):
+                            if should_include_law(item.name, law.name):
                                 result[item.name].add(law.name)
 
                     logger.debug(f"[MachineService] Found {len(content.data)} services with laws from {service_name}")
@@ -196,9 +207,7 @@ class MachineService(EngineInterface):
 
             for item in content.data:
                 for law in item.laws:
-                    # Check if the law is enabled in feature flags
-                    # If flag doesn't exist, law is enabled by default
-                    if FeatureFlags.is_law_enabled(item.name, law.name):
+                    if should_include_law(item.name, law.name):
                         result[item.name].add(law.name)
 
             return result

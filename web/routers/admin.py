@@ -126,10 +126,19 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     """Show a button to reset the state of the application"""
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
-    # Get discoverable laws to create law feature flags
-    all_laws = services.get_discoverable_service_laws()
-    # Now get the feature flags for these laws
-    law_flags = FeatureFlags.get_law_flags(all_laws)
+
+    # Get all discoverable laws for each type (without feature flag filtering for admin UI)
+    citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
+    business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
+    delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
+
+    # Get the feature flags for each law type
+    law_flags = {
+        "citizen": FeatureFlags.get_law_flags(citizen_laws),
+        "business": FeatureFlags.get_law_flags(business_laws),
+        "delegation": FeatureFlags.get_law_flags(delegation_laws),
+    }
+
     return templates.TemplateResponse(
         "admin/control.html",
         {
@@ -248,10 +257,18 @@ async def post_set_feature_flag(
 
         # Check if it's a law feature flag
         if flag_name.startswith(FeatureFlags.LAW_PREFIX):
-            # Get all laws for law feature flags
-            all_laws = services.get_discoverable_service_laws()
-            # Now get the feature flags for these laws
-            law_flags = FeatureFlags.get_law_flags(all_laws)
+            # Get all discoverable laws for each type (without feature flag filtering for admin UI)
+            citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
+            business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
+            delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
+
+            # Get the feature flags for each law type
+            law_flags = {
+                "citizen": FeatureFlags.get_law_flags(citizen_laws),
+                "business": FeatureFlags.get_law_flags(business_laws),
+                "delegation": FeatureFlags.get_law_flags(delegation_laws),
+            }
+
             # Return only the law feature flags partial
             return templates.TemplateResponse(
                 "/admin/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}

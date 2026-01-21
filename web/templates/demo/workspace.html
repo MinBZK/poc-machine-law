@@ -12,6 +12,21 @@
         [x-cloak] {
             display: none !important;
         }
+        .temp-tab-close {
+            margin-left: 8px;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.6;
+            padding: 0 4px;
+        }
+        .temp-tab-close:hover {
+            opacity: 1;
+            color: #e74c3c;
+        }
         </style>
     </head>
     <body>
@@ -53,6 +68,17 @@
                      @click="switchTab('zaaksysteem')">
                     <span class="tab-label">Zaaksysteem</span>
                 </div>
+                <!-- Temporary Tabs (dismissable) -->
+                <template x-for="tab in temporaryTabs" :key="tab.id">
+                    <div class="tab"
+                         :class="{ 'active': activeTab === tab.id }"
+                         @click="switchTab(tab.id)">
+                        <span class="tab-label" x-text="tab.name"></span>
+                        <button class="temp-tab-close"
+                                @click.stop="closeTemporaryTab(tab.id)"
+                                title="Sluiten">×</button>
+                    </div>
+                </template>
                 <!-- Hamburger Menu Button -->
                 <div class="demo-menu">
                     <button class="menu-toggle" @click.stop="menuOpen = !menuOpen" title="Menu">⋮</button>
@@ -213,6 +239,14 @@
                             class="tab-iframe"
                             title="Simulatie"></iframe>
                 </div>
+                <!-- Temporary Tabs (IFrame) -->
+                <template x-for="tab in temporaryTabs" :key="tab.id">
+                    <div class="tab-content iframe-content"
+                         x-show="activeTab === tab.id"
+                         x-cloak>
+                        <iframe :src="tab.url" frameborder="0" class="tab-iframe" :title="tab.name"></iframe>
+                    </div>
+                </template>
             </div>
             <!-- Menu Overlay (shown when menu is open) -->
             <div x-show="menuOpen"
@@ -238,6 +272,10 @@
                     <span x-show="theme === 'light'">🌙 Donkere modus</span>
                     <span x-show="theme === 'dark'">☀️ Lichte modus</span>
                 </button>
+                <!-- Admin -->
+                <button @click="openTemporaryTab('Admin', '/admin/control?demo=true'); menuOpen = false"
+                        class="menu-item">⚙️ Admin</button>
+                <div class="menu-divider"></div>
                 <!-- Reset State -->
                 <form hx-post="/admin/reset"
                       hx-trigger="submit"
@@ -473,6 +511,9 @@
                 activeLawTabId: null,     // Currently active law tab ID
                 nextLawTabId: 1,          // Auto-incrementing ID for law tabs
                 maxLawTabs: 10,           // Maximum number of law tabs
+                temporaryTabs: [],        // Array of {id: string, name: string, url: string}
+                nextTempTabId: 1,         // Auto-incrementing ID for temporary tabs
+                previousTab: null,        // Tab to return to when closing temporary tab
                 // Presentation slide state
                 currentSlide: 0,
                 totalSlides: 5,
@@ -640,6 +681,49 @@
                     document.documentElement.setAttribute('data-theme', this.theme);
                     localStorage.setItem('theme', this.theme);
                     console.log('Theme switched to:', this.theme);
+                },
+
+                openTemporaryTab(name, url) {
+                    // Check if tab with same URL already exists
+                    const existingTab = this.temporaryTabs.find(t => t.url === url);
+                    if (existingTab) {
+                        // Switch to existing tab
+                        this.activeTab = existingTab.id;
+                        return;
+                    }
+
+                    // Store current tab to return to when closing
+                    this.previousTab = this.activeTab;
+
+                    // Create new temporary tab
+                    const newTab = {
+                        id: `temp-tab-${this.nextTempTabId++}`,
+                        name: name,
+                        url: url
+                    };
+
+                    this.temporaryTabs.push(newTab);
+                    this.activeTab = newTab.id;
+
+                    // Update URL hash
+                    window.location.hash = newTab.id;
+                },
+
+                closeTemporaryTab(tabId) {
+                    const tabIndex = this.temporaryTabs.findIndex(t => t.id === tabId);
+                    if (tabIndex === -1) return;
+
+                    // Remove the tab
+                    this.temporaryTabs.splice(tabIndex, 1);
+
+                    // If closing the active tab, switch back to previous or first fixed tab
+                    if (this.activeTab === tabId) {
+                        if (this.previousTab && this.previousTab !== tabId) {
+                            this.switchTab(this.previousTab);
+                        } else {
+                            this.switchTab('presentatie');
+                        }
+                    }
                 },
 
                 // Presentation slide navigation
