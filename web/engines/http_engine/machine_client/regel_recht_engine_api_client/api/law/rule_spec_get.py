@@ -1,6 +1,6 @@
 import datetime
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -39,8 +39,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[RuleSpecGetResponse200, RuleSpecGetResponse400, RuleSpecGetResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> RuleSpecGetResponse200 | RuleSpecGetResponse400 | RuleSpecGetResponse500 | None:
     if response.status_code == 200:
         response_200 = RuleSpecGetResponse200.from_dict(response.json())
 
@@ -60,8 +60,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[RuleSpecGetResponse200, RuleSpecGetResponse400, RuleSpecGetResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[RuleSpecGetResponse200 | RuleSpecGetResponse400 | RuleSpecGetResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -72,11 +72,11 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     service: str,
     law: str,
     reference_date: datetime.date,
-) -> Response[Union[RuleSpecGetResponse200, RuleSpecGetResponse400, RuleSpecGetResponse500]]:
+) -> Response[RuleSpecGetResponse200 | RuleSpecGetResponse400 | RuleSpecGetResponse500]:
     """Get rule spec
 
     Args:
@@ -107,11 +107,11 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     service: str,
     law: str,
     reference_date: datetime.date,
-) -> Optional[Union[RuleSpecGetResponse200, RuleSpecGetResponse400, RuleSpecGetResponse500]]:
+) -> RuleSpecGetResponse200 | RuleSpecGetResponse400 | RuleSpecGetResponse500 | None:
     """Get rule spec
 
     Args:
@@ -137,11 +137,11 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     service: str,
     law: str,
     reference_date: datetime.date,
-) -> Response[Union[RuleSpecGetResponse200, RuleSpecGetResponse400, RuleSpecGetResponse500]]:
+) -> Response[RuleSpecGetResponse200 | RuleSpecGetResponse400 | RuleSpecGetResponse500]:
     """Get rule spec
 
     Args:
@@ -170,11 +170,11 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     service: str,
     law: str,
     reference_date: datetime.date,
-) -> Optional[Union[RuleSpecGetResponse200, RuleSpecGetResponse400, RuleSpecGetResponse500]]:
+) -> RuleSpecGetResponse200 | RuleSpecGetResponse400 | RuleSpecGetResponse500 | None:
     """Get rule spec
 
     Args:

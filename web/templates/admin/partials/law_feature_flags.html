@@ -1,35 +1,82 @@
 <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
-     id="law-feature-flags">
+     id="law-feature-flags"
+     x-data="{ openSection: 'citizen' }">
     <h1 class="text-gray-900 text-3xl font-semibold mb-5">Wetten</h1>
     <p class="mb-5">Schakel specifieke wetten aan of uit voor de applicatie.</p>
-    {% for service, laws in law_flags.items() %}
-        <div class="mb-5">
-            <h2 class="text-gray-800 text-xl font-medium mb-3">{{ service|replace('_', ' ') |title }}</h2>
-            <div class="space-y-4 pl-4">
-                {% for law_name, enabled in laws.items() %}
-                    <div class="flex items-center space-x-4">
-                        {% set safe_service_id = service|replace('_', '-') %}
-                        {% set safe_law_id = law_name|replace('/', '-')|replace('_', '-') %}
-                        {% set sanitized_law_name = law_name|replace('/', '__') %}
-                        <button class="toggle-btn w-14 h-7 flex items-center rounded-full p-1 cursor-pointer {{ 'bg-green-500' if enabled else 'bg-gray-300' }} focus:outline-none"
-                                hx-post="/admin/set-feature-flag"
-                                hx-target="#law-feature-flags"
-                                hx-swap="outerHTML"
-                                hx-indicator="#law-loading-{{ safe_service_id }}-{{ safe_law_id }}"
-                                hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}"}'>
-                            <div class="bg-white w-6 h-6 rounded-full shadow-md transform {{ 'translate-x-7' if enabled else '' }} transition-transform">
-                            </div>
-                        </button>
-                        <div id="law-loading-{{ safe_service_id }}-{{ safe_law_id }}"
-                             class="htmx-indicator">
-                            <div class="spinner w-6 h-6 border-2 border-t-2 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
-                        </div>
-                        <label class="font-medium">{{ law_name|replace('_', ' ') |title }}</label>
+    <div class="space-y-4">
+        {% set sections = [
+            {
+                "key": "citizen",
+                "label": "Burger",
+                "color": "blue"
+            },
+            {
+                "key": "business",
+                "label": "Bedrijven",
+                "color": "green"
+            },
+            {
+                "key": "delegation",
+                "label": "Delegatie",
+                "color": "purple"
+            }
+        ] %}
+        {% for section in sections %}
+            {% set section_laws = law_flags[section.key] if law_flags[section.key] else {} %}
+            <div class="border rounded-lg overflow-hidden">
+                <button @click="openSection = openSection === '{{ section.key }}' ? '' : '{{ section.key }}'"
+                        class="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <span class="font-medium text-lg">{{ section.label }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2 py-1 text-sm bg-{{ section.color }}-100 text-{{ section.color }}-800 rounded-full">
+                            {{ section_laws|length }} diensten
+                        </span>
+                        <svg class="w-5 h-5 transition-transform"
+                             :class="{ 'rotate-180': openSection === '{{ section.key }}' }"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
                     </div>
-                {% endfor %}
+                </button>
+                <div x-show="openSection === '{{ section.key }}'"
+                     x-collapse
+                     class="p-4 border-t">
+                    {% for service, laws in section_laws.items() %}
+                        <div class="mb-5">
+                            <h3 class="text-gray-800 text-lg font-medium mb-3">{{ service|replace('_', ' ') |title }}</h3>
+                            <div class="space-y-4 pl-4">
+                                {% for law_name, enabled in laws.items() %}
+                                    <div class="flex items-center space-x-4">
+                                        {% set safe_service_id = service|replace('_', '-') %}
+                                        {% set safe_law_id = law_name|replace('/', '-')|replace('_', '-') %}
+                                        {% set sanitized_law_name = law_name|replace('/', '__') %}
+                                        <button class="toggle-btn w-14 h-7 flex items-center rounded-full p-1 cursor-pointer {{ 'bg-green-500' if enabled else 'bg-gray-300' }} focus:outline-none"
+                                                hx-post="/admin/set-feature-flag"
+                                                hx-target="#law-feature-flags"
+                                                hx-swap="outerHTML"
+                                                hx-indicator="#law-loading-{{ section.key }}-{{ safe_service_id }}-{{ safe_law_id }}"
+                                                hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}"}'>
+                                            <div class="bg-white w-6 h-6 rounded-full shadow-md transform {{ 'translate-x-7' if enabled else '' }} transition-transform">
+                                            </div>
+                                        </button>
+                                        <div id="law-loading-{{ section.key }}-{{ safe_service_id }}-{{ safe_law_id }}"
+                                             class="htmx-indicator">
+                                            <div class="spinner w-6 h-6 border-2 border-t-2 border-gray-500 border-t-blue-500 rounded-full animate-spin"></div>
+                                        </div>
+                                        <label class="font-medium {{ 'text-gray-400' if not enabled else '' }}">{{ law_name|replace('_', ' ') |title }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 italic">Geen wetten beschikbaar</p>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 <style>
     .htmx-indicator {

@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -22,12 +22,12 @@ class CaseObjectionStatus:
         admissable (Union[Unset, bool]):
     """
 
-    possible: Union[Unset, bool] = UNSET
-    not_possible_reason: Union[Unset, str] = UNSET
-    objection_period: Union[Unset, int] = UNSET
-    decision_period: Union[Unset, int] = UNSET
-    extension_period: Union[Unset, int] = UNSET
-    admissable: Union[Unset, bool] = UNSET
+    possible: Unset | bool = UNSET
+    not_possible_reason: Unset | str = UNSET
+    objection_period: Unset | int = UNSET
+    decision_period: Unset | int = UNSET
+    extension_period: Unset | int = UNSET
+    admissable: Unset | bool = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:

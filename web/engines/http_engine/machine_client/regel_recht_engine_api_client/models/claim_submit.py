@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Any, TypeVar, Union, cast
+from typing import Any, TypeVar, cast
 from uuid import UUID
 
 from attrs import define as _attrs_define
@@ -35,10 +35,10 @@ class ClaimSubmit:
     claimant: str
     law: str
     bsn: str
-    case_id: Union[None, UUID, Unset] = UNSET
-    old_value: Union[Unset, Any] = UNSET
-    evidence_path: Union[None, Unset, str] = UNSET
-    auto_approve: Union[Unset, bool] = False
+    case_id: None | UUID | Unset = UNSET
+    old_value: Unset | Any = UNSET
+    evidence_path: None | Unset | str = UNSET
+    auto_approve: Unset | bool = False
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -56,7 +56,7 @@ class ClaimSubmit:
 
         bsn = self.bsn
 
-        case_id: Union[None, Unset, str]
+        case_id: None | Unset | str
         if isinstance(self.case_id, Unset):
             case_id = UNSET
         elif isinstance(self.case_id, UUID):
@@ -66,7 +66,7 @@ class ClaimSubmit:
 
         old_value = self.old_value
 
-        evidence_path: Union[None, Unset, str]
+        evidence_path: None | Unset | str
         if isinstance(self.evidence_path, Unset):
             evidence_path = UNSET
         else:
@@ -115,7 +115,7 @@ class ClaimSubmit:
 
         bsn = d.pop("bsn")
 
-        def _parse_case_id(data: object) -> Union[None, UUID, Unset]:
+        def _parse_case_id(data: object) -> None | UUID | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -128,18 +128,18 @@ class ClaimSubmit:
                 return case_id_type_0
             except:  # noqa: E722
                 pass
-            return cast(Union[None, UUID, Unset], data)
+            return cast(None | UUID | Unset, data)
 
         case_id = _parse_case_id(d.pop("caseId", UNSET))
 
         old_value = d.pop("oldValue", UNSET)
 
-        def _parse_evidence_path(data: object) -> Union[None, Unset, str]:
+        def _parse_evidence_path(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         evidence_path = _parse_evidence_path(d.pop("evidencePath", UNSET))
 

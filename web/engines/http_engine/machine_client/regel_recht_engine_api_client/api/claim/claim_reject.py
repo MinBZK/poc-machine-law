@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -36,8 +36,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ClaimRejectResponse200, ClaimRejectResponse400, ClaimRejectResponse404, ClaimRejectResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> ClaimRejectResponse200 | ClaimRejectResponse400 | ClaimRejectResponse404 | ClaimRejectResponse500 | None:
     if response.status_code == 200:
         response_200 = ClaimRejectResponse200.from_dict(response.json())
 
@@ -61,8 +61,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ClaimRejectResponse200, ClaimRejectResponse400, ClaimRejectResponse404, ClaimRejectResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[ClaimRejectResponse200 | ClaimRejectResponse400 | ClaimRejectResponse404 | ClaimRejectResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -74,9 +74,9 @@ def _build_response(
 def sync_detailed(
     claim_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: ClaimRejectBody,
-) -> Response[Union[ClaimRejectResponse200, ClaimRejectResponse400, ClaimRejectResponse404, ClaimRejectResponse500]]:
+) -> Response[ClaimRejectResponse200 | ClaimRejectResponse400 | ClaimRejectResponse404 | ClaimRejectResponse500]:
     """Reject a claim
 
      Reject a claim with reason
@@ -108,9 +108,9 @@ def sync_detailed(
 def sync(
     claim_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: ClaimRejectBody,
-) -> Optional[Union[ClaimRejectResponse200, ClaimRejectResponse400, ClaimRejectResponse404, ClaimRejectResponse500]]:
+) -> ClaimRejectResponse200 | ClaimRejectResponse400 | ClaimRejectResponse404 | ClaimRejectResponse500 | None:
     """Reject a claim
 
      Reject a claim with reason
@@ -137,9 +137,9 @@ def sync(
 async def asyncio_detailed(
     claim_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: ClaimRejectBody,
-) -> Response[Union[ClaimRejectResponse200, ClaimRejectResponse400, ClaimRejectResponse404, ClaimRejectResponse500]]:
+) -> Response[ClaimRejectResponse200 | ClaimRejectResponse400 | ClaimRejectResponse404 | ClaimRejectResponse500]:
     """Reject a claim
 
      Reject a claim with reason
@@ -169,9 +169,9 @@ async def asyncio_detailed(
 async def asyncio(
     claim_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
     body: ClaimRejectBody,
-) -> Optional[Union[ClaimRejectResponse200, ClaimRejectResponse400, ClaimRejectResponse404, ClaimRejectResponse500]]:
+) -> ClaimRejectResponse200 | ClaimRejectResponse400 | ClaimRejectResponse404 | ClaimRejectResponse500 | None:
     """Reject a claim
 
      Reject a claim with reason

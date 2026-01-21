@@ -1,6 +1,6 @@
 [project]
 name = "poc-machine-law"
-version = "0.1.0"
+version = "1.5.0"
 description = "Proof of Concept - Machine Law"
 readme = "README.md"
 requires-python = ">=3.12.0,<3.14"
@@ -33,7 +33,7 @@ dependencies = [
     "requests>=2.32.3",
     "tavily-python>=0.5.1",
     "tqdm>=4.67.1",
-    "uvicorn<0.36.0",
+    "uvicorn>=0.40.0",
     "websockets>=15.0.1",
 ]
 
@@ -63,3 +63,21 @@ ignore = ["TRY003", "SIM105"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+build_command = ""
+commit_message = "chore(release): {version}"
+tag_format = "v{version}"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+
+[tool.semantic_release.remote]
+type = "github"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = false

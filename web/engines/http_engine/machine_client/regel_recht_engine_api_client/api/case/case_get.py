@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -25,8 +25,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[CaseGetResponse200, CaseGetResponse400, CaseGetResponse404, CaseGetResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CaseGetResponse200 | CaseGetResponse400 | CaseGetResponse404 | CaseGetResponse500 | None:
     if response.status_code == 200:
         response_200 = CaseGetResponse200.from_dict(response.json())
 
@@ -50,8 +50,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[CaseGetResponse200, CaseGetResponse400, CaseGetResponse404, CaseGetResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CaseGetResponse200 | CaseGetResponse400 | CaseGetResponse404 | CaseGetResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -63,8 +63,8 @@ def _build_response(
 def sync_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Response[Union[CaseGetResponse200, CaseGetResponse400, CaseGetResponse404, CaseGetResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Response[CaseGetResponse200 | CaseGetResponse400 | CaseGetResponse404 | CaseGetResponse500]:
     """Get a case based on a case id
 
     Args:
@@ -92,8 +92,8 @@ def sync_detailed(
 def sync(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[CaseGetResponse200, CaseGetResponse400, CaseGetResponse404, CaseGetResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> CaseGetResponse200 | CaseGetResponse400 | CaseGetResponse404 | CaseGetResponse500 | None:
     """Get a case based on a case id
 
     Args:
@@ -116,8 +116,8 @@ def sync(
 async def asyncio_detailed(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Response[Union[CaseGetResponse200, CaseGetResponse400, CaseGetResponse404, CaseGetResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Response[CaseGetResponse200 | CaseGetResponse400 | CaseGetResponse404 | CaseGetResponse500]:
     """Get a case based on a case id
 
     Args:
@@ -143,8 +143,8 @@ async def asyncio_detailed(
 async def asyncio(
     case_id: UUID,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[CaseGetResponse200, CaseGetResponse400, CaseGetResponse404, CaseGetResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> CaseGetResponse200 | CaseGetResponse400 | CaseGetResponse404 | CaseGetResponse500 | None:
     """Get a case based on a case id
 
     Args:

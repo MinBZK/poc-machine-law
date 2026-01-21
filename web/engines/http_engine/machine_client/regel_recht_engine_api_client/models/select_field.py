@@ -36,7 +36,7 @@ class SelectField:
 
         type_ = self.type_
 
-        value: Union[Any, dict[str, Any]]
+        value: Any | dict[str, Any]
         if isinstance(self.value, Action):
             value = self.value.to_dict()
         else:

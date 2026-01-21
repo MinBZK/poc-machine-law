@@ -14,6 +14,7 @@ from web.dependencies import (
     get_claim_manager,
     get_engine_id,
     get_machine_service,
+    is_demo_mode,
     set_engine_id,
     templates,
 )
@@ -125,10 +126,19 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
     """Show a button to reset the state of the application"""
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
-    # Get discoverable laws to create law feature flags
-    all_laws = services.get_discoverable_service_laws()
-    # Now get the feature flags for these laws
-    law_flags = FeatureFlags.get_law_flags(all_laws)
+
+    # Get all discoverable laws for each type (without feature flag filtering for admin UI)
+    citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
+    business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
+    delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
+
+    # Get the feature flags for each law type
+    law_flags = {
+        "citizen": FeatureFlags.get_law_flags(citizen_laws),
+        "business": FeatureFlags.get_law_flags(business_laws),
+        "delegation": FeatureFlags.get_law_flags(delegation_laws),
+    }
+
     return templates.TemplateResponse(
         "admin/control.html",
         {
@@ -139,6 +149,7 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "current_provider": current_provider,
             "feature_flags": feature_flags,
             "law_flags": law_flags,
+            "demo_mode": is_demo_mode(request),
         },
     )
 
@@ -233,6 +244,7 @@ async def post_set_feature_flag(
     request: Request,
     flag_name: str = Form(...),
     value: str = Form(...),
+    source: str = Form(default="admin"),
     services: EngineInterface = Depends(get_machine_service),
 ):
     """Set the value of a feature flag and return updated partial"""
@@ -245,16 +257,30 @@ async def post_set_feature_flag(
 
         # Check if it's a law feature flag
         if flag_name.startswith(FeatureFlags.LAW_PREFIX):
-            # Get all laws for law feature flags
-            all_laws = services.get_discoverable_service_laws()
-            # Now get the feature flags for these laws
-            law_flags = FeatureFlags.get_law_flags(all_laws)
+            # Get all discoverable laws for each type (without feature flag filtering for admin UI)
+            citizen_laws = services.get_discoverable_service_laws("CITIZEN", filter_disabled=False)
+            business_laws = services.get_discoverable_service_laws("BUSINESS", filter_disabled=False)
+            delegation_laws = services.get_discoverable_service_laws("DELEGATION_PROVIDER", filter_disabled=False)
+
+            # Get the feature flags for each law type
+            law_flags = {
+                "citizen": FeatureFlags.get_law_flags(citizen_laws),
+                "business": FeatureFlags.get_law_flags(business_laws),
+                "delegation": FeatureFlags.get_law_flags(delegation_laws),
+            }
+
             # Return only the law feature flags partial
             return templates.TemplateResponse(
                 "/admin/partials/law_feature_flags.html", {"request": request, "law_flags": law_flags}
             )
+        elif source == "demo":
+            # Return demo-specific partial for feature flags
+            feature_flags = FeatureFlags.get_all()
+            return templates.TemplateResponse(
+                "demo/partials/feature_flags.html", {"request": request, "feature_flags": feature_flags}
+            )
         else:
-            # Regular feature flag
+            # Regular feature flag from admin
             feature_flags = FeatureFlags.get_all()
 
             # Return only the feature flags partial
@@ -304,6 +330,7 @@ async def admin_dashboard(
             "available_services": available_services,
             "service_laws": service_laws,
             "service_cases": service_cases,
+            "demo_mode": is_demo_mode(request),
         },
     )
 
@@ -462,27 +489,6 @@ async def view_case(
             "claim_ids": claim_ids,
             "person_name": person_name,
             "current_engine_id": get_engine_id(),
+            "demo_mode": is_demo_mode(request),
         },
-    )
-
-
-@router.get("/claims/{claim_id}")
-async def view_claim(
-    request: Request,
-    claim_id: str,
-    claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
-    case_manager: CaseManagerInterface = Depends(get_case_manager),
-):
-    """View details of a specific claim"""
-    claim = claim_manager.get_claim(claim_id)
-    if not claim:
-        raise HTTPException(status_code=404, detail="Claim not found")
-
-    # Get related case if it exists
-    related_case = None
-    if claim.case_id:
-        related_case = case_manager.get_case_by_id(claim.case_id)
-
-    return templates.TemplateResponse(
-        "admin/claim_detail.html", {"request": request, "claim": claim, "related_case": related_case}
     )

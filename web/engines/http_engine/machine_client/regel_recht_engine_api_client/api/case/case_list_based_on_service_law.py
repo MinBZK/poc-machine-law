@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -24,12 +24,13 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[
-    Union[
-        CaseListBasedOnServiceLawResponse200, CaseListBasedOnServiceLawResponse400, CaseListBasedOnServiceLawResponse500
-    ]
-]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> (
+    CaseListBasedOnServiceLawResponse200
+    | CaseListBasedOnServiceLawResponse400
+    | CaseListBasedOnServiceLawResponse500
+    | None
+):
     if response.status_code == 200:
         response_200 = CaseListBasedOnServiceLawResponse200.from_dict(response.json())
 
@@ -49,11 +50,9 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+    *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    Union[
-        CaseListBasedOnServiceLawResponse200, CaseListBasedOnServiceLawResponse400, CaseListBasedOnServiceLawResponse500
-    ]
+    CaseListBasedOnServiceLawResponse200 | CaseListBasedOnServiceLawResponse400 | CaseListBasedOnServiceLawResponse500
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -67,11 +66,9 @@ def sync_detailed(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        CaseListBasedOnServiceLawResponse200, CaseListBasedOnServiceLawResponse400, CaseListBasedOnServiceLawResponse500
-    ]
+    CaseListBasedOnServiceLawResponse200 | CaseListBasedOnServiceLawResponse400 | CaseListBasedOnServiceLawResponse500
 ]:
     """Get all cases based on service and law
 
@@ -103,12 +100,13 @@ def sync(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        CaseListBasedOnServiceLawResponse200, CaseListBasedOnServiceLawResponse400, CaseListBasedOnServiceLawResponse500
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    CaseListBasedOnServiceLawResponse200
+    | CaseListBasedOnServiceLawResponse400
+    | CaseListBasedOnServiceLawResponse500
+    | None
+):
     """Get all cases based on service and law
 
     Args:
@@ -134,11 +132,9 @@ async def asyncio_detailed(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient | Client,
 ) -> Response[
-    Union[
-        CaseListBasedOnServiceLawResponse200, CaseListBasedOnServiceLawResponse400, CaseListBasedOnServiceLawResponse500
-    ]
+    CaseListBasedOnServiceLawResponse200 | CaseListBasedOnServiceLawResponse400 | CaseListBasedOnServiceLawResponse500
 ]:
     """Get all cases based on service and law
 
@@ -168,12 +164,13 @@ async def asyncio(
     service: str,
     law: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[
-    Union[
-        CaseListBasedOnServiceLawResponse200, CaseListBasedOnServiceLawResponse400, CaseListBasedOnServiceLawResponse500
-    ]
-]:
+    client: AuthenticatedClient | Client,
+) -> (
+    CaseListBasedOnServiceLawResponse200
+    | CaseListBasedOnServiceLawResponse400
+    | CaseListBasedOnServiceLawResponse500
+    | None
+):
     """Get all cases based on service and law
 
     Args:

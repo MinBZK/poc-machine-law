@@ -73,9 +73,22 @@ class WebSocketMessage(TypedDict):
 # Initialize the graph
 workflow = StateGraph(state_schema=State)
 
-# Get the event loop and enable nesting, see https://pypi.org/project/nest-asyncio/
-nest_asyncio.apply()
-loop = asyncio.get_event_loop()
+# Lazy initialization for nest_asyncio and event loop
+# We delay applying nest_asyncio until it's actually needed to avoid
+# conflicts with uvicorn's startup (which uses loop_factory in 0.40.0+)
+_nest_asyncio_applied = False
+_loop = None
+
+
+def get_event_loop():
+    """Get or create the event loop with nest_asyncio applied."""
+    global _nest_asyncio_applied, _loop
+    if not _nest_asyncio_applied:
+        nest_asyncio.apply()
+        _nest_asyncio_applied = True
+    if _loop is None:
+        _loop = asyncio.get_event_loop()
+    return _loop
 
 
 def validate_schema(yaml_data: any) -> str | None:
@@ -150,7 +163,9 @@ def ask_law(state: State, config: dict) -> dict:
 
     # Ask the user for the law name
     msg = "Wat is de naam van de wet?"
-    loop.run_until_complete(manager.send_message(WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id))
+    get_event_loop().run_until_complete(
+        manager.send_message(WebSocketMessage(id=str(uuid.uuid4()), content=msg), thread_id)
+    )
 
     return {"messages": []}  # Note: we reset the messages
 
@@ -163,7 +178,7 @@ def check_law_input(state: State, config: dict) -> dict:
     thread_id = config["configurable"]["thread_id"]
 
     if len(resp) < 4:
-        loop.run_until_complete(
+        get_event_loop().run_until_complete(
             manager.send_message(
                 WebSocketMessage(
                     id=str(uuid.uuid4()),
@@ -179,7 +194,7 @@ def check_law_input(state: State, config: dict) -> dict:
     tavily_key = state.get("tavily_api_key") or os.getenv("TAVILY_API_KEY")
 
     if (not anthropic_key) or (not tavily_key):
-        loop.run_until_complete(
+        get_event_loop().run_until_complete(
             manager.send_message(
                 WebSocketMessage(
                     id=str(uuid.uuid4()),
@@ -191,7 +206,7 @@ def check_law_input(state: State, config: dict) -> dict:
         return {"should_retry": True, "law": resp}
 
     # Send a mesage to the frontend to update the progress to the next step
-    loop.run_until_complete(
+    get_event_loop().run_until_complete(
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
@@ -220,7 +235,7 @@ def ask_law_confirmation(state: State, config: dict) -> dict:
 
     thread_id = config["configurable"]["thread_id"]
 
-    loop.run_until_complete(
+    get_event_loop().run_until_complete(
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
@@ -240,7 +255,7 @@ def handle_law_confirmation(state: State, config: dict) -> dict:
     thread_id = config["configurable"]["thread_id"]
 
     if state["law_url"] is None:
-        loop.run_until_complete(
+        get_event_loop().run_until_complete(
             manager.send_message(
                 WebSocketMessage(
                     id=str(uuid.uuid4()),
@@ -259,7 +274,7 @@ def handle_law_confirmation(state: State, config: dict) -> dict:
         is_approved = True
 
         # Send a mesage to the frontend to update the progress to the next step
-        loop.run_until_complete(
+        get_event_loop().run_until_complete(
             manager.send_message(
                 WebSocketMessage(
                     id=str(uuid.uuid4()),
@@ -331,7 +346,7 @@ def process_law(state: State, config: dict) -> dict:
 
     thread_id = config["configurable"]["thread_id"]
 
-    loop.run_until_complete(
+    get_event_loop().run_until_complete(
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
@@ -364,7 +379,7 @@ def process_law(state: State, config: dict) -> dict:
     )
 
     # Send a mesage to the frontend to update the progress to the next step
-    loop.run_until_complete(
+    get_event_loop().run_until_complete(
         manager.send_message(
             WebSocketMessage(
                 id=str(uuid.uuid4()),
@@ -422,7 +437,7 @@ def process_law_feedback(state: State, config: dict) -> dict:
         thread_id = config["configurable"]["thread_id"]
 
         # Send a mesage to the frontend to update the progress to the next step
-        loop.run_until_complete(
+        get_event_loop().run_until_complete(
             manager.send_message(
                 WebSocketMessage(
                     id=str(uuid.uuid4()),
@@ -433,7 +448,7 @@ def process_law_feedback(state: State, config: dict) -> dict:
             )
         )
 
-        loop.run_until_complete(
+        get_event_loop().run_until_complete(
             manager.send_message(
                 WebSocketMessage(
                     id=str(uuid.uuid4()),

@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -14,8 +14,8 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     bsn: str,
     *,
-    approved: Union[Unset, bool] = UNSET,
-    include_rejected: Union[Unset, bool] = UNSET,
+    approved: Unset | bool = UNSET,
+    include_rejected: Unset | bool = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
@@ -35,8 +35,8 @@ def _get_kwargs(
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ClaimListBasedOnBSNResponse200, ClaimListBasedOnBSNResponse400, ClaimListBasedOnBSNResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> ClaimListBasedOnBSNResponse200 | ClaimListBasedOnBSNResponse400 | ClaimListBasedOnBSNResponse500 | None:
     if response.status_code == 200:
         response_200 = ClaimListBasedOnBSNResponse200.from_dict(response.json())
 
@@ -56,8 +56,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ClaimListBasedOnBSNResponse200, ClaimListBasedOnBSNResponse400, ClaimListBasedOnBSNResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[ClaimListBasedOnBSNResponse200 | ClaimListBasedOnBSNResponse400 | ClaimListBasedOnBSNResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -69,10 +69,10 @@ def _build_response(
 def sync_detailed(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-    approved: Union[Unset, bool] = UNSET,
-    include_rejected: Union[Unset, bool] = UNSET,
-) -> Response[Union[ClaimListBasedOnBSNResponse200, ClaimListBasedOnBSNResponse400, ClaimListBasedOnBSNResponse500]]:
+    client: AuthenticatedClient | Client,
+    approved: Unset | bool = UNSET,
+    include_rejected: Unset | bool = UNSET,
+) -> Response[ClaimListBasedOnBSNResponse200 | ClaimListBasedOnBSNResponse400 | ClaimListBasedOnBSNResponse500]:
     """Get all claims
 
     Args:
@@ -104,10 +104,10 @@ def sync_detailed(
 def sync(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-    approved: Union[Unset, bool] = UNSET,
-    include_rejected: Union[Unset, bool] = UNSET,
-) -> Optional[Union[ClaimListBasedOnBSNResponse200, ClaimListBasedOnBSNResponse400, ClaimListBasedOnBSNResponse500]]:
+    client: AuthenticatedClient | Client,
+    approved: Unset | bool = UNSET,
+    include_rejected: Unset | bool = UNSET,
+) -> ClaimListBasedOnBSNResponse200 | ClaimListBasedOnBSNResponse400 | ClaimListBasedOnBSNResponse500 | None:
     """Get all claims
 
     Args:
@@ -134,10 +134,10 @@ def sync(
 async def asyncio_detailed(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-    approved: Union[Unset, bool] = UNSET,
-    include_rejected: Union[Unset, bool] = UNSET,
-) -> Response[Union[ClaimListBasedOnBSNResponse200, ClaimListBasedOnBSNResponse400, ClaimListBasedOnBSNResponse500]]:
+    client: AuthenticatedClient | Client,
+    approved: Unset | bool = UNSET,
+    include_rejected: Unset | bool = UNSET,
+) -> Response[ClaimListBasedOnBSNResponse200 | ClaimListBasedOnBSNResponse400 | ClaimListBasedOnBSNResponse500]:
     """Get all claims
 
     Args:
@@ -167,10 +167,10 @@ async def asyncio_detailed(
 async def asyncio(
     bsn: str,
     *,
-    client: Union[AuthenticatedClient, Client],
-    approved: Union[Unset, bool] = UNSET,
-    include_rejected: Union[Unset, bool] = UNSET,
-) -> Optional[Union[ClaimListBasedOnBSNResponse200, ClaimListBasedOnBSNResponse400, ClaimListBasedOnBSNResponse500]]:
+    client: AuthenticatedClient | Client,
+    approved: Unset | bool = UNSET,
+    include_rejected: Unset | bool = UNSET,
+) -> ClaimListBasedOnBSNResponse200 | ClaimListBasedOnBSNResponse400 | ClaimListBasedOnBSNResponse500 | None:
     """Get all claims
 
     Args:

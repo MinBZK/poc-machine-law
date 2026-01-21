@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 import httpx
 
@@ -20,8 +20,8 @@ def _get_kwargs() -> dict[str, Any]:
 
 
 def _parse_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, ResetEngineResponse400, ResetEngineResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Any | ResetEngineResponse400 | ResetEngineResponse500 | None:
     if response.status_code == 201:
         response_201 = cast(Any, None)
         return response_201
@@ -40,8 +40,8 @@ def _parse_response(
 
 
 def _build_response(
-    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, ResetEngineResponse400, ResetEngineResponse500]]:
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[Any | ResetEngineResponse400 | ResetEngineResponse500]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -52,8 +52,8 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Response[Union[Any, ResetEngineResponse400, ResetEngineResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Response[Any | ResetEngineResponse400 | ResetEngineResponse500]:
     """Reset the engine
 
      Resets the entire engine, clearing all data and returning it to its initial state
@@ -77,8 +77,8 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[Any, ResetEngineResponse400, ResetEngineResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Any | ResetEngineResponse400 | ResetEngineResponse500 | None:
     """Reset the engine
 
      Resets the entire engine, clearing all data and returning it to its initial state
@@ -98,8 +98,8 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Response[Union[Any, ResetEngineResponse400, ResetEngineResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Response[Any | ResetEngineResponse400 | ResetEngineResponse500]:
     """Reset the engine
 
      Resets the entire engine, clearing all data and returning it to its initial state
@@ -121,8 +121,8 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
-) -> Optional[Union[Any, ResetEngineResponse400, ResetEngineResponse500]]:
+    client: AuthenticatedClient | Client,
+) -> Any | ResetEngineResponse400 | ResetEngineResponse500 | None:
     """Reset the engine
 
      Resets the entire engine, clearing all data and returning it to its initial state

@@ -38,11 +38,11 @@ class Evaluate:
     service: str
     law: str
     parameters: Union[Unset, "EvaluateParameters"] = UNSET
-    effective_date: Union[Unset, datetime.date] = UNSET
-    reference_date: Union[Unset, datetime.date] = UNSET
+    effective_date: Unset | datetime.date = UNSET
+    reference_date: Unset | datetime.date = UNSET
     input_: Union[Unset, "EvaluateInput"] = UNSET
-    output: Union[Unset, str] = UNSET
-    approved: Union[Unset, bool] = UNSET
+    output: Unset | str = UNSET
+    approved: Unset | bool = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -50,19 +50,19 @@ class Evaluate:
 
         law = self.law
 
-        parameters: Union[Unset, dict[str, Any]] = UNSET
+        parameters: Unset | dict[str, Any] = UNSET
         if not isinstance(self.parameters, Unset):
             parameters = self.parameters.to_dict()
 
-        effective_date: Union[Unset, str] = UNSET
+        effective_date: Unset | str = UNSET
         if not isinstance(self.effective_date, Unset):
             effective_date = self.effective_date.isoformat()
 
-        reference_date: Union[Unset, str] = UNSET
+        reference_date: Unset | str = UNSET
         if not isinstance(self.reference_date, Unset):
             reference_date = self.reference_date.isoformat()
 
-        input_: Union[Unset, dict[str, Any]] = UNSET
+        input_: Unset | dict[str, Any] = UNSET
         if not isinstance(self.input_, Unset):
             input_ = self.input_.to_dict()
 
@@ -104,28 +104,28 @@ class Evaluate:
         law = d.pop("law")
 
         _parameters = d.pop("parameters", UNSET)
-        parameters: Union[Unset, EvaluateParameters]
+        parameters: Unset | EvaluateParameters
         if isinstance(_parameters, Unset):
             parameters = UNSET
         else:
             parameters = EvaluateParameters.from_dict(_parameters)
 
         _effective_date = d.pop("effectiveDate", UNSET)
-        effective_date: Union[Unset, datetime.date]
+        effective_date: Unset | datetime.date
         if isinstance(_effective_date, Unset):
             effective_date = UNSET
         else:
             effective_date = isoparse(_effective_date).date()
 
         _reference_date = d.pop("referenceDate", UNSET)
-        reference_date: Union[Unset, datetime.date]
+        reference_date: Unset | datetime.date
         if isinstance(_reference_date, Unset):
             reference_date = UNSET
         else:
             reference_date = isoparse(_reference_date).date()
 
         _input_ = d.pop("input", UNSET)
-        input_: Union[Unset, EvaluateInput]
+        input_: Unset | EvaluateInput
         if isinstance(_input_, Unset):
             input_ = UNSET
         else:

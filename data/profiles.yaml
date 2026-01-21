@@ -113,7 +113,7 @@ profiles:
         - bsn: '100000001'
           loon_uit_dienstbetrekking: 0
           uitkeringen_en_pensioenen: 0
-          winst_uit_onderneming: 600000
+          winst_uit_onderneming: 2500000
           resultaat_overige_werkzaamheden: 0
           eigen_woning: -85000
         box2:

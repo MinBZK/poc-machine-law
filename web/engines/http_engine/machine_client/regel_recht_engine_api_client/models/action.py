@@ -30,18 +30,18 @@ class Action:
 
     output: str
     value: Union["Action", Any, Unset] = UNSET
-    operation: Union[None, Unset, str] = UNSET
-    subject: Union[None, Unset, str] = UNSET
-    unit: Union[None, Unset, str] = UNSET
-    combine: Union[None, Unset, str] = UNSET
-    values: Union[Any, Unset, list[Union["Action", Any]]] = UNSET
-    conditions: Union[Unset, list["Condition"]] = UNSET
+    operation: None | Unset | str = UNSET
+    subject: None | Unset | str = UNSET
+    unit: None | Unset | str = UNSET
+    combine: None | Unset | str = UNSET
+    values: Any | Unset | list[Union["Action", Any]] = UNSET
+    conditions: Unset | list["Condition"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         output = self.output
 
-        value: Union[Any, Unset, dict[str, Any]]
+        value: Any | Unset | dict[str, Any]
         if isinstance(self.value, Unset):
             value = UNSET
         elif isinstance(self.value, Action):
@@ -49,37 +49,37 @@ class Action:
         else:
             value = self.value
 
-        operation: Union[None, Unset, str]
+        operation: None | Unset | str
         if isinstance(self.operation, Unset):
             operation = UNSET
         else:
             operation = self.operation
 
-        subject: Union[None, Unset, str]
+        subject: None | Unset | str
         if isinstance(self.subject, Unset):
             subject = UNSET
         else:
             subject = self.subject
 
-        unit: Union[None, Unset, str]
+        unit: None | Unset | str
         if isinstance(self.unit, Unset):
             unit = UNSET
         else:
             unit = self.unit
 
-        combine: Union[None, Unset, str]
+        combine: None | Unset | str
         if isinstance(self.combine, Unset):
             combine = UNSET
         else:
             combine = self.combine
 
-        values: Union[Any, Unset, list[Union[Any, dict[str, Any]]]]
+        values: Any | Unset | list[Any | dict[str, Any]]
         if isinstance(self.values, Unset):
             values = UNSET
         elif isinstance(self.values, list):
             values = []
             for componentsschemas_action_values_type_0_item_data in self.values:
-                componentsschemas_action_values_type_0_item: Union[Any, dict[str, Any]]
+                componentsschemas_action_values_type_0_item: Any | dict[str, Any]
                 if isinstance(componentsschemas_action_values_type_0_item_data, Action):
                     componentsschemas_action_values_type_0_item = (
                         componentsschemas_action_values_type_0_item_data.to_dict()
@@ -91,7 +91,7 @@ class Action:
         else:
             values = self.values
 
-        conditions: Union[Unset, list[dict[str, Any]]] = UNSET
+        conditions: Unset | list[dict[str, Any]] = UNSET
         if not isinstance(self.conditions, Unset):
             conditions = []
             for conditions_item_data in self.conditions:
@@ -144,43 +144,43 @@ class Action:
 
         value = _parse_value(d.pop("value", UNSET))
 
-        def _parse_operation(data: object) -> Union[None, Unset, str]:
+        def _parse_operation(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         operation = _parse_operation(d.pop("operation", UNSET))
 
-        def _parse_subject(data: object) -> Union[None, Unset, str]:
+        def _parse_subject(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         subject = _parse_subject(d.pop("subject", UNSET))
 
-        def _parse_unit(data: object) -> Union[None, Unset, str]:
+        def _parse_unit(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         unit = _parse_unit(d.pop("unit", UNSET))
 
-        def _parse_combine(data: object) -> Union[None, Unset, str]:
+        def _parse_combine(data: object) -> None | Unset | str:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(Union[None, Unset, str], data)
+            return cast(None | Unset | str, data)
 
         combine = _parse_combine(d.pop("combine", UNSET))
 
-        def _parse_values(data: object) -> Union[Any, Unset, list[Union["Action", Any]]]:
+        def _parse_values(data: object) -> Any | Unset | list[Union["Action", Any]]:
             if isinstance(data, Unset):
                 return data
             try:
@@ -210,7 +210,7 @@ class Action:
                 return componentsschemas_action_values_type_0
             except:  # noqa: E722
                 pass
-            return cast(Union[Any, Unset, list[Union["Action", Any]]], data)
+            return cast(Any | Unset | list[Union["Action", Any]], data)
 
         values = _parse_values(d.pop("values", UNSET))
 

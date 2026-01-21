@@ -1,0 +1,53 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    # Only run if commit is not from semantic-release itself
+    if: "!contains(github.event.head_commit.message, 'chore(release):')"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.VERSION_BUMP_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install python-semantic-release
+        run: pip install python-semantic-release
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Semantic Release
+        env:
+          GH_TOKEN: ${{ secrets.VERSION_BUMP_TOKEN }}
+        run: |
+          # Run semantic-release (it handles version bump, commit, tag, and push)
+          semantic-release version
+
+      - name: Sync VERSION file
+        run: |
+          # Sync VERSION file with pyproject.toml version
+          VERSION=$(grep -oP 'version = "\K[^"]+' pyproject.toml | head -1)
+          if [ "$(cat VERSION)" != "$VERSION" ]; then
+            echo "$VERSION" > VERSION
+            git add VERSION
+            git commit -m "chore: sync VERSION file to $VERSION"
+            git push origin main
+          fi
