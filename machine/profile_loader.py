@@ -57,8 +57,11 @@ def load_profiles_from_yaml(yaml_path: str | Path) -> dict[str, dict[str, Any]]:
     logger.info(f"Successfully loaded {len(profiles)} profiles")
 
     # Add properties (badges) to each profile
+    # Merge static properties from YAML with dynamically generated ones
     for bsn, profile in profiles.items():
-        profile["properties"] = get_profile_properties(profile)
+        static_properties = profile.get("properties", [])
+        dynamic_properties = get_profile_properties(profile)
+        profile["properties"] = static_properties + dynamic_properties
 
     return profiles
 
