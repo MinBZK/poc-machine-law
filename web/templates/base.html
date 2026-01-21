@@ -496,6 +496,16 @@
                 // If not in iframe, allow normal browser refresh
             }
         });
+
+        // HTMX interceptor to preserve demo mode across navigation
+        // This ensures ?demo=true is automatically added to all HTMX requests
+        document.body.addEventListener('htmx:configRequest', function(evt) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const demo = urlParams.get('demo');
+            if (demo) {
+                evt.detail.parameters['demo'] = demo;
+            }
+        });
     </script>
     <!-- Footer -->
     <footer class="bg-gray-100 border-t mt-12">
