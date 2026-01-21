@@ -3312,3 +3312,473 @@ profiles:
           polis_status: ACTIEF
           verdrag_status: GEEN
           zorg_type: BASIS
+
+  # ====================================================================
+  # Delegation Law Test Profiles
+  # ====================================================================
+
+  # Profile: Curator who manages a curandus
+  '400100001':
+    name: Geert de Vries
+    description: Professioneel curator, bewindvoerder en mentor voor meerdere cliënten
+    properties:
+      - Curator
+      - Bewindvoerder
+      - Mentor
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100001'
+          geboortedatum: '1970-06-15'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 55
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Lange Nieuwstraat 10, 3512PH Utrecht
+          has_fixed_address: true
+          household_size: 1
+      RECHTSPRAAK:
+        # Curatele registraties - Geert is curator voor Sophie
+        curatele_registraties:
+        - bsn_curator: '400100001'
+          bsn_curandus: '500000001'
+          naam_curandus: Sophie van Dam
+          datum_ingang: '2022-01-15'
+          datum_einde: null
+          status: ACTIEF
+        # Bewind registraties - Geert is bewindvoerder voor Bart
+        bewind_registraties:
+        - bsn_bewindvoerder: '400100001'
+          bsn_rechthebbende: '500000002'
+          naam_rechthebbende: Bart Willems
+          bewind_type: VOLLEDIG_BEWIND
+          datum_ingang: '2023-03-01'
+          datum_einde: null
+          status: ACTIEF
+        # Mentorschap registraties - Geert is mentor voor Willem
+        mentorschap_registraties:
+        - bsn_mentor: '400100001'
+          bsn_betrokkene: '500000003'
+          naam_betrokkene: Willem Jansen
+          datum_ingang: '2023-06-15'
+          datum_einde: null
+          status: ACTIEF
+
+  # Profile: Curandus (person under curatele - legally incapacitated)
+  '500000001':
+    name: Sophie van Dam
+    description: Onder curatele gesteld wegens geestelijke stoornis
+    properties:
+      - Onder curatele
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000001'
+          geboortedatum: '1985-09-20'
+          verblijfsadres: Utrecht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 40
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Zorgcentrum De Heuvel, 3511AA Utrecht
+          has_fixed_address: true
+          household_size: 1
+
+  # Profile: Person under beschermingsbewind
+  '500000002':
+    name: Bart Willems
+    description: Onder beschermingsbewind, blijft handelingsbekwaam
+    properties:
+      - Onder bewind
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000002'
+          geboortedatum: '1978-04-12'
+          verblijfsadres: Amersfoort
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 47
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Langestraat 50, 3811NJ Amersfoort
+          has_fixed_address: true
+          household_size: 1
+
+  # Profile: Person under mentorschap
+  '500000003':
+    name: Willem Jansen
+    description: Onder mentorschap, blijft handelingsbekwaam
+    properties:
+      - Mentorschap
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000003'
+          geboortedatum: '1960-11-30'
+          verblijfsadres: Zeist
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 65
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Verzorgingshuis Zeist, 3701AA Zeist
+          has_fixed_address: true
+          household_size: 1
+
+  # Profile: Gevolmachtigde (holder of power of attorney)
+  '400100002':
+    name: Anna van den Berg
+    description: Gevolmachtigde met algemene volmacht voor haar moeder
+    properties:
+      - Gevolmachtigde
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100002'
+          geboortedatum: '1982-07-22'
+          verblijfsadres: Den Haag
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 43
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Parkstraat 100, 2514JK Den Haag
+          has_fixed_address: true
+          household_size: 2
+      NOTARIAAT:
+        # Volmacht registraties - Anna heeft algemene volmacht van haar moeder
+        volmacht_registraties:
+        - bsn_gevolmachtigde: '400100002'
+          bsn_volmachtgever: '500000004'
+          naam_volmachtgever: Elisabeth van den Berg-Smit
+          volmacht_type: ALGEMENE_VOLMACHT
+          datum_ingang: '2021-05-01'
+          datum_einde: null
+          status: ACTIEF
+          is_herroepen: false
+
+  # Profile: Volmachtgever (person who gave power of attorney)
+  '500000004':
+    name: Elisabeth van den Berg-Smit
+    description: Heeft algemene volmacht gegeven aan haar dochter Anna
+    properties:
+      - Volmachtgever
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000004'
+          geboortedatum: '1955-02-14'
+          verblijfsadres: Den Haag
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 70
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Bejaardenhuis Scheveningen, 2586AA Den Haag
+          has_fixed_address: true
+          household_size: 1
+
+  # Profile: Executeur (estate executor)
+  '400100003':
+    name: mr. Willem van Houten
+    description: Notaris en executeur van nalatenschappen
+    properties:
+      - Executeur
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100003'
+          geboortedatum: '1965-12-05'
+          verblijfsadres: Amsterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 60
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Herengracht 200, 1016BS Amsterdam
+          has_fixed_address: true
+          household_size: 2
+      NOTARIAAT:
+        # Executeur registraties
+        executeur_registraties:
+        - bsn_executeur: '400100003'
+          bsn_erflater: '500000005'
+          naam_erflater: Karel Posthumus
+          nalatenschap_id: 'NAL-2024-00123'
+          datum_overlijden: '2024-06-01'
+          datum_aanvaarding: '2024-06-15'
+          datum_einde: null
+          status: ACTIEF
+
+  # Profile: Faillissementscurator
+  '400100004':
+    name: mr. Karin Bakker
+    description: Advocaat en faillissementscurator
+    properties:
+      - Faillissementscurator
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100004'
+          geboortedatum: '1972-08-18'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 53
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Coolsingel 50, 3011AD Rotterdam
+          has_fixed_address: true
+          household_size: 3
+      RECHTSPRAAK:
+        # Faillissement registraties
+        faillissement_registraties:
+        - bsn_curator: '400100004'
+          gefailleerde_id: '500000006'
+          gefailleerde_naam: Henk Visser
+          gefailleerde_type: NATUURLIJK_PERSOON
+          insolventie_nummer: 'F.10/24/123'
+          datum_uitspraak: '2024-03-15'
+          datum_einde: null
+          status: ACTIEF
+        - bsn_curator: '400100004'
+          gefailleerde_id: '87654321'
+          gefailleerde_naam: Failliete BV
+          gefailleerde_type: RECHTSPERSOON
+          insolventie_nummer: 'F.10/24/456'
+          datum_uitspraak: '2024-05-20'
+          datum_einde: null
+          status: ACTIEF
+
+  # Profile: Gefailleerde persoon
+  '500000006':
+    name: Henk Visser
+    description: Failliet verklaard, boedel wordt beheerd door curator
+    properties:
+      - Failliet
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000006'
+          geboortedatum: '1980-01-25'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 45
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Schiedamseweg 100, 3025AA Rotterdam
+          has_fixed_address: true
+          household_size: 1
+
+  # Profile: WSNP Bewindvoerder
+  '400100005':
+    name: Frank Vermeer
+    description: WSNP bewindvoerder voor personen in schuldsanering
+    properties:
+      - WSNP bewindvoerder
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100005'
+          geboortedatum: '1968-03-10'
+          verblijfsadres: Eindhoven
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 57
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Vestdijk 25, 5611CA Eindhoven
+          has_fixed_address: true
+          household_size: 2
+      RECHTSPRAAK:
+        # WSNP registraties
+        wsnp_registraties:
+        - bsn_bewindvoerder: '400100005'
+          bsn_saniet: '500000007'
+          naam_saniet: Sandra Meijer
+          insolventie_nummer: 'R.18/23/789'
+          datum_uitspraak: '2023-09-01'
+          datum_einde: null
+          status: ACTIEF
+
+  # Profile: WSNP saniet (person in debt restructuring)
+  '500000007':
+    name: Sandra Meijer
+    description: In WSNP schuldsanering
+    properties:
+      - In WSNP
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000007'
+          geboortedatum: '1988-11-08'
+          verblijfsadres: Eindhoven
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 37
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Woenselsestraat 75, 5623AA Eindhoven
+          has_fixed_address: true
+          household_size: 1
+
+  # Profile: Family member who can be WGBO representative
+  '400100006':
+    name: Peter Groen
+    description: Echtgenoot van wilsonbekwame patiënt, WGBO-vertegenwoordiger
+    properties:
+      - WGBO vertegenwoordiger
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100006'
+          geboortedatum: '1958-05-30'
+          verblijfsadres: Groningen
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 67
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Hereweg 150, 9725AA Groningen
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '400100006'
+          partnerschap_type: HUWELIJK
+          partner_bsn: '500000008'
+          has_partner: true
+        # WGBO familie relaties voor medische vertegenwoordiging
+        wgbo_familie_relaties:
+        - bsn_familielid: '400100006'
+          bsn_patient: '500000008'
+          naam_patient: Gerda Groen-van Dijk
+          relatie_type: ECHTGENOOT
+          is_wilsonbekwaam: true
+          datum_wilsonbekwaamheid: '2024-01-10'
+
+  # Profile: Wilsonbekwame patient
+  '500000008':
+    name: Gerda Groen-van Dijk
+    description: Wilsonbekwaam verklaard
+    properties:
+      - Wilsonbekwaam
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000008'
+          geboortedatum: '1960-08-22'
+          verblijfsadres: Groningen
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 65
+          has_dutch_nationality: true
+          has_partner: true
+          residence_address: Hereweg 150, 9725AA Groningen
+          has_fixed_address: true
+          household_size: 2
+        relaties:
+        - bsn: '500000008'
+          partnerschap_type: HUWELIJK
+          partner_bsn: '400100006'
+          has_partner: true
+
+  # Profile: Person with ended curatele (for testing inactive status)
+  '400100007':
+    name: Marieke van der Berg
+    description: Was curator maar curatele is beëindigd
+    properties:
+      - Voormalig curator
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '400100007'
+          geboortedatum: '1975-04-15'
+          verblijfsadres: Maastricht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 50
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Vrijthof 10, 6211LE Maastricht
+          has_fixed_address: true
+          household_size: 1
+      RECHTSPRAAK:
+        # Beeindigde curatele
+        curatele_registraties:
+        - bsn_curator: '400100007'
+          bsn_curandus: '500000009'
+          naam_curandus: Jan de Boer
+          datum_ingang: '2020-01-01'
+          datum_einde: '2023-12-31'
+          status: BEEINDIGD
+
+  # Profile: Person whose curatele ended
+  '500000009':
+    name: Jan de Boer
+    description: Curatele is opgeheven, weer volledig handelingsbekwaam
+    properties:
+      - Curatele beëindigd
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '500000009'
+          geboortedatum: '1990-07-20'
+          verblijfsadres: Maastricht
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 35
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Wycker Brugstraat 5, 6221EA Maastricht
+          has_fixed_address: true
+          household_size: 1
