@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.6.2 (2026-01-21)
+
+### Bug Fixes
+
+- Also intercept regular link clicks for demo mode persistence
+  ([#345](https://github.com/MinBZK/poc-machine-law/pull/345),
+  [`68167f3`](https://github.com/MinBZK/poc-machine-law/commit/68167f33ea0428a338866a834798d79a415381a9))
+
+- Preserve demo_mode across HTMX navigation
+  ([#345](https://github.com/MinBZK/poc-machine-law/pull/345),
+  [`68167f3`](https://github.com/MinBZK/poc-machine-law/commit/68167f33ea0428a338866a834798d79a415381a9))
+
+### Chores
+
+- Sync VERSION file to 1.6.1
+  ([`a8adf20`](https://github.com/MinBZK/poc-machine-law/commit/a8adf2007e24d1fcc718b6100bc0d6a27d1998c5))
+
+
 ## v1.6.1 (2026-01-21)
 
 ### Bug Fixes
