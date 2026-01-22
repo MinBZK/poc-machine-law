@@ -3376,8 +3376,8 @@ profiles:
           status: ACTIEF
           activiteit: Horeca
           kvk_nummer: '85234567'
-          handelsnaam: Koffiezaak Bakkie Pleur #Dubbel
-          sbi_omschrijving: Cafés #Dubbel
+          handelsnaam: Koffiezaak Bakkie Pleur
+          sbi_omschrijving: Cafés
         functionarissen:
         - bsn: '999999990'
           kvk_nummer: '85234567'
@@ -3419,7 +3419,7 @@ profiles:
           sbi_code: '56102'
           sbi_omschrijving: Cafés
           is_active: true
-          aantal_werknemers: 2
+          aantal_werknemers: 0
           datum_telling: '2025-01-01'
         vestigingen:
         - vestigingsnummer: '000051234567'
@@ -3433,7 +3433,7 @@ profiles:
           heeft_terras: true
           schenkt_alcohol: false
           heeft_muziek: false
-          personeel_voltijd: 2
+          personeel_voltijd: 0
           personeel_deeltijd: 0
       GEMEENTE_ROTTERDAM:
         inschrijvingen:
@@ -3465,6 +3465,6 @@ profiles:
           postcode: 3021GC
           huisnummer: 225A
           gebruiksdoel: bijeenkomstfunctie
-          oppervlakte: 150
+          oppervlakte: 100
           bouwjaar: 1920
           status: Verblijfsobject in gebruik

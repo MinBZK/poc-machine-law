@@ -121,42 +121,26 @@ def get_profile_properties(profile: dict) -> list[str]:
     is_entrepreneur = False
     if "KVK" in profile["sources"]:
         kvk_data = profile["sources"]["KVK"]
-
-        # Check bestuurders (for DGA, directeur, etc.)
-        # NOTE: In the real KVK API, functionarissen/bestuurders data comes from
-        # KVK Dataservice Inschrijving (separate product), not from Basisprofiel API.
-        # For this POC we simplified by including bestuurders directly in profiles.
-        if "bestuurders" in kvk_data:
-            for bestuurder in kvk_data["bestuurders"]:
-                functie = bestuurder.get("functie")
-                if functie == "directeur_grootaandeelhouder":
+        # Check functionarissen for entrepreneur roles (priority order)
+        if "functionarissen" in kvk_data:
+            for entry in kvk_data["functionarissen"]:
+                functie = entry.get("functie")
+                if functie in ("BESTUURDER", "DIRECTEUR"):
                     is_entrepreneur = True
-                    properties.append("💼 DGA")
+                    properties.append("💼 Bestuurder")
                     break
-                elif functie == "directeur":
-                    is_entrepreneur = True
-                    properties.append("💼 Directeur")
-                    break
-        # Check rechtsvorm from inschrijvingen (for ZZP/VOF/Maatschap)
-        elif "inschrijvingen" in kvk_data:
-            for entry in kvk_data["inschrijvingen"]:
-                rechtsvorm = entry.get("rechtsvorm")
-                if rechtsvorm == "EENMANSZAAK":
-                    is_entrepreneur = True
-                    properties.append("💼 ZZP'er")
-                    break
-                elif rechtsvorm == "VOF":
+                elif functie == "VENNOOT":
                     is_entrepreneur = True
                     properties.append("💼 Vennoot")
                     break
-                elif rechtsvorm == "MAATSCHAP":
+                elif functie == "EIGENAAR":
                     is_entrepreneur = True
-                    properties.append("💼 Maat")
+                    rechtsvorm = entry.get("rechtsvorm")
+                    if rechtsvorm == "EENMANSZAAK":
+                        properties.append("💼 ZZP'er")
+                    else:
+                        properties.append("💼 Eigenaar")
                     break
-        # Fallback to is_entrepreneur flag
-        elif any(entry.get("waarde") for entry in kvk_data.get("is_entrepreneur", [])):
-            is_entrepreneur = True
-            properties.append("💼 Ondernemer")
 
     if "UWV" in profile["sources"]:
         uwv_data = profile["sources"]["UWV"]
