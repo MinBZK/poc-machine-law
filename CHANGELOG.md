@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v1.6.3 (2026-01-22)
+
+### Bug Fixes
+
+- Use RunnableConfig type hint for LangGraph node functions
+  ([#346](https://github.com/MinBZK/poc-machine-law/pull/346),
+  [`d790b9e`](https://github.com/MinBZK/poc-machine-law/commit/d790b9ef1772652eaf0fa60af7e1a8bd6a913360))
+
+### Chores
+
+- Sync VERSION file to 1.6.2
+  ([`97a13c0`](https://github.com/MinBZK/poc-machine-law/commit/97a13c005bbcdd9be594926b59372a3e4f9cbb21))
+
+
 ## v1.6.2 (2026-01-21)
 
 ### Bug Fixes
