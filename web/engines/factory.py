@@ -107,6 +107,16 @@ def _initialize_profiles(services_instance: Services) -> None:
                         logger.debug(f"Skipping global data reference for {service_name}.{table_name}")
                         continue
 
+                    # Inject implicit identifier into rows based on profile type
+                    # This allows profiles to omit kvk_nummer/bsn when it matches the profile key
+                    profile_type = profile_data.get("type", "burger")
+                    if isinstance(data, list):
+                        for row in data:
+                            if profile_type == "onderneming" and "kvk_nummer" not in row:
+                                row["kvk_nummer"] = profile_id
+                            elif profile_type != "onderneming" and "bsn" not in row:
+                                row["bsn"] = profile_id
+
                     # Convert data to DataFrame
                     if isinstance(data, list):
                         df = pd.DataFrame(data)

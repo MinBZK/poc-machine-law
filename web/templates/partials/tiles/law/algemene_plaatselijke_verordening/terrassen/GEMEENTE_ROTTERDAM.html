@@ -1,20 +1,36 @@
 {% extends "partials/tiles/base_tile.html" %}
 {% block tile_content %}
-    <div>
-        <h4 class="text-sm font-medium text-gray-500 mb-1">Op basis van uw gegevens heeft u</h4>
-        <div class="flex items-baseline space-x-2">
-            {% if result.heeft_recht_op_terrasvergunning %}
-                <p class="text-4xl font-bold text-green-600 mt-2">RECHT OP TERRASVERGUNNING</p>
-            {% else %}
-                <p class="text-4xl font-bold text-red-600 mt-2">GEEN recht op terrasvergunning</p>
-            {% endif %}
-            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=explanation"
-                    hx-target="#shared-application-panel"
-                    hx-swap="innerHTML"
-                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
-                waarom?
-            </button>
+    {% if current_case and current_case.status in ['SUBMITTED', 'IN_REVIEW', 'DECIDED'] %}
+        {# Case exists - show computation which handles all case statuses #}
+        {% include "partials/tiles/law/algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM/computation.html" %}
+    {% elif result.heeft_recht_op_terrasvergunning %}
+        {# No case but eligible - show computation #}
+        {% include "partials/tiles/law/algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM/computation.html" %}
+    {% else %}
+        <div class="text-sm leading-6 text-gray-700 mt-4">
+            <p class="mb-3">
+                U voldoet niet aan alle voorwaarden voor een terrasvergunning.
+                Dit kan verschillende redenen hebben, zoals:
+            </p>
+            <ul class="list-disc pl-5 space-y-2">
+                <li>U heeft nog geen exploitatievergunning</li>
+                <li>De obstakelvrije ruimte is minder dan 1,8 meter</li>
+                <li>Het pand heeft geen horecagerelateerd gebruiksdoel</li>
+                <li>U schenkt alcohol maar heeft geen alcoholvergunning</li>
+            </ul>
+            <p class="mt-3">Bekijk voor meer informatie de uitleg hiernaast.</p>
         </div>
-        {% if result.weigeringsgrond %}<p class="text-sm text-red-600 mt-2">{{ result.weigeringsgrond }}</p>{% endif %}
-    </div>
+    {% endif %}
+{% endblock %}
+{% block submit_button %}
+    {% if can_submit_claims|default(true) %}
+        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=application"
+                hx-target="#shared-application-panel"
+                hx-swap="innerHTML"
+                class="w-full px-6 py-3 bg-indigo-600 text-white text-center rounded-md hover:bg-indigo-700 transition-colors cursor-pointer">
+            Terrasvergunning aanvragen
+        </button>
+    {% else %}
+        {% include "partials/tiles/components/minor_blocked_message.html" %}
+    {% endif %}
 {% endblock %}

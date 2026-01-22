@@ -1,4 +1,4 @@
-{% macro render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+{% macro render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, kvk_nummer=None) %}
     {% if node is mapping and node.result is defined %}
         {% set display_value = node.result %}
     {% else %}
@@ -12,7 +12,7 @@
     <button class="group inline-flex items-center gap-1 text-{{- color -}}-600 hover:text-{{- color -}}-800 cursor-pointer rounded px-1 hover:bg-{{- color -}}-50 disabled:hover:bg-gray-50 disabled:cursor-not-allowed"
             hx-get="/edit/edit-form"
             hx-target="#edit-form-container"
-            hx-vals='{ "case_id": "{{ case_id }}", "service": "{{ service }}", "key": "{{ key }}", "value": {{ display_value|tojson }}, "law": "{{ law }}", "bsn": "{{ bsn }}", "show_approve": {{ show_approve|default(false) |tojson }}, "claimant": "{{ claimant }}", {% if node.details %}"details": {{ node.details|tojson }},{% endif %} "has_details": {{ (node.details is defined)|tojson }} }'
+            hx-vals='{ "case_id": "{{ case_id }}", "service": "{{ service }}", "key": "{{ key }}", "value": {{ display_value|tojson }}, "law": "{{ law }}", "bsn": "{{ bsn }}", "show_approve": {{ show_approve|default(false) |tojson }}, "claimant": "{{ claimant }}", {% if kvk_nummer %}"kvk_nummer": "{{ kvk_nummer }}",{% endif %} {% if node.details %}"details": {{ node.details|tojson }},{% endif %} "has_details": {{ (node.details is defined)|tojson }} }'
             type="button"
             {% if (current_engine_id == "http-go" or current_engine_id == "http-go-routing") and node is mapping and 'service' in node and 'children' in node and node.children %}disabled{% endif %}>
         {% if display_value is none or display_value is undefined or display_value == {} %}
@@ -187,14 +187,14 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, kvk_nummer=None) %}
     {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
         <div x-data="{ open: false }" class="text-sm leading-5">
             <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
                  @click="open = !open">
                 <div class="text-sm leading-5 py-0.5">
                     <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-                    <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                    <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, kvk_nummer) }}</span>
                 </div>
                 <div class="min-w-0 flex items-center">
                     <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
@@ -209,7 +209,7 @@
             <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
                 {% if node.children %}
                     {% for child_key, child_node in node.children.items() %}
-                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant) }}
+                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant, kvk_nummer) }}
                     {% endfor %}
                 {% endif %}
             </div>
@@ -219,12 +219,12 @@
         {% if display_result is not none and display_result != {} and display_result != {'value': None} or (node is mapping and node.required) %}
             <div class="text-sm leading-5 py-0.5">
                 <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-                <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, kvk_nummer) }}</span>
             </div>
         {% endif %}
     {% endif %}
 {% endmacro %}
-{% macro render_missing_required_form(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
+{% macro render_missing_required_form(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN", kvk_nummer=None) %}
     {% set missing_required = [] %}
     {% for key, node in path.items() %}
         {% if node is mapping %}
@@ -274,6 +274,7 @@
                 <input type="hidden" name="law" value="{{ law }}">
                 <input type="hidden" name="bsn" value="{{ bsn }}">
                 <input type="hidden" name="claimant" value="{{ claimant }}">
+                {% if kvk_nummer %}<input type="hidden" name="kvk_nummer" value="{{ kvk_nummer }}">{% endif %}
                 <div class="grid grid-cols-1 gap-4">
                     {% for item in missing_required %}
                         <div class="bg-gray-50 p-4 rounded-lg">
@@ -452,7 +453,7 @@
         </div>
     {% endif %}
 {% endmacro %}
-{% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
+{% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN", kvk_nummer=None) %}
     <!-- Alpine.js store for managing dialog state -->
     <script>
     document.addEventListener('alpine:init', () => {
@@ -490,12 +491,14 @@
     document.addEventListener('htmx:afterOnLoad', function (evt) {
         if (evt.detail.triggerSpec && evt.detail.triggerSpec.includes('edit-dialog-closed')) {
             Alpine.store('editDialog').close();
+            // Dispatch event to body so hx-trigger="edit-dialog-closed from:body" works
+            document.body.dispatchEvent(new CustomEvent('edit-dialog-closed', { bubbles: true }));
         }
     });
     </script>
     <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
         {% for key, node in path.items() %}
-            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, kvk_nummer) }}
         {% endfor %}
     </div>
     <div id="edit-form-container" class="relative z-[100]"></div>

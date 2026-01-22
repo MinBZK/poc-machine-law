@@ -35,6 +35,7 @@ async def get_edit_form(
     show_approve: bool = False,
     has_details: bool = False,
     details: str = None,
+    kvk_nummer: str = None,
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Return the edit form HTML"""
@@ -67,10 +68,11 @@ async def get_edit_form(
         except json.JSONDecodeError:
             parsed_details = None
 
-    # Try to get existing claim by bsn, service, law and key
+    # Try to get existing claim by bsn (or kvk_nummer for business laws), service, law and key
     claim_data = None
+    claim_identifier = kvk_nummer if kvk_nummer else bsn
     existing_claims = claim_manager.get_claim_by_bsn_service_law(
-        bsn=bsn,
+        bsn=claim_identifier,
         service=service,
         law=law,
         include_rejected=True,  # Include rejected claims to show history
@@ -313,6 +315,7 @@ async def update_missing_values(
     bsn: str = Form(...),
     reason: str = Form(...),
     claimant: str = Form(...),
+    kvk_nummer: str = Form(None),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Handle the bulk update of missing required values - multi value version"""
@@ -394,6 +397,8 @@ async def update_missing_values(
             pass
 
         # Submit each claim individually
+        # For business laws, use kvk_nummer as the identifier instead of bsn
+        claim_identifier = kvk_nummer if kvk_nummer else bsn
         try:
             claim_manager.submit_claim(
                 service=service,
@@ -404,7 +409,7 @@ async def update_missing_values(
                 case_id=case_id,
                 evidence_path=None,
                 law=law,
-                bsn=bsn,
+                bsn=claim_identifier,
                 auto_approve=is_auto_approve_claims_enabled(),
             )
         except ValueError as e:

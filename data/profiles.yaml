@@ -3376,7 +3376,7 @@ profiles:
           status: ACTIEF
           activiteit: Horeca
           kvk_nummer: '85234567'
-          naam: Koffiezaak Bakkie Pleur #Dubbel
+          handelsnaam: Koffiezaak Bakkie Pleur #Dubbel
           sbi_omschrijving: Cafés #Dubbel
         functionarissen:
         - bsn: '999999990'
@@ -3408,13 +3408,13 @@ profiles:
       JenV: *id003
       KVK:
         organisaties:
-        - kvk_nummer: '85234567'
-          vestigingsnummer: '000051234567'
+        - vestigingsnummer: '000051234567'
           rsin: '862345678'
           handelsnaam: Koffiezaak Bakkie Pleur
           rechtsvorm: EENMANSZAAK
           datum_oprichting: '2025-01-15'
-          status: ACTIEF
+          datum_aanvang: '2025-01-15'
+          status: Actief
           activiteit: Horeca
           sbi_code: '56102'
           sbi_omschrijving: Cafés
@@ -3423,24 +3423,21 @@ profiles:
           datum_telling: '2025-01-01'
         vestigingen:
         - vestigingsnummer: '000051234567'
-          kvk_nummer: '85234567'
           straat: Nieuwe Binnenweg
           huisnummer: 225A
           postcode: 3021GC
           plaats: Rotterdam
           gemeente_code: 0599
           type_inrichting: koffiezaak
+          bag_gebruiksdoel: bijeenkomstfunctie
           heeft_terras: true
-          terras_zitplaatsen: 12
-          binnen_zitplaatsen: 25
           schenkt_alcohol: false
           heeft_muziek: false
           personeel_voltijd: 2
           personeel_deeltijd: 0
       GEMEENTE_ROTTERDAM:
         inschrijvingen:
-        - kvk_nummer: '85234567'
-          bsn_eigenaar: '999999990'
+        - bsn_eigenaar: '999999990'
           handelsnaam: 'Koffiezaak Bakkie Pleur'
         personen_vog:
         - bsn: '999999990'
@@ -3450,21 +3447,18 @@ profiles:
         - bsn: '999999990'
           onder_curatele: false
         ontheffingen_geluid:
-        - kvk_nummer: '85234567'
-          aantal_verleend: 3
-          jaar: 2025
+        - aantal_verleend: 3
+          jaar: 2026
         geluidsklachten:
-        - kvk_nummer: '85234567'
-          heeft_actieve_klachten: false
+        - heeft_actieve_klachten: false
         vergunningen:
-        - kvk_nummer: '85234567'
-          heeft_exploitatievergunning: true
-          datum_exploitatievergunning: '2024-06-01'
+        - heeft_exploitatievergunning: true
+          datum_exploitatievergunning: '2025-08-01'
           heeft_alcoholvergunning: false
         vestigingen:
-        - kvk_nummer: '85234567'
-          schenkt_alcohol: false
+        - schenkt_alcohol: false
           adres: "Nieuwe Binnenweg 225A, 3021GC Rotterdam"
+          bag_gebruiksdoel: "bijeenkomstfunctie"
       KADASTER:
         bag_verblijfsobjecten:
         - adres: "Nieuwe Binnenweg 225A, 3021GC Rotterdam"

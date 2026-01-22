@@ -364,6 +364,25 @@ class RuleContext:
 
                             return result
 
+                        # Handle claim sources without a value - mark as required with type info
+                        if source_ref.get("source_type") == "claim":
+                            node.result = None
+                            node.resolve_type = "CLAIM"
+                            node.required = bool(spec.get("required", False))
+                            if node.required:
+                                self.missing_required = True
+                                logger.debug(f"Missing required claim source: {path}")
+
+                            # Add type information to the node
+                            if "type" in spec:
+                                node.details["type"] = spec["type"]
+                            if "type_spec" in spec:
+                                resolved_type_spec = self._resolve_type_spec_enums(spec, spec["type_spec"])
+                                node.details["type_spec"] = resolved_type_spec
+
+                            logger.debug(f"Claim source {path} has no value, marked as required={node.required}")
+                            return None
+
                 # Check services
                 if path in self.property_specs:
                     spec = self.property_specs[path]
@@ -419,7 +438,7 @@ class RuleContext:
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
             return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
         if path == "year":
-            return self.calculation_date[:4]
+            return int(self.calculation_date[:4])
         return None
 
     def _resolve_from_service(self, path, service_ref, spec):

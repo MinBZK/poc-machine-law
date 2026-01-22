@@ -224,10 +224,11 @@ class RulesEngine:
         root = PathNode(type="root", name="evaluation", result=None)
 
         claims = None
-        if "BSN" in parameters:
-            bsn = parameters["BSN"]
+        # Fetch claims for BSN (citizen laws) or KVK_NUMMER (business laws)
+        identifier = parameters.get("BSN") or parameters.get("KVK_NUMMER")
+        if identifier:
             claims = self.service_provider.claim_manager.get_claim_by_bsn_service_law(
-                bsn, self.service_name, self.law, approved=approved
+                identifier, self.service_name, self.law, approved=approved
             )
 
         context = RuleContext(
@@ -249,6 +250,10 @@ class RulesEngine:
         # Set missing_required if required parameters were not provided
         if missing_required_params:
             context.missing_required = True
+
+        # Pre-resolve all required claim sources so they appear in the path
+        # even if requirements evaluation short-circuits
+        self._pre_resolve_required_claim_sources(context)
 
         # Check requirements
         requirements_node = PathNode(type="requirements", name="Check all requirements", result=None)
@@ -337,6 +342,28 @@ class RulesEngine:
         if "temporal" in output_spec:
             output_def["temporal"] = output_spec["temporal"]
         return output_def, output_name
+
+    def _pre_resolve_required_claim_sources(self, context: RuleContext) -> None:
+        """Pre-resolve all required sources with source_type='claim' so they appear in the path.
+
+        This ensures that all required claim sources are visible in the UI form
+        even if requirements evaluation short-circuits before reaching them.
+        """
+        pre_resolve_node = PathNode(
+            type="pre_resolve",
+            name="Pre-resolve required claim sources",
+            result=None,
+        )
+        context.add_to_path(pre_resolve_node)
+
+        try:
+            for name, spec in self.property_specs.items():
+                source_ref = spec.get("source_reference", {})
+                if source_ref.get("source_type") == "claim" and spec.get("required", False):
+                    # Resolve this source to add it to the path
+                    context.resolve_value(f"${name}")
+        finally:
+            context.pop_path()
 
     def _evaluate_requirements(self, requirements: list, context: RuleContext) -> bool:
         """Evaluate all requirements"""

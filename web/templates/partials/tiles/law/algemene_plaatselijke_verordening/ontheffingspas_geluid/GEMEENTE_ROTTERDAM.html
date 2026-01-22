@@ -1,0 +1,107 @@
+{% from "macros/logos.html" import org_logo %}
+{# Custom tile for Geluidsontheffing - always shows progress bar #}
+{# Try output first, then fall back to input (with $ prefix) #}
+{% set gebruikt = result.aantal_verleende_ontheffingen_dit_jaar|default(input.get('$AANTAL_VERLEENDE_ONTHEFFINGEN_DIT_JAAR', 0))|default(0) %}
+{% set max_geluidjes = 12 %}
+{% set resterend = max_geluidjes - gebruikt %}
+{% set percentage = (gebruikt / max_geluidjes * 100)|int %}
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     id="tile-{{ law|replace('/', '-') }}">
+    <div class="p-6 flex flex-col h-full">
+        {% if error %}
+            <div class="flex-grow space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="flex-grow space-y-6">
+                <!-- Header -->
+                <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
+                        {% if current_case %}
+                            <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                </div>
+                <!-- Progress bar section - always shown -->
+                <div class="space-y-4">
+                    <!-- Progress info -->
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600">Geluidjes gebruikt dit jaar</span>
+                        <span class="font-semibold text-gray-900">{{ gebruikt }} / {{ max_geluidjes }}</span>
+                    </div>
+                    <!-- Progress bar -->
+                    <div class="relative">
+                        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                            <div class="h-4 rounded-full transition-all duration-500 {% if percentage >= 100 %}bg-red-500{% elif percentage >= 75 %}bg-yellow-500{% else %}bg-green-600{% endif %}"
+                                 style="width: {{ percentage }}%"></div>
+                        </div>
+                        <!-- Markers voor elke "geluidje" -->
+                        <div class="absolute top-0 left-0 w-full h-4 flex">
+                            {% for i in range(max_geluidjes) %}<div class="flex-1 border-r border-white/30 last:border-r-0"></div>{% endfor %}
+                        </div>
+                    </div>
+                    <!-- Status message -->
+                    <div class="text-center">
+                        {% if resterend > 0 %}
+                            <p class="text-sm text-gray-600">
+                                U heeft nog <span class="font-semibold text-gray-600">{{ resterend }}</span> geluidsontheffing{{ 'en' if resterend != 1 else '' }} beschikbaar dit jaar.
+                            </p>
+                        {% else %}
+                            <p class="text-sm text-red-600 font-medium">
+                                U heeft het maximum van {{ max_geluidjes }} geluidsontheffingen voor dit jaar bereikt.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Actions Section -->
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                {% if not current_case %}
+                    {% if resterend > 0 and can_submit_claims|default(true) %}
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk_nummer %}&kvk_nummer={{ kvk_nummer }}{% endif %}&default_tab=application"
+                                hx-target="#shared-application-panel"
+                                hx-swap="innerHTML"
+                                class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
+                            Geluidsontheffing aanvragen
+                        </button>
+                    {% elif resterend <= 0 %}
+                        <div class="w-full px-6 py-3 bg-gray-100 text-gray-500 text-center rounded-md">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" />
+                                </svg>
+                                Maximum bereikt voor dit jaar
+                            </span>
+                        </div>
+                    {% else %}
+                        {% include "partials/tiles/components/minor_blocked_message.html" %}
+                    {% endif %}
+                {% elif current_case.status == 'SUBMITTED' %}
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                        <p class="text-sm text-blue-800">Uw aanvraag wordt beoordeeld. U ontvangt binnen 48 uur bericht.</p>
+                    </div>
+                {% elif current_case.status == 'DECIDED' and current_case.approved %}
+                    <div class="bg-green-50 border border-green-100 rounded-lg p-4">
+                        <p class="text-green-800 font-medium">Uw geluidsontheffing is goedgekeurd!</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+    // Listen for the close-panel event
+    document.addEventListener('close-panel', function() {
+        const panel = document.getElementById('shared-application-panel');
+        if (panel) {
+            panel.innerHTML = '';
+        }
+    });
+</script>

@@ -1491,7 +1491,7 @@ profiles:
         werk_en_re_integratie:
           - bsn: "999993659"
             arbeidsvermogen: VOLLEDIG
-            re_integratie_traject: ACTIEF traject
+            re_integratie_traject: Actief traject
       RVZ:
         verzekeringen:
           - bsn: "999993659"

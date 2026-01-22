@@ -48,25 +48,9 @@ def evaluate_law(
 
     # For business laws, use KVK_NUMMER as the primary parameter
     parameters = {"KVK_NUMMER": kvk_nummer} if kvk_nummer else {"BSN": bsn}
-    overwrite_input = None
-
-    # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
-    if not approved and claim_manager:
-        claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
-        # Filter claims for this service and law that are pending or approved
-        relevant_claims = [
-            claim
-            for claim in claims
-            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
-        ]
-
-        # Build overwrite_input from claims
-        if relevant_claims:
-            overwrite_input = {}
-            for claim in relevant_claims:
-                overwrite_input[claim.key] = claim.new_value
 
     # Execute the law using EngineInterface
+    # Note: Claims are fetched automatically by the engine via claim_manager
     result = machine_service.evaluate(
         service=service,
         law=law,
@@ -74,7 +58,6 @@ def evaluate_law(
         reference_date=TODAY,
         effective_date=effective_date,
         approved=approved,
-        overwrite_input=overwrite_input,
     )
 
     return law, result, parameters
@@ -176,6 +159,7 @@ async def submit_case(
     law: str,
     bsn: str,
     approved: bool = False,
+    kvk_nummer: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
@@ -191,6 +175,7 @@ async def submit_case(
         approved=approved,
         claim_manager=claim_manager,
         effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk_nummer,
     )
 
     case_id = case_manager.submit_case(
@@ -211,6 +196,7 @@ async def submit_case(
         get_tile_template(service, law),
         {
             "bsn": bsn,
+            "kvk_nummer": kvk_nummer,
             "request": request,
             "law": law,
             "service": service,
@@ -421,7 +407,9 @@ async def application_panel(
         value_tree = machine_service.extract_value_tree(result.path)
         existing_case = case_manager.get_case(bsn, service, law)
 
-        claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=True)
+        # For business laws, use kvk_nummer as the identifier to fetch claims
+        claim_identifier = kvk_nummer if kvk_nummer else bsn
+        claims = claim_manager.get_claims_by_bsn(claim_identifier, include_rejected=True)
         claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
 
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
