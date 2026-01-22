@@ -17,6 +17,7 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.retrievers import TavilySearchAPIRetriever
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig
 from langchain_core.utils import (
     convert_to_secret_str,
     get_from_dict_or_env,
@@ -156,7 +157,7 @@ def validate_variable_definitions(
     )  # Return as a list for consistency with the function signature
 
 
-def ask_law(state: State, config: dict) -> dict:
+def ask_law(state: State, config: RunnableConfig) -> dict:
     print("----> ask_law")
 
     thread_id = config["configurable"]["thread_id"]
@@ -170,7 +171,7 @@ def ask_law(state: State, config: dict) -> dict:
     return {"messages": []}  # Note: we reset the messages
 
 
-def check_law_input(state: State, config: dict) -> dict:
+def check_law_input(state: State, config: RunnableConfig) -> dict:
     print("----> check_law_input")
 
     resp = interrupt("check_law_input")
@@ -220,7 +221,7 @@ def check_law_input(state: State, config: dict) -> dict:
     return {"should_retry": False, "law": resp}
 
 
-def ask_law_confirmation(state: State, config: dict) -> dict:
+def ask_law_confirmation(state: State, config: RunnableConfig) -> dict:
     print("----> ask_law_confirmation")
 
     # Find the law URL
@@ -249,7 +250,7 @@ def ask_law_confirmation(state: State, config: dict) -> dict:
     return {"law_url": url}
 
 
-def handle_law_confirmation(state: State, config: dict) -> dict:
+def handle_law_confirmation(state: State, config: RunnableConfig) -> dict:
     print("----> handle_law_confirmation")
 
     thread_id = config["configurable"]["thread_id"]
@@ -341,7 +342,7 @@ analyize_law_prompt = ChatPromptTemplate(
 )
 
 
-def process_law(state: State, config: dict) -> dict:
+def process_law(state: State, config: RunnableConfig) -> dict:
     print("----> process_law")
 
     thread_id = config["configurable"]["thread_id"]
@@ -393,7 +394,7 @@ def process_law(state: State, config: dict) -> dict:
     return {"messages": [result]}
 
 
-def process_law_feedback(state: State, config: dict) -> dict:
+def process_law_feedback(state: State, config: RunnableConfig) -> dict:
     print("----> process_law_feedback")
 
     user_input = interrupt("process_law_feedback")
