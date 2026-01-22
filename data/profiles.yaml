@@ -3347,6 +3347,12 @@ profiles:
       - Curator
       - Bewindvoerder
       - Mentor
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
         - bsn: '400100001'
           geboortedatum: '1970-06-15'
           verblijfsadres: Utrecht
@@ -3907,7 +3913,7 @@ profiles:
     description: Voorzitter van een sportvereniging
     properties:
       - Ondernemer
-        sources:
+    sources:
       CBS: *id001
       KIESRAAD: *id002
       JenV: *id003
@@ -4215,7 +4221,7 @@ profiles:
     name: Koffiezaak Bakkie Pleur
     description: Koffiezaak in Rotterdam West, Nieuwe Binnenweg. Heeft terras met 8 zitplaatsen.
     type: onderneming
-          KVK:
+    KVK:
         organisaties:
         - vestigingsnummer: '000051234567'
           rsin: '862345678'
@@ -4244,7 +4250,7 @@ profiles:
           heeft_muziek: false
           personeel_voltijd: 0
           personeel_deeltijd: 0
-      GEMEENTE_ROTTERDAM:
+    GEMEENTE_ROTTERDAM:
         inschrijvingen:
         - bsn_eigenaar: '999999990'
           handelsnaam: 'Koffiezaak Bakkie Pleur'
@@ -4268,7 +4274,7 @@ profiles:
         - schenkt_alcohol: false
           adres: "Nieuwe Binnenweg 225A, 3021GC Rotterdam"
           bag_gebruiksdoel: "bijeenkomstfunctie"
-      KADASTER:
+    KADASTER:
         bag_verblijfsobjecten:
         - adres: "Nieuwe Binnenweg 225A, 3021GC Rotterdam"
           postcode: 3021GC
