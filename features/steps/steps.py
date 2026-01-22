@@ -36,7 +36,7 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "bsn_gezagdrager", "bsn_kind"} else parse_value(v)
+            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "bsn_gezagdrager", "bsn_kind", "bsn_mentor", "bsn_betrokkene", "bsn_curator", "bsn_curandus", "bsn_bewindvoerder", "bsn_rechthebbende", "bsn_gevolmachtigde", "bsn_volmachtgever", "bsn_executeur", "bsn_erflater", "bsn_familielid", "bsn_patient"} else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)

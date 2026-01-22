@@ -79,6 +79,40 @@ class DelegationManager:
                 )
                 delegations.extend(law_delegations)
 
+        # Merge multiple SELF delegations into one with intersected permissions
+        self_delegations = [d for d in delegations if d.subject_type == "SELF"]
+        other_delegations = [d for d in delegations if d.subject_type != "SELF"]
+
+        if self_delegations:
+            # Merge permissions by intersection (most restrictive wins)
+            merged_permissions: set[str] = (
+                set(self_delegations[0].permissions) if self_delegations[0].permissions else set()
+            )
+            for d in self_delegations[1:]:
+                if d.permissions:
+                    merged_permissions = merged_permissions.intersection(set(d.permissions))
+
+            # Ensure at least LEZEN
+            if not merged_permissions:
+                merged_permissions = {"LEZEN"}
+
+            # Create single merged SELF delegation
+            permission_order = ["LEZEN", "CLAIMS_INDIENEN", "BESLUITEN_ONTVANGEN"]
+            ordered_permissions = [p for p in permission_order if p in merged_permissions]
+
+            merged_self = Delegation(
+                subject_id=self_delegations[0].subject_id,
+                subject_type="SELF",
+                subject_name="Mezelf",
+                delegation_type="EIGEN_ZAKEN",
+                permissions=ordered_permissions,
+                valid_from=None,
+                valid_until=None,
+            )
+            delegations = [merged_self] + other_delegations
+        else:
+            delegations = other_delegations
+
         # Sort to put SELF delegation first
         delegations.sort(key=lambda d: (d.subject_type != "SELF", d.subject_name or ""))
 
@@ -167,9 +201,10 @@ class DelegationManager:
     def get_user_permissions(self, bsn: str, reference_date: date | None = None) -> list[str]:
         """Get the permissions for a user acting as themselves.
 
-        This method finds the SELF delegation for the user and returns its permissions.
-        The SELF delegation is provided by the minderjarigheid law which determines
-        permissions based on age and handlichting status.
+        This method finds all SELF delegations for the user and merges their permissions
+        by taking the intersection (most restrictive). Multiple laws can provide SELF
+        delegations (e.g., minderjarigheid, handelingsonbekwaamheid) and each may impose
+        different restrictions.
 
         Args:
             bsn: The BSN of the user to check permissions for
@@ -184,19 +219,39 @@ class DelegationManager:
 
         delegations = self.get_delegations_for_user(bsn, reference_date)
 
-        # Find the SELF delegation
+        # Collect all SELF delegations and merge their permissions using intersection
+        self_permissions: list[set[str]] = []
         for delegation in delegations:
             if delegation.subject_type == "SELF":
-                # Use explicit None check - empty list means restricted, not default
-                # If permissions is None (shouldn't happen), default to restricted for safety
-                if delegation.permissions is not None:
-                    return delegation.permissions if delegation.permissions else restricted_permissions
-                logger.warning(f"SELF delegation for BSN {bsn} has None permissions, defaulting to restricted")
-                return restricted_permissions
+                if delegation.permissions is not None and len(delegation.permissions) > 0:
+                    self_permissions.append(set(delegation.permissions))
+                else:
+                    # Empty permissions means restricted - any law can restrict
+                    logger.debug(f"SELF delegation for BSN {bsn} has empty permissions, applying restriction")
+                    self_permissions.append(set(restricted_permissions))
 
-        # No SELF delegation found - default to restricted for safety
-        logger.warning(f"No SELF delegation found for BSN {bsn}, defaulting to restricted permissions")
-        return restricted_permissions
+        if not self_permissions:
+            # No SELF delegation found - default to restricted for safety
+            logger.warning(f"No SELF delegation found for BSN {bsn}, defaulting to restricted permissions")
+            return restricted_permissions
+
+        # Merge by taking intersection - most restrictive wins
+        # This ensures that if minderjarigheid says ['LEZEN'] and handelingsonbekwaamheid
+        # says ['LEZEN', 'CLAIMS_INDIENEN', 'BESLUITEN_ONTVANGEN'], the result is ['LEZEN']
+        merged_permissions = self_permissions[0]
+        for perm_set in self_permissions[1:]:
+            merged_permissions = merged_permissions.intersection(perm_set)
+
+        # Ensure at least LEZEN is always present
+        if not merged_permissions:
+            merged_permissions = set(restricted_permissions)
+
+        # Return in a consistent order
+        permission_order = ["LEZEN", "CLAIMS_INDIENEN", "BESLUITEN_ONTVANGEN"]
+        result = [p for p in permission_order if p in merged_permissions]
+
+        logger.debug(f"Merged {len(self_permissions)} SELF delegations for BSN {bsn}: {result}")
+        return result
 
     def can_act_on_behalf(
         self,

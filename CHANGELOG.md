@@ -2,6 +2,96 @@
 
 <!-- version list -->
 
+## v1.6.3 (2026-01-22)
+
+### Bug Fixes
+
+- Use RunnableConfig type hint for LangGraph node functions
+  ([#346](https://github.com/MinBZK/poc-machine-law/pull/346),
+  [`d790b9e`](https://github.com/MinBZK/poc-machine-law/commit/d790b9ef1772652eaf0fa60af7e1a8bd6a913360))
+
+### Chores
+
+- Sync VERSION file to 1.6.2
+  ([`97a13c0`](https://github.com/MinBZK/poc-machine-law/commit/97a13c005bbcdd9be594926b59372a3e4f9cbb21))
+
+
+## v1.6.2 (2026-01-21)
+
+### Bug Fixes
+
+- Also intercept regular link clicks for demo mode persistence
+  ([#345](https://github.com/MinBZK/poc-machine-law/pull/345),
+  [`68167f3`](https://github.com/MinBZK/poc-machine-law/commit/68167f33ea0428a338866a834798d79a415381a9))
+
+- Preserve demo_mode across HTMX navigation
+  ([#345](https://github.com/MinBZK/poc-machine-law/pull/345),
+  [`68167f3`](https://github.com/MinBZK/poc-machine-law/commit/68167f33ea0428a338866a834798d79a415381a9))
+
+### Chores
+
+- Sync VERSION file to 1.6.1
+  ([`a8adf20`](https://github.com/MinBZK/poc-machine-law/commit/a8adf2007e24d1fcc718b6100bc0d6a27d1998c5))
+
+
+## v1.6.1 (2026-01-21)
+
+### Bug Fixes
+
+- Unwrap double-wrapped arrays for array type fields
+  ([#344](https://github.com/MinBZK/poc-machine-law/pull/344),
+  [`1c176c6`](https://github.com/MinBZK/poc-machine-law/commit/1c176c642c3380ac66ddfc3232ccbc6b4c0c0419))
+
+### Chores
+
+- Sync VERSION file to 1.6.0
+  ([`58f4a9a`](https://github.com/MinBZK/poc-machine-law/commit/58f4a9aee2d22b6e233df222173fc69871979122))
+
+
+## v1.6.0 (2026-01-21)
+
+### Bug Fixes
+
+- Deduplicate SELF delegations in get_delegations_for_user
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Merge SELF delegation permissions using intersection
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Merge static profile properties with dynamic ones
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Skip handelingsonbekwaamheid tests in Go engine
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+### Chores
+
+- Sync VERSION file to 1.5.0
+  ([`e992cce`](https://github.com/MinBZK/poc-machine-law/commit/e992cce67a631b8bacc0e08cd3c61e45bce0f3d7))
+
+- Update regelrecht-laws submodule to latest main
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+### Features
+
+- Add 8 Dutch delegation law feature files with test scenarios
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Add badges for ouderlijk gezag, ondernemer, and minderjarig profiles
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+- Add extended business delegation tests and handelingsonbekwaamheid
+  ([#343](https://github.com/MinBZK/poc-machine-law/pull/343),
+  [`5772de4`](https://github.com/MinBZK/poc-machine-law/commit/5772de4f4ac56e027843f6e1fe903bb3baeee2a6))
+
+
 ## v1.5.0 (2026-01-21)
 
 ### Bug Fixes

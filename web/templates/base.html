@@ -500,6 +500,47 @@
                 // If not in iframe, allow normal browser refresh
             }
         });
+
+        // HTMX interceptor to preserve demo mode across navigation
+        // This ensures ?demo=true is automatically added to all HTMX requests
+        document.body.addEventListener('htmx:configRequest', function(evt) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const demo = urlParams.get('demo');
+            if (demo) {
+                evt.detail.parameters['demo'] = demo;
+            }
+        });
+
+        // Intercept regular link clicks to preserve demo mode
+        // This handles <a href="..."> links that would otherwise lose the demo parameter
+        document.addEventListener('click', function(evt) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const demo = urlParams.get('demo');
+            if (!demo) return;
+
+            // Find the closest anchor element
+            const link = evt.target.closest('a');
+            if (!link) return;
+
+            const href = link.getAttribute('href');
+            if (!href) return;
+
+            // Skip external links, anchors, and javascript: links
+            if (href.startsWith('http') || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+            // Skip links that already have the demo parameter
+            if (href.includes('demo=')) return;
+
+            // Prevent default navigation
+            evt.preventDefault();
+
+            // Build new URL with demo parameter
+            const url = new URL(href, window.location.origin);
+            url.searchParams.set('demo', demo);
+
+            // Navigate to the new URL
+            window.location.href = url.toString();
+        });
     </script>
     <!-- Footer -->
     <footer class="bg-gray-100 border-t mt-12">
