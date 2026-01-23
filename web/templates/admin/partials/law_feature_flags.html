@@ -1,6 +1,6 @@
 <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
      id="law-feature-flags"
-     x-data="{ openSection: 'citizen' }">
+     x-data="{ openSection: '{{ open_section | default("citizen") }}' }">
     <h1 class="text-gray-900 text-3xl font-semibold mb-5">Wetten</h1>
     <p class="mb-5">Schakel specifieke wetten aan of uit voor de applicatie.</p>
     <div class="space-y-4">
@@ -57,7 +57,7 @@
                                                 hx-target="#law-feature-flags"
                                                 hx-swap="outerHTML"
                                                 hx-indicator="#law-loading-{{ section.key }}-{{ safe_service_id }}-{{ safe_law_id }}"
-                                                hx-vals='{"flag_name": "LAW_{{ service }}_{{ sanitized_law_name }}", "value": "{{ '0' if enabled else '1' }}"}'>
+                                                :hx-vals="JSON.stringify({flag_name: 'LAW_{{ service }}_{{ sanitized_law_name }}', value: '{{ '0' if enabled else '1' }}', open_section: openSection})">
                                             <div class="bg-white w-6 h-6 rounded-full shadow-md transform {{ 'translate-x-7' if enabled else '' }} transition-transform">
                                             </div>
                                         </button>
