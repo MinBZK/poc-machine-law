@@ -8,9 +8,10 @@
         {# Get usage data from profile_data - using namespace for Jinja2 loop scoping #}
         {% set ns = namespace(used=0) %}
         {% set max_count = 12 %}
+        {% set current_year = "2026" %}
         {% if profile_data and profile_data.ontheffingen_geluid %}
             {% for o in profile_data.ontheffingen_geluid %}
-                {% if o.kvk_nummer == kvk and o.jaar|string == 2026|string %}
+                {% if o.kvk_nummer|string == kvk|string and o.jaar|string == current_year %}
                     {% set ns.used = o.aantal_verleend|default(0) %}
                 {% endif %}
             {% endfor %}
