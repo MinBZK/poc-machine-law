@@ -1,0 +1,63 @@
+{% from "macros/logos.html" import org_logo %}
+{# Custom standalone template for Geluidsontheffingspas - uses profile_data instead of law evaluation #}
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     x-data="{ showExplanation: false }"
+     @close-explanation.window="showExplanation = false"
+     id="tile-{{ law|replace('/', '-') }}">
+    <div class="p-6 flex flex-col h-full">
+        {# Get usage data from profile_data - using namespace for Jinja2 loop scoping #}
+        {% set ns = namespace(used=0) %}
+        {% set max_count = 12 %}
+        {% if profile_data and profile_data.ontheffingen_geluid %}
+            {% for o in profile_data.ontheffingen_geluid %}
+                {% if o.kvk_nummer == kvk and o.jaar|string == 2026|string %}
+                    {% set ns.used = o.aantal_verleend|default(0) %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% set used = ns.used %}
+        {% set remaining = max_count - used %}
+
+        <div class="flex-grow space-y-6">
+            <!-- Header -->
+            <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
+                </div>
+                <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+            </div>
+
+            <!-- Main Content - Progress Bar -->
+            <div class="space-y-6">
+                {% include "partials/tiles/law/algemene_plaatselijke_verordening/ontheffingspas_geluid/GEMEENTE_ROTTERDAM/computation.html" %}
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="mt-6 pt-4 border-t border-gray-100">
+            {% if remaining > 0 %}
+                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                        hx-target="#shared-application-panel"
+                        hx-swap="innerHTML"
+                        class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
+                    Geluidsontheffing aanvragen
+                </button>
+            {% else %}
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                    <p class="text-sm text-yellow-800">
+                        U heeft het maximum aantal geluidsontheffingen voor dit jaar bereikt.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    // Listen for the close-panel event and close the shared panel
+    document.addEventListener('close-panel', function() {
+        const panel = document.getElementById('shared-application-panel');
+        if (panel) {
+            panel.innerHTML = '';
+        }
+    });
+</script>
