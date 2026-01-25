@@ -4126,3 +4126,204 @@ profiles:
           status: ACTIEF
           functie: COMMANDITAIR_VENNOOT
           bevoegdheid: GEEN
+
+  # Profile: Claudia van Dam - Horeca ondernemer Rotterdam
+  '999999990':
+    name: Claudia van Dam
+    description: Eigenaar van Koffiezaak Bakkie Pleur in Rotterdam West, horeca ondernemer met exploitatievergunning
+    properties:
+      - Ondernemer
+    sources:
+      CBS: *id001
+      KIESRAAD: *id002
+      JenV: *id003
+      RvIG:
+        personen:
+        - bsn: '999999990'
+          geboortedatum: '1994-03-20'
+          verblijfsadres: Rotterdam
+          land_verblijf: NEDERLAND
+          nationaliteit: NEDERLANDS
+          age: 31
+          has_dutch_nationality: true
+          has_partner: false
+          residence_address: Agniesestraat 22A, 3032TL Rotterdam
+          has_fixed_address: true
+          household_size: 1
+        relaties:
+        - bsn: '999999990'
+          partnerschap_type: GEEN
+          partner_bsn: null
+          has_partner: false
+        verblijfplaats:
+        - bsn: '999999990'
+          straat: Agniesestraat
+          huisnummer: '22A'
+          postcode: 3032TL
+          woonplaats: Rotterdam
+          type: WOONADRES
+        personen_vog:
+        - bsn: '999999990'
+          heeft_geldige_vog: true
+          afgiftedatum: '2024-12-01'
+      BELASTINGDIENST:
+        box1:
+        - bsn: '999999990'
+          loon_uit_dienstbetrekking: 0
+          uitkeringen_en_pensioenen: 0
+          winst_uit_onderneming: 3500000
+          resultaat_overige_werkzaamheden: 0
+          eigen_woning: 0
+        box2:
+        - bsn: '999999990'
+          reguliere_voordelen: 0
+          vervreemdingsvoordelen: 0
+        box3:
+        - bsn: '999999990'
+          spaargeld: 2500000
+          beleggingen: 0
+          onroerend_goed: 0
+          schulden: 0
+          buitenlands_inkomen: 0
+        buitenlands_inkomen:
+        - bsn: '999999990'
+          bedrag: 0
+          land: GEEN
+        aftrekposten:
+        - bsn: '999999990'
+          persoonsgebonden_aftrek: 0
+        monthly_income:
+        - bsn: '999999990'
+          bedrag: 291700
+        assets:
+        - bsn: '999999990'
+          bedrag: 2500000
+        business_income:
+        - bsn: '999999990'
+          bedrag: 3500000
+      KVK:
+        inschrijvingen:
+        - bsn: '999999990'
+          bsn_eigenaar: '999999990'
+          kvk_nummer: '85234567'
+          handelsnaam: Koffiezaak Bakkie Pleur
+          rechtsvorm: EENMANSZAAK
+          status: Actief
+          activiteit: Horeca (SBI 56102, Cafés)
+          datum_aanvang: '2025-01-15'
+          aantal_werknemers: 0
+          datum_telling: '2025-01-01'
+        functionarissen:
+        - bsn: '999999990'
+          kvk_nummer: '85234567'
+          handelsnaam: Koffiezaak Bakkie Pleur
+          rechtsvorm: EENMANSZAAK
+          status: Actief
+          functie: EIGENAAR
+          bevoegdheid: VOLLEDIG
+          datum_inschrijving: '2025-01-15'
+          datum_uitschrijving: null
+        vestigingen:
+        - kvk_nummer: '85234567'
+          adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          schenkt_alcohol: false
+          heeft_terras: true
+          terras_oppervlakte_m2: null
+        is_entrepreneur:
+        - bsn: '999999990'
+          waarde: true
+        organisaties:
+        - kvk_nummer: '85234567'
+          rechtsvorm: EENMANSZAAK
+          status: Actief
+          aantal_werknemers: 0
+          datum_telling: '2025-01-01'
+          datum_aanvang: '2025-01-15'
+      UWV:
+        arbeidsverhoudingen:
+        - bsn: '999999990'
+          dienstverband_type: GEEN
+          verzekerd_ww: false
+          verzekerd_wia: false
+        uwv_toetsingsinkomen:
+        - bsn: '999999990'
+          toetsingsinkomen: 3500000
+        uwv_werkgegevens:
+        - bsn: '999999990'
+          gemiddeld_uren_per_week: 0.0
+          huidige_uren_per_week: 0.0
+          gewerkte_weken_36: 0
+          arbeidsverleden_jaren: 0
+          jaarloon: 0
+        ziektewet:
+        - bsn: '999999990'
+          heeft_ziektewet_uitkering: false
+        WIA:
+        - bsn: '999999990'
+          heeft_wia_uitkering: false
+      RVZ:
+        verzekeringen:
+        - bsn: '999999990'
+          polis_status: ACTIEF
+          verdrag_status: GEEN
+          zorg_type: BASIS
+      DUO:
+        inschrijvingen:
+        - bsn: '999999990'
+          onderwijssoort: GEEN
+        studiefinanciering:
+        - bsn: '999999990'
+          ontvangt_studiefinanciering: false
+        is_student:
+        - bsn: '999999990'
+          waarde: false
+        receives_study_grant:
+        - bsn: '999999990'
+          waarde: false
+      DJI:
+        detenties:
+        - bsn: '999999990'
+          is_gedetineerd: false
+        is_detainee:
+        - bsn: '999999990'
+          waarde: false
+        detentie:
+        - bsn: '999999990'
+          is_gedetineerd: false
+      IND:
+        verblijfsvergunningen:
+        - bsn: '999999990'
+          type: PERMANENT
+          status: VERLEEND
+        residence_permit_type:
+        - bsn: '999999990'
+          type: PERMANENT
+        vreemdelingenwet:
+        - bsn: '999999990'
+          verblijfsvergunning_type: null
+      RECHTSPRAAK:
+        curatele:
+        - bsn: '999999990'
+          is_onder_curatele: false
+          datum_uitspraak: null
+      KADASTER:
+        bag_verblijfsobjecten:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          gebruiksdoel: bijeenkomstfunctie
+          oppervlakte: 85
+          status: Actief
+          bouwjaar: 1920
+      GEMEENTE_ROTTERDAM:
+        vergunningen:
+        - kvk_nummer: '85234567'
+          heeft_exploitatievergunning: true
+          datum_verleend: '2025-08-01'
+          geldig_tot: '2030-08-01'
+          heeft_alcoholvergunning: false
+        ontheffingen_geluid:
+        - kvk_nummer: '85234567'
+          jaar: 2026
+          aantal_verleend: 3
+        geluidsklachten:
+        - kvk_nummer: '85234567'
+          heeft_actieve_klachten: false
