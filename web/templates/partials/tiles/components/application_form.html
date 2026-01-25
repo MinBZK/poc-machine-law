@@ -6,11 +6,20 @@
         {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
         {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
     </div>
-    <!-- Missing Required Data Form -->
-    <div class="mb-4">
-        {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
-                show_approve=False, claimant="CITIZEN") }}
-    </div>
+    <!-- Custom Application Inputs for Rotterdam APV laws -->
+    {% set has_custom_inputs = (law == 'algemene_plaatselijke_verordening/terrassen' or law == 'algemene_plaatselijke_verordening/ontheffingspas_geluid') and service == 'GEMEENTE_ROTTERDAM' %}
+    {% if has_custom_inputs %}
+        <div class="mb-4">
+            {% set custom_inputs_template = "partials/tiles/law/" + law + "/" + service + "/application_inputs.html" %}
+            {% include custom_inputs_template ignore missing %}
+        </div>
+    {% else %}
+        <!-- Missing Required Data Form -->
+        <div class="mb-4">
+            {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
+                        show_approve=False, claimant="CITIZEN") }}
+        </div>
+    {% endif %}
     <!-- Used Data -->
     <div class="border-t border-blue-200 pt-4 mb-4"
          x-data="{ showData: true }">
@@ -37,8 +46,8 @@
                         show_approve=False, claimant="CITIZEN") }}
         </div>
     </div>
-    <!-- Submit Form - only show if vergunning is not already granted -->
-    {% if not vergunning_already_granted %}
+    <!-- Submit Form - only show if vergunning is not already granted and no custom inputs -->
+    {% if not vergunning_already_granted and not has_custom_inputs %}
         <div x-data="{ isChecked: false }"
              class="space-y-4 border-t border-blue-200 pt-4">
             <div class="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700">

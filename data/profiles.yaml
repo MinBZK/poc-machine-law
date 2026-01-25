@@ -4324,6 +4324,16 @@ profiles:
         - kvk_nummer: '85234567'
           jaar: 2026
           aantal_verleend: 3
+        ontheffingen_geluid_historie:
+        - kvk_nummer: '85234567'
+          datum: '2026-01-05'
+          reden: Nieuwjaarsfeest
+        - kvk_nummer: '85234567'
+          datum: '2026-01-12'
+          reden: Live muziek
+        - kvk_nummer: '85234567'
+          datum: '2026-01-19'
+          reden: Verjaardag
         geluidsklachten:
         - kvk_nummer: '85234567'
           heeft_actieve_klachten: false
