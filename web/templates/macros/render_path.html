@@ -267,6 +267,7 @@
             </div>
             <form hx-post="/edit/update-missing-values"
                   hx-target="#missing-form-result"
+                  hx-on::after-request="setTimeout(function() { var panel = document.querySelector('[hx-trigger*=edit-dialog-closed]'); if (panel) { htmx.ajax('GET', panel.getAttribute('hx-get'), {target: '#application-panel', swap: 'innerHTML'}); } }, 100)"
                   class="space-y-4"
                   data-children-bsns="{{ path.CHILDREN_BSNS|join(',') if path.CHILDREN_BSNS is defined else '' }}">
                 <input type="hidden" name="case_id" value="{{ case_id }}">

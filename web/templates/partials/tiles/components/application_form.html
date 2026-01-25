@@ -35,37 +35,6 @@
              class="mt-4">
             {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
                         show_approve=False, claimant="CITIZEN") }}
-            <!-- Historie for Geluidsontheffing - displayed in same style as other data -->
-            {% if law == 'algemene_plaatselijke_verordening/ontheffingspas_geluid' and service == 'GEMEENTE_ROTTERDAM' and profile_data and profile_data.ontheffingen_geluid_historie %}
-                {# Count historie items for this KVK using string comparison #}
-                {% set ns_hist = namespace(count=0) %}
-                {% for o in profile_data.ontheffingen_geluid_historie %}
-                    {% if o.kvk_nummer|string == kvk|string %}
-                        {% set ns_hist.count = ns_hist.count + 1 %}
-                    {% endif %}
-                {% endfor %}
-                {% if ns_hist.count > 0 %}
-                    <div class="border-t border-gray-200 pt-4 mt-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm font-medium text-gray-700">Eerder verleende ontheffingen</span>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">{{ ns_hist.count }}</span>
-                            </div>
-                            <span class="text-xs text-gray-500">Resultaat van het uitrekenen Ontheffingspas Geluid</span>
-                        </div>
-                        <div class="mt-2 ml-4 space-y-1">
-                            {% for ontheffing in profile_data.ontheffingen_geluid_historie %}
-                                {% if ontheffing.kvk_nummer|string == kvk|string %}
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="text-gray-600">{{ ontheffing.datum }}</span>
-                                        <span class="text-gray-500">{{ ontheffing.reden }}</span>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
-            {% endif %}
         </div>
     </div>
     <!-- Submit Form - only show if vergunning is not already granted -->
@@ -102,7 +71,7 @@
                 </div>
             {% else %}
                 <!-- Standard panel submit button -->
-                <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}"
+                <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}{% if kvk %}&kvk={{ kvk }}{% endif %}"
                       hx-target="#tile-{{ law|replace('/', '-') }}"
                       hx-swap="outerHTML"
                       hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"

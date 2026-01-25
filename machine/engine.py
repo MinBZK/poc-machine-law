@@ -214,6 +214,13 @@ class RulesEngine:
             approved=approved,
         )
 
+        # Proactively resolve required parameters to ensure they appear in the value_tree
+        # even if they're not evaluated due to short-circuit logic
+        for p in self.parameter_specs:
+            if p.get("required") and p["name"] not in parameters:
+                # Create a resolve node for this missing required parameter
+                context.resolve_value(f"${p['name']}")
+
         # Check requirements
         requirements_node = PathNode(type="requirements", name="Check all requirements", result=None)
         context.add_to_path(requirements_node)

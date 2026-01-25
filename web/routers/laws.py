@@ -190,12 +190,17 @@ async def submit_case(
     law: str,
     bsn: str,
     approved: bool = False,
+    kvk: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit a new case"""
     law = unquote(law)
+
+    # Get kvk from query params if not provided directly
+    if not kvk:
+        kvk = request.query_params.get("kvk")
 
     law, result, parameters = evaluate_law(
         bsn,
@@ -205,6 +210,7 @@ async def submit_case(
         approved=approved,
         claim_manager=claim_manager,
         effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk,
     )
 
     case_id = case_manager.submit_case(
@@ -220,11 +226,23 @@ async def submit_case(
 
     rule_spec = machine_service.get_rule_spec(law, TODAY, service)
 
+    # For business laws, get profile data to display after submission
+    profile_data = None
+    if kvk:
+        try:
+            profile = machine_service.get_profile_data(bsn)
+            if profile and "sources" in profile:
+                profile_data = profile["sources"].get(service, {})
+        except Exception as e:
+            logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
     # Return the updated law result with the new case
     return templates.TemplateResponse(
         get_tile_template(service, law),
         {
             "bsn": bsn,
+            "effective_bsn": bsn,
+            "kvk": kvk,
             "request": request,
             "law": law,
             "service": service,
@@ -233,6 +251,7 @@ async def submit_case(
             "input": result.input,
             "requirements_met": result.requirements_met,
             "current_case": case,
+            "profile_data": profile_data,
         },
     )
 
@@ -470,6 +489,7 @@ async def application_panel(
                 "requirements_met": result.requirements_met,
                 "path": value_tree,
                 "bsn": bsn,
+                "effective_bsn": bsn,
                 "kvk": kvk,
                 "current_case": existing_case,
                 "claim_map": claim_map,
