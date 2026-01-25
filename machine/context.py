@@ -284,6 +284,16 @@ class RuleContext:
                     logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
                     node.result = self.parameters[path]
                     node.resolve_type = "PARAMETER"
+
+                    # Add spec information if available
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        node.required = bool(spec.get("required", False))
+                        if "type" in spec:
+                            node.details["type"] = spec["type"]
+                        if "type_spec" in spec:
+                            node.details["type_spec"] = spec["type_spec"]
+
                     return self.parameters[path]
 
                 # Check outputs

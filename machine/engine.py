@@ -30,6 +30,11 @@ class RulesEngine:
         """Build mapping of property paths to their specifications"""
         specs = {}
 
+        # Add parameter properties
+        for param in properties.get("parameters", []):
+            if "name" in param:
+                specs[param["name"]] = param
+
         # Add input properties
         for prop in properties.get("input", []):
             if "name" in prop:
