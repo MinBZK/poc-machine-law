@@ -459,21 +459,13 @@ async def application_panel(
 
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
 
-        # For business laws, get profile data to check existing vergunning status
+        # For business laws, get profile data (used in templates for display purposes)
         profile_data = None
-        vergunning_already_granted = False
         if kvk:
             try:
                 profile = machine_service.get_profile_data(bsn)
                 if profile and "sources" in profile:
                     profile_data = profile["sources"].get(service, {})
-                    # Check if exploitatievergunning is already granted
-                    if "exploitatievergunning" in law and profile_data:
-                        vergunningen = profile_data.get("vergunningen", [])
-                        for v in vergunningen:
-                            if v.get("kvk_nummer") == kvk and v.get("heeft_exploitatievergunning"):
-                                vergunning_already_granted = True
-                                break
             except Exception as e:
                 logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
@@ -497,11 +489,10 @@ async def application_panel(
                 "wallet_enabled": is_wallet_enabled(),
                 "current_engine_id": get_engine_id(),
                 "profile_data": profile_data,
-                "vergunning_already_granted": vergunning_already_granted,
             },
         )
     except Exception as e:
-        print(f"Error in application panel: {e}")
+        logger.error(f"Error in application panel: {e}")
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
             {
