@@ -40,12 +40,17 @@ def evaluate_law(
     approved: bool = True,
     claim_manager: ClaimManagerInterface | None = None,
     effective_date: str | None = None,
+    kvk_nummer: str | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
-    """Evaluate a law for a given BSN"""
+    """Evaluate a law for a given BSN or KVK_NUMMER"""
 
-    logger.warn(f"evalute law {service} {law} for {bsn}")
+    logger.warn(f"evalute law {service} {law} for {bsn} (kvk={kvk_nummer})")
 
+    # Determine parameters based on law type
+    # Business laws may need KVK_NUMMER as the primary parameter
     parameters = {"BSN": bsn}
+    if kvk_nummer:
+        parameters["KVK_NUMMER"] = kvk_nummer
     overwrite_input = None
 
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
@@ -99,6 +104,7 @@ async def execute_law(
     law: str,
     bsn: str,
     date: str = None,
+    kvk: str = None,
     can_submit_claims: bool = True,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -106,12 +112,19 @@ async def execute_law(
 ):
     """Execute a law and render its result"""
 
-    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims})")
+    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims}, kvk={kvk})")
 
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager, effective_date=date
+            bsn,
+            law,
+            service,
+            machine_service,
+            approved=False,
+            claim_manager=claim_manager,
+            effective_date=date,
+            kvk_nummer=kvk,
         )
 
     except Exception as e:
@@ -139,11 +152,22 @@ async def execute_law(
 
     logger.warn(f"[LAWS] result {result}")
 
+    # For business laws, get profile data to check existing vergunning status
+    profile_data = None
+    if kvk:
+        try:
+            profile = machine_service.get_profile_data(bsn)
+            if profile and "sources" in profile:
+                profile_data = profile["sources"].get(service, {})
+        except Exception as e:
+            logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
     return templates.TemplateResponse(
         template_path,
         {
             "bsn": bsn,
             "effective_bsn": bsn,  # For tile templates
+            "kvk": kvk,
             "request": request,
             "law": law,
             "service": service,
@@ -154,6 +178,7 @@ async def execute_law(
             "missing_required": result.missing_required,
             "current_case": existing_case,
             "can_submit_claims": can_submit_claims,
+            "profile_data": profile_data,
         },
     )
 
