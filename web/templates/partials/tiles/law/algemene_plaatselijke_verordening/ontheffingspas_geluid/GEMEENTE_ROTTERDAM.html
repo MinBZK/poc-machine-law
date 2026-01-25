@@ -17,7 +17,6 @@
         {% endif %}
         {% set used = ns.used %}
         {% set remaining = max_count - used %}
-
         <div class="flex-grow space-y-6">
             <!-- Header -->
             <div class="flex items-start justify-between border-b border-gray-100 pb-4">
@@ -26,17 +25,15 @@
                 </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
-
             <!-- Main Content - Progress Bar -->
             <div class="space-y-6">
                 {% include "partials/tiles/law/algemene_plaatselijke_verordening/ontheffingspas_geluid/GEMEENTE_ROTTERDAM/computation.html" %}
             </div>
         </div>
-
         <!-- Actions Section -->
         <div class="mt-6 pt-4 border-t border-gray-100">
             {% if remaining > 0 %}
-                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                         hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
@@ -44,9 +41,7 @@
                 </button>
             {% else %}
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-                    <p class="text-sm text-yellow-800">
-                        U heeft het maximum aantal geluidsontheffingen voor dit jaar bereikt.
-                    </p>
+                    <p class="text-sm text-yellow-800">U heeft het maximum aantal geluidsontheffingen voor dit jaar bereikt.</p>
                 </div>
             {% endif %}
         </div>

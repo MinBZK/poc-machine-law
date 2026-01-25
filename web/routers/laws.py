@@ -412,6 +412,7 @@ async def application_panel(
     service: str,
     law: str,
     bsn: str,
+    kvk: str = None,
     approved: bool = False,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -428,6 +429,7 @@ async def application_panel(
             approved=approved,
             claim_manager=claim_manager,
             effective_date=request.query_params.get("date"),
+            kvk_nummer=kvk,
         )
 
         value_tree = machine_service.extract_value_tree(result.path)
@@ -437,6 +439,24 @@ async def application_panel(
         claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
 
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+        # For business laws, get profile data to check existing vergunning status
+        profile_data = None
+        vergunning_already_granted = False
+        if kvk:
+            try:
+                profile = machine_service.get_profile_data(bsn)
+                if profile and "sources" in profile:
+                    profile_data = profile["sources"].get(service, {})
+                    # Check if exploitatievergunning is already granted
+                    if "exploitatievergunning" in law and profile_data:
+                        vergunningen = profile_data.get("vergunningen", [])
+                        for v in vergunningen:
+                            if v.get("kvk_nummer") == kvk and v.get("heeft_exploitatievergunning"):
+                                vergunning_already_granted = True
+                                break
+            except Exception as e:
+                logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
@@ -450,11 +470,14 @@ async def application_panel(
                 "requirements_met": result.requirements_met,
                 "path": value_tree,
                 "bsn": bsn,
+                "kvk": kvk,
                 "current_case": existing_case,
                 "claim_map": claim_map,
                 "missing_required": result.missing_required,
                 "wallet_enabled": is_wallet_enabled(),
                 "current_engine_id": get_engine_id(),
+                "profile_data": profile_data,
+                "vergunning_already_granted": vergunning_already_granted,
             },
         )
     except Exception as e:

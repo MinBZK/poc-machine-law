@@ -16,13 +16,11 @@
                 </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
-
             <!-- Main Content -->
             <div class="space-y-6">
                 {% include "partials/tiles/law/algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM/computation.html" %}
             </div>
         </div>
-
         <!-- Actions Section -->
         <div class="mt-6 pt-4 border-t border-gray-100">
             {% if current_case and current_case.status == 'IN_REVIEW' %}
@@ -51,7 +49,7 @@
                 </div>
             {% elif requirements_met %}
                 {# All requirements met - can apply #}
-                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                         hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
@@ -62,10 +60,10 @@
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <h4 class="font-medium text-yellow-900 mb-2">Gegevens aanvullen nodig</h4>
                     <p class="text-sm text-yellow-800 mb-4">
-                        Voor deze aanvraag hebben we extra informatie nodig over de stoepbreedte bij uw vestiging.
-                        U kunt deze gegevens zelf aanleveren.
+                        Om te bepalen of u in aanmerking komt voor een terrasvergunning hebben wij de
+                        obstakelvrije ruimte en gewenste terrasoppervlakte nodig.
                     </p>
-                    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=application"
+                    <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                             hx-target="#shared-application-panel"
                             hx-swap="innerHTML"
                             class="w-full px-4 py-2 bg-yellow-600 text-white text-center rounded-md hover:bg-yellow-700 transition-colors cursor-pointer">

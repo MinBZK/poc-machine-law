@@ -12,36 +12,29 @@
     {% set used = ns.used %}
     {% set remaining = max_count - used %}
     {% set percentage = (used / max_count * 100)|int %}
-
     <div class="flex items-center justify-between mb-2">
         <h4 class="text-sm font-medium text-gray-600">Geluidjes gebruikt dit jaar</h4>
         <span class="text-lg font-semibold text-gray-900">{{ used }} / {{ max_count }}</span>
     </div>
-
     {# Progress bar #}
     <div class="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden">
         <div class="h-4 rounded-full flex" style="width: 100%;">
             {# Used segments (green) #}
             {% for i in range(used) %}
-                <div class="h-full bg-green-500 {% if loop.first %}rounded-l-full{% endif %}" style="width: {{ 100 / max_count }}%;"></div>
-                {% if not loop.last %}
-                    <div class="h-full bg-white" style="width: 2px;"></div>
-                {% endif %}
+                <div class="h-full bg-green-500 {% if loop.first %}rounded-l-full{% endif %}"
+                     style="width: {{ 100 / max_count }}%"></div>
+                {% if not loop.last %}<div class="h-full bg-white" style="width: 2px;"></div>{% endif %}
             {% endfor %}
             {# Separator between used and remaining #}
-            {% if used > 0 and remaining > 0 %}
-                <div class="h-full bg-white" style="width: 2px;"></div>
-            {% endif %}
+            {% if used > 0 and remaining > 0 %}<div class="h-full bg-white" style="width: 2px;"></div>{% endif %}
             {# Remaining segments (gray) #}
             {% for i in range(remaining) %}
-                <div class="h-full bg-gray-300 {% if loop.last %}rounded-r-full{% endif %}" style="width: {{ 100 / max_count }}%;"></div>
-                {% if not loop.last %}
-                    <div class="h-full bg-white" style="width: 2px;"></div>
-                {% endif %}
+                <div class="h-full bg-gray-300 {% if loop.last %}rounded-r-full{% endif %}"
+                     style="width: {{ 100 / max_count }}%"></div>
+                {% if not loop.last %}<div class="h-full bg-white" style="width: 2px;"></div>{% endif %}
             {% endfor %}
         </div>
     </div>
-
     <p class="text-sm text-gray-600 text-center">
         U heeft nog <strong>{{ remaining }}</strong> geluidsontheffingen beschikbaar dit jaar.
     </p>

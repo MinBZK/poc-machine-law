@@ -37,60 +37,84 @@
                         show_approve=False, claimant="CITIZEN") }}
         </div>
     </div>
-    <!-- Submit Form -->
-    <div x-data="{ isChecked: false }"
-         class="space-y-4 border-t border-blue-200 pt-4">
-        <div class="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
-            <label for="declaration-checkbox" class="cursor-pointer block">
-                <div class="flex items-center">
-                    <input type="checkbox"
-                           id="declaration-checkbox"
-                           x-model="isChecked"
-                           class="mr-3 rounded text-blue-600 focus:ring-blue-500"
-                           autofocus>
-                    <span class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</span>
-                </div>
-                <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
-            </label>
-        </div>
-        {% if in_chat_panel %}
-            <!-- Chat-specific buttons -->
-            <div class="flex gap-2">
-                <button type="button"
-                        @click="document.dispatchEvent(new CustomEvent('cancel-application-form'))"
-                        class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
-                    Annuleren
-                </button>
-                <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
-                        :disabled="!isChecked"
-                        :class="{ 'bg-blue-600 hover:bg-blue-700 cursor-pointer': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
-                        class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
-                    Bevestig aanvraag
-                </button>
+    <!-- Submit Form - only show if vergunning is not already granted -->
+    {% if not vergunning_already_granted %}
+        <div x-data="{ isChecked: false }"
+             class="space-y-4 border-t border-blue-200 pt-4">
+            <div class="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+                <label for="declaration-checkbox" class="cursor-pointer block">
+                    <div class="flex items-center">
+                        <input type="checkbox"
+                               id="declaration-checkbox"
+                               x-model="isChecked"
+                               class="mr-3 rounded text-blue-600 focus:ring-blue-500"
+                               autofocus>
+                        <span class="font-medium">Ik verklaar dat mijn gegevens correct en volledig zijn</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 ml-7">Let op: Onjuiste informatie kan gevolgen hebben voor uw aanvraag.</p>
+                </label>
             </div>
-        {% else %}
-            <!-- Standard panel submit button -->
-            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}"
-                  hx-target="#tile-{{ law|replace('/', '-') }}"
-                  hx-swap="outerHTML"
-                  hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
-                  class="mb-2">
-                <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+            {% if in_chat_panel %}
+                <!-- Chat-specific buttons -->
                 <div class="flex gap-2">
                     <button type="button"
-                            @click="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                            @click="document.dispatchEvent(new CustomEvent('cancel-application-form'))"
                             class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
                         Annuleren
                     </button>
-                    <button type="submit"
+                    <button @click="submitApplication('{{ registry_service_name }}', '{{ law }}', '{{ bsn }}')"
                             :disabled="!isChecked"
                             :class="{ 'bg-blue-600 hover:bg-blue-700 cursor-pointer': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
                             class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
                         Bevestig aanvraag
                     </button>
                 </div>
-            </form>
-        {% endif %}
-    </div>
+            {% else %}
+                <!-- Standard panel submit button -->
+                <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}"
+                      hx-target="#tile-{{ law|replace('/', '-') }}"
+                      hx-swap="outerHTML"
+                      hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                      class="mb-2">
+                    <input type="hidden" name="claimed_result" value="{{ result|tojson }}">
+                    <div class="flex gap-2">
+                        <button type="button"
+                                @click="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                                class="w-full px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
+                            Annuleren
+                        </button>
+                        <button type="submit"
+                                :disabled="!isChecked"
+                                :class="{ 'bg-blue-600 hover:bg-blue-700 cursor-pointer': isChecked, 'bg-gray-400 cursor-not-allowed': !isChecked }"
+                                class="w-full px-6 py-3 text-white text-center rounded-md transition-colors">
+                            Bevestig aanvraag
+                        </button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- Vergunning already granted - show status instead of submit form -->
+        <div class="border-t border-blue-200 pt-4">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-600 mr-2"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                        </path>
+                    </svg>
+                    <span class="text-green-800 font-medium">Deze vergunning is al verleend</span>
+                </div>
+                <p class="text-sm text-green-700 mt-2 ml-7">U hoeft geen nieuwe aanvraag in te dienen.</p>
+            </div>
+            <button type="button"
+                    @click="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"
+                    class="w-full mt-4 px-6 py-3 bg-gray-400 text-white text-center rounded-md hover:bg-gray-500 transition-colors cursor-pointer">
+                Sluiten
+            </button>
+        </div>
+    {% endif %}
 </div>
 <!-- End of Shared Application Form Section -->
