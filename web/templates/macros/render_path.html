@@ -217,12 +217,37 @@
     {% else %}
         {% set display_result = node.result if node is mapping and node.result is defined else node %}
         {% if display_result is not none and display_result != {} and display_result != {'value': None} or (node is mapping and node.required) %}
-            <div class="text-sm leading-5 py-0.5">
-                <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-                <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
-            </div>
+            {# Check if this field has a known source law to display #}
+            {% set source_law = none %}
+            {% if key|upper == 'HEEFT_EXPLOITATIEVERGUNNING' %}
+                {% set source_law = "APV Exploitatievergunning" %}
+            {% endif %}
+            {% if source_law %}
+                <div class="text-sm leading-5 py-0.5 flex items-start gap-2">
+                    <div>
+                        <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+                        <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                    </div>
+                    <span class="text-green-600 text-xs whitespace-nowrap">Resultaat van het uitrekenen {{ source_law }}</span>
+                </div>
+            {% else %}
+                <div class="text-sm leading-5 py-0.5">
+                    <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+                    <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
+{% endmacro %}
+{% macro render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+    {# Render a service_reference node without its children tree (to avoid duplication) #}
+    <div class="text-sm leading-5 py-0.5 flex items-start gap-2">
+        <div>
+            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+            <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+        </div>
+        <span class="text-green-600 text-xs whitespace-nowrap">Resultaat van het uitrekenen {{ node.law|replace('_', ' ') |title }}</span>
+    </div>
 {% endmacro %}
 {% macro render_missing_required_form(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
     {% set missing_required = [] %}
@@ -267,8 +292,9 @@
             </div>
             <form hx-post="/edit/update-missing-values"
                   hx-target="#missing-form-result"
-                  hx-on::after-request="setTimeout(function() { var panel = document.querySelector('[hx-trigger*=edit-dialog-closed]'); if (panel) { htmx.ajax('GET', panel.getAttribute('hx-get'), {target: '#application-panel', swap: 'innerHTML'}); } }, 100)"
+                  hx-on::after-request="setTimeout(function() { htmx.ajax('GET', this.dataset.refreshUrl, {target: '#application-panel', swap: 'innerHTML'}); }.bind(this), 200)"
                   class="space-y-4"
+                  data-refresh-url="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}{% if kvk %}&kvk={{ kvk }}{% endif %}&approved=false"
                   data-children-bsns="{{ path.CHILDREN_BSNS|join(',') if path.CHILDREN_BSNS is defined else '' }}">
                 <input type="hidden" name="case_id" value="{{ case_id }}">
                 <input type="hidden" name="service" value="{{ service }}">
@@ -428,12 +454,34 @@
                                            {% if loop.first %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="date">
+                                {% elif item.node.details and item.node.details.type == 'enum' and item.node.details.type_spec and item.node.details.type_spec.enum %}
+                                    <select id="value-{{ item.key }}"
+                                            name="values[{{ loop.index0 }}]"
+                                            class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            {% if loop.first %}autofocus{% endif %}
+                                            required>
+                                        <option value="">Selecteer {{ item.key|title|replace('_', ' ') }}</option>
+                                        {% for enum_value in item.node.details.type_spec.enum %}
+                                            {% if item.node.details.type_spec.enum_labels and enum_value in item.node.details.type_spec.enum_labels %}
+                                                <option value="{{ enum_value }}">{{ item.node.details.type_spec.enum_labels[enum_value] }}</option>
+                                            {% else %}
+                                                <option value="{{ enum_value }}">{{ enum_value|title|replace('_', ' ') }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <input type="hidden" name="types[{{ loop.index0 }}]" value="string">
                                 {% else %}
+                                    {# Check if this is a KVK field and we have kvk in context #}
+                                    {% set prefill_value = "" %}
+                                    {% if item.key|lower in ['kvk_nummer', 'kvk', 'kvknummer'] and kvk is defined and kvk %}
+                                        {% set prefill_value = kvk %}
+                                    {% endif %}
                                     <input type="text"
                                            id="value-{{ item.key }}"
                                            name="values[{{ loop.index0 }}]"
                                            class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                           {% if loop.first %}autofocus{% endif %}
+                                           {% if prefill_value %}value="{{ prefill_value }}"{% endif %}
+                                           {% if loop.first and not prefill_value %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="string">
                                 {% endif %}
@@ -495,8 +543,37 @@
     });
     </script>
     <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
+        {# Track which laws have already shown their children (to avoid duplicate trees) #}
+        {% set ns = namespace(shown_law_children=[], service_ref_child_keys=[]) %}
+        {# Collect all keys that are children of service_reference nodes #}
         {% for key, node in path.items() %}
-            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+            {% if node is mapping and 'service' in node and 'children' in node and node.children %}
+                {% for child_key in node.children.keys() %}
+                    {% set _ = ns.service_ref_child_keys.append(child_key) %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        {# Render nodes #}
+        {% for key, node in path.items() %}
+            {% set is_service_ref_node = node is mapping and 'service' in node and 'children' in node and node.children %}
+            {% set is_child_of_service_ref = key in ns.service_ref_child_keys %}
+            {# Only render if: it's a service_reference node itself, OR it's not already a child of a service_reference node #}
+            {% if is_service_ref_node or not is_child_of_service_ref %}
+                {% if is_service_ref_node %}
+                    {# Check if we already showed children for this law #}
+                    {% set law_key = node.service ~ '/' ~ node.law %}
+                    {% if law_key in ns.shown_law_children %}
+                        {# Already showed children for this law - render without children #}
+                        {{ render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+                    {% else %}
+                        {# First time seeing this law - show with children #}
+                        {% set _ = ns.shown_law_children.append(law_key) %}
+                        {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+                    {% endif %}
+                {% else %}
+                    {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+                {% endif %}
+            {% endif %}
         {% endfor %}
     </div>
     <div id="edit-form-container" class="relative z-[100]"></div>

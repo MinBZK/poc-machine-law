@@ -475,7 +475,9 @@ async def view_case(
         raise HTTPException(status_code=404, detail="Case not found")
 
     case.events = case_manager.get_events(case.id)
-    law, result, parameters = evaluate_law(case.bsn, case.law, case.service, machine_service)
+    # Extract KVK number from case parameters if available
+    kvk_nummer = case.parameters.get("KVK_NUMMER") if case.parameters else None
+    law, result, parameters = evaluate_law(case.bsn, case.law, case.service, machine_service, kvk_nummer=kvk_nummer)
     value_tree = machine_service.extract_value_tree(result.path)
     claims = claim_manager.get_claims_by_bsn(case.bsn, include_rejected=True)
     claim_ids = {claim.id: claim for claim in claims}

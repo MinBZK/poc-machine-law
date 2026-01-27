@@ -4239,6 +4239,7 @@ profiles:
           aantal_werknemers: 0
           datum_telling: '2025-01-01'
           datum_aanvang: '2025-01-15'
+          vestigingsadres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
       UWV:
         arbeidsverhoudingen:
         - bsn: '999999990'
@@ -4314,9 +4315,14 @@ profiles:
           status: Actief
           bouwjaar: 1920
       GEMEENTE_ROTTERDAM:
+        vestigingen:
+        - kvk_nummer: '85234567'
+          adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          schenkt_alcohol: false
         vergunningen:
         - kvk_nummer: '85234567'
           heeft_exploitatievergunning: true
+          categorie: Lichte horeca
           datum_verleend: '2025-08-01'
           geldig_tot: '2030-08-01'
           heeft_alcoholvergunning: false
@@ -4337,3 +4343,71 @@ profiles:
         geluidsklachten:
         - kvk_nummer: '85234567'
           heeft_actieve_klachten: false
+        # Data voor exploitatievergunning
+        inschrijvingen:
+        - kvk_nummer: '85234567'
+          bsn_eigenaar: '999999990'
+          aangevraagde_categorie: licht
+          activiteiten:
+            - eten
+            - drinken
+        beheerders:
+        - kvk_nummer: '85234567'
+          schenkt_alcohol: false
+          bsn: '999999990'
+          heeft_vog: true
+          leeftijd: 31
+          is_onder_curatele: false
+          heeft_svh_diploma: false
+          alle_hebben_vog: true
+          alle_voldoen_leeftijd: true
+          geen_onder_curatele: true
+        bibob_adviezen:
+        - kvk_nummer: '85234567'
+          advies_uitgebracht: false
+          mate_van_gevaar: geen_gevaar
+        horecagebiedsplannen:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          categorie: licht
+          gebied: Rotterdam West
+          toegestane_categorieen:
+            - licht
+            - middelzwaar
+          maximaal_aantal: 50
+          ontwikkelruimte: true
+          categorie_toegestaan: true
+        vergunningen_historie:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          bsn: '999999990'
+          vergunning_type: exploitatievergunning
+          afgiftedatum: '2025-08-01'
+          intrekkingsdatum: null
+          intrekkingsreden: null
+          handhavingsacties: []
+          ingetrokken_slecht_levensgedrag: false
+        omgevingsplan_toetsingen:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          categorie: licht
+          horeca_toegestaan: true
+        # Data voor terrasvergunning
+        bgt_terraslocaties:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          locatie: voor
+          beschikbare_oppervlakte: 15.0
+          functie_oppervlak: voetpad
+          is_openbare_weg: true
+        terrassenbeleid:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          seizoen: jaarrond
+          gebied: Rotterdam West
+          max_oppervlakte: 20.0
+          max_sluitingstijd_doordeweeks: 1
+          max_sluitingstijd_weekend: 2
+          seizoensregels: jaarrond toegestaan
+          toegestane_locaties:
+            - voor
+            - zij
+        precario_tarieven:
+        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+          gebruik: terras
+          tarief_per_m2: 45.50
