@@ -26,4 +26,5 @@ simulation_summary.txt
 machinev2/backend/backend
 __debug_bin*
 
-.claude
+.claude/*
+!.claude/skills/
