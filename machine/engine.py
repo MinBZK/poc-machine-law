@@ -590,7 +590,9 @@ class RulesEngine:
             delta = end_date_converted - start_date_converted
 
             # Convert to requested unit
-            if unit == "days":
+            if unit == "hours":
+                result = int(delta.total_seconds() // 3600)
+            elif unit == "days":
                 result = delta.days
             elif unit == "years":
                 result = (
@@ -709,6 +711,19 @@ class RulesEngine:
             node.details["subject_value"] = subject
             logger.debug(f"EXISTS result: {result}")
 
+        elif op_type == "LENGTH":
+            subject = self._evaluate_value(operation["subject"], context)
+            # LENGTH returns the count of items in a list/array, or 0 if None/empty
+            if subject is None:
+                result = 0
+            elif isinstance(subject, list | tuple | dict) or hasattr(subject, "__len__"):
+                result = len(subject)
+            else:
+                # For non-collection types, return 1 if truthy, 0 if falsy
+                result = 1 if subject else 0
+            node.details["subject_value"] = subject
+            logger.debug(f"LENGTH result: {result}")
+
         elif op_type == "AND":
             with logger.indent_block("AND"):
                 values = []
@@ -750,6 +765,73 @@ class RulesEngine:
                         break
             node.details["evaluated_values"] = evaluated_values
             logger.debug(f"COALESCE result: {result}")
+
+        elif op_type == "COMBINE_DATETIME":
+            # Combine a date and time into a datetime
+            date_val = self._evaluate_value(operation.get("date"), context)
+            time_val = self._evaluate_value(operation.get("time"), context)
+
+            if date_val is None or time_val is None:
+                logger.warning(f"COMBINE_DATETIME: missing date ({date_val}) or time ({time_val})")
+                context.missing_required = True
+                result = None
+            else:
+                try:
+                    # Parse date if it's a string
+                    if isinstance(date_val, str):
+                        date_val = (
+                            datetime.fromisoformat(date_val).date()
+                            if "T" in date_val
+                            else datetime.strptime(date_val, "%Y-%m-%d").date()
+                        )
+                    elif isinstance(date_val, datetime):
+                        date_val = date_val.date()
+
+                    # Parse time - expect format like "20:00" or "20:00:00"
+                    if isinstance(time_val, str):
+                        time_parts = time_val.split(":")
+                        hour = int(time_parts[0])
+                        minute = int(time_parts[1]) if len(time_parts) > 1 else 0
+                        second = int(time_parts[2]) if len(time_parts) > 2 else 0
+                        from datetime import time as time_type
+
+                        time_val = time_type(hour, minute, second)
+
+                    result = datetime.combine(date_val, time_val)
+                    logger.debug(f"COMBINE_DATETIME({date_val}, {time_val}) = {result}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"COMBINE_DATETIME failed: {e}")
+                    result = None
+
+            node.details.update({"date": date_val, "time": time_val})
+
+        elif op_type == "DAY_OF_WEEK":
+            # Get day of week from a date (0=Monday, 6=Sunday)
+            date_val = self._evaluate_value(operation.get("subject"), context)
+
+            if date_val is None:
+                logger.warning("DAY_OF_WEEK: missing date value")
+                result = None
+            else:
+                try:
+                    # Parse date if it's a string
+                    if isinstance(date_val, str):
+                        date_val = (
+                            datetime.fromisoformat(date_val).date()
+                            if "T" in date_val
+                            else datetime.strptime(date_val, "%Y-%m-%d").date()
+                        )
+                    elif isinstance(date_val, datetime):
+                        date_val = date_val.date()
+
+                    # weekday() returns 0=Monday, 6=Sunday
+                    result = date_val.weekday()
+                    logger.debug(f"DAY_OF_WEEK({date_val}) = {result}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"DAY_OF_WEEK failed: {e}")
+                    result = None
+
+            node.details.update({"date": date_val, "day_of_week": result})
 
         elif "_DATE" in op_type:
             values = [self._evaluate_value(v, context) for v in operation["values"]]

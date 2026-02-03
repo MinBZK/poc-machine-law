@@ -162,6 +162,9 @@ async def execute_law(
         except Exception as e:
             logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
+    # Extract value tree from path for templates to access resolved values
+    value_tree = machine_service.extract_value_tree(result.path)
+
     return templates.TemplateResponse(
         template_path,
         {
@@ -174,6 +177,7 @@ async def execute_law(
             "rule_spec": rule_spec,
             "result": result.output,
             "input": result.input,
+            "path": value_tree,
             "requirements_met": result.requirements_met,
             "missing_required": result.missing_required,
             "current_case": existing_case,
@@ -213,18 +217,35 @@ async def submit_case(
         kvk_nummer=kvk,
     )
 
+    # Get user-provided parameter names from rule spec and merge their values
+    rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+    param_names = {p["name"] for p in rule_spec.get("properties", {}).get("parameters", [])}
+    user_params = {
+        k.lstrip("$"): v for k, v in (result.input or {}).items() if k.lstrip("$") in param_names and v is not None
+    }
+
     case_id = case_manager.submit_case(
         bsn=bsn,
         service=service,
         law=law,
-        parameters=parameters,
+        parameters={**parameters, **user_params},
         claimed_result=result.output,
         approved_claims_only=approved,
     )
 
     case = case_manager.get_case_by_id(case_id)
 
-    rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+    # Re-evaluate the law AFTER the case is submitted so counts include the new case
+    _, result, _ = evaluate_law(
+        bsn,
+        law,
+        service,
+        machine_service,
+        approved=approved,
+        claim_manager=claim_manager,
+        effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk,
+    )
 
     # For business laws, get profile data to display after submission
     profile_data = None
@@ -235,6 +256,9 @@ async def submit_case(
                 profile_data = profile["sources"].get(service, {})
         except Exception as e:
             logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
+    # Extract value tree from the re-evaluated result (includes the new case in counts)
+    value_tree = machine_service.extract_value_tree(result.path)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(
@@ -249,7 +273,9 @@ async def submit_case(
             "rule_spec": rule_spec,
             "result": result.output,
             "input": result.input,
+            "path": value_tree,
             "requirements_met": result.requirements_met,
+            "missing_required": result.missing_required,
             "current_case": case,
             "profile_data": profile_data,
         },

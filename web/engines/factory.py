@@ -139,6 +139,129 @@ def _initialize_profiles(services_instance: Services) -> None:
 _initialize_profiles(services)
 
 
+def _seed_historical_cases(services_instance: Services) -> None:
+    """
+    Seed historical cases from profiles.yaml into the CaseManager.
+
+    This uses the `case_seeds` configuration in profiles.yaml to determine which
+    historical data tables should be loaded as cases. This enables source_type: "cases"
+    queries to count historical approvals.
+
+    Example configuration in profiles.yaml:
+    ```yaml
+    case_seeds:
+      - service: "GEMEENTE_ROTTERDAM"
+        law: "algemene_plaatselijke_verordening/ontheffingspas_geluid"
+        table: "ontheffingen_geluid_historie"
+        bsn_lookup:
+          table: "inschrijvingen"
+          match_field: "kvk_nummer"
+          bsn_field: "bsn_eigenaar"
+        parameters:
+          KVK_NUMMER: "kvk_nummer"
+          ACTIVITEITSDATUM: "datum"
+        result:
+          komt_in_aanmerking_voor_geluidsontheffing: true
+    ```
+    """
+    try:
+        project_root = get_project_root()
+        profiles_path = project_root / "data" / "profiles.yaml"
+
+        import yaml
+
+        with open(profiles_path) as f:
+            raw_data = yaml.safe_load(f)
+
+        case_seeds_config = raw_data.get("case_seeds", [])
+        if not case_seeds_config:
+            logger.debug("No case_seeds configuration found in profiles.yaml")
+            return
+
+        profiles = raw_data.get("profiles", {})
+        seeded_count = 0
+
+        for seed_config in case_seeds_config:
+            service = seed_config.get("service")
+            law = seed_config.get("law")
+            table_name = seed_config.get("table")
+            bsn_lookup = seed_config.get("bsn_lookup", {})
+            param_mapping = seed_config.get("parameters", {})
+            result_template = seed_config.get("result", {})
+
+            if not all([service, law, table_name]):
+                logger.warning(f"Incomplete case_seeds config: {seed_config}")
+                continue
+
+            # Process each profile
+            for profile_id, profile_data in profiles.items():
+                sources = profile_data.get("sources", {})
+                service_data = sources.get(service, {})
+
+                # Get the historical data table
+                historie = service_data.get(table_name, [])
+                if not historie:
+                    continue
+
+                # Get BSN lookup table if configured
+                lookup_table = []
+                if bsn_lookup:
+                    lookup_table = service_data.get(bsn_lookup.get("table", ""), [])
+
+                for record in historie:
+                    # Build parameters from mapping
+                    parameters = {}
+                    for param_name, field_name in param_mapping.items():
+                        value = record.get(field_name)
+                        if value is not None:
+                            parameters[param_name] = value
+
+                    # Extract year from date field if present
+                    for param_name, value in parameters.items():
+                        if "datum" in param_name.lower() or "date" in param_name.lower():
+                            if isinstance(value, str) and len(value) >= 4:
+                                parameters["year"] = int(value[:4])
+                            break
+
+                    # Find BSN via lookup table
+                    bsn = None
+                    if bsn_lookup and lookup_table:
+                        match_field = bsn_lookup.get("match_field")
+                        bsn_field = bsn_lookup.get("bsn_field")
+                        match_value = record.get(match_field)
+
+                        for lookup_record in lookup_table:
+                            if lookup_record.get(match_field) == match_value:
+                                bsn = lookup_record.get(bsn_field)
+                                break
+                    else:
+                        # Try to get BSN directly from record or profile
+                        bsn = record.get("bsn") or profile_id
+
+                    if not bsn:
+                        logger.warning(f"No BSN found for record in {table_name}, skipping")
+                        continue
+
+                    # Seed the historical case
+                    services_instance.case_manager.seed_historical_case(
+                        bsn=bsn,
+                        service_type=service,
+                        law=law,
+                        parameters=parameters,
+                        result=result_template,
+                    )
+                    seeded_count += 1
+
+        logger.info(f"Seeded {seeded_count} historical cases from {len(case_seeds_config)} configurations")
+
+    except Exception as e:
+        logger.error(f"Failed to seed historical cases: {e}")
+
+
+# Seed historical cases after profiles are loaded
+_seed_historical_cases(services)
+
+
 class MachineFactory:
     """Factory for creating Machine service instances."""
 

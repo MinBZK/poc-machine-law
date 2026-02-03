@@ -16,6 +16,7 @@ logger = IndentLogger(logging.getLogger("service"))
 def clean_nan_value(value: Any, expected_type: str | None = None) -> Any:
     """
     Clean NaN values from pandas dataframes, converting them to appropriate defaults.
+    Also converts pandas Timestamps to ISO format strings for JSON serialization.
 
     Args:
         value: The value to clean (could be NaN, None, or a valid value)
@@ -29,6 +30,10 @@ def clean_nan_value(value: Any, expected_type: str | None = None) -> Any:
         return [clean_nan_value(v, expected_type) for v in value]
     elif isinstance(value, dict):
         return {k: clean_nan_value(v, expected_type) for k, v in value.items()}
+
+    # Convert pandas Timestamp to ISO format string for JSON serialization
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
 
     # Check if value is NaN (pandas float NaN or numpy NaN) - only for scalars
     try:
@@ -347,10 +352,33 @@ class RuleContext:
                         if source_ref.get("source_type") == "laws":
                             table = "laws"
                             df = self.service_provider.resolver.rules_dataframe()
-                        if source_ref.get("source_type") == "events":
+                        elif source_ref.get("source_type") == "events":
                             table = "events"
                             events = self.service_provider.case_manager.get_events()
                             df = pd.DataFrame(events)
+                        elif source_ref.get("source_type") == "cases":
+                            table = "cases"
+                            cases = self.service_provider.case_manager.get_all_cases()
+                            df = pd.DataFrame(
+                                [
+                                    {
+                                        "case_id": str(case.id),
+                                        "bsn": case.bsn,
+                                        "service": case.service,
+                                        "law": case.law,
+                                        "status": (
+                                            case.status.value if hasattr(case.status, "value") else str(case.status)
+                                        ),
+                                        "approved": case.approved,
+                                        "created_at": case.created_at,
+                                        "year": case.created_at.year if case.created_at else None,
+                                        # Flatten parameters for filtering
+                                        **(case.parameters or {}),
+                                    }
+                                    for case in cases
+                                    if case is not None
+                                ]
+                            )
                         elif self.sources and "table" in source_ref:
                             table = source_ref.get("table")
                             if table in self.sources:
@@ -425,11 +453,12 @@ class RuleContext:
         if path == "january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
             return calc_date.replace(month=1, day=1).isoformat()
+        if path == "year":
+            # Return as int for proper DataFrame filtering
+            return int(self.calculation_date[:4])
         if path == "prev_january_first":
             calc_date = datetime.strptime(self.calculation_date, "%Y-%m-%d").date()
             return calc_date.replace(month=1, day=1, year=calc_date.year - 1).isoformat()
-        if path == "year":
-            return self.calculation_date[:4]
         return None
 
     def _resolve_from_service(self, path, service_ref, spec):
@@ -550,6 +579,22 @@ class RuleContext:
                     df = df[df[select_on["name"]].isin(value)]
                 else:
                     df = df[df[select_on["name"]] == value]
+
+        # Handle aggregation operations
+        aggregation = source_ref.get("aggregation")
+        if aggregation:
+            if aggregation == "count":
+                return len(df)
+            elif aggregation == "sum" and "field" in source_ref:
+                return df[source_ref["field"]].sum()
+            elif aggregation == "max" and "field" in source_ref:
+                return df[source_ref["field"]].max()
+            elif aggregation == "min" and "field" in source_ref:
+                return df[source_ref["field"]].min()
+            elif aggregation == "avg" and "field" in source_ref:
+                return df[source_ref["field"]].mean()
+            elif aggregation == "median" and "field" in source_ref:
+                return df[source_ref["field"]].median()
 
         # Get specified fields
         fields = source_ref.get("fields", [])

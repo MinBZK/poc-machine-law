@@ -39,6 +39,20 @@ globalServices:
     - gemeente: Arnhem
       arrondissement: GELDERLAND
       rechtbank: RECHTBANK_GELDERLAND
+# Configuration for seeding historical cases at startup (demo/test only)
+case_seeds:
+  - service: "GEMEENTE_ROTTERDAM"
+    law: "algemene_plaatselijke_verordening/ontheffingspas_geluid"
+    table: "ontheffingen_geluid_historie"
+    bsn_lookup:
+      table: "inschrijvingen"
+      match_field: "kvk_nummer"
+      bsn_field: "bsn_eigenaar"
+    parameters:
+      KVK_NUMMER: "kvk_nummer"
+      ACTIVITEITSDATUM: "datum"
+    result:
+      komt_in_aanmerking_voor_geluidsontheffing: true
 profiles:
   '100000001':
     name: Merijn van der Meer
@@ -4130,7 +4144,7 @@ profiles:
   # Profile: Claudia van Dam - Horeca ondernemer Rotterdam
   '999999990':
     name: Claudia van Dam
-    description: Eigenaar van Koffiezaak Bakkie Pleur in Rotterdam West, horeca ondernemer met exploitatievergunning
+    description: Eigenaar van koffiezaak Noon in Rotterdam West, horeca ondernemer met exploitatievergunning
     properties:
       - Ondernemer
     sources:
@@ -4206,7 +4220,7 @@ profiles:
         - bsn: '999999990'
           bsn_eigenaar: '999999990'
           kvk_nummer: '85234567'
-          handelsnaam: Koffiezaak Bakkie Pleur
+          handelsnaam: Koffiezaak Noon
           rechtsvorm: EENMANSZAAK
           status: Actief
           activiteit: Horeca (SBI 56102, Cafés)
@@ -4216,7 +4230,7 @@ profiles:
         functionarissen:
         - bsn: '999999990'
           kvk_nummer: '85234567'
-          handelsnaam: Koffiezaak Bakkie Pleur
+          handelsnaam: Koffiezaak Noon
           rechtsvorm: EENMANSZAAK
           status: Actief
           functie: EIGENAAR
@@ -4326,10 +4340,6 @@ profiles:
           datum_verleend: '2025-08-01'
           geldig_tot: '2030-08-01'
           heeft_alcoholvergunning: false
-        ontheffingen_geluid:
-        - kvk_nummer: '85234567'
-          jaar: 2026
-          aantal_verleend: 3
         ontheffingen_geluid_historie:
         - kvk_nummer: '85234567'
           datum: '2026-01-05'

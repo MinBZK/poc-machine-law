@@ -1,16 +1,15 @@
 <div>
-    {# Get usage data from profile_data - using namespace for Jinja2 loop scoping #}
-    {% set ns = namespace(used=0) %}
+    {# Get usage data from path (value tree) or result #}
+    {# The path variable contains resolved values, result contains output values #}
     {% set max_count = 12 %}
-    {% set current_year = "2026" %}
-    {% if profile_data and profile_data.ontheffingen_geluid %}
-        {% for o in profile_data.ontheffingen_geluid %}
-            {% if o.kvk_nummer|string == kvk|string and o.jaar|string == current_year %}
-                {% set ns.used = o.aantal_verleend|default(0) %}
-            {% endif %}
-        {% endfor %}
+    {# Try to get from result first, then from path value tree #}
+    {% if result and result.aantal_verleende_ontheffingen_dit_jaar is defined %}
+        {% set used = result.aantal_verleende_ontheffingen_dit_jaar %}
+    {% elif path and path.VERLEENDE_ONTHEFFINGEN_DIT_JAAR is defined %}
+        {% set used = path.VERLEENDE_ONTHEFFINGEN_DIT_JAAR.result|length|default(0) %}
+    {% else %}
+        {% set used = 0 %}
     {% endif %}
-    {% set used = ns.used %}
     {% set remaining = max_count - used %}
     {% set percentage = (used / max_count * 100)|int %}
     <div class="flex items-center justify-between mb-2">

@@ -116,12 +116,22 @@ class CaseManager(Application):
         # Check if results match and if manual review is needed
         results_match = self._results_match(claimed_result, verified_result)
 
-        if results_match and not needs_manual_review:
+        # Only auto-approve if requirements are met
+        requirements_met = result.requirements_met if hasattr(result, "requirements_met") else True
+
+        if results_match and not needs_manual_review and requirements_met:
             # Automatic approval
             case.decide_automatically(
                 verified_result=verified_result,
                 parameters=parameters,
                 approved=True,
+            )
+        elif results_match and not needs_manual_review and not requirements_met:
+            # Requirements not met - auto-reject
+            case.decide_automatically(
+                verified_result=verified_result,
+                parameters=parameters,
+                approved=False,
             )
         else:
             # Route to manual review with reason
@@ -139,6 +149,50 @@ class CaseManager(Application):
         # Save and index
         self.save(case)
         self._index_case(case)
+
+        return str(case.id)
+
+    def seed_historical_case(
+        self,
+        bsn: str,
+        service_type: str,
+        law: str,
+        parameters: dict,
+        result: dict,
+    ) -> str:
+        """
+        Seed a historical case that was already approved.
+        Used for loading historical data at startup.
+
+        Note: Historical cases are NOT indexed in _case_index to allow multiple
+        cases per (bsn, service, law) combination. They are still available
+        via get_all_cases() for source_type: "cases" queries.
+        """
+        # Create case with minimal data
+        case = Case(
+            bsn=bsn,
+            service_type=service_type,
+            law=law,
+            parameters=parameters,
+            claimed_result=result,
+            verified_result=result,
+            rulespec_uuid="historical",
+            approved_claims_only=True,
+        )
+
+        # Immediately mark as decided and approved
+        case.decide_automatically(
+            verified_result=result,
+            parameters=parameters,
+            approved=True,
+        )
+
+        # Save but don't index - allows multiple historical cases per (bsn, service, law)
+        self.save(case)
+        # Store case_id for get_all_cases() without overwriting the main index
+        if not hasattr(self, "_historical_case_ids"):
+            self._historical_case_ids = []
+        self._historical_case_ids.append(str(case.id))
 
         return str(case.id)
 
@@ -323,6 +377,18 @@ class CaseManager(Application):
             case = self.get_case_by_id(case_id)
             if case.law == law and case.service == service_type:
                 cases.append(case)
+        return cases
+
+    def get_all_cases(self) -> list[Case]:
+        """Get all cases in the system, including historical seeded cases"""
+        # Get cases from the main index
+        cases = [self.get_case_by_id(case_id) for case_id in self._case_index.values()]
+        # Add historical cases (not in main index to allow multiples per bsn/service/law)
+        if hasattr(self, "_historical_case_ids"):
+            for case_id in self._historical_case_ids:
+                case = self.get_case_by_id(case_id)
+                if case:
+                    cases.append(case)
         return cases
 
     def get_events(self, case_id=None):
