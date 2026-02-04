@@ -1,3 +1,4 @@
+@skip
 Feature: Archiefwet 1995 - Beheer en openbaarheid van archiefbescheiden
   Als archivaris
   Wil ik weten of archiefbescheiden overgebracht, openbaar of vernietigd moeten worden

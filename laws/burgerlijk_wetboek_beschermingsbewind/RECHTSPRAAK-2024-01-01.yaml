@@ -1,0 +1,352 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 970f63e4-eed1-4884-a1ee-9050733eb2e1
+name: Bepalen beschermingsbewind en vertegenwoordigingsbevoegdheid bewindvoerder
+law: burgerlijk_wetboek_beschermingsbewind
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2024-01-01
+service: "RECHTSPRAAK"
+discoverable: "DELEGATION_PROVIDER"
+legal_basis:
+  law: "Burgerlijk Wetboek Boek 1"
+  bwb_id: "BWBR0002656"
+  article: "431"
+  paragraph: "1"
+  url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel431"
+  juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=431&lid=1&z=2024-01-01&g=2024-01-01"
+  explanation: >
+    Artikel 1:431 lid 1 BW bepaalt dat de kantonrechter een bewind kan instellen
+    over een of meer goederen van een meerderjarige die tijdelijk of duurzaam
+    niet in staat is zijn vermogensrechtelijke belangen zelf behoorlijk waar te nemen.
+description: >
+  Bepaalt of een persoon als bewindvoerder is benoemd voor een of meer rechthebbenden
+  (personen onder beschermingsbewind). Bij beschermingsbewind blijft de rechthebbende
+  handelingsbekwaam (Art. 1:438 lid 1 BW), maar de bewindvoerder beheert de onder
+  bewind gestelde goederen. De bewindvoerder vertegenwoordigt de rechthebbende
+  bij het beheer van die goederen (Art. 1:441 lid 1 BW).
+  Data komt uit het Centraal Curatele- en Bewindregister (CCBR) bij de Rechtspraak.
+
+references:
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "431"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel431"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "435"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel435"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "438"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel438"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "441"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon wiens bewindvoerder-bevoegdheden worden opgezocht"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN identificeert de bewindvoerder in het CCBR"
+
+  sources:
+    - name: "BEWIND_REGISTRATIES"
+      description: "Beschermingsbewind-registraties uit het Centraal Curatele- en Bewindregister"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "436"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel436"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=436&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:436 lid 2 BW bepaalt dat de instelling van het bewind en de benoeming
+          van de bewindvoerder worden ingeschreven in het curatele- en bewindregister.
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "bewind_registraties"
+        fields: ["bsn_rechthebbende", "naam_rechthebbende", "bewind_type", "datum_ingang", "datum_einde", "status"]
+        select_on:
+          - name: "bsn_bewindvoerder"
+            description: "BSN nummer van de bewindvoerder"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "heeft_delegaties"
+      description: "Of de persoon delegaties heeft als bewindvoerder"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "441"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=441&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:441 lid 1 BW: De bewindvoerder vertegenwoordigt de rechthebbende
+          bij het beheer van de onder bewind staande goederen.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_ids"
+      description: "BSN nummers van rechthebbenden waarvoor deze persoon bewindvoerder is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "436"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel436"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=436&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN nummers van rechthebbenden uit CCBR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_names"
+      description: "Namen van rechthebbenden waarvoor deze persoon bewindvoerder is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "436"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel436"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=436&z=2024-01-01&g=2024-01-01"
+        explanation: "Namen van rechthebbenden uit CCBR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_types"
+      description: "Types van de subjecten (altijd CITIZEN voor rechthebbenden)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "431"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel431"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=431&z=2024-01-01&g=2024-01-01"
+        explanation: "Beschermingsbewind is alleen voor meerderjarige natuurlijke personen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "delegation_types"
+      description: "Type delegatie (BEWINDVOERDER voor beschermingsbewind)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "435"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel435"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=435&z=2024-01-01&g=2024-01-01"
+        explanation: "De bewindvoerder wordt benoemd door de kantonrechter (Art. 1:435 BW)"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "permissions"
+      description: "Rechten per rechthebbende (bewindvoerder krijgt volledige rechten voor financiele zaken)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "441"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=441&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:441 lid 1 BW: De bewindvoerder vertegenwoordigt bij beheer van
+          onder bewind staande goederen. Volledige rechten voor financiele zaken.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_from_dates"
+      description: "Startdatum van elk bewind"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "432"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel432"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=432&z=2024-01-01&g=2024-01-01"
+        explanation: "Ingangsdatum bewind uit CCBR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_until_dates"
+      description: "Einddatum van elk bewind (null = nog actief)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "449"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel449"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=449&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 1:449 BW: bewind kan worden opgeheven"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    # Art. 1:441 BW: bewindvoerder vertegenwoordigt bij beheer goederen
+    # Bewindvoerder krijgt volledige rechten voor financiele zaken
+    BEWINDVOERDER_RECHTEN:
+      - "LEZEN"
+      - "CLAIMS_INDIENEN"
+      - "BESLUITEN_ONTVANGEN"
+
+requirements:
+  - operation: EXISTS
+    subject: "$BEWIND_REGISTRATIES"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "436"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel436"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=436&z=2024-01-01&g=2024-01-01"
+      explanation: "Persoon moet als bewindvoerder zijn geregistreerd in het CCBR"
+
+actions:
+  # Stap 1: Filter op actieve bewind-registraties
+  - output: "actief_bewind"
+    operation: FOREACH
+    subject: "$BEWIND_REGISTRATIES"
+    where:
+      operation: AND
+      values:
+        - operation: EQUALS
+          subject: "$current.status"
+          value: "ACTIEF"
+        - operation: OR
+          values:
+            - operation: IS_NULL
+              subject: "$current.datum_einde"
+            - operation: EQUALS
+              subject: "$current.datum_einde"
+              value: ""
+            - operation: GREATER_THAN
+              values:
+                - "$current.datum_einde"
+                - "$calculation_date"
+    value: "$current"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "449"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel449"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=449&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Alleen actieve bewind-registraties geven vertegenwoordigingsbevoegdheid.
+        Bewind kan worden opgeheven (Art. 1:449 BW).
+
+  # heeft_delegaties: boolean indicating if person has any delegations
+  - output: "heeft_delegaties"
+    operation: EXISTS
+    subject: "$actief_bewind"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "441"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=441&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 1:441 BW bepaalt dat de bewindvoerder de rechthebbende vertegenwoordigt.
+
+  # subject_ids: BSN numbers of rechthebbenden
+  - output: "subject_ids"
+    subject: "$actief_bewind.bsn_rechthebbende"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "436"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel436"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=436&z=2024-01-01&g=2024-01-01"
+      explanation: "BSN nummers van rechthebbenden uit CCBR registratie"
+
+  # subject_names: names of rechthebbenden
+  - output: "subject_names"
+    subject: "$actief_bewind.naam_rechthebbende"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "436"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel436"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=436&z=2024-01-01&g=2024-01-01"
+      explanation: "Namen van rechthebbenden uit CCBR registratie"
+
+  # subject_types: constant "CITIZEN" for each rechthebbende
+  - output: "subject_types"
+    operation: FOREACH
+    subject: "$actief_bewind"
+    value: "CITIZEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "431"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel431"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=431&z=2024-01-01&g=2024-01-01"
+      explanation: "Beschermingsbewind is alleen voor meerderjarigen, altijd CITIZEN"
+
+  # delegation_types: constant "BEWINDVOERDER" for beschermingsbewind
+  - output: "delegation_types"
+    operation: FOREACH
+    subject: "$actief_bewind"
+    value: "BEWINDVOERDER"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "435"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel435"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=435&z=2024-01-01&g=2024-01-01"
+      explanation: "Type delegatie is BEWINDVOERDER voor beschermingsbewind"
+
+  # permissions: full permissions for financial matters
+  - output: "permissions"
+    operation: FOREACH
+    subject: "$actief_bewind"
+    value: "$BEWINDVOERDER_RECHTEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "441"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel441"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=441&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 1:441 lid 1 BW: De bewindvoerder vertegenwoordigt bij beheer van
+        onder bewind staande goederen. Volledige rechten voor financiele zaken.
+
+  # valid_from_dates: start date from CCBR
+  - output: "valid_from_dates"
+    subject: "$actief_bewind.datum_ingang"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "432"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel432"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=432&z=2024-01-01&g=2024-01-01"
+      explanation: "Ingangsdatum bewind uit CCBR registratie"
+
+  # valid_until_dates: end date (null if still active)
+  - output: "valid_until_dates"
+    subject: "$actief_bewind.datum_einde"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "449"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling5_Artikel449"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=449&z=2024-01-01&g=2024-01-01"
+      explanation: "Einddatum bewind, null indien nog actief"

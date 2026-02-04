@@ -1,0 +1,154 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: c2124946-50d3-4aa8-b510-bccd04fc2cf9
+name: Bepalen forensische zorg status
+law: wet_forensische_zorg
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2022-01-01
+service: "DJI"
+legal_basis:
+  law: "Wet forensische zorg"
+  bwb_id: "BWBR0040635"
+  article: "1.1"
+  url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk1_Artikel1.1"
+  juriconnect: "jci1.3:c:BWBR0040635&artikel=1.1&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 1.1 Wfz definieert forensische zorg als geestelijke gezondheidszorg, verslavingszorg en verstandelijke gehandicaptenzorg die onderdeel is van een strafrechtelijke titel"
+description: >
+  Regels voor het bepalen van forensische zorg status volgens de Wet forensische zorg (Wfz).
+  Forensische zorg is geestelijke gezondheidszorg, verslavingszorg en verstandelijke
+  gehandicaptenzorg die onderdeel is van een (voorwaardelijke) straf of maatregel.
+
+references:
+  - law: "Wet forensische zorg"
+    article: "1.1"
+    url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk1_Artikel1.1"
+  - law: "Wet forensische zorg"
+    article: "2.1"
+    url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk2_Artikel2.1"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet forensische zorg"
+        bwb_id: "BWBR0040635"
+        article: "5.1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk5_Artikel5.1"
+        juriconnect: "jci1.3:c:BWBR0040635&artikel=5.1&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5.1 lid 1 Wfz bepaalt dat persoonsgegevens worden verwerkt voor de uitvoering van forensische zorg"
+
+  sources:
+    - name: "ZORGTYPE"
+      description: "Type zorg die wordt verleend"
+      type: "string"
+      legal_basis:
+        law: "Wet forensische zorg"
+        bwb_id: "BWBR0040635"
+        article: "1.1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk1_Artikel1.1"
+        juriconnect: "jci1.3:c:BWBR0040635&artikel=1.1&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 1.1 lid 1 Wfz definieert forensische zorg als geestelijke gezondheidszorg, verslavingszorg en verstandelijke gehandicaptenzorg"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "forensische_zorg"
+        field: "zorgtype"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+    - name: "JURIDISCHE_GRONDSLAG"
+      description: "Juridische titel voor zorgverlening"
+      type: "string"
+      legal_basis:
+        law: "Wet forensische zorg"
+        bwb_id: "BWBR0040635"
+        article: "2.1"
+        url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk2_Artikel2.1"
+        juriconnect: "jci1.3:c:BWBR0040635&artikel=2.1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.1 Wfz bepaalt dat forensische zorg wordt verleend op basis van een strafrechtelijke titel"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "forensische_zorg"
+        field: "juridische_titel"
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "is_forensisch"
+      description: "Ontvangt de persoon forensische zorg"
+      type: "boolean"
+      legal_basis:
+        law: "Wet forensische zorg"
+        bwb_id: "BWBR0040635"
+        article: "2.1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk2_Artikel2.1"
+        juriconnect: "jci1.3:c:BWBR0040635&artikel=2.1&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 2.1 lid 1 Wfz bepaalt dat forensische zorg wordt verleend aan personen met een strafrechtelijke titel"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    FORENSISCHE_ZORGTYPEN:
+      - "GGZ"
+      - "VERSLAVINGSZORG"
+      - "VG_ZORG"
+    GELDIGE_JURIDISCHE_TITELS:
+      - "VOORWAARDELIJKE_VEROORDELING"
+      - "TBS"
+      - "PIJ_MAATREGEL"
+      - "ISD_MAATREGEL"
+      - "VOORWAARDELIJKE_INVRIJHEIDSTELLING"
+      - "OVERPLAATSING"
+      - "ZORGMACHTIGING"
+      - "VOORLOPIGE_HECHTENIS"
+
+actions:
+  - output: "is_forensisch"
+    operation: AND
+    values:
+      - operation: IN
+        subject: "$ZORGTYPE"
+        values: "$FORENSISCHE_ZORGTYPEN"
+        legal_basis:
+          law: "Wet forensische zorg"
+          bwb_id: "BWBR0040635"
+          article: "1.1"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk1_Artikel1.1"
+          juriconnect: "jci1.3:c:BWBR0040635&artikel=1.1&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 1.1 lid 1 Wfz definieert forensische zorg als GGZ, verslavingszorg en VG-zorg"
+      - operation: IN
+        subject: "$JURIDISCHE_GRONDSLAG"
+        values: "$GELDIGE_JURIDISCHE_TITELS"
+        legal_basis:
+          law: "Wet forensische zorg"
+          bwb_id: "BWBR0040635"
+          article: "2.1"
+          url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk2_Artikel2.1"
+          juriconnect: "jci1.3:c:BWBR0040635&artikel=2.1&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 2.1 Wfz bepaalt welke strafrechtelijke titels grondslag vormen voor forensische zorg"
+    legal_basis:
+      law: "Wet forensische zorg"
+      bwb_id: "BWBR0040635"
+      article: "2.1"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0040635/2024-01-01#Hoofdstuk2_Artikel2.1"
+      juriconnect: "jci1.3:c:BWBR0040635&artikel=2.1&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 2.1 lid 1 Wfz bepaalt dat forensische zorg wordt verleend aan personen met een strafrechtelijke titel"

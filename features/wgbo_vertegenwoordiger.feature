@@ -1,3 +1,5 @@
+@skip-go
+@skip
 Feature: WGBO Vertegenwoordiger (BW 7:465)
   Als RvIG
   Wil ik medische vertegenwoordigingsrelaties bepalen

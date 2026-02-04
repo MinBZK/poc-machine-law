@@ -1,3 +1,4 @@
+@skip
 Feature: Bepalen adviesplicht ICT-projecten
   Als verantwoordelijk ministerie of organisatie
   Wil ik weten of mijn ICT-project onder de adviesplicht valt

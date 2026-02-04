@@ -1,0 +1,425 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 9f2a3b4c-1d5e-4f6a-b7c8-2e3d4f5a6b7c
+name: Bepalen handelingsonbekwaamheid volwassenen
+law: burgerlijk_wetboek_handelingsonbekwaamheid
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2024-01-01
+service: "RECHTSPRAAK"
+discoverable: "DELEGATION_PROVIDER"
+legal_basis:
+  law: "Burgerlijk Wetboek Boek 1"
+  bwb_id: "BWBR0002656"
+  article: "381"
+  paragraph: "1"
+  url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+  juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+  explanation: >
+    Artikel 1:381 lid 1 BW bepaalt dat een onder curatele gestelde persoon
+    onbekwaam is rechtshandelingen te verrichten, voor zover de wet niet
+    anders bepaalt. Dit betekent dat curandussen handelingsonbekwaam zijn.
+description: >
+  Bepaalt of een volwassen persoon handelingsonbekwaam is op grond van curatele
+  (Art. 1:378-391 BW). Personen onder curatele zijn handelingsonbekwaam en kunnen
+  geen rechtshandelingen zelfstandig verrichten. Hun curator handelt namens hen.
+  Deze wet bepaalt de base_permissions voor personen die onder curatele staan.
+
+references:
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "378"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel378"
+    explanation: "Gronden voor ondercuratelestelling"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "381"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+    explanation: "Handelingsonbekwaamheid van de curandus"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "386"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling2_Artikel386"
+    explanation: "Curator vertegenwoordigt curandus"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "389"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling3_Artikel389"
+    explanation: "Einde van curatele"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon wiens handelingsbekwaamheid wordt bepaald"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN identificeert personen"
+
+  sources:
+    - name: "CURATELE_ALS_CURANDUS"
+      description: "Curatele registraties waar deze persoon de curandus is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "391"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling3_Artikel391"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=391&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:391 BW: curatele wordt geregistreerd in het Centraal Curatele- en
+          Bewindregister (CCBR). Deze registratie bepaalt de handelingsonbekwaamheid.
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "curatele_registraties"
+        fields: ["bsn_curator", "bsn_curandus", "naam_curandus", "datum_ingang", "datum_einde", "status"]
+        select_on:
+          - name: "bsn_curandus"
+            description: "BSN van de persoon als curandus"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "is_onder_curatele"
+      description: "Of de persoon onder actieve curatele staat"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 1:381 BW: curandus is handelingsonbekwaam"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "is_handelingsonbekwaam"
+      description: "Of de persoon handelingsonbekwaam is (curatele)"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 1:381 BW: curandus is handelingsonbekwaam"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "base_permissions"
+      description: "Basis rechten: ['LEZEN'] als handelingsonbekwaam, volledig anders"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:381 lid 1 BW: curandussen zijn onbekwaam rechtshandelingen te verrichten.
+          Zij hebben alleen leesrecht voor eigen zaken.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "curator_bsn"
+      description: "BSN van de curator (indien onder curatele)"
+      type: "string"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "386"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling2_Artikel386"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=386&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 1:386 BW: de curator vertegenwoordigt de curandus"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    # Standard delegation interface outputs
+    - name: "heeft_delegaties"
+      description: "Of er delegaties bestaan (altijd true voor SELF)"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "Iedereen heeft een SELF delegatie"
+
+    - name: "subject_ids"
+      description: "BSN van de persoon zelf"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "Persoon handelt namens zichzelf"
+
+    - name: "subject_names"
+      description: "Weergavenaam voor SELF delegatie"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "Persoon handelt namens zichzelf"
+
+    - name: "subject_types"
+      description: "Type delegatie (SELF voor eigen zaken)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "Persoon handelt namens zichzelf"
+
+    - name: "delegation_types"
+      description: "Type machtiging (EIGEN_ZAKEN voor SELF)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "Persoon handelt voor eigen zaken"
+
+    - name: "permissions"
+      description: "Rechten per delegatie (beperkt bij handelingsonbekwaamheid)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Curandussen hebben beperkte rechten"
+
+    - name: "valid_from_dates"
+      description: "Ingangsdatum delegaties"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "SELF delegatie heeft geen ingangsdatum"
+
+    - name: "valid_until_dates"
+      description: "Einddatum delegaties"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "381"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+        explanation: "SELF delegatie heeft geen einddatum"
+
+  definitions:
+    # Art. 1:381 BW: curandussen hebben beperkte rechten
+    HANDELINGSONBEKWAME_RECHTEN:
+      - "LEZEN"
+
+    # Handelingsbekwame personen hebben volledige rechten
+    VOLLEDIGE_RECHTEN:
+      - "LEZEN"
+      - "CLAIMS_INDIENEN"
+      - "BESLUITEN_ONTVANGEN"
+
+actions:
+  # Stap 1: Filter actieve curatele registraties
+  - output: "actieve_curatele"
+    operation: FOREACH
+    subject: "$CURATELE_ALS_CURANDUS"
+    where:
+      operation: AND
+      values:
+        - operation: EQUALS
+          subject: "$current.status"
+          value: "ACTIEF"
+        - operation: OR
+          values:
+            - operation: IS_NULL
+              subject: "$current.datum_einde"
+            - operation: EQUALS
+              subject: "$current.datum_einde"
+              value: ""
+            - operation: GREATER_THAN
+              values:
+                - "$current.datum_einde"
+                - "$calculation_date"
+    value: "$current"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "389"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling3_Artikel389"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=389&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 1:389 BW: curatele eindigt door opheffing. Alleen actieve curatele
+        zonder einddatum of met toekomstige einddatum is van kracht.
+
+  # Stap 2: Bepaal of onder curatele
+  - output: "is_onder_curatele"
+    operation: EXISTS
+    subject: "$actieve_curatele"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Persoon staat onder curatele als er actieve registratie is"
+
+  # Stap 3: Bepaal handelingsonbekwaamheid (curatele = handelingsonbekwaam)
+  - output: "is_handelingsonbekwaam"
+    subject: "$is_onder_curatele"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Art. 1:381 lid 1 BW: onder curatele gestelden zijn handelingsonbekwaam"
+
+  # Stap 4: Haal curator BSN op (eerste actieve curatele)
+  - output: "curator_bsn"
+    operation: COALESCE
+    values:
+      - "$actieve_curatele.bsn_curator"
+      - null
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "386"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling2_Artikel386"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=386&z=2024-01-01&g=2024-01-01"
+      explanation: "BSN van curator uit curatele registratie"
+
+  # Stap 5: Bepaal basis rechten
+  - output: "base_permissions"
+    operation: IF
+    conditions:
+      - test: "$is_handelingsonbekwaam"
+        then: "$HANDELINGSONBEKWAME_RECHTEN"
+      - else: "$VOLLEDIGE_RECHTEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 1:381 lid 1 BW: handelingsonbekwamen kunnen geen rechtshandelingen
+        zelfstandig verrichten. Zij hebben alleen leesrecht.
+
+  # Stap 6-12: Standaard delegatie interface voor SELF delegatie
+  - output: "heeft_delegaties"
+    value: true
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "Iedereen heeft een SELF delegatie"
+
+  - output: "subject_ids"
+    value:
+      - "$BSN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "BSN van de persoon zelf"
+
+  - output: "subject_names"
+    value:
+      - "Mezelf"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "Weergavenaam voor SELF delegatie"
+
+  - output: "subject_types"
+    value:
+      - "SELF"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "SELF type voor eigen zaken"
+
+  - output: "delegation_types"
+    value:
+      - "EIGEN_ZAKEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "EIGEN_ZAKEN type voor SELF delegatie"
+
+  - output: "permissions"
+    value:
+      - "$base_permissions"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Rechten afhankelijk van handelingsbekwaamheid"
+
+  - output: "valid_from_dates"
+    value:
+      - null
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "SELF delegatie heeft geen ingangsdatum"
+
+  - output: "valid_until_dates"
+    value:
+      - null
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "381"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel19_Afdeling1_Artikel381"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=381&z=2024-01-01&g=2024-01-01"
+      explanation: "SELF delegatie heeft geen einddatum"

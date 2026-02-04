@@ -1,0 +1,811 @@
+schema_version: "0.1.5"
+uuid: a611a7ea-98d5-42f5-a05c-475b1be4590e
+name: Huurtoeslag
+law: wet_op_de_huurtoeslag
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2025-01-01
+service: "TOESLAGEN"
+description: >
+  Regels voor het bepalen van het recht op en de hoogte van de huurtoeslag volgens
+  de Wet op de huurtoeslag en de Algemene wet inkomensafhankelijke regelingen (AWIR),
+  geldend voor het jaar 2025.
+legal_basis:
+  law: "Wet op de huurtoeslag"
+  bwb_id: "BWBR0008659"
+  article: "1"
+  url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf1_Artikel1"
+  juriconnect: "jci1.3:c:BWBR0008659&artikel=1&z=2025-01-01&g=2025-01-01"
+  explanation: "De Wet op de huurtoeslag regelt het recht op en de hoogte van de huurtoeslag voor huurders met een laag inkomen"
+
+references:
+  - law: "Wet op de huurtoeslag"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel2"
+  - law: "Algemene wet inkomensafhankelijke regelingen"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+  - law: "Algemene wet inkomensafhankelijke regelingen"
+    article: "5"
+    url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel5"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "6"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel6"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=6&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Het BSN is nodig voor de identificatie van de aanvrager conform artikel 6 lid 1 AWIR"
+
+  sources:
+    - name: "HUURPRIJS"
+      required: true
+      description: "Kale huurprijs"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+        wallet_attribute: "rent"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf1_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=5&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "De huurprijs is de basis voor het berekenen van de rekenhuur conform artikel 5 lid 1"
+
+    - name: "SERVICEKOSTEN"
+      required: true
+      description: "Servicekosten"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+        wallet_attribute: "service_charges"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "5"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf1_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=5&lid=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Servicekosten worden meegenomen in de rekenhuur conform artikel 5 lid 2"
+
+    - name: "SUBSIDIABELE_SERVICEKOSTEN"
+      required: true
+      description: "In aanmerking komende servicekosten"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      source_reference:
+        source_type: "claim"
+        wallet_attribute: "eligible_service_charges"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "6"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf1_Artikel6"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=6&z=2025-01-01&g=2025-01-01"
+        explanation: "Het deel van de servicekosten dat meetelt voor de huurtoeslag is geregeld in artikel 6"
+
+  input:
+    - name: "HUISHOUDLEDEN"
+      description: "Gegevens medebewoners"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "huishoudleden"
+        law: "wet_brp"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=9&z=2025-01-01&g=2025-01-01"
+        explanation: "Medebewoners beïnvloeden het recht op huurtoeslag conform artikel 9"
+
+    - name: "KINDEREN"
+      description: "Gegevens kinderen"
+      type: "array"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "kinderen"
+        law: "wet_brp"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "7"
+        paragraph: "3"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=7&lid=3&z=2025-01-01&g=2025-01-01"
+        explanation: "Kinderen bepalen mede het inkomen en de huishoudgrootte conform artikel 7 lid 3 AWIR"
+
+    - name: "PARTNER_BSN"
+      description: "BSN van de partner"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "RvIG"
+        field: "partner_bsn"
+        law: "wet_brp"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=3&z=2025-01-01&g=2025-01-01"
+        explanation: "De partner wordt gedefinieerd in artikel 3 AWIR"
+
+    - name: "PARTNER_ADRES"
+      description: "Woonadres van de partner"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "verblijfsadres"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$PARTNER_BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "3"
+        paragraph: "1"
+        sentence: "1"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Partners moeten op hetzelfde adres wonen volgens artikel 3 lid 1 onder a AWIR"
+
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "8"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=8&z=2025-01-01&g=2025-01-01"
+        explanation: "De aanvrager moet meerderjarig zijn voor recht op huurtoeslag conform artikel 8"
+
+    - name: "HEEFT_PARTNER"
+      description: "Heeft de persoon een partner"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "heeft_partner"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=3&z=2025-01-01&g=2025-01-01"
+        explanation: "Het hebben van een partner beïnvloedt de hoogte van toeslagen conform artikel 3 AWIR"
+
+    - name: "HUISHOUDGROOTTE"
+      description: "Aantal personen in huishouden"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "huishoudgrootte"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf1_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=2&z=2025-01-01&g=2025-01-01"
+        explanation: "De huishoudgrootte bepaalt of het een eenpersoons- of meerpersoonshuishouden betreft conform artikel 2"
+
+    - name: "VERBLIJFSADRES"
+      description: "Woonadres"
+      type: "string"
+      service_reference:
+        service: "RvIG"
+        field: "verblijfsadres"
+        law: "wet_brp"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=9&z=2025-01-01&g=2025-01-01"
+        explanation: "De aanvrager moet op het adres van de huurwoning staan ingeschreven conform artikel 9"
+
+    - name: "INKOMEN"
+      description: "Toetsingsinkomen"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "inkomen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=14&z=2025-01-01&g=2025-01-01"
+        explanation: "Het toetsingsinkomen bepaalt het recht op huurtoeslag conform artikel 14"
+
+    - name: "PARTNER_INKOMEN"
+      description: "Toetsingsinkomen partner"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "partner_inkomen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "7"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel7"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=7&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Het inkomen van de partner telt mee voor het toetsingsinkomen conform artikel 7 lid 1 AWIR"
+
+    - name: "VERMOGEN"
+      description: "Vermogen"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "vermogen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=8&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Het vermogen bepaalt het recht op toeslag conform artikel 8 lid 1 AWIR"
+
+    - name: "GEZAMENLIJK_VERMOGEN"
+      description: "Gezamenlijk vermogen met partner"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "gezamenlijk_vermogen"
+        law: "wet_inkomstenbelasting"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$prev_january_first"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "8"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=8&lid=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Voor partners geldt een hoger vermogensgrens conform artikel 8 lid 2 AWIR"
+
+  output:
+    - name: "is_gerechtigd"
+      description: "Voldoet aan voorwaarden voor wet_op_de_huurtoeslag"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "8"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel8"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=8&z=2025-01-01&g=2025-01-01"
+        explanation: "Het recht op huurtoeslag wordt bepaald door de voorwaarden in hoofdstuk 2"
+
+    - name: "basishuur"
+      description: "Basishuur (na aftrek minimale eigen bijdrage)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "20"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel20"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=20&z=2025-01-01&g=2025-01-01"
+        explanation: "De basishuur is de rekenhuur minus de minimale eigen bijdrage conform artikel 20"
+
+    - name: "subsidiebedrag"
+      description: "Hoogte van de wet_op_de_huurtoeslag"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet op de huurtoeslag"
+        bwb_id: "BWBR0008659"
+        article: "21"
+        url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21"
+        juriconnect: "jci1.3:c:BWBR0008659&artikel=21&z=2025-01-01&g=2025-01-01"
+        explanation: "De hoogte van de huurtoeslag wordt berekend conform artikel 21"
+
+  definitions:
+    MINIMUM_LEEFTIJD: 18  # Minimumleeftijd van 18 jaar voor huurtoeslag conform artikel 8
+    KWALITEITSKORTINGSGRENS: 47720  # Kwaliteitskortingsgrens van €477,20 conform artikel 20 lid 1
+    AFTOPPINGSGRENS_1_2: 68296  # Aftoppingsgrens van €682,96 voor 1-2 personen conform artikel 20 lid 2
+    AFTOPPINGSGRENS_3_PLUS: 73193  # Aftoppingsgrens van €731,93 voor 3+ personen conform artikel 20 lid 2
+    MAXIMALE_HUURGRENS: 90007  # Maximale huurgrens van €900,07 conform artikel 13 lid 1
+    VERMOGENSGRENS_ALLEENSTAANDE: 3695200  # Vermogensgrens van €36.952 voor alleenstaanden conform artikel 8 lid 1 AWIR
+    VERMOGENSGRENS_PARTNERS: 7390400  # Vermogensgrens van €73.904 voor partners conform artikel 8 lid 2 AWIR
+    INKOMENSGRENS_ALLEENSTAANDE: 4400000  # Praktische inkomensgrens van €44.000 voor alleenstaanden gebaseerd op artikel 14
+    INKOMENSGRENS_PARTNERS: 5400000  # Praktische inkomensgrens van €54.000 voor partners gebaseerd op artikel 14
+    SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS: 1.00  # Subsidiepercentage van 100% onder kwaliteitskortingsgrens conform artikel 21 lid 1
+    SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP: 0.65  # Subsidiepercentage van 65% tussen kwaliteitskortingsgrens en aftoppingsgrens conform artikel 21 lid 2
+    SUBSIDIEPERCENTAGE_BOVEN_AFTOP: 0.40  # Subsidiepercentage van 40% boven aftoppingsgrens conform artikel 21 lid 3
+    MINIMUM_BASISHUUR_PERCENTAGE: 0.0486  # Minimum basishuur percentage van 4,86% van inkomen conform artikel 20
+    MAXIMALE_SERVICEKOSTEN: 4800  # Maximale servicekosten van €48,00 conform artikel 6 lid 2
+    KIND_VRIJSTELLING: 543200  # Kindvrijstelling van €5.432,00 conform artikel 7 lid 3 AWIR
+    LEEFTIJDSGRENS_KIND_INKOMEN: 23  # Leeftijdsgrens van 23 jaar voor kinderen in de inkomenstoets conform artikel 7 lid 3 AWIR
+    MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE: 1800000  # Minimum inkomensijkpunt van €18.000 voor alleenstaanden conform artikel 17 lid 1
+    MINIMUM_INKOMENSIJKPUNT_PARTNERS: 2400000  # Minimum inkomensijkpunt van €24.000 voor partners conform artikel 17 lid 1
+    REFERENTIE_INKOMENSIJKPUNT_ALLEENSTAANDE: 3262500  # Referentie inkomensijkpunt van €32.625 voor alleenstaanden conform artikel 18 lid 1
+    REFERENTIE_INKOMENSIJKPUNT_PARTNERS: 4247500  # Referentie inkomensijkpunt van €42.475 voor partners conform artikel 18 lid 1
+    NORMHUUR_BIJ_MINIMUM_INKOMEN: 23801  # Normhuur van €238,01 bij minimum inkomen conform artikel 17 lid 3
+    NORMHUUR_BIJ_REFERENTIE_INKOMEN: 48378  # Normhuur van €483,78 bij referentie inkomen conform artikel 18 lid 2
+
+requirements:
+  - all:
+      # Leeftijdseis
+      - subject: "$LEEFTIJD"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_LEEFTIJD"
+        legal_basis:
+          law: "Wet op de huurtoeslag"
+          bwb_id: "BWBR0008659"
+          article: "8"
+          url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel8"
+          juriconnect: "jci1.3:c:BWBR0008659&artikel=8&z=2025-01-01&g=2025-01-01"
+          explanation: "De aanvrager moet meerderjarig zijn voor recht op huurtoeslag conform artikel 8"
+
+      # Toetsingsinkomen inclusief medebewoners en vrijstellingen kinderen
+      - operation: LESS_THAN
+        legal_basis:
+          law: "Algemene wet inkomensafhankelijke regelingen"
+          bwb_id: "BWBR0018472"
+          article: "7"
+          url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel7"
+          juriconnect: "jci1.3:c:BWBR0018472&artikel=7&z=2025-01-01&g=2025-01-01"
+          explanation: "Het toetsingsinkomen inclusief medebewoners en kinderen wordt bepaald conform artikel 7 AWIR"
+        values:
+          - operation: ADD
+            values:
+              - "$INKOMEN"
+              - "$PARTNER_INKOMEN"
+              # Tel inkomen medebewoners mee (21+ volledig, onder 21 met vrijstelling)
+              - operation: FOREACH
+                subject: "$HUISHOUDLEDEN"
+                combine: "ADD"
+                value:
+                  operation: IF
+                  conditions:
+                    - test:
+                        operation: GREATER_OR_EQUAL
+                        values:
+                          - "$leeftijd"
+                          - 21
+                      then: "$inkomen"
+                    - else:
+                        operation: SUBTRACT
+                        values:
+                          - "$inkomen"
+                          - "$KIND_VRIJSTELLING"
+              # Tel inkomen kinderen mee minus vrijstelling
+              - operation: FOREACH
+                subject: "$KINDEREN"
+                combine: "ADD"
+                value:
+                  operation: IF
+                  conditions:
+                    - test:
+                        operation: LESS_THAN
+                        values:
+                          - "$leeftijd"
+                          - "$LEEFTIJDSGRENS_KIND_INKOMEN"
+                      then:
+                        operation: SUBTRACT
+                        values:
+                          - "$inkomen"
+                          - "$KIND_VRIJSTELLING"
+                    - else: "$inkomen"
+          - operation: IF
+            conditions:
+              - test:
+                  subject: "$HEEFT_PARTNER"
+                  operation: EQUALS
+                  value: true
+                then: "$INKOMENSGRENS_PARTNERS"
+              - else: "$INKOMENSGRENS_ALLEENSTAANDE"
+
+      # Partners moeten op hetzelfde adres wonen (wet op huurtoeslag)
+      - operation: IF
+        legal_basis:
+          law: "Algemene wet inkomensafhankelijke regelingen"
+          bwb_id: "BWBR0018472"
+          article: "3"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.2_Artikel3"
+          juriconnect: "jci1.3:c:BWBR0018472&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Partners moeten op hetzelfde adres wonen volgens artikel 3 lid 1 AWIR"
+        conditions:
+          - test:
+              subject: "$HEEFT_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: EQUALS
+              values:
+                - "$VERBLIJFSADRES"
+                - "$PARTNER_ADRES"
+          - else: true
+
+      # Vermogenstoets inclusief vermogen minderjarige kinderen
+      - operation: IF
+        legal_basis:
+          law: "Algemene wet inkomensafhankelijke regelingen"
+          bwb_id: "BWBR0018472"
+          article: "8"
+          url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk1_Paragraaf1.3_Artikel8"
+          juriconnect: "jci1.3:c:BWBR0018472&artikel=8&z=2025-01-01&g=2025-01-01"
+          explanation: "De vermogenstoets wordt bepaald conform artikel 8 AWIR"
+        conditions:
+          - test:
+              subject: "$HEEFT_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: LESS_THAN
+              values:
+                - "$GEZAMENLIJK_VERMOGEN"
+                - "$VERMOGENSGRENS_PARTNERS"
+          - else:
+              operation: LESS_THAN
+              values:
+                - "$VERMOGEN"
+                - "$VERMOGENSGRENS_ALLEENSTAANDE"
+
+      # Inkomenstoets
+      - operation: IF
+        legal_basis:
+          law: "Wet op de huurtoeslag"
+          bwb_id: "BWBR0008659"
+          article: "14"
+          url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel14"
+          juriconnect: "jci1.3:c:BWBR0008659&artikel=14&z=2025-01-01&g=2025-01-01"
+          explanation: "De inkomenstoets voor huurtoeslag wordt bepaald conform artikel 14"
+        conditions:
+          - test:
+              subject: "$HEEFT_PARTNER"
+              operation: EQUALS
+              value: true
+            then:
+              operation: LESS_THAN
+              values:
+                - operation: ADD
+                  values:
+                    - "$INKOMEN"
+                    - "$PARTNER_INKOMEN"
+                - "$INKOMENSGRENS_PARTNERS"
+          - else:
+              operation: LESS_THAN
+              values:
+                - "$INKOMEN"
+                - "$INKOMENSGRENS_ALLEENSTAANDE"
+      # Huurtoets
+      - operation: LESS_THAN
+        legal_basis:
+          law: "Wet op de huurtoeslag"
+          bwb_id: "BWBR0008659"
+          article: "13"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel13"
+          juriconnect: "jci1.3:c:BWBR0008659&artikel=13&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "De maximale huurgrens voor huurtoeslag wordt bepaald conform artikel 13 lid 1"
+        values:
+          - operation: ADD
+            values:
+              - "$HUURPRIJS"
+              - operation: MIN
+                values:
+                  - "$SUBSIDIABELE_SERVICEKOSTEN"
+                  - "$MAXIMALE_SERVICEKOSTEN"
+          - "$MAXIMALE_HUURGRENS"
+
+
+actions:
+  - output: "is_gerechtigd"
+    value: true
+    legal_basis:
+      law: "Wet op de huurtoeslag"
+      bwb_id: "BWBR0008659"
+      article: "7"
+      url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf2_Artikel7"
+      juriconnect: "jci1.3:c:BWBR0008659&artikel=7&z=2025-01-01&g=2025-01-01"
+      explanation: "Het recht op huurtoeslag wordt toegekend als aan alle voorwaarden wordt voldaan conform artikel 7"
+
+  - output: "basishuur"
+    operation: IF
+    legal_basis:
+      law: "Wet op de huurtoeslag"
+      bwb_id: "BWBR0008659"
+      article: "19"
+      url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel19"
+      juriconnect: "jci1.3:c:BWBR0008659&artikel=19&z=2025-01-01&g=2025-01-01"
+      explanation: "De basishuur is gelijk aan de normhuur berekend op basis van inkomen conform artikel 19"
+    conditions:
+      # Voor inkomen <= minimum-inkomensijkpunt: vaste normhuur
+      - test:
+          operation: LESS_OR_EQUAL
+          values:
+            - operation: IF
+              conditions:
+                - test:
+                    subject: "$HEEFT_PARTNER"
+                    operation: EQUALS
+                    value: true
+                  then:
+                    operation: ADD
+                    values:
+                      - "$INKOMEN"
+                      - "$PARTNER_INKOMEN"
+                - else: "$INKOMEN"
+            - operation: IF
+              conditions:
+                - test:
+                    subject: "$HEEFT_PARTNER"
+                    operation: EQUALS
+                    value: true
+                  then: "$MINIMUM_INKOMENSIJKPUNT_PARTNERS"
+                - else: "$MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE"
+        then: "$NORMHUUR_BIJ_MINIMUM_INKOMEN"
+      # Voor inkomen > minimum-inkomensijkpunt: lineaire interpolatie tussen minimum en referentie
+      - else:
+          operation: ADD
+          values:
+            - "$NORMHUUR_BIJ_MINIMUM_INKOMEN"
+            - operation: MULTIPLY
+              values:
+                - operation: DIVIDE
+                  values:
+                    - operation: SUBTRACT
+                      values:
+                        - operation: IF
+                          conditions:
+                            - test:
+                                subject: "$HEEFT_PARTNER"
+                                operation: EQUALS
+                                value: true
+                              then:
+                                operation: ADD
+                                values:
+                                  - "$INKOMEN"
+                                  - "$PARTNER_INKOMEN"
+                            - else: "$INKOMEN"
+                        - operation: IF
+                          conditions:
+                            - test:
+                                subject: "$HEEFT_PARTNER"
+                                operation: EQUALS
+                                value: true
+                              then: "$MINIMUM_INKOMENSIJKPUNT_PARTNERS"
+                            - else: "$MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE"
+                    - operation: SUBTRACT
+                      values:
+                        - operation: IF
+                          conditions:
+                            - test:
+                                subject: "$HEEFT_PARTNER"
+                                operation: EQUALS
+                                value: true
+                              then: "$REFERENTIE_INKOMENSIJKPUNT_PARTNERS"
+                            - else: "$REFERENTIE_INKOMENSIJKPUNT_ALLEENSTAANDE"
+                        - operation: IF
+                          conditions:
+                            - test:
+                                subject: "$HEEFT_PARTNER"
+                                operation: EQUALS
+                                value: true
+                              then: "$MINIMUM_INKOMENSIJKPUNT_PARTNERS"
+                            - else: "$MINIMUM_INKOMENSIJKPUNT_ALLEENSTAANDE"
+                - operation: SUBTRACT
+                  values:
+                    - "$NORMHUUR_BIJ_REFERENTIE_INKOMEN"
+                    - "$NORMHUUR_BIJ_MINIMUM_INKOMEN"
+
+  - output: "subsidiebedrag"
+    operation: ADD
+    legal_basis:
+      law: "Wet op de huurtoeslag"
+      bwb_id: "BWBR0008659"
+      article: "21"
+      url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21"
+      juriconnect: "jci1.3:c:BWBR0008659&artikel=21&z=2025-01-01&g=2025-01-01"
+      explanation: "De hoogte van de huurtoeslag wordt berekend volgens de formule in artikel 21"
+    values:
+      # Deel onder kwaliteitskortingsgrens (100%)
+      - operation: MULTIPLY
+        legal_basis:
+          law: "Wet op de huurtoeslag"
+          bwb_id: "BWBR0008659"
+          article: "21"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21"
+          juriconnect: "jci1.3:c:BWBR0008659&artikel=21&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Voor het deel van de rekenhuur boven de basishuur tot de kwaliteitskortingsgrens bedraagt de subsidie 100% conform artikel 21 lid 1"
+        values:
+          - operation: MIN
+            values:
+              - operation: MAX
+                values:
+                  - 0
+                  - operation: SUBTRACT
+                    values:
+                      - operation: ADD  # rekenhuur
+                        values:
+                          - "$HUURPRIJS"
+                          - "$SUBSIDIABELE_SERVICEKOSTEN"
+                      - "$basishuur"
+              - operation: SUBTRACT
+                values:
+                  - "$KWALITEITSKORTINGSGRENS"
+                  - "$basishuur"
+          - "$SUBSIDIEPERCENTAGE_ONDER_KWALITEITSKORTINGSGRENS"
+
+      # Deel tussen kwaliteitskortingsgrens en aftoppingsgrens (65%)
+      - operation: MULTIPLY
+        legal_basis:
+          law: "Wet op de huurtoeslag"
+          bwb_id: "BWBR0008659"
+          article: "21"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21"
+          juriconnect: "jci1.3:c:BWBR0008659&artikel=21&lid=2&z=2025-01-01&g=2025-01-01"
+          explanation: "Voor het deel tussen kwaliteitskortingsgrens en aftoppingsgrens bedraagt de subsidie 65% conform artikel 21 lid 2"
+        values:
+          - operation: MAX
+            values:
+              - 0
+              - operation: MIN
+                values:
+                  - operation: SUBTRACT
+                    values:
+                      - operation: ADD  # rekenhuur
+                        values:
+                          - "$HUURPRIJS"
+                          - "$SUBSIDIABELE_SERVICEKOSTEN"
+                      - "$KWALITEITSKORTINGSGRENS"
+                  - operation: SUBTRACT
+                    values:
+                      - operation: IF
+                        conditions:
+                          - test:
+                              operation: LESS_OR_EQUAL
+                              values:
+                                - "$HUISHOUDGROOTTE"
+                                - 2
+                            then: "$AFTOPPINGSGRENS_1_2"
+                          - else: "$AFTOPPINGSGRENS_3_PLUS"
+                      - "$KWALITEITSKORTINGSGRENS"
+          - "$SUBSIDIEPERCENTAGE_TUSSEN_KWALITEIT_AFTOP"
+
+      # Deel boven aftoppingsgrens (40%)
+      - operation: MULTIPLY
+        legal_basis:
+          law: "Wet op de huurtoeslag"
+          bwb_id: "BWBR0008659"
+          article: "21"
+          paragraph: "3"
+          url: "https://wetten.overheid.nl/BWBR0008659/2025-01-01#Paragraaf3_Artikel21"
+          juriconnect: "jci1.3:c:BWBR0008659&artikel=21&lid=3&z=2025-01-01&g=2025-01-01"
+          explanation: "Voor het deel boven de aftoppingsgrens bedraagt de subsidie 40% conform artikel 21 lid 3"
+        values:
+          - operation: MAX
+            values:
+              - 0
+              - operation: SUBTRACT
+                values:
+                  - operation: ADD  # rekenhuur
+                    values:
+                      - "$HUURPRIJS"
+                      - "$SUBSIDIABELE_SERVICEKOSTEN"
+                  - operation: IF
+                    conditions:
+                      - test:
+                          operation: LESS_OR_EQUAL
+                          values:
+                            - "$HUISHOUDGROOTTE"
+                            - 2
+                        then: "$AFTOPPINGSGRENS_1_2"
+                      - else: "$AFTOPPINGSGRENS_3_PLUS"
+          - "$SUBSIDIEPERCENTAGE_BOVEN_AFTOP"

@@ -1,0 +1,752 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 7d4e8f2a-3b6c-4a9d-8e1f-5c2d7a9b4e3f
+name: Bijstand voor Zelfstandigen (Bbz 2004)
+law: besluit_bijstandverlening_zelfstandigen
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2025-01-01
+service: "SZW"
+description: >
+  Het Besluit bijstandverlening zelfstandigen 2004 (Bbz 2004) regelt bijstand voor zelfstandigen.
+  Er zijn vier categorieën: gevestigde zelfstandigen met een levensvatbaar bedrijf, beginnende
+  zelfstandigen na werkloosheid, oudere zelfstandigen (geboren voor 1960) met een niet-levensvatbaar
+  bedrijf, en beëindigende zelfstandigen. De bijstand kan bestaan uit algemene bijstand voor
+  levensonderhoud en/of bedrijfskapitaal in de vorm van een lening of gift.
+
+legal_basis:
+  law: "Besluit bijstandverlening zelfstandigen 2004"
+  bwb_id: "BWBR0015711"
+  article: "2"
+  url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+  juriconnect: "jci1.3:c:BWBR0015711&artikel=2&z=2025-01-01&g=2025-01-01"
+  explanation: "Artikel 2 bepaalt welke categorieën zelfstandigen in aanmerking komen voor bijstand"
+
+references:
+  - law: "Besluit bijstandverlening zelfstandigen 2004"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+  - law: "Besluit bijstandverlening zelfstandigen 2004"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3"
+  - law: "Participatiewet"
+    article: "11"
+    url: "https://wetten.overheid.nl/BWBR0015703/2025-01-01#Hoofdstuk2_Paragraaf2.2_Artikel11"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de zelfstandige"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "BSN is nodig voor identificatie van de zelfstandige"
+
+  sources:
+    - name: "BBZ_AANVRAAG"
+      description: "Aanvraaggegevens voor Bbz"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bbz_aanvraag"
+        fields: ["type_zelfstandige", "bedrijf_levensvatbaar", "jaren_ondernemerschap", "uren_per_week", "beeindigingsdatum"]
+        select_on:
+          - name: "bsn"
+            description: "BSN van de zelfstandige"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 2 bepaalt de categorieën zelfstandigen waarvoor aanvraaggegevens nodig zijn"
+
+  input:
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de zelfstandige"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "1"
+        paragraph: "1"
+        sentence: "b"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 1 lid 1 onder b definieert zelfstandige als persoon van 18 jaar tot pensioenleeftijd"
+
+    - name: "GEBOORTEDATUM"
+      description: "Geboortedatum van de zelfstandige"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "geboortedatum"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "25"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf3_Artikel25"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=25&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 25 lid 1 vereist geboren voor 1 januari 1960 voor categorie oudere zelfstandige"
+
+    - name: "PENSIOENLEEFTIJD"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "SVB"
+        field: "pensioenleeftijd"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "GEBOORTEDATUM"
+            reference: "$GEBOORTEDATUM"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "1"
+        paragraph: "1"
+        sentence: "b"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 1 lid 1 onder b bepaalt de bovengrens als de pensioengerechtigde leeftijd"
+
+    - name: "IS_ACTIEVE_ONDERNEMER"
+      description: "Is actief als ondernemer volgens KVK"
+      type: "boolean"
+      service_reference:
+        service: "KVK"
+        field: "is_actieve_ondernemer"
+        law: "handelsregisterwet"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "1"
+        paragraph: "1"
+        sentence: "b"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 1 lid 1 onder b vereist dat de persoon arbeid verricht in eigen bedrijf of beroep"
+
+    - name: "VERMOGEN"
+      description: "Eigen vermogen van de zelfstandige"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "bezittingen"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 3 lid 1 bepaalt de vermogensgrenzen voor bijstandsverlening"
+
+    - name: "HEEFT_WW_UITKERING"
+      description: "Heeft of had recent WW-uitkering"
+      type: "boolean"
+      service_reference:
+        service: "UWV"
+        field: "heeft_recht_op_ww"
+        law: "werkloosheidswet"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "23"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf2_Artikel23"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=23&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 23 lid 1 vereist werkloosheidsuitkering voor categorie beginnende zelfstandige"
+
+    - name: "BASISBEDRAG_BIJSTAND"
+      description: "Landelijke bijstandsnorm"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      service_reference:
+        service: "SZW"
+        field: "basisbedrag"
+        law: "participatiewet/bijstand"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "10"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=10&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 10 lid 1 bepaalt dat de algemene bijstand wordt bepaald volgens de Participatiewet"
+
+  output:
+    - name: "is_gerechtigd"
+      description: "Komt in aanmerking voor Bbz"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=2&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 2 bepaalt wie als zelfstandige in aanmerking komt voor bijstand"
+
+    - name: "categorie_zelfstandige"
+      description: "Categorie zelfstandige (GEVESTIGD, BEGINNEND, OUDER, BEEINDIGEND)"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "2"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=2&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 2 lid 1 onderscheidt vier categorieën zelfstandigen"
+
+    - name: "algemene_bijstand_bedrag"
+      description: "Maandelijkse algemene bijstand voor levensonderhoud"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "10"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=10&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 10 bepaalt de algemene bijstand aan zelfstandigen"
+
+    - name: "max_duur_maanden"
+      description: "Maximale duur van de bijstand in maanden"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=18&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikelen 18, 23, 25 en 27 bepalen de maximale duur per categorie"
+
+    - name: "bedrijfskapitaal_max"
+      description: "Maximaal bedrijfskapitaal waarvoor bijstand mogelijk is"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "20"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel20"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=20&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikelen 20, 24 en 26 bepalen de maximale bedrijfskapitaalbijstand per categorie"
+
+    - name: "bedrijfskapitaal_type"
+      description: "Type bijstand voor bedrijfskapitaal (LENING_RENTE, LENING_RENTELOOS, OM_NIET)"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit bijstandverlening zelfstandigen 2004"
+        bwb_id: "BWBR0015711"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0015711&artikel=14&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 14 bepaalt de vormen van bijstand (lening, borgtocht, bedrag om niet)"
+
+  definitions:
+    # Vermogensgrenzen (in eurocent) - Artikel 3
+    VERMOGENSGRENS_ALGEMEEN: 24389200      # €243.892 - algemene grens
+    VERMOGENSGRENS_OUDER: 17072500         # €170.725 - voor oudere zelfstandigen
+    VERMOGENSGRENS_LAAG: 5803500           # €58.035 - ondergrens voor 30% regel
+
+    # Bedrijfskapitaal maxima (in eurocent) - Artikelen 20, 24, 26
+    BEDRIJFSKAPITAAL_GEVESTIGD: 25342000   # €253.420 - gevestigde zelfstandigen
+    BEDRIJFSKAPITAAL_BEGINNEND: 4665600    # €46.656 - beginnende zelfstandigen
+    BEDRIJFSKAPITAAL_OUDER: 1267100        # €12.671 - oudere zelfstandigen (en om niet)
+
+    # Rente en belasting - Artikelen 6, 15
+    RENTE_PERCENTAGE: 0.08                 # 8% rente op bedrijfskapitaal lening
+    BELASTING_PERCENTAGE: 0.20             # 20% forfaitaire belasting op inkomen
+
+    # Minimaal inkomen oudere zelfstandige (in eurocent) - Artikel 25
+    MIN_INKOMEN_OUDER: 1006500             # €10.065 per jaar
+
+    # Geboortedatum criterium oudere zelfstandige - Artikel 25
+    GEBOREN_VOOR_DATUM: "1960-01-01"
+
+    # Urencriterium - Artikel 1 lid 1 onder b (verwijst naar Wet IB 2001 art. 3.6)
+    URENCRITERIUM_PER_JAAR: 1225           # minimaal 1225 uur per jaar
+
+    # Maximale duur algemene bijstand in maanden - Artikelen 18, 23, 27
+    MAX_DUUR_GEVESTIGD: 12
+    MAX_DUUR_BEGINNEND: 36
+    MAX_DUUR_BEEINDIGEND: 12
+    MAX_DUUR_OUDER: 0                      # 0 betekent onbeperkt
+
+    # Leeftijdsgrenzen
+    MINIMUM_LEEFTIJD: 18
+
+    # Categorieën
+    CATEGORIE_GEVESTIGD: "GEVESTIGD"
+    CATEGORIE_BEGINNEND: "BEGINNEND"
+    CATEGORIE_OUDER: "OUDER"
+    CATEGORIE_BEEINDIGEND: "BEEINDIGEND"
+
+    # Type bedrijfskapitaal
+    TYPE_LENING_RENTE: "LENING_RENTE"
+    TYPE_LENING_RENTELOOS: "LENING_RENTELOOS"
+    TYPE_OM_NIET: "OM_NIET"
+
+requirements:
+  - all:
+      # Basisvoorwaarde: is ondernemer
+      - subject: "$IS_ACTIEVE_ONDERNEMER"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "1"
+          paragraph: "1"
+          sentence: "b"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 1 lid 1 onder b vereist dat de persoon arbeid verricht in eigen bedrijf"
+
+      # Leeftijdseis: 18 tot pensioenleeftijd
+      - subject: "$LEEFTIJD"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_LEEFTIJD"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "1"
+          paragraph: "1"
+          sentence: "b"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 1 lid 1 onder b bepaalt minimumleeftijd van 18 jaar"
+
+      - subject: "$LEEFTIJD"
+        operation: LESS_THAN
+        value: "$PENSIOENLEEFTIJD"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "1"
+          paragraph: "1"
+          sentence: "b"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 1 lid 1 onder b bepaalt maximumleeftijd als pensioengerechtigde leeftijd"
+
+      # Urencriterium: minimaal 1225 uur per jaar (gem. 24 uur per week)
+      - operation: GREATER_OR_EQUAL
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "1"
+          paragraph: "1"
+          sentence: "b"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=1&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 1 lid 1 onder b vereist voldoen aan urencriterium (art 3.6 Wet IB 2001)"
+        values:
+          - operation: MULTIPLY
+            values:
+              - "$BBZ_AANVRAAG.uren_per_week"
+              - 52
+          - "$URENCRITERIUM_PER_JAAR"
+
+      # Vermogenstoets: verschilt per categorie
+      - or:
+          # Voor oudere zelfstandigen: lagere vermogensgrens
+          - operation: AND
+            values:
+              - subject: "$BBZ_AANVRAAG.type_zelfstandige"
+                operation: EQUALS
+                value: "OUDER"
+              - operation: LESS_OR_EQUAL
+                values:
+                  - "$VERMOGEN"
+                  - "$VERMOGENSGRENS_OUDER"
+            legal_basis:
+              law: "Besluit bijstandverlening zelfstandigen 2004"
+              bwb_id: "BWBR0015711"
+              article: "3"
+              paragraph: "2"
+              url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3"
+              juriconnect: "jci1.3:c:BWBR0015711&artikel=3&lid=2&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 3 lid 2 bepaalt vermogensgrens €170.725 voor oudere zelfstandigen"
+          # Voor overige categorieën: algemene vermogensgrens
+          - operation: LESS_OR_EQUAL
+            values:
+              - "$VERMOGEN"
+              - "$VERMOGENSGRENS_ALGEMEEN"
+            legal_basis:
+              law: "Besluit bijstandverlening zelfstandigen 2004"
+              bwb_id: "BWBR0015711"
+              article: "3"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel3"
+              juriconnect: "jci1.3:c:BWBR0015711&artikel=3&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 3 lid 1 bepaalt algemene vermogensgrens €243.892"
+
+      # Categorie-specifieke eisen
+      - or:
+          # Gevestigde zelfstandige: levensvatbaar bedrijf
+          - operation: AND
+            values:
+              - subject: "$BBZ_AANVRAAG.type_zelfstandige"
+                operation: EQUALS
+                value: "GEVESTIGD"
+              - subject: "$BBZ_AANVRAAG.bedrijf_levensvatbaar"
+                operation: EQUALS
+                value: true
+            legal_basis:
+              law: "Besluit bijstandverlening zelfstandigen 2004"
+              bwb_id: "BWBR0015711"
+              article: "18"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel18"
+              juriconnect: "jci1.3:c:BWBR0015711&artikel=18&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 18 lid 1 vereist levensvatbaar bedrijf voor gevestigde zelfstandigen"
+
+          # Beginnende zelfstandige: WW-uitkering en levensvatbaar bedrijf
+          - operation: AND
+            values:
+              - subject: "$BBZ_AANVRAAG.type_zelfstandige"
+                operation: EQUALS
+                value: "BEGINNEND"
+              - subject: "$HEEFT_WW_UITKERING"
+                operation: EQUALS
+                value: true
+              - subject: "$BBZ_AANVRAAG.bedrijf_levensvatbaar"
+                operation: EQUALS
+                value: true
+            legal_basis:
+              law: "Besluit bijstandverlening zelfstandigen 2004"
+              bwb_id: "BWBR0015711"
+              article: "23"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf2_Artikel23"
+              juriconnect: "jci1.3:c:BWBR0015711&artikel=23&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 23 lid 1 vereist WW-uitkering en levensvatbaar bedrijf voor beginnende zelfstandigen"
+
+          # Oudere zelfstandige: geboren voor 1960, niet-levensvatbaar, 10 jaar ondernemerschap
+          - operation: AND
+            values:
+              - subject: "$BBZ_AANVRAAG.type_zelfstandige"
+                operation: EQUALS
+                value: "OUDER"
+              - subject: "$GEBOORTEDATUM"
+                operation: LESS_THAN
+                value: "$GEBOREN_VOOR_DATUM"
+              - subject: "$BBZ_AANVRAAG.bedrijf_levensvatbaar"
+                operation: EQUALS
+                value: false
+              - operation: GREATER_OR_EQUAL
+                values:
+                  - "$BBZ_AANVRAAG.jaren_ondernemerschap"
+                  - 10
+            legal_basis:
+              law: "Besluit bijstandverlening zelfstandigen 2004"
+              bwb_id: "BWBR0015711"
+              article: "25"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf3_Artikel25"
+              juriconnect: "jci1.3:c:BWBR0015711&artikel=25&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 25 lid 1 stelt eisen voor oudere zelfstandigen: geboren voor 1960, niet-levensvatbaar, 10 jaar ondernemerschap"
+
+          # Beëindigende zelfstandige: beëindigt binnen 12 maanden
+          - operation: AND
+            values:
+              - subject: "$BBZ_AANVRAAG.type_zelfstandige"
+                operation: EQUALS
+                value: "BEEINDIGEND"
+              - operation: NOT_NULL
+                subject: "$BBZ_AANVRAAG.beeindigingsdatum"
+            legal_basis:
+              law: "Besluit bijstandverlening zelfstandigen 2004"
+              bwb_id: "BWBR0015711"
+              article: "27"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf4_Artikel27"
+              juriconnect: "jci1.3:c:BWBR0015711&artikel=27&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 27 lid 1 vereist beëindiging binnen 12 maanden voor beëindigende zelfstandigen"
+
+actions:
+  - output: "is_gerechtigd"
+    value: true
+    legal_basis:
+      law: "Besluit bijstandverlening zelfstandigen 2004"
+      bwb_id: "BWBR0015711"
+      article: "2"
+      url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+      juriconnect: "jci1.3:c:BWBR0015711&artikel=2&z=2025-01-01&g=2025-01-01"
+      explanation: "Als aan alle voorwaarden is voldaan, is de zelfstandige gerechtigd tot Bbz"
+
+  - output: "categorie_zelfstandige"
+    value: "$BBZ_AANVRAAG.type_zelfstandige"
+    legal_basis:
+      law: "Besluit bijstandverlening zelfstandigen 2004"
+      bwb_id: "BWBR0015711"
+      article: "2"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+      juriconnect: "jci1.3:c:BWBR0015711&artikel=2&lid=1&z=2025-01-01&g=2025-01-01"
+      explanation: "De categorie wordt overgenomen uit de aanvraag"
+
+  - output: "algemene_bijstand_bedrag"
+    value: "$BASISBEDRAG_BIJSTAND"
+    legal_basis:
+      law: "Besluit bijstandverlening zelfstandigen 2004"
+      bwb_id: "BWBR0015711"
+      article: "10"
+      url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel10"
+      juriconnect: "jci1.3:c:BWBR0015711&artikel=10&z=2025-01-01&g=2025-01-01"
+      explanation: "Artikel 10 bepaalt dat de algemene bijstand wordt vastgesteld volgens de Participatiewet"
+
+  - output: "max_duur_maanden"
+    operation: IF
+    legal_basis:
+      law: "Besluit bijstandverlening zelfstandigen 2004"
+      bwb_id: "BWBR0015711"
+      article: "18"
+      url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel18"
+      juriconnect: "jci1.3:c:BWBR0015711&artikel=18&z=2025-01-01&g=2025-01-01"
+      explanation: "De maximale duur verschilt per categorie zelfstandige"
+    conditions:
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "GEVESTIGD"
+        then: "$MAX_DUUR_GEVESTIGD"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "18"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel18"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=18&lid=2&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 18 lid 2 bepaalt maximaal 12 maanden voor gevestigde zelfstandigen"
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "BEGINNEND"
+        then: "$MAX_DUUR_BEGINNEND"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "23"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf2_Artikel23"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=23&lid=2&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 23 lid 2 bepaalt maximaal 36 maanden voor beginnende zelfstandigen"
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "OUDER"
+        then: "$MAX_DUUR_OUDER"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "25"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf3_Artikel25"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=25&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 25 lid 1 bepaalt onbeperkte duur voor oudere zelfstandigen (0 = onbeperkt)"
+      - else: "$MAX_DUUR_BEEINDIGEND"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "27"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf4_Artikel27"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=27&lid=2&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 27 lid 2 bepaalt maximaal 12 maanden voor beëindigende zelfstandigen"
+
+  - output: "bedrijfskapitaal_max"
+    operation: IF
+    legal_basis:
+      law: "Besluit bijstandverlening zelfstandigen 2004"
+      bwb_id: "BWBR0015711"
+      article: "20"
+      url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel20"
+      juriconnect: "jci1.3:c:BWBR0015711&artikel=20&z=2025-01-01&g=2025-01-01"
+      explanation: "Het maximale bedrijfskapitaal verschilt per categorie zelfstandige"
+    conditions:
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "GEVESTIGD"
+        then: "$BEDRIJFSKAPITAAL_GEVESTIGD"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "20"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf1_Artikel20"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=20&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 20 lid 1 bepaalt maximaal €253.420 voor gevestigde zelfstandigen"
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "BEGINNEND"
+        then: "$BEDRIJFSKAPITAAL_BEGINNEND"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "24"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf2_Artikel24"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=24&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 24 lid 1 bepaalt maximaal €46.656 voor beginnende zelfstandigen"
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "OUDER"
+        then: "$BEDRIJFSKAPITAAL_OUDER"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "26"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf3_Artikel26"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=26&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 26 lid 1 bepaalt maximaal €12.671 voor oudere zelfstandigen"
+      - else: 0
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "2"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=2&lid=2&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 2 lid 2 bepaalt dat beëindigende zelfstandigen geen bedrijfskapitaal krijgen"
+
+  - output: "bedrijfskapitaal_type"
+    operation: IF
+    legal_basis:
+      law: "Besluit bijstandverlening zelfstandigen 2004"
+      bwb_id: "BWBR0015711"
+      article: "14"
+      url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel14"
+      juriconnect: "jci1.3:c:BWBR0015711&artikel=14&z=2025-01-01&g=2025-01-01"
+      explanation: "Het type bedrijfskapitaal verschilt per categorie zelfstandige"
+    conditions:
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "OUDER"
+        then: "$TYPE_OM_NIET"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "26"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk3_Paragraaf3_Artikel26"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=26&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 26 lid 1 bepaalt dat oudere zelfstandigen bedrijfskapitaal om niet of renteloos krijgen"
+      - test:
+          subject: "$BBZ_AANVRAAG.type_zelfstandige"
+          operation: EQUALS
+          value: "BEEINDIGEND"
+        then: "GEEN"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "2"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk1_Artikel2"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=2&lid=2&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 2 lid 2 bepaalt dat beëindigende zelfstandigen geen bedrijfskapitaal krijgen"
+      - else: "$TYPE_LENING_RENTE"
+        legal_basis:
+          law: "Besluit bijstandverlening zelfstandigen 2004"
+          bwb_id: "BWBR0015711"
+          article: "15"
+          url: "https://wetten.overheid.nl/BWBR0015711/2025-01-01#Hoofdstuk2_Artikel15"
+          juriconnect: "jci1.3:c:BWBR0015711&artikel=15&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 15 bepaalt dat bedrijfskapitaal als rentedragende lening wordt verstrekt"
