@@ -2,6 +2,120 @@
 
 <!-- version list -->
 
+## v1.7.0 (2026-02-04)
+
+### Bug Fixes
+
+- Correct behave tag filter syntax in CI
+  ([`8b86972`](https://github.com/MinBZK/poc-machine-law/commit/8b86972d4f2ee4e9c1e063244750e199e5caf045))
+
+- Exclude @skip tagged features from demo
+  ([`f3df800`](https://github.com/MinBZK/poc-machine-law/commit/f3df800dd4b57ec4a9e5bd723f9c2450970c7c9e))
+
+- Quote tilde in behave tags to prevent shell expansion
+  ([`45f1fe6`](https://github.com/MinBZK/poc-machine-law/commit/45f1fe67c3b02eac53088e3d7e182617facef680))
+
+- Re-enable AOW-uitkering in demo, remove wildcard code
+  ([`396fa44`](https://github.com/MinBZK/poc-machine-law/commit/396fa442dfb7e4edb768588e3fd9129baa33a4ad))
+
+- Remove duplicate feature files and tag LAA
+  ([`427b5e4`](https://github.com/MinBZK/poc-machine-law/commit/427b5e480970a1a10e34920e429e4f8a692bfbec))
+
+- Skip archiefwet tests (pre-existing failures)
+  ([`460b4e4`](https://github.com/MinBZK/poc-machine-law/commit/460b4e443f7500644af39e39d63f2a7e22b8a7d5))
+
+- Skip AWB and LAA tests (incomplete step definitions)
+  ([`15ce9a3`](https://github.com/MinBZK/poc-machine-law/commit/15ce9a3f4281e2e0c1d1ac29fe1db60774652b4f))
+
+- Skip wet_adviescollege_ict_toetsing tests (incomplete step definitions)
+  ([`5e74901`](https://github.com/MinBZK/poc-machine-law/commit/5e74901a95d7bd622ffb62901935e18c4292382b))
+
+- Tag delegation and other incomplete features with @skip-go
+  ([`1ce4065`](https://github.com/MinBZK/poc-machine-law/commit/1ce406594ebf1182157fec442e69f3928258c639))
+
+- Tag imported features with @ui and @skip-go to prevent test failures
+  ([`17af3b0`](https://github.com/MinBZK/poc-machine-law/commit/17af3b0606315d5c601f7dd4644b0b6ef372b01b))
+
+- Tag laa.feature with @skip-go due to test failure
+  ([`9cbfd6c`](https://github.com/MinBZK/poc-machine-law/commit/9cbfd6cf1ce3aa6c88194c9c64a45f43446ee469))
+
+- Tag remaining kernenergiewet features with @skip-go and @skip
+  ([`67fa0d1`](https://github.com/MinBZK/poc-machine-law/commit/67fa0d17b999ce3a99b9967f76b0540e05bc1983))
+
+- Update default feature to zorgtoeslag 2025
+  ([`8e687a5`](https://github.com/MinBZK/poc-machine-law/commit/8e687a57d0489f3b66d8cc62fe748322ed60ea3f))
+
+### Chores
+
+- Pre-commit autoupdate ([#347](https://github.com/MinBZK/poc-machine-law/pull/347),
+  [`4c045f8`](https://github.com/MinBZK/poc-machine-law/commit/4c045f88dab1fbc35f6fa776265d1bd28ec5d564))
+
+- Sync VERSION file to 1.6.3
+  ([`11b7472`](https://github.com/MinBZK/poc-machine-law/commit/11b7472dbc56b745a677e1763629da12e88b1192))
+
+- **deps**: Bump github.com/bmatcuk/doublestar/v4
+  ([`5c7312f`](https://github.com/MinBZK/poc-machine-law/commit/5c7312fe84a170d9d4bd0a31ad4540db20b02859))
+
+- **deps**: Bump pandas from 2.3.3 to 3.0.0
+  ([`643fb7c`](https://github.com/MinBZK/poc-machine-law/commit/643fb7c96c764962c738dd4117901413490903d0))
+
+- **deps**: Bump the python-minor-patch group with 8 updates
+  ([`acc8114`](https://github.com/MinBZK/poc-machine-law/commit/acc8114cfc9867e821052bdf96ecb2210ba21447))
+
+- **deps**: Bump webiny/action-conventional-commits
+  ([`b113352`](https://github.com/MinBZK/poc-machine-law/commit/b113352833760b8bb2bbef5ff6208db96461b173))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([`75d6afb`](https://github.com/MinBZK/poc-machine-law/commit/75d6afbe1b028d699ba2dddfb625b190e183004f))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([`d0eb5da`](https://github.com/MinBZK/poc-machine-law/commit/d0eb5da5938051961ee3fdab307b77b9eec827fa))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([`e667fd5`](https://github.com/MinBZK/poc-machine-law/commit/e667fd5fdc2e5ad8b1ee87d025c06d6a9416e7e8))
+
+### Code Style
+
+- Apply ruff formatting to demo.py
+  ([`ba40a28`](https://github.com/MinBZK/poc-machine-law/commit/ba40a286c65de19f1a7d5c162f82c17932959ec7))
+
+### Documentation
+
+- Update README to reference local laws instead of archived submodule
+  ([`2e80fae`](https://github.com/MinBZK/poc-machine-law/commit/2e80fae963ed9a75a98da50e9eb94081d6a4e90f))
+
+### Features
+
+- Add law filtering for demo mode
+  ([`8b7e2e5`](https://github.com/MinBZK/poc-machine-law/commit/8b7e2e5869e5827b4496f2eaf1248544fb9747bd))
+
+- Add missing feature files from old submodule commit
+  ([`60d729a`](https://github.com/MinBZK/poc-machine-law/commit/60d729ac6450206fb8c9349f414a349c5df73139))
+
+- Disable Pensioenuitkering in demo mode
+  ([`64ebd7b`](https://github.com/MinBZK/poc-machine-law/commit/64ebd7baa5430390b0483871104b71da77badae9))
+
+- Enable huurtoeslag, disable all SVB laws in demo
+  ([`6f35f96`](https://github.com/MinBZK/poc-machine-law/commit/6f35f96337edec0b8afddd6e974b149f844b5f29))
+
+### Refactoring
+
+- Add enable_law/disable_law methods to FeatureFlags
+  ([`c7f45b0`](https://github.com/MinBZK/poc-machine-law/commit/c7f45b0768fb665d274adffc749735048b556a3c))
+
+- Remove law symlinks, improve path resolution
+  ([`40ca10f`](https://github.com/MinBZK/poc-machine-law/commit/40ca10f8dd6b99d9328127fb692d4923e15a329a))
+
+- Remove regelrecht-laws submodule and import content directly
+  ([`0ff8391`](https://github.com/MinBZK/poc-machine-law/commit/0ff839101f225253cd497a05610fe86ef0b3fc2b))
+
+- Use @skip tag instead of @ui for incomplete features
+  ([`e7ec892`](https://github.com/MinBZK/poc-machine-law/commit/e7ec892d2bc1335eb6e0fc335c875f42343f86d0))
+
+- Use feature flags for demo law filtering
+  ([`837ffcb`](https://github.com/MinBZK/poc-machine-law/commit/837ffcb3b4c8d1b2211154d2e8d55a61b475f3dd))
+
+
 ## v1.6.3 (2026-01-22)
 
 ### Bug Fixes
