@@ -158,7 +158,7 @@ async def workspace_laws(request: Request) -> HTMLResponse:
 @router.get("/workspace/features", response_class=HTMLResponse)
 async def workspace_features(request: Request) -> HTMLResponse:
     """Get features tab content (defaults to Zorgtoeslag feature)."""
-    feature_path = "features/TOESLAGEN-2025-01-01.feature"
+    feature_path = "features/zorgtoeslagwet_TOESLAGEN-2025-01-01.feature"
     feature_file = Path(feature_path)
 
     if not feature_file.exists():
@@ -317,7 +317,7 @@ async def get_features_api() -> JSONResponse:
 async def list_features() -> RedirectResponse:
     """Redirect to default feature."""
     return RedirectResponse(
-        url="/demo/feature/features/TOESLAGEN-2025-01-01.feature",
+        url="/demo/feature/features/zorgtoeslagwet_TOESLAGEN-2025-01-01.feature",
         status_code=302,
     )
 
