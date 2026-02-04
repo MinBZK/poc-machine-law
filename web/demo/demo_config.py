@@ -18,7 +18,6 @@ DEMO_DISABLED_LAWS = {
     "SVB": [
         "algemene_kinderbijslagwet",  # Kinderbijslag gegevens
         "algemene_nabestaandenwet",  # Anw-uitkering
-        "algemene_ouderdomswet",  # AOW-uitkering
         "algemene_ouderdomswet/leeftijdsbepaling",  # AOW leeftijdsbepaling
         "algemene_ouderdomswet_gegevens",  # AOW gegevens
         "participatiewet/aio",  # AIO-aanvulling
@@ -185,12 +184,6 @@ def configure_demo_feature_flags():
 
     for service, disabled_laws in DEMO_DISABLED_LAWS.items():
         for law in disabled_laws:
-            if law == "*":
-                # Disable all laws for this service - we'd need to discover them first
-                # For now, skip wildcard and require explicit law names
-                continue
-
-            # Use the proper method to disable the law
             FeatureFlags.disable_law(service, law)
 
 
