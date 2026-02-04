@@ -1,0 +1,616 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 8a7f3c2d-9e4b-4f5a-b8c1-2d6e9f1a3b7c
+name: Werkloosheidsuitkering
+law: werkloosheidswet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2025-01-01
+service: "UWV"
+description: >
+  Berekeningsregels voor het bepalen van het recht op en de hoogte van de werkloosheidsuitkering (WW)
+  volgens de Werkloosheidswet. De WW biedt een tijdelijke inkomensvoorziening voor werknemers die
+  werkloos worden en voldoen aan de arbeidsverledeneis. De uitkering bedraagt 75% van het dagloon
+  gedurende de eerste 2 maanden, daarna 70%, met een maximale duur van 24 maanden afhankelijk van
+  het arbeidsverleden.
+
+legal_basis:
+  law: "Werkloosheidswet"
+  bwb_id: "BWBR0004045"
+  article: "16"
+  url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01"
+  juriconnect: "jci1.3:c:BWBR0004045&z=2025-01-01&g=2025-01-01"
+  explanation: "De Werkloosheidswet regelt de uitkering bij werkloosheid voor werknemers"
+
+references:
+  - law: "Werkloosheidswet"
+    article: "16"
+    url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+  - law: "Werkloosheidswet"
+    article: "17"
+    url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel17"
+  - law: "Werkloosheidswet"
+    article: "42"
+    url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf4_Artikel42"
+  - law: "Werkloosheidswet"
+    article: "47"
+    url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf5_Artikel47"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "28"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel28"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=28&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 28 bepaalt dat gegevens over werkloosheid worden gekoppeld aan het BSN"
+
+  input:
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de werknemer"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "f"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder f sluit personen boven pensioenleeftijd uit van WW"
+
+    - name: "PENSIOENLEEFTIJD"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "pensioenleeftijd"
+        law: "algemene_ouderdomswet_gegevens"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "f"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder f bepaalt dat geen recht op WW bestaat bij het bereiken van de pensioengerechtigde leeftijd"
+
+    - name: "HEEFT_NEDERLANDSE_NATIONALITEIT"
+      description: "Heeft Nederlandse nationaliteit"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "heeft_nederlandse_nationaliteit"
+        law: "wet_brp"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "c"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder c vereist rechtmatig verblijf in Nederland voor WW"
+
+    - name: "VERBLIJFSVERGUNNING_TYPE"
+      description: "Type verblijfsvergunning"
+      type: "string"
+      service_reference:
+        service: "IND"
+        field: "verblijfsvergunning_type"
+        law: "vreemdelingenwet"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "d"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder d bepaalt dat vreemdelingen rechtmatig verblijf moeten hebben"
+
+    - name: "WOONT_IN_NEDERLAND"
+      description: "Woont in Nederland"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "woont_in_nederland"
+        law: "wet_brp"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "b"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder b sluit personen die niet in Nederland wonen uit van WW"
+
+    - name: "GEMIDDELD_ARBEIDSUREN_PER_WEEK"
+      description: "Gemiddeld aantal arbeidsuren per kalenderweek"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "gemiddeld_uren_per_week"
+        law: "uwv_werkgegevens"
+      type_spec:
+        precision: 2
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "16"
+        paragraph: "1"
+        sentence: "a"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=16&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 16 lid 1 onder a definieert werkloosheid als minimaal 5 uur minder werken dan gemiddeld"
+
+    - name: "HUIDIGE_ARBEIDSUREN_PER_WEEK"
+      description: "Huidig aantal arbeidsuren per kalenderweek"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "huidige_uren_per_week"
+        law: "uwv_werkgegevens"
+      type_spec:
+        precision: 2
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "16"
+        paragraph: "1"
+        sentence: "a"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=16&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 16 lid 1 onder a vereist dat men ten minste 5 arbeidsuren minder heeft"
+
+    - name: "GEWERKTE_WEKEN_IN_REFPERIODE"
+      description: "Aantal weken met minimaal 1 arbeidsuur in de referentieperiode van 36 weken"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "gewerkte_weken_36"
+        law: "uwv_werkgegevens"
+      type_spec:
+        precision: 0
+        min: 0
+        max: 36
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "17"
+        paragraph: "1"
+        sentence: "a"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel17"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=17&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 17 lid 1 onder a vereist minimaal 26 uit 36 weken gewerkt te hebben"
+
+    - name: "ARBEIDSVERLEDEN_JAREN"
+      description: "Aantal volledige kalenderjaren arbeidsverleden"
+      type: "number"
+      service_reference:
+        service: "UWV"
+        field: "arbeidsverleden_jaren"
+        law: "uwv_werkgegevens"
+      type_spec:
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "42"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf4_Artikel42"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=42&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 42 lid 1 bepaalt de duur van de uitkering op basis van arbeidsverleden"
+
+    - name: "JAARLOON"
+      description: "Loon verdiend in het jaar voorafgaand aan werkloosheid"
+      type: "amount"
+      service_reference:
+        service: "UWV"
+        field: "jaarloon"
+        law: "uwv_werkgegevens"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "1b"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk1_Artikel1b"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=1b&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 1b bepaalt dat het dagloon wordt berekend als 1/261 van het jaarloon"
+
+    - name: "ONTVANGT_ZIEKTEWET"
+      description: "Ontvangt uitkering op grond van de Ziektewet"
+      type: "boolean"
+      service_reference:
+        service: "UWV"
+        field: "heeft_ziektewet_uitkering"
+        law: "ziektewet"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "a"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder a sluit personen met ziektewetuitkering uit van WW"
+
+    - name: "ONTVANGT_WIA"
+      description: "Ontvangt uitkering op grond van de WIA"
+      type: "boolean"
+      service_reference:
+        service: "UWV"
+        field: "heeft_wia_uitkering"
+        law: "wet_werk_en_inkomen_naar_arbeidsvermogen"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "a"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder a sluit personen met arbeidsongeschiktheidsuitkering uit van WW"
+
+    - name: "IS_GEDETINEERD"
+      description: "Is gedetineerd of onttrokken aan de vrijheid"
+      type: "boolean"
+      service_reference:
+        service: "DJI"
+        field: "is_gedetineerd"
+        law: "penitentiaire_beginselenwet"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "19"
+        paragraph: "1"
+        sentence: "e"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 19 lid 1 onder e sluit gedetineerden uit van WW"
+
+  output:
+    - name: "heeft_recht_op_ww"
+      description: "Geeft aan of iemand recht heeft op werkloosheidsuitkering"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "16"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=16&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 16 en 17 bepalen de voorwaarden voor recht op WW"
+
+    - name: "ww_dagloon"
+      description: "Dagloon voor berekening WW-uitkering"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "1b"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk1_Artikel1b"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=1b&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 1b bepaalt dat het dagloon 1/261 van het jaarloon is"
+
+    - name: "ww_uitkering_per_maand"
+      description: "Hoogte van de WW-uitkering per maand"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "47"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf5_Artikel47"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=47&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 47 bepaalt de hoogte van de uitkering: 75% eerste 2 maanden, daarna 70%"
+
+    - name: "ww_duur_maanden"
+      description: "Duur van de WW-uitkering in maanden"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 3
+        max: 24
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "42"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf4_Artikel42"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=42&z=2025-01-01&g=2025-01-01"
+        explanation: "Artikel 42 bepaalt de duur: minimaal 3 maanden, maximaal 24 maanden, afhankelijk van arbeidsverleden"
+
+  definitions:
+    MINIMUM_LEEFTIJD: 18
+    MINIMUM_GEWERKTE_WEKEN: 26
+    REFERENTIEPERIODE_WEKEN: 36
+    MINIMUM_URENVERMINDERING: 5
+    MAXIMUM_DAGLOON: 29067  # €290,67 per 1 januari 2025
+    PERCENTAGE_EERSTE_2_MAANDEN: 0.75  # 75%
+    PERCENTAGE_DAARNA: 0.70  # 70%
+    WERKDAGEN_PER_JAAR: 261
+    WERKDAGEN_PER_MAAND: 21.75
+    MINIMUM_DUUR_MAANDEN: 3
+    MAXIMUM_DUUR_MAANDEN: 24
+    GELDIGE_VERBLIJFSVERGUNNINGEN:
+      - "PERMANENT"
+      - "EU"
+      - "FAMILY_REUNIFICATION"
+      - "WORK_PERMIT"
+
+requirements:
+  - all:
+      # Leeftijdseis
+      - subject: "$LEEFTIJD"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_LEEFTIJD"
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "16"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=16&z=2025-01-01&g=2025-01-01"
+          explanation: "Minimum leeftijd voor WW is 18 jaar"
+
+      - subject: "$LEEFTIJD"
+        operation: LESS_THAN
+        value: "$PENSIOENLEEFTIJD"
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "19"
+          paragraph: "1"
+          sentence: "f"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 19 lid 1 onder f sluit personen boven pensioenleeftijd uit"
+
+      # Werkloosheidseis
+      - operation: GREATER_OR_EQUAL
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "16"
+          paragraph: "1"
+          sentence: "a"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=16&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 16 lid 1 onder a definieert werkloosheid als minimaal 5 arbeidsuren minder"
+        values:
+          - operation: SUBTRACT
+            values:
+              - "$GEMIDDELD_ARBEIDSUREN_PER_WEEK"
+              - "$HUIDIGE_ARBEIDSUREN_PER_WEEK"
+          - "$MINIMUM_URENVERMINDERING"
+
+      # Arbeidsverledeneis
+      - subject: "$GEWERKTE_WEKEN_IN_REFPERIODE"
+        operation: GREATER_OR_EQUAL
+        value: "$MINIMUM_GEWERKTE_WEKEN"
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "17"
+          paragraph: "1"
+          sentence: "a"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel17"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=17&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 17 lid 1 onder a vereist minimaal 26 uit 36 weken gewerkt"
+
+      # Woonplaats en verblijfsrecht
+      - or:
+          - subject: "$HEEFT_NEDERLANDSE_NATIONALITEIT"
+            operation: EQUALS
+            value: true
+            legal_basis:
+              law: "Werkloosheidswet"
+              bwb_id: "BWBR0004045"
+              article: "19"
+              paragraph: "1"
+              sentence: "c"
+              url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+              juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 19 lid 1 onder c geeft Nederlanders recht op WW"
+          - operation: IN
+            subject: "$VERBLIJFSVERGUNNING_TYPE"
+            values: "$GELDIGE_VERBLIJFSVERGUNNINGEN"
+            legal_basis:
+              law: "Werkloosheidswet"
+              bwb_id: "BWBR0004045"
+              article: "19"
+              paragraph: "1"
+              sentence: "d"
+              url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+              juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+              explanation: "Artikel 19 lid 1 onder d vereist rechtmatig verblijf voor vreemdelingen"
+
+      - subject: "$WOONT_IN_NEDERLAND"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "19"
+          paragraph: "1"
+          sentence: "b"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 19 lid 1 onder b vereist woonplaats in Nederland"
+
+      # Uitsluitingsgronden
+      - subject: "$ONTVANGT_ZIEKTEWET"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "19"
+          paragraph: "1"
+          sentence: "a"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 19 lid 1 onder a sluit personen met ziektewetuitkering uit"
+
+      - subject: "$ONTVANGT_WIA"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "19"
+          paragraph: "1"
+          sentence: "a"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 19 lid 1 onder a sluit personen met arbeidsongeschiktheidsuitkering uit"
+
+      - subject: "$IS_GEDETINEERD"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Werkloosheidswet"
+          bwb_id: "BWBR0004045"
+          article: "19"
+          paragraph: "1"
+          sentence: "e"
+          url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf2_Artikel19"
+          juriconnect: "jci1.3:c:BWBR0004045&artikel=19&lid=1&z=2025-01-01&g=2025-01-01"
+          explanation: "Artikel 19 lid 1 onder e sluit gedetineerden uit"
+
+actions:
+  - output: "heeft_recht_op_ww"
+    value: true
+    legal_basis:
+      law: "Werkloosheidswet"
+      bwb_id: "BWBR0004045"
+      article: "16"
+      url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Artikel16"
+      juriconnect: "jci1.3:c:BWBR0004045&artikel=16&z=2025-01-01&g=2025-01-01"
+      explanation: "Als aan alle voorwaarden is voldaan, heeft men recht op WW"
+
+  - output: "ww_dagloon"
+    operation: MIN
+    legal_basis:
+      law: "Werkloosheidswet"
+      bwb_id: "BWBR0004045"
+      article: "1b"
+      url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk1_Artikel1b"
+      juriconnect: "jci1.3:c:BWBR0004045&artikel=1b&z=2025-01-01&g=2025-01-01"
+      explanation: "Artikel 1b bepaalt dat dagloon 1/261 van jaarloon is, met een maximum van €290,67"
+    values:
+      - operation: DIVIDE
+        values:
+          - "$JAARLOON"
+          - "$WERKDAGEN_PER_JAAR"
+      - "$MAXIMUM_DAGLOON"
+
+  - output: "ww_uitkering_per_maand"
+    operation: MULTIPLY
+    legal_basis:
+      law: "Werkloosheidswet"
+      bwb_id: "BWBR0004045"
+      article: "47"
+      url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf5_Artikel47"
+      juriconnect: "jci1.3:c:BWBR0004045&artikel=47&z=2025-01-01&g=2025-01-01"
+      explanation: "Artikel 47: eerste 2 maanden 75%, daarna 70% van dagloon * 21.75 werkdagen"
+    values:
+      - operation: MULTIPLY
+        values:
+          - "$ww_dagloon"
+          - "$PERCENTAGE_EERSTE_2_MAANDEN"
+      - "$WERKDAGEN_PER_MAAND"
+
+  - output: "ww_duur_maanden"
+    operation: MIN
+    legal_basis:
+      law: "Werkloosheidswet"
+      bwb_id: "BWBR0004045"
+      article: "42"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01#Hoofdstuk2_Paragraaf4_Artikel42"
+      juriconnect: "jci1.3:c:BWBR0004045&artikel=42&lid=1&z=2025-01-01&g=2025-01-01"
+      explanation: "Artikel 42: eerste 10 jaar 1 maand per jaar, daarna 0.5 maand per jaar, max 24 maanden"
+    values:
+      - operation: MAX
+        values:
+          - operation: IF
+            conditions:
+              - test:
+                  operation: LESS_OR_EQUAL
+                  values:
+                    - "$ARBEIDSVERLEDEN_JAREN"
+                    - 10
+                then: "$ARBEIDSVERLEDEN_JAREN"
+              - else:
+                  operation: ADD
+                  values:
+                    - 10
+                    - operation: MULTIPLY
+                      values:
+                        - operation: SUBTRACT
+                          values:
+                            - "$ARBEIDSVERLEDEN_JAREN"
+                            - 10
+                        - 0.5
+          - "$MINIMUM_DUUR_MAANDEN"
+      - "$MAXIMUM_DUUR_MAANDEN"

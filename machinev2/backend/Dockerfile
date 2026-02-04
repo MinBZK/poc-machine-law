@@ -41,7 +41,7 @@ COPY --from=builder /build/server /app/server
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY ./submodules/regelrecht-laws/laws ./app/law
+COPY ./laws ./app/laws
 COPY ./services /app/services
 
 # Set working directory

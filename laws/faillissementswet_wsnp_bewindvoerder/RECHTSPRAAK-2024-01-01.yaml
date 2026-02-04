@@ -1,0 +1,353 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 1a8ce7cd-8c96-41ae-806c-d6387e43c0dd
+name: Bepalen WSNP-bewindvoerder en vertegenwoordigingsbevoegdheid schuldsanering
+law: faillissementswet_wsnp_bewindvoerder
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2024-01-01
+service: "RECHTSPRAAK"
+discoverable: "DELEGATION_PROVIDER"
+legal_basis:
+  law: "Faillissementswet"
+  bwb_id: "BWBR0001860"
+  article: "316"
+  paragraph: "1"
+  url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+  juriconnect: "jci1.3:c:BWBR0001860&artikel=316&lid=1&z=2024-01-01&g=2024-01-01"
+  explanation: >
+    Artikel 316 lid 1 Fw bepaalt dat bij de toepassing van de schuldsaneringsregeling
+    een bewindvoerder wordt benoemd. De bewindvoerder houdt toezicht op de naleving
+    door de schuldenaar van diens verplichtingen.
+description: >
+  Bepaalt of een persoon als WSNP-bewindvoerder is benoemd voor een of meer personen
+  in de schuldsaneringsregeling natuurlijke personen (WSNP). De WSNP-bewindvoerder
+  vertegenwoordigt de BOEDEL bij vermogensrechtelijke handelingen. De saniet behoudt
+  handelingsbekwaamheid maar is beperkt in beschikking over vermogen (Art. 296 Fw).
+  Standaardduur WSNP: 18 maanden (sinds juli 2023). Data uit CIR.
+
+references:
+  - law: "Faillissementswet"
+    article: "284"
+    url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel284"
+  - law: "Faillissementswet"
+    article: "296"
+    url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel296"
+  - law: "Faillissementswet"
+    article: "316"
+    url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+  - law: "Faillissementswet"
+    article: "356"
+    url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel356"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon wiens WSNP-bewindvoerder-bevoegdheden worden opgezocht"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN identificeert de bewindvoerder in het CIR"
+
+  sources:
+    - name: "WSNP_REGISTRATIES"
+      description: "WSNP-registraties uit het Centraal Insolventieregister"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "294"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel294"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=294&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 294 Fw: schuldsaneringsregelingen worden gepubliceerd en ingeschreven
+          in het Centraal Insolventieregister (CIR).
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "wsnp_registraties"
+        fields: ["bsn_saniet", "naam_saniet", "insolventie_nummer", "datum_uitspraak", "datum_einde", "status"]
+        select_on:
+          - name: "bsn_bewindvoerder"
+            description: "BSN nummer van de WSNP-bewindvoerder"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "heeft_delegaties"
+      description: "Of de persoon delegaties heeft als WSNP-bewindvoerder"
+      type: "boolean"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "316"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=316&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 316 lid 1 Fw: De bewindvoerder houdt toezicht en beheer over de boedel.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_ids"
+      description: "BSN nummers van sanieten wiens boedel wordt beheerd"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "294"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel294"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=294&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN nummers van sanieten uit CIR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_names"
+      description: "Namen van sanieten wiens boedel wordt beheerd"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "294"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel294"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=294&z=2024-01-01&g=2024-01-01"
+        explanation: "Namen van sanieten uit CIR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_types"
+      description: "Types van de subjecten (altijd CITIZEN voor WSNP)"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "284"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel284"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=284&z=2024-01-01&g=2024-01-01"
+        explanation: "WSNP is alleen voor natuurlijke personen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "delegation_types"
+      description: "Type delegatie (WSNP_BEWINDVOERDER_BOEDEL)"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "316"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=316&z=2024-01-01&g=2024-01-01"
+        explanation: "WSNP-bewindvoerder vertegenwoordigt de schuldsaneringsboedel"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "permissions"
+      description: "Rechten per saniet (bewindvoerder krijgt volledige rechten voor boedelbeheer)"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "316"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=316&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 316 lid 1 Fw: De bewindvoerder beheer de WSNP-boedel.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_from_dates"
+      description: "Startdatum van elk bewindvoerderschap (datum toelating WSNP)"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "289"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel289"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=289&z=2024-01-01&g=2024-01-01"
+        explanation: "Datum toelating WSNP uit CIR"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_until_dates"
+      description: "Einddatum van elk bewindvoerderschap (null = nog actief)"
+      type: "array"
+      legal_basis:
+        law: "Faillissementswet"
+        bwb_id: "BWBR0001860"
+        article: "356"
+        url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel356"
+        juriconnect: "jci1.3:c:BWBR0001860&artikel=356&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 356 Fw: schuldsanering eindigt bij schone lei of beeindiging"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    # Art. 316 Fw: bewindvoerder beheert de WSNP-boedel
+    WSNP_BEWINDVOERDER_RECHTEN:
+      - "LEZEN"
+      - "CLAIMS_INDIENEN"
+      - "BESLUITEN_ONTVANGEN"
+
+requirements:
+  - operation: EXISTS
+    subject: "$WSNP_REGISTRATIES"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "294"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel294"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=294&z=2024-01-01&g=2024-01-01"
+      explanation: "Persoon moet als WSNP-bewindvoerder zijn geregistreerd in het CIR"
+
+actions:
+  # Stap 1: Filter op actieve WSNP-regelingen
+  - output: "actieve_wsnp"
+    operation: FOREACH
+    subject: "$WSNP_REGISTRATIES"
+    where:
+      operation: AND
+      values:
+        - operation: EQUALS
+          subject: "$current.status"
+          value: "ACTIEF"
+        - operation: OR
+          values:
+            - operation: IS_NULL
+              subject: "$current.datum_einde"
+            - operation: EQUALS
+              subject: "$current.datum_einde"
+              value: ""
+            - operation: GREATER_THAN
+              values:
+                - "$current.datum_einde"
+                - "$calculation_date"
+    value: "$current"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "356"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel356"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=356&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Alleen actieve WSNP-regelingen geven bewindvoerderbevoegdheid.
+        Art. 356 Fw: schuldsanering eindigt bij schone lei of beeindiging.
+
+  # heeft_delegaties: boolean indicating if person has any delegations
+  - output: "heeft_delegaties"
+    operation: EXISTS
+    subject: "$actieve_wsnp"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "316"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=316&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 316 Fw bepaalt dat de bewindvoerder de WSNP-boedel beheert.
+
+  # subject_ids: BSN numbers of sanieten
+  - output: "subject_ids"
+    subject: "$actieve_wsnp.bsn_saniet"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "294"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel294"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=294&z=2024-01-01&g=2024-01-01"
+      explanation: "BSN nummers van sanieten uit CIR registratie"
+
+  # subject_names: names with "WSNP Boedel" prefix
+  - output: "subject_names"
+    operation: FOREACH
+    subject: "$actieve_wsnp"
+    value:
+      operation: CONCAT
+      values:
+        - "WSNP Boedel "
+        - "$current.naam_saniet"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "316"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=316&z=2024-01-01&g=2024-01-01"
+      explanation: "Namen met 'WSNP Boedel' prefix om boedelvertegenwoordiging aan te geven"
+
+  # subject_types: constant "CITIZEN" for WSNP (only natural persons)
+  - output: "subject_types"
+    operation: FOREACH
+    subject: "$actieve_wsnp"
+    value: "CITIZEN"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "284"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel284"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=284&z=2024-01-01&g=2024-01-01"
+      explanation: "WSNP is alleen voor natuurlijke personen, altijd CITIZEN"
+
+  # delegation_types: constant "WSNP_BEWINDVOERDER_BOEDEL"
+  - output: "delegation_types"
+    operation: FOREACH
+    subject: "$actieve_wsnp"
+    value: "WSNP_BEWINDVOERDER_BOEDEL"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "316"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=316&z=2024-01-01&g=2024-01-01"
+      explanation: "Type delegatie is WSNP_BEWINDVOERDER_BOEDEL voor WSNP-bewindvoerder"
+
+  # permissions: full permissions for estate management
+  - output: "permissions"
+    operation: FOREACH
+    subject: "$actieve_wsnp"
+    value: "$WSNP_BEWINDVOERDER_RECHTEN"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "316"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel316"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=316&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 316 lid 1 Fw: De bewindvoerder beheert de WSNP-boedel.
+
+  # valid_from_dates: date of WSNP admission
+  - output: "valid_from_dates"
+    subject: "$actieve_wsnp.datum_uitspraak"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "289"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel289"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=289&z=2024-01-01&g=2024-01-01"
+      explanation: "Datum toelating WSNP uit CIR"
+
+  # valid_until_dates: end date (null if still active)
+  - output: "valid_until_dates"
+    subject: "$actieve_wsnp.datum_einde"
+    legal_basis:
+      law: "Faillissementswet"
+      bwb_id: "BWBR0001860"
+      article: "356"
+      url: "https://wetten.overheid.nl/BWBR0001860/2024-01-01#TiteldeelIII_Artikel356"
+      juriconnect: "jci1.3:c:BWBR0001860&artikel=356&z=2024-01-01&g=2024-01-01"
+      explanation: "Einddatum WSNP, null indien nog actief"

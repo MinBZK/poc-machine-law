@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LawBaseDir = "law"
+	LawBaseDir = "laws"
 )
 
 var (
@@ -45,7 +45,18 @@ type RuleResolver interface {
 // New creates a new rule resolver
 func New() (resolver *RuleResolve, err error) {
 	once.Do(func() {
-		ruleSpec, lawsByService, discoverableLawsByService, err = rulesLoad(LawBaseDir)
+		// Try to find the laws directory - could be relative to current dir or parent dir
+		lawDir := LawBaseDir
+		if _, statErr := os.Stat(lawDir); os.IsNotExist(statErr) {
+			// Try parent directory (for when running from features/ dir)
+			lawDir = filepath.Join("..", LawBaseDir)
+			if _, statErr := os.Stat(lawDir); os.IsNotExist(statErr) {
+				err = fmt.Errorf("laws directory not found at %s or ../%s", LawBaseDir, LawBaseDir)
+				return
+			}
+		}
+
+		ruleSpec, lawsByService, discoverableLawsByService, err = rulesLoad(lawDir)
 		if err != nil {
 			return
 		}

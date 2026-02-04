@@ -1,0 +1,196 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 5f9d3e7a-4c8b-4e1f-9a6c-3d7e8f2a5b4c
+name: BRP Terugmeldplicht Dienst Toeslagen
+law: wet_brp/terugmelding
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2023-05-15
+service: "TOESLAGEN"
+legal_basis:
+  law: "Wet basisregistratie personen"
+  bwb_id: "BWBR0033715"
+  article: "2.34"
+  url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+  juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+  explanation: "Artikel 2.34 verplicht bestuursorganen gerede twijfel over BRP-gegevens te melden via de terugmeldvoorziening"
+description: >
+  Dienst Toeslagen heeft een wettelijke verplichting om twijfel over de juistheid van
+  adresgegevens in de BRP te melden. Dit gebeurt via de Terugmeldvoorziening (TMV) naar
+  gemeenten. Dienst Toeslagen ontdekt afwijkingen bij toekenning van toeslagen zoals
+  huurtoeslag, zorgtoeslag en kinderopvangtoeslag.
+
+references:
+  - law: "Wet BRP"
+    article: "2.34"
+    url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+  - law: "Besluit BRP"
+    article: "28"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.5_Artikel28"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon (optioneel bij adresgerichte controles)"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.34"
+        url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+        explanation: "Artikel 2.34 vereist identificatie van persoon bij terugmelding"
+
+    - name: "ADRES"
+      description: "Adresgegevens die mogelijk onjuist zijn"
+      type: "object"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.34"
+        url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+        explanation: "Artikel 2.34 vereist specificatie van het adresgegeven waarover twijfel bestaat"
+
+  sources:
+    - name: "TOESLAG_ADRES"
+      description: "Adres bekend bij Dienst Toeslagen voor toeslagverstrekking"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "toeslagen_adressen"
+        fields: ["postcode", "huisnummer", "straat", "woonplaats"]
+        select_on:
+          - name: "bsn"
+            description: "BSN van de toeslagontvanger"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "7"
+        url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Artikel7"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=7&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 7 Awir verplicht opgave van adresgegevens voor toeslagverstrekking"
+
+    - name: "TOESLAGEN_ONDERZOEK"
+      description: "Uitkomst adresonderzoek door Dienst Toeslagen"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "toeslagen_adresonderzoek"
+        fields: ["onderzoek_datum", "onderzoek_uitkomst", "adres_geverifieerd"]
+        select_on:
+          - name: "bsn"
+            description: "BSN van de toeslagontvanger"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Artikel18"
+        juriconnect: "jci1.3:c:BWBR0018472&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 Awir bepaalt controle en onderzoek door Dienst Toeslagen"
+
+  output:
+    - name: "heeft_gerede_twijfel_adres"
+      description: "Of er gerede twijfel bestaat over juistheid adresgegevens"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.34"
+        url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+        explanation: "Artikel 2.34 verplicht melding bij gerede twijfel over adresgegevens"
+
+    - name: "twijfel_reden"
+      description: "Reden van twijfel over adresgegevens"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.5_Artikel28"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28 Besluit BRP regelt de terugmeldvoorziening en vereist onderbouwing"
+
+  definitions:
+    TWIJFEL_ADRES_AFWIJKING: "Adres bij Dienst Toeslagen wijkt af van BRP"
+    TWIJFEL_ONDERZOEK: "Adresonderzoek Toeslagen bevestigt adres niet"
+
+requirements:
+  - all:
+      - subject: "$ADRES"
+        operation: NOT_NULL
+
+actions:
+  - output: "heeft_gerede_twijfel_adres"
+    operation: OR
+    values:
+      # Reden 1: Adres wijkt af van toeslagadres
+      - operation: NOT_EQUALS
+        values:
+          - "$ADRES"
+          - "$TOESLAG_ADRES"
+        legal_basis:
+          law: "Wet basisregistratie personen"
+          bwb_id: "BWBR0033715"
+          article: "2.34"
+          url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+          juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+          explanation: "Afwijkend adres levert gerede twijfel op"
+      # Reden 2: Onderzoek kon adres niet bevestigen
+      - subject: "$TOESLAGEN_ONDERZOEK.adres_geverifieerd"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Wet basisregistratie personen"
+          bwb_id: "BWBR0033715"
+          article: "2.34"
+          url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+          juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+          explanation: "Niet-geverifieerd adres levert gerede twijfel op"
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.34"
+      url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+      explanation: "Artikel 2.34 verplicht melding bij gerede twijfel"
+
+  - output: "twijfel_reden"
+    operation: IF
+    conditions:
+      - test:
+          operation: NOT_EQUALS
+          values:
+            - "$ADRES"
+            - "$TOESLAG_ADRES"
+        then: "$TWIJFEL_ADRES_AFWIJKING"
+      - test:
+          subject: "$TOESLAGEN_ONDERZOEK.adres_geverifieerd"
+          operation: EQUALS
+          value: false
+        then: "$TWIJFEL_ONDERZOEK"
+      - else: null
+    legal_basis:
+      law: "Besluit basisregistratie personen"
+      bwb_id: "BWBR0034306"
+      article: "28"
+      url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.5_Artikel28"
+      juriconnect: "jci1.3:c:BWBR0034306&artikel=28&z=2024-04-01&g=2024-04-01"
+      explanation: "Artikel 28 vereist specificatie van reden bij terugmelding"

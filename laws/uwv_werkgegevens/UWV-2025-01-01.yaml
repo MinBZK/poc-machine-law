@@ -1,0 +1,134 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 7e3f6b1c-8d2a-4e9b-9c5d-3a8f7b2e6d4a
+name: UWV Werkgegevens
+law: uwv_werkgegevens
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2020-01-01
+service: "UWV"
+description: >
+  Werkgegevens van werknemers zoals geadministreerd door UWV voor de uitvoering van
+  werknemersverzekeringen zoals WW, ZW, en WIA.
+
+legal_basis:
+  law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+  bwb_id: "BWBR0013060"
+  article: "54"
+  url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01#Hoofdstuk5_Paragraaf5.2_Artikel54"
+  juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+  explanation: "UWV verwerkt werkgegevens voor de uitvoering van werknemersverzekeringen"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de werknemer"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "WERKGEGEVENS"
+      description: "Werkgegevens van de werknemer"
+      type: "object"
+      legal_basis:
+        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+        bwb_id: "BWBR0013060"
+        article: "54"
+        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+        explanation: "UWV administreert werkgegevens voor WW en andere uitkeringen"
+      source_reference:
+        table: "uwv_werkgegevens"
+        fields: ["gemiddeld_uren_per_week", "huidige_uren_per_week", "gewerkte_weken_36", "arbeidsverleden_jaren", "jaarloon"]
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de werknemer"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "gemiddeld_uren_per_week"
+      description: "Gemiddeld aantal gewerkte uren per week in de referteperiode"
+      type: "number"
+      type_spec:
+        precision: 1
+        min: 0
+        max: 80
+      legal_basis:
+        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+        bwb_id: "BWBR0013060"
+        article: "54"
+        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+        explanation: "UWV administreert gewerkte uren voor WW-berekeningen"
+
+    - name: "huidige_uren_per_week"
+      description: "Huidig aantal gewerkte uren per week"
+      type: "number"
+      type_spec:
+        precision: 1
+        min: 0
+        max: 80
+      legal_basis:
+        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+        bwb_id: "BWBR0013060"
+        article: "54"
+        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+        explanation: "Voor deeltijdwerkloosheid"
+
+    - name: "gewerkte_weken_36"
+      description: "Aantal gewerkte weken in de afgelopen 36 weken"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 0
+        max: 36
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "17a"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=17a&z=2025-01-01&g=2025-01-01"
+        explanation: "Refertetermijn is 36 weken volgens artikel 17a WW"
+
+    - name: "arbeidsverleden_jaren"
+      description: "Aantal jaren arbeidsverleden"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "42"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=42&z=2025-01-01&g=2025-01-01"
+        explanation: "Duur van WW hangt af van arbeidsverleden volgens artikel 42 WW"
+
+    - name: "jaarloon"
+      description: "Jaarloon in eurocenten"
+      type: "amount"
+      legal_basis:
+        law: "Werkloosheidswet"
+        bwb_id: "BWBR0004045"
+        article: "45"
+        url: "https://wetten.overheid.nl/BWBR0004045/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0004045&artikel=45&z=2025-01-01&g=2025-01-01"
+        explanation: "Hoogte WW is gebaseerd op het dagloon afgeleid van het jaarloon"
+
+actions:
+  - output: "gemiddeld_uren_per_week"
+    value: "$WERKGEGEVENS.gemiddeld_uren_per_week"
+
+  - output: "huidige_uren_per_week"
+    value: "$WERKGEGEVENS.huidige_uren_per_week"
+
+  - output: "gewerkte_weken_36"
+    value: "$WERKGEGEVENS.gewerkte_weken_36"
+
+  - output: "arbeidsverleden_jaren"
+    value: "$WERKGEGEVENS.arbeidsverleden_jaren"
+
+  - output: "jaarloon"
+    value: "$WERKGEGEVENS.jaarloon"

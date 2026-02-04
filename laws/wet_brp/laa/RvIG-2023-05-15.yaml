@@ -1,0 +1,407 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 7f3e9a2b-5c4d-4e8f-9b1a-3d6c8f2e4a5b
+name: Landelijke Aanpak Adreskwaliteit (LAA)
+law: wet_brp/laa
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2023-05-15
+service: "RvIG"
+legal_basis:
+  law: "Besluit basisregistratie personen"
+  bwb_id: "BWBR0034306"
+  article: "28a"
+  url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28a"
+  juriconnect: "jci1.3:c:BWBR0034306&artikel=28a&z=2024-04-01&g=2024-04-01"
+  explanation: "Artikel 28a bepaalt de analysemethoden waarmee de minister gemeenten ondersteunt bij onderzoek naar juistheid van adresgegevens in de BRP"
+description: >
+  De Landelijke Aanpak Adreskwaliteit (LAA) regelt de ondersteuning door de minister van BZK aan
+  gemeenten bij het onderzoeken van de juistheid van adresgegevens in de Basisregistratie Personen.
+  De minister gebruikt analysemethoden (meldingen van Belastingdienst, Toeslagen en CJIB; profielen
+  op basis van BRP en BAG data) om signalen te genereren over mogelijk onjuiste adresregistraties.
+  Gemeenten zijn verplicht binnen 4 weken te reageren en binnen 6 maanden onderzoek af te ronden.
+
+references:
+  - law: "Besluit BRP"
+    article: "28a"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28a"
+  - law: "Besluit BRP"
+    article: "28b"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+  - law: "Besluit BRP"
+    article: "28c"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28c"
+  - law: "Besluit BRP"
+    article: "28d"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28d"
+  - law: "Besluit BRP"
+    article: "28e"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28e"
+  - law: "Besluit BRP"
+    article: "28f"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f"
+  - law: "Besluit BRP"
+    article: "28g"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28g"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon voor wie adres gecontroleerd wordt (optioneel, vereist bij persoonsgerichte meldingen)"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28f"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28f&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28f bepaalt dat signalen BSN bevatten bij persoonsgerichte meldingen"
+
+    - name: "ADRES"
+      description: "Adresgegevens voor LAA analyse"
+      type: "object"
+      required: true
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28f"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28f&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28f bepaalt dat signalen gemeente- en adresgegevens bevatten"
+
+  sources:
+    - name: "AANTAL_BEWONERS"
+      description: "Aantal geregistreerde bewoners op adres uit BRP"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "brp_adressen"
+        field: "aantal_bewoners"
+        select_on:
+          - name: "postcode"
+            description: "Postcode van het adres"
+            type: "string"
+            value: "$ADRES.postcode"
+          - name: "huisnummer"
+            description: "Huisnummer van het adres"
+            type: "string"
+            value: "$ADRES.huisnummer"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28e"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28e"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28e&lid=1&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28e lid 1 bepaalt dat woonsamenstellingsgegevens mogen worden verwerkt"
+
+  input:
+    # Meldingen van externe instanties (Art. 28a, 28b)
+    - name: "BELASTINGDIENST_TWIJFEL"
+      description: "Terugmelding Belastingdienst over adres"
+      type: "boolean"
+      service_reference:
+        service: "BELASTINGDIENST"
+        law: "wet_brp/terugmelding"
+        field: "heeft_gerede_twijfel_adres"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+          - name: "ADRES"
+            reference: "$ADRES"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28b"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28b&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28b bepaalt dat meldingen van bestuursorganen worden geanalyseerd"
+
+    - name: "TOESLAGEN_TWIJFEL"
+      description: "Terugmelding Dienst Toeslagen over adres"
+      type: "boolean"
+      service_reference:
+        service: "TOESLAGEN"
+        law: "wet_brp/terugmelding"
+        field: "heeft_gerede_twijfel_adres"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+          - name: "ADRES"
+            reference: "$ADRES"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28b"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28b&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28b bepaalt dat meldingen van bestuursorganen worden geanalyseerd"
+
+    - name: "CJIB_TWIJFEL"
+      description: "Terugmelding CJIB over adres (OBR profiel)"
+      type: "boolean"
+      service_reference:
+        service: "CJIB"
+        law: "wet_brp/terugmelding"
+        field: "heeft_gerede_twijfel_adres"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+          - name: "ADRES"
+            reference: "$ADRES"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28b"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28b&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28b bepaalt dat meldingen van bestuursorganen worden geanalyseerd"
+
+    # BAG data voor profielen (Art. 28c, 28e)
+    - name: "BAG_GEBRUIKSDOEL"
+      description: "Gebruiksdoel van verblijfsobject volgens BAG"
+      type: "string"
+      service_reference:
+        service: "KADASTER"
+        law: "wet_bag"
+        field: "gebruiksdoel"
+        parameters:
+          - name: "ADRES"
+            reference: "$ADRES"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28e"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28e"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28e&lid=2&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28e lid 2 bepaalt dat gegevens over gebruik van panden mogen worden verwerkt"
+
+    - name: "BAG_IS_WOONFUNCTIE"
+      description: "Of verblijfsobject woonfunctie heeft volgens BAG"
+      type: "boolean"
+      service_reference:
+        service: "KADASTER"
+        law: "wet_bag"
+        field: "is_woonfunctie"
+        parameters:
+          - name: "ADRES"
+            reference: "$ADRES"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28e"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28e"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28e&lid=2&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28e lid 2 bepaalt dat gegevens over gebruik van panden mogen worden verwerkt"
+
+  output:
+    - name: "genereer_signaal"
+      description: "Of er een signaal naar de gemeente moet worden gestuurd over mogelijk onjuiste adresregistratie"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28f"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28f&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28f bepaalt dat de minister signalen verstrekt aan colleges over adresgegevens waarbij gerede twijfel bestaat"
+
+    - name: "signaal_type"
+      description: "Type signaal: MELDING of PROFIEL"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28a"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28a"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28a&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28a bepaalt analysemethoden: meldingen en profielen (patroononderzoek leidt niet tot signalen)"
+
+    - name: "reactietermijn_weken"
+      description: "Termijn waarbinnen gemeente moet reageren (in weken)"
+      type: "number"
+      type_spec:
+        unit: "weeks"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28g"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28g"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28g&lid=1&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28g lid 1 bepaalt dat het college binnen vier weken moet aangeven of het signaal tot aanpassing heeft geleid"
+
+    - name: "onderzoekstermijn_maanden"
+      description: "Maximale termijn voor afronding onderzoek (in maanden)"
+      type: "number"
+      type_spec:
+        unit: "months"
+        precision: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28g"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28g"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28g&lid=2&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28g lid 2 bepaalt dat onderzoek binnen zes maanden moet worden afgerond"
+
+  definitions:
+    HOOG_BEWONERS_DREMPEL: 5
+    REACTIETERMIJN_WEKEN: 4
+    ONDERZOEKSTERMIJN_MAANDEN: 6
+
+requirements:
+  - all:
+      - subject: "$ADRES"
+        operation: NOT_NULL
+        legal_basis:
+          law: "Besluit basisregistratie personen"
+          bwb_id: "BWBR0034306"
+          article: "28f"
+          url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f"
+          juriconnect: "jci1.3:c:BWBR0034306&artikel=28f&z=2024-04-01&g=2024-04-01"
+          explanation: "Artikel 28f vereist minimaal adresgegevens voor signalering"
+
+actions:
+  - output: "genereer_signaal"
+    operation: OR
+    values:
+      # Methode 1: Analyse van meldingen (Art. 28a, 28b)
+      - subject: "$BELASTINGDIENST_TWIJFEL"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Besluit basisregistratie personen"
+          bwb_id: "BWBR0034306"
+          article: "28b"
+          url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+          juriconnect: "jci1.3:c:BWBR0034306&artikel=28b&z=2024-04-01&g=2024-04-01"
+          explanation: "Melding Belastingdienst genereert signaal"
+      - subject: "$TOESLAGEN_TWIJFEL"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Besluit basisregistratie personen"
+          bwb_id: "BWBR0034306"
+          article: "28b"
+          url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+          juriconnect: "jci1.3:c:BWBR0034306&artikel=28b&z=2024-04-01&g=2024-04-01"
+          explanation: "Melding Toeslagen genereert signaal"
+      - subject: "$CJIB_TWIJFEL"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Besluit basisregistratie personen"
+          bwb_id: "BWBR0034306"
+          article: "28b"
+          url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28b"
+          juriconnect: "jci1.3:c:BWBR0034306&artikel=28b&z=2024-04-01&g=2024-04-01"
+          explanation: "Melding CJIB genereert signaal"
+
+      # Methode 2: Profielanalyse (Art. 28a, 28c)
+      - operation: AND
+        values:
+          - operation: GREATER_THAN
+            values:
+              - "$AANTAL_BEWONERS"
+              - "$HOOG_BEWONERS_DREMPEL"
+            legal_basis:
+              law: "Besluit basisregistratie personen"
+              bwb_id: "BWBR0034306"
+              article: "28c"
+              url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28c"
+              juriconnect: "jci1.3:c:BWBR0034306&artikel=28c&z=2024-04-01&g=2024-04-01"
+              explanation: "Hoog aantal bewoners is selectiefactor in profiel"
+          - subject: "$BAG_IS_WOONFUNCTIE"
+            operation: EQUALS
+            value: false
+            legal_basis:
+              law: "Besluit basisregistratie personen"
+              bwb_id: "BWBR0034306"
+              article: "28c"
+              url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28c"
+              juriconnect: "jci1.3:c:BWBR0034306&artikel=28c&z=2024-04-01&g=2024-04-01"
+              explanation: "Bewoners op niet-woonfunctie is selectiefactor in profiel"
+        legal_basis:
+          law: "Besluit basisregistratie personen"
+          bwb_id: "BWBR0034306"
+          article: "28a"
+          url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28a"
+          juriconnect: "jci1.3:c:BWBR0034306&artikel=28a&z=2024-04-01&g=2024-04-01"
+          explanation: "Artikel 28a bepaalt analyse met profielen als methode"
+    legal_basis:
+      law: "Besluit basisregistratie personen"
+      bwb_id: "BWBR0034306"
+      article: "28f"
+      url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28f"
+      juriconnect: "jci1.3:c:BWBR0034306&artikel=28f&z=2024-04-01&g=2024-04-01"
+      explanation: "Artikel 28f bepaalt verstrekking van signalen aan colleges"
+
+  - output: "signaal_type"
+    operation: IF
+    conditions:
+      - test:
+          operation: OR
+          values:
+            - subject: "$BELASTINGDIENST_TWIJFEL"
+              operation: EQUALS
+              value: true
+            - subject: "$TOESLAGEN_TWIJFEL"
+              operation: EQUALS
+              value: true
+            - subject: "$CJIB_TWIJFEL"
+              operation: EQUALS
+              value: true
+        then: "MELDING"
+      - else: "PROFIEL"
+    legal_basis:
+      law: "Besluit basisregistratie personen"
+      bwb_id: "BWBR0034306"
+      article: "28a"
+      url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28a"
+      juriconnect: "jci1.3:c:BWBR0034306&artikel=28a&z=2024-04-01&g=2024-04-01"
+      explanation: "Artikel 28a onderscheidt meldingen en profielen (patroononderzoek leidt niet tot signaal)"
+
+  - output: "reactietermijn_weken"
+    value: "$REACTIETERMIJN_WEKEN"
+    legal_basis:
+      law: "Besluit basisregistratie personen"
+      bwb_id: "BWBR0034306"
+      article: "28g"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28g"
+      juriconnect: "jci1.3:c:BWBR0034306&artikel=28g&lid=1&z=2024-04-01&g=2024-04-01"
+      explanation: "Artikel 28g lid 1 bepaalt vier weken reactietermijn"
+
+  - output: "onderzoekstermijn_maanden"
+    value: "$ONDERZOEKSTERMIJN_MAANDEN"
+    legal_basis:
+      law: "Besluit basisregistratie personen"
+      bwb_id: "BWBR0034306"
+      article: "28g"
+      paragraph: "2"
+      url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.6_Artikel28g"
+      juriconnect: "jci1.3:c:BWBR0034306&artikel=28g&lid=2&z=2024-04-01&g=2024-04-01"
+      explanation: "Artikel 28g lid 2 bepaalt zes maanden onderzoekstermijn"

@@ -1,0 +1,840 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f
+name: Terrasvergunning APV Rotterdam 2024
+law: algemene_plaatselijke_verordening/terrassen
+law_type: "GEMEENTELIJKE_VERORDENING"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "BUSINESS"
+requires_manual_approval: true
+valid_from: 2024-01-01
+service: "GEMEENTE_ROTTERDAM"
+legal_basis:
+  law: "Algemene plaatselijke verordening Rotterdam 2012"
+  article: "2:30b"
+  url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+  explanation: "Artikel 2:30b bepaalt de voorwaarden voor het exploiteren van een terras bij een horecabedrijf"
+description: >
+  Regels voor het verkrijgen van een terrasvergunning voor horecabedrijven in Rotterdam volgens de APV Rotterdam 2012.
+  Een terrasvergunning is vereist voor het plaatsen van een terras bij een horecabedrijf. De vergunning
+  wordt alleen verleend indien het horecabedrijf over een geldige exploitatievergunning beschikt.
+  De vergunning stelt eisen aan de locatie (obstakelvrije ruimte, BGT-oppervlak), het seizoen,
+  openingstijden en precariobelasting.
+
+references:
+  - law: "Algemene plaatselijke verordening Rotterdam 2012"
+    article: "2:10"
+    url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+    explanation: "Voorwerpen op of aan de weg (algemeen)"
+  - law: "Algemene plaatselijke verordening Rotterdam 2012"
+    article: "2:28"
+    url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+    explanation: "Exploitatievergunning horecabedrijf (voorwaarde voor terras)"
+  - law: "Terrassenbeleid Rotterdam 2023"
+    article: "Geheel"
+    url: "https://lokaleregelgeving.overheid.nl/CVDR717301/1"
+    explanation: "Beleidskader voor terrassen in Rotterdam"
+  - law: "Verordening precariobelasting Rotterdam 2024"
+    article: "2"
+    url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
+    explanation: "Precariobelasting voor gebruik van gemeentegrond voor terrassen"
+  - law: "Alcoholwet"
+    bwb_id: "BWBR0002458"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0002458/2025-02-12#Paragraaf2_Artikel3"
+    explanation: "Voor het schenken van alcohol op het terras is een alcoholvergunning vereist"
+
+properties:
+  parameters:
+    - name: "KVK_NUMMER"
+      description: "KVK-nummer van de onderneming"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:28"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De onderneming moet geregistreerd zijn in het Handelsregister"
+
+    - name: "TERRAS_LOCATIE"
+      description: "Beoogde locatie van het terras"
+      type: "enum"
+      type_spec:
+        enum: ["voor", "zij", "achter"]
+        enum_labels:
+          voor: "Voor het pand"
+          zij: "Aan de zijkant"
+          achter: "Achter het pand"
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        paragraph: "1"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De locatie van het terras bepaalt welke voorwaarden van toepassing zijn"
+
+    - name: "TERRAS_OPPERVLAKTE"
+      description: "Gewenste oppervlakte van het terras in vierkante meters (opgegeven door aanvrager)"
+      type: "number"
+      type_spec:
+        precision: 2
+        min: 0
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De oppervlakte van het terras moet worden opgegeven voor de vergunning en precarioberekening"
+
+    - name: "OBSTAKELVRIJE_RUIMTE"
+      description: "Obstakelvrije ruimte naast het terras in meters (opgegeven door aanvrager, geverifieerd door gemeente bij inspectie)"
+      type: "number"
+      type_spec:
+        precision: 2
+        min: 0
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        paragraph: "3"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Er moet minimaal 1,8 meter obstakelvrije ruimte blijven voor voetgangers. De aanvrager geeft dit op bij de aanvraag; de gemeente verifieert dit bij inspectie ter plaatse"
+
+    - name: "SEIZOEN"
+      description: "Seizoen waarvoor het terras wordt aangevraagd"
+      type: "enum"
+      type_spec:
+        enum: ["jaarrond", "zomer", "winter"]
+        enum_labels:
+          jaarrond: "Jaarrond"
+          zomer: "Zomerseizoen (1 maart - 1 november)"
+          winter: "Winterseizoen (1 november - 1 maart)"
+      required: true
+      legal_basis:
+        law: "Terrassenbeleid Rotterdam 2023"
+        article: "4"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR717301/1"
+        explanation: "Het seizoen bepaalt de openingstijden en voorwaarden voor het terras"
+
+    - name: "GEWENSTE_OPENINGSTIJD"
+      description: "Gewenste openingstijd van het terras"
+      type: "enum"
+      type_spec:
+        enum: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+        enum_labels:
+          6: "06:00"
+          7: "07:00"
+          8: "08:00"
+          9: "09:00"
+          10: "10:00"
+          11: "11:00"
+          12: "12:00"
+          13: "13:00"
+          14: "14:00"
+          15: "15:00"
+          16: "16:00"
+          17: "17:00"
+          18: "18:00"
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Terrassen mogen vanaf 07:00 uur open zijn"
+
+    - name: "GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS"
+      description: "Gewenste sluitingstijd doordeweeks (zondag t/m donderdag)"
+      type: "enum"
+      type_spec:
+        enum: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 1]
+        enum_labels:
+          13: "13:00"
+          14: "14:00"
+          15: "15:00"
+          16: "16:00"
+          17: "17:00"
+          18: "18:00"
+          19: "19:00"
+          20: "20:00"
+          21: "21:00"
+          22: "22:00"
+          23: "23:00"
+          24: "00:00"
+          1: "01:00 (maximum)"
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Terrassen mogen doordeweeks (zo-do) maximaal tot 01:00 uur open zijn"
+
+    - name: "GEWENSTE_SLUITINGSTIJD_WEEKEND"
+      description: "Gewenste sluitingstijd weekend (vrijdag en zaterdag)"
+      type: "enum"
+      type_spec:
+        enum: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 1, 2]
+        enum_labels:
+          13: "13:00"
+          14: "14:00"
+          15: "15:00"
+          16: "16:00"
+          17: "17:00"
+          18: "18:00"
+          19: "19:00"
+          20: "20:00"
+          21: "21:00"
+          22: "22:00"
+          23: "23:00"
+          24: "00:00"
+          1: "01:00"
+          2: "02:00 (maximum)"
+      required: true
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Terrassen mogen in het weekend (vr-za) maximaal tot 02:00 uur open zijn"
+
+  sources:
+    - name: "HEEFT_ALCOHOLVERGUNNING"
+      description: "Of de onderneming een alcoholvergunning heeft (indien alcohol wordt geschonken op terras)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "vergunningen"
+        field: "heeft_alcoholvergunning"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0002458/2025-02-12#Paragraaf2_Artikel3"
+        explanation: "Voor het schenken van alcohol op het terras is een alcoholvergunning vereist"
+
+    # BGT data voor terraslocatie
+    - name: "BGT_OPPERVLAKTE_BESCHIKBAAR"
+      description: "Beschikbare oppervlakte voor terras volgens Basisregistratie Grootschalige Topografie"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bgt_terraslocaties"
+        field: "beschikbare_oppervlakte"
+        select_on:
+          - name: "adres"
+            description: "Adres van de horecalocatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+          - name: "locatie"
+            description: "Terraslocatie (voor/zij/achter)"
+            type: "string"
+            value: "$TERRAS_LOCATIE"
+      legal_basis:
+        law: "Wet basisregistratie grootschalige topografie"
+        bwb_id: "BWBR0035674"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0035674/2016-07-01#Hoofdstuk1_Artikel2"
+        explanation: "De BGT bevat gegevens over de inrichting van de openbare ruimte"
+
+    - name: "BGT_FUNCTIE_OPPERVLAK"
+      description: "Functie van het oppervlak volgens BGT (voetpad, rijbaan, groen, etc.)"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bgt_terraslocaties"
+        field: "functie_oppervlak"
+        select_on:
+          - name: "adres"
+            description: "Adres van de horecalocatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+          - name: "locatie"
+            description: "Terraslocatie (voor/zij/achter)"
+            type: "string"
+            value: "$TERRAS_LOCATIE"
+      legal_basis:
+        law: "Wet basisregistratie grootschalige topografie"
+        bwb_id: "BWBR0035674"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0035674/2016-07-01#Hoofdstuk1_Artikel2"
+        explanation: "De functie van het oppervlak bepaalt of een terras is toegestaan"
+
+    - name: "LOCATIE_OP_OPENBARE_WEG"
+      description: "Of de terraslocatie zich op openbare weg/gemeentegrond bevindt"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bgt_terraslocaties"
+        field: "is_openbare_weg"
+        select_on:
+          - name: "adres"
+            description: "Adres van de horecalocatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+          - name: "locatie"
+            description: "Terraslocatie (voor/zij/achter)"
+            type: "string"
+            value: "$TERRAS_LOCATIE"
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:10"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Voor terrassen op openbare weg gelden aanvullende voorwaarden en is precariobelasting verschuldigd"
+
+    # Terrassenbeleid per gebied
+    - name: "TERRASSENBELEID_GEBIED"
+      description: "Terrassenbeleid dat geldt voor dit gebied"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "terrassenbeleid"
+        fields: ["gebied", "max_oppervlakte", "max_sluitingstijd", "seizoensregels", "toegestane_locaties"]
+        select_on:
+          - name: "adres"
+            description: "Adres van de horecalocatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+      legal_basis:
+        law: "Terrassenbeleid Rotterdam 2023"
+        article: "3"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR717301/1"
+        explanation: "Het terrassenbeleid bepaalt per gebied welke regels gelden"
+
+    - name: "MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS"
+      description: "Maximale sluitingstijd doordeweeks (zo-do) voor terrassen in dit gebied"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "terrassenbeleid"
+        field: "max_sluitingstijd_doordeweeks"
+        select_on:
+          - name: "adres"
+            description: "Adres van de horecalocatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+          - name: "seizoen"
+            description: "Seizoen"
+            type: "string"
+            value: "$SEIZOEN"
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Terrassen mogen doordeweeks (zo-do) maximaal tot 01:00 uur open zijn"
+
+    - name: "MAXIMALE_SLUITINGSTIJD_WEEKEND"
+      description: "Maximale sluitingstijd weekend (vr-za) voor terrassen in dit gebied"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "terrassenbeleid"
+        field: "max_sluitingstijd_weekend"
+        select_on:
+          - name: "adres"
+            description: "Adres van de horecalocatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+          - name: "seizoen"
+            description: "Seizoen"
+            type: "string"
+            value: "$SEIZOEN"
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Terrassen mogen in het weekend (vr-za) maximaal tot 02:00 uur open zijn"
+
+    # Precariobelasting
+    - name: "PRECARIO_TARIEF_PER_M2"
+      description: "Precariobelasting tarief per vierkante meter per jaar"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "precario_tarieven"
+        field: "tarief_per_m2"
+        select_on:
+          - name: "adres"
+            description: "Adres van de locatie"
+            type: "string"
+            value: "$VESTIGINGSADRES"
+          - name: "gebruik"
+            description: "Type gebruik"
+            type: "string"
+            value: "terras"
+      legal_basis:
+        law: "Verordening precariobelasting Rotterdam 2024"
+        article: "5"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
+        explanation: "Het tarief voor precariobelasting verschilt per gebied in Rotterdam"
+
+  input:
+    # Expliciete link naar exploitatievergunning
+    - name: "HEEFT_EXPLOITATIEVERGUNNING"
+      description: "Of de onderneming een geldige exploitatievergunning heeft"
+      type: "boolean"
+      service_reference:
+        service: "GEMEENTE_ROTTERDAM"
+        law: "algemene_plaatselijke_verordening/exploitatievergunning"
+        field: "heeft_actieve_vergunning"
+        parameters:
+          - name: "KVK_NUMMER"
+            reference: "$KVK_NUMMER"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:28"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Een terras vereist eerst een exploitatievergunning voor het horecabedrijf"
+
+    - name: "VESTIGINGSADRES"
+      description: "Adres van de vestiging (uit Handelsregister)"
+      type: "string"
+      service_reference:
+        service: "KVK"
+        law: "handelsregisterwet/bedrijfsgegevens"
+        field: "vestigingsadres"
+        parameters:
+          - name: "KVK_NUMMER"
+            reference: "$KVK_NUMMER"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel14"
+        explanation: "Het vestigingsadres wordt opgehaald uit het Handelsregister"
+
+    - name: "BAG_GEBRUIKSDOEL"
+      description: "Gebruiksdoel van het pand volgens de BAG"
+      type: "string"
+      service_reference:
+        service: "KADASTER"
+        law: "wet_bag"
+        field: "gebruiksdoel"
+        parameters:
+          - name: "ADRES"
+            reference: "$VESTIGINGSADRES"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "6"
+        url: "https://wetten.overheid.nl/BWBR0023466/2022-01-01#Hoofdstuk2_Artikel6"
+        explanation: "Het pand moet een horecafunctie hebben"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "SCHENKT_ALCOHOL"
+      description: "Of de onderneming alcohol schenkt (via exploitatievergunning)" #TO DO: ALCOHOL-WET toevoegen
+      type: "boolean"
+      service_reference:
+        service: "GEMEENTE_ROTTERDAM"
+        law: "algemene_plaatselijke_verordening/exploitatievergunning"
+        field: "verstrekt_alcoholhoudende_dranken"
+        parameters:
+          - name: "KVK_NUMMER"
+            reference: "$KVK_NUMMER"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0002458/2025-02-12#Paragraaf2_Artikel3"
+        explanation: "Voor het schenken van alcohol is een alcoholvergunning vereist"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  output:
+    - name: "heeft_recht_op_terrasvergunning"
+      description: "Voldoet aan voorwaarden voor terrasvergunning"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Het recht op een terrasvergunning wordt bepaald volgens artikel 2:30b APV Rotterdam 2012"
+
+    - name: "weigeringsgrond"
+      description: "Eventuele reden voor weigering van de terrasvergunning"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De burgemeester kan de vergunning weigeren indien niet wordt voldaan aan de voorwaarden"
+
+    - name: "vergunde_oppervlakte"
+      description: "Vergunde oppervlakte van het terras in vierkante meters"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De vergunde oppervlakte wordt bepaald op basis van de aanvraag en beschikbare ruimte"
+
+    - name: "vergunde_sluitingstijd_doordeweeks"
+      description: "Vergunde sluitingstijd doordeweeks (zondag t/m donderdag)"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De sluitingstijd doordeweeks wordt bepaald op basis van de aanvraag en het gebiedsbeleid"
+
+    - name: "vergunde_sluitingstijd_weekend"
+      description: "Vergunde sluitingstijd weekend (vrijdag en zaterdag)"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:29"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "De sluitingstijd weekend wordt bepaald op basis van de aanvraag en het gebiedsbeleid"
+
+    - name: "precariobelasting_per_jaar"
+      description: "Te betalen precariobelasting per jaar"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Verordening precariobelasting Rotterdam 2024"
+        article: "5"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
+        explanation: "Precariobelasting is verschuldigd voor terrassen op openbare gemeentegrond"
+
+    - name: "precariobelasting_verschuldigd"
+      description: "Of precariobelasting verschuldigd is"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Verordening precariobelasting Rotterdam 2024"
+        article: "2"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
+        explanation: "Precariobelasting is alleen verschuldigd voor terrassen op openbare gemeentegrond"
+
+  definitions:
+    MINIMALE_OBSTAKELVRIJE_RUIMTE:
+      value: 1.8
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        paragraph: "3"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Er moet minimaal 1,8 meter obstakelvrije ruimte blijven voor voetgangers en hulpdiensten"
+
+    TOEGESTANE_GEBRUIKSDOELEN:
+      - "bijeenkomstfunctie"
+      - "celfunctie"
+      - "winkelfunctie"
+      - "overige gebruiksfunctie"
+
+    TOEGESTANE_BGT_FUNCTIES:
+      - "voetpad"
+      - "voetgangersgebied"
+      - "woonerf"
+      - "inrit"
+
+requirements:
+  - all:
+      # Exploitatievergunning vereist
+      - subject: "$HEEFT_EXPLOITATIEVERGUNNING"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Algemene plaatselijke verordening Rotterdam 2012"
+          article: "2:28"
+          url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+          explanation: "Een terras vereist eerst een exploitatievergunning voor het horecabedrijf"
+
+      # Gebruiksdoel moet horecagerelateerd zijn
+      - subject: "$BAG_GEBRUIKSDOEL"
+        operation: IN
+        values: "$TOEGESTANE_GEBRUIKSDOELEN"
+        legal_basis:
+          law: "Wet basisregistratie adressen en gebouwen"
+          bwb_id: "BWBR0023466"
+          article: "6"
+          url: "https://wetten.overheid.nl/BWBR0023466/2022-01-01#Hoofdstuk2_Artikel6"
+          explanation: "Het pand moet een horecafunctie hebben volgens BAG"
+
+      # Obstakelvrije ruimte minimaal 1,8 meter
+      - operation: GREATER_OR_EQUAL
+        values:
+          - "$OBSTAKELVRIJE_RUIMTE"
+          - "$MINIMALE_OBSTAKELVRIJE_RUIMTE"
+        legal_basis:
+          law: "Algemene plaatselijke verordening Rotterdam 2012"
+          article: "2:30b"
+          paragraph: "3"
+          url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+          explanation: "Er moet minimaal 1,8 meter obstakelvrije ruimte blijven voor voetgangers en hulpdiensten"
+
+      # Gevraagde oppervlakte past binnen beschikbare BGT-oppervlakte
+      - operation: LESS_OR_EQUAL
+        values:
+          - "$TERRAS_OPPERVLAKTE"
+          - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+        legal_basis:
+          law: "Algemene plaatselijke verordening Rotterdam 2012"
+          article: "2:30b"
+          url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+          explanation: "De gevraagde oppervlakte mag niet groter zijn dan de beschikbare ruimte"
+
+      # BGT functie moet geschikt zijn voor terras
+      - subject: "$BGT_FUNCTIE_OPPERVLAK"
+        operation: IN
+        values: "$TOEGESTANE_BGT_FUNCTIES"
+        legal_basis:
+          law: "Algemene plaatselijke verordening Rotterdam 2012"
+          article: "2:30b"
+          url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+          explanation: "Een terras mag alleen op daarvoor geschikte oppervlakken worden geplaatst"
+
+      # Sluitingstijd doordeweeks niet later dan maximaal toegestaan
+      - operation: LESS_OR_EQUAL
+        values:
+          - "$GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS"
+          - "$MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS"
+        legal_basis:
+          law: "Algemene plaatselijke verordening Rotterdam 2012"
+          article: "2:29"
+          url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+          explanation: "Terrassen mogen doordeweeks (zo-do) maximaal tot 01:00 uur open zijn"
+
+      # Sluitingstijd weekend niet later dan maximaal toegestaan
+      - operation: LESS_OR_EQUAL
+        values:
+          - "$GEWENSTE_SLUITINGSTIJD_WEEKEND"
+          - "$MAXIMALE_SLUITINGSTIJD_WEEKEND"
+        legal_basis:
+          law: "Algemene plaatselijke verordening Rotterdam 2012"
+          article: "2:29"
+          url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+          explanation: "Terrassen mogen in het weekend (vr-za) maximaal tot 02:00 uur open zijn"
+
+      # Alcoholvergunning indien alcohol geschonken wordt
+      - or:
+          - subject: "$SCHENKT_ALCOHOL"
+            operation: EQUALS
+            value: false
+          - subject: "$HEEFT_ALCOHOLVERGUNNING"
+            operation: EQUALS
+            value: true
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "3"
+          url: "https://wetten.overheid.nl/BWBR0002458/2025-02-12#Paragraaf2_Artikel3"
+          explanation: "Voor het schenken van alcohol op het terras is een alcoholvergunning vereist"
+
+actions:
+  - output: "heeft_recht_op_terrasvergunning"
+    operation: AND
+    values:
+      - subject: "$HEEFT_EXPLOITATIEVERGUNNING"
+        operation: EQUALS
+        value: true
+      - subject: "$BAG_GEBRUIKSDOEL"
+        operation: IN
+        values: "$TOEGESTANE_GEBRUIKSDOELEN"
+      - operation: GREATER_OR_EQUAL
+        values:
+          - "$OBSTAKELVRIJE_RUIMTE"
+          - "$MINIMALE_OBSTAKELVRIJE_RUIMTE"
+      - operation: LESS_OR_EQUAL
+        values:
+          - "$TERRAS_OPPERVLAKTE"
+          - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+      - subject: "$BGT_FUNCTIE_OPPERVLAK"
+        operation: IN
+        values: "$TOEGESTANE_BGT_FUNCTIES"
+      - operation: LESS_OR_EQUAL
+        values:
+          - "$GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS"
+          - "$MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS"
+      - operation: LESS_OR_EQUAL
+        values:
+          - "$GEWENSTE_SLUITINGSTIJD_WEEKEND"
+          - "$MAXIMALE_SLUITINGSTIJD_WEEKEND"
+      - operation: OR
+        values:
+          - subject: "$SCHENKT_ALCOHOL"
+            operation: EQUALS
+            value: false
+          - subject: "$HEEFT_ALCOHOLVERGUNNING"
+            operation: EQUALS
+            value: true
+    legal_basis:
+      law: "Algemene plaatselijke verordening Rotterdam 2012"
+      article: "2:30b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+      explanation: "Alle voorwaarden moeten worden vervuld voor een terrasvergunning"
+
+  - output: "weigeringsgrond"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HEEFT_EXPLOITATIEVERGUNNING"
+          operation: EQUALS
+          value: false
+        then: "Geen geldige exploitatievergunning"
+      - test:
+          subject: "$BAG_GEBRUIKSDOEL"
+          operation: NOT_IN
+          values: "$TOEGESTANE_GEBRUIKSDOELEN"
+        then: "Pand heeft geen horecagerelateerd gebruiksdoel"
+      - test:
+          operation: LESS_THAN
+          values:
+            - "$OBSTAKELVRIJE_RUIMTE"
+            - "$MINIMALE_OBSTAKELVRIJE_RUIMTE"
+        then: "Obstakelvrije ruimte is minder dan 1,8 meter"
+      - test:
+          operation: GREATER_THAN
+          values:
+            - "$TERRAS_OPPERVLAKTE"
+            - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+        then: "Gevraagde oppervlakte groter dan beschikbare ruimte"
+      - test:
+          subject: "$BGT_FUNCTIE_OPPERVLAK"
+          operation: NOT_IN
+          values: "$TOEGESTANE_BGT_FUNCTIES"
+        then: "Locatie niet geschikt voor terras (verkeerde BGT-functie)"
+      - test:
+          operation: GREATER_THAN
+          values:
+            - "$GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS"
+            - "$MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS"
+        then: "Gevraagde sluitingstijd doordeweeks (zo-do) later dan toegestaan in dit gebied"
+      - test:
+          operation: GREATER_THAN
+          values:
+            - "$GEWENSTE_SLUITINGSTIJD_WEEKEND"
+            - "$MAXIMALE_SLUITINGSTIJD_WEEKEND"
+        then: "Gevraagde sluitingstijd weekend (vr-za) later dan toegestaan in dit gebied"
+      - test:
+          operation: AND
+          values:
+            - subject: "$SCHENKT_ALCOHOL"
+              operation: EQUALS
+              value: true
+            - subject: "$HEEFT_ALCOHOLVERGUNNING"
+              operation: EQUALS
+              value: false
+        then: "Geen alcoholvergunning terwijl alcohol wordt geschonken"
+      - else: ""
+    legal_basis:
+      law: "Algemene plaatselijke verordening Rotterdam 2012"
+      article: "2:30b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+      explanation: "De burgemeester weigert de vergunning indien niet aan de voorwaarden wordt voldaan"
+
+  - output: "vergunde_oppervlakte"
+    operation: MIN
+    values:
+      - "$TERRAS_OPPERVLAKTE"
+      - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+    legal_basis:
+      law: "Algemene plaatselijke verordening Rotterdam 2012"
+      article: "2:30b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+      explanation: "De vergunde oppervlakte is het minimum van de aangevraagde en beschikbare oppervlakte"
+
+  - output: "vergunde_sluitingstijd_doordeweeks"
+    operation: MIN
+    values:
+      - "$GEWENSTE_SLUITINGSTIJD_DOORDEWEEKS"
+      - "$MAXIMALE_SLUITINGSTIJD_DOORDEWEEKS"
+    legal_basis:
+      law: "Terrassenbeleid Rotterdam 2023"
+      article: "5"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR717301/1"
+      explanation: "De vergunde sluitingstijd doordeweeks (zo-do) is het minimum van de aangevraagde en maximaal toegestane tijd"
+
+  - output: "vergunde_sluitingstijd_weekend"
+    operation: MIN
+    values:
+      - "$GEWENSTE_SLUITINGSTIJD_WEEKEND"
+      - "$MAXIMALE_SLUITINGSTIJD_WEEKEND"
+    legal_basis:
+      law: "Terrassenbeleid Rotterdam 2023"
+      article: "5"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR717301/1"
+      explanation: "De vergunde sluitingstijd weekend (vr-za) is het minimum van de aangevraagde en maximaal toegestane tijd"
+
+  - output: "precariobelasting_verschuldigd"
+    value: "$LOCATIE_OP_OPENBARE_WEG"
+    legal_basis:
+      law: "Verordening precariobelasting Rotterdam 2024"
+      article: "2"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
+      explanation: "Precariobelasting is verschuldigd indien het terras op openbare gemeentegrond staat"
+
+  - output: "precariobelasting_per_jaar"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$LOCATIE_OP_OPENBARE_WEG"
+          operation: EQUALS
+          value: true
+        then:
+          operation: MULTIPLY
+          values:
+            - operation: MIN
+              values:
+                - "$TERRAS_OPPERVLAKTE"
+                - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+            - "$PRECARIO_TARIEF_PER_M2"
+      - else: 0
+    legal_basis:
+      law: "Verordening precariobelasting Rotterdam 2024"
+      article: "5"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
+      explanation: "Precariobelasting wordt berekend op basis van oppervlakte en tarief per m2"

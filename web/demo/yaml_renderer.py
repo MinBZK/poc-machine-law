@@ -123,12 +123,12 @@ def parse_law_yaml(yaml_file: Path | str, law_dir: Path | str = None, law_path: 
 
     Args:
         yaml_file: Path to the YAML file (Path or str)
-        law_dir: Base directory for laws (Path or str, default: "law")
+        law_dir: Base directory for laws (Path or str, default: "laws")
         law_path: Relative path used for demo config (e.g., "zorgtoeslagwet/TOESLAGEN-2025-01-01")
     """
     # Normalize to strings for consistent caching
     yaml_file_str = str(yaml_file) if isinstance(yaml_file, Path) else yaml_file
-    law_dir_str = str(law_dir) if law_dir and isinstance(law_dir, Path) else (law_dir or "law")
+    law_dir_str = str(law_dir) if law_dir and isinstance(law_dir, Path) else (law_dir or "laws")
     return _parse_law_yaml_cached(yaml_file_str, law_dir_str, law_path)
 
 

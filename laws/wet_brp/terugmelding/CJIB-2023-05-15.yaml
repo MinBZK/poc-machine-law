@@ -1,0 +1,178 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 8e3f7a2c-4d9b-4e1f-9a6c-2f7e4d8a3b5c
+name: BRP Terugmeldplicht CJIB
+law: wet_brp/terugmelding
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2023-05-15
+service: "CJIB"
+legal_basis:
+  law: "Wet basisregistratie personen"
+  bwb_id: "BWBR0033715"
+  article: "2.34"
+  url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+  juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+  explanation: "Artikel 2.34 verplicht bestuursorganen gerede twijfel over BRP-gegevens te melden via de terugmeldvoorziening"
+description: >
+  Het Centraal Justitieel Incassobureau (CJIB) heeft een wettelijke verplichting om twijfel
+  over de juistheid van adresgegevens in de BRP te melden. Dit gebeurt via de Terugmeldvoorziening
+  (TMV) naar gemeenten. CJIB ontdekt afwijkingen vooral via het OBR-profiel (Onbestelbaar Retour)
+  waarbij post onbestelbaar retour komt.
+
+references:
+  - law: "Wet BRP"
+    article: "2.34"
+    url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+  - law: "Besluit BRP"
+    article: "28"
+    url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.5_Artikel28"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon (optioneel bij adresgerichte controles)"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.34"
+        url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+        explanation: "Artikel 2.34 vereist identificatie van persoon bij terugmelding"
+
+    - name: "ADRES"
+      description: "Adresgegevens die mogelijk onjuist zijn"
+      type: "object"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.34"
+        url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+        explanation: "Artikel 2.34 vereist specificatie van het adresgegeven waarover twijfel bestaat"
+
+  sources:
+    - name: "POST_ONBESTELBAAR"
+      description: "Post aan dit adres is onbestelbaar retour gekomen"
+      type: "boolean"
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "cjib_post"
+        field: "onbestelbaar_retour"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de persoon (optioneel bij adresgerichte controles)"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Wet Mulder"
+        bwb_id: "BWBR0004581"
+        article: "4"
+        url: "https://wetten.overheid.nl/BWBR0004581/2024-01-01#Artikel4"
+        juriconnect: "jci1.3:c:BWBR0004581&artikel=4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 4 Wet Mulder bepaalt bevoegdheden CJIB bij inning geldboetes"
+
+    - name: "AANTAL_ONBESTELBAAR"
+      description: "Aantal keer dat post onbestelbaar retour is gekomen"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "cjib_post"
+        field: "aantal_onbestelbaar"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de persoon (optioneel bij adresgerichte controles)"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Wet Mulder"
+        bwb_id: "BWBR0004581"
+        article: "4"
+        url: "https://wetten.overheid.nl/BWBR0004581/2024-01-01#Artikel4"
+        juriconnect: "jci1.3:c:BWBR0004581&artikel=4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 4 Wet Mulder regelt werkzaamheden CJIB bij invordering"
+
+  output:
+    - name: "heeft_gerede_twijfel_adres"
+      description: "Of er gerede twijfel bestaat over juistheid adresgegevens"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.34"
+        url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+        explanation: "Artikel 2.34 verplicht melding bij gerede twijfel over adresgegevens"
+
+    - name: "twijfel_reden"
+      description: "Reden van twijfel over adresgegevens"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Besluit basisregistratie personen"
+        bwb_id: "BWBR0034306"
+        article: "28"
+        url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.5_Artikel28"
+        juriconnect: "jci1.3:c:BWBR0034306&artikel=28&z=2024-04-01&g=2024-04-01"
+        explanation: "Artikel 28 Besluit BRP regelt de terugmeldvoorziening en vereist onderbouwing"
+
+  definitions:
+    TWIJFEL_OBR_ENKEL: "Post eenmalig onbestelbaar retour (OBR)"
+    TWIJFEL_OBR_HERHAALD: "Post meerdere keren onbestelbaar retour (OBR)"
+    OBR_DREMPEL_HERHAALD: 2
+
+requirements:
+  - all:
+      - subject: "$ADRES"
+        operation: NOT_NULL
+
+actions:
+  - output: "heeft_gerede_twijfel_adres"
+    subject: "$POST_ONBESTELBAAR"
+    operation: EQUALS
+    value: true
+    legal_basis:
+      law: "Wet basisregistratie personen"
+      bwb_id: "BWBR0033715"
+      article: "2.34"
+      url: "https://wetten.overheid.nl/BWBR0033715/2023-05-15#Hoofdstuk2_Paragraaf2.5_Artikel2.34"
+      juriconnect: "jci1.3:c:BWBR0033715&artikel=2.34&z=2023-05-15&g=2023-05-15"
+      explanation: "Onbestelbare post levert gerede twijfel op over adresgegevens"
+
+  - output: "twijfel_reden"
+    operation: IF
+    conditions:
+      - test:
+          operation: GREATER_OR_EQUAL
+          values:
+            - "$AANTAL_ONBESTELBAAR"
+            - "$OBR_DREMPEL_HERHAALD"
+        then: "$TWIJFEL_OBR_HERHAALD"
+      - test:
+          subject: "$POST_ONBESTELBAAR"
+          operation: EQUALS
+          value: true
+        then: "$TWIJFEL_OBR_ENKEL"
+      - else: null
+    legal_basis:
+      law: "Besluit basisregistratie personen"
+      bwb_id: "BWBR0034306"
+      article: "28"
+      url: "https://wetten.overheid.nl/BWBR0034306/2024-04-01#Hoofdstuk2_Afdeling2.5_Artikel28"
+      juriconnect: "jci1.3:c:BWBR0034306&artikel=28&z=2024-04-01&g=2024-04-01"
+      explanation: "Artikel 28 vereist specificatie van reden bij terugmelding"

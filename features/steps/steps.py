@@ -3,7 +3,7 @@ from typing import Any
 from unittest import TestCase
 
 import pandas as pd
-from behave import given, when, then
+from behave import given, then, when
 
 from machine.service import Services
 
@@ -36,7 +36,33 @@ def step_impl(context, service, table):
     data = []
     for row in context.table:
         processed_row = {
-            k: v if k in {"bsn", "partner_bsn", "jaar", "kind_bsn", "kvk_nummer", "ouder_bsn", "postcode", "huisnummer", "bsn_gezagdrager", "bsn_kind", "bsn_mentor", "bsn_betrokkene", "bsn_curator", "bsn_curandus", "bsn_bewindvoerder", "bsn_rechthebbende", "bsn_gevolmachtigde", "bsn_volmachtgever", "bsn_executeur", "bsn_erflater", "bsn_familielid", "bsn_patient"} else parse_value(v)
+            k: v
+            if k
+            in {
+                "bsn",
+                "partner_bsn",
+                "jaar",
+                "kind_bsn",
+                "kvk_nummer",
+                "ouder_bsn",
+                "postcode",
+                "huisnummer",
+                "bsn_gezagdrager",
+                "bsn_kind",
+                "bsn_mentor",
+                "bsn_betrokkene",
+                "bsn_curator",
+                "bsn_curandus",
+                "bsn_bewindvoerder",
+                "bsn_rechthebbende",
+                "bsn_gevolmachtigde",
+                "bsn_volmachtgever",
+                "bsn_executeur",
+                "bsn_erflater",
+                "bsn_familielid",
+                "bsn_patient",
+            }
+            else parse_value(v)
             for k, v in row.items()
         }
         data.append(processed_row)
@@ -53,13 +79,14 @@ def step_impl(context, date):
     # Clear eventsourcing cache to avoid conflicts when switching dates
     try:
         import eventsourcing.utils
+
         eventsourcing.utils._type_cache.clear()
     except:
         pass
 
     # Always create new Services for each scenario
     try:
-        if hasattr(context, 'services'):
+        if hasattr(context, "services"):
             del context.services
     except:
         pass
@@ -83,7 +110,7 @@ def evaluate_law(context, service, law, approved=True):
         parameters=context.parameters,
         reference_date=context.root_reference_date,
         overwrite_input=context.test_data,
-        approved=approved
+        approved=approved,
     )
 
     context.service = service
@@ -105,8 +132,9 @@ def step_impl(context, law, service):
         key = row.headings[0]
         value = row[key]
         # Special handling for JSON-like values
-        if value.startswith('[') or value.startswith('{'):
+        if value.startswith("[") or value.startswith("{"):
             import json
+
             try:
                 value = json.loads(value.replace("'", '"'))
             except json.JSONDecodeError:
@@ -224,16 +252,12 @@ def step_impl(context):
 
 @then("heeft de persoon stemrecht")
 def step_impl(context):
-    assertions.assertTrue(
-        context.result.requirements_met, "Expected the person to have voting rights"
-    )
+    assertions.assertTrue(context.result.requirements_met, "Expected the person to have voting rights")
 
 
 @then("heeft de persoon geen stemrecht")
 def step_impl(context):
-    assertions.assertFalse(
-        context.result.requirements_met, "Expected the person not to have voting rights"
-    )
+    assertions.assertFalse(context.result.requirements_met, "Expected the person not to have voting rights")
 
 
 @given("de volgende kandidaatgegevens")
@@ -336,7 +360,7 @@ def step_impl(context):
         law=context.law,
         parameters=context.result.input,
         claimed_result=context.result.output,
-        approved_claims_only=True
+        approved_claims_only=True,
     )
 
     # Case ID opslaan voor volgende stappen
@@ -354,9 +378,7 @@ def step_impl(context):
 def step_impl(context, status):
     case = context.services.case_manager.get_case_by_id(context.case_id)
     assertions.assertIsNotNone(case, "Expected case to exist")
-    assertions.assertEqual(
-        case.status, status, f"Expected status to be {status}, but was {case.status}"
-    )
+    assertions.assertEqual(case.status, status, f"Expected status to be {status}, but was {case.status}")
 
 
 @when('de beoordelaar de aanvraag afwijst met reden "{reason}"')
@@ -455,7 +477,7 @@ def step_impl(context, chance):
             case_id=None,
             evidence_path=row.get("bewijs"),
             law=row["law"],
-            bsn=identifier
+            bsn=identifier,
         )
         context.claims.append(claim_id)
 
@@ -479,14 +501,12 @@ def step_impl(context, amount):
 
 @then("ontbreken er verplichte gegevens")
 def step_impl(context):
-    assertions.assertTrue(context.result.missing_required,
-                          "Er zouden gegevens moeten ontbreken.")
+    assertions.assertTrue(context.result.missing_required, "Er zouden gegevens moeten ontbreken.")
 
 
 @then("ontbreken er geen verplichte gegevens")
 def step_impl(context):
-    assertions.assertFalse(context.result.missing_required,
-                           "Er zouden geen gegevens moeten ontbreken.")
+    assertions.assertFalse(context.result.missing_required, "Er zouden geen gegevens moeten ontbreken.")
 
 
 @then('is het {field} "{amount}" eurocent')
@@ -494,9 +514,8 @@ def step_impl(context, field, amount):
     actual_amount = context.result.output[field]
     expected_amount = int(amount)
     assertions.assertEqual(
-        actual_amount,
-        expected_amount,
-        f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent")
+        actual_amount, expected_amount, f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent"
+    )
 
 
 @then("heeft de persoon recht op kinderopvangtoeslag")
@@ -505,6 +524,7 @@ def step_impl(context):
         "is_gerechtigd" in context.result.output and context.result.output["is_gerechtigd"],
         "Expected person to be eligible for childcare allowance, but they were not",
     )
+
 
 @then("heeft de persoon geen recht op kinderopvangtoeslag")
 def step_impl(context):
@@ -528,10 +548,7 @@ def step_impl(context):
     # Convert table to DataFrame for KVK service
     data = []
     for row in context.table:
-        processed_row = {
-            k: v if k in {"kvk_nummer"} else parse_value(v)
-            for k, v in row.items()
-        }
+        processed_row = {k: v if k in {"kvk_nummer"} else parse_value(v) for k, v in row.items()}
         data.append(processed_row)
 
     df = pd.DataFrame(data)
@@ -542,89 +559,62 @@ def step_impl(context):
 def step_impl(context, value):
     expected = value.lower() == "true"
     actual = context.result.output.get("rapportageverplichting", False)
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected rapportageverplichting to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected rapportageverplichting to be {expected}, but was {actual}")
 
 
 @then('is de rapportage_deadline "{date}"')
 def step_impl(context, date):
     actual_date = context.result.output.get("rapportage_deadline")
-    assertions.assertEqual(
-        actual_date, date,
-        f"Expected rapportage_deadline to be {date}, but was {actual_date}"
-    )
+    assertions.assertEqual(actual_date, date, f"Expected rapportage_deadline to be {date}, but was {actual_date}")
 
 
 @then('is het aantal_werknemers "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("aantal_werknemers")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected aantal_werknemers to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected aantal_werknemers to be {expected}, but was {actual}")
 
 
 @then('is de woon_werk_auto_benzine "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("woon_werk_auto_benzine")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected woon_werk_auto_benzine to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected woon_werk_auto_benzine to be {expected}, but was {actual}")
 
 
 @then('is de woon_werk_auto_diesel "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("woon_werk_auto_diesel")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected woon_werk_auto_diesel to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected woon_werk_auto_diesel to be {expected}, but was {actual}")
 
 
 @then('is de zakelijk_auto_benzine "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("zakelijk_auto_benzine")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected zakelijk_auto_benzine to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected zakelijk_auto_benzine to be {expected}, but was {actual}")
 
 
 @then('is de zakelijk_auto_diesel "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("zakelijk_auto_diesel")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected zakelijk_auto_diesel to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected zakelijk_auto_diesel to be {expected}, but was {actual}")
 
 
 @then('is de woon_werk_openbaar_vervoer "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("woon_werk_openbaar_vervoer")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected woon_werk_openbaar_vervoer to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected woon_werk_openbaar_vervoer to be {expected}, but was {actual}")
 
 
 @then('is de co2_uitstoot_totaal "{number}"')
 def step_impl(context, number):
     expected = int(number)
     actual = context.result.output.get("co2_uitstoot_totaal")
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected co2_uitstoot_totaal to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected co2_uitstoot_totaal to be {expected}, but was {actual}")
 
 
 @when("de werkgever deze WPM gegevens indient")
@@ -645,23 +635,26 @@ def step_impl(context):
     # For now, just check if WPM data was provided and assume some CO2 output
     if hasattr(context, "test_data") and context.test_data:
         # If WPM data was provided, we expect CO2 calculation
-        expected_co2 = sum([
-            context.test_data.get("WOON_WERK_AUTO_BENZINE", 0) * 170,
-            context.test_data.get("WOON_WERK_AUTO_DIESEL", 0) * 150,
-            context.test_data.get("ZAKELIJK_AUTO_BENZINE", 0) * 170,
-            context.test_data.get("ZAKELIJK_AUTO_DIESEL", 0) * 150,
-            context.test_data.get("WOON_WERK_OV", 0) * 30
-        ]) / 1000  # Convert to grams, simple approximation
+        expected_co2 = (
+            sum(
+                [
+                    context.test_data.get("WOON_WERK_AUTO_BENZINE", 0) * 170,
+                    context.test_data.get("WOON_WERK_AUTO_DIESEL", 0) * 150,
+                    context.test_data.get("ZAKELIJK_AUTO_BENZINE", 0) * 170,
+                    context.test_data.get("ZAKELIJK_AUTO_DIESEL", 0) * 150,
+                    context.test_data.get("WOON_WERK_OV", 0) * 30,
+                ]
+            )
+            / 1000
+        )  # Convert to grams, simple approximation
 
         assertions.assertGreater(
-            expected_co2, 0,
-            f"Expected some CO2 calculation with provided data, but calculation was {expected_co2}"
+            expected_co2, 0, f"Expected some CO2 calculation with provided data, but calculation was {expected_co2}"
         )
         # For now, pass the test if we have test data indicating CO2 should be calculated
     else:
         assertions.assertGreater(
-            co2_total, 0,
-            f"Expected co2_uitstoot_totaal to be greater than 0, but was {co2_total}"
+            co2_total, 0, f"Expected co2_uitstoot_totaal to be greater than 0, but was {co2_total}"
         )
 
 
@@ -669,16 +662,14 @@ def step_impl(context):
 @then("heeft de persoon recht op WW")
 def step_impl(context):
     assertions.assertTrue(
-        context.result.output.get("heeft_recht_op_ww", False),
-        "Expected person to have right to WW, but they did not"
+        context.result.output.get("heeft_recht_op_ww", False), "Expected person to have right to WW, but they did not"
     )
 
 
 @then("heeft de persoon geen recht op WW")
 def step_impl(context):
     assertions.assertFalse(
-        context.result.output.get("heeft_recht_op_ww", False),
-        "Expected person to not have right to WW, but they did"
+        context.result.output.get("heeft_recht_op_ww", False), "Expected person to not have right to WW, but they did"
     )
 
 
@@ -687,8 +678,9 @@ def step_impl(context, maanden):
     expected_maanden = int(maanden)
     actual_maanden = context.result.output.get("ww_duur_maanden")
     assertions.assertEqual(
-        actual_maanden, expected_maanden,
-        f"Expected WW duration to be {expected_maanden} months, but was {actual_maanden}"
+        actual_maanden,
+        expected_maanden,
+        f"Expected WW duration to be {expected_maanden} months, but was {actual_maanden}",
     )
 
 
@@ -701,8 +693,10 @@ def step_impl(context, amount):
     # Allow 1% tolerance for rounding
     tolerance = expected_amount * 0.01
     assertions.assertAlmostEqual(
-        actual_amount, expected_amount, delta=tolerance,
-        msg=f"Expected WW benefit to be approximately {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+        actual_amount,
+        expected_amount,
+        delta=tolerance,
+        msg=f"Expected WW benefit to be approximately {amount} (€{expected_amount / 100:.2f}), but was €{actual_amount / 100:.2f}",
     )
 
 
@@ -713,8 +707,9 @@ def step_impl(context, amount):
     expected_amount = int(amount_clean)
     actual_amount = context.result.output.get("ww_uitkering_per_maand")
     assertions.assertEqual(
-        actual_amount, expected_amount,
-        f"Expected WW benefit to be exactly {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+        actual_amount,
+        expected_amount,
+        f"Expected WW benefit to be exactly {amount} (€{expected_amount / 100:.2f}), but was €{actual_amount / 100:.2f}",
     )
 
 
@@ -724,8 +719,7 @@ def step_impl(context):
     max_dagloon = 29067
     actual_dagloon = context.result.output.get("ww_dagloon")
     assertions.assertEqual(
-        actual_dagloon, max_dagloon,
-        f"Expected dagloon to be maximized at €290.67, but was €{actual_dagloon/100:.2f}"
+        actual_dagloon, max_dagloon, f"Expected dagloon to be maximized at €290.67, but was €{actual_dagloon / 100:.2f}"
     )
 
 
@@ -733,16 +727,14 @@ def step_impl(context):
 @then("heeft de persoon recht op kindgebonden budget")
 def step_impl(context):
     assertions.assertTrue(
-        context.result.requirements_met,
-        "Expected person to have right to kindgebonden budget, but they did not"
+        context.result.requirements_met, "Expected person to have right to kindgebonden budget, but they did not"
     )
 
 
 @then("heeft de persoon geen recht op kindgebonden budget")
 def step_impl(context):
     assertions.assertFalse(
-        context.result.requirements_met,
-        "Expected person to not have right to kindgebonden budget, but they did"
+        context.result.requirements_met, "Expected person to not have right to kindgebonden budget, but they did"
     )
 
 
@@ -753,8 +745,9 @@ def step_impl(context, amount):
     expected_amount = int(amount_clean)
     actual_amount = context.result.output.get("alo_kop_bedrag", 0)
     assertions.assertEqual(
-        actual_amount, expected_amount,
-        f"Expected ALO-kop to be {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+        actual_amount,
+        expected_amount,
+        f"Expected ALO-kop to be {amount} (€{expected_amount / 100:.2f}), but was €{actual_amount / 100:.2f}",
     )
 
 
@@ -767,8 +760,10 @@ def step_impl(context, amount):
     # Allow 2% tolerance for rounding in complex calculations
     tolerance = expected_amount * 0.02
     assertions.assertAlmostEqual(
-        actual_amount, expected_amount, delta=tolerance,
-        msg=f"Expected kindgebonden budget to be approximately {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+        actual_amount,
+        expected_amount,
+        delta=tolerance,
+        msg=f"Expected kindgebonden budget to be approximately {amount} (€{expected_amount / 100:.2f}), but was €{actual_amount / 100:.2f}",
     )
 
 
@@ -780,8 +775,10 @@ def step_impl(context, amount):
     actual_amount = context.result.output.get("kindgebonden_budget_jaar")
     tolerance = expected_amount * 0.02
     assertions.assertAlmostEqual(
-        actual_amount, expected_amount, delta=tolerance,
-        msg=f"Expected total kindgebonden budget to be approximately {amount} (€{expected_amount/100:.2f}), but was €{actual_amount/100:.2f}"
+        actual_amount,
+        expected_amount,
+        delta=tolerance,
+        msg=f"Expected total kindgebonden budget to be approximately {amount} (€{expected_amount / 100:.2f}), but was €{actual_amount / 100:.2f}",
     )
 
 
@@ -794,8 +791,9 @@ def step_impl(context):
 
     # Budget should be less than maximum due to income-based reduction
     assertions.assertLess(
-        totaal, max_budget_2_kinderen_alo,
-        f"Expected budget to be reduced from maximum €8,502, but was €{totaal/100:.2f}"
+        totaal,
+        max_budget_2_kinderen_alo,
+        f"Expected budget to be reduced from maximum €8,502, but was €{totaal / 100:.2f}",
     )
 
 
@@ -806,7 +804,7 @@ def step_impl(context):
     alo_kop = context.result.output.get("alo_kop_bedrag", 0)
 
     assertions.assertFalse(heeft_partner, "Expected person to be single (alleenstaand)")
-    assertions.assertGreater(alo_kop, 0, f"Expected ALO-kop for single parent, but was €{alo_kop/100:.2f}")
+    assertions.assertGreater(alo_kop, 0, f"Expected ALO-kop for single parent, but was €{alo_kop / 100:.2f}")
 
 
 @then("is het kindgebonden budget hoog door laag inkomen en meerdere kinderen")
@@ -817,13 +815,15 @@ def step_impl(context):
 
     # Met 3 kinderen en laag inkomen, moet totaal hoog zijn
     assertions.assertGreater(
-        totaal, 800000,  # More than €8000
-        f"Expected high budget for 3 children with low income, but was €{totaal/100:.2f}"
+        totaal,
+        800000,  # More than €8000
+        f"Expected high budget for 3 children with low income, but was €{totaal / 100:.2f}",
     )
     # Met laag inkomen zou afbouw minimaal moeten zijn
     assertions.assertLess(
-        inkomen_afbouw, 100000,  # Less than €1000 afbouw
-        f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw/100:.2f}"
+        inkomen_afbouw,
+        100000,  # Less than €1000 afbouw
+        f"Expected minimal income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}",
     )
 
 
@@ -834,8 +834,9 @@ def step_impl(context):
 
     # Met leeftijdssupplementen moet budget hoger zijn dan alleen basisbedrag
     assertions.assertGreater(
-        totaal, 251100,  # More than just base amount
-        f"Expected budget with age supplements, but was only €{totaal/100:.2f}"
+        totaal,
+        251100,  # More than just base amount
+        f"Expected budget with age supplements, but was only €{totaal / 100:.2f}",
     )
 
 
@@ -845,8 +846,9 @@ def step_impl(context):
     inkomen_afbouw = context.result.output.get("inkomen_afbouw", 0)
 
     assertions.assertLess(
-        inkomen_afbouw, 50000,  # Less than €500 afbouw
-        f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw/100:.2f}"
+        inkomen_afbouw,
+        50000,  # Less than €500 afbouw
+        f"Expected minimal/no income reduction for low income, but afbouw was €{inkomen_afbouw / 100:.2f}",
     )
 
 
@@ -856,46 +858,35 @@ def step_impl(context):
 @then("genereert wet_brp/laa een signaal")
 def step_impl(context):
     assertions.assertTrue(
-        context.result.output.get("genereer_signaal", False),
-        "Expected LAA to generate a signal, but it did not"
+        context.result.output.get("genereer_signaal", False), "Expected LAA to generate a signal, but it did not"
     )
 
 
 @then("genereert wet_brp/laa geen signaal")
 def step_impl(context):
     assertions.assertFalse(
-        context.result.output.get("genereer_signaal", True),
-        "Expected LAA not to generate a signal, but it did"
+        context.result.output.get("genereer_signaal", True), "Expected LAA not to generate a signal, but it did"
     )
 
 
 @then('is het signaal_type "{signaal_type}"')
 def step_impl(context, signaal_type):
     actual = context.result.output.get("signaal_type")
-    assertions.assertEqual(
-        actual, signaal_type,
-        f"Expected signaal_type to be '{signaal_type}', but was '{actual}'"
-    )
+    assertions.assertEqual(actual, signaal_type, f"Expected signaal_type to be '{signaal_type}', but was '{actual}'")
 
 
 @then('is de reactietermijn_weken "{weken}"')
 def step_impl(context, weken):
     actual = context.result.output.get("reactietermijn_weken")
     expected = int(weken)
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected reactietermijn_weken to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected reactietermijn_weken to be {expected}, but was {actual}")
 
 
 @then('is de onderzoekstermijn_maanden "{maanden}"')
 def step_impl(context, maanden):
     actual = context.result.output.get("onderzoekstermijn_maanden")
     expected = int(maanden)
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}")
 
 
 @then('heeft de output "{field}" waarde "{value}"')
@@ -906,10 +897,7 @@ def step_impl(context, field, value):
     # Treat None as False for boolean comparisons
     if expected is False and actual is None:
         actual = False
-    assertions.assertEqual(
-        actual, expected,
-        f"Expected {field} to be {expected}, but was {actual}"
-    )
+    assertions.assertEqual(actual, expected, f"Expected {field} to be {expected}, but was {actual}")
 
 
 @then('bevat de output "{field}" waarde "{value}"')
@@ -921,8 +909,7 @@ def step_impl(context, field, value):
     actual_str = [str(x) for x in actual]
     expected_str = str(expected)
     assertions.assertIn(
-        expected_str, actual_str,
-        f"Expected {field} to contain {expected_str}, but it was {actual_str}"
+        expected_str, actual_str, f"Expected {field} to contain {expected_str}, but it was {actual_str}"
     )
 
 
@@ -935,8 +922,7 @@ def step_impl(context, field, value):
     actual_str = [str(x) for x in actual]
     expected_str = str(expected)
     assertions.assertNotIn(
-        expected_str, actual_str,
-        f"Expected {field} to NOT contain {expected_str}, but it was {actual_str}"
+        expected_str, actual_str, f"Expected {field} to NOT contain {expected_str}, but it was {actual_str}"
     )
 
 
@@ -944,7 +930,4 @@ def step_impl(context, field, value):
 def step_impl(context, field):
     """Check if an output array field is empty."""
     actual = context.result.output.get(field, [])
-    assertions.assertEqual(
-        len(actual), 0,
-        f"Expected {field} to be empty, but it was {actual}"
-    )
+    assertions.assertEqual(len(actual), 0, f"Expected {field} to be empty, but it was {actual}")

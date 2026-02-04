@@ -16,9 +16,8 @@ from web.feature_flags import FeatureFlags
 
 router = APIRouter(prefix="/demo", tags=["demo"])
 
-LAW_DIR = Path("law")
 FEATURES_DIR = Path("features")
-SUBMODULE_LAWS_DIR = Path("submodules/regelrecht-laws/laws")
+LAWS_DIR = Path("laws")
 
 # Store for ongoing test runs (run_id -> output)
 _test_runs: dict[str, dict[str, Any]] = {}
@@ -155,7 +154,7 @@ async def workspace_laws(request: Request) -> HTMLResponse:
 @router.get("/workspace/features", response_class=HTMLResponse)
 async def workspace_features(request: Request) -> HTMLResponse:
     """Get features tab content (defaults to Zorgtoeslag feature)."""
-    feature_path = "submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature"
+    feature_path = "features/TOESLAGEN-2025-01-01.feature"
     feature_file = Path(feature_path)
 
     if not feature_file.exists():
@@ -166,8 +165,8 @@ async def workspace_features(request: Request) -> HTMLResponse:
         feature_html = render_feature_to_html(parsed_feature)
 
         base_dirs = [FEATURES_DIR]
-        if SUBMODULE_LAWS_DIR.exists():
-            base_dirs.append(SUBMODULE_LAWS_DIR)
+        if LAWS_DIR.exists():
+            base_dirs.append(LAWS_DIR)
         grouped_features = discover_feature_files(base_dirs)
 
         return templates.TemplateResponse(
@@ -187,14 +186,14 @@ async def workspace_features(request: Request) -> HTMLResponse:
 @router.get("/workspace/law/{law_path:path}", response_class=HTMLResponse)
 async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
     """Get specific law content for workspace tab."""
-    yaml_file = LAW_DIR / f"{law_path}.yaml"
+    yaml_file = LAWS_DIR / f"{law_path}.yaml"
 
     if not yaml_file.exists():
         raise HTTPException(status_code=404, detail=f"Law file not found: {law_path}")
 
     try:
-        law_data = parse_law_yaml(yaml_file, law_dir=LAW_DIR, law_path=law_path)
-        grouped_laws = discover_laws(LAW_DIR, grouped=True)
+        law_data = parse_law_yaml(yaml_file, law_dir=LAWS_DIR, law_path=law_path)
+        grouped_laws = discover_laws(LAWS_DIR, grouped=True)
         yaml_html = render_yaml_to_html(law_data)
 
         return templates.TemplateResponse(
@@ -220,8 +219,8 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
         feature_file = Path(feature_path)
     elif (FEATURES_DIR / feature_path).exists():
         feature_file = FEATURES_DIR / feature_path
-    elif SUBMODULE_LAWS_DIR.exists() and (SUBMODULE_LAWS_DIR / feature_path).exists():
-        feature_file = SUBMODULE_LAWS_DIR / feature_path
+    elif LAWS_DIR.exists() and (LAWS_DIR / feature_path).exists():
+        feature_file = LAWS_DIR / feature_path
 
     if not feature_file or not feature_file.exists():
         raise HTTPException(status_code=404, detail=f"Feature file not found: {feature_path}")
@@ -231,8 +230,8 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
         feature_html = render_feature_to_html(parsed_feature)
 
         base_dirs = [FEATURES_DIR]
-        if SUBMODULE_LAWS_DIR.exists():
-            base_dirs.append(SUBMODULE_LAWS_DIR)
+        if LAWS_DIR.exists():
+            base_dirs.append(LAWS_DIR)
         grouped_features = discover_feature_files(base_dirs)
 
         return templates.TemplateResponse(
@@ -252,21 +251,21 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
 @router.get("/api/laws", response_class=JSONResponse)
 async def get_laws() -> JSONResponse:
     """Get list of all available laws as JSON."""
-    laws = discover_laws(LAW_DIR)
+    laws = discover_laws(LAWS_DIR)
     return JSONResponse(content=laws)
 
 
 @router.get("/law/{law_path:path}", response_class=HTMLResponse)
 async def view_law(request: Request, law_path: str) -> HTMLResponse:
     """View a specific law YAML file with collapsible sections."""
-    yaml_file = LAW_DIR / f"{law_path}.yaml"
+    yaml_file = LAWS_DIR / f"{law_path}.yaml"
 
     if not yaml_file.exists():
         raise HTTPException(status_code=404, detail=f"Law file not found: {law_path}")
 
     try:
-        law_data = parse_law_yaml(yaml_file, law_dir=LAW_DIR, law_path=law_path)
-        grouped_laws = discover_laws(LAW_DIR, grouped=True)
+        law_data = parse_law_yaml(yaml_file, law_dir=LAWS_DIR, law_path=law_path)
+        grouped_laws = discover_laws(LAWS_DIR, grouped=True)
 
         # Render YAML to HTML
         yaml_html = render_yaml_to_html(law_data)
@@ -290,8 +289,8 @@ async def view_law(request: Request, law_path: str) -> HTMLResponse:
 async def get_features_api() -> JSONResponse:
     """Get list of all available feature files as JSON (grouped)."""
     base_dirs = [FEATURES_DIR]
-    if SUBMODULE_LAWS_DIR.exists():
-        base_dirs.append(SUBMODULE_LAWS_DIR)
+    if LAWS_DIR.exists():
+        base_dirs.append(LAWS_DIR)
 
     grouped_features = discover_feature_files(base_dirs)
     return JSONResponse(content=grouped_features)
@@ -301,7 +300,7 @@ async def get_features_api() -> JSONResponse:
 async def list_features() -> RedirectResponse:
     """Redirect to default feature."""
     return RedirectResponse(
-        url="/demo/feature/submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature",
+        url="/demo/feature/features/TOESLAGEN-2025-01-01.feature",
         status_code=302,
     )
 
@@ -380,8 +379,8 @@ async def view_feature(request: Request, feature_path: str) -> HTMLResponse:
         feature_file = Path(feature_path)
     elif (FEATURES_DIR / feature_path).exists():
         feature_file = FEATURES_DIR / feature_path
-    elif SUBMODULE_LAWS_DIR.exists() and (SUBMODULE_LAWS_DIR / feature_path).exists():
-        feature_file = SUBMODULE_LAWS_DIR / feature_path
+    elif LAWS_DIR.exists() and (LAWS_DIR / feature_path).exists():
+        feature_file = LAWS_DIR / feature_path
 
     if not feature_file or not feature_file.exists():
         raise HTTPException(status_code=404, detail=f"Feature file not found: {feature_path}")
@@ -395,8 +394,8 @@ async def view_feature(request: Request, feature_path: str) -> HTMLResponse:
 
         # Get all features for sidebar
         base_dirs = [FEATURES_DIR]
-        if SUBMODULE_LAWS_DIR.exists():
-            base_dirs.append(SUBMODULE_LAWS_DIR)
+        if LAWS_DIR.exists():
+            base_dirs.append(LAWS_DIR)
         grouped_features = discover_feature_files(base_dirs)
 
         return templates.TemplateResponse(
