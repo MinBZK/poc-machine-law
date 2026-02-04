@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"maps"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -41,15 +42,38 @@ type claimManagerCtxKey struct{}
 type lawCtxKey struct{}
 type caseIDCtxKey struct{}
 
+// getFeatureFiles returns feature files from the current directory only,
+// excluding subdirectories like pending/
+func getFeatureFiles() []string {
+	entries, err := os.ReadDir(".")
+	if err != nil {
+		return []string{"."}
+	}
+
+	var features []string
+	for _, entry := range entries {
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".feature" {
+			features = append(features, entry.Name())
+		}
+	}
+
+	if len(features) == 0 {
+		return []string{"."}
+	}
+	return features
+}
+
 func TestFeatures(t *testing.T) {
+	// Get feature files from current directory only (exclude pending/ subdirectory)
+	featurePaths := getFeatureFiles()
+
 	suite := godog.TestSuite{
 		ScenarioInitializer: InitializeScenario,
 		Options: &godog.Options{
-			Format: "pretty", // pretty, progress, cucumber, events, junit
-			// ShowStepDefinitions: false,
-			Paths:    []string{"."},
-			Tags:     "~@skip-go", // Skip tests tagged with @skip-go (Go engine doesn't support all services)
-			TestingT: t,           // Testing instance that will run subtests.
+			Format:   "pretty", // pretty, progress, cucumber, events, junit
+			Paths:    featurePaths,
+			Tags:     "~@skip-go", // Skip tests tagged with @skip-go
+			TestingT: t,
 		},
 	}
 

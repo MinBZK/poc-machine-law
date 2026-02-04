@@ -40,6 +40,14 @@ jobs:
         run: |
           uv run playwright install --with-deps chromium
 
+      - name: Ensure no skip tags in main features
+        run: |
+          if grep -rE "^[[:space:]]*@skip" features/*.feature 2>/dev/null; then
+            echo "ERROR: @skip tags found in features/. Move to features/pending/ instead."
+            exit 1
+          fi
+          echo "No skip tags found in main features directory."
+
       - name: Run tests
         run: ./script/test-behaviour --tags='~@ui' --tags='~@skip'
         env:
