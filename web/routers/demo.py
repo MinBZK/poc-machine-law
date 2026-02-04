@@ -258,10 +258,7 @@ async def get_laws() -> JSONResponse:
     all_laws = discover_laws(LAWS_DIR)
 
     # Filter laws based on demo configuration
-    enabled_laws = [
-        law for law in all_laws
-        if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))
-    ]
+    enabled_laws = [law for law in all_laws if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))]
 
     return JSONResponse(content=enabled_laws)
 
@@ -282,8 +279,7 @@ async def view_law(request: Request, law_path: str) -> HTMLResponse:
         grouped_laws = {}
         for directory, laws_in_dir in all_grouped_laws.items():
             filtered_laws = [
-                law for law in laws_in_dir
-                if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))
+                law for law in laws_in_dir if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))
             ]
             if filtered_laws:
                 grouped_laws[directory] = filtered_laws
