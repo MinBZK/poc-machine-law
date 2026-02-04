@@ -1,0 +1,63 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 9c4e7b2d-6f3a-4e8b-9d5c-1a7f8b3e4c6d
+name: UWV Toetsingsinkomen
+law: uwv_toetsingsinkomen
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2020-01-01
+service: "UWV"
+description: >
+  Toetsingsinkomen zoals geadministreerd door UWV voor de berekening van
+  inkomensafhankelijke regelingen zoals toeslagen.
+
+legal_basis:
+  law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+  bwb_id: "BWBR0013060"
+  article: "54"
+  url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
+  juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+  explanation: "UWV verwerkt inkomensgegevens voor toeslagenberekeningen"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+
+  sources:
+    - name: "INKOMENSGEGEVENS"
+      description: "Toetsingsinkomen van de persoon"
+      type: "object"
+      legal_basis:
+        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+        bwb_id: "BWBR0013060"
+        article: "54"
+        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+        explanation: "UWV administreert toetsingsinkomen"
+      source_reference:
+        table: "uwv_toetsingsinkomen"
+        fields: ["toetsingsinkomen"]
+        select_on:
+          - name: "bsn"
+            description: "Burgerservicenummer van de persoon"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "toetsingsinkomen"
+      description: "Toetsingsinkomen in eurocenten voor berekening toeslagen"
+      type: "amount"
+      legal_basis:
+        law: "Wet structuur uitvoeringsorganisatie werk en inkomen"
+        bwb_id: "BWBR0013060"
+        article: "54"
+        url: "https://wetten.overheid.nl/BWBR0013060/2025-01-01"
+        juriconnect: "jci1.3:c:BWBR0013060&artikel=54&z=2025-01-01&g=2025-01-01"
+        explanation: "Toetsingsinkomen voor inkomensafhankelijke regelingen"
+
+actions:
+  - output: "toetsingsinkomen"
+    value: "$INKOMENSGEGEVENS.toetsingsinkomen"

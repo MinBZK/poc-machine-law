@@ -1,0 +1,353 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 0c6a4f3c-8a49-4f76-a109-265c0b7a05dc
+name: Bepalen mentorschap en vertegenwoordigingsbevoegdheid mentor
+law: burgerlijk_wetboek_mentorschap
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2024-01-01
+service: "RECHTSPRAAK"
+discoverable: "DELEGATION_PROVIDER"
+legal_basis:
+  law: "Burgerlijk Wetboek Boek 1"
+  bwb_id: "BWBR0002656"
+  article: "450"
+  paragraph: "1"
+  url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel450"
+  juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=450&lid=1&z=2024-01-01&g=2024-01-01"
+  explanation: >
+    Artikel 1:450 lid 1 BW bepaalt dat de kantonrechter ten behoeve van een meerderjarige
+    die als gevolg van zijn geestelijke of lichamelijke toestand tijdelijk of duurzaam
+    niet in staat is of bemoeilijkt wordt zijn belangen van niet-vermogensrechtelijke
+    aard zelf behoorlijk waar te nemen, een mentorschap kan instellen.
+description: >
+  Bepaalt of een persoon als mentor is benoemd voor een of meer betrokkenen (personen
+  onder mentorschap). Bij mentorschap blijft de betrokkene handelingsbekwaam, maar de
+  mentor neemt beslissingen over verzorging, verpleging, behandeling en begeleiding
+  (Art. 1:453 lid 1 BW). Mentorschap wordt vaak gecombineerd met beschermingsbewind.
+  Data komt uit het Centraal Curatele- en Bewindregister (CCBR) bij de Rechtspraak.
+
+references:
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "450"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel450"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "452"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "453"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453"
+  - law: "Burgerlijk Wetboek Boek 1"
+    article: "459"
+    url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling3_Artikel459"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon wiens mentor-bevoegdheden worden opgezocht"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN identificeert de mentor in het CCBR"
+
+  sources:
+    - name: "MENTORSCHAP_REGISTRATIES"
+      description: "Mentorschap-registraties uit het Centraal Curatele- en Bewindregister"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "452"
+        paragraph: "5"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&lid=5&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:452 lid 5 BW bepaalt dat de instelling van het mentorschap en de
+          benoeming van de mentor worden ingeschreven in het curatele- en bewindregister.
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "mentorschap_registraties"
+        fields: ["bsn_betrokkene", "naam_betrokkene", "datum_ingang", "datum_einde", "status"]
+        select_on:
+          - name: "bsn_mentor"
+            description: "BSN nummer van de mentor"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "heeft_delegaties"
+      description: "Of de persoon delegaties heeft als mentor"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "453"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=453&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:453 lid 1 BW: De mentor heeft tot taak de betrokkene te adviseren
+          en hem bij te staan, en kan hem zo nodig in en buiten rechte vertegenwoordigen.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_ids"
+      description: "BSN nummers van betrokkenen waarvoor deze persoon mentor is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "452"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN nummers van betrokkenen uit CCBR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_names"
+      description: "Namen van betrokkenen waarvoor deze persoon mentor is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "452"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+        explanation: "Namen van betrokkenen uit CCBR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_types"
+      description: "Types van de subjecten (altijd CITIZEN voor betrokkenen)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "450"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel450"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=450&z=2024-01-01&g=2024-01-01"
+        explanation: "Mentorschap is alleen voor meerderjarige natuurlijke personen"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "delegation_types"
+      description: "Type delegatie (MENTOR voor mentorschap)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "452"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+        explanation: "De mentor wordt benoemd door de kantonrechter (Art. 1:452 BW)"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "permissions"
+      description: "Rechten per betrokkene (mentor krijgt volledige rechten voor niet-vermogensrechtelijke zaken)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "453"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=453&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 1:453 lid 1 BW: De mentor heeft tot taak de betrokkene bij te staan
+          en kan hem zo nodig vertegenwoordigen in aangelegenheden betreffende
+          verzorging, verpleging, behandeling en begeleiding.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_from_dates"
+      description: "Startdatum van elk mentorschap"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "451"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel451"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=451&z=2024-01-01&g=2024-01-01"
+        explanation: "Ingangsdatum mentorschap uit CCBR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_until_dates"
+      description: "Einddatum van elk mentorschap (null = nog actief)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 1"
+        bwb_id: "BWBR0002656"
+        article: "462"
+        url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling3_Artikel462"
+        juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=462&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 1:462 BW: mentorschap kan worden opgeheven"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    # Art. 1:453 BW: mentor vertegenwoordigt bij niet-vermogensrechtelijke zaken
+    # Mentor krijgt volledige rechten voor zorg/behandeling beslissingen
+    MENTOR_RECHTEN:
+      - "LEZEN"
+      - "CLAIMS_INDIENEN"
+      - "BESLUITEN_ONTVANGEN"
+
+requirements:
+  - operation: EXISTS
+    subject: "$MENTORSCHAP_REGISTRATIES"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "452"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+      explanation: "Persoon moet als mentor zijn geregistreerd in het CCBR"
+
+actions:
+  # Stap 1: Filter op actieve mentorschap-registraties
+  - output: "actief_mentorschap"
+    operation: FOREACH
+    subject: "$MENTORSCHAP_REGISTRATIES"
+    where:
+      operation: AND
+      values:
+        - operation: EQUALS
+          subject: "$current.status"
+          value: "ACTIEF"
+        - operation: OR
+          values:
+            - operation: IS_NULL
+              subject: "$current.datum_einde"
+            - operation: EQUALS
+              subject: "$current.datum_einde"
+              value: ""
+            - operation: GREATER_THAN
+              values:
+                - "$current.datum_einde"
+                - "$calculation_date"
+    value: "$current"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "462"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling3_Artikel462"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=462&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Alleen actieve mentorschap-registraties geven vertegenwoordigingsbevoegdheid.
+        Mentorschap kan worden opgeheven (Art. 1:462 BW).
+
+  # heeft_delegaties: boolean indicating if person has any delegations
+  - output: "heeft_delegaties"
+    operation: EXISTS
+    subject: "$actief_mentorschap"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "453"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=453&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 1:453 BW bepaalt dat de mentor de betrokkene kan vertegenwoordigen.
+
+  # subject_ids: BSN numbers of betrokkenen
+  - output: "subject_ids"
+    subject: "$actief_mentorschap.bsn_betrokkene"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "452"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+      explanation: "BSN nummers van betrokkenen uit CCBR registratie"
+
+  # subject_names: names of betrokkenen
+  - output: "subject_names"
+    subject: "$actief_mentorschap.naam_betrokkene"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "452"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+      explanation: "Namen van betrokkenen uit CCBR registratie"
+
+  # subject_types: constant "CITIZEN" for each betrokkene
+  - output: "subject_types"
+    operation: FOREACH
+    subject: "$actief_mentorschap"
+    value: "CITIZEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "450"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel450"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=450&z=2024-01-01&g=2024-01-01"
+      explanation: "Mentorschap is alleen voor meerderjarigen, altijd CITIZEN"
+
+  # delegation_types: constant "MENTOR" for mentorschap
+  - output: "delegation_types"
+    operation: FOREACH
+    subject: "$actief_mentorschap"
+    value: "MENTOR"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "452"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel452"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=452&z=2024-01-01&g=2024-01-01"
+      explanation: "Type delegatie is MENTOR voor mentorschap"
+
+  # permissions: full permissions for non-financial matters
+  - output: "permissions"
+    operation: FOREACH
+    subject: "$actief_mentorschap"
+    value: "$MENTOR_RECHTEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "453"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling2_Artikel453"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=453&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 1:453 lid 1 BW: De mentor vertegenwoordigt de betrokkene in
+        aangelegenheden betreffende verzorging, verpleging, behandeling en begeleiding.
+
+  # valid_from_dates: start date from CCBR
+  - output: "valid_from_dates"
+    subject: "$actief_mentorschap.datum_ingang"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "451"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling1_Artikel451"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=451&z=2024-01-01&g=2024-01-01"
+      explanation: "Ingangsdatum mentorschap uit CCBR registratie"
+
+  # valid_until_dates: end date (null if still active)
+  - output: "valid_until_dates"
+    subject: "$actief_mentorschap.datum_einde"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 1"
+      bwb_id: "BWBR0002656"
+      article: "462"
+      url: "https://wetten.overheid.nl/BWBR0002656/2024-01-01#Boek1_Titeldeel20_Afdeling3_Artikel462"
+      juriconnect: "jci1.3:c:BWBR0002656&boek=1&artikel=462&z=2024-01-01&g=2024-01-01"
+      explanation: "Einddatum mentorschap, null indien nog actief"

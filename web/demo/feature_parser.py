@@ -154,7 +154,7 @@ def discover_feature_files(base_dirs: list[Path]) -> dict[str, list[dict[str, An
     from collections import defaultdict
 
     grouped_features = defaultdict(list)
-    excluded_tags = {"ui", "browser"}
+    excluded_tags = {"ui", "browser", "skip"}
 
     for base_dir in base_dirs:
         if not base_dir.exists():

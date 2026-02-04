@@ -1,0 +1,396 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: 2d6430cb-dd3c-47fa-9741-2202386619a8
+name: Bibob-advies Landelijk Bureau Bibob
+law: wet_bibob
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+discoverable: "HIDDEN"
+valid_from: 2024-01-01
+service: "LBB"
+legal_basis:
+  law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+  bwb_id: "BWBR0013798"
+  article: "9"
+  url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel9"
+  juriconnect: "jci1.3:c:BWBR0013798&paragraaf=3&artikel=9&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 9 bepaalt dat het Bureau tot taak heeft desgevraagd aan bestuursorganen advies uit te brengen over de mate van gevaar"
+description: >
+  Het Landelijk Bureau Bibob (LBB) brengt op verzoek van bestuursorganen advies uit over de mate van gevaar
+  dat een vergunning, subsidie, overheidsopdracht of vastgoedtransactie wordt misbruikt voor criminele
+  activiteiten of het witwassen van geld. Het advies is niet bindend; het bestuursorgaan beslist zelf
+  over weigering of het verbinden van voorschriften aan de beschikking. Bij ernstig gevaar kan de
+  beschikking worden geweigerd of ingetrokken, bij mindere mate kunnen voorschriften worden gesteld.
+
+references:
+  - law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+    bwb_id: "BWBR0013798"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+    explanation: "Artikel 3 bepaalt de gronden voor weigering of intrekking van beschikkingen"
+  - law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+    bwb_id: "BWBR0013798"
+    article: "5"
+    url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel5"
+    explanation: "Artikel 5 bepaalt wanneer een bestuursorgaan advies kan vragen"
+  - law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+    bwb_id: "BWBR0013798"
+    article: "8"
+    url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel8"
+    explanation: "Artikel 8 regelt de instelling van het Bureau"
+  - law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+    bwb_id: "BWBR0013798"
+    article: "12"
+    url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel12"
+    explanation: "Artikel 12 regelt de gegevensverzameling door het Bureau"
+  - law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+    bwb_id: "BWBR0013798"
+    article: "15"
+    url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel15"
+    explanation: "Artikel 15 bepaalt de adviestermijn van acht weken"
+
+properties:
+  parameters:
+    - name: "KVK_NUMMER"
+      description: "KVK-nummer van de onderneming waarvoor advies wordt gevraagd"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "7a"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel7a"
+        explanation: "Artikel 7a regelt de formulieren en gegevens die worden opgevraagd bij de betrokkene"
+
+    - name: "BSN"
+      description: "BSN van de natuurlijke persoon waarvoor advies wordt gevraagd (exploitant, bestuurder, etc.)"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "7a"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel7a"
+        explanation: "Bij Bibob-onderzoek worden ook natuurlijke personen onderzocht die bij de onderneming betrokken zijn"
+
+    - name: "BESCHIKKING_TYPE"
+      description: "Type beschikking waarvoor advies wordt gevraagd"
+      type: "enum"
+      type_spec:
+        enum: ["vergunning", "subsidie", "overheidsopdracht", "vastgoedtransactie"]
+        enum_labels:
+          vergunning: "Vergunning (horeca, bouw, milieu, etc.)"
+          subsidie: "Subsidie"
+          overheidsopdracht: "Overheidsopdracht of aanbesteding"
+          vastgoedtransactie: "Vastgoedtransactie"
+      required: true
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 1 noemt de verschillende typen beschikkingen waarop de wet van toepassing is"
+
+  sources:
+    # Adviesgegevens uit het LBB-register
+    - name: "ADVIES_UITGEBRACHT"
+      description: "Of er een Bibob-advies is uitgebracht door het LBB"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bibob_adviezen"
+        field: "advies_uitgebracht"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel9"
+        explanation: "Artikel 9 bepaalt de adviestaak van het Bureau"
+
+    - name: "ADVIES_MATE_VAN_GEVAAR"
+      description: "De mate van gevaar volgens het Bibob-advies"
+      type: "enum"
+      type_spec:
+        enum: ["geen_gevaar", "mindere_mate", "ernstig_gevaar"]
+        enum_labels:
+          geen_gevaar: "Geen gevaar gebleken"
+          mindere_mate: "Mindere mate van gevaar"
+          ernstig_gevaar: "Ernstig gevaar"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bibob_adviezen"
+        field: "mate_van_gevaar"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 1 onderscheidt ernstig gevaar (sub a-d), artikel 3 lid 7 regelt de mindere mate van gevaar"
+
+    - name: "ADVIES_DATUM"
+      description: "Datum waarop het Bibob-advies is uitgebracht"
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bibob_adviezen"
+        field: "advies_datum"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "15"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel15"
+        explanation: "Artikel 15 bepaalt dat het Bureau binnen acht weken advies uitbrengt"
+
+    - name: "RELATIE_TOT_STRAFBARE_FEITEN"
+      description: "Of er een relatie is vastgesteld tot strafbare feiten"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bibob_adviezen"
+        field: "relatie_strafbare_feiten"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 1 sub b: ernstig gevaar als betrokkene in relatie staat tot strafbare feiten"
+
+    - name: "FINANCIERINGSRISICO"
+      description: "Of er sprake is van financieringsrisico (witwassen)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bibob_adviezen"
+        field: "financieringsrisico"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 1 sub a: ernstig gevaar voor misbruik van de beschikking (witwassen, criminele herkomst gelden)"
+
+    - name: "VOORSCHRIFTEN_GEADVISEERD"
+      description: "Of het LBB adviseert voorschriften aan de beschikking te verbinden"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bibob_adviezen"
+        field: "voorschriften_geadviseerd"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KVK-nummer van de onderneming"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "7"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 7: bij mindere mate van gevaar kunnen voorschriften worden verbonden ter beperking van het gevaar"
+
+  output:
+    - name: "advies_uitgebracht"
+      description: "Of er een Bibob-advies is uitgebracht"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel9"
+        explanation: "Geeft aan of het LBB een advies heeft uitgebracht"
+
+    - name: "mate_van_gevaar"
+      description: "De mate van gevaar volgens het Bibob-advies"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "De mate van gevaar bepaalt of weigering, voorschriften of verlening geadviseerd wordt"
+
+    - name: "weigering_mogelijk"
+      description: "Of weigering of intrekking van de beschikking mogelijk is op grond van het advies"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Weigering is mogelijk bij ernstig gevaar (artikel 3 lid 1)"
+
+    - name: "voorschriften_mogelijk"
+      description: "Of voorschriften aan de beschikking kunnen worden verbonden"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "7"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Voorschriften zijn mogelijk bij mindere mate van gevaar of bij ernstig gevaar waar weigering niet proportioneel is"
+
+    - name: "verlening_geadviseerd"
+      description: "Of verlening van de beschikking wordt geadviseerd (geen belemmeringen vanuit Bibob)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Bij geen gevaar hoeft de Wet Bibob geen belemmering te zijn voor verlening"
+
+  definitions:
+    MATE_GEEN_GEVAAR: "geen_gevaar"
+    MATE_MINDERE_MATE: "mindere_mate"
+    MATE_ERNSTIG_GEVAAR: "ernstig_gevaar"
+    ADVIESTERMIJN_WEKEN: 8
+
+actions:
+  - output: "advies_uitgebracht"
+    value: "$ADVIES_UITGEBRACHT"
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "9"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf3_Artikel9"
+      explanation: "Geeft door of er een advies is uitgebracht"
+
+  - output: "mate_van_gevaar"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$ADVIES_UITGEBRACHT"
+          operation: EQUALS
+          value: true
+        then: "$ADVIES_MATE_VAN_GEVAAR"
+      - else: null
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "3"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+      explanation: "De mate van gevaar wordt alleen bepaald als er een advies is uitgebracht"
+
+  - output: "weigering_mogelijk"
+    operation: AND
+    values:
+      - subject: "$ADVIES_UITGEBRACHT"
+        operation: EQUALS
+        value: true
+      - subject: "$ADVIES_MATE_VAN_GEVAAR"
+        operation: EQUALS
+        value: "$MATE_ERNSTIG_GEVAAR"
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "3"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+      explanation: "Weigering of intrekking is mogelijk bij ernstig gevaar"
+
+  - output: "voorschriften_mogelijk"
+    operation: AND
+    values:
+      - subject: "$ADVIES_UITGEBRACHT"
+        operation: EQUALS
+        value: true
+      - operation: OR
+        values:
+          - subject: "$ADVIES_MATE_VAN_GEVAAR"
+            operation: EQUALS
+            value: "$MATE_MINDERE_MATE"
+          - operation: AND
+            values:
+              - subject: "$ADVIES_MATE_VAN_GEVAAR"
+                operation: EQUALS
+                value: "$MATE_ERNSTIG_GEVAAR"
+              - subject: "$VOORSCHRIFTEN_GEADVISEERD"
+                operation: EQUALS
+                value: true
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "3"
+      paragraph: "7"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+      explanation: "Voorschriften zijn mogelijk bij mindere mate van gevaar of bij ernstig gevaar waar weigering niet proportioneel is"
+
+  - output: "verlening_geadviseerd"
+    operation: OR
+    values:
+      - subject: "$ADVIES_UITGEBRACHT"
+        operation: EQUALS
+        value: false
+      - subject: "$ADVIES_MATE_VAN_GEVAAR"
+        operation: EQUALS
+        value: "$MATE_GEEN_GEVAAR"
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "3"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+      explanation: "Verlening wordt geadviseerd als er geen advies is of als er geen gevaar is gebleken"

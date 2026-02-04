@@ -1,0 +1,499 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: 8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c
+name: Alcoholwet vergunningseisen nationaal
+law: alcoholwet/vergunning
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "HIDDEN"
+valid_from: 2024-01-01
+service: "VWS"
+legal_basis:
+  law: "Alcoholwet"
+  bwb_id: "BWBR0002458"
+  article: "8"
+  url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+  explanation: "De Alcoholwet stelt landelijke eisen aan leidinggevenden (artikel 8) en inrichtingen (artikel 10) voor het verkrijgen van een vergunning"
+description: >
+  Nationale eisen uit de Alcoholwet voor het verkrijgen van een vergunning voor het uitoefenen van het
+  horecabedrijf of slijtersbedrijf. Deze wet stelt eisen aan leidinggevenden (artikel 8: minimaal 21 jaar,
+  niet van slecht levensgedrag, niet onder curatele, ingeschreven in Register sociale hygiëne) en aan
+  inrichtingen (artikel 10: minimale vloeroppervlakte). Gemeenten gebruiken deze nationale eisen bij de
+  beoordeling van vergunningaanvragen.
+
+references:
+  - law: "Alcoholwet"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk1_Artikel1"
+  - law: "Alcoholwet"
+    article: "8"
+    url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+  - law: "Alcoholwet"
+    article: "10"
+    url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+  - law: "Alcoholwet"
+    article: "27"
+    url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27"
+
+properties:
+  parameters:
+    # Gegevens over leidinggevenden - aangeleverd door gemeenten
+    - name: "LEEFTIJD_LEIDINGGEVENDE"
+      description: "Leeftijd van de leidinggevende in jaren"
+      type: "number"
+      required: true
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Artikel 8 lid 1 onder a vereist dat leidinggevenden de leeftijd van 21 jaar hebben bereikt"
+
+    - name: "IS_ONDER_CURATELE"
+      description: "Of de leidinggevende onder curatele staat"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Artikel 8 lid 1 onder c bepaalt dat leidinggevenden niet onder curatele mogen staan"
+
+    - name: "IS_VAN_SLECHT_LEVENSGEDRAG"
+      description: "Of de leidinggevende in enig opzicht van slecht levensgedrag is"
+      type: "boolean"
+      required: false
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Artikel 8 lid 1 onder b bepaalt dat leidinggevenden niet in enig opzicht van slecht levensgedrag mogen zijn"
+
+    - name: "IS_INGESCHREVEN_SVH_REGISTER"
+      description: "Of de leidinggevende is ingeschreven in het Register sociale hygiëne"
+      type: "boolean"
+      required: false
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Artikel 8 lid 1 onder d vereist inschrijving in het Register sociale hygiëne"
+
+    # Gegevens over inrichting - aangeleverd door gemeenten
+    - name: "VLOEROPPERVLAKTE"
+      description: "Vloeroppervlakte van de lokaliteit in vierkante meters"
+      type: "number"
+      required: true
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "10"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+        explanation: "Artikel 10 lid 2 bepaalt minimale vloeroppervlakte-eisen"
+
+    - name: "TYPE_BEDRIJF"
+      description: "Type bedrijf: horecabedrijf of slijtersbedrijf"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk1_Artikel1"
+        explanation: "Artikel 1 definieert horecabedrijf en slijtersbedrijf met verschillende vloeroppervlakte-eisen"
+
+  output:
+    - name: "voldoet_aan_leeftijdseis"
+      description: "Of de leidinggevende voldoet aan de leeftijdseis van 21 jaar (artikel 8 lid 1 onder a)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Leidinggevenden moeten de leeftijd van 21 jaar hebben bereikt"
+
+    - name: "voldoet_aan_curatele_eis"
+      description: "Of de leidinggevende voldoet aan de eis om niet onder curatele te staan (artikel 8 lid 1 onder c)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Leidinggevenden mogen niet onder curatele staan"
+
+    - name: "voldoet_aan_levensgedrag_eis"
+      description: "Of de leidinggevende voldoet aan de eis om niet van slecht levensgedrag te zijn (artikel 8 lid 1 onder b)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Leidinggevenden mogen niet in enig opzicht van slecht levensgedrag zijn"
+
+    - name: "voldoet_aan_svh_eis"
+      description: "Of de leidinggevende voldoet aan de eis van inschrijving in het Register sociale hygiëne (artikel 8 lid 1 onder d)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Leidinggevenden moeten ingeschreven zijn in het Register sociale hygiëne"
+
+    - name: "voldoet_aan_inrichtingseis"
+      description: "Of de inrichting voldoet aan de vloeroppervlakte-eis (artikel 10 lid 2)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "10"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+        explanation: "Een horecalokaliteit moet ten minste 35 m² hebben, een slijtlokaliteit ten minste 15 m²"
+
+    - name: "voldoet_aan_artikel_8"
+      description: "Of de leidinggevende voldoet aan alle eisen van artikel 8 lid 1"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Alle eisen van artikel 8 lid 1 moeten zijn vervuld"
+
+    - name: "voldoet_aan_nationale_eisen"
+      description: "Of aan alle nationale eisen uit de Alcoholwet is voldaan (artikel 8 en 10)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "27"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27"
+        explanation: "Artikel 27 lid 1 onder a: vergunning wordt geweigerd als niet wordt voldaan aan artikel 8 of 10"
+
+    - name: "weigeringsgrond_nationaal"
+      description: "Reden voor weigering op grond van nationale Alcoholwet-eisen"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "27"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27"
+        explanation: "Weigeringsgronden op basis van artikel 27 lid 1 onder a"
+
+  definitions:
+    MINIMALE_LEEFTIJD: 21
+    MINIMALE_VLOEROPPERVLAKTE_HORECA: 35
+    MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ: 15
+    TYPE_HORECABEDRIJF: "horecabedrijf"
+    TYPE_SLIJTERSBEDRIJF: "slijtersbedrijf"
+
+requirements:
+  - all:
+      # Leeftijdseis artikel 8 lid 1 onder a
+      - operation: GREATER_OR_EQUAL
+        subject: "$LEEFTIJD_LEIDINGGEVENDE"
+        value: "$MINIMALE_LEEFTIJD"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "8"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+          explanation: "Artikel 8 lid 1 onder a: leidinggevenden moeten de leeftijd van eenentwintig jaar hebben bereikt"
+
+      # Curatele-eis artikel 8 lid 1 onder c
+      - subject: "$IS_ONDER_CURATELE"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "8"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+          explanation: "Artikel 8 lid 1 onder c: leidinggevenden mogen niet onder curatele staan"
+
+      # Inrichtingseis artikel 10 lid 2 - horeca
+      - or:
+          - subject: "$TYPE_BEDRIJF"
+            operation: NOT_EQUALS
+            value: "$TYPE_HORECABEDRIJF"
+          - operation: GREATER_OR_EQUAL
+            subject: "$VLOEROPPERVLAKTE"
+            value: "$MINIMALE_VLOEROPPERVLAKTE_HORECA"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "10"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+          explanation: "Artikel 10 lid 2: een horecalokaliteit moet ten minste 35 m² vloeroppervlakte hebben"
+
+      # Inrichtingseis artikel 10 lid 2 - slijterij
+      - or:
+          - subject: "$TYPE_BEDRIJF"
+            operation: NOT_EQUALS
+            value: "$TYPE_SLIJTERSBEDRIJF"
+          - operation: GREATER_OR_EQUAL
+            subject: "$VLOEROPPERVLAKTE"
+            value: "$MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "10"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+          explanation: "Artikel 10 lid 2: een slijtlokaliteit moet ten minste 15 m² vloeroppervlakte hebben"
+
+actions:
+  # Individuele eisen
+  - output: "voldoet_aan_leeftijdseis"
+    operation: GREATER_OR_EQUAL
+    subject: "$LEEFTIJD_LEIDINGGEVENDE"
+    value: "$MINIMALE_LEEFTIJD"
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Leeftijd moet minimaal 21 jaar zijn"
+
+  - output: "voldoet_aan_curatele_eis"
+    operation: EQUALS
+    subject: "$IS_ONDER_CURATELE"
+    value: false
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Mag niet onder curatele staan"
+
+  - output: "voldoet_aan_levensgedrag_eis"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$IS_VAN_SLECHT_LEVENSGEDRAG"
+          operation: IS_NULL
+        then: true
+      - test:
+          subject: "$IS_VAN_SLECHT_LEVENSGEDRAG"
+          operation: EQUALS
+          value: false
+        then: true
+      - else: false
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Mag niet van slecht levensgedrag zijn"
+
+  - output: "voldoet_aan_svh_eis"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$IS_INGESCHREVEN_SVH_REGISTER"
+          operation: IS_NULL
+        then: true
+      - test:
+          subject: "$IS_INGESCHREVEN_SVH_REGISTER"
+          operation: EQUALS
+          value: true
+        then: true
+      - else: false
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Moet ingeschreven zijn in Register sociale hygiëne"
+
+  - output: "voldoet_aan_inrichtingseis"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - subject: "$TYPE_BEDRIJF"
+              operation: EQUALS
+              value: "$TYPE_HORECABEDRIJF"
+            - operation: GREATER_OR_EQUAL
+              subject: "$VLOEROPPERVLAKTE"
+              value: "$MINIMALE_VLOEROPPERVLAKTE_HORECA"
+        then: true
+      - test:
+          operation: AND
+          values:
+            - subject: "$TYPE_BEDRIJF"
+              operation: EQUALS
+              value: "$TYPE_SLIJTERSBEDRIJF"
+            - operation: GREATER_OR_EQUAL
+              subject: "$VLOEROPPERVLAKTE"
+              value: "$MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ"
+        then: true
+      - test:
+          operation: AND
+          values:
+            - subject: "$TYPE_BEDRIJF"
+              operation: NOT_EQUALS
+              value: "$TYPE_HORECABEDRIJF"
+            - subject: "$TYPE_BEDRIJF"
+              operation: NOT_EQUALS
+              value: "$TYPE_SLIJTERSBEDRIJF"
+        then: true
+      - else: false
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "10"
+      paragraph: "2"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+      explanation: "Vloeroppervlakte moet voldoen aan minimumeis voor bedrijfstype"
+
+  # Gecombineerde artikel 8 check
+  - output: "voldoet_aan_artikel_8"
+    operation: AND
+    values:
+      - operation: GREATER_OR_EQUAL
+        subject: "$LEEFTIJD_LEIDINGGEVENDE"
+        value: "$MINIMALE_LEEFTIJD"
+      - subject: "$IS_ONDER_CURATELE"
+        operation: EQUALS
+        value: false
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Alle verplichte eisen van artikel 8 lid 1"
+
+  # Totaal oordeel nationale eisen
+  - output: "voldoet_aan_nationale_eisen"
+    value: true
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "27"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27"
+      explanation: "Aan alle nationale eisen uit artikel 8 en 10 is voldaan"
+
+  # Weigeringsgrond
+  - output: "weigeringsgrond_nationaal"
+    operation: IF
+    conditions:
+      - test:
+          operation: LESS_THAN
+          subject: "$LEEFTIJD_LEIDINGGEVENDE"
+          value: "$MINIMALE_LEEFTIJD"
+        then: "Leidinggevende heeft de leeftijd van 21 jaar niet bereikt (artikel 8 lid 1 onder a)"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "8"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+          explanation: "Leeftijdseis niet vervuld"
+      - test:
+          subject: "$IS_ONDER_CURATELE"
+          operation: EQUALS
+          value: true
+        then: "Leidinggevende staat onder curatele (artikel 8 lid 1 onder c)"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "8"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+          explanation: "Curatele-eis niet vervuld"
+      - test:
+          operation: AND
+          values:
+            - subject: "$TYPE_BEDRIJF"
+              operation: EQUALS
+              value: "$TYPE_HORECABEDRIJF"
+            - operation: LESS_THAN
+              subject: "$VLOEROPPERVLAKTE"
+              value: "$MINIMALE_VLOEROPPERVLAKTE_HORECA"
+        then: "Horecalokaliteit heeft minder dan 35 m² vloeroppervlakte (artikel 10 lid 2)"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "10"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+          explanation: "Vloeroppervlakte-eis horeca niet vervuld"
+      - test:
+          operation: AND
+          values:
+            - subject: "$TYPE_BEDRIJF"
+              operation: EQUALS
+              value: "$TYPE_SLIJTERSBEDRIJF"
+            - operation: LESS_THAN
+              subject: "$VLOEROPPERVLAKTE"
+              value: "$MINIMALE_VLOEROPPERVLAKTE_SLIJTERIJ"
+        then: "Slijtlokaliteit heeft minder dan 15 m² vloeroppervlakte (artikel 10 lid 2)"
+        legal_basis:
+          law: "Alcoholwet"
+          bwb_id: "BWBR0002458"
+          article: "10"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel10"
+          explanation: "Vloeroppervlakte-eis slijterij niet vervuld"
+      - else: ""
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "27"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk3_Artikel27"
+      explanation: "Weigeringsgrond op basis van niet voldoen aan artikel 8 of 10"

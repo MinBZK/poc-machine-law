@@ -104,7 +104,7 @@ def validate_schema(yaml_data: any) -> str | None:
 
 
 # Get all law YAML files
-laws_dir = os.path.join(os.path.dirname(__file__), "../../law")
+laws_dir = os.path.join(os.path.dirname(__file__), "../../laws")
 examples = []
 for root, _, files in os.walk(laws_dir):
     for file in files:

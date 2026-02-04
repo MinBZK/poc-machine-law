@@ -1,0 +1,167 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: 4e7f7c46-e0fe-4cf0-b72c-d446e6dd1f55
+name: Landelijk Register Sociale Hygiëne
+law: alcoholwet/register_sociale_hygiene
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "HIDDEN"
+valid_from: 2024-01-01
+service: "SVH"
+legal_basis:
+  law: "Alcoholwet"
+  bwb_id: "BWBR0002458"
+  article: "8"
+  paragraph: "4"
+  url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+  explanation: "Artikel 8 lid 4 bepaalt dat leidinggevenden ingeschreven moeten staan in het Register Sociale Hygiëne"
+description: >
+  Het Landelijk Register Sociale Hygiëne bevat de registraties van personen die het examen
+  Sociale Hygiëne hebben behaald. Dit register wordt beheerd door de Stichting Vakbekwaamheid
+  Horeca (SVH). Gemeenten raadplegen dit register bij de beoordeling van aanvragen voor
+  een Alcoholwetvergunning om te controleren of leidinggevenden aan de vakbekwaamheidseis voldoen.
+
+references:
+  - law: "Alcoholwet"
+    article: "8"
+    paragraph: "4"
+    url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon waarvan de SVH-registratie wordt opgevraagd"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "BSN is nodig voor identificatie van de persoon in het register"
+
+  sources:
+    - name: "REGISTRATIE"
+      description: "Registratiegegevens uit het Landelijk Register Sociale Hygiëne"
+      type: "object"
+      source_reference:
+        table: "registraties"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de persoon"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Het register bevat gegevens over de vakbekwaamheid sociale hygiëne"
+
+  output:
+    - name: "is_geregistreerd"
+      description: "Of de persoon geregistreerd staat in het Register Sociale Hygiëne"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Leidinggevenden moeten ingeschreven staan in het register"
+
+    - name: "registratienummer"
+      description: "Het unieke registratienummer in het Register Sociale Hygiëne"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Het registratienummer identificeert de inschrijving"
+
+    - name: "naam"
+      description: "Naam van de geregistreerde persoon"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Naam voor verificatie van de registratie"
+
+    - name: "registratiedatum"
+      description: "Datum waarop de registratie is ingegaan"
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Datum van registratie"
+
+actions:
+  - output: "is_geregistreerd"
+    condition:
+      always: true
+    value: "$REGISTRATIE.is_geregistreerd"
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "4"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Controle of persoon in register voorkomt"
+
+  - output: "registratienummer"
+    condition:
+      always: true
+    value: "$REGISTRATIE.registratienummer"
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "4"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Ophalen registratienummer"
+
+  - output: "naam"
+    condition:
+      expression: "$REGISTRATIE != null"
+    value: "$REGISTRATIE.naam"
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "4"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Ophalen naam"
+
+  - output: "registratiedatum"
+    condition:
+      expression: "$REGISTRATIE != null"
+    value: "$REGISTRATIE.registratiedatum"
+    legal_basis:
+      law: "Alcoholwet"
+      bwb_id: "BWBR0002458"
+      article: "8"
+      paragraph: "4"
+      url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+      explanation: "Ophalen registratiedatum"

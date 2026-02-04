@@ -1,0 +1,355 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 9e69492c-c73d-44ea-9672-8a1d36f53ad5
+name: Bepalen executeurschap en vertegenwoordigingsbevoegdheid executeur
+law: burgerlijk_wetboek_executeur
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2024-01-01
+service: "NOTARIAAT"
+discoverable: "DELEGATION_PROVIDER"
+legal_basis:
+  law: "Burgerlijk Wetboek Boek 4"
+  bwb_id: "BWBR0002761"
+  article: "144"
+  paragraph: "1"
+  url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+  juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&lid=1&z=2024-01-01&g=2024-01-01"
+  explanation: >
+    Artikel 4:144 lid 1 BW bepaalt dat een erflater bij uiterste wilsbeschikking
+    een of meer executeurs kan benoemen. De executeur heeft tot taak de goederen
+    der nalatenschap te beheren en de schulden der nalatenschap te voldoen.
+description: >
+  Bepaalt of een persoon als executeur is benoemd voor een of meer nalatenschappen.
+  De executeur vertegenwoordigt de nalatenschap (boedel) en heeft privatieve
+  vertegenwoordigingsbevoegdheid: zolang de executeur optreedt, kunnen erfgenamen
+  niet over de goederen beschikken (Art. 4:145 lid 1 BW).
+  Data komt uit het Centraal Testamentenregister (CTR) bij het Notariaat.
+
+references:
+  - law: "Burgerlijk Wetboek Boek 4"
+    article: "144"
+    url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+  - law: "Burgerlijk Wetboek Boek 4"
+    article: "145"
+    url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel145"
+  - law: "Burgerlijk Wetboek Boek 4"
+    article: "149"
+    url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel149"
+  - law: "Burgerlijk Wetboek Boek 4"
+    article: "150"
+    url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel150"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon wiens executeur-bevoegdheden worden opgezocht"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN identificeert de executeur in het CTR"
+
+  sources:
+    - name: "EXECUTEUR_REGISTRATIES"
+      description: "Executeur-registraties uit het Centraal Testamentenregister"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "144"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Testamenten met executeurbenoemingen worden geregistreerd in het
+          Centraal Testamentenregister (CTR).
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "executeur_registraties"
+        fields: ["bsn_erflater", "naam_erflater", "nalatenschap_id", "datum_overlijden", "datum_aanvaarding", "datum_einde", "status"]
+        select_on:
+          - name: "bsn_executeur"
+            description: "BSN nummer van de executeur"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "heeft_delegaties"
+      description: "Of de persoon delegaties heeft als executeur"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "145"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel145"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=145&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 4:145 lid 1 BW: De executeur is bevoegd de goederen der nalatenschap
+          te beheren.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_ids"
+      description: "Identifiers van nalatenschappen waarvoor deze persoon executeur is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "144"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+        explanation: "Nalatenschap identifiers uit CTR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_names"
+      description: "Namen van erflaters wiens nalatenschap wordt beheerd"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "144"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+        explanation: "Namen van erflaters uit CTR registratie"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_types"
+      description: "Types van de subjecten (CITIZEN voor nalatenschap van natuurlijk persoon)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "144"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+        explanation: "Nalatenschap van natuurlijk persoon"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "delegation_types"
+      description: "Type delegatie (EXECUTEUR_NALATENSCHAP voor executeurschap)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "144"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+        explanation: "Executeur vertegenwoordigt nalatenschap (boedel)"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "permissions"
+      description: "Rechten per nalatenschap (executeur krijgt volledige rechten)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "145"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel145"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=145&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 4:145 lid 1 BW: De executeur is bevoegd de goederen der nalatenschap
+          te beheren en heeft privatieve bevoegdheid (uitsluiting erfgenamen).
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_from_dates"
+      description: "Startdatum van elk executeurschap (datum overlijden + aanvaarding)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "144"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+        explanation: "Datum aanvaarding executeurschap uit CTR"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_until_dates"
+      description: "Einddatum van elk executeurschap (null = nog actief)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 4"
+        bwb_id: "BWBR0002761"
+        article: "149"
+        url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel149"
+        juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=149&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 4:149 BW: taak executeur eindigt bij voltooiing of ontslag"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    # Art. 4:145 BW: executeur heeft privatieve beheers- en beschikkingsbevoegdheid
+    EXECUTEUR_RECHTEN:
+      - "LEZEN"
+      - "CLAIMS_INDIENEN"
+      - "BESLUITEN_ONTVANGEN"
+
+requirements:
+  - operation: EXISTS
+    subject: "$EXECUTEUR_REGISTRATIES"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "144"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+      explanation: "Persoon moet als executeur zijn geregistreerd in het CTR"
+
+actions:
+  # Stap 1: Filter op actieve executeurschappen
+  - output: "actief_executeurschap"
+    operation: FOREACH
+    subject: "$EXECUTEUR_REGISTRATIES"
+    where:
+      operation: AND
+      values:
+        - operation: EQUALS
+          subject: "$current.status"
+          value: "ACTIEF"
+        - operation: OR
+          values:
+            - operation: IS_NULL
+              subject: "$current.datum_einde"
+            - operation: EQUALS
+              subject: "$current.datum_einde"
+              value: ""
+            - operation: GREATER_THAN
+              values:
+                - "$current.datum_einde"
+                - "$calculation_date"
+    value: "$current"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "149"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel149"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=149&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Alleen actieve executeurschappen geven vertegenwoordigingsbevoegdheid.
+        Art. 4:149 BW: taak executeur eindigt bij voltooiing of ontslag.
+
+  # heeft_delegaties: boolean indicating if person has any delegations
+  - output: "heeft_delegaties"
+    operation: EXISTS
+    subject: "$actief_executeurschap"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "145"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel145"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=145&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 4:145 BW bepaalt dat de executeur de nalatenschap beheert.
+
+  # subject_ids: nalatenschap identifiers
+  - output: "subject_ids"
+    subject: "$actief_executeurschap.nalatenschap_id"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "144"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+      explanation: "Nalatenschap identifiers uit CTR registratie"
+
+  # subject_names: names of deceased (erflaters)
+  - output: "subject_names"
+    operation: FOREACH
+    subject: "$actief_executeurschap"
+    value:
+      operation: CONCAT
+      values:
+        - "Nalatenschap "
+        - "$current.naam_erflater"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "144"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+      explanation: "Namen van erflaters wiens nalatenschap wordt beheerd"
+
+  # subject_types: constant "CITIZEN" for estate of natural person
+  - output: "subject_types"
+    operation: FOREACH
+    subject: "$actief_executeurschap"
+    value: "CITIZEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "144"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+      explanation: "Nalatenschap van natuurlijk persoon, behandeld als CITIZEN"
+
+  # delegation_types: constant "EXECUTEUR_NALATENSCHAP" for executeurschap
+  - output: "delegation_types"
+    operation: FOREACH
+    subject: "$actief_executeurschap"
+    value: "EXECUTEUR_NALATENSCHAP"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "144"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+      explanation: "Type delegatie is EXECUTEUR_NALATENSCHAP voor executeurschap"
+
+  # permissions: full permissions for estate management
+  - output: "permissions"
+    operation: FOREACH
+    subject: "$actief_executeurschap"
+    value: "$EXECUTEUR_RECHTEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "145"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel145"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=145&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 4:145 lid 1 BW: De executeur heeft privatieve bevoegdheid tot beheer
+        en beschikking over de goederen der nalatenschap.
+
+  # valid_from_dates: date of acceptance
+  - output: "valid_from_dates"
+    subject: "$actief_executeurschap.datum_aanvaarding"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "144"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel144"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=144&z=2024-01-01&g=2024-01-01"
+      explanation: "Datum aanvaarding executeurschap uit CTR"
+
+  # valid_until_dates: end date (null if still active)
+  - output: "valid_until_dates"
+    subject: "$actief_executeurschap.datum_einde"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 4"
+      bwb_id: "BWBR0002761"
+      article: "149"
+      url: "https://wetten.overheid.nl/BWBR0002761/2024-01-01#Boek4_Titeldeel7_Artikel149"
+      juriconnect: "jci1.3:c:BWBR0002761&boek=4&artikel=149&z=2024-01-01&g=2024-01-01"
+      explanation: "Einddatum executeurschap, null indien nog actief"

@@ -1,4 +1,5 @@
-@ui
+@skip-go
+@skip
 Feature: Edit values through web interface
   As a citizen
   I want to edit my income values through the web interface

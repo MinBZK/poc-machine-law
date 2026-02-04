@@ -1,0 +1,200 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c
+name: Bepalen BAG gegevens
+law: wet_bag
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2018-07-28
+service: "KADASTER"
+legal_basis:
+  law: "Wet basisregistratie adressen en gebouwen"
+  bwb_id: "BWBR0023466"
+  article: "1"
+  url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+  juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+  explanation: "Artikel 1 Wet BAG bepaalt dat de basisregistratie adressen en gebouwen bevat gegevens over adressen, gebouwen en standplaatsen"
+description: >
+  Regels voor het bepalen van gegevens uit de Basisregistratie Adressen en Gebouwen (BAG).
+  Het Kadaster verzorgt de landelijke voorziening waarin gemeenten hun BAG-gegevens aanleveren.
+  Overheidsorganen zijn verplicht deze authentieke gegevens te gebruiken bij hun publiekrechtelijke taken.
+
+references:
+  - law: "Wet BAG"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+  - law: "Wet BAG"
+    article: "2"
+    url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel2"
+  - law: "Wet BAG"
+    article: "6"
+    url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf2_Artikel6"
+
+properties:
+  parameters:
+    - name: "ADRES"
+      description: "Adresgegevens (volledig adres als string)"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "1"
+        url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+        explanation: "Artikel 1 bepaalt dat nummeraanduidingen deel uitmaken van de BAG"
+
+  sources:
+    - name: "VERBLIJFSOBJECT"
+      description: "Verblijfsobject gegevens uit BAG"
+      type: "object"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "bag_verblijfsobjecten"
+        fields: ["gebruiksdoel", "oppervlakte", "status", "bouwjaar"]
+        select_on:
+          - name: "adres"
+            description: "Volledig adres"
+            type: "string"
+            value: "$ADRES"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "1"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=1&lid=1&z=2018-07-28&g=2018-07-28"
+        explanation: "Artikel 1 lid 1 onder c bepaalt dat verblijfsobjecten geregistreerd worden met hun kenmerken"
+
+  output:
+    - name: "gebruiksdoel"
+      description: "Gebruiksdoel van het verblijfsobject volgens Bouwbesluit 2012"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "1"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=1&lid=2&z=2018-07-28&g=2018-07-28"
+        explanation: "Artikel 1 lid 2 bepaalt dat gebruiksdoel wordt geregistreerd"
+
+    - name: "oppervlakte"
+      description: "Gebruiksoppervlakte van het verblijfsobject in m²"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 1
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "1"
+        url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+        explanation: "Artikel 1 bepaalt dat oppervlakte als kenmerk wordt geregistreerd"
+
+    - name: "status"
+      description: "Status van het verblijfsobject"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "1"
+        url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+        explanation: "Artikel 1 bepaalt dat de status wordt geregistreerd"
+
+    - name: "is_woonfunctie"
+      description: "Of het verblijfsobject een woonfunctie heeft"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "2"
+        url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel2"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=2&z=2018-07-28&g=2018-07-28"
+        explanation: "Artikel 2 bepaalt verplicht gebruik van authentieke gegevens, waaronder gebruiksdoelen"
+
+  definitions:
+    WOON_GEBRUIKSDOELEN:
+      - "woonfunctie"
+    NIET_WOON_GEBRUIKSDOELEN:
+      - "bijeenkomstfunctie"
+      - "celfunctie"
+      - "gezondheidszorgfunctie"
+      - "industriefunctie"
+      - "kantoorfunctie"
+      - "logiesfunctie"
+      - "onderwijsfunctie"
+      - "sportfunctie"
+      - "winkelfunctie"
+      - "overige gebruiksfunctie"
+
+requirements:
+  - all:
+      - subject: "$ADRES"
+        operation: NOT_NULL
+        legal_basis:
+          law: "Wet basisregistratie adressen en gebouwen"
+          bwb_id: "BWBR0023466"
+          article: "1"
+          url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+          juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+          explanation: "Artikel 1 vereist adresgegevens voor opzoeken verblijfsobject"
+
+actions:
+  - output: "gebruiksdoel"
+    value: "$VERBLIJFSOBJECT.gebruiksdoel"
+    legal_basis:
+      law: "Wet basisregistratie adressen en gebouwen"
+      bwb_id: "BWBR0023466"
+      article: "1"
+      url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+      juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+      explanation: "Artikel 1 bepaalt registratie van gebruiksdoel"
+
+  - output: "oppervlakte"
+    value: "$VERBLIJFSOBJECT.oppervlakte"
+    legal_basis:
+      law: "Wet basisregistratie adressen en gebouwen"
+      bwb_id: "BWBR0023466"
+      article: "1"
+      url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+      juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+      explanation: "Artikel 1 bepaalt registratie van oppervlakte"
+
+  - output: "status"
+    value: "$VERBLIJFSOBJECT.status"
+    legal_basis:
+      law: "Wet basisregistratie adressen en gebouwen"
+      bwb_id: "BWBR0023466"
+      article: "1"
+      url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel1"
+      juriconnect: "jci1.3:c:BWBR0023466&artikel=1&z=2018-07-28&g=2018-07-28"
+      explanation: "Artikel 1 bepaalt registratie van status"
+
+  - output: "is_woonfunctie"
+    operation: IN
+    subject: "$VERBLIJFSOBJECT.gebruiksdoel"
+    values: "$WOON_GEBRUIKSDOELEN"
+    legal_basis:
+      law: "Wet basisregistratie adressen en gebouwen"
+      bwb_id: "BWBR0023466"
+      article: "2"
+      url: "https://wetten.overheid.nl/BWBR0023466/2018-07-28#Paragraaf1_Artikel2"
+      juriconnect: "jci1.3:c:BWBR0023466&artikel=2&z=2018-07-28&g=2018-07-28"
+      explanation: "Artikel 2 verplicht gebruik BAG-gegevens voor bepaling woonfunctie"

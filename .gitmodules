@@ -1,6 +1,3 @@
-[submodule "submodules/regelrecht-laws"]
-	path = submodules/regelrecht-laws
-	url = https://github.com/MinBZK/regelrecht-laws.git
 [submodule "wallet/nl-wallet"]
 	path = wallet/nl-wallet
 	url = https://github.com/MinBZK/nl-wallet.git

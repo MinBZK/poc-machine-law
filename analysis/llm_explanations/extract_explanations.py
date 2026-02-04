@@ -77,27 +77,9 @@ def get_git_info() -> dict:
         if result.returncode == 0:
             info["machine_law_dirty"] = len(result.stdout.strip()) > 0
 
-        # Law submodule commit
-        law_path = PROJECT_ROOT / "submodules" / "regelrecht-laws"
-        if law_path.exists():
-            result = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                capture_output=True,
-                text=True,
-                cwd=law_path,
-            )
-            if result.returncode == 0:
-                info["regelrecht_laws_commit"] = result.stdout.strip()
-
-            # Check for uncommitted changes in submodule
-            result = subprocess.run(
-                ["git", "status", "--porcelain"],
-                capture_output=True,
-                text=True,
-                cwd=law_path,
-            )
-            if result.returncode == 0:
-                info["regelrecht_laws_dirty"] = len(result.stdout.strip()) > 0
+        # Note: laws are now integrated directly into the main repository
+        # Previously tracked via regelrecht-laws submodule (archived)
+        # Laws imported from commit: 3401c045b78cb2e3b4c61f1c887d043730febafa
 
     except Exception as e:
         info["git_error"] = str(e)
