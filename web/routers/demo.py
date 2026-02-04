@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
+from web.demo.demo_config import is_law_enabled_in_demo
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
@@ -250,9 +251,16 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
 
 @router.get("/api/laws", response_class=JSONResponse)
 async def get_laws() -> JSONResponse:
-    """Get list of all available laws as JSON."""
-    laws = discover_laws(LAWS_DIR)
-    return JSONResponse(content=laws)
+    """Get list of all available laws as JSON, filtered for demo mode."""
+    all_laws = discover_laws(LAWS_DIR)
+
+    # Filter laws based on demo configuration
+    enabled_laws = [
+        law for law in all_laws
+        if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))
+    ]
+
+    return JSONResponse(content=enabled_laws)
 
 
 @router.get("/law/{law_path:path}", response_class=HTMLResponse)
@@ -265,7 +273,17 @@ async def view_law(request: Request, law_path: str) -> HTMLResponse:
 
     try:
         law_data = parse_law_yaml(yaml_file, law_dir=LAWS_DIR, law_path=law_path)
-        grouped_laws = discover_laws(LAWS_DIR, grouped=True)
+        all_grouped_laws = discover_laws(LAWS_DIR, grouped=True)
+
+        # Filter grouped laws based on demo configuration
+        grouped_laws = {}
+        for directory, laws_in_dir in all_grouped_laws.items():
+            filtered_laws = [
+                law for law in laws_in_dir
+                if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))
+            ]
+            if filtered_laws:
+                grouped_laws[directory] = filtered_laws
 
         # Render YAML to HTML
         yaml_html = render_yaml_to_html(law_data)

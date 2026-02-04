@@ -1,8 +1,29 @@
 """Demo collapse configuration for specific law files.
 
 This module defines which sections should be expanded/collapsed by default
-when viewing specific laws in demo mode.
+when viewing specific laws in demo mode, and which laws are enabled.
 """
+
+# Laws enabled in demo mode (by service)
+# Only laws in this list will be shown in demo mode
+DEMO_ENABLED_LAWS = {
+    "BELASTINGDIENST": [
+        "wet_inkomstenbelasting_2001",
+    ],
+    "TOESLAGEN": [
+        "zorgtoeslagwet",
+    ],
+    "RVZ": [
+        "zvw",
+    ],
+    "DJI": [
+        "penitentiaire_beginselenwet",
+    ],
+    "JenV": [
+        "awb",
+    ],
+}
+
 
 # Demo collapse configuration per law file
 DEMO_COLLAPSE_CONFIG = {
@@ -147,3 +168,18 @@ def should_expand_in_demo_mode(law_path: str, item_path: str) -> bool:
 
     # Default: collapse if not in expand paths
     return False
+
+
+def is_law_enabled_in_demo(law: str, service: str) -> bool:
+    """
+    Check if a law should be shown in demo mode.
+
+    Args:
+        law: Law identifier (e.g., "zorgtoeslagwet")
+        service: Service identifier (e.g., "TOESLAGEN")
+
+    Returns:
+        True if law is enabled in demo mode, False otherwise
+    """
+    enabled_laws = DEMO_ENABLED_LAWS.get(service, [])
+    return law in enabled_laws

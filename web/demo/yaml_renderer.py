@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from web.demo.demo_collapse_config import should_expand_in_demo_mode
+from web.demo.demo_config import should_expand_in_demo_mode
 
 # Global context for current law path (used during rendering)
 _current_law_path: str | None = None
