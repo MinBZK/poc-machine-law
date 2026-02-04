@@ -12,6 +12,9 @@ DEMO_DISABLED_LAWS = {
     "BELASTINGDIENST": [
         "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
     ],
+    "PENSIOENFONDS": [
+        "pensioenwet",  # Pensioenuitkering
+    ],
     "SVB": [
         "algemene_kinderbijslagwet",  # Kinderbijslag gegevens
         "algemene_nabestaandenwet",  # Anw-uitkering
