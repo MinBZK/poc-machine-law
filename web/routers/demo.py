@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
-from web.demo.demo_config import is_law_enabled_in_demo
+from web.demo.demo_config import configure_demo_feature_flags, is_law_enabled_in_demo
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
@@ -24,6 +24,9 @@ LAWS_DIR = Path("laws")
 _test_runs: dict[str, dict[str, Any]] = {}
 # Store for task references to prevent garbage collection
 _active_tasks: set[asyncio.Task] = set()
+
+# Configure demo feature flags on module load
+configure_demo_feature_flags()
 
 
 def filter_behave_output(output: str) -> str:

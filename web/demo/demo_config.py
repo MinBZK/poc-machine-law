@@ -1,26 +1,23 @@
-"""Demo collapse configuration for specific law files.
+"""Demo configuration for law files.
 
-This module defines which sections should be expanded/collapsed by default
-when viewing specific laws in demo mode, and which laws are enabled.
+This module defines:
+1. Which laws are enabled/disabled in demo mode (using feature flags)
+2. Which sections should be expanded/collapsed by default when viewing specific laws
 """
 
-# Laws enabled in demo mode (by service)
-# Only laws in this list will be shown in demo mode
-DEMO_ENABLED_LAWS = {
+# Laws to DISABLE in demo mode (by service)
+# All other laws will be enabled by default
+# This list drives the FEATURE_LAW_* environment variable settings
+DEMO_DISABLED_LAWS = {
     "BELASTINGDIENST": [
-        "wet_inkomstenbelasting_2001",
+        "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
+    ],
+    "SVB": [
+        "*",  # Disable all SVB laws in demo
     ],
     "TOESLAGEN": [
-        "zorgtoeslagwet",
-    ],
-    "RVZ": [
-        "zvw",
-    ],
-    "DJI": [
-        "penitentiaire_beginselenwet",
-    ],
-    "JenV": [
-        "awb",
+        "wet_op_de_huurtoeslag",  # Keep only zorgtoeslagwet enabled
+        "wet_kinderopvang",
     ],
 }
 
@@ -170,9 +167,30 @@ def should_expand_in_demo_mode(law_path: str, item_path: str) -> bool:
     return False
 
 
+def configure_demo_feature_flags():
+    """
+    Configure feature flags for demo mode based on DEMO_DISABLED_LAWS.
+
+    This sets FEATURE_LAW_* environment variables to disable specific laws.
+    Should be called once at application startup when in demo mode.
+    """
+    from web.feature_flags import FeatureFlags
+
+    for service, disabled_laws in DEMO_DISABLED_LAWS.items():
+        for law in disabled_laws:
+            if law == "*":
+                # Disable all laws for this service - we'd need to discover them first
+                # For now, skip wildcard and require explicit law names
+                continue
+
+            # Set the feature flag to disable this law
+            flag_name = f"LAW_{service}_{law.replace('/', '__')}".upper()
+            FeatureFlags.set(flag_name, False)
+
+
 def is_law_enabled_in_demo(law: str, service: str) -> bool:
     """
-    Check if a law should be shown in demo mode.
+    Check if a law should be shown in demo mode using feature flags.
 
     Args:
         law: Law identifier (e.g., "zorgtoeslagwet")
@@ -181,5 +199,6 @@ def is_law_enabled_in_demo(law: str, service: str) -> bool:
     Returns:
         True if law is enabled in demo mode, False otherwise
     """
-    enabled_laws = DEMO_ENABLED_LAWS.get(service, [])
-    return law in enabled_laws
+    from web.feature_flags import FeatureFlags
+
+    return FeatureFlags.is_law_enabled(service, law)
