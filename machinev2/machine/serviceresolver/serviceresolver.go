@@ -13,7 +13,7 @@ import (
 
 const (
 	// LawBaseDir is the base directory for rule specs
-	LawBaseDir     = "law"
+	LawBaseDir     = "laws"
 	ServiceBaseDir = "services"
 )
 
