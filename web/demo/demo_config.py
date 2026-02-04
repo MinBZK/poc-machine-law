@@ -13,11 +13,15 @@ DEMO_DISABLED_LAWS = {
         "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
     ],
     "SVB": [
-        "*",  # Disable all SVB laws in demo
+        "algemene_kinderbijslagwet",  # Kinderbijslag gegevens
+        "algemene_nabestaandenwet",  # Anw-uitkering
+        "algemene_ouderdomswet",  # AOW-uitkering
+        "algemene_ouderdomswet/leeftijdsbepaling",  # AOW leeftijdsbepaling
+        "algemene_ouderdomswet_gegevens",  # AOW gegevens
+        "participatiewet/aio",  # AIO-aanvulling
     ],
     "TOESLAGEN": [
-        "wet_op_de_huurtoeslag",  # Keep only zorgtoeslagwet enabled
-        "wet_kinderopvang",
+        "wet_kinderopvang",  # Kinderopvangtoeslag uit, maar huurtoeslag aan
     ],
 }
 
