@@ -27,7 +27,20 @@ from web.feature_flags import (
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
-from web.routers import admin, chat, dashboard, delegation, demo, edit, importer, laws, mcp, simulation, wallet
+from web.routers import (
+    admin,
+    chat,
+    dashboard,
+    delegation,
+    demo,
+    edit,
+    importer,
+    laws,
+    mcp,
+    regeldruk,
+    simulation,
+    wallet,
+)
 
 app = FastAPI(title="RegelRecht")
 
@@ -57,6 +70,7 @@ app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 app.include_router(delegation.router)
+app.include_router(regeldruk.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="law"))
 # app.mount(

@@ -493,9 +493,78 @@ class RuleContext:
         cache_key = (
             f"{path}({','.join([f'{k}:{param_to_str(v)}' for k, v in sorted(parameters.items())])},{reference_date})"
         )
-        if cache_key in self.values_cache:
-            logger.debug(f"Resolving from CACHE with key '{cache_key}': {self.values_cache[cache_key]}")
-            return self.values_cache[cache_key]
+
+        # Build cache key for path metadata (stores source info alongside value)
+        path_cache_key = f"{cache_key}_path_meta"
+
+        # Check cache - but we still need to build path structure for the UI
+        cache_hit = cache_key in self.values_cache and path_cache_key in self.values_cache
+        cached_value = self.values_cache.get(cache_key) if cache_hit else None
+        cached_path_meta = self.values_cache.get(path_cache_key) if cache_hit else None
+
+        if cache_hit:
+            logger.debug(f"Resolving from CACHE with key '{cache_key}': {cached_value}")
+
+            # Even when returning from cache, we need to build path structure for the UI
+            # Create service evaluation node with cached metadata
+            details = {
+                "service": service_ref["service"],
+                "law": service_ref["law"],
+                "field": service_ref["field"],
+                "reference_date": reference_date,
+                "parameters": parameters,
+                "path": path,
+            }
+            if "type" in spec:
+                details["type"] = spec["type"]
+            if "type_spec" in spec:
+                details["type_spec"] = spec["type_spec"]
+
+            # Add cached path metadata (source info)
+            details.update(cached_path_meta.get("details_extra", {}))
+
+            service_node = PathNode(
+                type="service_evaluation",
+                name=f"Service call: {service_ref['service']}.{service_ref['law']}",
+                result=cached_value,
+                details=details,
+            )
+            self.add_to_path(service_node)
+
+            # Recreate a minimal child node so the UI can show "Resultaat van het uitrekenen [law]"
+            source = cached_path_meta.get("source", "normal")
+            if source == "approved_case":
+                child_node = PathNode(
+                    type="resolve",
+                    name=f"Value from approved case: {service_ref['field']}",
+                    result=cached_value,
+                    resolve_type="APPROVED_CASE",
+                    details={
+                        "path": service_ref["field"],
+                        "source": "approved_case",
+                        "case_id": cached_path_meta.get("case_id"),
+                        "type": spec.get("type"),
+                    },
+                )
+                service_node.children.append(child_node)
+            else:
+                # For normal evaluations, create a minimal child node representing the resolved value
+                # This allows the UI to show the source reference even for cached results
+                child_node = PathNode(
+                    type="resolve",
+                    name=f"Value from service: {service_ref['field']}",
+                    result=cached_value,
+                    resolve_type="SERVICE",
+                    details={
+                        "path": service_ref["field"],
+                        "source": "service",
+                        "type": spec.get("type"),
+                    },
+                )
+                service_node.children.append(child_node)
+
+            self.pop_path()
+            return cached_value
 
         logger.debug(f"Resolving from {service_ref['service']} field {service_ref['field']} ({parameters})")
 
@@ -524,6 +593,95 @@ class RuleContext:
         self.add_to_path(service_node)
 
         try:
+            # First check if there's an approved case for this service/law/parameters combination
+            # This allows service_references to see approved vergunningen
+            if self.service_provider and hasattr(self.service_provider, "case_manager"):
+                case_manager = self.service_provider.case_manager
+                if case_manager:
+                    all_cases = case_manager.get_all_cases()
+                    for case in all_cases:
+                        if (
+                            case
+                            and case.service == service_ref["service"]
+                            and case.law == service_ref["law"]
+                            and case.approved
+                            and hasattr(case.status, "value")
+                            and case.status.value == "DECIDED"
+                        ):
+                            # Check if parameters match (e.g., KVK_NUMMER)
+                            case_params = case.parameters or {}
+                            params_match = True
+                            for key, value in parameters.items():
+                                if key in case_params and case_params[key] != value:
+                                    params_match = False
+                                    break
+
+                            if params_match:
+                                # Found an approved case with matching parameters
+                                field = service_ref["field"]
+
+                                # For "heeft_actieve_vergunning", the existence of an approved case
+                                # means the vergunning is active - return True regardless of claimed_result
+                                if field == "heeft_actieve_vergunning":
+                                    resolved_value = True
+                                    logger.debug(
+                                        f"Resolved {field}=True from approved case {case.id} "
+                                        f"(approved case exists = active vergunning)"
+                                    )
+                                else:
+                                    # For other fields, use verified_result (the decided values)
+                                    # Fall back to claimed_result if verified_result doesn't have the field
+                                    verified = case.verified_result or {}
+                                    claimed = case.claimed_result or {}
+                                    if field in verified:
+                                        resolved_value = verified[field]
+                                    elif field in claimed:
+                                        resolved_value = claimed[field]
+                                    else:
+                                        continue  # Field not found, try next case or fall through
+
+                                    logger.debug(f"Resolved {field} from approved case {case.id}: {resolved_value}")
+
+                                # Cache the value AND path metadata for rebuilding path on cache hit
+                                self.values_cache[cache_key] = resolved_value
+                                self.values_cache[path_cache_key] = {
+                                    "source": "approved_case",
+                                    "case_id": str(case.id),
+                                    "details_extra": {
+                                        "source": "approved_case",
+                                        "case_id": str(case.id),
+                                    },
+                                }
+
+                                # Build proper path structure so the UI shows the source reference
+                                # Create a child node to represent the resolved value from the approved case
+                                # This node will be processed by extract_value_tree() and added to
+                                # service_entry["children"], which triggers the template to show
+                                # "Resultaat van het uitrekenen [law]"
+                                child_node = PathNode(
+                                    type="resolve",
+                                    name=f"Value from approved case: {field}",
+                                    result=resolved_value,
+                                    resolve_type="APPROVED_CASE",
+                                    details={
+                                        "path": field,
+                                        "source": "approved_case",
+                                        "case_id": str(case.id),
+                                        "type": spec.get("type"),
+                                    },
+                                )
+
+                                # Update service_node with result and children
+                                # Directly append child_node - extract_value_tree will process it
+                                # because APPROVED_CASE is in the resolve_type whitelist
+                                service_node.result = resolved_value
+                                service_node.details["source"] = "approved_case"
+                                service_node.details["case_id"] = str(case.id)
+                                service_node.children.append(child_node)
+
+                                return resolved_value
+
+            # No approved case found, evaluate normally
             result = self.service_provider.evaluate(
                 service_ref["service"],
                 service_ref["law"],
@@ -536,6 +694,8 @@ class RuleContext:
 
             value = result.output.get(service_ref["field"])
             self.values_cache[cache_key] = value
+            # Store path metadata for normal evaluation (used to skip approved_case path rebuild on cache hit)
+            self.values_cache[path_cache_key] = {"source": "normal"}
 
             # Update the service node with the result and add child path
             service_node.result = value

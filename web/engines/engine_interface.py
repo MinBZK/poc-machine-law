@@ -367,7 +367,7 @@ class EngineInterface(ABC):
             # Handle resolve nodes
             if (
                 node.type == "resolve"
-                and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM", "NONE"}
+                and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM", "NONE", "PARAMETER", "APPROVED_CASE"}
                 and path
                 and isinstance(path, str)
             ):

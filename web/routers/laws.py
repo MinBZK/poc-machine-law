@@ -239,6 +239,36 @@ async def submit_case(
 
     case = case_manager.get_case_by_id(case_id)
 
+    # For exploitatievergunning: if alcohol permit is active, create claim to add "Alcoholhoudende dranken"
+    if law == "algemene_plaatselijke_verordening/exploitatievergunning" and kvk:
+        verstrekt_alcohol = result.output.get("verstrekt_alcoholhoudende_dranken", False)
+        if verstrekt_alcohol:
+            # Get current activities from profile data
+            try:
+                profile = machine_service.get_profile_data(bsn)
+                if profile and "sources" in profile:
+                    profile_service_data = profile["sources"].get(service, {})
+                    vergunningen = profile_service_data.get("vergunningen", [])
+                    for v in vergunningen:
+                        if v.get("kvk_nummer") == kvk and v.get("heeft_exploitatievergunning"):
+                            current_activiteiten = v.get("vergunde_activiteiten", [])
+                            if "Alcoholhoudende dranken" not in current_activiteiten:
+                                new_activiteiten = current_activiteiten + ["Alcoholhoudende dranken"]
+                                claim_manager.submit_claim(
+                                    service=service,
+                                    key="VERGUNDE_ACTIVITEITEN",
+                                    old_value=current_activiteiten,
+                                    new_value=new_activiteiten,
+                                    reason="Alcoholwetvergunning is actief",
+                                    claimant="CITIZEN",
+                                    law=law,
+                                    bsn=bsn,
+                                    case_id=case_id,
+                                )
+                            break
+            except Exception as e:
+                logger.warning(f"Failed to create activity claim for exploitatievergunning: {e}")
+
     # Re-evaluate the law AFTER the case is submitted so counts include the new case
     _, result, _ = evaluate_law(
         bsn,
@@ -351,6 +381,7 @@ async def explanation(
     service: str,
     law: str,
     bsn: str,
+    kvk: str = None,
     provider: str = None,  # Add provider parameter
     approved: bool = False,
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -368,6 +399,7 @@ async def explanation(
             approved=approved,
             claim_manager=claim_manager,
             effective_date=request.query_params.get("date"),
+            kvk_nummer=kvk,
         )
 
         # Convert path and rule_spec to JSON strings

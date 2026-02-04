@@ -1,6 +1,19 @@
 {% from "macros/render_path.html" import render_path, render_missing_required_form with context %}
 <!-- Start of Shared Application Form Section -->
-<!-- DEBUG application_form: result={{ result }} -->
+{# Calculate changed_values for data change warnings (e.g., alcoholvergunning approved affects exploitatievergunning) #}
+{% set changed_values = {} %}
+{% if profile_data and profile_data.vergunningen and path and path.VERSTREKT_ALCOHOL %}
+    {# Check if there's an existing exploitatievergunning without alcohol, but calculation shows alcohol is now active #}
+    {% set ns_form = namespace(existing_vergunning=none) %}
+    {% for v in profile_data.vergunningen %}
+        {% if v.kvk_nummer == kvk and v.heeft_exploitatievergunning %}
+            {% set ns_form.existing_vergunning = v %}
+        {% endif %}
+    {% endfor %}
+    {% if ns_form.existing_vergunning and not ns_form.existing_vergunning.heeft_alcoholvergunning and path.VERSTREKT_ALCOHOL.result %}
+        {% set _ = changed_values.update({'VERSTREKT_ALCOHOL': {'old': false, 'new': true, 'old_display': 'Nee'}}) %}
+    {% endif %}
+{% endif %}
 <div class="border border-blue-200 rounded-lg p-5 mb-6 bg-blue-50/30">
     <!-- Result Summary -->
     <div class="mb-4">
@@ -35,9 +48,101 @@
              x-transition:leave-end="opacity-0 transform -translate-y-2"
              class="mt-4">
             {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
-                        show_approve=False, claimant="CITIZEN") }}
+                        show_approve=False, claimant="CITIZEN", changed_values=changed_values) }}
+            {# Show permit details for exploitatievergunning from profile data #}
+            {% if law == 'algemene_plaatselijke_verordening/exploitatievergunning' and profile_data and profile_data.vergunningen %}
+                {% for v in profile_data.vergunningen %}
+                    {% if v.kvk_nummer == kvk and v.heeft_exploitatievergunning %}
+                        <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100 mt-2">
+                            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Vergunningsgegevens</div>
+                            {% if v.vergunde_categorie %}
+                                <div class="text-sm leading-5 py-0.5">
+                                    <span class="text-gray-600">Vergunde categorie:</span>
+                                    <span class="ml-2 text-blue-600">{{ v.vergunde_categorie }}</span>
+                                </div>
+                            {% endif %}
+                            {% if v.vergunde_activiteiten %}
+                                <div class="text-sm leading-5 py-0.5">
+                                    <span class="text-gray-600">Vergunde activiteiten:</span>
+                                    {# Check if alcohol activity will be added #}
+                                    {% set alcohol_will_be_added = path and path.VERSTREKT_ALCOHOL and path.VERSTREKT_ALCOHOL.result and 'Alcoholhoudende dranken' not in v.vergunde_activiteiten %}
+                                    {% if alcohol_will_be_added %}
+                                        <div class="ml-2 mt-1">
+                                            {% for activiteit in v.vergunde_activiteiten %}
+                                                <div class="flex items-center text-gray-700">
+                                                    <span class="w-4 h-4 mr-1 text-gray-400">•</span>
+                                                    {{ activiteit }}
+                                                </div>
+                                            {% endfor %}
+                                            <div class="flex items-center text-green-700 font-medium">
+                                                <svg class="w-4 h-4 mr-1 text-green-500"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                </svg>
+                                                Alcoholhoudende dranken
+                                                <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">toevoegen</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="ml-2 text-blue-600">{{ v.vergunde_activiteiten|join(", ") }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            {% if v.type_horeca %}
+                                <div class="text-sm leading-5 py-0.5">
+                                    <span class="text-gray-600">Openingstijden ({{ v.type_horeca }}):</span>
+                                    <span class="ml-2 text-blue-600">
+                                        {% if v.openingstijden %}
+                                            {{ v.openingstijden }}
+                                        {% else %}
+                                            {{ v.openingstijden_doordeweeks }} (zo-do)
+                                            {% if v.openingstijden_weekend %}/ {{ v.openingstijden_weekend }} (vr-za){% endif %}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
+    {# Show activity update notice for exploitatievergunning when alcohol permit is active #}
+    {% if law == 'algemene_plaatselijke_verordening/exploitatievergunning' and profile_data and profile_data.vergunningen %}
+        {% set ns_activiteiten = namespace(current_activiteiten=[], heeft_alcohol_activiteit=false, alcohol_approved=false) %}
+        {% for v in profile_data.vergunningen %}
+            {% if v.kvk_nummer == kvk and v.heeft_exploitatievergunning %}
+                {% set ns_activiteiten.current_activiteiten = v.vergunde_activiteiten|default([]) %}
+                {% set ns_activiteiten.heeft_alcohol_activiteit = 'Alcoholhoudende dranken' in ns_activiteiten.current_activiteiten %}
+            {% endif %}
+        {% endfor %}
+        {% if path and path.VERSTREKT_ALCOHOL and path.VERSTREKT_ALCOHOL.result %}
+            {% set ns_activiteiten.alcohol_approved = true %}
+        {% endif %}
+        {% if ns_activiteiten.alcohol_approved and not ns_activiteiten.heeft_alcohol_activiteit %}
+            <div class="border-t border-blue-200 pt-4 mb-4">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-green-800">Activiteit wordt toegevoegd</p>
+                            <p class="text-sm text-green-700 mt-1">
+                                Uw Alcoholwetvergunning is actief. De activiteit <strong>"Alcoholhoudende dranken"</strong> wordt toegevoegd aan uw exploitatievergunning.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
     <!-- Submit Form -->
     <div x-data="{ isChecked: false }"
          class="space-y-4 border-t border-blue-200 pt-4">

@@ -4348,10 +4348,16 @@ profiles:
         vergunningen:
         - kvk_nummer: '85234567'
           heeft_exploitatievergunning: true
-          categorie: Lichte horeca
+          categorie: '1'
+          vergunde_categorie: Categorie 1
           datum_verleend: '2025-08-01'
           geldig_tot: '2030-08-01'
           heeft_alcoholvergunning: false
+          type_horeca: Daghoreca
+          openingstijden: '07:00 - 23:00'
+          vergunde_activiteiten:
+            - Verstrekken van etenswaren
+            - Alcoholvrije dranken
         ontheffingen_geluid_historie:
         - kvk_nummer: '85234567'
           datum: '2026-01-05'

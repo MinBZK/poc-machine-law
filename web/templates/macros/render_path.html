@@ -187,14 +187,27 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values=none) %}
+    {# Check if this key has a changed value #}
+    {% set change_info = changed_values[key] if changed_values and key in changed_values else none %}
     {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
         <div x-data="{ open: false }" class="text-sm leading-5">
             <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
                  @click="open = !open">
-                <div class="text-sm leading-5 py-0.5">
+                <div class="text-sm leading-5 py-0.5 flex items-center gap-2">
                     <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
                     <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                    {% if change_info %}
+                        <span class="text-gray-500 text-xs">{{ change_info.old_display }}</span>
+                        <span class="text-gray-500 text-xs">→</span>
+                        <span class="text-gray-500 text-xs">
+                            {% if change_info.new is boolean %}
+                                {{ 'Ja' if change_info.new else 'Nee' }}
+                            {% else %}
+                                {{ change_info.new }}
+                            {% endif %}
+                        </span>
+                    {% endif %}
                 </div>
                 <div class="min-w-0 flex items-center">
                     <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
@@ -209,7 +222,7 @@
             <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
                 {% if node.children %}
                     {% for child_key, child_node in node.children.items() %}
-                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant) }}
+                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant, changed_values) }}
                     {% endfor %}
                 {% endif %}
             </div>
@@ -225,8 +238,43 @@
             <div class="text-sm leading-5 py-0.5">
                 <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
                 <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                {% if change_info %}
+                    <span class="text-gray-500 text-xs">{{ change_info.old_display }}</span>
+                    <span class="text-gray-500 text-xs">→</span>
+                    <span class="text-gray-500 text-xs">
+                        {% if change_info.new is boolean %}
+                            {{ 'Ja' if change_info.new else 'Nee' }}
+                        {% else %}
+                            {{ change_info.new }}
+                        {% endif %}
+                    </span>
+                {% endif %}
             </div>
         {% endif %}
+    {% endif %}
+{% endmacro %}
+{% macro render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values=none) %}
+    {# Render a service reference node without its children (to avoid duplicate rendering) #}
+    {% set change_info = changed_values[key] if changed_values and key in changed_values else none %}
+    {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
+        <div class="text-sm leading-5 py-0.5">
+            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+            <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+            {% if change_info %}
+                <span class="text-gray-500 text-xs">{{ change_info.old_display }}</span>
+                <span class="text-gray-500 text-xs">→</span>
+                <span class="text-gray-500 text-xs">
+                    {% if change_info.new is boolean %}
+                        {{ 'Ja' if change_info.new else 'Nee' }}
+                    {% else %}
+                        {{ change_info.new }}
+                    {% endif %}
+                </span>
+            {% endif %}
+            <span class="ml-2 text-green-600 text-xs">({{ node.law|replace('_', ' ') |title }})</span>
+        </div>
+    {% else %}
+        {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
     {% endif %}
 {% endmacro %}
 {% macro render_missing_required_form(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
@@ -489,7 +537,7 @@
         </div>
     {% endif %}
 {% endmacro %}
-{% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
+{% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN", changed_values=none) %}
     <!-- Alpine.js store for managing dialog state -->
     <script>
     document.addEventListener('alpine:init', () => {
@@ -552,14 +600,14 @@
                     {% set law_key = node.service ~ '/' ~ node.law %}
                     {% if law_key in ns.shown_law_children %}
                         {# Already showed children for this law - render without children #}
-                        {{ render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+                        {{ render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
                     {% else %}
                         {# First time seeing this law - show with children #}
                         {% set _ = ns.shown_law_children.append(law_key) %}
-                        {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+                        {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
                     {% endif %}
                 {% else %}
-                    {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+                    {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
                 {% endif %}
             {% endif %}
         {% endfor %}

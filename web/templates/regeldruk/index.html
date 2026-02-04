@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Regeldruk - Horeca Vergunningen Rotterdam</title>
+        <link rel="stylesheet" href="/static/css/demo.css">
+        <style>
+            /* Regeldruk-specific styles */
+            .regeldruk-summary {
+                margin-top: var(--spacing-lg);
+                padding: var(--spacing-lg);
+                background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+                border-radius: 0.5rem;
+                border: 1px solid var(--border-color);
+            }
+
+            .regeldruk-summary h3 {
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-bottom: var(--spacing-md);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .summary-stats {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
+            .stat {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--spacing-sm);
+                background-color: var(--bg-primary);
+                border-radius: 0.375rem;
+            }
+
+            .stat-value {
+                font-weight: 700;
+                color: var(--success-color);
+                font-size: 1rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+            }
+
+            .regeldruk-footer {
+                padding: var(--spacing-lg);
+                border-top: 1px solid var(--border-color);
+                background-color: var(--bg-secondary);
+            }
+
+            .footer-title {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .source-badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--spacing-xs);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .source-badge {
+                display: inline-block;
+                padding: 0.125rem 0.5rem;
+                background-color: var(--primary-color);
+                color: white;
+                border-radius: 0.25rem;
+                font-size: 0.625rem;
+                font-weight: 600;
+            }
+
+            .footer-message {
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                line-height: 1.5;
+            }
+
+            .footer-message strong {
+                color: var(--success-color);
+            }
+
+            .scenario-time-badge {
+                margin-left: auto;
+                padding: var(--spacing-xs) var(--spacing-sm);
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .scenario-time-badge.traditional {
+                background-color: var(--error-color);
+                color: white;
+            }
+
+            .scenario-time-badge.optimized {
+                background-color: var(--success-color);
+                color: white;
+            }
+
+            .law-item.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            .coming-soon-badge {
+                font-size: 0.625rem;
+                color: var(--text-tertiary);
+                font-style: italic;
+            }
+
+            /* Highlight data sources in Gherkin steps */
+            .gherkin-step-text .data-source {
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+
+            .intro-banner {
+                padding: var(--spacing-lg);
+                background: linear-gradient(135deg, #dbeafe, #eff6ff);
+                border: 1px solid var(--primary-color);
+                border-radius: 0.5rem;
+                margin-bottom: var(--spacing-lg);
+            }
+
+            [data-theme="dark"] .intro-banner {
+                background: linear-gradient(135deg, #1e3a5f, #1e293b);
+            }
+
+            .intro-banner h2 {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--primary-color);
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .intro-banner p {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                margin: 0;
+            }
+
+            .intro-banner ul {
+                margin: var(--spacing-sm) 0 0 var(--spacing-lg);
+                padding: 0;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+            }
+
+            .intro-banner li {
+                margin-bottom: var(--spacing-xs);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="demo-layout three-panel">
+            <!-- Toggle button when sidebar is collapsed -->
+            <button class="sidebar-toggle-collapsed"
+                    id="regeldruk-sidebar-toggle-collapsed"
+                    onclick="toggleRegeldrukSidebar()">☰</button>
+            <!-- Sidebar with feature list -->
+            <aside class="demo-sidebar" id="regeldruk-sidebar">
+                <button class="sidebar-toggle" onclick="toggleRegeldrukSidebar()">−</button>
+                <div class="sidebar-header">
+                    <h2>Horeca Vergunningen</h2>
+                </div>
+                <div class="law-list">
+                    <div class="law-directory">
+                        <div class="directory-header">
+                            <span class="directory-icon">▼</span>
+                            <span class="directory-name">Rotterdam APV</span>
+                            <span class="directory-count">({{ horeca_features|length }})</span>
+                        </div>
+                        <div class="directory-laws">
+                            {% for key, feature in horeca_features.items() %}
+                                <a href="/regeldruk/feature/{{ key }}{% if demo_mode %}?demo=true{% endif %}"
+                                   class="law-item {% if key == feature_key %}active{% endif %}">
+                                    <div class="law-item-header">
+                                        <span class="law-name">{{ feature.name }}</span>
+                                        <span class="law-service">{{ feature.scenario_count }} scenario's</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                            <!-- Placeholder for future combined feature -->
+                            <div class="law-item disabled">
+                                <div class="law-item-header">
+                                    <span class="law-name">Gecombineerd</span>
+                                    <span class="coming-soon-badge">Binnenkort</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Regeldruk summary -->
+                <div class="regeldruk-summary">
+                    <h3>Data Optimalisatie</h3>
+                    <div class="summary-stats">
+                        <div class="stat">
+                            <span class="stat-label">Aanvragen</span>
+                            <span class="stat-value">{{ metrics.forms_consolidated }} → 1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Auto-opgehaald</span>
+                            <span class="stat-value">{{ metrics.sources_auto_retrieved_unique + metrics.inputs_auto_retrieved_unique }}+</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Tijd bespaard</span>
+                            <span class="stat-value">~{{ (metrics.estimated_time_saved_minutes / 60)|round(1) }} uur</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <!-- Main content area with Gherkin viewer -->
+            <main class="demo-content feature-content">
+                <div class="feature-viewer">
+                    <!-- Intro banner -->
+                    <div class="intro-banner">
+                        <h2>Regeldrukvermindering door Data Optimalisatie</h2>
+                        <p>
+                            Bekijk de test scenario's hieronder. Let op de <strong>Given</strong> stappen -
+                            dit zijn alle databronnen die automatisch worden geraadpleegd:
+                        </p>
+                        <ul>
+                            <li>
+                                <strong>KVK</strong>, <strong>RvIG</strong>, <strong>Kadaster</strong> gegevens worden automatisch opgehaald
+                            </li>
+                            <li>De terrasvergunning checkt automatisch of je een exploitatievergunning hebt</li>
+                            <li>In een gecombineerde aanvraag worden gegevens maar één keer opgevraagd</li>
+                        </ul>
+                    </div>
+                    <!-- Toolbar -->
+                    <div class="feature-toolbar">
+                        <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
+                        <button class="btn btn-secondary" onclick="collapseAllScenarios()">Alles inklappen</button>
+                        <span class="scenario-status" id="scenario-status"></span>
+                    </div>
+                    <!-- Gherkin content -->
+                    <div class="gherkin-wrapper">{{ feature_html | safe }}</div>
+                </div>
+            </main>
+            <!-- Output panel -->
+            <aside class="output-panel">
+                <div class="output-header">
+                    <h3>Test Output</h3>
+                    <button class="btn btn-small" onclick="clearOutput()">Wissen</button>
+                </div>
+                <div class="output-content" id="output-content">
+                    <div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>
+                </div>
+                <!-- Regeldruk footer -->
+                <div class="regeldruk-footer">
+                    <div class="footer-title">Geraadpleegde Bronnen</div>
+                    <div class="source-badges">
+                        {% for source in metrics.cross_org_sources %}<span class="source-badge">{{ source }}</span>{% endfor %}
+                        <span class="source-badge">VOG</span>
+                        <span class="source-badge">BAG</span>
+                        <span class="source-badge">BGT</span>
+                        <span class="source-badge">CCBR</span>
+                    </div>
+                    <div class="footer-message">
+                        Al deze gegevens worden <strong>automatisch</strong> opgehaald.
+                        Geen handmatige documenten nodig.
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <script>
+            // Set the current feature path for test execution
+            let currentFeaturePath = '{{ feature_path }}';
+            let currentRunId = null;
+            let pollInterval = null;
+
+            // Sidebar toggle
+            function toggleRegeldrukSidebar() {
+                const sidebar = document.getElementById('regeldruk-sidebar');
+                const collapsedToggle = document.getElementById('regeldruk-sidebar-toggle-collapsed');
+                const sidebarToggle = sidebar?.querySelector('.sidebar-toggle');
+
+                if (!sidebar || !collapsedToggle || !sidebarToggle) return;
+
+                sidebar.classList.toggle('collapsed');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+
+                collapsedToggle.style.display = isCollapsed ? 'block' : 'none';
+                sidebarToggle.style.display = isCollapsed ? 'none' : 'block';
+
+                localStorage.setItem('regeldrukSidebarCollapsed', isCollapsed);
+            }
+
+            // Initialize sidebar state
+            function initSidebar() {
+                const sidebar = document.getElementById('regeldruk-sidebar');
+                const collapsedToggle = document.getElementById('regeldruk-sidebar-toggle-collapsed');
+                const sidebarToggle = sidebar?.querySelector('.sidebar-toggle');
+
+                if (!sidebar || !collapsedToggle || !sidebarToggle) return;
+
+                const savedState = localStorage.getItem('regeldrukSidebarCollapsed');
+                const isCollapsed = savedState === 'true';
+
+                if (isCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    collapsedToggle.style.display = 'block';
+                    sidebarToggle.style.display = 'none';
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    collapsedToggle.style.display = 'none';
+                    sidebarToggle.style.display = 'block';
+                }
+            }
+
+            // Scenario functions
+            function toggleScenario(element) {
+                const scenario = element.closest('.gherkin-scenario');
+                if (!scenario) return;
+
+                scenario.classList.toggle('collapsed');
+                const icon = element.querySelector('.collapse-icon');
+                if (icon) {
+                    icon.textContent = scenario.classList.contains('collapsed') ? '▶' : '▼';
+                }
+            }
+
+            function expandAllScenarios() {
+                document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+                    scenario.classList.remove('collapsed');
+                    const icon = scenario.querySelector('.collapse-icon');
+                    if (icon) icon.textContent = '▼';
+                });
+            }
+
+            function collapseAllScenarios() {
+                document.querySelectorAll('.gherkin-scenario').forEach(scenario => {
+                    scenario.classList.add('collapsed');
+                    const icon = scenario.querySelector('.collapse-icon');
+                    if (icon) icon.textContent = '▶';
+                });
+            }
+
+            async function runScenario(scenarioIndex) {
+                const outputContent = document.getElementById('output-content');
+                outputContent.innerHTML = '<div class="output-running">Scenario wordt uitgevoerd...</div>';
+
+                try {
+                    const response = await fetch('/demo/feature/run-scenario', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            feature_path: currentFeaturePath,
+                            scenario_index: parseInt(scenarioIndex)
+                        })
+                    });
+
+                    const data = await response.json();
+                    currentRunId = data.run_id;
+
+                    // Start polling for output
+                    if (pollInterval) clearInterval(pollInterval);
+                    pollInterval = setInterval(pollForOutput, 500);
+
+                } catch (error) {
+                    outputContent.innerHTML = `<div class="output-error">Error: ${error.message}</div>`;
+                }
+            }
+
+            function highlightTestOutput(text) {
+                if (!text) return '';
+
+                // Escape HTML first
+                const escapeHtml = (str) => {
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                };
+
+                let highlighted = escapeHtml(text);
+
+                // Highlight tree drawing characters
+                highlighted = highlighted.replace(/([║│├─]+)/g, '<span class="output-tree">$1</span>');
+
+                // Highlight service and law names
+                highlighted = highlighted.replace(/\b([A-Z_]{2,})(:\s+)(\w+)/g,
+                    '<span class="output-service">$1</span>$2<span class="output-law">$3</span>');
+
+                // Highlight variables
+                highlighted = highlighted.replace(/(\$[A-Z_]+)/g, '<span class="output-variable">$1</span>');
+
+                // Highlight requirement status
+                highlighted = highlighted.replace(/\b(requirements met)\b/gi, '<span class="output-requirement-met">$1</span>');
+                highlighted = highlighted.replace(/\b(requirements not met|NOT met)\b/gi, '<span class="output-requirement-not-met">$1</span>');
+
+                return highlighted;
+            }
+
+            async function pollForOutput() {
+                if (!currentRunId) return;
+
+                try {
+                    const response = await fetch(`/demo/feature/run-status/${currentRunId}`);
+                    const data = await response.json();
+
+                    const outputContent = document.getElementById('output-content');
+                    const highlightedOutput = highlightTestOutput(data.output);
+                    outputContent.innerHTML = `<pre class="output-text">${highlightedOutput}</pre>`;
+
+                    // Update status
+                    const statusEl = document.getElementById('scenario-status');
+                    if (data.status === 'completed') {
+                        statusEl.textContent = '✅ Geslaagd';
+                        statusEl.className = 'scenario-status passed';
+                        clearInterval(pollInterval);
+                        outputContent.scrollTop = 0;
+                    } else if (data.status === 'failed') {
+                        statusEl.textContent = '❌ Mislukt';
+                        statusEl.className = 'scenario-status failed';
+                        clearInterval(pollInterval);
+                        outputContent.scrollTop = 0;
+                    } else {
+                        statusEl.textContent = '⏳ Bezig...';
+                        statusEl.className = 'scenario-status running';
+                        outputContent.scrollTop = outputContent.scrollHeight;
+                    }
+
+                } catch (error) {
+                    console.error('Error polling output:', error);
+                    clearInterval(pollInterval);
+                }
+            }
+
+            function clearOutput() {
+                document.getElementById('output-content').innerHTML =
+                    '<div class="output-placeholder">Voer een scenario uit om de output hier te zien...</div>';
+                document.getElementById('scenario-status').textContent = '';
+                if (pollInterval) {
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+                }
+            }
+
+            // Initialize on load
+            document.addEventListener('DOMContentLoaded', initSidebar);
+        </script>
+    </body>
+</html>

@@ -217,7 +217,7 @@ class Services:
             # Handle resolve nodes
             if (
                 node.type == "resolve"
-                and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM", "NONE", "PARAMETER"}
+                and node.resolve_type in {"SERVICE", "SOURCE", "CLAIM", "NONE", "PARAMETER", "APPROVED_CASE"}
                 and path
                 and isinstance(path, str)
             ):
