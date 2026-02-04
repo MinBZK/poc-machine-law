@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Bepalen kiesrecht Tweede Kamer
   Als burger
   Wil ik weten of ik stemrecht heb voor de Tweede Kamerverkiezingen

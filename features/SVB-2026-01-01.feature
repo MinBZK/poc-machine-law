@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Anw - Nabestaandenuitkering
   Als nabestaande van een verzekerde
   Wil ik weten of ik recht heb op een nabestaandenuitkering

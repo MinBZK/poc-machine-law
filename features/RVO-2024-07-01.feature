@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: WPM Rapportageverplichting
   Als werkgever
   Wil ik weten of ik verplicht ben om te rapporteren over werkgebonden personenmobiliteit

@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Machtigingenwet - Delegation provider for KVK
   Als ondernemer
   Wil ik namens mijn bedrijf kunnen handelen

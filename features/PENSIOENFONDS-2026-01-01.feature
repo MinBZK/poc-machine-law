@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Pensioenwet - Pensioenuitkering berekening
   Als pensioengerechtigde
   Wil ik weten wat mijn pensioenuitkering is

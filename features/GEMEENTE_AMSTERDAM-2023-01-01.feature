@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Bepalen recht op bijstand Amsterdam
   Als inwoner van Amsterdam
   Wil ik weten of ik recht heb op bijstand

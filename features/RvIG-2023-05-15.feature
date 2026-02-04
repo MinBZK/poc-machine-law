@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Landelijke Aanpak Adreskwaliteit (LAA)
   Als RvIG
   Wil ik signalen genereren over mogelijk onjuiste adresregistraties

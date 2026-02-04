@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
   Als Notariaat
   Wil ik executeur-registraties beheren

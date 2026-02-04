@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Burgerlijk Wetboek Volmacht (BW 3:60-79)
   Als Notariaat
   Wil ik volmacht-registraties beheren

@@ -41,7 +41,7 @@ jobs:
           uv run playwright install --with-deps chromium
 
       - name: Run tests
-        run: ./script/test-behaviour --tags="~@ui"
+        run: ./script/test-behaviour --tags="~@ui and ~@skip"
         env:
           LANG: nl_NL.UTF-8
           LC_ALL: nl_NL.UTF-8

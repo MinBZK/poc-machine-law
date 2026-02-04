@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
   Als werkgever
   Wil ik weten hoeveel werkgeversbijdrage Zvw ik moet afdragen

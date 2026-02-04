@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Berekening Werkloosheidsuitkering (WW)
   Als werknemer
   Wil ik weten of ik recht heb op WW

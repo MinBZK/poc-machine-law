@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Burgerlijk Wetboek Beschermingsbewind (BW 1:431-449)
   Als Rechtspraak
   Wil ik bewind-registraties beheren

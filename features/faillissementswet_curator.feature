@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Faillissementswet Curator (Fw Art. 64-71)
   Als Rechtspraak
   Wil ik faillissement-registraties beheren

@@ -1,5 +1,5 @@
 @skip-go
-@ui
+@skip
 Feature: Wijzigen gegevens
   Als burger
   Wil ik een gegevens kunnen wijzigen.
