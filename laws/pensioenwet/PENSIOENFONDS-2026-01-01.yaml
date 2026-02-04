@@ -1,0 +1,467 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 8a3f5c2d-4e6b-4a1f-9c8d-7e2f3a4b5c6d
+name: Pensioenuitkering
+law: pensioenwet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2026-01-01
+service: "PENSIOENFONDS"
+legal_basis:
+  law: "Pensioenwet"
+  bwb_id: "BWBR0020809"
+  article: "1"
+  url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk1_Artikel1"
+  juriconnect: "jci1.3:c:BWBR0020809&artikel=1&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 1 Pensioenwet definieert de begrippen ouderdomspensioen, nabestaandenpensioen en arbeidsongeschiktheidspensioen"
+description: >
+  Regels voor het bepalen van pensioenuitkeringen volgens de Pensioenwet.
+  De Pensioenwet regelt de arbeidsvoorwaardelijke pensioenen die werknemers
+  opbouwen via hun werkgever. Deze wet is van toepassing op pensioenfondsen
+  en pensioenverzekeraars. De pensioenuitkering is afhankelijk van het
+  opgebouwde pensioenkapitaal, de pensioenleeftijd en het type regeling.
+
+references:
+  - law: "Pensioenwet"
+    article: "1"
+    url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk1_Artikel1"
+  - law: "Pensioenwet"
+    article: "10"
+    url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+  - law: "Pensioenwet"
+    article: "51"
+    url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk5_Artikel51"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "51"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk5_Artikel51"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=51&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 51 Pensioenwet regelt de informatierechten van de deelnemer"
+
+  sources:
+    - name: "PENSIOENKAPITAAL"
+      description: "Opgebouwd pensioenkapitaal"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "pensioen_deelnemers"
+        field: "pensioenkapitaal"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de deelnemer"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 lid 1 Pensioenwet bepaalt het recht op ouderdomspensioen op basis van opgebouwd kapitaal"
+
+    - name: "PENSIOENJAREN"
+      description: "Aantal jaren pensioenopbouw"
+      type: "number"
+      type_spec:
+        precision: 2
+        min: 0
+        max: 50
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "pensioen_deelnemers"
+        field: "pensioenjaren"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de deelnemer"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 lid 2 Pensioenwet regelt de opbouw van pensioenaanspraken"
+
+    - name: "TYPE_REGELING"
+      description: "Type pensioenregeling (middelloon, eindloon, beschikbare premie)"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "pensioen_deelnemers"
+        field: "type_regeling"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de deelnemer"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 lid 1 Pensioenwet erkent verschillende typen pensioenregelingen"
+
+    - name: "FRANCHISE"
+      description: "Franchisebedrag (deel van salaris waarover geen pensioen wordt opgebouwd)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "pensioen_deelnemers"
+        field: "franchise"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de deelnemer"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk3_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 Pensioenwet regelt de franchise als onderdeel van de pensioengrondslag"
+
+    - name: "PENSIOENGEVEND_LOON"
+      description: "Laatst bekende pensioengevend loon"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      source_reference:
+        table: "pensioen_deelnemers"
+        field: "pensioengevend_loon"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de deelnemer"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk3_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 Pensioenwet definieert de pensioengrondslag"
+
+    - name: "PENSIOEN_LEEFTIJD_FONDS"
+      description: "Pensioenleeftijd volgens het pensioenfonds"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 60
+        max: 70
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "pensioen_deelnemers"
+        field: "pensioenleeftijd"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de deelnemer"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "18"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk3_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=18&lid=4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 lid 4 Pensioenwet regelt de pensioenrichtleeftijd"
+
+  input:
+    - name: "GEBOORTEDATUM"
+      description: "Geboortedatum van de aanvrager"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "geboortedatum"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "51"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk5_Artikel51"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=51&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 51 Pensioenwet vereist persoonlijke gegevens voor informatieverstrekking"
+
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 Pensioenwet vereist het bereiken van de pensioengerechtigde leeftijd"
+
+  output:
+    - name: "is_gepensioneerd"
+      description: "Of de persoon gepensioneerd is"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 lid 1 Pensioenwet bepaalt het recht op pensioenuitkering bij pensionering"
+
+    - name: "pensioenkapitaal"
+      description: "Opgebouwd pensioenkapitaal"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "51"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk5_Artikel51"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=51&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 51 Pensioenwet regelt het recht op informatie over opgebouwd kapitaal"
+
+    - name: "pensioen_uitkering_bruto"
+      description: "Bruto jaarlijkse pensioenuitkering"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 Pensioenwet bepaalt het recht op ouderdomspensioen"
+
+    - name: "pensioen_uitkering_maandelijks"
+      description: "Bruto maandelijkse pensioenuitkering"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "10"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=10&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 10 Pensioenwet bepaalt het recht op ouderdomspensioen"
+
+    - name: "pensioenleeftijd"
+      description: "Pensioenleeftijd volgens het pensioenfonds"
+      type: "number"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 60
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Pensioenwet"
+        bwb_id: "BWBR0020809"
+        article: "18"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk3_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0020809&artikel=18&lid=4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 lid 4 Pensioenwet regelt de pensioenrichtleeftijd"
+
+  definitions:
+    # Standaard opbouwpercentages per type regeling
+    OPBOUW_MIDDELLOON: 0.0175  # 1,75% per jaar voor middelloonregeling
+    OPBOUW_EINDLOON: 0.0167    # 1,67% per jaar voor eindloonregeling
+    # Omrekenfactor van kapitaal naar jaarlijkse uitkering (actuarieel)
+    # Gebaseerd op gemiddelde levensverwachting en rekenrente
+    OMREKENFACTOR_KAPITAAL: 0.05  # 5% van kapitaal per jaar (standaard)
+    # Maanden per jaar voor maandelijkse berekening
+    MAANDEN_PER_JAAR: 12
+
+requirements:
+  - all:
+      - subject: "$LEEFTIJD"
+        operation: GREATER_OR_EQUAL
+        value: "$PENSIOEN_LEEFTIJD_FONDS"
+      - subject: "$PENSIOENKAPITAAL"
+        operation: GREATER_THAN
+        value: 0
+
+actions:
+  - output: "is_gepensioneerd"
+    value: true
+    legal_basis:
+      law: "Pensioenwet"
+      bwb_id: "BWBR0020809"
+      article: "10"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+      juriconnect: "jci1.3:c:BWBR0020809&artikel=10&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 10 lid 1 Pensioenwet: toekenning ouderdomspensioen"
+
+  - output: "pensioenkapitaal"
+    value: "$PENSIOENKAPITAAL"
+    legal_basis:
+      law: "Pensioenwet"
+      bwb_id: "BWBR0020809"
+      article: "51"
+      url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk5_Artikel51"
+      juriconnect: "jci1.3:c:BWBR0020809&artikel=51&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 51 Pensioenwet: informatieverstrekking over opgebouwd kapitaal"
+
+  - output: "pensioenleeftijd"
+    value: "$PENSIOEN_LEEFTIJD_FONDS"
+    legal_basis:
+      law: "Pensioenwet"
+      bwb_id: "BWBR0020809"
+      article: "18"
+      paragraph: "4"
+      url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk3_Artikel18"
+      juriconnect: "jci1.3:c:BWBR0020809&artikel=18&lid=4&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 18 lid 4 Pensioenwet: pensioenrichtleeftijd"
+
+  - output: "pensioen_uitkering_bruto"
+    operation: IF
+    conditions:
+      # Beschikbare premieregeling: kapitaal * omrekenfactor
+      - test:
+          subject: "$TYPE_REGELING"
+          operation: EQUALS
+          value: "beschikbare_premie"
+        then:
+          operation: MULTIPLY
+          values:
+            - "$PENSIOENKAPITAAL"
+            - "$OMREKENFACTOR_KAPITAAL"
+      # Middelloonregeling: opbouw * jaren * pensioengrondslag
+      - test:
+          subject: "$TYPE_REGELING"
+          operation: EQUALS
+          value: "middelloon"
+        then:
+          operation: MULTIPLY
+          values:
+            - "$OPBOUW_MIDDELLOON"
+            - "$PENSIOENJAREN"
+            - operation: SUBTRACT
+              values:
+                - "$PENSIOENGEVEND_LOON"
+                - "$FRANCHISE"
+      # Eindloonregeling: opbouw * jaren * pensioengrondslag
+      - test:
+          subject: "$TYPE_REGELING"
+          operation: EQUALS
+          value: "eindloon"
+        then:
+          operation: MULTIPLY
+          values:
+            - "$OPBOUW_EINDLOON"
+            - "$PENSIOENJAREN"
+            - operation: SUBTRACT
+              values:
+                - "$PENSIOENGEVEND_LOON"
+                - "$FRANCHISE"
+      # Default: kapitaal * omrekenfactor
+      - else:
+          operation: MULTIPLY
+          values:
+            - "$PENSIOENKAPITAAL"
+            - "$OMREKENFACTOR_KAPITAAL"
+    legal_basis:
+      law: "Pensioenwet"
+      bwb_id: "BWBR0020809"
+      article: "10"
+      url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+      juriconnect: "jci1.3:c:BWBR0020809&artikel=10&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 10 Pensioenwet: berekening ouderdomspensioen afhankelijk van type regeling"
+
+  - output: "pensioen_uitkering_maandelijks"
+    operation: DIVIDE
+    values:
+      - "$pensioen_uitkering_bruto"
+      - "$MAANDEN_PER_JAAR"
+    legal_basis:
+      law: "Pensioenwet"
+      bwb_id: "BWBR0020809"
+      article: "10"
+      url: "https://wetten.overheid.nl/BWBR0020809/2024-01-01#Hoofdstuk2_Artikel10"
+      juriconnect: "jci1.3:c:BWBR0020809&artikel=10&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 10 Pensioenwet: maandelijkse uitbetaling van ouderdomspensioen"

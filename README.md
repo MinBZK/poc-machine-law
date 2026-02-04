@@ -98,55 +98,57 @@ Vooralsnog zijn deze wetten geïmplementeerd in `machine law` (met behulp van ee
 
 ### Zorgtoeslag
 
-- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml) - Berekening zorgtoeslag
-- [Verzekeringsstatus](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/zvw/RVZ-2024-01-01.yaml) - Bepaling verzekeringsstatus
+- [Hoofdwet](./laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.yaml) - Berekening zorgtoeslag
+- [Verzekeringsstatus](./laws/zvw/RVZ-2024-01-01.yaml) - Bepaling verzekeringsstatus
 
 ### AOW
 
-- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/algemene_ouderdomswet/SVB-2024-01-01.yaml) - Berekening AOW-uitkering
-- [Leeftijdsbepaling](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml) - Bepaling AOW-leeftijd
+- [Hoofdwet](./laws/algemene_ouderdomswet/SVB-2024-01-01.yaml) - Berekening AOW-uitkering
+- [Leeftijdsbepaling](./laws/algemene_ouderdomswet/leeftijdsbepaling/SVB-2024-01-01.yaml) - Bepaling AOW-leeftijd
 
 ### Huurtoeslag
 
-- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml) - Berekening huurtoeslag
+- [Hoofdwet](./laws/wet_op_de_huurtoeslag/TOESLAGEN-2025-01-01.yaml) - Berekening huurtoeslag
 
 ### Participatiewet (Bijstand)
 
-- [Landelijke regels](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/participatiewet/bijstand/SZW-2023-01-01.yaml) - Beoordeling bijstandsrecht (SZW)
-- [Gemeente Amsterdam](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/participatiewet/bijstand/gemeenten/GEMEENTE_AMSTERDAM-2023-01-01.yaml) - Lokale bijstandsregels
+- [Landelijke regels](./laws/participatiewet/bijstand/SZW-2023-01-01.yaml) - Beoordeling bijstandsrecht (SZW)
+- [Gemeente Amsterdam](./laws/participatiewet/bijstand/gemeenten/GEMEENTE_AMSTERDAM-2023-01-01.yaml) - Lokale bijstandsregels
 
 ### Bestuursrecht (AWB)
 
-- [Bezwaarprocedure](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/awb/bezwaar/JenV-2024-01-01.yaml) - Regels voor bezwaar
-- [Beroepsprocedure](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/awb/beroep/JenV-2024-01-01.yaml) - Regels voor beroep
+- [Bezwaarprocedure](./laws/awb/bezwaar/JenV-2024-01-01.yaml) - Regels voor bezwaar
+- [Beroepsprocedure](./laws/awb/beroep/JenV-2024-01-01.yaml) - Regels voor beroep
 
 ### Kieswet
 
-- [Hoofdwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/kieswet/KIESRAAD-2024-01-01.yaml) - Bepaling kiesrecht
+- [Hoofdwet](./laws/kieswet/KIESRAAD-2024-01-01.yaml) - Bepaling kiesrecht
 
 ### Overige Wetten
 
-- [Handelsregisterwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/handelsregisterwet/KVK-2024-01-01.yaml) - KVK-registratie
-- [Vreemdelingenwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/vreemdelingenwet/IND-2024-01-01.yaml) - Verblijfsvergunningen
-- [Penitentiaire Beginselenwet](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/penitentiaire_beginselenwet/DJI-2022-01-01.yaml) - Detentieregels
-- [Wet Forensische Zorg](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_forensische_zorg/DJI-2022-01-01.yaml) - Forensische zorg
-- [Wet Studiefinanciering](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_studiefinanciering/DUO-2024-01-01.yaml) - Studiefinanciering
-- [Wetboek van Strafrecht](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wetboek_van_strafrecht/JUSTID-2023-01-01.yaml) - Strafbepalingen
+- [Handelsregisterwet](./laws/handelsregisterwet/KVK-2024-01-01.yaml) - KVK-registratie
+- [Vreemdelingenwet](./laws/vreemdelingenwet/IND-2024-01-01.yaml) - Verblijfsvergunningen
+- [Penitentiaire Beginselenwet](./laws/penitentiaire_beginselenwet/DJI-2022-01-01.yaml) - Detentieregels
+- [Wet Forensische Zorg](./laws/wet_forensische_zorg/DJI-2022-01-01.yaml) - Forensische zorg
+- [Wet Studiefinanciering](./laws/wet_studiefinanciering/DUO-2024-01-01.yaml) - Studiefinanciering
+- [Wetboek van Strafrecht](./laws/wetboek_van_strafrecht/JUSTID-2023-01-01.yaml) - Strafbepalingen
 
 ### Ondersteunende Wetten
 
-- [Wet BRP](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_brp/RvIG-2020-01-01.yaml) - Persoonsgegevens
-- [Wet Inkomstenbelasting](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_inkomstenbelasting/UWV-2020-01-01.yaml) - Toetsingsinkomen
-- [SUWI](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_structuur_uitvoeringsorganisatie_werk_en_inkomen/UWV-2024-01-01.yaml) - Verzekerde jaren
-- [CBS](https://github.com/MinBZK/regelrecht-laws/tree/main/laws/wet_op_het_centraal_bureau_voor_de_statistiek/CBS-2024-01-01.yaml) - Levensverwachting
+- [Wet BRP](./laws/wet_brp/RvIG-2020-01-01.yaml) - Persoonsgegevens
+- [Wet Inkomstenbelasting](./laws/wet_inkomstenbelasting/UWV-2020-01-01.yaml) - Toetsingsinkomen
+- [SUWI](./laws/wet_structuur_uitvoeringsorganisatie_werk_en_inkomen/UWV-2024-01-01.yaml) - Verzekerde jaren
+- [CBS](./laws/wet_op_het_centraal_bureau_voor_de_statistiek/CBS-2024-01-01.yaml) - Levensverwachting
 
 ## 🚀 Aan de slag
 
-Clone deze repository inclusief submodules:
+Clone deze repository:
 ```bash
-git clone --recurse-submodules git@github.com:MinBZK/poc-machine-law.git
+git clone git@github.com:MinBZK/poc-machine-law.git
 cd poc-machine-law
 ```
+
+> **Note**: De wetten zijn direct in deze repository opgenomen in de `/laws` directory. Het gebruik van `--recurse-submodules` is alleen nodig als je de wallet functionaliteit wilt gebruiken.
 
 Installeer `uv` volgens de [documentatie](https://github.com/astral-sh/uv?tab=readme-ov-file#installation) of maak gebruik van [asdf](https://asdf-vm.com/) (zodat de juiste versie van `uv` wordt gebruikt):
 ```bash

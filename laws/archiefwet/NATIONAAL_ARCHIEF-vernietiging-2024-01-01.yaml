@@ -1,0 +1,320 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 81c1b431-545b-4a8a-b1e2-eacfc6c3915a
+name: Archiefwet - Vernietiging archiefbescheiden
+law: archiefwet/vernietiging
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2024-01-01
+service: "NATIONAAL_ARCHIEF"
+legal_basis:
+  law: "Archiefwet 1995"
+  bwb_id: "BWBR0007376"
+  article: "5"
+  url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+  juriconnect: "jci1.3:c:BWBR0007376&artikel=5&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 5 bepaalt dat de zorgdrager verplicht is selectielijsten vast te stellen die aangeven welke archiefbescheiden voor vernietiging in aanmerking komen"
+description: >
+  Bepaalt of archiefbescheiden vernietigd mogen worden volgens artikel 5 van de
+  Archiefwet 1995 in combinatie met artikel 3. Vernietiging mag alleen plaatsvinden
+  als het archiefstuk op een vastgestelde selectielijst voorkomt en de bewaartermijn
+  is verstreken.
+
+references:
+  - law: "Archiefwet 1995"
+    article: "3"
+    url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel3"
+  - law: "Archiefwet 1995"
+    article: "5"
+    url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+
+properties:
+  parameters:
+    - name: "ARCHIEFSTUK_ID"
+      description: "Identificatie van het archiefstuk"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&z=2024-01-01&g=2024-01-01"
+        explanation: "Identificatie is nodig om het archiefstuk te kunnen beoordelen op vernietigbaarheid"
+
+    - name: "AANMAAKDATUM"
+      description: "Datum waarop het archiefstuk is aangemaakt"
+      type: "date"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "De aanmaakdatum is nodig om te bepalen of de bewaartermijn is verstreken"
+
+    - name: "DOCUMENTTYPE"
+      description: "Type document volgens de organisatie-indeling"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Het documenttype bepaalt of het document op de selectielijst staat voor vernietiging"
+
+    - name: "OP_SELECTIELIJST_VERNIETIGING"
+      description: "Staat het archiefstuk op een vastgestelde selectielijst als te vernietigen"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 lid 1 bepaalt dat de zorgdrager selectielijsten vaststelt die aangeven welke archiefbescheiden voor vernietiging in aanmerking komen"
+
+    - name: "BEWAARTERMIJN_JAREN"
+      description: "Bewaartermijn in jaren zoals vastgesteld in de selectielijst"
+      type: "number"
+      required: false
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "De selectielijst geeft aan na welke termijn archiefbescheiden vernietigd moeten worden"
+
+    - name: "SELECTIELIJST_VASTGESTELD"
+      description: "Is de selectielijst formeel vastgesteld volgens artikel 5"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 lid 2 bepaalt hoe selectielijsten worden vastgesteld (bij KB, ministerieel besluit, etc.)"
+
+    - name: "SELECTIELIJST_GEPUBLICEERD"
+      description: "Is de selectielijst gepubliceerd in de Staatscourant"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "3"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=3&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 lid 3 bepaalt dat het besluit tot vaststelling van een selectielijst wordt bekendgemaakt in de Staatscourant"
+
+  output:
+    - name: "mag_vernietigd_worden"
+      description: "Mag het archiefstuk vernietigd worden"
+      type: "boolean"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "3"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel3"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=3&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 3 bepaalt dat overheidsorganen zorg dragen voor de vernietiging van daarvoor in aanmerking komende archiefbescheiden"
+
+    - name: "vernietig_vanaf_datum"
+      description: "Datum vanaf wanneer het archiefstuk vernietigd mag worden"
+      type: "date"
+      required: false
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "De selectielijst bepaalt na welke termijn archiefbescheiden vernietigd mogen worden"
+
+    - name: "reden_niet_vernietigen"
+      description: "Reden waarom het archiefstuk niet vernietigd mag worden"
+      type: "string"
+      required: false
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "5"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=5&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5 bepaalt de voorwaarden waaronder archiefbescheiden vernietigd mogen worden"
+
+  definitions:
+    MINIMALE_BEWAARTERMIJN_JAREN: 0  # Sommige documenten mogen direct vernietigd worden
+
+actions:
+  - output: "mag_vernietigd_worden"
+    operation: AND
+    values:
+      - subject: "$OP_SELECTIELIJST_VERNIETIGING"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "5"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Het archiefstuk moet op een selectielijst staan als te vernietigen"
+      - subject: "$SELECTIELIJST_VASTGESTELD"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "5"
+          paragraph: "2"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=2&z=2024-01-01&g=2024-01-01"
+          explanation: "De selectielijst moet formeel vastgesteld zijn"
+      - subject: "$SELECTIELIJST_GEPUBLICEERD"
+        operation: EQUALS
+        value: true
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "5"
+          paragraph: "3"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=3&z=2024-01-01&g=2024-01-01"
+          explanation: "Het besluit tot vaststelling moet bekendgemaakt zijn in de Staatscourant"
+      - operation: IF
+        conditions:
+          - test:
+              subject: "$BEWAARTERMIJN_JAREN"
+              operation: NOT_NULL
+            then:
+              operation: GREATER_OR_EQUAL
+              values:
+                - operation: SUBTRACT_DATE
+                  unit: "years"
+                  values:
+                    - "$calculation_date"
+                    - "$AANMAAKDATUM"
+                - "$BEWAARTERMIJN_JAREN"
+            legal_basis:
+              law: "Archiefwet 1995"
+              bwb_id: "BWBR0007376"
+              article: "5"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+              juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+              explanation: "De bewaartermijn zoals vastgesteld in de selectielijst moet verstreken zijn"
+          - else: true
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "3"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel3"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=3&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 3 bepaalt de zorgplicht voor vernietiging van daarvoor in aanmerking komende archiefbescheiden"
+
+  - output: "vernietig_vanaf_datum"
+    operation: IF
+    conditions:
+      - test:
+          operation: AND
+          values:
+            - subject: "$OP_SELECTIELIJST_VERNIETIGING"
+              operation: EQUALS
+              value: true
+            - subject: "$BEWAARTERMIJN_JAREN"
+              operation: NOT_NULL
+        then:
+          operation: CONCAT
+          values:
+            - "$AANMAAKDATUM"
+            - "|"
+            - "$BEWAARTERMIJN_JAREN"
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "5"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "De bewaartermijn in de selectielijst bepaalt wanneer vernietiging mag plaatsvinden"
+      - else: null
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "5"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=5&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "De selectielijst bepaalt de termijn na welke vernietiging plaats mag vinden"
+
+  - output: "reden_niet_vernietigen"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$mag_vernietigd_worden"
+          operation: EQUALS
+          value: false
+        then:
+          operation: IF
+          conditions:
+            - test:
+                subject: "$OP_SELECTIELIJST_VERNIETIGING"
+                operation: EQUALS
+                value: false
+              then: "Archiefstuk komt niet voor op een selectielijst voor vernietiging (mogelijk blijvend te bewaren)"
+            - test:
+                subject: "$SELECTIELIJST_VASTGESTELD"
+                operation: EQUALS
+                value: false
+              then: "Selectielijst is niet formeel vastgesteld volgens artikel 5 lid 2 Archiefwet"
+            - test:
+                subject: "$SELECTIELIJST_GEPUBLICEERD"
+                operation: EQUALS
+                value: false
+              then: "Selectielijst is niet bekendgemaakt in de Staatscourant volgens artikel 5 lid 3 Archiefwet"
+            - test:
+                operation: AND
+                values:
+                  - subject: "$BEWAARTERMIJN_JAREN"
+                    operation: NOT_NULL
+                  - operation: LESS_THAN
+                    values:
+                      - operation: SUBTRACT_DATE
+                        unit: "years"
+                        values:
+                          - "$calculation_date"
+                          - "$AANMAAKDATUM"
+                      - "$BEWAARTERMIJN_JAREN"
+              then: "Bewaartermijn is nog niet verstreken"
+            - else: "Onbekende reden"
+      - else: null
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "5"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel5"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=5&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 5 bepaalt de voorwaarden voor vernietiging"

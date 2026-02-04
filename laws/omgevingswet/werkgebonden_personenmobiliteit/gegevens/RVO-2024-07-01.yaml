@@ -1,0 +1,393 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 9c5d8e7a-4b2f-4d6e-8a1c-3e5b7d9a2f4c
+name: WPM Gegevensverzameling
+law: omgevingswet/werkgebonden_personenmobiliteit/gegevens
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "BUSINESS"
+valid_from: 2024-07-01
+service: "RVO"
+description: >
+  Verzameling van werkgebonden personenmobiliteitsgegevens voor CO2-rapportage volgens
+  artikel 18.14 van het Besluit activiteiten leefomgeving. Organisaties moeten
+  gedetailleerde gegevens rapporteren over vervoerskilometers per modaliteit.
+
+legal_basis:
+  law: "Besluit activiteiten leefomgeving"
+  bwb_id: "BWBR0041330"
+  article: "18.14"
+  url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+  juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&z=2024-07-01&g=2024-07-01"
+  explanation: "Artikel 18.14 bepaalt welke gegevens organisaties moeten rapporteren over werkgebonden personenmobiliteit"
+
+properties:
+  parameters:
+    - name: "KVK_NUMMER"
+      description: "KvK nummer van de organisatie"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.9"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.1_Artikel18.9"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.9&z=2024-07-01&g=2024-07-01"
+        explanation: "Het KvK nummer is vereist voor identificatie van de organisatie"
+
+  sources:
+    - name: "WOON_WERK_AUTO_BENZINE"
+      description: "Kilometers woon-werkverkeer met auto op benzine"
+      type: "number"
+      required: false
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "wpm_reisgegevens"
+        field: "woon_werk_auto_benzine"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Artikel 18.14 lid 1 bepaalt de rapportage van woon-werkverkeer per vervoermiddel"
+
+    - name: "WOON_WERK_AUTO_DIESEL"
+      description: "Kilometers woon-werkverkeer met auto op diesel"
+      type: "number"
+      required: false
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "wpm_reisgegevens"
+        field: "woon_werk_auto_diesel"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Artikel 18.14 lid 1 bepaalt de rapportage van woon-werkverkeer per vervoermiddel"
+
+    - name: "ZAKELIJK_AUTO_BENZINE"
+      description: "Kilometers zakelijk verkeer met auto op benzine"
+      type: "number"
+      required: false
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "wpm_reisgegevens"
+        field: "zakelijk_auto_benzine"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Artikel 18.14 lid 1 bepaalt de rapportage van zakelijk verkeer per vervoermiddel"
+
+    - name: "ZAKELIJK_AUTO_DIESEL"
+      description: "Kilometers zakelijk verkeer met auto op diesel"
+      type: "number"
+      required: false
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "wpm_reisgegevens"
+        field: "zakelijk_auto_diesel"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Artikel 18.14 lid 1 bepaalt de rapportage van zakelijk verkeer per vervoermiddel"
+
+    - name: "WOON_WERK_OPENBAAR_VERVOER"
+      description: "Kilometers woon-werkverkeer met openbaar vervoer"
+      type: "number"
+      required: false
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "wpm_reisgegevens"
+        field: "woon_werk_openbaar_vervoer"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Artikel 18.14 lid 1 bepaalt de rapportage van openbaar vervoer gebruik"
+
+  output:
+    - name: "woon_werk_auto_benzine"
+      description: "Kilometers woon-werkverkeer met auto op benzine"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Rapportage van woon-werkverkeer per vervoermiddel conform artikel 18.14 lid 1"
+
+    - name: "woon_werk_auto_diesel"
+      description: "Kilometers woon-werkverkeer met auto op diesel"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Rapportage van woon-werkverkeer per vervoermiddel conform artikel 18.14 lid 1"
+
+    - name: "zakelijk_auto_benzine"
+      description: "Kilometers zakelijk verkeer met auto op benzine"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Rapportage van zakelijk verkeer per vervoermiddel conform artikel 18.14 lid 1"
+
+    - name: "zakelijk_auto_diesel"
+      description: "Kilometers zakelijk verkeer met auto op diesel"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Rapportage van zakelijk verkeer per vervoermiddel conform artikel 18.14 lid 1"
+
+    - name: "woon_werk_openbaar_vervoer"
+      description: "Kilometers woon-werkverkeer met openbaar vervoer"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "Rapportage van openbaar vervoer gebruik conform artikel 18.14 lid 1"
+
+    - name: "co2_uitstoot_totaal"
+      description: "Totale berekende CO2-uitstoot in gram per kalenderjaar"
+      type: "number"
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "18.14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+        explanation: "CO2-uitstoot wordt berekend op basis van kilometrage per vervoermiddel conform artikel 18.14 lid 1"
+
+  definitions:
+    # TODO: Deze emissiefactoren zijn voorbeelden - werkelijke factoren moeten worden vastgesteld via ministeriële regeling
+    CO2_FACTOR_AUTO_BENZINE: 170  # gram CO2 per kilometer
+    CO2_FACTOR_AUTO_DIESEL: 150   # gram CO2 per kilometer
+    CO2_FACTOR_OPENBAAR_VERVOER: 30  # gram CO2 per kilometer
+
+requirements:
+  - all:
+      - operation: EQUALS
+        subject: true
+        value: true
+        legal_basis:
+          law: "Besluit activiteiten leefomgeving"
+          bwb_id: "BWBR0041330"
+          article: "18.14"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+          juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+          explanation: "Gegevensverzameling is altijd mogelijk voor organisaties die rapportageverplichting hebben"
+
+actions:
+  - output: "woon_werk_auto_benzine"
+    value: "$WOON_WERK_AUTO_BENZINE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "18.14"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+      explanation: "Woon-werkverkeer benzine kilometers voor CO2-berekening"
+
+  - output: "woon_werk_auto_diesel"
+    value: "$WOON_WERK_AUTO_DIESEL"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "18.14"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+      explanation: "Woon-werkverkeer diesel kilometers voor CO2-berekening"
+
+  - output: "zakelijk_auto_benzine"
+    value: "$ZAKELIJK_AUTO_BENZINE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "18.14"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+      explanation: "Zakelijk verkeer benzine kilometers voor CO2-berekening"
+
+  - output: "zakelijk_auto_diesel"
+    value: "$ZAKELIJK_AUTO_DIESEL"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "18.14"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+      explanation: "Zakelijk verkeer diesel kilometers voor CO2-berekening"
+
+  - output: "woon_werk_openbaar_vervoer"
+    value: "$WOON_WERK_OPENBAAR_VERVOER"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "18.14"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+      explanation: "Openbaar vervoer kilometers voor CO2-berekening"
+
+  - output: "co2_uitstoot_totaal"
+    operation: ADD
+    values:
+      - operation: MULTIPLY
+        values:
+          - "$WOON_WERK_AUTO_BENZINE"
+          - "$CO2_FACTOR_AUTO_BENZINE"
+      - operation: MULTIPLY
+        values:
+          - "$WOON_WERK_AUTO_DIESEL"
+          - "$CO2_FACTOR_AUTO_DIESEL"
+      - operation: MULTIPLY
+        values:
+          - "$ZAKELIJK_AUTO_BENZINE"
+          - "$CO2_FACTOR_AUTO_BENZINE"
+      - operation: MULTIPLY
+        values:
+          - "$ZAKELIJK_AUTO_DIESEL"
+          - "$CO2_FACTOR_AUTO_DIESEL"
+      - operation: MULTIPLY
+        values:
+          - "$WOON_WERK_OPENBAAR_VERVOER"
+          - "$CO2_FACTOR_OPENBAAR_VERVOER"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "18.14"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-07-01#Hoofdstuk18_Afdeling18.1_Paragraaf18.1.2_Artikel18.14"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=18.14&lid=1&z=2024-07-01&g=2024-07-01"
+      explanation: "Totale CO2-uitstoot wordt berekend door kilometers te vermenigvuldigen met emissiefactoren per vervoermiddel"

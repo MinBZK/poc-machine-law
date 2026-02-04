@@ -1,0 +1,154 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 8f2a6d4c-1e3b-4f9a-b5c8-7d9e3a2f1b8c
+name: Werkgeversbijdrage Zorgverzekeringswet 2024
+law: zvw
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "AANSLAG"
+discoverable: "BUSINESS"
+valid_from: 2024-01-01
+service: "BELASTINGDIENST"
+legal_basis:
+  law: "Zorgverzekeringswet"
+  bwb_id: "BWBR0018450"
+  article: "42"
+  url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel42"
+  juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=42&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 42 bepaalt dat een verzekerde een inkomensafhankelijke bijdrage verschuldigd is, die door werkgevers wordt afgedragen"
+description: >
+  Berekening van de werkgeversbijdrage Zorgverzekeringswet (ook wel werkgeversheffing Zvw genoemd).
+  Werkgevers dragen 6,57% af over het loon van werknemers tot maximaal het bijdrage-inkomen van
+  €71.624 per jaar (2024). Dit is een kostenpost voor werkgevers naast de Wfsv-premies en wordt
+  geïnd door de Belastingdienst.
+
+references:
+  - law: "Zorgverzekeringswet"
+    article: "43"
+    url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel43"
+  - law: "Zorgverzekeringswet"
+    article: "44"
+    url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel44"
+
+properties:
+  parameters:
+    - name: "LOONHEFFINGENNUMMER"
+      description: "Loonheffingennummer van de werkgever (identificatie bij Belastingdienst)"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Zorgverzekeringswet"
+        bwb_id: "BWBR0018450"
+        article: "42"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel42"
+        juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=42&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Werkgevers worden geïdentificeerd via hun loonheffingennummer voor de afdracht van de werkgeversbijdrage"
+
+    - name: "BRUTO_LOON"
+      description: "Bruto loon van de werknemer in euro's"
+      type: "number"
+      type_spec:
+        precision: 2
+        min: 0
+      required: true
+      legal_basis:
+        law: "Zorgverzekeringswet"
+        bwb_id: "BWBR0018450"
+        article: "43"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel43"
+        juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=43&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 43 definieert het bijdrage-inkomen als grondslag voor de werkgeversbijdrage"
+
+  output:
+    - name: "bijdrage_inkomen"
+      description: "Bijdrage-inkomen voor ZVW (maximaal €71.624 in 2024)"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Zorgverzekeringswet"
+        bwb_id: "BWBR0018450"
+        article: "43"
+        url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel43"
+        juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=43&z=2024-01-01&g=2024-01-01"
+        explanation: "Het bijdrage-inkomen is het loon tot maximaal de grens van artikel 43"
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: secondary
+
+    - name: "zvw_werkgeversbijdrage"
+      description: "Verschuldigde werkgeversbijdrage Zvw in eurocenten"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      legal_basis:
+        law: "Zorgverzekeringswet"
+        bwb_id: "BWBR0018450"
+        article: "42"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel42"
+        juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=42&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 42 bepaalt de inkomensafhankelijke bijdrage die door werkgevers wordt afgedragen"
+      temporal:
+        type: "period"
+        period_type: "year"
+      citizen_relevance: primary
+
+  definitions:
+    ZVW_PERCENTAGE:
+      value: 6.57
+      legal_basis:
+        law: "Regeling Zorgverzekeringswet"
+        article: "1"
+        url: "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/werk_en_inkomen/zorgverzekeringswet/bijdrage_zorgverzekeringswet/tabel_werkgeversheffing_zvw_of_bijdrage_zvw/tabel_werkgeversheffing_zvw_of_bijdrage_zvw"
+        explanation: "Voor 2024 bedraagt het percentage werkgeversbijdrage Zvw 6,57% volgens ministeriële regeling"
+
+    MAXIMUM_BIJDRAGE_INKOMEN:
+      value: 7162800
+      legal_basis:
+        law: "Zorgverzekeringswet"
+        bwb_id: "BWBR0018450"
+        article: "43"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel43"
+        juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=43&lid=2&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 43 lid 2 bepaalt een maximum bijdrage-inkomen, voor 2024: €71.628 (7.162.800 eurocenten) conform Staatscourant 2023, 31461"
+
+actions:
+  - output: "bijdrage_inkomen"
+    operation: MIN
+    values:
+      - operation: MULTIPLY
+        values:
+          - "$BRUTO_LOON"
+          - 100
+      - "$MAXIMUM_BIJDRAGE_INKOMEN.value"
+    legal_basis:
+      law: "Zorgverzekeringswet"
+      bwb_id: "BWBR0018450"
+      article: "43"
+      url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel43"
+      juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=43&z=2024-01-01&g=2024-01-01"
+      explanation: "Bijdrage-inkomen is loon tot maximaal de grens van €71.628"
+
+  - output: "zvw_werkgeversbijdrage"
+    operation: MULTIPLY
+    values:
+      - "$bijdrage_inkomen"
+      - operation: DIVIDE
+        values:
+          - "$ZVW_PERCENTAGE.value"
+          - 100
+    legal_basis:
+      law: "Zorgverzekeringswet"
+      bwb_id: "BWBR0018450"
+      article: "42"
+      url: "https://wetten.overheid.nl/BWBR0018450/2024-01-01#Hoofdstuk5_Paragraaf5.2_Artikel42"
+      juriconnect: "jci1.3:c:BWBR0018450&hoofdstuk=5&paragraaf=5.2&artikel=42&z=2024-01-01&g=2024-01-01"
+      explanation: "Werkgeversbijdrage = bijdrage-inkomen × percentage (6,57% in 2024)"

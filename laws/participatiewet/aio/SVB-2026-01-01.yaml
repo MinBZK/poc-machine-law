@@ -1,0 +1,387 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 4d6e8f0a-3c5b-4e7f-a8b9-1c2d3e4f5a6b
+name: AIO-aanvulling
+law: participatiewet/aio
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2026-01-01
+service: "SVB"
+legal_basis:
+  law: "Participatiewet"
+  bwb_id: "BWBR0015703"
+  article: "47a"
+  url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+  juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 47a Participatiewet regelt de aanvullende inkomensvoorziening ouderen (AIO)"
+description: >
+  Regels voor het bepalen van het recht op de Aanvullende Inkomensvoorziening Ouderen (AIO).
+  De AIO is een aanvulling op het inkomen voor personen die de AOW-leeftijd hebben bereikt
+  maar door onvolledige AOW-opbouw onder het sociaal minimum leven. De SVB voert de AIO
+  uit namens gemeenten. De AIO vult het inkomen aan tot het sociaal minimum, rekening
+  houdend met vermogen en leefsituatie.
+
+references:
+  - law: "Participatiewet"
+    article: "47a"
+    url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+  - law: "Participatiewet"
+    article: "21"
+    url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+  - law: "Participatiewet"
+    article: "34"
+    url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel34"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN is nodig voor identificatie van de aanvrager"
+
+  input:
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de aanvrager"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 47a lid 1: AIO is voor personen die de pensioengerechtigde leeftijd hebben bereikt"
+
+    - name: "GEBOORTEDATUM"
+      description: "Geboortedatum van de aanvrager"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "geboortedatum"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+        explanation: "Geboortedatum voor bepaling AOW-leeftijd"
+
+    - name: "PENSIOENLEEFTIJD"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "pensioenleeftijd"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "GEBOORTEDATUM"
+            reference: "$GEBOORTEDATUM"
+      type_spec:
+        unit: "years"
+        precision: 2
+        min: 65
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 47a lid 1: leeftijdseis is pensioengerechtigde leeftijd"
+
+    - name: "HEEFT_PARTNER"
+      description: "Heeft de persoon een partner"
+      type: "boolean"
+      service_reference:
+        service: "RvIG"
+        field: "heeft_partner"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "21"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=21&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 21 bepaalt de norm afhankelijk van de leefsituatie"
+
+    - name: "INKOMEN"
+      description: "Totaal inkomen inclusief AOW"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "inkomen"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "32"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel32"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=32&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 32 definieert inkomen voor de vermogenstoets"
+
+    - name: "VERMOGEN"
+      description: "Vermogen van de persoon"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "vermogen"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "34"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel34"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=34&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 34 bepaalt de vermogensgrens voor bijstand"
+
+    - name: "AOW_UITKERING"
+      description: "AOW-uitkering van de persoon"
+      type: "amount"
+      service_reference:
+        service: "SVB"
+        field: "pensioenbedrag"
+        law: "algemene_ouderdomswet"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+        explanation: "AOW-uitkering is onderdeel van het inkomen voor AIO-berekening"
+
+  output:
+    - name: "is_gerechtigd"
+      description: "Heeft de persoon recht op AIO-aanvulling"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 47a bepaalt de voorwaarden voor AIO"
+
+    - name: "sociaal_minimum"
+      description: "Sociaal minimum (bijstandsnorm) per maand"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "21"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=21&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 21 bepaalt de bijstandsnorm afhankelijk van leefsituatie"
+
+    - name: "totaal_inkomen"
+      description: "Totaal maandelijks inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "32"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel32"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=32&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 32: bepaling totaal inkomen"
+
+    - name: "aio_aanvulling"
+      description: "AIO-aanvulling per maand"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Participatiewet"
+        bwb_id: "BWBR0015703"
+        article: "47a"
+        url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+        juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 47a: hoogte van de AIO-aanvulling"
+
+  definitions:
+    # Bijstandsnormen per maand (bruto, 2026 geschat)
+    NORM_ALLEENSTAAND: 138000  # €1.380 per maand (70% netto minimumloon)
+    NORM_GEHUWDEN: 197000      # €1.970 per maand (100% netto minimumloon voor paar)
+    # Vermogensgrenzen
+    VERMOGENSGRENS_ALLEENSTAAND: 800000   # €8.000
+    VERMOGENSGRENS_GEHUWDEN: 1600000      # €16.000
+    # Maanden per jaar
+    MAANDEN_PER_JAAR: 12
+
+requirements:
+  - all:
+      - subject: "$LEEFTIJD"
+        operation: GREATER_OR_EQUAL
+        value: "$PENSIOENLEEFTIJD"
+      - any:
+          # Alleenstaand: vermogen onder grens
+          - all:
+              - subject: "$HEEFT_PARTNER"
+                operation: EQUALS
+                value: false
+              - subject: "$VERMOGEN"
+                operation: LESS_THAN
+                value: "$VERMOGENSGRENS_ALLEENSTAAND"
+          # Gehuwden: vermogen onder grens
+          - all:
+              - subject: "$HEEFT_PARTNER"
+                operation: EQUALS
+                value: true
+              - subject: "$VERMOGEN"
+                operation: LESS_THAN
+                value: "$VERMOGENSGRENS_GEHUWDEN"
+
+actions:
+  - output: "is_gerechtigd"
+    value: true
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "47a"
+      url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 47a: toekenning AIO-aanvulling"
+
+  - output: "sociaal_minimum"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$HEEFT_PARTNER"
+          operation: EQUALS
+          value: true
+        then: "$NORM_GEHUWDEN"
+      - else: "$NORM_ALLEENSTAAND"
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "21"
+      url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.2_Artikel21"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=21&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 21: bijstandsnorm afhankelijk van leefsituatie"
+
+  - output: "totaal_inkomen"
+    operation: ADD
+    values:
+      - "$AOW_UITKERING"
+      - operation: SUBTRACT
+        values:
+          - operation: DIVIDE
+            values:
+              - "$INKOMEN"
+              - "$MAANDEN_PER_JAAR"
+          - "$AOW_UITKERING"
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "32"
+      url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel32"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=32&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 32: totaal inkomen voor AIO-berekening"
+
+  - output: "aio_aanvulling"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$sociaal_minimum"
+          - "$totaal_inkomen"
+      - 0
+    legal_basis:
+      law: "Participatiewet"
+      bwb_id: "BWBR0015703"
+      article: "47a"
+      url: "https://wetten.overheid.nl/BWBR0015703/2024-01-01#Hoofdstuk3_Paragraaf3.4_Artikel47a"
+      juriconnect: "jci1.3:c:BWBR0015703&artikel=47a&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 47a: berekening AIO als verschil tussen norm en inkomen"
