@@ -1,0 +1,376 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 5a437c98-30bb-4044-af1a-11701a9bf7ea
+name: Bepalen volmacht en vertegenwoordigingsbevoegdheid gevolmachtigde
+law: burgerlijk_wetboek_volmacht
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+valid_from: 2024-01-01
+service: "NOTARIAAT"
+discoverable: "DELEGATION_PROVIDER"
+legal_basis:
+  law: "Burgerlijk Wetboek Boek 3"
+  bwb_id: "BWBR0005291"
+  article: "60"
+  paragraph: "1"
+  url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+  juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&lid=1&z=2024-01-01&g=2024-01-01"
+  explanation: >
+    Artikel 3:60 lid 1 BW bepaalt dat volmacht is de bevoegdheid die een
+    volmachtgever verleent aan een ander, de gevolmachtigde, om in zijn naam
+    rechtshandelingen te verrichten.
+description: >
+  Bepaalt of een persoon gevolmachtigde is voor een of meer volmachtgevers op basis
+  van een geregistreerde volmacht. De volmacht kan algemeen (alle rechtshandelingen)
+  of bijzonder (specifieke handelingen) zijn. Bij een algemene volmacht krijgt de
+  gevolmachtigde volledige vertegenwoordigingsbevoegdheid (Art. 3:62 BW).
+  Dit betreft alleen notarieel geregistreerde volmachten. Informele volmachten
+  zijn niet in dit register opgenomen.
+
+references:
+  - law: "Burgerlijk Wetboek Boek 3"
+    article: "60"
+    url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+  - law: "Burgerlijk Wetboek Boek 3"
+    article: "62"
+    url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel62"
+  - law: "Burgerlijk Wetboek Boek 3"
+    article: "72"
+    url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel72"
+  - law: "Burgerlijk Wetboek Boek 3"
+    article: "74"
+    url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel74"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de persoon wiens gevolmachtigde-bevoegdheden worden opgezocht"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Wet basisregistratie personen"
+        bwb_id: "BWBR0033715"
+        article: "2.7"
+        url: "https://wetten.overheid.nl/BWBR0033715/2024-01-01#Hoofdstuk2_Paragraaf2.2_Artikel2.7"
+        juriconnect: "jci1.3:c:BWBR0033715&artikel=2.7&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN identificeert de gevolmachtigde in het volmachtregister"
+
+  sources:
+    - name: "VOLMACHT_REGISTRATIES"
+      description: "Volmacht-registraties uit het notarieel register"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "61"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel61"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=61&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Notarieel vastgelegde volmachten worden geregistreerd in het
+          notarieel register (Centraal Testamentenregister).
+      temporal:
+        type: "period"
+        period_type: "continuous"
+      source_reference:
+        table: "volmacht_registraties"
+        fields: ["bsn_volmachtgever", "naam_volmachtgever", "volmacht_type", "datum_ingang", "datum_einde", "status", "is_herroepen"]
+        select_on:
+          - name: "bsn_gevolmachtigde"
+            description: "BSN nummer van de gevolmachtigde"
+            type: "string"
+            value: "$BSN"
+
+  output:
+    - name: "heeft_delegaties"
+      description: "Of de persoon delegaties heeft als gevolmachtigde"
+      type: "boolean"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "60"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 3:60 lid 1 BW: Volmacht is de bevoegdheid om in naam van de
+          volmachtgever rechtshandelingen te verrichten.
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_ids"
+      description: "BSN nummers van volmachtgevers waarvoor deze persoon gevolmachtigde is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "60"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+        explanation: "BSN nummers van volmachtgevers uit notarieel register"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_names"
+      description: "Namen van volmachtgevers waarvoor deze persoon gevolmachtigde is"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "60"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+        explanation: "Namen van volmachtgevers uit notarieel register"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "subject_types"
+      description: "Types van de subjecten (altijd CITIZEN voor volmachtgevers)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "60"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+        explanation: "Dit register betreft alleen natuurlijke personen als volmachtgever"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "delegation_types"
+      description: "Type delegatie (GEVOLMACHTIGDE_ALGEMEEN of GEVOLMACHTIGDE_BIJZONDER)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "62"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel62"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=62&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 3:62 BW: onderscheid algemene en bijzondere volmacht"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "permissions"
+      description: "Rechten per volmachtgever (afhankelijk van type volmacht)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "62"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel62"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=62&z=2024-01-01&g=2024-01-01"
+        explanation: >
+          Art. 3:62 BW: Algemene volmacht strekt tot alle rechtshandelingen
+          (volledige rechten), bijzondere tot specifieke handelingen (beperkt).
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_from_dates"
+      description: "Startdatum van elke volmacht"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "61"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel61"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=61&z=2024-01-01&g=2024-01-01"
+        explanation: "Ingangsdatum volmacht uit notarieel register"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+    - name: "valid_until_dates"
+      description: "Einddatum van elke volmacht (null = onbepaalde tijd)"
+      type: "array"
+      legal_basis:
+        law: "Burgerlijk Wetboek Boek 3"
+        bwb_id: "BWBR0005291"
+        article: "72"
+        url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel72"
+        juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=72&z=2024-01-01&g=2024-01-01"
+        explanation: "Art. 3:72 BW: volmacht eindigt door herroeping, dood, etc."
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+
+  definitions:
+    # Art. 3:62 BW: algemene volmacht strekt tot alle rechtshandelingen
+    ALGEMENE_VOLMACHT_RECHTEN:
+      - "LEZEN"
+      - "CLAIMS_INDIENEN"
+      - "BESLUITEN_ONTVANGEN"
+
+    # Bijzondere volmacht: alleen specifieke handelingen, dus beperkte rechten
+    BIJZONDERE_VOLMACHT_RECHTEN:
+      - "LEZEN"
+
+    # Volmacht types
+    VOLMACHT_TYPEN:
+      ALGEMENE_VOLMACHT: "GEVOLMACHTIGDE_ALGEMEEN"
+      BIJZONDERE_VOLMACHT: "GEVOLMACHTIGDE_BIJZONDER"
+
+requirements:
+  - operation: EXISTS
+    subject: "$VOLMACHT_REGISTRATIES"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "61"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel61"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=61&z=2024-01-01&g=2024-01-01"
+      explanation: "Persoon moet als gevolmachtigde zijn geregistreerd"
+
+actions:
+  # Stap 1: Filter op actieve, niet-herroepen volmachten
+  - output: "actieve_volmachten"
+    operation: FOREACH
+    subject: "$VOLMACHT_REGISTRATIES"
+    where:
+      operation: AND
+      values:
+        - operation: EQUALS
+          subject: "$current.status"
+          value: "ACTIEF"
+        - operation: NOT_EQUALS
+          subject: "$current.is_herroepen"
+          value: true
+        - operation: OR
+          values:
+            - operation: IS_NULL
+              subject: "$current.datum_einde"
+            - operation: EQUALS
+              subject: "$current.datum_einde"
+              value: ""
+            - operation: GREATER_THAN
+              values:
+                - "$current.datum_einde"
+                - "$calculation_date"
+    value: "$current"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "72"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel72"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=72&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 3:72 BW: volmacht eindigt door herroeping, dood volmachtgever,
+        faillissement, etc. Alleen actieve volmachten geven bevoegdheid.
+
+  # heeft_delegaties: boolean indicating if person has any delegations
+  - output: "heeft_delegaties"
+    operation: EXISTS
+    subject: "$actieve_volmachten"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "60"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 3:60 BW bepaalt dat volmacht vertegenwoordigingsbevoegdheid geeft.
+
+  # subject_ids: BSN numbers of volmachtgevers
+  - output: "subject_ids"
+    subject: "$actieve_volmachten.bsn_volmachtgever"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "60"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+      explanation: "BSN nummers van volmachtgevers uit notarieel register"
+
+  # subject_names: names of volmachtgevers
+  - output: "subject_names"
+    subject: "$actieve_volmachten.naam_volmachtgever"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "60"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+      explanation: "Namen van volmachtgevers uit notarieel register"
+
+  # subject_types: constant "CITIZEN" for each volmachtgever
+  - output: "subject_types"
+    operation: FOREACH
+    subject: "$actieve_volmachten"
+    value: "CITIZEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "60"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel60"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=60&z=2024-01-01&g=2024-01-01"
+      explanation: "Dit register betreft alleen natuurlijke personen, altijd CITIZEN"
+
+  # delegation_types: based on volmacht type
+  - output: "delegation_types"
+    operation: FOREACH
+    subject: "$actieve_volmachten"
+    value:
+      operation: IF
+      conditions:
+        - test:
+            operation: EQUALS
+            subject: "$current.volmacht_type"
+            value: "ALGEMENE_VOLMACHT"
+          then: "GEVOLMACHTIGDE_ALGEMEEN"
+        - else: "GEVOLMACHTIGDE_BIJZONDER"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "62"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel62"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=62&z=2024-01-01&g=2024-01-01"
+      explanation: "Art. 3:62 BW: onderscheid algemene en bijzondere volmacht"
+
+  # permissions: based on volmacht type
+  - output: "permissions"
+    operation: FOREACH
+    subject: "$actieve_volmachten"
+    value:
+      operation: IF
+      conditions:
+        - test:
+            operation: EQUALS
+            subject: "$current.volmacht_type"
+            value: "ALGEMENE_VOLMACHT"
+          then: "$ALGEMENE_VOLMACHT_RECHTEN"
+        - else: "$BIJZONDERE_VOLMACHT_RECHTEN"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "62"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel62"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=62&z=2024-01-01&g=2024-01-01"
+      explanation: >
+        Art. 3:62 BW: Algemene volmacht strekt tot alle rechtshandelingen
+        (volledige rechten), bijzondere tot specifieke handelingen (beperkt).
+
+  # valid_from_dates: start date from register
+  - output: "valid_from_dates"
+    subject: "$actieve_volmachten.datum_ingang"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "61"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel61"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=61&z=2024-01-01&g=2024-01-01"
+      explanation: "Ingangsdatum volmacht uit notarieel register"
+
+  # valid_until_dates: end date (null if open-ended)
+  - output: "valid_until_dates"
+    subject: "$actieve_volmachten.datum_einde"
+    legal_basis:
+      law: "Burgerlijk Wetboek Boek 3"
+      bwb_id: "BWBR0005291"
+      article: "72"
+      url: "https://wetten.overheid.nl/BWBR0005291/2024-01-01#Boek3_Titeldeel3_Artikel72"
+      juriconnect: "jci1.3:c:BWBR0005291&boek=3&artikel=72&z=2024-01-01&g=2024-01-01"
+      explanation: "Einddatum volmacht, null indien onbepaalde tijd"

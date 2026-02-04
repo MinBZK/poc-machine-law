@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LawBaseDir = "law"
+	LawBaseDir = "laws"
 )
 
 var (
@@ -45,7 +45,30 @@ type RuleResolver interface {
 // New creates a new rule resolver
 func New() (resolver *RuleResolve, err error) {
 	once.Do(func() {
-		ruleSpec, lawsByService, discoverableLawsByService, err = rulesLoad(LawBaseDir)
+		// Try to find the laws directory by walking up from current directory
+		// This handles cases where tests run from nested directories
+		lawDir := ""
+		currentDir, _ := os.Getwd()
+
+		// Try up to 5 levels up to find laws directory
+		for i := 0; i < 5; i++ {
+			checkPath := LawBaseDir
+			if i > 0 {
+				checkPath = filepath.Join(strings.Repeat("../", i), LawBaseDir)
+			}
+
+			if _, statErr := os.Stat(checkPath); statErr == nil {
+				lawDir = checkPath
+				break
+			}
+		}
+
+		if lawDir == "" {
+			err = fmt.Errorf("laws directory not found (searched up to 5 levels from %s)", currentDir)
+			return
+		}
+
+		ruleSpec, lawsByService, discoverableLawsByService, err = rulesLoad(lawDir)
 		if err != nil {
 			return
 		}

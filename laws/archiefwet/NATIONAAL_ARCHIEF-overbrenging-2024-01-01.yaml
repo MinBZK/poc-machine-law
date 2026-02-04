@@ -1,0 +1,207 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 5cebc6f0-caa4-4f2f-908e-37c0fcb7337a
+name: Archiefwet - Overbrenging archiefbescheiden
+law: archiefwet/overbrenging
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2024-01-01
+service: "NATIONAAL_ARCHIEF"
+legal_basis:
+  law: "Archiefwet 1995"
+  bwb_id: "BWBR0007376"
+  article: "12"
+  url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+  juriconnect: "jci1.3:c:BWBR0007376&artikel=12&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 12 bepaalt dat de zorgdrager archiefbescheiden die niet voor vernietiging in aanmerking komen en ouder zijn dan twintig jaar over moet brengen naar een archiefbewaarplaats"
+description: >
+  Bepaalt of archiefbescheiden overgebracht moeten worden naar een archiefbewaarplaats
+  volgens artikel 12 van de Archiefwet 1995. Archiefbescheiden die niet voor vernietiging
+  in aanmerking komen en ouder zijn dan 20 jaar moeten uiterlijk 10 jaar na het bereiken
+  van de 20-jarige leeftijd worden overgebracht.
+
+references:
+  - law: "Archiefwet 1995"
+    article: "12"
+    url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+  - law: "Archiefwet 1995"
+    article: "13"
+    url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel13"
+
+properties:
+  parameters:
+    - name: "ARCHIEFSTUK_ID"
+      description: "Identificatie van het archiefstuk"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "12"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=12&z=2024-01-01&g=2024-01-01"
+        explanation: "Identificatie is nodig om het archiefstuk te kunnen beoordelen op overbrengplicht"
+
+    - name: "AANMAAKDATUM"
+      description: "Datum waarop het archiefstuk is aangemaakt"
+      type: "date"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "12"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 12 lid 1 bepaalt dat archiefbescheiden ouder dan twintig jaar overgebracht moeten worden"
+
+    - name: "VOOR_VERNIETIGING"
+      description: "Komt het archiefstuk in aanmerking voor vernietiging volgens de selectielijst"
+      type: "boolean"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "12"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 12 lid 1 bepaalt dat alleen archiefbescheiden die NIET voor vernietiging in aanmerking komen overgebracht moeten worden"
+
+    - name: "VEELVULDIG_GEBRUIK"
+      description: "Worden de archiefbescheiden nog veelvuldig gebruikt door het overheidsorgaan"
+      type: "boolean"
+      required: false
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "13"
+        paragraph: "3"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel13"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=13&lid=3&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 13 lid 3 bepaalt dat opschorting van overbrenging mogelijk is indien archiefbescheiden nog veelvuldig worden gebruikt"
+
+    - name: "OPSCHORTINGSMACHTIGING"
+      description: "Is er een machtiging van de Minister voor opschorting van overbrenging"
+      type: "boolean"
+      required: false
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "13"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel13"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=13&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 13 bepaalt dat opschorting alleen mogelijk is met machtiging van de Minister"
+
+  output:
+    - name: "moet_overgebracht_worden"
+      description: "Moet het archiefstuk overgebracht worden naar een archiefbewaarplaats"
+      type: "boolean"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "12"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 12 lid 1 bepaalt de overbrengplicht voor archiefbescheiden"
+
+    - name: "uiterste_overbrengdatum"
+      description: "Uiterlijke datum waarop het archiefstuk overgebracht moet zijn"
+      type: "date"
+      required: false
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Archiefbesluit 1995"
+        bwb_id: "BWBR0007748"
+        article: "11"
+        url: "https://wetten.overheid.nl/BWBR0007748/2020-01-01#Artikel11"
+        juriconnect: "jci1.3:c:BWBR0007748&artikel=11&z=2020-01-01&g=2020-01-01"
+        explanation: "Artikel 11 Archiefbesluit bepaalt dat overbrenging moet plaatsvinden binnen 10 jaar na het bereiken van de 20-jarige leeftijd"
+
+  definitions:
+    MINIMALE_LEEFTIJD_JAREN: 20  # Artikel 12 lid 1 Archiefwet 1995
+    MAXIMALE_TERMIJN_OVERBRENGEN_JAREN: 10  # Artikel 11 Archiefbesluit 1995
+    UITERSTE_LEEFTIJD_JAREN: 30  # 20 + 10 jaar
+
+actions:
+  - output: "moet_overgebracht_worden"
+    operation: AND
+    values:
+      - subject: "$VOOR_VERNIETIGING"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "12"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Alleen archiefbescheiden die NIET voor vernietiging in aanmerking komen worden overgebracht"
+      - operation: GREATER_OR_EQUAL
+        values:
+          - operation: SUBTRACT_DATE
+            unit: "years"
+            values:
+              - "$calculation_date"
+              - "$AANMAAKDATUM"
+          - "$MINIMALE_LEEFTIJD_JAREN"
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "12"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Archiefbescheiden moeten ouder zijn dan twintig jaar"
+      - operation: OR
+        values:
+          # Geen opschortingsmachtiging OF niet ingesteld
+          - subject: "$OPSCHORTINGSMACHTIGING"
+            operation: NOT_EQUALS
+            value: true
+          # Wel machtiging maar niet veelvuldig in gebruik
+          - subject: "$VEELVULDIG_GEBRUIK"
+            operation: NOT_EQUALS
+            value: true
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "13"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel13"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=13&z=2024-01-01&g=2024-01-01"
+          explanation: "Opschorting is alleen mogelijk bij veelvuldig gebruik met machtiging"
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "12"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel12"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=12&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 12 lid 1 bepaalt wanneer archiefbescheiden overgebracht moeten worden"
+
+  - output: "uiterste_overbrengdatum"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$moet_overgebracht_worden"
+          operation: EQUALS
+          value: true
+        then: "$AANMAAKDATUM"  # Placeholder - will be post-processed in step definition to add 30 years
+        legal_basis:
+          law: "Archiefbesluit 1995"
+          bwb_id: "BWBR0007748"
+          article: "11"
+          url: "https://wetten.overheid.nl/BWBR0007748/2020-01-01#Artikel11"
+          juriconnect: "jci1.3:c:BWBR0007748&artikel=11&z=2020-01-01&g=2020-01-01"
+          explanation: "Overbrenging moet plaatsvinden binnen 10 jaar na het bereiken van de 20-jarige leeftijd"
+      - else: null
+    legal_basis:
+      law: "Archiefbesluit 1995"
+      bwb_id: "BWBR0007748"
+      article: "11"
+      url: "https://wetten.overheid.nl/BWBR0007748/2020-01-01#Artikel11"
+      juriconnect: "jci1.3:c:BWBR0007748&artikel=11&z=2020-01-01&g=2020-01-01"
+      explanation: "Artikel 11 Archiefbesluit bepaalt de uiterste termijn voor overbrenging"

@@ -3,8 +3,6 @@ default_language_version:
 
 ci:
   autofix_prs: false
-  submodules: true
-  skip: [check-submodule-uptodate]
   autoupdate_commit_msg: 'chore: pre-commit autoupdate'
 
 repos:
@@ -54,29 +52,8 @@ repos:
     hooks:
       - id: validate-schema
         name: validate schema
-        entry: sh -c './submodules/regelrecht-laws/script/validate.py'
+        entry: sh -c './script/validate.py'
         language: python
         additional_dependencies: [jsonschema, pyyaml]
-        pass_filenames: false
-        always_run: true
-
-      - id: check-submodule-initialized
-        name: check law submodule is initialized
-        entry: ./script/check-submodule-initialized.sh
-        language: system
-        pass_filenames: false
-        always_run: true
-
-      - id: check-submodule-clean
-        name: check law submodule has no uncommitted changes
-        entry: ./script/check-submodule-clean.sh
-        language: system
-        pass_filenames: false
-        always_run: true
-
-      - id: check-submodule-uptodate
-        name: check law submodule is up-to-date with remote
-        entry: ./script/check-submodule-uptodate.sh
-        language: system
         pass_filenames: false
         always_run: true

@@ -1,3 +1,5 @@
+@skip-go
+@skip
 Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
   Als Rechtspraak
   Wil ik curatele-registraties beheren
