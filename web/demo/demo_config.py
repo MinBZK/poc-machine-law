@@ -190,9 +190,8 @@ def configure_demo_feature_flags():
                 # For now, skip wildcard and require explicit law names
                 continue
 
-            # Set the feature flag to disable this law
-            flag_name = f"LAW_{service}_{law.replace('/', '__')}".upper()
-            FeatureFlags.set(flag_name, False)
+            # Use the proper method to disable the law
+            FeatureFlags.disable_law(service, law)
 
 
 def is_law_enabled_in_demo(law: str, service: str) -> bool:
