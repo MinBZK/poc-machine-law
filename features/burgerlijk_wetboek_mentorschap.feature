@@ -1,4 +1,5 @@
 @skip-go
+@ui
 Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
   Als Rechtspraak
   Wil ik mentorschap-registraties beheren

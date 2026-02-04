@@ -1,3 +1,4 @@
+@ui
 @skip-go
 Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
   Als RECHTSPRAAK

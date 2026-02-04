@@ -1,3 +1,4 @@
+@skip-go
 @ui
 Feature: Edit values through web interface
   As a citizen

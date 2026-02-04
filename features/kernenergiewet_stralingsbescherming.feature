@@ -1,4 +1,5 @@
 @skip-go
+@ui
 Feature: Besluit basisveiligheidsnormen stralingsbescherming
   Als nucleaire operator
   Wil ik weten of mijn verwachte stralingsdosis binnen de wettelijke limieten blijft

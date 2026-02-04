@@ -1,3 +1,5 @@
+@skip-go
+@ui
 Feature: AOW Pensioen Berekening 2025
   Als burger die de pensioenleeftijd nadert
   Wil ik weten of ik recht heb op AOW pensioen
