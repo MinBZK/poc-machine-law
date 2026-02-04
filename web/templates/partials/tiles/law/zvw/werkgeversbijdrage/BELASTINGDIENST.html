@@ -1,0 +1,33 @@
+{% from "macros/logos.html" import org_logo %}
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     id="tile-{{ law|replace('/', '-') }}">
+    <div class="p-6 flex flex-col h-full">
+        <div class="flex-grow space-y-6">
+            <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
+                </div>
+                <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+            </div>
+            <div class="space-y-6">
+                <div class="flex items-center">
+                    <h4 class="text-sm font-medium text-gray-500 mb-1">
+                        U komt waarschijnlijk niet in aanmerking
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                                hx-target="#shared-application-panel"
+                                hx-swap="innerHTML"
+                                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                            waarom?
+                        </button>
+                    </h4>
+                </div>
+            </div>
+            <div class="bg-gray-100 rounded-lg p-4">
+                <h4 class="font-medium text-gray-900 mb-2">Geen werkgeversbijdrage verschuldigd</h4>
+                <p class="text-sm text-gray-600">
+                    U heeft geen werknemers in dienst. De werkgeversbijdrage Zorgverzekeringswet is alleen van toepassing als u werknemers heeft.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

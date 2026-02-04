@@ -27,6 +27,21 @@ class FeatureFlags:
         "DELEGATION": False,  # Delegation feature (act on behalf of) is disabled by default
     }
 
+    # Laws that should be DISABLED by default (for demo purposes)
+    # Format: {(service, law): False} means disabled by default
+    # Laws not in this list are enabled by default
+    # Note: law identifier comes from the 'law' field in the YAML, not the file path
+    LAW_DEFAULTS = {
+        # BUSINESS laws that should be disabled by default
+        ("ANVS", "besluit_kerninstallaties"): False,
+        ("ANVS", "besluit_basisveiligheidsnormen_stralingsbescherming"): False,
+        ("ANVS", "kernenergiewet"): False,
+        ("ACICT", "wet_adviescollege_ict_toetsing"): False,
+        ("RvIG", "wet_brp"): False,
+        ("AWB", "algemene_wet_bestuursrecht"): False,  # Bestuursorgaan Definitie
+        ("RVO", "omgevingswet/werkgebonden_personenmobiliteit/gegevens"): False,
+    }
+
     @classmethod
     def get_all(cls) -> dict[str, bool]:
         """Get all feature flags with their current values (excluding law flags)."""
@@ -109,7 +124,8 @@ class FeatureFlags:
             law: Law name (e.g., "zorgtoeslagwet" or "participatiewet/bijstand")
 
         Returns:
-            Boolean indicating if the law is enabled (default is True if not set)
+            Boolean indicating if the law is enabled (default is True if not set,
+            unless the law is in LAW_DEFAULTS with a False value)
         """
         # Sanitize law name for environment variable
         # Replace slashes with double underscores for safe environment variable names
@@ -121,12 +137,17 @@ class FeatureFlags:
         # Check if flag is set in environment
         env_value = os.environ.get(flag_key)
 
-        # Default to True (enabled) if not set
-        if env_value is None:
-            return True
+        # If explicitly set in environment, use that value
+        if env_value is not None:
+            return env_value.lower() in ("1", "true", "yes", "y")
 
-        # Otherwise, convert the value to boolean
-        return env_value.lower() in ("1", "true", "yes", "y")
+        # Check if there's a default value for this specific law
+        law_key = (service, law)
+        if law_key in cls.LAW_DEFAULTS:
+            return cls.LAW_DEFAULTS[law_key]
+
+        # Default to True (enabled) if not in LAW_DEFAULTS
+        return True
 
     @classmethod
     def set(cls, flag_name: str, value: bool) -> None:

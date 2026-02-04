@@ -4215,6 +4215,11 @@ profiles:
         business_income:
         - bsn: '999999990'
           bedrag: 3500000
+        # Werkgeversbijdrage ZVW - Claudia heeft geen werknemers
+        werkgevers:
+        - kvk_nummer: '85234567'
+          heeft_werknemers: false
+          totaal_bruto_loon: 0
       KVK:
         inschrijvingen:
         - bsn: '999999990'
@@ -4328,6 +4333,13 @@ profiles:
           oppervlakte: 85
           status: Actief
           bouwjaar: 1920
+      SVH:
+        registraties:
+        - bsn: '999999990'
+          registratienummer: 'SVH-2024-123456'
+          naam: Claudia van Dam
+          is_geregistreerd: true
+          registratiedatum: '2024-06-15'
       GEMEENTE_ROTTERDAM:
         vestigingen:
         - kvk_nummer: '85234567'
@@ -4374,8 +4386,25 @@ profiles:
           geen_onder_curatele: true
         bibob_adviezen:
         - kvk_nummer: '85234567'
+          bsn: '999999990'
           advies_uitgebracht: false
           mate_van_gevaar: geen_gevaar
+        # Data voor alcoholwetvergunning - leidinggevenden tabel
+        leidinggevenden:
+        - kvk_nummer: '85234567'
+          bsn: '999999990'
+          naam: Claudia van Dam
+          leeftijd: 31
+          is_onder_curatele: false
+          heeft_svh_diploma: true
+          svh_registratienummer: 'SVH-2024-123456'
+          is_van_slecht_levensgedrag: false
+          is_ingeschreven_svh_register: true
+          aantal_voldoet_alle_eisen: 1
+        inrichtingen:
+        - kvk_nummer: '85234567'
+          vloeroppervlakte_horecalokaliteit: 85
+          type_bedrijf: horecabedrijf
         horecagebiedsplannen:
         - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
           categorie: licht
@@ -4421,3 +4450,15 @@ profiles:
         - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
           gebruik: terras
           tarief_per_m2: 45.50
+      LBB:
+        bibob_adviezen:
+        - kvk_nummer: '85234567'
+          bsn: '999999990'
+          advies_uitgebracht: false
+          mate_van_gevaar: geen_gevaar
+      RVO:
+        # WPM rapportageverplichting gegevens - Claudia heeft geen werknemers
+        wpm_gegevens:
+        - kvk_nummer: '85234567'
+          aantal_werknemers: 0
+          verstrekt_mobiliteitsvergoeding: false

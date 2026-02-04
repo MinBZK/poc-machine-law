@@ -76,6 +76,7 @@ class CaseManager(Application):
         parameters: dict,
         claimed_result: dict,
         approved_claims_only: bool,
+        force_manual_review: bool = False,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
@@ -119,7 +120,16 @@ class CaseManager(Application):
         # Only auto-approve if requirements are met
         requirements_met = result.requirements_met if hasattr(result, "requirements_met") else True
 
-        if results_match and not needs_manual_review and requirements_met:
+        # Force manual review overrides automatic processing
+        if force_manual_review:
+            reason = "Aanvraag vereist handmatige beoordeling door medewerker"
+            case.select_for_manual_review(
+                verifier_id="SYSTEM",
+                reason=reason,
+                claimed_result=claimed_result,
+                verified_result=verified_result,
+            )
+        elif results_match and not needs_manual_review and requirements_met:
             # Automatic approval
             case.decide_automatically(
                 verified_result=verified_result,

@@ -1,0 +1,81 @@
+<div class="space-y-4">
+    {# Check profile_data for existing alcohol vergunning status #}
+    {% set ns = namespace(heeft_alcoholvergunning=false, vergunning_info=none) %}
+    {% if profile_data and profile_data.vergunningen %}
+        {% for v in profile_data.vergunningen %}
+            {% if v.kvk_nummer == kvk and v.heeft_alcoholvergunning %}
+                {% set ns.heeft_alcoholvergunning = true %}
+                {% set ns.vergunning_info = v %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {# If case is submitted or in review, show waiting message #}
+    {% if current_case and current_case.status in ['SUBMITTED', 'IN_REVIEW'] %}
+        <div class="text-center py-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-3">
+                <svg class="w-8 h-8 text-blue-600 animate-pulse"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                    </path>
+                </svg>
+            </div>
+            <h4 class="text-xl font-semibold text-blue-700">Aanvraag in behandeling</h4>
+        </div>
+        {# Main status display - entrepreneur focused #}
+    {% elif ns.heeft_alcoholvergunning or (current_case and current_case.status == 'DECIDED' and current_case.approved) %}
+        {# Already has license #}
+        <div class="text-center py-2">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-3">
+                <svg class="w-8 h-8 text-green-600"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h4 class="text-xl font-semibold text-green-700">U mag alcohol schenken</h4>
+            <p class="text-sm text-gray-600 mt-1">Uw Alcoholwetvergunning is actief</p>
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </div>
+    {% elif requirements_met or result.heeft_recht_op_vergunning %}
+        {# Qualifies but doesn't have license yet - needs to apply and get approval #}
+        <div class="text-center py-2">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-3">
+                <svg class="w-8 h-8 text-green-600"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                    </path>
+                </svg>
+            </div>
+            <h4 class="text-sm font-medium text-gray-600 mb-2">U voldoet aan de voorwaarden voor een Alcoholwetvergunning.</h4>
+            <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                    hx-target="#shared-application-panel"
+                    hx-swap="innerHTML"
+                    class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button>
+        </div>
+    {% else %}
+        {# Show what's missing in a helpful way #}
+        <div class="text-center py-2">
+            <!-- <h4 class="text-sm font-medium text-red-600 mb-1">
+                U komt waarschijnlijk niet in aanmerking voor een Alcoholwetvergunning.
+            </h4> -->
+            <!-- <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation" hx-target="#shared-application-panel" hx-swap="innerHTML" class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                waarom?
+            </button> -->
+        </div>
+        {% if result.weigeringsgrond %}
+            <p class="text-sm text-gray-600 text-center">{{ result.weigeringsgrond }}</p>
+        {% endif %}
+    {% endif %}
+</div>

@@ -1,0 +1,145 @@
+{% from "macros/logos.html" import org_logo %}
+{# Alcoholwetvergunning tile - standalone template with explicit logo #}
+<div class="law-result-card min-h-64 bg-white rounded-lg shadow"
+     x-data="{ showExplanation: false }"
+     @close-explanation.window="showExplanation = false"
+     id="tile-{{ law|replace('/', '-') }}">
+    <div class="p-6 flex flex-col h-full">
+        {# Check profile_data for existing alcohol vergunning status #}
+        {% set ns = namespace(heeft_alcoholvergunning=false) %}
+        {% if profile_data and profile_data.vergunningen %}
+            {% for v in profile_data.vergunningen %}
+                {% if v.kvk_nummer == kvk and v.heeft_alcoholvergunning %}
+                    {% set ns.heeft_alcoholvergunning = true %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if missing_required %}
+            {# Missing required data - positive messaging to encourage application #}
+            <div class="flex-grow space-y-6">
+                <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ rule_spec.name }}</h3>
+                        {% if current_case %}
+                            <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center">
+                        <h4 class="text-sm font-medium text-green-600 mb-1">
+                            U komt waarschijnlijk in aanmerking voor een alcoholwetvergunning.
+                        </h4>
+                    </div>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 class="font-medium text-green-900 mb-2">Aanvraag starten</h4>
+                    <p class="text-sm text-green-800 mb-4">Bevestig uw gegevens en dien een aanvraag in voor uw alcoholwetvergunning.</p>
+                    {% if can_submit_claims|default(true) %}
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
+                                hx-target="#shared-application-panel"
+                                hx-swap="innerHTML"
+                                class="w-full px-4 py-2 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
+                            Aanvraag starten
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="flex-grow space-y-6">
+                <!-- Header -->
+                <div class="flex items-start justify-between border-b border-gray-100 pb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ rule_spec.name }}</h3>
+                        {% if current_case and current_case.status == 'IN_REVIEW' %}
+                            <div class="mt-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">In behandeling</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
+                </div>
+                <!-- Main Content -->
+                <div class="space-y-6">
+                    {% include "partials/tiles/law/alcoholwet/vergunning/GEMEENTE_ROTTERDAM/computation.html" %}
+                </div>
+            </div>
+            <!-- Actions Section -->
+            <div class="mt-6 pt-4 border-t border-gray-100">
+                {% if current_case and current_case.status == 'SUBMITTED' %}
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                        <p class="text-sm text-blue-800">
+                            Uw aanvraag wordt beoordeeld door een medewerker van Gemeente Rotterdam.
+                            U ontvangt bericht zodra de beoordeling is afgerond.
+                        </p>
+                    </div>
+                {% elif current_case and current_case.status == 'IN_REVIEW' %}
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-3">Wat gebeurt er nu?</h4>
+                        <ol class="space-y-2 text-sm text-blue-800">
+                            <li class="flex items-start">
+                                <span class="font-medium mr-2">1.</span>
+                                <span>Een medewerker bekijkt uw aanvraag binnen 5 werkdagen</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="font-medium mr-2">2.</span>
+                                <span>U krijgt mogelijk een uitnodiging voor een gesprek</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="font-medium mr-2">3.</span>
+                                <span>Binnen 6 weken ontvangt u bericht over uw aanvraag</span>
+                            </li>
+                        </ol>
+                        <p class="mt-3 text-sm text-blue-800">
+                            Heeft u vragen? <a href="#" class="underline">Klik hier</a>, of bel 14010.
+                        </p>
+                    </div>
+                {% elif ns.heeft_alcoholvergunning or (current_case and current_case.status == 'DECIDED' and current_case.approved) %}
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600 mr-2"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            <span class="text-green-800 font-medium">Uw Alcoholwetvergunning is actief</span>
+                        </div>
+                    </div>
+                {% elif requirements_met and not ns.heeft_alcoholvergunning and not current_case %}
+                    {% if can_submit_claims|default(true) %}
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
+                                hx-target="#shared-application-panel"
+                                hx-swap="innerHTML"
+                                class="w-full px-6 py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
+                            Alcoholwetvergunning aanvragen
+                        </button>
+                    {% endif %}
+                {% elif not requirements_met and not current_case %}
+                    {# Not eligible - show what's needed #}
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <h4 class="font-medium text-amber-900 mb-2">Wat is er nodig?</h4>
+                        <p class="text-sm text-amber-800 mb-3">Om alcohol te mogen schenken moet u aan een aantal voorwaarden voldoen.</p>
+                        <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
+                                hx-target="#shared-application-panel"
+                                hx-swap="innerHTML"
+                                class="text-sm text-amber-700 hover:text-amber-900 underline cursor-pointer">
+                            Bekijk de voorwaarden
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+    // Listen for the close-panel event and close the shared panel
+    document.addEventListener('close-panel', function() {
+        const panel = document.getElementById('shared-application-panel');
+        if (panel) {
+            panel.innerHTML = '';
+        }
+    });
+</script>

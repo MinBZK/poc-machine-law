@@ -147,8 +147,8 @@ async def demo_index(request: Request) -> HTMLResponse:
 @router.get("/workspace/laws", response_class=HTMLResponse)
 async def workspace_laws(request: Request) -> HTMLResponse:
     """Get laws tab content - redirects to default law."""
-    # Redirect to default law so tab gets created properly
-    default_law_path = "zorgtoeslagwet/TOESLAGEN-2025-01-01"
+    # Redirect to alcoholvergunning (gemeentelijk niveau) as default for demo
+    default_law_path = "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01"
     return RedirectResponse(url=f"/demo/workspace/law/{default_law_path}", status_code=307)
 
 

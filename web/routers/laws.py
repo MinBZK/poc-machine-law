@@ -224,6 +224,9 @@ async def submit_case(
         k.lstrip("$"): v for k, v in (result.input or {}).items() if k.lstrip("$") in param_names and v is not None
     }
 
+    # Check if this law requires manual approval (from YAML metadata)
+    requires_manual_approval = rule_spec.get("requires_manual_approval", False)
+
     case_id = case_manager.submit_case(
         bsn=bsn,
         service=service,
@@ -231,6 +234,7 @@ async def submit_case(
         parameters={**parameters, **user_params},
         claimed_result=result.output,
         approved_claims_only=approved,
+        force_manual_review=requires_manual_approval,
     )
 
     case = case_manager.get_case_by_id(case_id)

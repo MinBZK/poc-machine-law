@@ -379,6 +379,19 @@ class RuleContext:
                                     if case is not None
                                 ]
                             )
+                        elif (
+                            source_ref.get("source_type")
+                            and self.service_provider
+                            and hasattr(self.service_provider, "services")
+                            and source_ref.get("source_type") in self.service_provider.services
+                        ):
+                            # Delegate to specific service's source dataframes
+                            service_name = source_ref.get("source_type")
+                            service = self.service_provider.services[service_name]
+                            table = source_ref.get("table")
+                            if table and table in service.source_dataframes:
+                                df = service.source_dataframes[table]
+                                logger.debug(f"Resolving from SERVICE SOURCE {service_name}.{table}")
                         elif self.sources and "table" in source_ref:
                             table = source_ref.get("table")
                             if table in self.sources:

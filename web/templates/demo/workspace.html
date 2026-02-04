@@ -33,11 +33,9 @@
         <div class="workspace-container" x-data="workspaceData()" x-init="init()">
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
-                <div class="tab"
-                     :class="{ 'active': activeTab === 'presentatie' }"
-                     @click="switchTab('presentatie')">
+                <!-- <div class="tab" :class="{ 'active': activeTab === 'presentatie' }" @click="switchTab('presentatie')">
                     <span class="tab-label">Presentatie</span>
-                </div>
+                </div> -->
                 <div class="tab"
                      :class="{ 'active': activeTab === 'laws' }"
                      @click="switchTab('laws')">
@@ -48,20 +46,16 @@
                      @click="switchTab('graph')">
                     <span class="tab-label">Graaf analyse</span>
                 </div>
-                <div class="tab"
-                     :class="{ 'active': activeTab === 'features' }"
-                     @click="switchTab('features')">
+                <!-- <div class="tab" :class="{ 'active': activeTab === 'features' }" @click="switchTab('features')">
                     <span class="tab-label">Scenarios</span>
-                </div>
-                <div class="tab"
-                     :class="{ 'active': activeTab === 'simulatie' }"
-                     @click="switchTab('simulatie')">
+                </div> -->
+                <!-- <div class="tab" :class="{ 'active': activeTab === 'simulatie' }" @click="switchTab('simulatie')">
                     <span class="tab-label">Simulatie</span>
-                </div>
+                </div> -->
                 <div class="tab"
                      :class="{ 'active': activeTab === 'burger' }"
                      @click="switchTab('burger')">
-                    <span class="tab-label">Burger.nl</span>
+                    <span class="tab-label">Overheid.nl</span>
                 </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'zaaksysteem' }"
@@ -212,33 +206,28 @@
                             class="tab-iframe"
                             title="Graph Analysis"></iframe>
                 </div>
-                <!-- Burger.nl Tab (IFrame) -->
+                <!-- Overheid.nl Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'burger'"
                      x-cloak>
-                    <iframe src="/?demo=true"
+                    <iframe :src="'/?demo=true&bsn=' + bsn"
                             frameborder="0"
                             class="tab-iframe"
-                            title="Burger.nl"></iframe>
+                            title="Overheid.nl"></iframe>
                 </div>
                 <!-- Zaaksysteem Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'zaaksysteem'"
                      x-cloak>
-                    <iframe src="/admin/TOESLAGEN?demo=true"
+                    <iframe src="/admin/GEMEENTE_ROTTERDAM?demo=true"
                             frameborder="0"
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
                 </div>
                 <!-- Simulatie Tab (IFrame) -->
-                <div class="tab-content iframe-content"
-                     x-show="activeTab === 'simulatie'"
-                     x-cloak>
-                    <iframe src="/simulation/?demo=true"
-                            frameborder="0"
-                            class="tab-iframe"
-                            title="Simulatie"></iframe>
-                </div>
+                <!-- <div class="tab-content iframe-content" x-show="activeTab === 'simulatie'" x-cloak>
+                    <iframe src="/simulation/?demo=true" frameborder="0" class="tab-iframe" title="Simulatie"></iframe>
+                </div> -->
                 <!-- Temporary Tabs (IFrame) -->
                 <template x-for="tab in temporaryTabs" :key="tab.id">
                     <div class="tab-content iframe-content"
@@ -500,6 +489,7 @@
         function workspaceData() {
             return {
                 activeTab: 'presentatie',
+                bsn: new URLSearchParams(window.location.search).get('bsn') || '999999990',  // Default to Claudia
                 lawsContent: '',
                 featuresContent: '',
                 lawsLoaded: false,
@@ -524,6 +514,24 @@
                     // Initialize theme
                     document.documentElement.setAttribute('data-theme', this.theme);
 
+                    // Default law tabs for demo (alcoholvergunning nationaal + gemeentelijk)
+                    const defaultLawTabs = [
+                        {
+                            id: 'law-tab-1',
+                            path: 'alcoholwet/vergunning/VWS-2024-01-01',
+                            name: 'Alcoholwet (nationaal)',
+                            law: 'alcoholwet/vergunning',
+                            service: 'VWS'
+                        },
+                        {
+                            id: 'law-tab-2',
+                            path: 'alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01',
+                            name: 'Alcoholwet (Rotterdam)',
+                            law: 'alcoholwet/vergunning',
+                            service: 'GEMEENTE_ROTTERDAM'
+                        }
+                    ];
+
                     // Load law tabs from localStorage
                     const savedLawTabs = localStorage.getItem('openedLawTabs');
                     if (savedLawTabs) {
@@ -542,6 +550,14 @@
                             console.error('Error loading law tabs from localStorage:', e);
                             this.openedLawTabs = [];
                         }
+                    }
+
+                    // If no saved tabs, use default tabs for demo
+                    if (this.openedLawTabs.length === 0) {
+                        this.openedLawTabs = defaultLawTabs;
+                        this.activeLawTabId = 'law-tab-2'; // Start with Rotterdam (gemeentelijk)
+                        this.nextLawTabId = 3;
+                        this.saveLawTabsToStorage();
                     }
 
                     // Check URL hash first

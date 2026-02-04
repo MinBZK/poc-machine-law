@@ -30,11 +30,13 @@
     };
   };
 
-  // Demo mode configuration
+  // Demo mode configuration - Horeca ondernemers Rotterdam
   const DEMO_LAW_UUIDS = [
-    '60e71675-38bc-4297-87ac-0c145613e481', // Zorgtoeslag
-    'aba2b8fa-4b34-420f-883a-e78da326a8f4', // ZVW
-    '292c11ff-8318-4b7a-bb11-3ea545b04c8e', // Penitentiaire Beginselenwet
+    '8a3f4b2c-7d1e-4f8a-9c3b-5e6d7f8a9b0c', // Exploitatievergunning
+    '3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f', // Terrassen
+    '56ec10fc-cf5b-468f-927f-4a4615f4dbfa', // Ontheffingspas geluid
+    '9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c', // BAG (Kadaster)
+    '1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f', // KVK Bedrijfsgegevens
   ];
 
   // Check if demo mode is enabled via URL parameter

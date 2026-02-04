@@ -222,32 +222,12 @@
             {% if key|upper == 'HEEFT_EXPLOITATIEVERGUNNING' %}
                 {% set source_law = "APV Exploitatievergunning" %}
             {% endif %}
-            {% if source_law %}
-                <div class="text-sm leading-5 py-0.5 flex items-start gap-2">
-                    <div>
-                        <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-                        <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
-                    </div>
-                    <span class="text-green-600 text-xs whitespace-nowrap">Resultaat van het uitrekenen {{ source_law }}</span>
-                </div>
-            {% else %}
-                <div class="text-sm leading-5 py-0.5">
-                    <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-                    <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
-                </div>
-            {% endif %}
+            <div class="text-sm leading-5 py-0.5">
+                <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
+                <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+            </div>
         {% endif %}
     {% endif %}
-{% endmacro %}
-{% macro render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
-    {# Render a service_reference node without its children tree (to avoid duplication) #}
-    <div class="text-sm leading-5 py-0.5 flex items-start gap-2">
-        <div>
-            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-            <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
-        </div>
-        <span class="text-green-600 text-xs whitespace-nowrap">Resultaat van het uitrekenen {{ node.law|replace('_', ' ') |title }}</span>
-    </div>
 {% endmacro %}
 {% macro render_missing_required_form(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
     {% set missing_required = [] %}
