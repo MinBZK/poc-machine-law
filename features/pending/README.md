@@ -45,6 +45,9 @@ To graduate a feature from `pending/` to the main directory:
 
 ## Feature Status
 
-| Feature | Issue | Priority |
-|---------|-------|----------|
-| web_edit_values.feature | Requires Playwright browser installation | Low |
+No features are currently pending. All features have been graduated to the main test suite.
+
+### Special Tags
+
+- `@ui` - UI/browser tests requiring Playwright (`playwright install`)
+- `@skip-go` - Tests that only run in Python (no Go implementation)
