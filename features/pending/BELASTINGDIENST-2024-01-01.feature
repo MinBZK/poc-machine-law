@@ -1,1 +1,111 @@
-@skip@skipFeature:BerekeningWerkgeversbijdrageZorgverzekeringswet2024AlswerkgeverWilikwetenhoeveelwerkgeversbijdrageZvwikmoetafdragenZodatikdejuistepremieskanafdragenaandeBelastingdienstBackground:Givendedatumis"2024-06-01"#CasussengebaseerdopZorgverzekeringswetartikel42en43#Percentagewerkgeversbijdrage2024:6,57%#Maximumbijdrage-inkomen2024:EUR71.628(7.162.800eurocent)Scenario:Werknemermetmodaalinkomen-volledigeberekening#WerknemerverdientEUR40.000brutoperjaar#Bijdrage-inkomen:EUR40.000(ondermaximum)#Werkgeversbijdrage:40.000x6,57%=EUR2.628Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"40000"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"4000000"eurocentAndisdewerkgeversbijdrage"262800"eurocentScenario:Werknemermetlaaginkomen(minimumloon)#WerknemerverdientEUR24.000brutoperjaar(rondminimumloon)#Bijdrage-inkomen:EUR24.000(ondermaximum)#Werkgeversbijdrage:24.000x6,57%=EUR1.576,80Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"24000"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"2400000"eurocentAndisdewerkgeversbijdrage"157680"eurocentScenario:Werknemermethooginkomen-aftoppingopmaximumbijdrage-inkomen#WerknemerverdientEUR100.000brutoperjaar#Bijdrage-inkomen:afgetoptopEUR71.628(maximum2024)#Werkgeversbijdrage:71.628x6,57%=EUR4.705,96Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"100000"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"7162800"eurocentAndisdewerkgeversbijdrage"470565"eurocentScenario:Werknemermetinkomenpreciesopmaximum#WerknemerverdientEUR71.628brutoperjaar(precieshetmaximum)#Bijdrage-inkomen:EUR71.628(gelijkaanmaximum)#Werkgeversbijdrage:71.628x6,57%=EUR4.705,96Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"71628"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"7162800"eurocentAndisdewerkgeversbijdrage"470565"eurocentScenario:Werknemermetinkomennetondermaximum#WerknemerverdientEUR71.627brutoperjaar(1euroondermaximum)#Bijdrage-inkomen:EUR71.627(ondermaximum,dusvolledig)#Werkgeversbijdrage:71.627x6,57%=EUR4.705,89Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"71627"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"7162700"eurocentAndisdewerkgeversbijdrage"470489"eurocentScenario:Werknemermetzeerhooginkomen-maximalewerkgeversbijdrage#WerknemerverdientEUR200.000brutoperjaar#Bijdrage-inkomen:afgetoptopEUR71.628(maximum2024)#Werkgeversbijdrage:maximaalEUR4.705,96Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"200000"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"7162800"eurocentAndisdewerkgeversbijdrage"470565"eurocentScenario:Werknemermetnulinkomen#WerknemerheeftEUR0brutoloon(bijv.onbetaaldverlof)#Bijdrage-inkomen:EUR0#Werkgeversbijdrage:EUR0Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"0"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"0"eurocentAndisdewerkgeversbijdrage"0"eurocentScenario:Werknemerparttime-proportioneelinkomen#ParttimewerknemerverdientEUR20.000brutoperjaar#Bijdrage-inkomen:EUR20.000(ondermaximum)#Werkgeversbijdrage:20.000x6,57%=EUR1.314Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"20000"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"2000000"eurocentAndisdewerkgeversbijdrage"131400"eurocentScenario:Directeur-grootaandeelhouder(DGA)metgebruikelijkloon#DGAmetgebruikelijkloonvanEUR56.000(2024)#Bijdrage-inkomen:EUR56.000(ondermaximum)#Werkgeversbijdrage:56.000x6,57%=EUR3.679,20Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"56000"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"5600000"eurocentAndisdewerkgeversbijdrage"367920"eurocentScenario:Berekeningmetdecimaleninbrutoloon#WerknemerverdientEUR45.123,45brutoperjaar#Bijdrage-inkomen:EUR45.123,45(ondermaximum)#Werkgeversbijdrage:45.123,45x6,57%=EUR2.964,61Giveneenwerkgevermetloonheffingennummer"123456789L01"Andeenwerknemermetbrutojaarloon"45123.45"euroWhendezvwwordtuitgevoerddoorBELASTINGDIENSTThenishetbijdrage-inkomen"4512345"eurocentAndisdewerkgeversbijdrage"296461"eurocent
+Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
+  Als werkgever
+  Wil ik weten hoeveel werkgeversbijdrage Zvw ik moet afdragen
+  Zodat ik de juiste premies kan afdragen aan de Belastingdienst
+
+  Background:
+    Given de datum is "2024-06-01"
+
+  # Casussen gebaseerd op Zorgverzekeringswet artikel 42 en 43
+  # Percentage werkgeversbijdrage 2024: 6,57%
+  # Maximum bijdrage-inkomen 2024: EUR 71.628 (7.162.800 eurocent)
+
+  Scenario: Werknemer met modaal inkomen - volledige berekening
+    # Werknemer verdient EUR 40.000 bruto per jaar
+    # Bijdrage-inkomen: EUR 40.000 (onder maximum)
+    # Werkgeversbijdrage: 40.000 x 6,57% = EUR 2.628
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "40000" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "4000000" eurocent
+    And is de werkgeversbijdrage "262800" eurocent
+
+  Scenario: Werknemer met laag inkomen (minimumloon)
+    # Werknemer verdient EUR 24.000 bruto per jaar (rond minimumloon)
+    # Bijdrage-inkomen: EUR 24.000 (onder maximum)
+    # Werkgeversbijdrage: 24.000 x 6,57% = EUR 1.576,80
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "24000" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "2400000" eurocent
+    And is de werkgeversbijdrage "157680" eurocent
+
+  Scenario: Werknemer met hoog inkomen - aftopping op maximum bijdrage-inkomen
+    # Werknemer verdient EUR 100.000 bruto per jaar
+    # Bijdrage-inkomen: afgetopt op EUR 71.628 (maximum 2024)
+    # Werkgeversbijdrage: 71.628 x 6,57% = EUR 4.705,96
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "100000" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "7162800" eurocent
+    And is de werkgeversbijdrage "470565" eurocent
+
+  Scenario: Werknemer met inkomen precies op maximum
+    # Werknemer verdient EUR 71.628 bruto per jaar (precies het maximum)
+    # Bijdrage-inkomen: EUR 71.628 (gelijk aan maximum)
+    # Werkgeversbijdrage: 71.628 x 6,57% = EUR 4.705,96
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "71628" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "7162800" eurocent
+    And is de werkgeversbijdrage "470565" eurocent
+
+  Scenario: Werknemer met inkomen net onder maximum
+    # Werknemer verdient EUR 71.627 bruto per jaar (1 euro onder maximum)
+    # Bijdrage-inkomen: EUR 71.627 (onder maximum, dus volledig)
+    # Werkgeversbijdrage: 71.627 x 6,57% = EUR 4.705,89
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "71627" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "7162700" eurocent
+    And is de werkgeversbijdrage "470489" eurocent
+
+  Scenario: Werknemer met zeer hoog inkomen - maximale werkgeversbijdrage
+    # Werknemer verdient EUR 200.000 bruto per jaar
+    # Bijdrage-inkomen: afgetopt op EUR 71.628 (maximum 2024)
+    # Werkgeversbijdrage: maximaal EUR 4.705,96
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "200000" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "7162800" eurocent
+    And is de werkgeversbijdrage "470565" eurocent
+
+  Scenario: Werknemer met nul inkomen
+    # Werknemer heeft EUR 0 bruto loon (bijv. onbetaald verlof)
+    # Bijdrage-inkomen: EUR 0
+    # Werkgeversbijdrage: EUR 0
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "0" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "0" eurocent
+    And is de werkgeversbijdrage "0" eurocent
+
+  Scenario: Werknemer parttime - proportioneel inkomen
+    # Parttime werknemer verdient EUR 20.000 bruto per jaar
+    # Bijdrage-inkomen: EUR 20.000 (onder maximum)
+    # Werkgeversbijdrage: 20.000 x 6,57% = EUR 1.314
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "20000" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "2000000" eurocent
+    And is de werkgeversbijdrage "131400" eurocent
+
+  Scenario: Directeur-grootaandeelhouder (DGA) met gebruikelijk loon
+    # DGA met gebruikelijk loon van EUR 56.000 (2024)
+    # Bijdrage-inkomen: EUR 56.000 (onder maximum)
+    # Werkgeversbijdrage: 56.000 x 6,57% = EUR 3.679,20
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "56000" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "5600000" eurocent
+    And is de werkgeversbijdrage "367920" eurocent
+
+  Scenario: Berekening met decimalen in bruto loon
+    # Werknemer verdient EUR 45.123,45 bruto per jaar
+    # Bijdrage-inkomen: EUR 45.123,45 (onder maximum)
+    # Werkgeversbijdrage: 45.123,45 x 6,57% = EUR 2.964,61
+    Given een werkgever met loonheffingennummer "123456789L01"
+    And een werknemer met bruto jaarloon "45123.45" euro
+    When de zvw wordt uitgevoerd door BELASTINGDIENST
+    Then is het bijdrage-inkomen "4512345" eurocent
+    And is de werkgeversbijdrage "296461" eurocent

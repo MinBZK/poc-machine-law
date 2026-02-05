@@ -3,4 +3,5 @@ set -e
 
 # Run behavior tests with Behave
 # Pass all arguments to behave (e.g., --tags="~@ui")
-uv run behave features "$@"
+# Exclude features/pending/ directory (work-in-progress features)
+uv run behave features --exclude="pending/" "$@"
