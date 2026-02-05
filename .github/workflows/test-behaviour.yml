@@ -44,7 +44,7 @@ jobs:
         run: |
           # Check for @skip tag (but allow @skip-go which is valid for Go-only skipping)
           if grep -rE "^[[:space:]]*@skip[[:space:]]*$" features/*.feature 2>/dev/null; then
-            echo "ERROR: @skip tags found in features/. Move to features/pending/ instead."
+            echo "ERROR: @skip tags found in features/. Use @skip-go for Go-only skipping."
             exit 1
           fi
           echo "No @skip tags found in main features directory."

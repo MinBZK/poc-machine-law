@@ -6,8 +6,8 @@ This directory contains Gherkin feature files for testing Dutch law implementati
 
 - All features in `features/` **MUST pass** without skip tags
 - Use generic step patterns (see below)
-- Work-in-progress features go in `features/pending/`
-- Before merging: ensure tests pass in BOTH Python and Go
+- Use `@skip-go` tag for features that only work in Python (no Go step definitions)
+- Before merging: ensure tests pass in BOTH Python and Go (or use `@skip-go`)
 
 ## Running Tests
 
@@ -47,7 +47,6 @@ Then is de output "<field>" leeg
 ```
 features/
 ├── *.feature          # Active, passing feature files
-├── pending/           # Work-in-progress features (not run in CI)
 ├── steps/             # Python step definitions
 ├── godogs_test.go     # Go step definitions
 └── README.md          # This file

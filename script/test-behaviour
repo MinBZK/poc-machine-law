@@ -3,6 +3,5 @@ set -e
 
 # Run behavior tests with Behave
 # Pass all arguments to behave (e.g., --tags="@zorgtoeslag")
-# Exclude features/pending/ directory (work-in-progress features)
 # Skip @ui tests by default (require Playwright browser installation)
-uv run behave features --exclude="pending/" --tags="~@ui" "$@"
+uv run behave features --tags="~@ui" "$@"
