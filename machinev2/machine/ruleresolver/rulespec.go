@@ -501,6 +501,7 @@ const (
 	OperationIf             OperationType = "IF"
 	OperationForeach        OperationType = "FOREACH"
 	OperationSubtractDate   OperationType = "SUBTRACT_DATE"
+	OperationAddDate        OperationType = "ADD_DATE"
 	OperationIsNull         OperationType = "IS_NULL"
 	OperationNotNull        OperationType = "NOT_NULL"
 )

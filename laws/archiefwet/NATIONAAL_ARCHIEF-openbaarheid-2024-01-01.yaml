@@ -300,10 +300,10 @@ actions:
               then: null
             # Altijd 75 jaar na aanmaakdatum (conform artikel 15 lid 4)
             - else:
-                operation: CONCAT
+                operation: ADD_DATE
+                unit: "years"
                 values:
                   - "$AANMAAKDATUM"
-                  - "|"
                   - "$MAXIMALE_BEPERKING_JAREN"
       - else: null
     legal_basis:

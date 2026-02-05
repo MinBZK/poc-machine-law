@@ -128,7 +128,7 @@ actions:
         values:
           - "$BRUTO_LOON"
           - 100
-      - "$MAXIMUM_BIJDRAGE_INKOMEN.value"
+      - "$MAXIMUM_BIJDRAGE_INKOMEN"
     legal_basis:
       law: "Zorgverzekeringswet"
       bwb_id: "BWBR0018450"
@@ -143,7 +143,7 @@ actions:
       - "$bijdrage_inkomen"
       - operation: DIVIDE
         values:
-          - "$ZVW_PERCENTAGE.value"
+          - "$ZVW_PERCENTAGE"
           - 100
     legal_basis:
       law: "Zorgverzekeringswet"

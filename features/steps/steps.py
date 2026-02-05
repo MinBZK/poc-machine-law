@@ -80,15 +80,16 @@ def step_impl(context, date):
     try:
         import eventsourcing.utils
 
+        eventsourcing.utils.clear_topic_cache()
         eventsourcing.utils._type_cache.clear()
-    except:
+    except Exception:
         pass
 
     # Always create new Services for each scenario
     try:
         if hasattr(context, "services"):
             del context.services
-    except:
+    except Exception:
         pass
     context.services = Services(date)
 
@@ -220,7 +221,11 @@ def step_impl(context, amount):
 
 @then('is het pensioen "{amount}" euro')
 def step_impl(context, amount):
-    actual_amount = context.result.output["pensioenbedrag"]
+    # Support both pensioenbedrag (AOW) and pensioen_uitkering_maandelijks (pensioenwet)
+    if "pensioen_uitkering_maandelijks" in context.result.output:
+        actual_amount = context.result.output["pensioen_uitkering_maandelijks"]
+    else:
+        actual_amount = context.result.output["pensioenbedrag"]
     compare_euro_amount(actual_amount, amount)
 
 
@@ -1102,3 +1107,230 @@ def step_impl(context):
     assertions.assertFalse(
         actual, f"Expected organization to NOT be a bestuursorgaan, but is_bestuursorgaan was {actual}"
     )
+
+
+# =============================================================================
+# Archiefwet Step Definitions
+# =============================================================================
+
+
+@given("een archiefstuk met de volgende eigenschappen")
+def step_impl(context):
+    """Set up archive document properties from table."""
+    if not context.table:
+        raise ValueError("No table provided for archiefstuk properties")
+
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+    if not hasattr(context, "test_data"):
+        context.test_data = {}
+
+    # Process the table - first row contains the data
+    for row in context.table:
+        for heading in context.table.headings:
+            value = parse_value(row[heading])
+            context.parameters[heading.upper()] = value
+            context.test_data[heading.upper()] = value
+
+
+@then("moet het archiefstuk overgebracht worden")
+def step_impl(context):
+    """Check that the archive document must be transferred."""
+    actual = context.result.output.get("moet_overgebracht_worden", False)
+    assertions.assertTrue(actual, "Expected archiefstuk to require overbrenging, but it does not")
+
+
+@then("hoeft het archiefstuk niet overgebracht te worden")
+def step_impl(context):
+    """Check that the archive document does not need to be transferred."""
+    actual = context.result.output.get("moet_overgebracht_worden", True)
+    assertions.assertFalse(actual, "Expected archiefstuk to NOT require overbrenging, but it does")
+
+
+@then('is de uiterste overbrengdatum "{date}"')
+def step_impl(context, date):
+    """Check the deadline for transfer."""
+    actual = context.result.output.get("uiterste_overbrengdatum")
+    assertions.assertEqual(actual, date, f"Expected uiterste_overbrengdatum to be {date}, but was {actual}")
+
+
+@then("is het archiefstuk openbaar")
+def step_impl(context):
+    """Check that the archive document is public."""
+    actual = context.result.output.get("is_openbaar", False)
+    assertions.assertTrue(actual, "Expected archiefstuk to be openbaar, but it is not")
+
+
+@then("is het archiefstuk niet openbaar")
+def step_impl(context):
+    """Check that the archive document is not public."""
+    actual = context.result.output.get("is_openbaar", True)
+    assertions.assertFalse(actual, "Expected archiefstuk to NOT be openbaar, but it is")
+
+
+@then('is de beperking reden "{reason}"')
+def step_impl(context, reason):
+    """Check the reason for access restriction."""
+    actual = context.result.output.get("beperking_reden")
+    assertions.assertEqual(actual, reason, f"Expected beperking_reden to be '{reason}', but was '{actual}'")
+
+
+@then('is het archiefstuk openbaar vanaf "{date}"')
+def step_impl(context, date):
+    """Check when the archive document becomes public."""
+    # Support both openbaar_vanaf and openbaar_vanaf_datum
+    actual = context.result.output.get("openbaar_vanaf") or context.result.output.get("openbaar_vanaf_datum")
+    assertions.assertEqual(actual, date, f"Expected openbaar_vanaf to be {date}, but was {actual}")
+
+
+@then("mag het archiefstuk vernietigd worden")
+def step_impl(context):
+    """Check that the archive document may be destroyed."""
+    actual = context.result.output.get("mag_vernietigd_worden", False)
+    assertions.assertTrue(actual, "Expected archiefstuk mag vernietigd worden, but it may not")
+
+
+@then("mag het archiefstuk niet vernietigd worden")
+def step_impl(context):
+    """Check that the archive document may not be destroyed."""
+    actual = context.result.output.get("mag_vernietigd_worden", True)
+    assertions.assertFalse(actual, "Expected archiefstuk mag NIET vernietigd worden, but it may")
+
+
+@then('mag het archiefstuk vernietigd worden vanaf "{date}"')
+def step_impl(context, date):
+    """Check when the archive document may be destroyed."""
+    # Support both vernietigingsdatum and vernietig_vanaf_datum
+    actual = context.result.output.get("vernietigingsdatum") or context.result.output.get("vernietig_vanaf_datum")
+    assertions.assertEqual(actual, date, f"Expected vernietigingsdatum to be {date}, but was {actual}")
+
+
+@then('is de reden van niet vernietigen "{reason}"')
+def step_impl(context, reason):
+    """Check the reason for not being able to destroy."""
+    actual = context.result.output.get("reden_niet_vernietigen")
+    assertions.assertEqual(actual, reason, f"Expected reden_niet_vernietigen to be '{reason}', but was '{actual}'")
+
+
+# =============================================================================
+# Bibob/LBB Step Definitions
+# =============================================================================
+
+
+@given('een onderneming met KVK nummer "{kvk_nummer}"')
+def step_impl(context, kvk_nummer):
+    """Set up a business with a KVK number."""
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+    if not hasattr(context, "test_data"):
+        context.test_data = {}
+    context.parameters["KVK_NUMMER"] = kvk_nummer
+    context.test_data["KVK_NUMMER"] = kvk_nummer
+
+
+@given("er is geen Bibob-advies uitgebracht voor deze onderneming")
+def step_impl(context):
+    """Set up scenario with no Bibob advice issued."""
+    if not hasattr(context, "test_data"):
+        context.test_data = {}
+    # Ensure no bibob_adviezen data exists for this KVK
+    context.test_data["NO_BIBOB_ADVIES"] = True
+
+
+@given('de aanvraag betreft een "{aanvraag_type}"')
+def step_impl(context, aanvraag_type):
+    """Set up the type of application."""
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+    context.parameters["AANVRAAG_TYPE"] = aanvraag_type
+
+
+@then("is er geen advies uitgebracht")
+def step_impl(context):
+    """Check that no Bibob advice has been issued."""
+    actual = context.result.output.get("advies_uitgebracht", True)
+    assertions.assertFalse(actual, "Expected no advies uitgebracht, but advies was issued")
+
+
+@then("is er een advies uitgebracht")
+def step_impl(context):
+    """Check that a Bibob advice has been issued."""
+    actual = context.result.output.get("advies_uitgebracht", False)
+    assertions.assertTrue(actual, "Expected advies uitgebracht, but no advies was issued")
+
+
+@then("wordt verlening geadviseerd")
+def step_impl(context):
+    """Check that granting is advised."""
+    actual = context.result.output.get("verlening_geadviseerd", False)
+    assertions.assertTrue(actual, "Expected verlening geadviseerd, but it was not")
+
+
+@then("wordt verlening niet geadviseerd")
+def step_impl(context):
+    """Check that granting is not advised."""
+    actual = context.result.output.get("verlening_geadviseerd", True)
+    assertions.assertFalse(actual, "Expected verlening NOT geadviseerd, but it was")
+
+
+@then("is weigering mogelijk")
+def step_impl(context):
+    """Check that refusal is possible."""
+    actual = context.result.output.get("weigering_mogelijk", False)
+    assertions.assertTrue(actual, "Expected weigering mogelijk, but it is not")
+
+
+@then("is weigering niet mogelijk")
+def step_impl(context):
+    """Check that refusal is not possible."""
+    actual = context.result.output.get("weigering_mogelijk", True)
+    assertions.assertFalse(actual, "Expected weigering NOT mogelijk, but it is")
+
+
+@then("zijn voorschriften mogelijk")
+def step_impl(context):
+    """Check that conditions/provisions are possible."""
+    actual = context.result.output.get("voorschriften_mogelijk", False)
+    assertions.assertTrue(actual, "Expected voorschriften mogelijk, but they are not")
+
+
+@then("zijn voorschriften niet mogelijk")
+def step_impl(context):
+    """Check that conditions/provisions are not possible."""
+    actual = context.result.output.get("voorschriften_mogelijk", True)
+    assertions.assertFalse(actual, "Expected voorschriften NOT mogelijk, but they are")
+
+
+@then('is de mate van gevaar "{mate}"')
+def step_impl(context, mate):
+    """Check the degree of danger."""
+    actual = context.result.output.get("mate_van_gevaar")
+    assertions.assertEqual(actual, mate, f"Expected mate_van_gevaar to be '{mate}', but was '{actual}'")
+
+
+@then("is er sprake van financieringsrisico")
+def step_impl(context):
+    """Check that there is a financing risk (money laundering concern)."""
+    actual = context.result.output.get("financieringsrisico", False)
+    assertions.assertTrue(actual, "Expected financieringsrisico, but there is none")
+
+
+@then("is er geen sprake van financieringsrisico")
+def step_impl(context):
+    """Check that there is no financing risk."""
+    actual = context.result.output.get("financieringsrisico", True)
+    assertions.assertFalse(actual, "Expected geen financieringsrisico, but there is")
+
+
+@then("is er een relatie tot strafbare feiten")
+def step_impl(context):
+    """Check that there is a relation to criminal offenses."""
+    actual = context.result.output.get("relatie_strafbare_feiten", False)
+    assertions.assertTrue(actual, "Expected relatie tot strafbare feiten, but there is none")
+
+
+@then("is er geen relatie tot strafbare feiten")
+def step_impl(context):
+    """Check that there is no relation to criminal offenses."""
+    actual = context.result.output.get("relatie_strafbare_feiten", True)
+    assertions.assertFalse(actual, "Expected geen relatie tot strafbare feiten, but there is")

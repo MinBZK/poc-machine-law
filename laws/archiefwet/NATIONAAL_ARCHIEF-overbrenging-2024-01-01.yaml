@@ -189,7 +189,12 @@ actions:
           subject: "$moet_overgebracht_worden"
           operation: EQUALS
           value: true
-        then: "$AANMAAKDATUM"  # Placeholder - will be post-processed in step definition to add 30 years
+        then:
+          operation: ADD_DATE
+          unit: "years"
+          values:
+            - "$AANMAAKDATUM"
+            - "$UITERSTE_LEEFTIJD_JAREN"  # 30 years (20 + 10 grace)
         legal_basis:
           law: "Archiefbesluit 1995"
           bwb_id: "BWBR0007748"

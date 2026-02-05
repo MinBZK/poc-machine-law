@@ -338,7 +338,7 @@ requirements:
       - subject: "$LEEFTIJD"
         operation: LESS_THAN
         value: "$PENSIOENLEEFTIJD"
-      - any:
+      - or:
           - subject: "$HEEFT_KINDEREN_ONDER_18"
             operation: EQUALS
             value: true
