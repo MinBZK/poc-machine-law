@@ -295,7 +295,7 @@ def fetch_and_format_data(url: str) -> str:
 
 
 # Get the schema content
-with open("schema/v0.1.4/schema.json") as sf:
+with open("submodules/regelrecht-laws/schema/v0.1.7/schema.json") as sf:
     schema_content = sf.read()
 
 analyize_law_prompt = ChatPromptTemplate(

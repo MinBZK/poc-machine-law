@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="mb-8">
+    <!-- Simulated date banner -->
+    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm text-indigo-700">
+                    <strong>Gesimuleerde datum:</strong> {{ simulated_date }}
+                </span>
+            </div>
+            <form action="/zaken/simulate/reset" method="post" class="flex items-center gap-2">
+                <input type="hidden" name="bsn" value="{{ bsn }}">
+                <input type="date" name="reset_date" value="{{ simulated_date }}"
+                       class="text-sm px-2 py-1 border border-indigo-300 rounded focus:ring-indigo-500 focus:border-indigo-500">
+                <button type="submit"
+                        class="text-sm px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    Wijzig datum
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-2xl font-semibold text-gray-900">Mijn Toeslagen</h2>
+        <p class="text-gray-600 mt-1">Overzicht van al uw toeslag aanvragen en lopende toeslagen</p>
+    </div>
+
+    {% if toeslagen %}
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jaar</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jaarbedrag</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Maandbedrag</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aanvraagdatum</th>
+                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Bekijk</span></th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for toeslag in toeslagen %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ toeslag.type_label }}</div>
+                                <div class="text-xs text-gray-500">{{ toeslag.oid }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ toeslag.berekeningsjaar }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if toeslag.status_color == 'green' %}bg-green-100 text-green-800
+                            {% elif toeslag.status_color == 'yellow' %}bg-yellow-100 text-yellow-800
+                            {% elif toeslag.status_color == 'blue' %}bg-blue-100 text-blue-800
+                            {% elif toeslag.status_color == 'purple' %}bg-purple-100 text-purple-800
+                            {% elif toeslag.status_color == 'red' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ toeslag.status_label }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ toeslag.berekend_jaarbedrag_display }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ toeslag.voorschot_maandbedrag_display }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ toeslag.aanvraag_datum }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="/zaken/{{ toeslag.id }}?bsn={{ bsn }}" class="text-blue-600 hover:text-blue-900">
+                            Bekijk details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+        <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Geen toeslagen gevonden</h3>
+        <p class="text-gray-500">U heeft nog geen actieve toeslagen.</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Back link -->
+<div class="mt-6">
+    <a href="/?bsn={{ bsn }}" class="text-blue-600 hover:text-blue-800 inline-flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Terug naar dashboard
+    </a>
+</div>
+{% endblock %}

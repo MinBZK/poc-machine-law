@@ -221,7 +221,7 @@ class EngineInterface(ABC):
     @abstractmethod
     def reset(self) -> None:
         """
-        reset the engine data.
+        Reset the engine data.
         """
 
     def get_services(self) -> Services | None:

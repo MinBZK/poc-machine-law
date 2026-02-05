@@ -251,6 +251,34 @@ class CaseManager(CaseManagerInterface):
 
             return to_events(response.parsed.data)
 
+    # === AWIR Toeslag Methods ===
+    # Note: These methods are not yet implemented in the HTTP backend
+
+    def bereken_aanspraak(
+        self,
+        case_id: UUID,
+        heeft_aanspraak: bool,
+        berekend_jaarbedrag: int,
+        berekening_datum: datetime.date | None = None,
+    ) -> UUID:
+        raise NotImplementedError("bereken_aanspraak not supported via HTTP API")
+
+    def wijs_af(
+        self,
+        case_id: UUID,
+        reden: str,
+    ) -> UUID:
+        raise NotImplementedError("wijs_af not supported via HTTP API")
+
+    def stel_voorschot_vast(
+        self,
+        case_id: UUID,
+        jaarbedrag: int | None = None,
+        maandbedrag: int | None = None,
+        beschikking_datum: datetime.date | None = None,
+    ) -> UUID:
+        raise NotImplementedError("stel_voorschot_vast not supported via HTTP API")
+
     async def __aenter__(self):
         await self.client.__aenter__()
         return self
@@ -281,6 +309,23 @@ def to_case(case) -> Case:
         approved=get_value(case.approved),
         objection_status=to_objection_status(case.objection_status),
         appeal_status=to_appeal_status(case.appeal_status),
+        # AWIR lifecycle fields
+        created_at=get_value(getattr(case, "created_at", None)),
+        berekeningsjaar=get_value(getattr(case, "berekeningsjaar", None)),
+        heeft_aanspraak=get_value(getattr(case, "heeft_aanspraak", None)),
+        berekend_jaarbedrag=get_value(getattr(case, "berekend_jaarbedrag", None)),
+        berekening_datum=get_value(getattr(case, "berekening_datum", None)),
+        voorschot_jaarbedrag=get_value(getattr(case, "voorschot_jaarbedrag", None)),
+        voorschot_maandbedrag=get_value(getattr(case, "voorschot_maandbedrag", None)),
+        huidige_maand=get_value(getattr(case, "huidige_maand", None)) or 0,
+        beschikkingen=get_value(getattr(case, "beschikkingen", None)) or [],
+        maandelijkse_berekeningen=get_value(getattr(case, "maandelijkse_berekeningen", None)) or [],
+        maandelijkse_betalingen=get_value(getattr(case, "maandelijkse_betalingen", None)) or [],
+        definitieve_beschikking_datum=get_value(getattr(case, "definitieve_beschikking_datum", None)),
+        definitief_jaarbedrag=get_value(getattr(case, "definitief_jaarbedrag", None)),
+        vereffening_datum=get_value(getattr(case, "vereffening_datum", None)),
+        vereffening_type=get_value(getattr(case, "vereffening_type", None)),
+        vereffening_bedrag=get_value(getattr(case, "vereffening_bedrag", None)),
     )
 
 

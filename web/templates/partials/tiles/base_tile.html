@@ -129,6 +129,54 @@
                                 </button>
                             </div>
                         {% endif %}
+                    {% elif current_case.status == 'BEREKEND' %}
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <p class="text-sm text-blue-800">
+                                Uw aanspraak is berekend. De beschikking wordt binnenkort vastgesteld.
+                            </p>
+                        </div>
+                    {% elif current_case.status == 'VOORSCHOT' %}
+                        <div class="bg-green-50 border border-green-100 rounded-lg p-4">
+                            <p class="text-green-800 font-medium">Voorschot vastgesteld</p>
+                            <p class="text-sm text-green-700 mt-1">
+                                Het voorschot wordt maandelijks uitbetaald.
+                            </p>
+                        </div>
+                    {% elif current_case.status == 'LOPEND' %}
+                        <div class="bg-green-50 border border-green-100 rounded-lg p-4">
+                            <p class="text-green-800 font-medium">Toeslag lopend</p>
+                            <p class="text-sm text-green-700 mt-1">
+                                Uw toeslag wordt maandelijks uitbetaald.
+                            </p>
+                        </div>
+                    {% elif current_case.status == 'DEFINITIEF' %}
+                        <div class="bg-green-50 border border-green-100 rounded-lg p-4">
+                            <p class="text-green-800 font-medium">Definitief vastgesteld</p>
+                            <p class="text-sm text-green-700 mt-1">
+                                Uw toeslag is definitief berekend op basis van uw werkelijke inkomen.
+                            </p>
+                        </div>
+                    {% elif current_case.status == 'VEREFFEND' %}
+                        <div class="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                            <p class="text-gray-800 font-medium">Afgerond</p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Uw toeslag is volledig vereffend.
+                            </p>
+                        </div>
+                    {% elif current_case.status == 'AFGEWEZEN' %}
+                        <div class="bg-red-50 border border-red-100 rounded-lg p-4">
+                            <p class="text-red-800 font-medium">Aanvraag afgewezen</p>
+                            <p class="text-sm text-red-700 mt-1">
+                                U heeft geen recht op deze toeslag.
+                            </p>
+                        </div>
+                    {% elif current_case.status == 'BEEINDIGD' %}
+                        <div class="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                            <p class="text-gray-800 font-medium">Toeslag beëindigd</p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Uw toeslag is beëindigd.
+                            </p>
+                        </div>
                     {% endif %}
                 {% endblock %}
             </div>

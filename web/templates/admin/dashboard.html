@@ -35,7 +35,11 @@
                     </div>
                     <div class="p-6">
                         <div class="flex gap-4 overflow-x-auto pb-4">
-                            {% for status in ['SUBMITTED', 'IN_REVIEW', 'DECIDED', 'OBJECTED'] %}
+                            {% set all_statuses = ['SUBMITTED', 'IN_REVIEW', 'DECIDED', 'OBJECTED'] %}
+                            {% if current_service == 'TOESLAGEN' %}
+                                {% set all_statuses = ['SUBMITTED', 'IN_REVIEW', 'DECIDED', 'OBJECTED', 'BEREKEND', 'VOORSCHOT', 'LOPEND', 'DEFINITIEF', 'VEREFFEND', 'AFGEWEZEN', 'BEEINDIGD'] %}
+                            {% endif %}
+                            {% for status in all_statuses %}
                                 <div class="w-72 flex-shrink-0">
                                     <div class="bg-gray-50 p-2 rounded-t border border-gray-200">
                                         <h4 class="font-medium">
@@ -47,6 +51,20 @@
                                                 In behandeling
                                             {% elif status == 'OBJECTED' %}
                                                 Onder bezwaar
+                                            {% elif status == 'BEREKEND' %}
+                                                Berekend
+                                            {% elif status == 'VOORSCHOT' %}
+                                                Voorschot
+                                            {% elif status == 'LOPEND' %}
+                                                Lopend
+                                            {% elif status == 'DEFINITIEF' %}
+                                                Definitief
+                                            {% elif status == 'VEREFFEND' %}
+                                                Vereffend
+                                            {% elif status == 'AFGEWEZEN' %}
+                                                Afgewezen
+                                            {% elif status == 'BEEINDIGD' %}
+                                                Beëindigd
                                             {% endif %}
                                         </h4>
                                         <div class="text-sm text-gray-600">{{ service_cases[law][status]|length }} cases</div>

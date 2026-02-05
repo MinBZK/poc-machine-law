@@ -14,6 +14,7 @@ from web.dependencies import (
     get_case_manager,
     get_claim_manager,
     get_machine_service,
+    get_message_manager,
     is_demo_mode,
     templates,
 )
@@ -27,9 +28,9 @@ from web.feature_flags import (
     is_total_income_widget_enabled,
     is_wallet_enabled,
 )
-from web.routers import admin, chat, dashboard, delegation, demo, edit, importer, laws, mcp, simulation, wallet
+from web.routers import admin, berichten, chat, dashboard, delegation, demo, edit, importer, laws, mcp, simulation, wallet, zaken
 
-app = FastAPI(title="RegelRecht")
+app = FastAPI(title="RegelRecht", debug=True)
 
 # Add session middleware with a secure secret key and max age of 7 days
 # In production, this should be stored securely and not in the code
@@ -57,6 +58,8 @@ app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
 app.include_router(delegation.router)
+app.include_router(zaken.router)
+app.include_router(berichten.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="laws"))
 # app.mount(
@@ -119,6 +122,7 @@ async def root(
     services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
+    message_manager=Depends(get_message_manager),
 ):
     """Render the main dashboard page"""
     # Parse effective date
@@ -263,6 +267,9 @@ async def root(
         # Check if user can submit claims
         can_submit_claims = "CLAIMS_INDIENEN" in user_permissions
 
+    # Get unread message count for notification badge
+    unread_count = message_manager.get_unread_count(bsn) if message_manager else 0
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -289,6 +296,7 @@ async def root(
             "can_submit_claims": can_submit_claims,
             "business_profile": business_profile,
             "demo_mode": is_demo_mode(request),
+            "unread_count": unread_count,  # For notification badge
         },
     )
 

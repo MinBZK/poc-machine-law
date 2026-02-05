@@ -340,6 +340,30 @@ import render_event %} {% from "macros/logos.html" import org_logo %} {% from
                                 </button>
                             </form>
                         </div>
+                    {% elif case.status == 'BEREKEND' %}
+                        <div class="p-6" id="review-form-container">
+                            <h2 class="text-lg font-semibold mb-4">Aanspraak verwerken</h2>
+                            <p class="text-sm text-gray-600 mb-4">De aanspraak is berekend. Kies een actie om de zaak verder te verwerken.</p>
+                            <form hx-post="/admin/cases/{{ case.id }}/process-berekend"
+                                  hx-target="#review-form-container"
+                                  class="space-y-4 max-w-lg">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Actie</label>
+                                    <select name="action" class="w-full border rounded-md p-2">
+                                        <option value="voorschot">Voorschot vaststellen</option>
+                                        <option value="afwijzen">Afwijzen</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Reden (optioneel)</label>
+                                    <textarea name="reason" class="w-full border rounded-md p-2" rows="3" placeholder="Voer een reden in (verplicht bij afwijzing)"></textarea>
+                                </div>
+                                <button type="submit"
+                                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
+                                    Verwerken
+                                </button>
+                            </form>
+                        </div>
                     {% endif %}
                 </div>
             </div>

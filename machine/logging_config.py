@@ -106,6 +106,7 @@ def configure_logging(level: str | None = None):
         "service": logging.getLogger("service"),
         "rule_context": logging.getLogger("rule_context"),
         "logger": logging.getLogger("rule_context"),
+        "simulator": logging.getLogger("machine.events.toeslag.simulator"),
     }
 
     # Configure each logger

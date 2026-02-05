@@ -1,12 +1,26 @@
 import json
 import random
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
 from eventsourcing.application import Application
+from eventsourcing.persistence import Transcoder, Transcoding
 
 from .aggregate import Case, CaseStatus
+
+
+class DateAsISO(Transcoding):
+    """Transcoding for datetime.date objects to ISO format strings."""
+
+    type = date
+    name = "date_iso"
+
+    def encode(self, obj: date) -> str:
+        return obj.isoformat()
+
+    def decode(self, data: str) -> date:
+        return date.fromisoformat(data)
 
 
 class CaseManager(Application):
@@ -24,14 +38,31 @@ class CaseManager(Application):
         self._case_index: dict[tuple[str, str, str], str] = {}  # (bsn, service, law) -> case_id
         # self.follow()
 
+    def register_transcodings(self, transcoder: Transcoder) -> None:
+        """Register custom transcodings for date serialization."""
+        super().register_transcodings(transcoder)
+        transcoder.register(DateAsISO())
+
     @staticmethod
-    def _index_key(bsn: str, service_type: str, law: str) -> tuple[str, str, str]:
-        """Generate index key for the combination of bsn, service and law"""
+    def _index_key(bsn: str, service_type: str, law: str, berekeningsjaar: int | None = None) -> tuple:
+        """Generate index key for the combination of bsn, service, law, and optionally year.
+
+        For toeslagen with yearly cycles (like zorgtoeslag), berekeningsjaar is required
+        to allow multiple years of cases to coexist for the same person.
+        """
+        if berekeningsjaar is not None:
+            return (bsn, service_type, law, berekeningsjaar)
         return (bsn, service_type, law)
 
     def _index_case(self, case: Case) -> None:
-        """Add case to index"""
-        key = self._index_key(case.bsn, case.service, case.law)
+        """Add case to index.
+
+        For toeslagen, extracts berekeningsjaar from parameters to create a year-specific key.
+        This allows multiple years of cases to coexist for the same person.
+        """
+        # Extract berekeningsjaar from case attribute or parameters
+        berekeningsjaar = getattr(case, "berekeningsjaar", None) or case.parameters.get("berekeningsjaar")
+        key = self._index_key(case.bsn, case.service, case.law, berekeningsjaar)
         self._case_index[key] = str(case.id)
 
     @staticmethod
@@ -76,10 +107,15 @@ class CaseManager(Application):
         parameters: dict,
         claimed_result: dict,
         approved_claims_only: bool,
+        aanvraag_datum: date | None = None,
     ) -> str:
         """
         Submit a new case and automatically process it if possible.
         A case starts with the citizen's claimed result which is then verified.
+
+        Args:
+            aanvraag_datum: Optional date for the application (used for time simulation).
+                            If not provided, current system time is used.
         """
 
         result = self.rules_engine.evaluate(service_type, law, parameters, approved=True)
@@ -87,7 +123,9 @@ class CaseManager(Application):
         # Verify using rules engine
         verified_result = result.output
 
-        case = self.get_case(bsn, service_type, law)
+        # Extract berekeningsjaar from parameters for year-specific case lookup (toeslagen)
+        berekeningsjaar = parameters.get("berekeningsjaar")
+        case = self.get_case(bsn, service_type, law, berekeningsjaar)
 
         needs_manual_review = True
         if case is None:
@@ -101,6 +139,7 @@ class CaseManager(Application):
                 verified_result=verified_result,
                 rulespec_uuid=result.rulespec_uuid,
                 approved_claims_only=approved_claims_only,
+                aanvraag_datum=aanvraag_datum,
             )
 
             needs_manual_review = random.random() < self.SAMPLE_RATE
@@ -114,27 +153,32 @@ class CaseManager(Application):
             )
 
         # Check if results match and if manual review is needed
-        results_match = self._results_match(claimed_result, verified_result)
-
-        if results_match and not needs_manual_review:
-            # Automatic approval
-            case.decide_automatically(
-                verified_result=verified_result,
-                parameters=parameters,
-                approved=True,
-            )
+        # For AWIR workflow (empty claimed_result), skip auto-routing - let the workflow steps handle it
+        if not claimed_result:
+            # AWIR workflow: keep in SUBMITTED status for later processing via bereken_aanspraak
+            pass
         else:
-            # Route to manual review with reason
-            reason = "Selected for manual review - " + (
-                "results differ" if not results_match else "random sample check"
-            )
+            results_match = self._results_match(claimed_result, verified_result)
 
-            case.select_for_manual_review(
-                verifier_id="SYSTEM",
-                reason=reason,
-                claimed_result=claimed_result,
-                verified_result=verified_result,
-            )
+            if results_match and not needs_manual_review:
+                # Automatic approval
+                case.decide_automatically(
+                    verified_result=verified_result,
+                    parameters=parameters,
+                    approved=True,
+                )
+            else:
+                # Route to manual review with reason
+                reason = "Selected for manual review - " + (
+                    "results differ" if not results_match else "random sample check"
+                )
+
+                case.select_for_manual_review(
+                    verifier_id="SYSTEM",
+                    reason=reason,
+                    claimed_result=claimed_result,
+                    verified_result=verified_result,
+                )
 
         # Save and index
         self.save(case)
@@ -274,6 +318,13 @@ class CaseManager(Application):
         self.save(case)
         return str(case.id)
 
+    def link_to_previous_year(self, case_id: str, vorig_jaar_case_id: str) -> str:
+        """Link a case to the previous year's case (for automatic year continuations)"""
+        case = self.repository.get(UUID(case_id))
+        case.link_to_previous_year(vorig_jaar_case_id=vorig_jaar_case_id)
+        self.save(case)
+        return str(case.id)
+
     # Query methods
     def can_appeal(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_appeal()
@@ -281,10 +332,21 @@ class CaseManager(Application):
     def can_object(self, case_id: str) -> bool:
         return self.get_case_by_id(case_id).can_object()
 
-    def get_case(self, bsn: str, service_type: str, law: str) -> Case | None:
-        """Get case for specific bsn, service and law combination"""
-        key = self._index_key(bsn, service_type, law)
+    def get_case(self, bsn: str, service_type: str, law: str, berekeningsjaar: int | None = None) -> Case | None:
+        """Get case for specific bsn, service, law, and optionally berekeningsjaar combination.
+
+        For toeslagen with yearly cycles, berekeningsjaar should be provided to find the correct year's case.
+        If berekeningsjaar is provided but no case is found, falls back to looking up without year for
+        backward compatibility with non-yearly cases.
+        """
+        key = self._index_key(bsn, service_type, law, berekeningsjaar)
         case_id = self._case_index.get(key)
+
+        # Fallback: if year-specific key not found, try without year (backward compatibility)
+        if case_id is None and berekeningsjaar is not None:
+            key_without_year = self._index_key(bsn, service_type, law)
+            case_id = self._case_index.get(key_without_year)
+
         return self.get_case_by_id(case_id) if case_id else None
 
     def get_cases_by_status(self, service_type: str, status: CaseStatus) -> list[Case]:
@@ -299,7 +361,8 @@ class CaseManager(Application):
         """Get all cases for a specific citizen by BSN"""
         cases = []
         for key_tuple, case_id in self._case_index.items():
-            key_bsn, _, _ = key_tuple  # Unpack the (bsn, service, law) tuple
+            # First element is always the BSN (tuple can be 3 or 4 elements)
+            key_bsn = key_tuple[0]
             if key_bsn == bsn:
                 case = self.get_case_by_id(case_id)
                 if case:
@@ -364,3 +427,178 @@ class CaseManager(Application):
         events.sort(key=lambda x: str(x["timestamp"]))
 
         return events
+
+    # === AWIR Toeslag Methods ===
+    # These methods wrap the Case aggregate's toeslag lifecycle methods
+
+    def bereken_aanspraak(
+        self,
+        case_id: str,
+        heeft_aanspraak: bool,
+        berekend_jaarbedrag: int,
+        berekening_datum: date | None = None,
+    ) -> str:
+        """Calculate entitlement for a toeslag case"""
+        case = self.repository.get(UUID(case_id))
+        case.bereken_aanspraak(
+            heeft_aanspraak=heeft_aanspraak,
+            berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=berekening_datum,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def wijs_af(self, case_id: str, reden: str) -> str:
+        """Reject a toeslag application"""
+        case = self.repository.get(UUID(case_id))
+        case.wijs_af(reden=reden)
+        self.save(case)
+        return str(case.id)
+
+    def stel_voorschot_vast(
+        self,
+        case_id: str,
+        jaarbedrag: int | None = None,
+        maandbedrag: int | None = None,
+        beschikking_datum: date | None = None,
+    ) -> str:
+        """Establish advance payment for a toeslag case"""
+        case = self.repository.get(UUID(case_id))
+        # Use provided amounts or calculate from berekend_jaarbedrag
+        jaar = jaarbedrag if jaarbedrag is not None else case.berekend_jaarbedrag
+        maand = maandbedrag if maandbedrag is not None else (jaar // 12 if jaar else 0)
+        case.stel_voorschot_vast(jaarbedrag=jaar, maandbedrag=maand, beschikking_datum=beschikking_datum)
+        self.save(case)
+        return str(case.id)
+
+    def start_maand(self, case_id: str, maand: int) -> str:
+        """Start a month for processing"""
+        case = self.repository.get(UUID(case_id))
+        case.start_maand(maand=maand)
+        self.save(case)
+        return str(case.id)
+
+    def herbereken_maand(
+        self,
+        case_id: str,
+        maand: int,
+        berekend_bedrag: int,
+        trigger: str = "schedule",
+        berekening_datum: date | None = None,
+    ) -> str:
+        """Recalculate monthly amount"""
+        case = self.repository.get(UUID(case_id))
+        case.herbereken_maand(
+            maand=maand,
+            berekend_bedrag=berekend_bedrag,
+            trigger=trigger,
+            berekening_datum=berekening_datum,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def betaal_maand(
+        self,
+        case_id: str,
+        maand: int,
+        betaald_bedrag: int | None = None,
+        basis: str = "voorschot",
+        betaal_datum: date | None = None,
+    ) -> str:
+        """Process monthly payment"""
+        case = self.repository.get(UUID(case_id))
+        case.betaal_maand(
+            maand=maand,
+            betaald_bedrag=betaald_bedrag,
+            basis=basis,
+            betaal_datum=betaal_datum,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def herzien_voorschot(self, case_id: str, nieuw_jaarbedrag: int, nieuw_maandbedrag: int, reden: str) -> str:
+        """Revise the advance payment"""
+        case = self.repository.get(UUID(case_id))
+        case.herzien_voorschot(
+            nieuw_jaarbedrag=nieuw_jaarbedrag,
+            nieuw_maandbedrag=nieuw_maandbedrag,
+            reden=reden,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def stel_definitief_vast(
+        self,
+        case_id: str,
+        definitief_jaarbedrag: int,
+        beschikking_datum: date | None = None,
+    ) -> str:
+        """Establish final determination"""
+        case = self.repository.get(UUID(case_id))
+        case.stel_definitief_vast(definitief_jaarbedrag=definitief_jaarbedrag, beschikking_datum=beschikking_datum)
+        self.save(case)
+        return str(case.id)
+
+    def vereffen(self, case_id: str, vereffening_datum: date | None = None) -> str:
+        """Execute settlement (back-payment or recovery)"""
+        case = self.repository.get(UUID(case_id))
+
+        # Calculate total paid amount from maandelijkse_betalingen
+        totaal_betaald = sum(b.get("betaald_bedrag") or 0 for b in case.maandelijkse_betalingen)
+
+        # Calculate the difference
+        definitief = case.definitief_jaarbedrag or 0
+        verschil = definitief - totaal_betaald
+
+        # Determine vereffening type and bedrag
+        if verschil > 0:
+            vereffening_type = "NABETALING"
+            vereffening_bedrag = verschil
+        elif verschil < 0:
+            vereffening_type = "TERUGVORDERING"
+            vereffening_bedrag = abs(verschil)
+        else:
+            vereffening_type = "GEEN"
+            vereffening_bedrag = 0
+
+        case.vereffen(
+            vereffening_type=vereffening_type,
+            vereffening_bedrag=vereffening_bedrag,
+            vereffening_datum=vereffening_datum,
+        )
+        self.save(case)
+        return str(case.id)
+
+    def beeindig(self, case_id: str, reden: str, einddatum: date | None = None) -> str:
+        """End a toeslag"""
+        case = self.repository.get(UUID(case_id))
+        case.beeindig(reden=reden, einddatum=einddatum)
+        self.save(case)
+        return str(case.id)
+
+    def ontvang_ib_aanslag(
+        self,
+        case_id: str,
+        vastgesteld_inkomen: int,
+        aanslag_datum: date,
+    ) -> str:
+        """
+        Register receipt of IB-aanslag (AWIR Art. 19 trigger).
+
+        This triggers the definitieve vaststelling procedure:
+        - Deadline is 6 months after IB-aanslag receipt
+        """
+        from dateutil.relativedelta import relativedelta
+
+        case = self.repository.get(UUID(case_id))
+
+        # Calculate deadline: 6 months after IB-aanslag
+        deadline_definitief = aanslag_datum + relativedelta(months=6)
+
+        case.ib_aanslag_ontvangen(
+            vastgesteld_inkomen=vastgesteld_inkomen,
+            aanslag_datum=aanslag_datum,
+            deadline_definitief=deadline_definitief,
+        )
+        self.save(case)
+        return str(case.id)

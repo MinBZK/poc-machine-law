@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="mb-8">
+    <!-- Header with back link -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <a href="/zaken/?bsn={{ bsn }}" class="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Dashboard
+            </a>
+            <h1 class="text-xl font-semibold text-gray-900 mt-1">Tijdlijn</h1>
+        </div>
+    </div>
+
+    <!-- Zaak Filter Section -->
+    {% if zaak_labels and zaak_labels|length >= 1 %}
+    <div class="mb-4 flex flex-wrap gap-2">
+        <!-- "Alles" pill to show all -->
+        <button
+            id="alles-pill"
+            class="zaak-filter-pill px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border-2 bg-blue-600 text-white border-blue-600"
+            data-active="true"
+        >
+            Alles
+        </button>
+
+        {% for zaak_label, zaak_id in zaak_labels %}
+        <button
+            class="zaak-filter-pill px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border-2 bg-gray-100 text-gray-600 border-gray-300"
+            data-zaak-label="{{ zaak_label }}"
+            data-active="false"
+        >
+            {{ zaak_label }}
+        </button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 gap-6">
+        <!-- Timeline (RegelRecht design) -->
+        <div>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                {% if grouped_timeline %}
+                {% for month, events in grouped_timeline %}
+                <div data-month-group>
+                    <!-- Month header -->
+                    <div class="regelrecht-timeline__heading-row bg-gray-100 px-4 py-2 font-medium text-gray-700 border-l-4 border-blue-600">
+                        {{ month }}
+                    </div>
+
+                    <!-- Events for this month -->
+                    {% for event in events %}
+                    <div class="flex items-center border-b border-gray-100 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                         onclick="openEventPanel(this)"
+                         data-event-type="{{ event.type }}"
+                         data-event-label="{{ event.label }}"
+                         data-event-date="{{ event.date_formatted }}"
+                         data-event-details='{{ event.details | tojson if event.details else "{}" }}'
+                         data-event-zaak-label="{{ event.zaak_label }}"
+                    <!-- Status indicator - icons per event type -->
+                    <div class="mr-4 flex-shrink-0">
+                        {% if event.type == 'betaling' %}
+                        <!-- Euro icon for payments (green) -->
+                        <span class="w-6 h-6 bg-green-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        {% elif event.type in ['beschikking', 'definitieve_beschikking'] %}
+                        <!-- Document icon for beschikkingen (purple) -->
+                        <span class="w-6 h-6 bg-purple-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </span>
+                        {% elif event.type == 'herberekening' %}
+                        <!-- Calculator icon for herberekeningen (orange) -->
+                        <span class="w-6 h-6 bg-orange-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+                        {% elif event.type in ['aanvraag', 'voortzetting'] %}
+                        <!-- Inbox icon for aanvraag/voortzetting (blue) -->
+                        <span class="w-6 h-6 bg-blue-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                        </span>
+                        {% elif event.type == 'berekening' %}
+                        <!-- Check icon for berekening (blue) -->
+                        <span class="w-6 h-6 bg-blue-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        {% elif event.type == 'vereffening' %}
+                        <!-- Scale icon for vereffening (gray) -->
+                        <span class="w-6 h-6 bg-gray-200 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                            </svg>
+                        </span>
+                        {% elif event.type == 'bericht' %}
+                        <!-- Envelope icon for berichten (indigo) -->
+                        <span class="w-6 h-6 bg-indigo-100 rounded-full inline-flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+                        {% elif event.is_past %}
+                        <span class="w-3 h-3 bg-blue-600 rounded-full inline-block"></span>
+                        {% else %}
+                        <span class="w-3 h-3 border-2 border-gray-400 rounded-full inline-block"></span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs text-gray-500">
+                            {{ event.date_formatted }}
+                            {% if event.zaak_label %}
+                            <span class="ml-2 px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{{ event.zaak_label }}</span>
+                            {% endif %}
+                        </div>
+                        {% if event.type == 'betaling' %}
+                        <span class="text-green-600 font-medium hover:underline">{{ event.label }}</span>
+                        {% elif event.type in ['beschikking', 'definitieve_beschikking'] %}
+                        <span class="text-purple-600 font-medium hover:underline">{{ event.label }}</span>
+                        {% elif event.type == 'herberekening' %}
+                        <span class="text-orange-600 hover:underline">{{ event.label }}</span>
+                        {% elif event.type == 'vereffening' %}
+                        <span class="text-gray-700 font-medium hover:underline">{{ event.label }}</span>
+                        {% elif event.type == 'bericht' %}
+                        <span class="text-indigo-600 font-medium">{{ event.label }}</span>
+                        <a href="/berichten/{{ event.message_id }}?bsn={{ event.bsn }}" class="ml-2 text-sm text-indigo-500 hover:text-indigo-700 hover:underline">Ga naar bericht →</a>
+                        {% else %}
+                        <span class="text-blue-600 hover:underline">{{ event.label }}</span>
+                        {% endif %}
+                        {% if event.details %}
+                        <div class="text-sm text-gray-500 truncate">
+                            {% for key, value in event.details.items() %}
+                            {{ key }}: {{ value }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Chevron -->
+                    <div class="ml-4 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="p-8 text-center text-gray-500">
+                    Nog geen gebeurtenissen geregistreerd
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Slide-out panel overlay (invisible, just for click-to-close) -->
+<div id="panel-overlay" class="fixed inset-0 hidden z-40" onclick="closeEventPanel()"></div>
+
+<!-- Slide-out event detail panel -->
+<div id="event-panel" class="fixed top-0 right-0 h-full w-96 bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+    <div class="p-6 h-full flex flex-col">
+        <!-- Close button -->
+        <div class="flex justify-end mb-4">
+            <button onclick="closeEventPanel()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                &times; Sluit
+            </button>
+        </div>
+
+        <!-- Panel content -->
+        <h2 id="panel-title" class="text-xl font-semibold text-gray-900 mb-4"></h2>
+        <div id="panel-content" class="flex-1 text-gray-600 overflow-y-auto">
+            <!-- Event details will be populated here -->
+        </div>
+
+        <!-- Action buttons -->
+        <div id="panel-buttons" class="space-y-2 mt-6 pt-4 border-t">
+            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors">
+                Bekijk details
+            </button>
+            <button class="w-full border border-blue-600 text-blue-600 py-2 px-4 rounded hover:bg-blue-50 transition-colors">
+                Download PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEventPanel(element) {
+    const eventType = element.dataset.eventType;
+    const eventLabel = element.dataset.eventLabel;
+    const eventDate = element.dataset.eventDate;
+    const eventDetails = JSON.parse(element.dataset.eventDetails || '{}');
+
+    // Set panel title
+    document.getElementById('panel-title').textContent = eventLabel;
+
+    // Build panel content
+    let contentHtml = `<p class="text-sm text-gray-500 mb-4">${eventDate}</p>`;
+
+    // Add event type description
+    const descriptions = {
+        'aanvraag': 'Uw aanvraag is ontvangen en wordt verwerkt.',
+        'voortzetting': 'Uw toeslag is automatisch voortgezet voor het nieuwe jaar.',
+        'berekening': 'De berekening voor uw aanspraak is uitgevoerd.',
+        'beschikking': 'Een formele beschikking is verzonden.',
+        'herberekening': 'De maandelijkse herberekening is uitgevoerd op basis van actuele gegevens.',
+        'betaling': 'Het maandelijkse voorschotbedrag is overgemaakt naar uw rekening.',
+        'definitieve_beschikking': 'Het jaar is afgesloten met de definitieve beschikking. Het definitieve bedrag is vastgesteld op basis van uw werkelijke inkomen.',
+        'vereffening': 'De vereffening is uitgevoerd. Het verschil tussen voorschot en definitief bedrag is berekend en verwerkt.',
+        'bericht': 'Er is een bericht naar u verstuurd over uw toeslag. U kunt dit bericht bekijken in uw berichtenbox.'
+    };
+
+    contentHtml += `<p class="mb-4">${descriptions[eventType] || 'Details van deze gebeurtenis.'}</p>`;
+
+    // Add details
+    if (Object.keys(eventDetails).length > 0) {
+        contentHtml += '<div class="bg-gray-50 rounded-lg p-4 mt-4">';
+        contentHtml += '<h3 class="text-sm font-medium text-gray-900 mb-2">Gegevens</h3>';
+        contentHtml += '<dl class="space-y-2 text-sm">';
+        for (const [key, value] of Object.entries(eventDetails)) {
+            contentHtml += `<div class="flex justify-between">`;
+            contentHtml += `<dt class="text-gray-500">${key}</dt>`;
+            contentHtml += `<dd class="font-medium text-gray-900">${value}</dd>`;
+            contentHtml += `</div>`;
+        }
+        contentHtml += '</dl></div>';
+    }
+
+    document.getElementById('panel-content').innerHTML = contentHtml;
+
+    // Show panel with animation
+    document.getElementById('event-panel').classList.remove('translate-x-full');
+    document.getElementById('panel-overlay').classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeEventPanel() {
+    document.getElementById('event-panel').classList.add('translate-x-full');
+    document.getElementById('panel-overlay').classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+}
+
+// Close panel on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEventPanel();
+    }
+});
+
+// Timeline filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const originalPills = document.querySelectorAll('.zaak-filter-pill[data-zaak-label]');
+    const pillContainer = document.querySelector('.mb-4.flex');
+    const allesPill = document.getElementById('alles-pill');
+    const timelineEvents = document.querySelectorAll('[data-event-zaak-label]');
+
+    // Group zaak labels by wet name (without year)
+    const wetGroups = {};
+    originalPills.forEach(pill => {
+        const fullLabel = pill.dataset.zaakLabel;
+        // Extract wet name by removing the year at the end
+        const wetName = fullLabel.replace(/\s+\d{4}$/, '');
+
+        if (!wetGroups[wetName]) {
+            wetGroups[wetName] = [];
+        }
+        wetGroups[wetName].push(fullLabel);
+    });
+
+    // Remove original pills
+    originalPills.forEach(pill => pill.remove());
+
+    // Create new grouped pills
+    const newPills = [];
+    Object.keys(wetGroups).sort().forEach(wetName => {
+        const button = document.createElement('button');
+        button.className = 'zaak-filter-pill px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer border-2 bg-gray-100 text-gray-600 border-gray-300';
+        button.dataset.wetName = wetName;
+        button.dataset.zaakLabels = JSON.stringify(wetGroups[wetName]);
+        button.dataset.active = 'false';
+        button.textContent = wetName;
+        pillContainer.appendChild(button);
+        newPills.push(button);
+    });
+
+    function setActive(pill) {
+        pill.dataset.active = 'true';
+        pill.classList.remove('bg-gray-100', 'text-gray-600', 'border-gray-300');
+        pill.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+    }
+
+    function setInactive(pill) {
+        pill.dataset.active = 'false';
+        pill.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+        pill.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-300');
+    }
+
+    function filterTimeline() {
+        // Check if "Alles" is active
+        if (allesPill.dataset.active === 'true') {
+            // Show all events
+            timelineEvents.forEach(event => {
+                event.style.display = '';
+            });
+            // Show all month headers
+            document.querySelectorAll('[data-month-group]').forEach(monthGroup => {
+                monthGroup.style.display = '';
+            });
+        } else {
+            // Collect active labels from grouped pills
+            const activeLabels = new Set();
+            newPills.forEach(pill => {
+                if (pill.dataset.active === 'true') {
+                    const labels = JSON.parse(pill.dataset.zaakLabels);
+                    labels.forEach(label => activeLabels.add(label));
+                }
+            });
+
+            // Show/hide events based on active labels
+            timelineEvents.forEach(event => {
+                const eventLabel = event.dataset.eventZaakLabel;
+                event.style.display = activeLabels.has(eventLabel) ? '' : 'none';
+            });
+
+            // Hide empty month headers
+            document.querySelectorAll('[data-month-group]').forEach(monthGroup => {
+                const visibleEvents = monthGroup.querySelectorAll(
+                    '[data-event-zaak-label]:not([style*="display: none"])'
+                );
+                monthGroup.style.display = visibleEvents.length === 0 ? 'none' : '';
+            });
+        }
+    }
+
+    // Click handler for wet pills - activate only this one
+    newPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            // Deactivate "Alles"
+            setInactive(allesPill);
+
+            // Deactivate all other pills
+            newPills.forEach(p => setInactive(p));
+
+            // Activate clicked pill
+            setActive(pill);
+
+            filterTimeline();
+        });
+    });
+
+    // Click handler for "Alles" pill - show everything
+    if (allesPill) {
+        allesPill.addEventListener('click', () => {
+            // Deactivate all wet pills
+            newPills.forEach(p => setInactive(p));
+
+            // Activate "Alles"
+            setActive(allesPill);
+
+            filterTimeline();
+        });
+    }
+});
+</script>
+{% endblock %}

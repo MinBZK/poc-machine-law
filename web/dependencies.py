@@ -1,5 +1,6 @@
 import locale
-from datetime import datetime
+import uuid
+from datetime import date, datetime
 from importlib.metadata import version as get_version
 from pathlib import Path
 
@@ -26,6 +27,10 @@ APP_VERSION = get_app_version()
 
 # Load configuration
 config_loader = ConfigLoader()
+
+# Generate a unique server instance ID at startup
+# This is used to detect stale sessions from previous server runs
+SERVER_INSTANCE_ID = str(uuid.uuid4())
 
 # Set Dutch locale
 try:
@@ -71,6 +76,53 @@ def get_claim_manager() -> ClaimManagerInterface:
 def get_machine_service() -> EngineInterface:
     """Dependency to get EngineInterface instance"""
     return machine_service
+
+
+def get_zaken_case_manager():
+    """Dependency to get CaseManager instance for toeslag/zaken workflows"""
+    return machine_service.get_services().case_manager
+
+
+def get_message_manager():
+    """Dependency to get MessageManager instance for berichten"""
+    return machine_service.get_services().message_manager
+
+
+def get_simulated_date(request: Request, auto_reset: bool = True) -> date:
+    """Get the current simulated date from session, defaults to today.
+
+    Auto-resets to today when:
+    - The server has restarted (session from previous server instance)
+    - The stored date is more than 5 years in the future (stale data)
+
+    This ensures that after a server restart, everyone starts fresh with today's date.
+    """
+    today = date.today()
+
+    # Check if session is from current server instance
+    session_server_id = request.session.get("server_instance_id")
+    if session_server_id != SERVER_INSTANCE_ID:
+        # Session is from a previous server run - reset to today
+        request.session["simulated_date"] = today.isoformat()
+        request.session["server_instance_id"] = SERVER_INSTANCE_ID
+        return today
+
+    date_str = request.session.get("simulated_date")
+    if date_str:
+        stored_date = date.fromisoformat(date_str)
+        # Reset if date is unreasonably far in the future (stale session)
+        # Use 5 years as threshold - more than that is likely stale
+        if auto_reset and stored_date > today.replace(year=today.year + 5):
+            request.session["simulated_date"] = today.isoformat()
+            return today
+        return stored_date
+    return today
+
+
+def set_simulated_date(request: Request, new_date: date) -> None:
+    """Store the simulated date in session along with the server instance ID"""
+    request.session["simulated_date"] = new_date.isoformat()
+    request.session["server_instance_id"] = SERVER_INSTANCE_ID
 
 
 def set_engine_id(id: str):

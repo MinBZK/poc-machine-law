@@ -9,13 +9,122 @@ from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_factory import llm_factory
-from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
+from web.dependencies import (
+    TODAY,
+    get_case_manager,
+    get_claim_manager,
+    get_engine_id,
+    get_machine_service,
+    get_simulated_date,
+    templates,
+)
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
 
 router = APIRouter(prefix="/laws", tags=["laws"])
 
 logger = logging.getLogger(__name__)
+
+
+def _check_awir_needs_review(
+    case,
+    current_jaarbedrag: int,
+    case_manager: CaseManagerInterface,
+    has_claims: bool = False,
+    claim_manager: ClaimManagerInterface | None = None,
+    bsn: str | None = None,
+    service: str | None = None,
+    law: str | None = None,
+) -> dict | None:
+    """
+    Check of een AWIR case handmatige review nodig heeft.
+    Bij ELK verschil t.o.v. vorig jaar OF claims (wijzigingen) → IN_REVIEW.
+
+    Args:
+        case: Het huidige Case object
+        current_jaarbedrag: Het berekende jaarbedrag voor dit jaar
+        case_manager: De CaseManager voor opvragen vorig jaar case
+        has_claims: Of er claims (wijzigingen door burger) zijn
+        claim_manager: De ClaimManager voor opvragen claims
+        bsn: BSN van de burger
+        service: Service type
+        law: Law identifier
+
+    Returns:
+        None als geen review nodig, anders dict met previous_result en reason
+    """
+    # Check 1: Zijn er claims (wijzigingen door de burger)?
+    if has_claims and claim_manager and bsn and service and law:
+        claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
+        relevant_claims = [
+            claim
+            for claim in claims
+            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
+        ]
+        if relevant_claims:
+            # Er zijn wijzigingen door de burger - naar review
+            claim_details = {claim.key: claim.new_value for claim in relevant_claims}
+            return {
+                "previous_result": {"wijzigingen": "brongegevens"},
+                "current_result": {"wijzigingen": claim_details},
+                "reason": "Wijziging in gegevens door burger doorgegeven",
+            }
+
+    # Check 2: Is er een vorig jaar case om mee te vergelijken?
+    vorig_jaar_case_id = getattr(case, "vorig_jaar_case_id", None)
+    if vorig_jaar_case_id:
+        vorig_jaar_case = case_manager.get_case_by_id(vorig_jaar_case_id)
+        if vorig_jaar_case:
+            # Vergelijk berekend jaarbedrag met vorig jaar
+            vorig_jaarbedrag = vorig_jaar_case.berekend_jaarbedrag or 0
+
+            # Bij ELK verschil → naar review
+            if current_jaarbedrag != vorig_jaarbedrag:
+                return {
+                    "previous_result": {"jaarbedrag": vorig_jaarbedrag},
+                    "current_result": {"jaarbedrag": current_jaarbedrag},
+                    "reason": "Wijziging in gegevens gedetecteerd t.o.v. vorig jaar",
+                }
+
+    return None
+
+
+def get_primary_amount_value(rule_spec: dict, output: dict) -> int:
+    """
+    Haal de som van primary output waarden op basis van citizen_relevance: primary.
+
+    Vervangt hardcoded veldnaam checks (hoogte_toeslag, subsidiebedrag)
+    met dynamische lookup uit de rule specification.
+
+    Args:
+        rule_spec: De rule specification dictionary uit YAML
+        output: De output dictionary van het evaluatie resultaat
+
+    Returns:
+        Som van primary amount/number output waarden, of 0 als geen gevonden
+    """
+    total = 0
+    output_definitions = rule_spec.get("properties", {}).get("output", [])
+
+    for output_def in output_definitions:
+        if output_def.get("citizen_relevance") != "primary":
+            continue
+
+        output_name = output_def.get("name")
+        output_type = output_def.get("type", "")
+
+        # Alleen numerieke types voor bedragberekening
+        if output_type not in ["amount", "number"]:
+            continue
+
+        value = output.get(output_name)
+        if value is not None:
+            try:
+                total += int(value)
+            except (ValueError, TypeError):
+                pass
+
+    return total
 
 
 def get_tile_template(service: str, law: str) -> str:
@@ -129,8 +238,27 @@ async def execute_law(
             },
         )
 
-    # Check if there's an existing case
-    existing_case = case_manager.get_case(bsn, service, law)
+    # Check if there's an existing case for the current simulated year
+    simulated_date = get_simulated_date(request)
+    simulated_year = simulated_date.year
+
+    # Get all cases for this BSN/service/law combination and find the most relevant one
+    all_cases = case_manager.get_cases_by_bsn(bsn)
+    relevant_cases = [c for c in all_cases if c.service == service and c.law == law]
+
+    # Find the case for the current year, or the most recent one
+    existing_case = None
+    for case in relevant_cases:
+        if getattr(case, "berekeningsjaar", None) == simulated_year:
+            existing_case = case
+            break
+    if not existing_case and relevant_cases:
+        # Fallback to most recent case (by berekeningsjaar or created_at)
+        relevant_cases.sort(
+            key=lambda c: c.berekeningsjaar if c.berekeningsjaar else (c.created_at.year if c.created_at else 0),
+            reverse=True,
+        )
+        existing_case = relevant_cases[0]
 
     # Get the appropriate template
     template_path = get_tile_template(service, law)
@@ -172,6 +300,9 @@ async def submit_case(
     """Submit a new case"""
     law = unquote(law)
 
+    # Get simulated date for time-based workflows
+    simulated_date = get_simulated_date(request)
+
     law, result, parameters = evaluate_law(
         bsn,
         law,
@@ -189,11 +320,66 @@ async def submit_case(
         parameters=parameters,
         claimed_result=result.output,
         approved_claims_only=approved,
+        effective_date=simulated_date,
     )
 
-    case = case_manager.get_case_by_id(case_id)
-
+    # Get rule_spec for dynamic field detection in AWIR workflow
     rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+    # AWIR workflow for toeslagen: calculate eligibility and set voorschot/afwijzing
+    # This triggers events that will create messages via CaseProcessor
+    if service == "TOESLAGEN":
+        # Dynamically determine benefit amount using citizen_relevance: primary
+        # instead of hardcoded field names (hoogte_toeslag, subsidiebedrag, etc.)
+        berekend_jaarbedrag = get_primary_amount_value(rule_spec, result.output)
+        heeft_aanspraak = berekend_jaarbedrag > 0
+
+        # Calculate eligibility (AWIR Art. 16 lid 1)
+        case_manager.bereken_aanspraak(
+            case_id=case_id,
+            heeft_aanspraak=heeft_aanspraak,
+            berekend_jaarbedrag=berekend_jaarbedrag,
+            berekening_datum=simulated_date,
+        )
+
+        # Get the case to check for review requirements
+        case = case_manager.get_case_by_id(case_id)
+
+        # Check if manual review is needed due to changes vs previous year OR claims
+        # approved=False means claims were applied (burger has made changes)
+        has_claims = not approved
+        needs_review = _check_awir_needs_review(
+            case=case,
+            current_jaarbedrag=berekend_jaarbedrag,
+            case_manager=case_manager,
+            has_claims=has_claims,
+            claim_manager=claim_manager,
+            bsn=bsn,
+            service=service,
+            law=law,
+        )
+
+        if needs_review:
+            # Changes detected - route to manual review (IN_REVIEW)
+            reason = needs_review.get("reason", "Wijziging in gegevens gedetecteerd")
+            case_manager.select_for_manual_review(
+                case_id=case_id,
+                verifier_id="SYSTEM",
+                reason=reason,
+                claimed_result=needs_review.get("current_result", {}),
+                verified_result=needs_review.get("previous_result", {}),
+            )
+        elif heeft_aanspraak:
+            # No review needed and has entitlement - proceed to voorschot
+            has_voorschot = any(b.get("type") == "VOORSCHOT" for b in (case.beschikkingen or []))
+            if not has_voorschot:
+                # Set voorschot (AWIR Art. 16) - triggers VoorschotBeschikkingVastgesteld event
+                case_manager.stel_voorschot_vast(case_id=case_id, beschikking_datum=simulated_date)
+        else:
+            # No entitlement - reject (AWIR Art. 16 lid 4)
+            case_manager.wijs_af(case_id=case_id, reden="Geen aanspraak op basis van berekening")
+
+    case = case_manager.get_case_by_id(case_id)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(

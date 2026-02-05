@@ -349,6 +349,16 @@ class MachineService(EngineInterface):
         overall_elapsed = time.time() - overall_start
         logger.warning(f"[MachineService] All resets completed in {overall_elapsed:.3f}s total")
 
+    def get_services(self):
+        """Get the underlying Services instance.
+
+        Note: This is not available in the HTTP engine.
+        """
+        raise NotImplementedError(
+            "Services is only available with the Python engine. "
+            "The HTTP engine does not support direct Services access."
+        )
+
     async def __aenter__(self):
         await self.client.__aenter__()
         return self

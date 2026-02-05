@@ -8,10 +8,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <script type="module" src="/nl-wallet-files/nl-wallet-web.iife.js"></script>
-        <link rel="stylesheet" href="/static/css/nl-wallet-button.css"></link>
-    <script defer
-            src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
-    <style>
+        <script defer
+                src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+        <style>
         /* HTMX Indicator styles - hide the indicator by default */
         .htmx-indicator {
             opacity: 0;
@@ -34,8 +33,8 @@
         }
 
 
-    </style>
-    <script>
+        </style>
+        <script>
         function attach_wallet_handlers() {
             const wallet_button = document.getElementsByTagName("nl-wallet-button").item(0);
             if (wallet_button) {
@@ -87,165 +86,248 @@
                 }
             });
         };
-    </script>
-    <link rel="icon"
-          type="image/png"
-          href="/static/img/favicon-96x96.png"
-          sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg" />
-    <link rel="shortcut icon" href="/static/img/favicon.ico" />
-    <link rel="apple-touch-icon"
-          sizes="180x180"
-          href="/static/img/apple-touch-icon.png" />
-    <link rel="manifest" href="/static/img/site.webmanifest" />
-</head>
-<body class="min-h-screen bg-gray-50">
-    {% if not demo_mode %}
+        </script>
+        <link rel="icon"
+              type="image/png"
+              href="/static/img/favicon-96x96.png"
+              sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg" />
+        <link rel="shortcut icon" href="/static/img/favicon.ico" />
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="/static/img/apple-touch-icon.png" />
+        <link rel="manifest" href="/static/img/site.webmanifest" />
+    </head>
+    <body class="min-h-screen bg-gray-50">
         <!-- Proof of Concept Ribbon -->
         <button onclick="localStorage.removeItem('regelrecht-banner-dismissed'); location.reload();"
                 class="fixed z-[10000] w-[180px] top-[30px] right-[-50px] text-center text-[15px] font-medium py-[5px] bg-[#FACC15] text-black transform rotate-45 origin-center shadow-md hover:bg-[#EAB308] transition-colors no-underline cursor-pointer border-0">
             Proof of Concept
         </button>
-    {% endif %}
-    <!-- Header -->
-    <header class="bg-linear-to-br from-blue-600 to-blue-800 text-white"
-            x-data="{ mobileMenuOpen: false }">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <!-- Mobile Menu Button (Left Side) -->
-                <button class="lg:hidden focus:outline-none cursor-pointer"
-                        @click="mobileMenuOpen = !mobileMenuOpen"
-                        aria-label="Toon/verberg menu">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-6 w-6"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-                <!-- Left side with Logo and Nav -->
-                <div class="flex items-center flex-1 justify-center lg:justify-start">
-                    <h1 class="text-2xl font-semibold">
-                        <a href="/" class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 class="w-8 h-8 mr-3"
-                                 viewBox="0 0 24 24">
-                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                <path d="M12 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
-                                <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9s-9-1.8-9-9s1.8-9 9-9" />
-                                <path d="M6 20.05V20a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v.05" />
-                                </g>
-                            </svg>
-                            RegelRecht
-                        </a>
-                    </h1>
-                    <!-- Desktop Navigation -->
-                    <nav class="hidden lg:block ml-8">
-                        <ul class="flex space-x-6">
-                            <li>
-                                <a href="/?bsn={{ bsn }}"
-                                   class="text-white hover:text-blue-200 font-medium">Dashboard</a>
-                            </li>
-                            {% if chat_enabled %}
+        <!-- Header -->
+        <header class="bg-linear-to-br from-blue-600 to-blue-800 text-white"
+                x-data="{ mobileMenuOpen: false }">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <!-- Mobile Menu Button (Left Side) -->
+                    <button class="lg:hidden focus:outline-none cursor-pointer"
+                            @click="mobileMenuOpen = !mobileMenuOpen"
+                            aria-label="Toon/verberg menu">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-6 w-6"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <!-- Left side with Logo and Nav -->
+                    <div class="flex items-center flex-1 justify-center lg:justify-start">
+                        <h1 class="text-2xl font-semibold">
+                            <a href="/" class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="w-8 h-8 mr-3"
+                                     viewBox="0 0 24 24">
+                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                    <path d="M12 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
+                                    <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9s-9-1.8-9-9s1.8-9 9-9" />
+                                    <path d="M6 20.05V20a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v.05" />
+                                    </g>
+                                </svg>
+                                RegelRecht
+                            </a>
+                        </h1>
+                        <!-- Desktop Navigation -->
+                        <nav class="hidden lg:block ml-8">
+                            <ul class="flex space-x-6">
                                 <li>
-                                    <a href="/chat?bsn={{ bsn }}"
-                                       class="text-white hover:text-blue-200 font-medium flex items-center">
+                                    <a href="/?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="/berichten?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium flex items-center relative">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              class="h-5 w-5 mr-1"
                                              fill="none"
                                              viewBox="0 0 24 24"
                                              stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
-                                        Chat
+                                        Berichten
+                                        {% if unread_count is defined and unread_count > 0 %}
+                                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                                {{ unread_count }}
+                                            </span>
+                                        {% endif %}
                                     </a>
                                 </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </div>
-                <!-- Right side: Desktop Profile & More menu -->
-                <div class="hidden lg:flex items-center space-x-2">
-                    <!-- Desktop User Switcher -->
-                    <div class="relative"
-                         x-data="{ profileSelectorOpen: false, selectedProfile: '{{ bsn }}' }">
-                        <!-- DigiD Indicator with integrated logo -->
-                        <div class="flex items-center space-x-2 bg-white text-gray-900 px-4 py-2 rounded w-[350px] cursor-pointer border border-gray-300 hover:border-blue-500"
-                             @click="profileSelectorOpen = !profileSelectorOpen">
-                            <!-- DigiD logo -->
-                            <div class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
-                            </div>
-                            <div class="flex-grow truncate">
-                                <div class="font-semibold">
-                                    {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer
-                                    profiel" }}
-                                </div>
-                                <div class="text-xs text-gray-500 truncate">
-                                    {{ all_profiles[bsn].description if bsn in
-                                    all_profiles else "" }}
-                                </div>
-                            </div>
-                            <div class="flex-shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     class="h-5 w-5 text-gray-500"
-                                     viewBox="0 0 20 20"
-                                     fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-                        <!-- Desktop Dropdown Menu -->
-                        <div x-show="profileSelectorOpen"
-                             x-cloak
-                             @click.away="profileSelectorOpen = false"
-                             class="absolute right-0 mt-2 w-[450px] bg-white rounded-md shadow-lg z-50 py-1 text-sm max-h-96 overflow-y-auto">
-                            <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">
-                                Gesimuleerde
-                                DigiD Profielen
-                            </div>
-                            {% for bsn_key, profile_data in all_profiles.items() %}
-                                <a href="/?bsn={{ bsn_key }}"
-                                   class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if bsn == bsn_key %}bg-blue-50{% endif %}">
-                                    <div class="flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                             class="h-8 w-8 text-gray-400"
-                                             viewBox="0 0 24 24"
-                                             fill="currentColor">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
+                                <li>
+                                    <a href="/zaken/tijdlijn?bsn={{ bsn }}"
+                                       class="text-white hover:text-blue-200 font-medium flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
+                                        Tijdlijn
+                                    </a>
+                                </li>
+                                {% if chat_enabled %}
+                                    <li>
+                                        <a href="/chat?bsn={{ bsn }}"
+                                           class="text-white hover:text-blue-200 font-medium flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-5 w-5 mr-1"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                            Chat
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    <!-- Right side: Time Simulation, Profile & More menu -->
+                    <div class="hidden lg:flex items-center space-x-2">
+                        <!-- Time Simulation Controls -->
+                        {% if simulated_date %}
+                        <div class="flex items-center space-x-2 bg-indigo-900/50 rounded-lg px-3 py-1.5 mr-2"
+                             x-data="{
+                                 targetDate: '{{ simulated_date }}',
+                                 getNextMonth() {
+                                     const currentDate = '{{ simulated_date }}';  // Read fresh from template
+                                     const parts = currentDate.split('-');
+                                     let year = parseInt(parts[0]);
+                                     let month = parseInt(parts[1]);
+                                     const day = parts[2];
+                                     month++;
+                                     if (month > 12) {
+                                         month = 1;
+                                         year++;
+                                     }
+                                     return `${year}-${String(month).padStart(2, '0')}-${day}`;
+                                 },
+                                 getCurrentPath() {
+                                     return window.location.pathname + window.location.search;
+                                 }
+                             }">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <input type="date"
+                                   x-model="targetDate"
+                                   class="bg-transparent text-white text-sm border-0 focus:ring-0 p-0 w-32 cursor-pointer"
+                                   style="color-scheme: dark;">
+                            <form action="/zaken/simulate" method="post" class="inline">
+                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                <input type="hidden" name="target_date" :value="targetDate">
+                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                <button type="submit"
+                                        class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded transition-colors">
+                                    Ga
+                                </button>
+                            </form>
+                            <form action="/zaken/simulate" method="post" class="inline">
+                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                <input type="hidden" name="target_date" :value="getNextMonth()">
+                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                <button type="submit"
+                                        class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded transition-colors whitespace-nowrap">
+                                    +1 maand
+                                </button>
+                            </form>
+                            <form action="/zaken/simulate/reset" method="post" class="inline">
+                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                <input type="hidden" name="reset_date" value="{{ today }}">
+                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                <button type="submit"
+                                        class="text-xs text-indigo-300 hover:text-white px-1 py-1 rounded transition-colors"
+                                        title="Reset naar vandaag">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                        <!-- Desktop User Switcher -->
+                        <div class="relative"
+                             x-data="{ profileSelectorOpen: false, selectedProfile: '{{ bsn }}' }">
+                            <!-- DigiD Indicator with integrated logo -->
+                            <div class="flex items-center space-x-2 bg-white text-gray-900 px-4 py-2 rounded w-[350px] cursor-pointer border border-gray-300 hover:border-blue-500"
+                                 @click="profileSelectorOpen = !profileSelectorOpen">
+                                <!-- DigiD logo -->
+                                <div class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
+                                </div>
+                                <div class="flex-grow truncate">
+                                    <div class="font-semibold">
+                                        {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer
+                                        profiel" }}
                                     </div>
-                                    <div class="ml-3">
-                                        <div class="font-medium text-gray-900">{{ profile_data.name }}</div>
-                                        <div class="text-sm text-gray-500">{{ profile_data.description }}</div>
-                                        {% if profile_data.get('properties') %}
-                                            <div class="flex flex-wrap gap-1 mt-1">
-                                                {% for property in profile_data.properties %}
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        {{ property }}
-                                                    </span>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        {% if profile_data.get('details') %}
-                                            <div class="text-xs text-gray-400 mt-1">{{ profile_data.details }}</div>
-                                        {% endif %}
+                                    <div class="text-xs text-gray-500 truncate">
+                                        {{ all_profiles[bsn].description if bsn in
+                                        all_profiles else "" }}
                                     </div>
-                                    {% if bsn == bsn_key %}
-                                        <div class="ml-auto">
-                                            <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-5 w-5 text-gray-500"
+                                         viewBox="0 0 20 20"
+                                         fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- Desktop Dropdown Menu -->
+                            <div x-show="profileSelectorOpen"
+                                 x-cloak
+                                 @click.away="profileSelectorOpen = false"
+                                 class="absolute right-0 mt-2 w-[450px] bg-white rounded-md shadow-lg z-50 py-1 text-sm max-h-96 overflow-y-auto">
+                                <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">
+                                    Gesimuleerde
+                                    DigiD Profielen
+                                </div>
+                                {% for bsn_key, profile_data in all_profiles.items() %}
+                                    <a href="/?bsn={{ bsn_key }}"
+                                       class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if bsn == bsn_key %}bg-blue-50{% endif %}">
+                                        <div class="flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-8 w-8 text-gray-400"
+                                                 viewBox="0 0 24 24"
+                                                 fill="currentColor">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
                                             </svg>
                                         </div>
-                                    {% endif %}
-                                </a>
-                            {% endfor %}
+                                        <div class="ml-3">
+                                            <div class="font-medium text-gray-900">{{ profile_data.name }}</div>
+                                            <div class="text-sm text-gray-500">{{ profile_data.description }}</div>
+                                            {% if profile_data.get('properties') %}
+                                                <div class="flex flex-wrap gap-1 mt-1">
+                                                    {% for property in profile_data.properties %}
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            {{ property }}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% if profile_data.get('details') %}
+                                                <div class="text-xs text-gray-400 mt-1">{{ profile_data.details }}</div>
+                                            {% endif %}
+                                        </div>
+                                        {% if bsn == bsn_key %}
+                                            <div class="ml-auto">
+                                                <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
-                    <!-- Delegation Context Switcher -->
-                    {% include "components/delegation_switcher.html" %}
-                    {% if not demo_mode %}
                         <!-- Desktop Kebab Menu (vertical ellipsis) -->
                         <!-- Dropdown Menu Wrapper for Homepage -->
                         <div class="homepage-dropdown-override">{% include "admin/partials/navigation_menu.html" %}</div>
@@ -261,46 +343,126 @@
                                 background-color: rgba(30, 64, 175, 0.8); /* blue-800 with transparency */
                             }
                         </style>
-                    {% endif %}
-                </div>
-                <!-- Mobile Navigation Menu -->
-                <div class="hidden">
-                    <button @click="desktopMoreMenuOpen = !desktopMoreMenuOpen"
-                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 focus:outline-none cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             class="h-5 w-5 text-white"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                    </button>
-                </div>
-                <div x-show="mobileMenuOpen"
-                     x-cloak
-                     class="lg:hidden absolute left-0 right-0 top-16 bg-blue-900 z-50 px-4 py-4 shadow-lg overflow-y-auto max-h-[80vh]">
-                    <nav>
-                        <ul class="space-y-4">
-                            <li>
-                                <a href="/?bsn={{ bsn }}"
-                                   class="block text-white hover:text-blue-200 font-medium py-2">Dashboard</a>
-                            </li>
-                            {% if chat_enabled %}
+                    </div>
+                    <!-- Mobile Navigation Menu -->
+                    <div class="hidden">
+                        <button @click="desktopMoreMenuOpen = !desktopMoreMenuOpen"
+                                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-800 focus:outline-none cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5 text-white"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div x-show="mobileMenuOpen"
+                         x-cloak
+                         class="lg:hidden absolute left-0 right-0 top-16 bg-blue-900 z-50 px-4 py-4 shadow-lg overflow-y-auto max-h-[80vh]">
+                        <nav>
+                            <ul class="space-y-4">
                                 <li>
-                                    <a href="/chat?bsn={{ bsn }}"
+                                    <a href="/?bsn={{ bsn }}"
+                                       class="block text-white hover:text-blue-200 font-medium py-2">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="/berichten?bsn={{ bsn }}"
                                        class="block text-white hover:text-blue-200 font-medium py-2 flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              class="h-5 w-5 mr-1"
                                              fill="none"
                                              viewBox="0 0 24 24"
                                              stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
-                                        Chat
+                                        Berichten
+                                        {% if unread_count is defined and unread_count > 0 %}
+                                            <span class="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                                {{ unread_count }}
+                                            </span>
+                                        {% endif %}
                                     </a>
                                 </li>
-                            {% endif %}
-                            {% if not demo_mode %}
+                                <li>
+                                    <a href="/zaken/tijdlijn?bsn={{ bsn }}"
+                                       class="block text-white hover:text-blue-200 font-medium py-2 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Tijdlijn
+                                    </a>
+                                </li>
+                                {% if chat_enabled %}
+                                    <li>
+                                        <a href="/chat?bsn={{ bsn }}"
+                                           class="block text-white hover:text-blue-200 font-medium py-2 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-5 w-5 mr-1"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                            Chat
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                <!-- Mobile Time Simulation Controls -->
+                                {% if simulated_date %}
+                                <li class="pt-4 border-t border-blue-800"
+                                    x-data="{
+                                        targetDate: '{{ simulated_date }}',
+                                        getNextMonth() {
+                                            const parts = this.targetDate.split('-');
+                                            let year = parseInt(parts[0]);
+                                            let month = parseInt(parts[1]);
+                                            const day = parts[2];
+                                            month++;
+                                            if (month > 12) {
+                                                month = 1;
+                                                year++;
+                                            }
+                                            return `${year}-${String(month).padStart(2, '0')}-${day}`;
+                                        },
+                                        getCurrentPath() {
+                                            return window.location.pathname + window.location.search;
+                                        }
+                                    }">
+                                    <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Tijd Simulatie
+                                    </div>
+                                    <div class="flex flex-col space-y-2 mt-2">
+                                        <input type="date"
+                                               x-model="targetDate"
+                                               class="bg-blue-800 text-white text-sm px-3 py-2 rounded border border-blue-700 focus:ring-indigo-500 focus:border-indigo-500"
+                                               style="color-scheme: dark;">
+                                        <div class="flex space-x-2">
+                                            <form action="/zaken/simulate" method="post" class="flex-1">
+                                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                                <input type="hidden" name="target_date" :value="targetDate">
+                                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                                <button type="submit"
+                                                        class="w-full text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded transition-colors">
+                                                    Ga naar datum
+                                                </button>
+                                            </form>
+                                            <form action="/zaken/simulate" method="post" class="flex-1">
+                                                <input type="hidden" name="bsn" value="{{ bsn }}">
+                                                <input type="hidden" name="target_date" :value="getNextMonth()">
+                                                <input type="hidden" name="redirect_url" :value="getCurrentPath()">
+                                                <button type="submit"
+                                                        class="w-full text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded transition-colors">
+                                                    +1 maand
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endif %}
                                 <!-- More Menu for Mobile (Kebab Menu) -->
                                 <li class="pt-4 border-t border-blue-800"
                                     x-data="{ mobilemoreMenuOpen: false }">
@@ -358,7 +520,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
-                                            Admin
+                                            Admin beheer
                                         </a>
                                         <a href="/simulation"
                                            class="block text-white hover:text-blue-200 font-medium py-2 pl-8 flex items-center">
@@ -402,81 +564,80 @@
                                         </a>
                                     </div>
                                 </li>
-                            {% endif %}
-                            <!-- Mobile Profile Switcher Header -->
-                            <li class="pt-4 border-t border-blue-800">
-                                <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">Profiel Wisselen</div>
-                                <div x-data="{ mobileProfilesOpen: false }" class="relative">
-                                    <button @click="mobileProfilesOpen = !mobileProfilesOpen"
-                                            class="w-full flex items-center justify-between bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded cursor-pointer">
-                                        <div class="flex items-center">
-                                            <div class="w-6 h-6 mr-2 rounded-md overflow-hidden">
-                                                <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
+                                <!-- Mobile Profile Switcher Header -->
+                                <li class="pt-4 border-t border-blue-800">
+                                    <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">Profiel Wisselen</div>
+                                    <div x-data="{ mobileProfilesOpen: false }" class="relative">
+                                        <button @click="mobileProfilesOpen = !mobileProfilesOpen"
+                                                class="w-full flex items-center justify-between bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded cursor-pointer">
+                                            <div class="flex items-center">
+                                                <div class="w-6 h-6 mr-2 rounded-md overflow-hidden">
+                                                    <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
+                                                </div>
+                                                {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer profiel" }}
                                             </div>
-                                            {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer profiel" }}
-                                        </div>
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                             class="h-5 w-5"
-                                             viewBox="0 0 20 20"
-                                             fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <!-- Mobile Profile Dropdown -->
-                                    <div x-show="mobileProfilesOpen"
-                                         x-cloak
-                                         class="bg-white rounded-md shadow-lg mt-1 py-1 text-sm max-h-96 overflow-y-auto">
-                                        <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">Gesimuleerde DigiD Profielen</div>
-                                        {% for bsn_key, profile_data in all_profiles.items() %}
-                                            <a href="/?bsn={{ bsn_key }}"
-                                               class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if bsn == bsn_key %}bg-blue-50{% endif %}">
-                                                <div class="flex-shrink-0">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                         class="h-8 w-8 text-gray-400"
-                                                         viewBox="0 0 24 24"
-                                                         fill="currentColor">
-                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
-                                                    </svg>
-                                                </div>
-                                                <div class="ml-3">
-                                                    <div class="font-medium text-gray-900">{{ profile_data.name }}</div>
-                                                    <div class="text-sm text-gray-500">{{ profile_data.description }}</div>
-                                                    {% if profile_data.get('properties') %}
-                                                        <div class="flex flex-wrap gap-1 mt-1">
-                                                            {% for property in profile_data.properties %}
-                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                                    {{ property }}
-                                                                </span>
-                                                            {% endfor %}
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-                                                {% if bsn == bsn_key %}
-                                                    <div class="ml-auto">
-                                                        <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-5 w-5"
+                                                 viewBox="0 0 20 20"
+                                                 fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <!-- Mobile Profile Dropdown -->
+                                        <div x-show="mobileProfilesOpen"
+                                             x-cloak
+                                             class="bg-white rounded-md shadow-lg mt-1 py-1 text-sm max-h-96 overflow-y-auto">
+                                            <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">Gesimuleerde DigiD Profielen</div>
+                                            {% for bsn_key, profile_data in all_profiles.items() %}
+                                                <a href="/?bsn={{ bsn_key }}"
+                                                   class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if bsn == bsn_key %}bg-blue-50{% endif %}">
+                                                    <div class="flex-shrink-0">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                             class="h-8 w-8 text-gray-400"
+                                                             viewBox="0 0 24 24"
+                                                             fill="currentColor">
+                                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z" />
                                                         </svg>
                                                     </div>
-                                                {% endif %}
-                                            </a>
-                                        {% endfor %}
+                                                    <div class="ml-3">
+                                                        <div class="font-medium text-gray-900">{{ profile_data.name }}</div>
+                                                        <div class="text-sm text-gray-500">{{ profile_data.description }}</div>
+                                                        {% if profile_data.get('properties') %}
+                                                            <div class="flex flex-wrap gap-1 mt-1">
+                                                                {% for property in profile_data.properties %}
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                        {{ property }}
+                                                                    </span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    {% if bsn == bsn_key %}
+                                                        <div class="ml-auto">
+                                                            <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    {% endif %}
+                                                </a>
+                                            {% endfor %}
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </nav>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
-    <main class="container mx-auto px-4 py-8">
-        <div id="dashboard-content" class="relative">
-            {% block content %}{% endblock %}
-        </div>
-    </main>
-    <!-- Shared Application Panel -->
-    <div id="shared-application-panel"></div>
-    <script>
+        </header>
+        <main class="container mx-auto px-4 py-8">
+            <div id="dashboard-content" class="relative">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+        <!-- Shared Application Panel -->
+        <div id="shared-application-panel"></div>
+        <script>
         // Global ESC key handler for closing the panel
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
@@ -496,80 +657,39 @@
                 // If not in iframe, allow normal browser refresh
             }
         });
-
-        // HTMX interceptor to preserve demo mode across navigation
-        // This ensures ?demo=true is automatically added to all HTMX requests
-        document.body.addEventListener('htmx:configRequest', function(evt) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const demo = urlParams.get('demo');
-            if (demo) {
-                evt.detail.parameters['demo'] = demo;
-            }
-        });
-
-        // Intercept regular link clicks to preserve demo mode
-        // This handles <a href="..."> links that would otherwise lose the demo parameter
-        document.addEventListener('click', function(evt) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const demo = urlParams.get('demo');
-            if (!demo) return;
-
-            // Find the closest anchor element
-            const link = evt.target.closest('a');
-            if (!link) return;
-
-            const href = link.getAttribute('href');
-            if (!href) return;
-
-            // Skip external links, anchors, and javascript: links
-            if (href.startsWith('http') || href.startsWith('#') || href.startsWith('javascript:')) return;
-
-            // Skip links that already have the demo parameter
-            if (href.includes('demo=')) return;
-
-            // Prevent default navigation
-            evt.preventDefault();
-
-            // Build new URL with demo parameter
-            const url = new URL(href, window.location.origin);
-            url.searchParams.set('demo', demo);
-
-            // Navigate to the new URL
-            window.location.href = url.toString();
-        });
-    </script>
-    <!-- Footer -->
-    <footer class="bg-gray-100 border-t mt-12">
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="font-semibold text-gray-900 mb-4">RegelRecht</h4>
-                    <p class="text-gray-600">Een demonstratie van Nederlandse wetgeving als uitvoerbare code</p>
-                    <a href="https://minbzk.github.io/regelrecht"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="text-blue-600 hover:text-blue-800 text-sm flex items-center mt-2">
-                        Bezoek de RegelRecht website
-                        <svg class="w-4 h-4 ml-1"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                    </a>
+        </script>
+        <!-- Footer -->
+        <footer class="bg-gray-100 border-t mt-12">
+            <div class="container mx-auto px-4 py-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">RegelRecht</h4>
+                        <p class="text-gray-600">Een demonstratie van Nederlandse wetgeving als uitvoerbare code</p>
+                        <a href="https://minbzk.github.io/regelrecht"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="text-blue-600 hover:text-blue-800 text-sm flex items-center mt-2">
+                            Bezoek de RegelRecht website
+                            <svg class="w-4 h-4 ml-1"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Disclaimer</h4>
+                        <p class="text-gray-600 text-sm">
+                            Dit is een proof of concept. Alle gegevens zijn fictief.
+                            Niet gebruiken voor daadwerkelijke besluitvorming.
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold text-gray-900 mb-4">Disclaimer</h4>
-                    <p class="text-gray-600 text-sm">
-                        Dit is een proof of concept. Alle gegevens zijn fictief.
-                        Niet gebruiken voor daadwerkelijke besluitvorming.
-                    </p>
+                <div class="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-xs">
+                    © 2025 RegelRecht Demo | <span class="cursor-pointer hover:underline">v1.0.0</span>
                 </div>
             </div>
-            <div class="mt-8 pt-6 border-t border-gray-200 text-center text-gray-500 text-xs">
-                © 2026 RegelRecht Demo | <span class="cursor-pointer hover:underline">v{{ app_version }}</span>
-            </div>
-        </div>
-    </footer>
-</body>
+        </footer>
+    </body>
 </html>
