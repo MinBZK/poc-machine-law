@@ -754,6 +754,23 @@ func (re *RulesEngine) evaluateRequirements(
 						break
 					}
 				}
+			} else if req.Action != nil {
+				// Direct action requirement (not wrapped in All/Or)
+				res, err := re.evaluateOperation(ctx, *req.Action, ruleCtx)
+				if err != nil {
+					return err
+				}
+
+				// Convert result to bool
+				switch v := res.(type) {
+				case bool:
+					result = v
+				case nil:
+					result = false
+				default:
+					// Non-bool, non-nil value is truthy
+					result = true
+				}
 			}
 
 			node.Result = result
@@ -1496,6 +1513,34 @@ func (re *RulesEngine) evaluateOperation(
 
 		result = subject == nil
 		node.Details["subject_value"] = subject
+	case "EXISTS":
+		subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
+		if err != nil {
+			return nil, err
+		}
+
+		// EXISTS returns true if subject is not nil and not empty
+		if subject == nil {
+			result = false
+		} else {
+			switch v := subject.(type) {
+			case []any:
+				result = len(v) > 0
+			case []string:
+				result = len(v) > 0
+			case []int:
+				result = len(v) > 0
+			case map[string]any:
+				result = len(v) > 0
+			case string:
+				result = v != ""
+			default:
+				// For other types, just check if not nil (which we already know)
+				result = true
+			}
+		}
+		node.Details["subject_value"] = subject
+		logr.Debugf("EXISTS result: %v", result)
 	case "AND":
 		err = logr.IndentBlock(ctx, "AND", func(ctx context.Context) error {
 			logr := logger.FromContext(ctx)

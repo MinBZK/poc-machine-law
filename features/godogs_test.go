@@ -1380,6 +1380,15 @@ func heeftDeOutputWaarde(ctx context.Context, field, expectedValue string) error
 	// Parse expected value
 	expected := parseValue(expectedValue)
 
+	// Handle numeric type coercion (Go JSON unmarshals numbers as float64)
+	if expectedInt, ok := expected.(int); ok {
+		if actualFloat, ok := v.(float64); ok {
+			// Compare as floats to handle int vs float64
+			assert.Equal(godog.T(ctx), float64(expectedInt), actualFloat, "Expected %s to be %v, but was %v", field, expected, v)
+			return nil
+		}
+	}
+
 	// Compare values
 	assert.Equal(godog.T(ctx), expected, v, "Expected %s to be %v, but was %v", field, expected, v)
 
@@ -1412,7 +1421,7 @@ func bevatDeOutputWaarde(ctx context.Context, field, expectedValue string) error
 			actualList := "[" + strings.Join(items, ", ") + "]"
 			assert.Equal(godog.T(ctx), expectedValue, actualList, "Expected %s to equal %s, but got %s", field, expectedValue, actualList)
 		default:
-			assert.Fail(godog.T(ctx), "Expected %s to be a list, but was %T", field, v)
+			assert.Fail(godog.T(ctx), fmt.Sprintf("Expected %s to be a list, but was %T", field, v))
 		}
 		return nil
 	}
@@ -1491,7 +1500,7 @@ func isDeOutputLeeg(ctx context.Context, field string) error {
 	case nil:
 		// nil is considered empty
 	default:
-		assert.Fail(godog.T(ctx), "Expected %s to be empty, but was %v", field, v)
+		assert.Fail(godog.T(ctx), fmt.Sprintf("Expected %s to be empty, but was %v", field, v))
 	}
 
 	return nil
