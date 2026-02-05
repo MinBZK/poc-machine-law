@@ -47,8 +47,4 @@ To graduate a feature from `pending/` to the main directory:
 
 | Feature | Issue | Priority |
 |---------|-------|----------|
-| zorgtoeslag-related | Missing service config | High |
-| BELASTINGDIENST-* | Multiple missing steps | Medium |
-| SVB-*, UWV-* | Service integration | Medium |
-| burgerlijk_wetboek_* | Specialized domain | Low |
-| kernenergiewet_* | Specialized domain | Low |
+| web_edit_values.feature | Requires Playwright browser installation | Low |

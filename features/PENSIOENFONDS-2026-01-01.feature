@@ -18,7 +18,8 @@ Feature: Pensioenwet - Pensioenuitkering berekening
     Then is voldaan aan de voorwaarden
     And heeft de output "is_gepensioneerd" waarde "true"
     And heeft de output "pensioenkapitaal" waarde "30000000"
-    And is het pensioen "15000.00" euro
+    # Maandelijkse uitkering: jaarlijks €15000 / 12 = €1250.00 per maand
+    And is het pensioen "1250.00" euro
 
   Scenario: Gepensioneerde met middelloonregeling
     Given een persoon met BSN "100000002"
@@ -31,8 +32,9 @@ Feature: Pensioenwet - Pensioenuitkering berekening
     When de pensioenwet wordt uitgevoerd door PENSIOENFONDS
     Then is voldaan aan de voorwaarden
     And heeft de output "is_gepensioneerd" waarde "true"
-    # Berekening: 0.0175 * 35 * (5500000 - 1750000) = 0.6125 * 3750000 = 2296875 eurocent = 22968.75 euro
-    And is het pensioen "22968.75" euro
+    # Berekening jaarlijks: 0.0175 * 35 * (5500000 - 1750000) = 2296875 eurocent = 22968.75 euro/jaar
+    # Maandelijks: 22968.75 / 12 = 1914.06 euro
+    And is het pensioen "1914.06" euro
 
   Scenario: Gepensioneerde met eindloonregeling
     Given een persoon met BSN "100000003"
@@ -45,8 +47,9 @@ Feature: Pensioenwet - Pensioenuitkering berekening
     When de pensioenwet wordt uitgevoerd door PENSIOENFONDS
     Then is voldaan aan de voorwaarden
     And heeft de output "is_gepensioneerd" waarde "true"
-    # Berekening: 0.0167 * 40 * (7000000 - 1750000) = 0.668 * 5250000 = 3507000 eurocent = 35070.00 euro
-    And is het pensioen "35070.00" euro
+    # Berekening jaarlijks: 0.0167 * 40 * (7000000 - 1750000) = 3507000 eurocent = 35070.00 euro/jaar
+    # Maandelijks: 35070.00 / 12 = 2922.50 euro
+    And is het pensioen "2922.50" euro
 
   Scenario: Persoon nog niet pensioengerechtigd
     Given een persoon met BSN "100000004"
@@ -81,4 +84,5 @@ Feature: Pensioenwet - Pensioenuitkering berekening
     When de pensioenwet wordt uitgevoerd door PENSIOENFONDS
     Then is voldaan aan de voorwaarden
     And heeft de output "pensioenleeftijd" waarde "65"
-    And is het pensioen "10000.00" euro
+    # Maandelijks: 10000.00 / 12 = 833.33 euro
+    And is het pensioen "833.33" euro

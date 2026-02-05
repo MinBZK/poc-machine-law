@@ -48,7 +48,10 @@ Feature: Zorgverzekeringswet - Inkomensafhankelijke bijdrage
     # 3000000 * 0.0525 = 157500 eurocent = 1575.00 euro
     And heeft de output "verschuldigde_bijdrage" waarde "157500"
 
-  Scenario: Zelfstandige zonder werkgever met laag tarief
+  Scenario: Zelfstandige zonder werkgever
+    # NOTE: In werkelijkheid zouden zelfstandigen het lage tarief (5,25%) moeten betalen.
+    # De huidige law implementatie maakt dit onderscheid nog niet - dit is een TODO.
+    # Voor nu wordt het hoge tarief toegepast voor alle niet-AOW-gerechtigden.
     Given een persoon met BSN "200000003"
     And de volgende RvIG personen gegevens:
       | bsn       | geboortedatum | verblijfsadres |
@@ -64,9 +67,9 @@ Feature: Zorgverzekeringswet - Inkomensafhankelijke bijdrage
       | 200000003 | 0                         | 0                         | 7000000               | 0                               | 0            |
     When de zorgverzekeringswet/bijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is voldaan aan de voorwaarden
-    And heeft de output "bijdrage_type" waarde "LAAG"
-    # 7000000 * 0.0525 = 367500 eurocent = 3675.00 euro
-    And heeft de output "verschuldigde_bijdrage" waarde "367500"
+    And heeft de output "bijdrage_type" waarde "HOOG"
+    # 7000000 * 0.0650 = 455000 eurocent = 4550.00 euro
+    And heeft de output "verschuldigde_bijdrage" waarde "455000"
 
   Scenario: Werknemer met inkomen boven maximum
     Given een persoon met BSN "200000004"

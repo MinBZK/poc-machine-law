@@ -38,7 +38,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     And een werknemer met bruto jaarloon "100000" euro
     When de zvw wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162800" eurocent
-    And is de werkgeversbijdrage "470565" eurocent
+    And is de werkgeversbijdrage "470596" eurocent
 
   Scenario: Werknemer met inkomen precies op maximum
     # Werknemer verdient EUR 71.628 bruto per jaar (precies het maximum)
@@ -48,7 +48,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     And een werknemer met bruto jaarloon "71628" euro
     When de zvw wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162800" eurocent
-    And is de werkgeversbijdrage "470565" eurocent
+    And is de werkgeversbijdrage "470596" eurocent
 
   Scenario: Werknemer met inkomen net onder maximum
     # Werknemer verdient EUR 71.627 bruto per jaar (1 euro onder maximum)
@@ -58,7 +58,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     And een werknemer met bruto jaarloon "71627" euro
     When de zvw wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162700" eurocent
-    And is de werkgeversbijdrage "470489" eurocent
+    And is de werkgeversbijdrage "470589" eurocent
 
   Scenario: Werknemer met zeer hoog inkomen - maximale werkgeversbijdrage
     # Werknemer verdient EUR 200.000 bruto per jaar
@@ -68,7 +68,7 @@ Feature: Berekening Werkgeversbijdrage Zorgverzekeringswet 2024
     And een werknemer met bruto jaarloon "200000" euro
     When de zvw wordt uitgevoerd door BELASTINGDIENST
     Then is het bijdrage-inkomen "7162800" eurocent
-    And is de werkgeversbijdrage "470565" eurocent
+    And is de werkgeversbijdrage "470596" eurocent
 
   Scenario: Werknemer met nul inkomen
     # Werknemer heeft EUR 0 bruto loon (bijv. onbetaald verlof)

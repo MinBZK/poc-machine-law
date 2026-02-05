@@ -59,8 +59,8 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | postcode | huisnummer | aantal_bewoners |
       | 3456GH   | 100        | 8               |
     And de volgende KADASTER bag_verblijfsobjecten gegevens:
-      | postcode | huisnummer | gebruiksdoel      | is_woonfunctie |
-      | 3456GH   | 100        | kantoorfunctie    | false          |
+      | postcode | huisnummer | adres                                                    | gebruiksdoel      | is_woonfunctie |
+      | 3456GH   | 100        | {"postcode": "3456GH", "huisnummer": "100"}              | kantoorfunctie    | false          |
     And de volgende BELASTINGDIENST belasting_adressen gegevens:
       | bsn       | postcode | huisnummer |
       | 999993657 | 3456GH   | 100        |
@@ -108,8 +108,8 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | postcode | huisnummer | aantal_bewoners |
       | 2345KL   | 200        | 8               |
     And de volgende KADASTER bag_verblijfsobjecten gegevens:
-      | postcode | huisnummer | gebruiksdoel | is_woonfunctie |
-      | 2345KL   | 200        | woonfunctie  | true           |
+      | postcode | huisnummer | adres                                                    | gebruiksdoel | is_woonfunctie |
+      | 2345KL   | 200        | {"postcode": "2345KL", "huisnummer": "200"}              | woonfunctie  | true           |
     And de volgende BELASTINGDIENST belasting_adressen gegevens:
       | bsn       | postcode | huisnummer |
       | 999993659 | 2345KL   | 200        |

@@ -18,8 +18,8 @@ Feature: Anw - Nabestaandenuitkering
       | bsn       | kind_bsn  | geboortedatum |
       | 300000001 | 300000101 | 2015-03-20    |
     And de volgende SVB anw_dossiers gegevens:
-      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage |
-      | 300000001 | true              | 2026-01-15               | 0             |
+      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage | heeft_kinderen_onder_18 |
+      | 300000001 | true              | 2026-01-15               | 0             | true                    |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 300000001 | 0                         | 0                         | 0                     | 0                               | 0            |
@@ -36,8 +36,8 @@ Feature: Anw - Nabestaandenuitkering
       | bsn       | geboortedatum | verblijfsadres |
       | 300000002 | 1975-09-20    | Rotterdam      |
     And de volgende SVB anw_dossiers gegevens:
-      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage |
-      | 300000002 | true              | 2026-02-01               | 50            |
+      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage | heeft_kinderen_onder_18 |
+      | 300000002 | true              | 2026-02-01               | 50            | false                   |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 300000002 | 0                         | 0                         | 0                     | 0                               | 0            |
@@ -55,8 +55,8 @@ Feature: Anw - Nabestaandenuitkering
       | bsn       | kind_bsn  | geboortedatum |
       | 300000003 | 300000103 | 2012-07-15    |
     And de volgende SVB anw_dossiers gegevens:
-      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage |
-      | 300000003 | true              | 2026-03-01               | 0             |
+      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage | heeft_kinderen_onder_18 |
+      | 300000003 | true              | 2026-03-01               | 0             | true                    |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 300000003 | 2400000                   | 0                         | 0                     | 0                               | 0            |
@@ -75,8 +75,8 @@ Feature: Anw - Nabestaandenuitkering
       | bsn       | geboortedatum | verblijfsadres |
       | 300000004 | 1970-04-25    | Den Haag       |
     And de volgende SVB anw_dossiers gegevens:
-      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage |
-      | 300000004 | true              | 2026-04-01               | 30            |
+      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage | heeft_kinderen_onder_18 |
+      | 300000004 | true              | 2026-04-01               | 30            | false                   |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 300000004 | 3000000                   | 0                         | 0                     | 0                               | 0            |
@@ -92,8 +92,8 @@ Feature: Anw - Nabestaandenuitkering
       | bsn       | kind_bsn  | geboortedatum |
       | 300000005 | 300000105 | 2018-02-10    |
     And de volgende SVB anw_dossiers gegevens:
-      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage |
-      | 300000005 | false             | 2026-05-01               | 0             |
+      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage | heeft_kinderen_onder_18 |
+      | 300000005 | false             | 2026-05-01               | 0             | true                    |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 300000005 | 0                         | 0                         | 0                     | 0                               | 0            |
@@ -109,8 +109,8 @@ Feature: Anw - Nabestaandenuitkering
       | bsn       | kind_bsn  | geboortedatum |
       | 300000006 | 300000106 | 2015-06-20    |
     And de volgende SVB anw_dossiers gegevens:
-      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage |
-      | 300000006 | true              | 2026-06-01               | 0             |
+      | bsn       | partner_verzekerd | overlijdensdatum_partner | ao_percentage | heeft_kinderen_onder_18 |
+      | 300000006 | true              | 2026-06-01               | 0             | true                    |
     And de volgende BELASTINGDIENST box1 gegevens:
       | bsn       | loon_uit_dienstbetrekking | uitkeringen_en_pensioenen | winst_uit_onderneming | resultaat_overige_werkzaamheden | eigen_woning |
       | 300000006 | 0                         | 0                         | 0                     | 0                               | 0            |
