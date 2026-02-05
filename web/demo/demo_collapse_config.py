@@ -97,6 +97,45 @@ DEMO_COLLAPSE_CONFIG = {
         ],
         "collapse_all_except_expanded": True,
     },
+    # Alcoholwet - Collapse most sections, show only key info
+    "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    "alcoholwet/vergunning/VWS-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Exploitatievergunning - Collapse most sections
+    "algemene_plaatselijke_verordening/exploitatievergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Terrasvergunning - Collapse most sections
+    "algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # Geluidsontheffing - Collapse most sections
+    "algemene_plaatselijke_verordening/ontheffingspas_geluid/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
 }
 
 
