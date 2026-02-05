@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Regeldruk - Horeca Vergunningen Rotterdam</title>
+        <title>Scenarios - Horeca Vergunningen Rotterdam</title>
         <link rel="stylesheet" href="/static/css/demo.css">
         <style>
             /* Regeldruk-specific styles */
@@ -204,43 +204,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Regeldruk summary -->
-                <div class="regeldruk-summary">
-                    <h3>Data Optimalisatie</h3>
-                    <div class="summary-stats">
-                        <div class="stat">
-                            <span class="stat-label">Aanvragen</span>
-                            <span class="stat-value">{{ metrics.forms_consolidated }} → 1</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">Auto-opgehaald</span>
-                            <span class="stat-value">{{ metrics.sources_auto_retrieved_unique + metrics.inputs_auto_retrieved_unique }}+</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">Tijd bespaard</span>
-                            <span class="stat-value">~{{ (metrics.estimated_time_saved_minutes / 60)|round(1) }} uur</span>
-                        </div>
-                    </div>
-                </div>
             </aside>
             <!-- Main content area with Gherkin viewer -->
             <main class="demo-content feature-content">
                 <div class="feature-viewer">
-                    <!-- Intro banner -->
-                    <div class="intro-banner">
-                        <h2>Regeldrukvermindering door Data Optimalisatie</h2>
-                        <p>
-                            Bekijk de test scenario's hieronder. Let op de <strong>Given</strong> stappen -
-                            dit zijn alle databronnen die automatisch worden geraadpleegd:
-                        </p>
-                        <ul>
-                            <li>
-                                <strong>KVK</strong>, <strong>RvIG</strong>, <strong>Kadaster</strong> gegevens worden automatisch opgehaald
-                            </li>
-                            <li>De terrasvergunning checkt automatisch of je een exploitatievergunning hebt</li>
-                            <li>In een gecombineerde aanvraag worden gegevens maar één keer opgevraagd</li>
-                        </ul>
-                    </div>
                     <!-- Toolbar -->
                     <div class="feature-toolbar">
                         <button class="btn btn-secondary" onclick="expandAllScenarios()">Alles uitklappen</button>
@@ -269,10 +236,6 @@
                         <span class="source-badge">BAG</span>
                         <span class="source-badge">BGT</span>
                         <span class="source-badge">CCBR</span>
-                    </div>
-                    <div class="footer-message">
-                        Al deze gegevens worden <strong>automatisch</strong> opgehaald.
-                        Geen handmatige documenten nodig.
                     </div>
                 </div>
             </aside>

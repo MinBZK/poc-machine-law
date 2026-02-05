@@ -65,7 +65,7 @@
                 <div class="tab"
                      :class="{ 'active': activeTab === 'regeldruk' }"
                      @click="switchTab('regeldruk')">
-                    <span class="tab-label">Regeldruk</span>
+                    <span class="tab-label">Scenarios</span>
                 </div>
                 <!-- Temporary Tabs (dismissable) -->
                 <template x-for="tab in temporaryTabs" :key="tab.id">
@@ -229,14 +229,14 @@
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
                 </div>
-                <!-- Regeldruk Tab (IFrame) -->
+                <!-- Scenarios Tab (IFrame) -->
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'regeldruk'"
                      x-cloak>
                     <iframe src="/regeldruk/?demo=true"
                             frameborder="0"
                             class="tab-iframe"
-                            title="Regeldruk"></iframe>
+                            title="Scenarios"></iframe>
                 </div>
                 <!-- Simulatie Tab (IFrame) -->
                 <!-- <div class="tab-content iframe-content" x-show="activeTab === 'simulatie'" x-cloak>
