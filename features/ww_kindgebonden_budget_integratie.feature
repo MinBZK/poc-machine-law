@@ -1,3 +1,4 @@
+@skip-go
 Feature: Integratie WW en Kindgebonden Budget
   Als alleenstaande ouder met WW-uitkering
   Wil ik weten hoe mijn WW-inkomen mijn kindgebonden budget beïnvloedt

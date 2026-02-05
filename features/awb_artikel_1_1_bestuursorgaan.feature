@@ -1,3 +1,4 @@
+@skip-go
 Feature: AWB Article 1:1 - Bestuursorgaan Definition
   Als burger of organisatie
   Wil ik weten of een bepaalde instantie een bestuursorgaan is

@@ -1,3 +1,4 @@
+@skip-go
 Feature: Besluit kerninstallaties, splijtstoffen en ertsen
   Als nucleaire operator
   Wil ik weten of mijn kerninstallatie voldoet aan de administratieve eisen

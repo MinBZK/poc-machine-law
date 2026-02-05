@@ -1,3 +1,4 @@
+@skip-go
 Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
   Als Rechtspraak
   Wil ik WSNP-registraties beheren

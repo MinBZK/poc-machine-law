@@ -1,3 +1,4 @@
+@skip-go
 Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
   Als minderjarige
   Wil ik weten wat mijn rechten zijn

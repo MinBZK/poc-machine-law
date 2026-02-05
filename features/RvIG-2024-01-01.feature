@@ -1,3 +1,4 @@
+@skip-go
 Feature: Burgerlijk Wetboek Gezag - Delegation provider for minors
   Als ouder of voogd
   Wil ik namens mijn minderjarige kind kunnen handelen

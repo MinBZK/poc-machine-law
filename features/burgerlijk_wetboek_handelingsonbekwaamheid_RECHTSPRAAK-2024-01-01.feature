@@ -1,3 +1,4 @@
+@skip-go
 Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
   Als RECHTSPRAAK
   Wil ik bepalen of een persoon handelingsonbekwaam is
