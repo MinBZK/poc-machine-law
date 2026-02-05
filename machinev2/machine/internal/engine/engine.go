@@ -1541,6 +1541,28 @@ func (re *RulesEngine) evaluateOperation(
 		}
 		node.Details["subject_value"] = subject
 		logr.Debugf("EXISTS result: %v", result)
+	case "COALESCE":
+		// COALESCE returns the first non-nil value from the values list (lazy evaluation)
+		if operation.Values == nil || operation.Values.ActionValues == nil {
+			return nil, fmt.Errorf("COALESCE operation requires values")
+		}
+
+		evaluatedValues := []any{}
+		for _, v := range *operation.Values.ActionValues {
+			val, err := re.evaluateActionValue(ctx, ruleCtx, v)
+			if err != nil {
+				return nil, err
+			}
+
+			evaluatedValues = append(evaluatedValues, val)
+			if val != nil {
+				result = val
+				logr.Debugf("Non-null value found in COALESCE: %v", val)
+				break
+			}
+		}
+		node.Details["evaluated_values"] = evaluatedValues
+		logr.Debugf("COALESCE result: %v", result)
 	case "AND":
 		err = logr.IndentBlock(ctx, "AND", func(ctx context.Context) error {
 			logr := logger.FromContext(ctx)
