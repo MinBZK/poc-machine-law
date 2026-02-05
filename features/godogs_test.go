@@ -83,7 +83,7 @@ func TestFeatures(t *testing.T) {
 }
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Given(`^de volgende ([^"]*) ([^"]*) gegevens:$`, DeVolgendeGegevens)
+	ctx.Given(`^de volgende ([^"]*) ([^"]*) gegevens:?$`, DeVolgendeGegevens)
 	ctx.Given(`^de datum is "([^"]*)"$`, deDatumIs)
 	ctx.Given(`^een persoon met BSN "([^"]*)"$`, eenPersoonMetBSN)
 	ctx.Given(`^alle aanvragen worden beoordeeld$`, alleAanvragenWordenBeoordeeld)
@@ -148,6 +148,45 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Step(`^is de reactietermijn_weken "([^"]*)"$`, isDeReactietermijnWeken)
 	ctx.Step(`^is de onderzoekstermijn_maanden "([^"]*)"$`, isDeOnderzoekstermijnMaanden)
 
+	// Generic output assertion step definitions
+	ctx.Step(`^heeft de output "([^"]*)" waarde "([^"]*)"$`, heeftDeOutputWaarde)
+	ctx.Step(`^bevat de output "([^"]*)" waarde "(\[.+\])"$`, bevatDeOutputWaarde)
+	ctx.Step(`^bevat de output "([^"]*)" waarde "([^"]*)"$`, bevatDeOutputWaarde)
+	ctx.Step(`^bevat de output "([^"]*)" niet de waarde "([^"]*)"$`, bevatDeOutputNietDeWaarde)
+	ctx.Step(`^is de output "([^"]*)" leeg$`, isDeOutputLeeg)
+	ctx.Step(`^is het veld "([^"]*)" gelijk aan "([^"]*)"$`, isHetVeldGelijkAan)
+	ctx.Step(`^is het veld "([^"]*)" een lege lijst$`, isHetVeldEenLegeLijst)
+	ctx.Step(`^bevat het veld "([^"]*)" de waarde "([^"]*)"$`, bevatHetVeldDeWaarde)
+
+	// Entity setup step definitions
+	ctx.Step(`^een organisatie met ID "([^"]*)"$`, eenOrganisatieMetID)
+	ctx.Step(`^een ICT-project met ID "([^"]*)"$`, eenICTprojectMetID)
+	ctx.Step(`^een organisatie met KVK-nummer "([^"]*)"$`, eenOrganisatieMetKVKnummer)
+	ctx.Step(`^een werkgever met loonheffingennummer "([^"]*)"$`, eenWerkgeverMetLoonheffingennummer)
+	ctx.Step(`^een werknemer met bruto jaarloon "([^"]*)" euro$`, eenWerknemerMetBrutoJaarloon)
+
+	// Boolean assertion step definitions
+	ctx.Step(`^is de organisatie een bestuursorgaan$`, isDeOrganisatieEenBestuursorgaan)
+	ctx.Step(`^is de organisatie geen bestuursorgaan$`, isDeOrganisatieGeenBestuursorgaan)
+	ctx.Step(`^valt het project onder adviesplicht$`, valtHetProjectOnderAdviesplicht)
+	ctx.Step(`^valt het project niet onder adviesplicht$`, valtHetProjectNietOnderAdviesplicht)
+
+	// Additional field assertions
+	ctx.Step(`^is de werkgeversbijdrage "([^"]*)" eurocent$`, isDeWerkgeversbijdrageEurocent)
+	ctx.Step(`^zijn de project kosten "([^"]*)" euro$`, zijnDeProjectKostenEuro)
+	ctx.Step(`^is de rapportageverplichting "([^"]*)"$`, isDeRapportageverplichting)
+	ctx.Step(`^is het aantal_werknemers "([^"]*)"$`, isHetAantalWerknemers)
+	ctx.Step(`^is de co2_uitstoot_totaal "([^"]*)"$`, isDeCo2UitstootTotaal)
+	ctx.Step(`^is de max_duur_maanden "([^"]*)"$`, isDeMaxDuurMaanden)
+	ctx.Step(`^is de categorie_zelfstandige "([^"]*)"$`, isDeCategorieZelfstandige)
+	ctx.Step(`^is het bedrijfskapitaal_max "([^"]*)" euro$`, isHetBedrijfskapitaalMaxEuro)
+	ctx.Step(`^is het bedrijfskapitaal_type "([^"]*)"$`, isHetBedrijfskapitaalType)
+	ctx.Step(`^is de woon_werk_auto_benzine "([^"]*)"$`, isDeWoonWerkAutoBenzine)
+	ctx.Step(`^is de woon_werk_auto_diesel "([^"]*)"$`, isDeWoonWerkAutoDiesel)
+	ctx.Step(`^is de woon_werk_openbaar_vervoer "([^"]*)"$`, isDeWoonWerkOpenbaarVervoer)
+	ctx.Step(`^is de zakelijk_auto_benzine "([^"]*)"$`, isDeZakelijkAutoBenzine)
+	ctx.Step(`^is de zakelijk_auto_diesel "([^"]*)"$`, isDeZakelijkAutoDiesel)
+
 	ctx.StepContext().After(func(ctx context.Context, _ *godog.Step, _ godog.StepResultStatus, _ error) (context.Context, error) {
 		cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
 		if !ok || cm == nil {
@@ -180,13 +219,18 @@ func evaluateLaw(ctx context.Context, svc, law string, approved bool) (context.C
 	err := services.Reset(ctx)
 	require.NoError(godog.T(ctx), err)
 
-	inputs := ctx.Value(inputCtxKey{}).([]input)
-	for _, input := range inputs {
-		err := services.SetSourceDataFrame(ctx, input.Service, input.Table, input.DF)
-		require.NoError(godog.T(ctx), err)
+	inputs, ok := ctx.Value(inputCtxKey{}).([]input)
+	if ok {
+		for _, input := range inputs {
+			err := services.SetSourceDataFrame(ctx, input.Service, input.Table, input.DF)
+			require.NoError(godog.T(ctx), err)
+		}
 	}
 
-	params := ctx.Value(paramsCtxKey{}).(map[string]any)
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
 
 	result, err := services.Evaluate(ctx, svc, law, params, nil, nil, nil, "", approved)
 	require.NoError(godog.T(ctx), err)
@@ -1320,6 +1364,521 @@ func isDeOnderzoekstermijnMaanden(ctx context.Context, maanden string) error {
 
 	assert.Equal(godog.T(ctx), expected, actual,
 		"Expected onderzoekstermijn_maanden to be %d, but was %d", expected, actual)
+
+	return nil
+}
+
+// Generic output assertion step definitions
+
+func heeftDeOutputWaarde(ctx context.Context, field, expectedValue string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[field]
+	require.True(godog.T(ctx), ok, "Expected '%s' to be present in output", field)
+
+	// Parse expected value
+	expected := parseValue(expectedValue)
+
+	// Compare values
+	assert.Equal(godog.T(ctx), expected, v, "Expected %s to be %v, but was %v", field, expected, v)
+
+	return nil
+}
+
+func bevatDeOutputWaarde(ctx context.Context, field, expectedValue string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[field]
+	require.True(godog.T(ctx), ok, "Expected '%s' to be present in output", field)
+
+	// Check if expected value is a Python-style list (e.g., "['LEZEN', 'CLAIMS_INDIENEN']")
+	if strings.HasPrefix(expectedValue, "['") && strings.HasSuffix(expectedValue, "']") {
+		// Convert actual value to Python-style list format for comparison
+		switch arr := v.(type) {
+		case []any:
+			items := make([]string, len(arr))
+			for i, item := range arr {
+				items[i] = fmt.Sprintf("'%v'", item)
+			}
+			actualList := "[" + strings.Join(items, ", ") + "]"
+			assert.Equal(godog.T(ctx), expectedValue, actualList, "Expected %s to equal %s, but got %s", field, expectedValue, actualList)
+		case []string:
+			items := make([]string, len(arr))
+			for i, item := range arr {
+				items[i] = fmt.Sprintf("'%s'", item)
+			}
+			actualList := "[" + strings.Join(items, ", ") + "]"
+			assert.Equal(godog.T(ctx), expectedValue, actualList, "Expected %s to equal %s, but got %s", field, expectedValue, actualList)
+		default:
+			assert.Fail(godog.T(ctx), "Expected %s to be a list, but was %T", field, v)
+		}
+		return nil
+	}
+
+	// Check if value is an array/slice
+	switch arr := v.(type) {
+	case []any:
+		found := false
+		for _, item := range arr {
+			if fmt.Sprintf("%v", item) == expectedValue {
+				found = true
+				break
+			}
+		}
+		assert.True(godog.T(ctx), found, "Expected %s to contain %s, but it did not. Values: %v", field, expectedValue, arr)
+	case []string:
+		found := slices.Contains(arr, expectedValue)
+		assert.True(godog.T(ctx), found, "Expected %s to contain %s, but it did not. Values: %v", field, expectedValue, arr)
+	case string:
+		assert.Contains(godog.T(ctx), arr, expectedValue, "Expected %s to contain %s", field, expectedValue)
+	default:
+		// If it's a single value, check equality
+		assert.Equal(godog.T(ctx), expectedValue, fmt.Sprintf("%v", v), "Expected %s to equal %s", field, expectedValue)
+	}
+
+	return nil
+}
+
+func bevatDeOutputNietDeWaarde(ctx context.Context, field, expectedValue string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[field]
+	if !ok {
+		// Field doesn't exist, so it doesn't contain the value
+		return nil
+	}
+
+	// Check if value is an array/slice
+	switch arr := v.(type) {
+	case []any:
+		for _, item := range arr {
+			assert.NotEqual(godog.T(ctx), expectedValue, fmt.Sprintf("%v", item),
+				"Expected %s to NOT contain %s, but it did", field, expectedValue)
+		}
+	case []string:
+		assert.False(godog.T(ctx), slices.Contains(arr, expectedValue),
+			"Expected %s to NOT contain %s, but it did", field, expectedValue)
+	case string:
+		assert.NotContains(godog.T(ctx), arr, expectedValue, "Expected %s to NOT contain %s", field, expectedValue)
+	default:
+		assert.NotEqual(godog.T(ctx), expectedValue, fmt.Sprintf("%v", v), "Expected %s to NOT equal %s", field, expectedValue)
+	}
+
+	return nil
+}
+
+func isDeOutputLeeg(ctx context.Context, field string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output[field]
+	if !ok {
+		// Field doesn't exist, treat as empty
+		return nil
+	}
+
+	// Check if value is empty
+	switch arr := v.(type) {
+	case []any:
+		assert.Empty(godog.T(ctx), arr, "Expected %s to be empty, but had %d items", field, len(arr))
+	case []string:
+		assert.Empty(godog.T(ctx), arr, "Expected %s to be empty, but had %d items", field, len(arr))
+	case string:
+		assert.Empty(godog.T(ctx), arr, "Expected %s to be empty", field)
+	case nil:
+		// nil is considered empty
+	default:
+		assert.Fail(godog.T(ctx), "Expected %s to be empty, but was %v", field, v)
+	}
+
+	return nil
+}
+
+func isHetVeldGelijkAan(ctx context.Context, field, expectedValue string) error {
+	return heeftDeOutputWaarde(ctx, field, expectedValue)
+}
+
+func isHetVeldEenLegeLijst(ctx context.Context, field string) error {
+	return isDeOutputLeeg(ctx, field)
+}
+
+func bevatHetVeldDeWaarde(ctx context.Context, field, expectedValue string) error {
+	return bevatDeOutputWaarde(ctx, field, expectedValue)
+}
+
+// Entity setup step definitions
+
+func eenOrganisatieMetID(ctx context.Context, orgID string) (context.Context, error) {
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
+	params["ORGANISATIE_ID"] = orgID
+	return context.WithValue(ctx, paramsCtxKey{}, params), nil
+}
+
+func eenICTprojectMetID(ctx context.Context, projectID string) (context.Context, error) {
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
+	params["PROJECT_ID"] = projectID
+	return context.WithValue(ctx, paramsCtxKey{}, params), nil
+}
+
+func eenOrganisatieMetKVKnummer(ctx context.Context, kvkNummer string) (context.Context, error) {
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
+	params["KVK_NUMMER"] = kvkNummer
+	return context.WithValue(ctx, paramsCtxKey{}, params), nil
+}
+
+func eenWerkgeverMetLoonheffingennummer(ctx context.Context, loonheffingennummer string) (context.Context, error) {
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
+	params["LOONHEFFINGENNUMMER"] = loonheffingennummer
+	return context.WithValue(ctx, paramsCtxKey{}, params), nil
+}
+
+func eenWerknemerMetBrutoJaarloon(ctx context.Context, brutoJaarloon string) (context.Context, error) {
+	params, ok := ctx.Value(paramsCtxKey{}).(map[string]any)
+	if !ok {
+		params = map[string]any{}
+	}
+	// Store as float euros (to match Python implementation which handles unit conversion internally)
+	amount, err := strconv.ParseFloat(brutoJaarloon, 64)
+	if err != nil {
+		return ctx, fmt.Errorf("could not parse bruto jaarloon: %w", err)
+	}
+	params["BRUTO_LOON"] = amount
+	return context.WithValue(ctx, paramsCtxKey{}, params), nil
+}
+
+// Boolean assertion step definitions
+
+func isDeOrganisatieEenBestuursorgaan(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["is_bestuursorgaan"]
+	require.True(godog.T(ctx), ok, "Expected 'is_bestuursorgaan' to be present in output")
+
+	actual, ok := v.(bool)
+	require.True(godog.T(ctx), ok, "Expected 'is_bestuursorgaan' to be a bool")
+
+	assert.True(godog.T(ctx), actual, "Expected organisation to be a bestuursorgaan, but it was not")
+
+	return nil
+}
+
+func isDeOrganisatieGeenBestuursorgaan(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["is_bestuursorgaan"]
+	if !ok {
+		// Field doesn't exist, treat as not a bestuursorgaan
+		return nil
+	}
+
+	actual, ok := v.(bool)
+	require.True(godog.T(ctx), ok, "Expected 'is_bestuursorgaan' to be a bool")
+
+	assert.False(godog.T(ctx), actual, "Expected organisation to NOT be a bestuursorgaan, but it was")
+
+	return nil
+}
+
+func valtHetProjectOnderAdviesplicht(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["adviesplicht"]
+	require.True(godog.T(ctx), ok, "Expected 'adviesplicht' to be present in output")
+
+	actual, ok := v.(bool)
+	require.True(godog.T(ctx), ok, "Expected 'adviesplicht' to be a bool")
+
+	assert.True(godog.T(ctx), actual, "Expected project to be subject to adviesplicht, but it was not")
+
+	return nil
+}
+
+func valtHetProjectNietOnderAdviesplicht(ctx context.Context) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["adviesplicht"]
+	if !ok {
+		// Field doesn't exist, treat as no adviesplicht
+		return nil
+	}
+
+	actual, ok := v.(bool)
+	require.True(godog.T(ctx), ok, "Expected 'adviesplicht' to be a bool")
+
+	assert.False(godog.T(ctx), actual, "Expected project to NOT be subject to adviesplicht, but it was")
+
+	return nil
+}
+
+// Additional field assertions
+
+func isDeWerkgeversbijdrageEurocent(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	// Try multiple field names
+	fieldNames := []string{"werkgeversbijdrage_awf", "zvw_werkgeversbijdrage", "werkgeversbijdrage"}
+	var v any
+	var found bool
+	for _, name := range fieldNames {
+		if v, found = result.Output[name]; found {
+			break
+		}
+	}
+	require.True(godog.T(ctx), found, "Expected werkgeversbijdrage field to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected werkgeversbijdrage to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected werkgeversbijdrage to be %d eurocent, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func zijnDeProjectKostenEuro(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["project_kosten"]
+	require.True(godog.T(ctx), ok, "Expected 'project_kosten' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'project_kosten' to be an int")
+
+	expectedFloat, err := strconv.ParseFloat(expected, 64)
+	require.NoError(godog.T(ctx), err)
+
+	compareMonitaryValue(ctx, expectedFloat, actual)
+
+	return nil
+}
+
+func isDeRapportageverplichting(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["rapportageverplichting"]
+	require.True(godog.T(ctx), ok, "Expected 'rapportageverplichting' to be present in output")
+
+	expectedBool := expected == "true" || expected == "True" || expected == "TRUE"
+	actual, ok := v.(bool)
+	require.True(godog.T(ctx), ok, "Expected 'rapportageverplichting' to be a bool")
+
+	assert.Equal(godog.T(ctx), expectedBool, actual, "Expected rapportageverplichting to be %v, but was %v", expectedBool, actual)
+
+	return nil
+}
+
+func isHetAantalWerknemers(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["aantal_werknemers"]
+	require.True(godog.T(ctx), ok, "Expected 'aantal_werknemers' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'aantal_werknemers' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected aantal_werknemers to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeCo2UitstootTotaal(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["co2_uitstoot_totaal"]
+	require.True(godog.T(ctx), ok, "Expected 'co2_uitstoot_totaal' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'co2_uitstoot_totaal' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected co2_uitstoot_totaal to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeMaxDuurMaanden(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["max_duur_maanden"]
+	require.True(godog.T(ctx), ok, "Expected 'max_duur_maanden' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'max_duur_maanden' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected max_duur_maanden to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeCategorieZelfstandige(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["categorie_zelfstandige"]
+	require.True(godog.T(ctx), ok, "Expected 'categorie_zelfstandige' to be present in output")
+
+	actual, ok := v.(string)
+	require.True(godog.T(ctx), ok, "Expected 'categorie_zelfstandige' to be a string")
+
+	assert.Equal(godog.T(ctx), expected, actual, "Expected categorie_zelfstandige to be %s, but was %s", expected, actual)
+
+	return nil
+}
+
+func isHetBedrijfskapitaalMaxEuro(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["bedrijfskapitaal_max"]
+	require.True(godog.T(ctx), ok, "Expected 'bedrijfskapitaal_max' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'bedrijfskapitaal_max' to be an int")
+
+	expectedFloat, err := strconv.ParseFloat(expected, 64)
+	require.NoError(godog.T(ctx), err)
+
+	compareMonitaryValue(ctx, expectedFloat, actual)
+
+	return nil
+}
+
+func isHetBedrijfskapitaalType(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["bedrijfskapitaal_type"]
+	require.True(godog.T(ctx), ok, "Expected 'bedrijfskapitaal_type' to be present in output")
+
+	actual, ok := v.(string)
+	require.True(godog.T(ctx), ok, "Expected 'bedrijfskapitaal_type' to be a string")
+
+	assert.Equal(godog.T(ctx), expected, actual, "Expected bedrijfskapitaal_type to be %s, but was %s", expected, actual)
+
+	return nil
+}
+
+func isDeWoonWerkAutoBenzine(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["woon_werk_auto_benzine"]
+	require.True(godog.T(ctx), ok, "Expected 'woon_werk_auto_benzine' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'woon_werk_auto_benzine' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected woon_werk_auto_benzine to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeWoonWerkAutoDiesel(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["woon_werk_auto_diesel"]
+	require.True(godog.T(ctx), ok, "Expected 'woon_werk_auto_diesel' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'woon_werk_auto_diesel' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected woon_werk_auto_diesel to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeWoonWerkOpenbaarVervoer(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["woon_werk_openbaar_vervoer"]
+	require.True(godog.T(ctx), ok, "Expected 'woon_werk_openbaar_vervoer' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'woon_werk_openbaar_vervoer' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected woon_werk_openbaar_vervoer to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeZakelijkAutoBenzine(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["zakelijk_auto_benzine"]
+	require.True(godog.T(ctx), ok, "Expected 'zakelijk_auto_benzine' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'zakelijk_auto_benzine' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected zakelijk_auto_benzine to be %d, but was %d", expectedInt, actual)
+
+	return nil
+}
+
+func isDeZakelijkAutoDiesel(ctx context.Context, expected string) error {
+	result, ok := ctx.Value(resultCtxKey{}).(model.RuleResult)
+	require.True(godog.T(ctx), ok)
+
+	v, ok := result.Output["zakelijk_auto_diesel"]
+	require.True(godog.T(ctx), ok, "Expected 'zakelijk_auto_diesel' to be present in output")
+
+	actual, ok := v.(int)
+	require.True(godog.T(ctx), ok, "Expected 'zakelijk_auto_diesel' to be an int")
+
+	expectedInt, err := strconv.Atoi(expected)
+	require.NoError(godog.T(ctx), err)
+
+	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected zakelijk_auto_diesel to be %d, but was %d", expectedInt, actual)
 
 	return nil
 }

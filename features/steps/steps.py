@@ -128,20 +128,24 @@ def step_impl(context, law, service):
         context.test_data = {}
 
     # Process the table to get the input data
-    for row in context.table:
-        key = row.headings[0]
-        value = row[key]
-        # Special handling for JSON-like values
-        if value.startswith("[") or value.startswith("{"):
-            import json
+    # Support both vertical (key-value pairs) and horizontal (header row + data row) formats
+    headings = context.table.headings
 
-            try:
-                value = json.loads(value.replace("'", '"'))
-            except json.JSONDecodeError:
-                pass
-        context.test_data[key] = value
-        # Also add to parameters for direct parameter access
-        context.parameters[key] = value
+    for row in context.table:
+        # Check if this is a horizontal table (multiple columns with meaningful headers)
+        # A horizontal table has headers that are field names, not "key"/"value" style
+        if len(headings) > 1 and headings[0] != "key":
+            # Horizontal format: headers are field names, row contains values
+            for heading in headings:
+                value = parse_value(row[heading])
+                context.test_data[heading] = value
+                context.parameters[heading] = value
+        else:
+            # Vertical format: first column is key, second is value
+            key = row.headings[0]
+            value = parse_value(row[key])
+            context.test_data[key] = value
+            context.parameters[key] = value
 
     evaluate_law(context, service, law)
 
@@ -509,13 +513,45 @@ def step_impl(context):
     assertions.assertFalse(context.result.missing_required, "Er zouden geen gegevens moeten ontbreken.")
 
 
-@then('is het {field} "{amount}" eurocent')
-def step_impl(context, field, amount):
-    actual_amount = context.result.output[field]
+def _check_eurocent_field(context, field, amount):
+    """Helper to check eurocent field values with field name mapping."""
+    # Map common field names to their actual output names
+    field_mapping = {
+        "bijdrage-inkomen": "bijdrage_inkomen",
+        "werkgeversbijdrage": ["werkgeversbijdrage_awf", "zvw_werkgeversbijdrage"],
+    }
+
+    field_key = field.replace("-", "_").lower()
+    output_fields = field_mapping.get(field_key, field_key)
+
+    if isinstance(output_fields, list):
+        # Try each possible field name
+        actual_amount = None
+        for f in output_fields:
+            actual_amount = context.result.output.get(f)
+            if actual_amount is not None:
+                break
+    else:
+        actual_amount = context.result.output.get(output_fields)
+
     expected_amount = int(amount)
     assertions.assertEqual(
-        actual_amount, expected_amount, f"Expected {field} to be {amount} eurocent, but was {actual_amount} eurocent"
+        actual_amount,
+        expected_amount,
+        f"Expected {field} to be {expected_amount} eurocent, but was {actual_amount} eurocent",
     )
+
+
+@then('is het {field} "{amount}" eurocent')
+def step_impl(context, field, amount):
+    """Generic step to check any eurocent field value (het)."""
+    _check_eurocent_field(context, field, amount)
+
+
+@then('is de {field} "{amount}" eurocent')
+def step_impl(context, field, amount):
+    """Generic step to check any eurocent field value (de)."""
+    _check_eurocent_field(context, field, amount)
 
 
 @then("heeft de persoon recht op kinderopvangtoeslag")
@@ -931,3 +967,138 @@ def step_impl(context, field):
     """Check if an output array field is empty."""
     actual = context.result.output.get(field, [])
     assertions.assertEqual(len(actual), 0, f"Expected {field} to be empty, but it was {actual}")
+
+
+@then('is het veld "{field}" gelijk aan "{value}"')
+def step_impl(context, field, value):
+    """Alias for 'heeft de output' - Check if an output field has a specific value."""
+    actual = context.result.output.get(field)
+    expected = parse_value(value)
+    # Treat None as False for boolean comparisons
+    if expected is False and actual is None:
+        actual = False
+    assertions.assertEqual(actual, expected, f"Expected {field} to be {expected}, but was {actual}")
+
+
+@then('is het veld "{field}" een lege lijst')
+def step_impl(context, field):
+    """Alias for 'is de output leeg' - Check if an output array field is empty."""
+    actual = context.result.output.get(field, [])
+    assertions.assertEqual(len(actual), 0, f"Expected {field} to be empty, but it was {actual}")
+
+
+@then('bevat het veld "{field}" de waarde "{value}"')
+def step_impl(context, field, value):
+    """Alias for 'bevat de output' - Check if an output array field contains a specific value."""
+    actual = context.result.output.get(field, [])
+    expected = parse_value(value)
+    # Convert to strings for comparison (handles mixed int/string arrays)
+    actual_str = [str(x) for x in actual]
+    expected_str = str(expected)
+    assertions.assertIn(
+        expected_str, actual_str, f"Expected {field} to contain {expected_str}, but it was {actual_str}"
+    )
+
+
+# =============================================================================
+# Generic Entity Setup Steps
+# These steps set parameters for law execution using a naming convention:
+# - The parameter name is derived from the entity type in the step
+# - Entity types are converted to UPPER_CASE for the parameter name
+# =============================================================================
+
+
+@given('een {entity_type} met ID "{entity_id}"')
+def step_impl(context, entity_type, entity_id):
+    """Generic step to set up any entity context with an ID.
+
+    Converts entity_type to UPPER_CASE parameter name with _ID suffix.
+    Examples:
+      - "een ICT-project met ID" -> PROJECT_ID
+      - "een organisatie met ID" -> ORGANISATIE_ID
+    """
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+
+    # Map common entity types to their parameter names
+    param_mapping = {
+        "ICT-project": "PROJECT_ID",
+        "organisatie": "ORGANISATIE_ID",
+        "archiefstuk": "ARCHIEFSTUK_ID",
+        "project": "PROJECT_ID",
+    }
+    param_name = param_mapping.get(entity_type, f"{entity_type.upper().replace('-', '_')}_ID")
+    context.parameters[param_name] = entity_id
+
+
+@given('een werkgever met loonheffingennummer "{number}"')
+def step_impl(context, number):
+    """Set up employer context with the given loonheffingennummer."""
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+    context.parameters["LOONHEFFINGENNUMMER"] = number
+
+
+@given('een werknemer met bruto jaarloon "{amount}" euro')
+def step_impl(context, amount):
+    """Set up employee salary parameter."""
+    if not hasattr(context, "parameters"):
+        context.parameters = {}
+    # Store as euros (the law handles unit conversion internally)
+    context.parameters["BRUTO_LOON"] = float(amount)
+
+
+# =============================================================================
+# Generic Output Assertion Steps with Unit Conversions
+# =============================================================================
+
+
+@then('zijn de {field} "{amount}" euro')
+def step_impl(context, field, amount):
+    """Generic step to check field value in euros (converts from eurocent in output).
+
+    Examples:
+      - "zijn de project kosten" -> project_kosten
+    """
+    field_key = field.replace(" ", "_").lower()
+    actual_cents = context.result.output.get(field_key)
+    expected_euros = float(amount)
+    actual_euros = actual_cents / 100 if actual_cents else 0
+    assertions.assertEqual(
+        actual_euros, expected_euros, f"Expected {field} to be {expected_euros} euro, but was {actual_euros} euro"
+    )
+
+
+# =============================================================================
+# Generic Boolean Assertion Steps
+# =============================================================================
+
+
+@then("valt het project onder adviesplicht")
+def step_impl(context):
+    """Check if the project falls under advisory obligation."""
+    actual = context.result.output.get("adviesplicht")
+    assertions.assertTrue(actual, f"Expected project to fall under adviesplicht, but adviesplicht was {actual}")
+
+
+@then("valt het project niet onder adviesplicht")
+def step_impl(context):
+    """Check if the project does NOT fall under advisory obligation."""
+    actual = context.result.output.get("adviesplicht")
+    assertions.assertFalse(actual, f"Expected project to NOT fall under adviesplicht, but adviesplicht was {actual}")
+
+
+@then("is de organisatie een bestuursorgaan")
+def step_impl(context):
+    """Check if the organization is classified as a bestuursorgaan."""
+    actual = context.result.output.get("is_bestuursorgaan")
+    assertions.assertTrue(actual, f"Expected organization to be a bestuursorgaan, but is_bestuursorgaan was {actual}")
+
+
+@then("is de organisatie geen bestuursorgaan")
+def step_impl(context):
+    """Check if the organization is NOT classified as a bestuursorgaan."""
+    actual = context.result.output.get("is_bestuursorgaan")
+    assertions.assertFalse(
+        actual, f"Expected organization to NOT be a bestuursorgaan, but is_bestuursorgaan was {actual}"
+    )
