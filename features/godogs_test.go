@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"maps"
 	"os"
 	"path/filepath"
@@ -42,21 +43,19 @@ type claimManagerCtxKey struct{}
 type lawCtxKey struct{}
 type caseIDCtxKey struct{}
 
-// getFeatureFiles returns .feature files from the current directory only.
+// getFeatureFiles returns .feature files recursively from the current directory.
 func getFeatureFiles() []string {
-	entries, err := os.ReadDir(".")
-	if err != nil {
-		return []string{"."}
-	}
-
 	var features []string
-	for _, entry := range entries {
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".feature" {
-			features = append(features, entry.Name())
+	err := filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
-	}
-
-	if len(features) == 0 {
+		if !d.IsDir() && filepath.Ext(path) == ".feature" {
+			features = append(features, path)
+		}
+		return nil
+	})
+	if err != nil || len(features) == 0 {
 		return []string{"."}
 	}
 	return features

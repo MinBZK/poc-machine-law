@@ -59,18 +59,29 @@ Then is niet voldaan aan de voorwaarden
 
 ## Directory Structure
 
+Feature files are organized into subdirectories by law domain:
+
 ```
 features/
-├── *.feature          # Active, passing feature files
-├── steps/             # Python step definitions
-├── godogs_test.go     # Go step definitions
-└── README.md          # This file
+├── toeslagen/          # Tax benefits (huurtoeslag, zorgtoeslag, kindgebonden budget, kinderopvang)
+├── sociale_zekerheid/  # Social security (WW, AOW, ANW, pensioen, participatiewet, Bbz)
+├── burgerlijk_wetboek/ # Civil law (bewind, curatele, gezag, mentorschap, volmacht, etc.)
+├── bestuursrecht/      # Administrative law (AWB, adviescollege ICT, BIBOB)
+├── kernenergiewet/     # Nuclear energy law (installaties, splijtstoffen, stralingsbescherming)
+├── belastingen/        # Tax law (inkomstenbelasting, zorgverzekeringswet)
+├── overig/             # Miscellaneous (alcoholwet, archiefwet, kieswet, omgevingswet, etc.)
+├── integratie/         # Cross-cutting & integration tests
+├── web/                # UI/web tests (@ui tagged)
+├── steps/              # Python step definitions
+├── godogs_test.go      # Go step definitions
+└── README.md           # This file
 ```
 
 ## Adding New Features
 
 1. Create the YAML law definition in `laws/`
 2. Write a feature file following the naming convention above
-3. Use generic step patterns where possible
-4. Run both Python and Go tests to verify
-5. Only commit if both engines pass (or add `@skip-go` if Go steps are missing)
+3. Place it in the appropriate subdirectory (or `overig/` if no category fits)
+4. Use generic step patterns where possible
+5. Run both Python and Go tests to verify
+6. Only commit if both engines pass (or add `@skip-go` if Go steps are missing)

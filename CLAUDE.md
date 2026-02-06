@@ -2,7 +2,7 @@
 
 ## Commands
 - Run all tests: `uv run behave features --no-capture -v --define log_level=DEBUG`
-- Run specific feature: `uv run behave features/zorgtoeslag.feature`
+- Run specific feature: `uv run behave features/toeslagen/zorgtoeslagwet_TOESLAGEN-2025-01-01.feature`
 - Lint code: `ruff check` and `ruff format`
 - Run pre-commit hooks: `pre-commit run --all-files`
 - Validate schemas: `./script/validate.py`
