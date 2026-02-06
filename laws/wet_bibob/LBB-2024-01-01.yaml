@@ -303,6 +303,36 @@ properties:
         url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
         explanation: "Bij geen gevaar hoeft de Wet Bibob geen belemmering te zijn voor verlening"
 
+    - name: "financieringsrisico"
+      description: "Of er sprake is van financieringsrisico (witwassen)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 1 sub a: ernstig gevaar voor misbruik van de beschikking (witwassen, criminele herkomst gelden)"
+
+    - name: "relatie_strafbare_feiten"
+      description: "Of er een relatie is vastgesteld tot strafbare feiten"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+        bwb_id: "BWBR0013798"
+        article: "3"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+        explanation: "Artikel 3 lid 1 sub b: ernstig gevaar als betrokkene in relatie staat tot strafbare feiten"
+
   definitions:
     MATE_GEEN_GEVAAR: "geen_gevaar"
     MATE_MINDERE_MATE: "mindere_mate"
@@ -394,3 +424,23 @@ actions:
       article: "3"
       url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
       explanation: "Verlening wordt geadviseerd als er geen advies is of als er geen gevaar is gebleken"
+
+  - output: "financieringsrisico"
+    value: "$FINANCIERINGSRISICO"
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "3"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+      explanation: "Geeft door of er sprake is van financieringsrisico"
+
+  - output: "relatie_strafbare_feiten"
+    value: "$RELATIE_TOT_STRAFBARE_FEITEN"
+    legal_basis:
+      law: "Wet bevordering integriteitsbeoordelingen door het openbaar bestuur"
+      bwb_id: "BWBR0013798"
+      article: "3"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0013798/2024-01-01#Paragraaf2_Artikel3"
+      explanation: "Geeft door of er een relatie is tot strafbare feiten"

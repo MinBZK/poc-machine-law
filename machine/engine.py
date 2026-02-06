@@ -6,6 +6,7 @@ from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 
 from .context import PathNode, RuleContext, TypeSpec, logger
 
@@ -599,6 +600,43 @@ class RulesEngine:
                 logger.warning(f"Unknown date unit '{unit}', defaulting to days")
                 result = delta.days
 
+            logger.debug(f"Compute {op}({values}, {unit}) = {result}")
+            return result
+
+        if op == "ADD_DATE":
+            # ADD_DATE adds a duration to a date
+            if len(values) != 2:
+                context.missing_required = True
+                logger.warning(f"ADD_DATE requires exactly 2 values, got {len(values)}")
+                return None
+
+            base_date, amount = values
+
+            # Validate and convert the base date
+            base_date_converted = validate_and_convert_date(base_date, "base_date")
+            if base_date_converted is None:
+                return None
+
+            # Amount must be a number
+            try:
+                amount = int(amount)
+            except (ValueError, TypeError):
+                context.missing_required = True
+                logger.warning(f"ADD_DATE amount must be a number, got {amount}")
+                return None
+
+            # Calculate the new date based on unit
+            if unit == "days":
+                result_date = base_date_converted + relativedelta(days=amount)
+            elif unit == "years":
+                result_date = base_date_converted + relativedelta(years=amount)
+            elif unit == "months":
+                result_date = base_date_converted + relativedelta(months=amount)
+            else:
+                logger.warning(f"Unknown date unit '{unit}', defaulting to days")
+                result_date = base_date_converted + relativedelta(days=amount)
+
+            result = result_date.strftime("%Y-%m-%d")
             logger.debug(f"Compute {op}({values}, {unit}) = {result}")
             return result
 

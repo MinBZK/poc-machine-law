@@ -254,17 +254,20 @@ func (s *Services) Evaluate(
 		return nil, fmt.Errorf("get rule spec: %w", err)
 	}
 
-	bsn, ok := parameters["BSN"].(string)
-	if !ok {
-		return nil, fmt.Errorf("bsn not found in parameters")
-	}
+	// BSN is optional - some laws (e.g., employer contributions) don't require it
+	bsn, _ := parameters["BSN"].(string)
 
 	if s.ldvEnabled {
-		ctx, span = tracer.Action(ctx, s.tracer,
-			fmt.Sprintf("uri://%s.example/activities/evaluate-do", strings.ToLower(s.GetOrganizationName())),
-			tracer.SetAttributeBSN(bsn),
+		opts := []trace.SpanStartOption{
 			tracer.SetAttributeActivityID(s.rvaIDs["evaluate-do"].String()),
 			tracer.SetAlgorithmID(spec.UUID.String()),
+		}
+		if bsn != "" {
+			opts = append(opts, tracer.SetAttributeBSN(bsn))
+		}
+		ctx, span = tracer.Action(ctx, s.tracer,
+			fmt.Sprintf("uri://%s.example/activities/evaluate-do", strings.ToLower(s.GetOrganizationName())),
+			opts...,
 		)
 
 		defer span.End()

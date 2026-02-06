@@ -247,10 +247,10 @@ actions:
             - subject: "$BEWAARTERMIJN_JAREN"
               operation: NOT_NULL
         then:
-          operation: CONCAT
+          operation: ADD_DATE
+          unit: "years"
           values:
             - "$AANMAAKDATUM"
-            - "|"
             - "$BEWAARTERMIJN_JAREN"
         legal_basis:
           law: "Archiefwet 1995"
