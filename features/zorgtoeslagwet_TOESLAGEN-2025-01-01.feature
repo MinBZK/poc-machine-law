@@ -62,7 +62,7 @@ Feature: Berekening Zorgtoeslag 2025
       | bsn       | spaargeld | beleggingen | onroerend_goed | schulden |
       | 999993653 | 10000     | 0           | 0              | 0        |
     When de zorgtoeslagwet wordt uitgevoerd door TOESLAGEN
-    Then is de output "is_verzekerde_zorgtoeslag" waar
+    Then heeft de persoon recht op zorgtoeslag
     And is het toeslagbedrag "2108.21" euro
 
   Scenario: Persoon met studiefinanciering heeft recht op zorgtoeslag
@@ -85,5 +85,5 @@ Feature: Berekening Zorgtoeslag 2025
       | bsn       | aantal_studerend_gezin |
       | 999993653 | 0                      |
     When de zorgtoeslagwet wordt uitgevoerd door TOESLAGEN
-    Then is de output "is_verzekerde_zorgtoeslag" waar
+    Then heeft de persoon recht op zorgtoeslag
     And is het toeslagbedrag "2109.16" euro

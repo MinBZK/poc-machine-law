@@ -486,6 +486,71 @@ def step_impl(context, amount):
     compare_euro_amount(context.result.output["subsidiebedrag"], amount)
 
 
+# =============================================================================
+# Then Steps - Bbz 2004
+# =============================================================================
+
+
+@then('is de categorie_zelfstandige "{categorie}"')
+def step_impl(context, categorie):
+    _check_output_field(context, "categorie_zelfstandige", categorie)
+
+
+@then('is de max_duur_maanden "{maanden}"')
+def step_impl(context, maanden):
+    _check_output_field(context, "max_duur_maanden", maanden)
+
+
+@then('is het bedrijfskapitaal_type "{type}"')
+def step_impl(context, type):
+    _check_output_field(context, "bedrijfskapitaal_type", type)
+
+
+# =============================================================================
+# Then Steps - Zorgtoeslag
+# =============================================================================
+
+
+@then("heeft de persoon recht op zorgtoeslag")
+def step_impl(context):
+    _check_output_field(context, "is_verzekerde_zorgtoeslag", "true")
+
+
+# =============================================================================
+# Then Steps - Kinderopvangtoeslag
+# =============================================================================
+
+
+@then("heeft de persoon recht op kinderopvangtoeslag")
+def step_impl(context):
+    _check_output_field(context, "is_gerechtigd", "true")
+
+
+@then("heeft de persoon geen recht op kinderopvangtoeslag")
+def step_impl(context):
+    _check_output_field(context, "is_gerechtigd", "false")
+
+
+# =============================================================================
+# Then Steps - WW (Werkloosheidswet)
+# =============================================================================
+
+
+@then("heeft de persoon recht op WW")
+def step_impl(context):
+    _check_output_field(context, "heeft_recht_op_ww", "true")
+
+
+@then("heeft de persoon geen recht op WW")
+def step_impl(context):
+    _check_output_field(context, "heeft_recht_op_ww", "false")
+
+
+@then('is de WW duur "{maanden}" maanden')
+def step_impl(context, maanden):
+    _check_output_field(context, "ww_duur_maanden", maanden)
+
+
 @then('is de WW uitkering per maand ongeveer "{amount}"')
 def step_impl(context, amount):
     expected = parse_dutch_currency(amount)
@@ -658,3 +723,180 @@ def step_impl(context, competent_court):
     assertions.assertEqual(
         competent_court, case.appeal_status.get("competent_court"), "Expected another competent court"
     )
+
+
+# =============================================================================
+# Then Steps - LAA (Landelijke Aanpak Adreskwaliteit)
+# =============================================================================
+
+
+@then("genereert wet_brp/laa een signaal")
+def step_impl(context):
+    _check_output_field(context, "genereer_signaal", "true")
+
+
+@then("genereert wet_brp/laa geen signaal")
+def step_impl(context):
+    _check_output_field(context, "genereer_signaal", "false")
+
+
+@then('is het signaal_type "{signaal_type}"')
+def step_impl(context, signaal_type):
+    _check_output_field(context, "signaal_type", signaal_type)
+
+
+@then('is de reactietermijn_weken "{weken}"')
+def step_impl(context, weken):
+    _check_output_field(context, "reactietermijn_weken", weken)
+
+
+@then('is de onderzoekstermijn_maanden "{maanden}"')
+def step_impl(context, maanden):
+    _check_output_field(context, "onderzoekstermijn_maanden", maanden)
+
+
+# =============================================================================
+# Then Steps - Archiefwet
+# =============================================================================
+
+
+@then("moet het archiefstuk overgebracht worden")
+def step_impl(context):
+    _check_output_field(context, "moet_overgebracht_worden", "true")
+
+
+@then("hoeft het archiefstuk niet overgebracht te worden")
+def step_impl(context):
+    _check_output_field(context, "moet_overgebracht_worden", "false")
+
+
+@then('is de uiterste overbrengdatum "{date}"')
+def step_impl(context, date):
+    _check_output_field(context, "uiterste_overbrengdatum", date)
+
+
+@then("is het archiefstuk openbaar")
+def step_impl(context):
+    _check_output_field(context, "is_openbaar", "true")
+
+
+@then("is het archiefstuk niet openbaar")
+def step_impl(context):
+    _check_output_field(context, "is_openbaar", "false")
+
+
+@then('is de beperking reden "{reason}"')
+def step_impl(context, reason):
+    _check_output_field(context, "beperking_reden", reason)
+
+
+@then('is het archiefstuk openbaar vanaf "{date}"')
+def step_impl(context, date):
+    actual = context.result.output.get("openbaar_vanaf") or context.result.output.get("openbaar_vanaf_datum")
+    assertions.assertEqual(actual, date, f"Expected openbaar_vanaf to be {date}, but was {actual}")
+
+
+@then("mag het archiefstuk vernietigd worden")
+def step_impl(context):
+    _check_output_field(context, "mag_vernietigd_worden", "true")
+
+
+@then("mag het archiefstuk niet vernietigd worden")
+def step_impl(context):
+    _check_output_field(context, "mag_vernietigd_worden", "false")
+
+
+@then('mag het archiefstuk vernietigd worden vanaf "{date}"')
+def step_impl(context, date):
+    actual = context.result.output.get("vernietigingsdatum") or context.result.output.get("vernietig_vanaf_datum")
+    assertions.assertEqual(actual, date, f"Expected vernietigingsdatum to be {date}, but was {actual}")
+
+
+@then('is de reden van niet vernietigen "{reason}"')
+def step_impl(context, reason):
+    _check_output_field(context, "reden_niet_vernietigen", reason)
+
+
+# =============================================================================
+# Then Steps - Bibob/LBB
+# =============================================================================
+
+
+@then("is er geen advies uitgebracht")
+def step_impl(context):
+    _check_output_field(context, "advies_uitgebracht", "false")
+
+
+@then("is er een advies uitgebracht")
+def step_impl(context):
+    _check_output_field(context, "advies_uitgebracht", "true")
+
+
+@then("wordt verlening geadviseerd")
+def step_impl(context):
+    _check_output_field(context, "verlening_geadviseerd", "true")
+
+
+@then("wordt verlening niet geadviseerd")
+def step_impl(context):
+    _check_output_field(context, "verlening_geadviseerd", "false")
+
+
+@then("is weigering mogelijk")
+def step_impl(context):
+    _check_output_field(context, "weigering_mogelijk", "true")
+
+
+@then("is weigering niet mogelijk")
+def step_impl(context):
+    _check_output_field(context, "weigering_mogelijk", "false")
+
+
+@then("zijn voorschriften mogelijk")
+def step_impl(context):
+    _check_output_field(context, "voorschriften_mogelijk", "true")
+
+
+@then("zijn voorschriften niet mogelijk")
+def step_impl(context):
+    _check_output_field(context, "voorschriften_mogelijk", "false")
+
+
+@then('is de mate van gevaar "{mate}"')
+def step_impl(context, mate):
+    _check_output_field(context, "mate_van_gevaar", mate)
+
+
+@then("is er sprake van financieringsrisico")
+def step_impl(context):
+    _check_output_field(context, "financieringsrisico", "true")
+
+
+@then("is er een relatie tot strafbare feiten")
+def step_impl(context):
+    _check_output_field(context, "relatie_strafbare_feiten", "true")
+
+
+# =============================================================================
+# Then Steps - Adviesplicht / Bestuursorgaan
+# =============================================================================
+
+
+@then("valt het project onder adviesplicht")
+def step_impl(context):
+    _check_output_field(context, "adviesplicht", "true")
+
+
+@then("valt het project niet onder adviesplicht")
+def step_impl(context):
+    _check_output_field(context, "adviesplicht", "false")
+
+
+@then("is de organisatie een bestuursorgaan")
+def step_impl(context):
+    _check_output_field(context, "is_bestuursorgaan", "true")
+
+
+@then("is de organisatie geen bestuursorgaan")
+def step_impl(context):
+    _check_output_field(context, "is_bestuursorgaan", "false")

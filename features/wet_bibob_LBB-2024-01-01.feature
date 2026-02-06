@@ -20,10 +20,10 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" onwaar
-    And is de output "verlening_geadviseerd" waar
-    And is de output "weigering_mogelijk" onwaar
-    And is de output "voorschriften_mogelijk" onwaar
+    Then is er geen advies uitgebracht
+    And wordt verlening geadviseerd
+    And is weigering niet mogelijk
+    And zijn voorschriften niet mogelijk
 
   Scenario: Bibob-advies uitgebracht - geen gevaar gebleken
     # Het LBB constateert geen gevaar; de Wet Bibob vormt geen belemmering
@@ -34,11 +34,11 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "geen_gevaar"
-    And is de output "verlening_geadviseerd" waar
-    And is de output "weigering_mogelijk" onwaar
-    And is de output "voorschriften_mogelijk" onwaar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "geen_gevaar"
+    And wordt verlening geadviseerd
+    And is weigering niet mogelijk
+    And zijn voorschriften niet mogelijk
 
   Scenario: Bibob-advies uitgebracht - mindere mate van gevaar
     # Het LBB constateert een mindere mate van gevaar; voorschriften zijn mogelijk
@@ -50,11 +50,11 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "mindere_mate"
-    And is de output "verlening_geadviseerd" onwaar
-    And is de output "weigering_mogelijk" onwaar
-    And is de output "voorschriften_mogelijk" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "mindere_mate"
+    And wordt verlening niet geadviseerd
+    And is weigering niet mogelijk
+    And zijn voorschriften mogelijk
 
   Scenario: Bibob-advies uitgebracht - ernstig gevaar (weigering mogelijk)
     # Het LBB constateert ernstig gevaar; weigering of intrekking is mogelijk
@@ -66,11 +66,11 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "ernstig_gevaar"
-    And is de output "verlening_geadviseerd" onwaar
-    And is de output "weigering_mogelijk" waar
-    And is de output "voorschriften_mogelijk" onwaar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "ernstig_gevaar"
+    And wordt verlening niet geadviseerd
+    And is weigering mogelijk
+    And zijn voorschriften niet mogelijk
 
   Scenario: Bibob-advies uitgebracht - ernstig gevaar maar weigering niet proportioneel
     # Het LBB constateert ernstig gevaar, maar weigering is niet proportioneel
@@ -82,10 +82,10 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "ernstig_gevaar"
-    And is de output "weigering_mogelijk" waar
-    And is de output "voorschriften_mogelijk" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "ernstig_gevaar"
+    And is weigering mogelijk
+    And zijn voorschriften mogelijk
 
   Scenario: Bibob-advies voor natuurlijk persoon (exploitant)
     # Bibob-onderzoek naar de exploitant als natuurlijk persoon
@@ -97,9 +97,9 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "geen_gevaar"
-    And is de output "verlening_geadviseerd" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "geen_gevaar"
+    And wordt verlening geadviseerd
 
   Scenario: Bibob-advies met financieringsrisico (witwassen)
     # Artikel 3 lid 1 sub a: ernstig gevaar dat beschikking wordt misbruikt
@@ -111,10 +111,10 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "ernstig_gevaar"
-    And is de output "weigering_mogelijk" waar
-    And is de output "financieringsrisico" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "ernstig_gevaar"
+    And is weigering mogelijk
+    And is er sprake van financieringsrisico
 
   Scenario: Bibob-advies met relatie tot strafbare feiten
     # Artikel 3 lid 1 sub b: ernstig gevaar als betrokkene in relatie staat
@@ -127,10 +127,10 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "ernstig_gevaar"
-    And is de output "weigering_mogelijk" waar
-    And is de output "relatie_strafbare_feiten" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "ernstig_gevaar"
+    And is weigering mogelijk
+    And is er een relatie tot strafbare feiten
 
   Scenario: Bibob-advies voor horecavergunning
     # Bibob-toets specifiek voor horecavergunning (exploitatievergunning)
@@ -142,9 +142,9 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE |
       | vergunning       |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "geen_gevaar"
-    And is de output "verlening_geadviseerd" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "geen_gevaar"
+    And wordt verlening geadviseerd
 
   Scenario: Bibob-advies voor vastgoedtransactie
     # Bibob-toets voor vastgoedtransactie (verkoop gemeentelijk vastgoed)
@@ -156,6 +156,6 @@ Feature: Bibob-advies Landelijk Bureau Bibob
     When de wet_bibob wordt uitgevoerd door LBB met
       | BESCHIKKING_TYPE      |
       | vastgoedtransactie    |
-    Then is de output "advies_uitgebracht" waar
-    And heeft de output "mate_van_gevaar" waarde "mindere_mate"
-    And is de output "voorschriften_mogelijk" waar
+    Then is er een advies uitgebracht
+    And is de mate van gevaar "mindere_mate"
+    And zijn voorschriften mogelijk

@@ -35,10 +35,10 @@ Feature: Bepalen recht op bijstand voor zelfstandigen (Bbz 2004)
       | 999993653 | GEVESTIGD         | true                  | 5                     | 40            | null              |
     When de besluit_bijstandverlening_zelfstandigen wordt uitgevoerd door SZW
     Then is voldaan aan de voorwaarden
-    And heeft de output "categorie_zelfstandige" waarde "GEVESTIGD"
-    And heeft de output "max_duur_maanden" waarde "12"
+    And is de categorie_zelfstandige "GEVESTIGD"
+    And is de max_duur_maanden "12"
     And is het bedrijfskapitaal_max "253420.00" euro
-    And heeft de output "bedrijfskapitaal_type" waarde "LENING_RENTE"
+    And is het bedrijfskapitaal_type "LENING_RENTE"
 
   Scenario: Gevestigde zelfstandige met te hoog vermogen krijgt geen bijstand
     Given de volgende RvIG personen gegevens:
@@ -115,10 +115,10 @@ Feature: Bepalen recht op bijstand voor zelfstandigen (Bbz 2004)
       | 999993653 | BEGINNEND         | true                  | 0                     | 30            | null              |
     When de besluit_bijstandverlening_zelfstandigen wordt uitgevoerd door SZW
     Then is voldaan aan de voorwaarden
-    And heeft de output "categorie_zelfstandige" waarde "BEGINNEND"
-    And heeft de output "max_duur_maanden" waarde "36"
+    And is de categorie_zelfstandige "BEGINNEND"
+    And is de max_duur_maanden "36"
     And is het bedrijfskapitaal_max "46656.00" euro
-    And heeft de output "bedrijfskapitaal_type" waarde "LENING_RENTE"
+    And is het bedrijfskapitaal_type "LENING_RENTE"
 
   Scenario: Beginnende zelfstandige zonder WW-uitkering krijgt geen bijstand
     Given de volgende RvIG personen gegevens:
@@ -176,10 +176,10 @@ Feature: Bepalen recht op bijstand voor zelfstandigen (Bbz 2004)
       | 999993653 | OUDER             | false                 | 25                    | 30            | null              |
     When de besluit_bijstandverlening_zelfstandigen wordt uitgevoerd door SZW
     Then is voldaan aan de voorwaarden
-    And heeft de output "categorie_zelfstandige" waarde "OUDER"
-    And heeft de output "max_duur_maanden" waarde "0"
+    And is de categorie_zelfstandige "OUDER"
+    And is de max_duur_maanden "0"
     And is het bedrijfskapitaal_max "12671.00" euro
-    And heeft de output "bedrijfskapitaal_type" waarde "OM_NIET"
+    And is het bedrijfskapitaal_type "OM_NIET"
 
   Scenario: Oudere zelfstandige met te hoog vermogen krijgt geen bijstand
     Given de volgende RvIG personen gegevens:
@@ -260,10 +260,10 @@ Feature: Bepalen recht op bijstand voor zelfstandigen (Bbz 2004)
       | 999993653 | BEEINDIGEND       | false                 | 7                     | 25            | 2025-12-01        |
     When de besluit_bijstandverlening_zelfstandigen wordt uitgevoerd door SZW
     Then is voldaan aan de voorwaarden
-    And heeft de output "categorie_zelfstandige" waarde "BEEINDIGEND"
-    And heeft de output "max_duur_maanden" waarde "12"
+    And is de categorie_zelfstandige "BEEINDIGEND"
+    And is de max_duur_maanden "12"
     And is het bedrijfskapitaal_max "0.00" euro
-    And heeft de output "bedrijfskapitaal_type" waarde "GEEN"
+    And is het bedrijfskapitaal_type "GEEN"
 
   # ============================================================================
   # URENCRITERIUM (Artikel 1 lid 1 onder b)

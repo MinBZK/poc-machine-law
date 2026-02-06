@@ -47,8 +47,8 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000001 | 4000000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then is de output "heeft_recht_op_ww" waar
-    And heeft de output "ww_duur_maanden" waarde "8"
+    Then heeft de persoon recht op WW
+    And is de WW duur "8" maanden
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
     Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
@@ -94,7 +94,7 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000002 | 8000000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then is de output "heeft_recht_op_ww" waar
+    Then heeft de persoon recht op WW
     And is de WW uitkering maximaal omdat het dagloon gemaximeerd is
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
     Then is voldaan aan de voorwaarden
@@ -141,8 +141,8 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000003 | 3500000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then is de output "heeft_recht_op_ww" waar
-    And heeft de output "ww_duur_maanden" waarde "7"
+    Then heeft de persoon recht op WW
+    And is de WW duur "7" maanden
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
     Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
@@ -188,8 +188,8 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000004 | 2500000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then is de output "heeft_recht_op_ww" waar
-    And heeft de output "ww_duur_maanden" waarde "5"
+    Then heeft de persoon recht op WW
+    And is de WW duur "5" maanden
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
     Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
@@ -236,7 +236,7 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000005 | 1200000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then is de output "heeft_recht_op_ww" onwaar
+    Then heeft de persoon geen recht op WW
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
     Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
