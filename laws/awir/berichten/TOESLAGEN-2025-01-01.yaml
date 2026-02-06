@@ -1,0 +1,150 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: f8c3e7a1-4b2d-4c5e-9f8a-1b3c5d7e9f0a
+name: AWIR Berichten - Bekendmaking beschikkingen
+law: awir/berichten
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "BEKENDMAKING"
+valid_from: 2025-01-01
+service: "TOESLAGEN"
+legal_basis:
+  law: "Algemene wet inkomensafhankelijke regelingen"
+  bwb_id: "BWBR0018472"
+  article: "13"
+  url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Hoofdstuk2_Artikel13"
+  juriconnect: "jci1.3:c:BWBR0018472&artikel=13&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 13 AWIR regelt het elektronisch berichtenverkeer met belanghebbenden"
+description: >
+  Regelt het aanmaken en verzenden van berichten aan burgers bij beschikkingen
+  conform AWB Art. 3:40-3:45 (bekendmaking) en AWIR Art. 13 (elektronisch verkeer).
+
+references:
+  - law: "Algemene wet bestuursrecht"
+    article: "3:40"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.6_Artikel3:40"
+  - law: "Algemene wet bestuursrecht"
+    article: "3:41"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.6_Artikel3:41"
+  - law: "Algemene wet bestuursrecht"
+    article: "3:45"
+    url: "https://wetten.overheid.nl/BWBR0005537/2024-01-01#Hoofdstuk3_Afdeling3.7_Artikel3:45"
+  - law: "Algemene wet inkomensafhankelijke regelingen"
+    article: "16"
+    url: "https://wetten.overheid.nl/BWBR0018472/2024-01-01#Hoofdstuk2_Artikel16"
+
+properties:
+  applies:
+    # Trigger bij voorschotbeschikking (AWIR Art. 16)
+    - name: "ZAAK"
+      aggregate: "Case"
+      events:
+        - type: "VoorschotBeschikkingVastgesteld"
+      update:
+        - method: "create_message"
+          target: "message_manager"
+          mapping:
+            bsn: "$ZAAK.bsn"
+            case_id: "$ZAAK.id"
+            law: "$ZAAK.law"
+            message_type: "VOORSCHOT_BESCHIKKING"
+            onderwerp: "$ZAAK.voorschot_onderwerp"
+            inhoud: "$VOORSCHOT_TEMPLATE"
+            rechtsmiddel_info: "$RECHTSMIDDEL_INFO"
+            datum: "$ZAAK.voorschot_beschikking_datum"
+
+    # Trigger bij afwijzing (AWIR Art. 16 lid 4)
+    - name: "ZAAK"
+      aggregate: "Case"
+      events:
+        - type: "Afgewezen"
+      update:
+        - method: "create_message"
+          target: "message_manager"
+          mapping:
+            bsn: "$ZAAK.bsn"
+            case_id: "$ZAAK.id"
+            law: "$ZAAK.law"
+            message_type: "AFWIJZING"
+            onderwerp: "$ZAAK.afwijzing_onderwerp"
+            inhoud: "$AFWIJZING_TEMPLATE"
+            rechtsmiddel_info: "$RECHTSMIDDEL_INFO"
+            datum: "$ZAAK.afwijzing_datum"
+
+    # Trigger bij definitieve beschikking (AWIR Art. 19)
+    - name: "ZAAK"
+      aggregate: "Case"
+      events:
+        - type: "DefinitieveBeschikkingVastgesteld"
+      update:
+        - method: "create_message"
+          target: "message_manager"
+          mapping:
+            bsn: "$ZAAK.bsn"
+            case_id: "$ZAAK.id"
+            law: "$ZAAK.law"
+            message_type: "DEFINITIEVE_BESCHIKKING"
+            onderwerp: "$ZAAK.definitief_onderwerp"
+            inhoud: "$DEFINITIEF_TEMPLATE"
+            rechtsmiddel_info: "$RECHTSMIDDEL_INFO"
+            datum: "$ZAAK.definitieve_beschikking_datum"
+
+  definitions:
+    RECHTSMIDDEL_INFO:
+      description: "AWB Art. 3:45 - Rechtsmiddelenclausule"
+      value: |
+        Bent u het niet eens met deze beslissing? Dan kunt u binnen 6 weken
+        bezwaar maken. Ga naar mijn.toeslagen.nl of bel de BelastingTelefoon.
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        article: "3:45"
+
+    VOORSCHOT_TEMPLATE:
+      description: "Template voor voorschotbeschikking bericht"
+      value: |
+        <p>Geachte heer/mevrouw,</p>
+        <p>Wij hebben uw aanvraag beoordeeld.</p>
+        <h3>Beslissing</h3>
+        <p>U heeft recht op toeslag. Het voorschot is vastgesteld.</p>
+        <p>Het voorschot wordt maandelijks uitbetaald, uiterlijk op de 20e van elke maand.</p>
+        <h3>Wat als uw situatie wijzigt?</h3>
+        <p>Wijzigt uw inkomen of leefsituatie? Geef dit dan door via mijn.toeslagen.nl.</p>
+        <p>Met vriendelijke groet,</p>
+        <p>Belastingdienst/Toeslagen</p>
+
+    AFWIJZING_TEMPLATE:
+      description: "Template voor afwijzingsbeschikking bericht"
+      value: |
+        <p>Geachte heer/mevrouw,</p>
+        <p>Wij hebben uw aanvraag beoordeeld.</p>
+        <h3>Beslissing</h3>
+        <p>U heeft geen recht op toeslag. Op basis van de gegevens die wij hebben, komt u niet in aanmerking.</p>
+        <p>Met vriendelijke groet,</p>
+        <p>Belastingdienst/Toeslagen</p>
+
+    DEFINITIEF_TEMPLATE:
+      description: "Template voor definitieve beschikking bericht"
+      value: |
+        <p>Geachte heer/mevrouw,</p>
+        <p>Wij hebben uw toeslag definitief vastgesteld.</p>
+        <h3>Beslissing</h3>
+        <p>Uw definitieve toeslag is berekend op basis van uw werkelijke inkomen.</p>
+        <p>Met vriendelijke groet,</p>
+        <p>Belastingdienst/Toeslagen</p>
+
+  output:
+    - name: "bericht_aangemaakt"
+      description: "Of er een bericht is aangemaakt"
+      type: "boolean"
+      legal_basis:
+        law: "Algemene wet bestuursrecht"
+        article: "3:40"
+        explanation: "Artikel 3:40 AWB bepaalt dat een besluit pas in werking treedt na bekendmaking"
+
+actions:
+  - output: "bericht_aangemaakt"
+    operation: ASSIGN
+    value: true
+    legal_basis:
+      law: "Algemene wet bestuursrecht"
+      article: "3:41"
+      explanation: "Artikel 3:41 AWB bepaalt dat bekendmaking geschiedt door toezending of uitreiking"

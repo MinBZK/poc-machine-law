@@ -77,11 +77,17 @@ async def _run_behave_async(run_id: str, feature_path: str, line_number: int | N
             cmd = ["uv", "run", "behave", str(feature_path), "--no-capture", "-v"]
 
         print(f"DEBUG: About to create subprocess with cmd: {cmd}")
-        # Create subprocess
+        # Create subprocess with UTF-8 encoding environment
+        import os
+
+        env = os.environ.copy()
+        env["PYTHONUTF8"] = "1"
+        env["PYTHONIOENCODING"] = "utf-8"
         process = await asyncio.create_subprocess_exec(
             *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
+            env=env,
         )
         print(f"DEBUG: Subprocess created, PID: {process.pid}")
 
@@ -95,7 +101,7 @@ async def _run_behave_async(run_id: str, feature_path: str, line_number: int | N
                 line = await process.stdout.readline()
                 if not line:
                     break
-                output_lines.append(line.decode("utf-8"))
+                output_lines.append(line.decode("utf-8", errors="replace"))
                 raw_output = "".join(output_lines)
                 _test_runs[run_id]["raw_output"] = raw_output
                 _test_runs[run_id]["output"] = filter_behave_output(raw_output)
@@ -382,7 +388,12 @@ async def get_run_status(run_id: str) -> JSONResponse:
         print(f"DEBUG: run_id {run_id} NOT FOUND in _test_runs!")
         raise HTTPException(status_code=404, detail="Run ID not found")
 
-    print(f"DEBUG: Returning status for run_id {run_id}: {_test_runs[run_id]}")
+    status_info = {
+        k: (v[:100] + "..." if isinstance(v, str) and len(v) > 100 else v) for k, v in _test_runs[run_id].items()
+    }
+    print(
+        f"DEBUG: Returning status for run_id {run_id}: {status_info}".encode("ascii", errors="replace").decode("ascii")
+    )
     return JSONResponse(content=_test_runs[run_id])
 
 

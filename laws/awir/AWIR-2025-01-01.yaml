@@ -1,0 +1,654 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+name: "AWIR Toeslagproces"
+law: "awir/workflow"
+law_type: "FORMELE_WET"
+legal_character: "PROCES"
+decision_type: "WORKFLOW"
+discoverable: "NONE"
+valid_from: 2025-01-01
+service: "AWIR"
+description: |
+  Generieke workflow voor inkomensafhankelijke toeslagen conform de Algemene wet
+  inkomensafhankelijke regelingen (AWIR). Deze workflow beschrijft het proces van
+  aanvraag tot definitieve toekenning en kan worden toegepast op elke wet die onder
+  de AWIR valt. De specifieke berekeningswet wordt als parameter meegegeven.
+
+legal_basis:
+  law: "Algemene wet inkomensafhankelijke regelingen"
+  bwb_id: "BWBR0018472"
+  article: "1"
+  url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01"
+
+properties:
+  parameters:
+    - name: "TOESLAG_ID"
+      description: "Unieke identifier van de toeslagaanvraag (zaaknummer)"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "15"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel15"
+        explanation: "De aanvraag wordt geïdentificeerd door een uniek zaaknummer"
+
+  # Gegevens worden opgehaald uit de aanvraag op basis van TOESLAG_ID
+  sources:
+    - name: "BSN"
+      description: "BSN van de aanvrager, opgehaald uit de aanvraag"
+      type: "string"
+      source_reference:
+        table: "toeslagen"
+        field: "bsn"
+        select_on:
+          - name: "toeslag_id"
+            value: "$TOESLAG_ID"
+
+    - name: "TOESLAG_TYPE"
+      description: "Het type toeslag waarvoor aanspraak wordt gedaan"
+      type: "string"
+      source_reference:
+        table: "toeslagen"
+        field: "toeslag_type"
+        select_on:
+          - name: "toeslag_id"
+            value: "$TOESLAG_ID"
+      allowed_values:
+        - value: "ZORGTOESLAG"
+          description: "Zorgtoeslag (Wet op de zorgtoeslag)"
+          regeling: "zorgtoeslagwet"
+        - value: "HUURTOESLAG"
+          description: "Huurtoeslag (Wet op de huurtoeslag)"
+          regeling: "wet_op_de_huurtoeslag"
+        - value: "KINDGEBONDEN_BUDGET"
+          description: "Kindgebonden budget (Wet op het kindgebonden budget)"
+          regeling: "wet_op_het_kindgebonden_budget"
+        - value: "KINDEROPVANGTOESLAG"
+          description: "Kinderopvangtoeslag (Wet kinderopvang)"
+          regeling: "wet_kinderopvang"
+
+    - name: "BEREKENINGSJAAR"
+      description: "Het jaar waarvoor de toeslag wordt aangevraagd"
+      type: "number"
+      source_reference:
+        table: "toeslagen"
+        field: "berekeningsjaar"
+        select_on:
+          - name: "toeslag_id"
+            value: "$TOESLAG_ID"
+
+  definitions:
+    # Mapping van TOESLAG_TYPE naar regeling (wet)
+    REGELING_MAPPING:
+      ZORGTOESLAG: "zorgtoeslagwet"
+      HUURTOESLAG: "wet_op_de_huurtoeslag"
+      KINDGEBONDEN_BUDGET: "wet_op_het_kindgebonden_budget"
+      KINDEROPVANGTOESLAG: "wet_kinderopvang"
+
+  input:
+    - name: "TOESLAG_BEREKENING"
+      description: "De berekening van de toeslag volgens het gekozen toeslag type"
+      type: "amount"
+      service_reference:
+        service: "TOESLAGEN"
+        law_from_type: "$TOESLAG_TYPE"
+        field: "hoogte_toeslag"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+        explanation: "Het voorschot wordt berekend op basis van de specifieke regeling"
+
+    - name: "HEEFT_AANSPRAAK"
+      description: "Of de aanvrager recht heeft op de toeslag volgens het gekozen type"
+      type: "boolean"
+      service_reference:
+        service: "TOESLAGEN"
+        law_from_type: "$TOESLAG_TYPE"
+        field: "heeft_recht"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+
+workflow:
+  name: "Toeslagproces"
+  description: "Jaarlijkse cyclus van voorschot tot definitieve toekenning"
+
+  states:
+    - id: "aanvraag"
+      type: "start"
+      name: "Aanvraag"
+      description: "Burger dient aanvraag in voor toeslag"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "15"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel15"
+        explanation: "De aanvraag om een voorschot moet uiterlijk worden ingediend vóór 1 september van het berekeningsjaar."
+      transitions:
+        - to: "berekenen_aanspraak"
+
+    - id: "berekenen_aanspraak"
+      type: "calculation"
+      name: "Berekenen aanspraak"
+      description: "Berekening van de aanspraak op toeslag op basis van actuele gegevens"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+        explanation: "Het voorschot moet zoveel mogelijk gelijk zijn aan het vermoedelijke bedrag van de definitieve toekenning."
+      calculation_reference:
+        description: "Verwijst naar de specifieke toeslagwet voor de berekening"
+        placeholder: true  # Wordt ingevuld door de specifieke toeslag (zorgtoeslag, huurtoeslag, etc.)
+      required_data:
+        - name: "inkomen"
+          source: "BELASTINGDIENST"
+        - name: "vermogen"
+          source: "BELASTINGDIENST"
+        - name: "partner_gegevens"
+          source: "RvIG"
+        - name: "specifieke_toeslag_gegevens"
+          source: "variabel"
+      outputs:
+        - name: "berekend_jaarbedrag"
+          type: "amount"
+        - name: "berekend_maandbedrag"
+          type: "amount"
+        - name: "heeft_aanspraak"
+          type: "boolean"
+      transitions:
+        - to: "voorschot_beschikking"
+          condition: "heeft_aanspraak == true"
+        - to: "afwijzing"
+          condition: "heeft_aanspraak == false"
+
+    - id: "afwijzing"
+      type: "decision"
+      name: "Afwijzing aanvraag"
+      description: "Aanvraag wordt afgewezen wegens geen recht op toeslag"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+        explanation: "Het voorschot wordt op nihil vastgesteld als geen recht op toeslag bestaat."
+      outputs:
+        - name: "beschikking_type"
+          value: "AFWIJZING"
+      transitions:
+        - to: "einde"
+
+    - id: "voorschot_beschikking"
+      type: "decision"
+      name: "Voorschotbeschikking"
+      description: "Beschikking met het vastgestelde voorschotbedrag voor het toeslagjaar"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+        explanation: "Toeslagen verleent een voorschot tot het vermoedelijke bedrag van de tegemoetkoming."
+      deadline:
+        description: "Binnen 13 weken na aanvraag, verlengbaar tot 26 of 39 weken"
+        legal_basis:
+          article: "16"
+          paragraph: "3"
+      stores:
+        - name: "voorschot_jaarbedrag"
+          from: "berekend_jaarbedrag"
+        - name: "voorschot_maandbedrag"
+          from: "berekend_maandbedrag"
+        - name: "beschikking_datum"
+          type: "date"
+      outputs:
+        - name: "beschikking_type"
+          value: "VOORSCHOT"
+      transitions:
+        - to: "maandelijkse_cyclus"
+
+    - id: "maandelijkse_cyclus"
+      type: "loop"
+      name: "Maandelijkse cyclus"
+      description: "Maandelijkse herberekening en uitbetaling gedurende het toeslagjaar"
+      loop:
+        count: 12
+        period: "month"
+        start: "januari"
+        end: "december"
+      contains:
+        - "maand_herberekening"
+        - "maand_betaling"
+        - "wijziging_check"
+      transitions:
+        - to: "definitieve_beschikking"
+          condition: "maand == 12 AND jaar_afgelopen"
+
+    - id: "maand_herberekening"
+      type: "calculation"
+      name: "Maandelijkse herberekening"
+      description: "Herberekening van de aanspraak op basis van actuele gegevens"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        paragraph: "5"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+        explanation: "Toeslagen kan het voorschot herzien gedurende het toeslagjaar."
+      triggers:
+        - type: "schedule"
+          description: "Automatisch op de 1e van elke maand"
+          cron: "0 0 1 * *"
+        - type: "data_change"
+          description: "Bij wijziging in relevante gegevens"
+          sources:
+            - "inkomen"
+            - "vermogen"
+            - "partner_status"
+            - "adres"
+          legal_basis:
+            article: "17"
+            explanation: "Aanvrager is verplicht wijzigingen door te geven"
+      calculation_reference:
+        inherit_from: "berekenen_aanspraak"
+      outputs:
+        - name: "herberekend_maandbedrag"
+          type: "amount"
+        - name: "verschil_met_voorschot"
+          type: "amount"
+      logs:
+        - name: "maand"
+          type: "number"
+        - name: "berekend_bedrag"
+          type: "amount"
+        - name: "voorschot_bedrag"
+          type: "amount"
+      transitions:
+        - to: "maand_betaling"
+
+    - id: "maand_betaling"
+      type: "action"
+      name: "Maandelijkse betaling"
+      description: "Uitbetaling van het voorschotbedrag (niet het herberekende bedrag)"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "22"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf4_Artikel22"
+        explanation: "Uitbetaling geschiedt maandelijks in de maand voorafgaand aan de maand waarin aanspraak ontstaat."
+      payment:
+        basis: "voorschot_maandbedrag"
+        description: "Betaling is gebaseerd op de voorschotbeschikking, niet op de herberekening"
+      timing:
+        description: "Maandelijks, in de maand voorafgaand aan de aanspraakmaand"
+        legal_basis:
+          article: "22"
+          paragraph: "3"
+      logs:
+        - name: "betaald_bedrag"
+          type: "amount"
+        - name: "betaal_datum"
+          type: "date"
+      transitions:
+        - to: "wijziging_check"
+
+    - id: "wijziging_check"
+      type: "choice"
+      name: "Controle op wijzigingen"
+      description: "Beslismoment of het voorschot moet worden herzien"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        paragraph: "5"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+      conditions:
+        - id: "significante_wijziging"
+          description: "Herberekend bedrag wijkt significant af van voorschot"
+          test:
+            subject: "abs(herberekend_maandbedrag - voorschot_maandbedrag)"
+            operation: "GREATER_THAN"
+            value: "drempel_herziening"
+        - id: "verplichte_melding"
+          description: "Aanvrager heeft wijziging doorgegeven"
+          test:
+            subject: "heeft_wijziging_melding"
+            operation: "EQUALS"
+            value: true
+      transitions:
+        - to: "herzien_voorschot"
+          condition: "significante_wijziging OR verplichte_melding"
+        - to: "maand_herberekening"
+          condition: "volgende_maand AND NOT jaar_afgelopen"
+        - to: "definitieve_beschikking"
+          condition: "jaar_afgelopen"
+
+    - id: "herzien_voorschot"
+      type: "decision"
+      name: "Herzien voorschot"
+      description: "Nieuwe voorschotbeschikking met aangepast bedrag"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "16"
+        paragraph: "5"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel16"
+        explanation: "Toeslagen kan het voorschot herzien tot het moment van definitieve toekenning."
+      updates:
+        - name: "voorschot_jaarbedrag"
+          from: "herberekend_jaarbedrag"
+        - name: "voorschot_maandbedrag"
+          from: "herberekend_maandbedrag"
+      outputs:
+        - name: "beschikking_type"
+          value: "HERZIEN_VOORSCHOT"
+      transitions:
+        - to: "maand_betaling"
+
+    - id: "definitieve_beschikking"
+      type: "decision"
+      name: "Definitieve beschikking"
+      description: "Vaststelling van het definitieve toeslagbedrag na afloop van het berekeningsjaar"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "19"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf3_Artikel19"
+        explanation: "De definitieve toekenning wordt vastgesteld nadat de benodigde fiscale gegevens beschikbaar zijn."
+      timing:
+        conditions:
+          - description: "Binnen 6 maanden na laatste IB-aanslag"
+            trigger: "ib_aanslag_ontvangen"
+          - description: "Binnen 8 weken na NINBI-vaststelling"
+            trigger: "ninbi_vastgesteld"
+          - description: "Uiterlijk 31 december van jaar T+1"
+            trigger: "default"
+        legal_basis:
+          article: "19"
+      calculation:
+        description: "Definitieve berekening op basis van vastgestelde fiscale gegevens"
+        inputs:
+          - name: "definitief_inkomen"
+            source: "BELASTINGDIENST"
+            description: "Inkomen na IB-aanslag"
+          - name: "definitief_vermogen"
+            source: "BELASTINGDIENST"
+      outputs:
+        - name: "definitief_jaarbedrag"
+          type: "amount"
+        - name: "totaal_voorschot_betaald"
+          type: "amount"
+          calculation: "sum(betaald_bedrag)"
+        - name: "verschil"
+          type: "amount"
+          calculation: "definitief_jaarbedrag - totaal_voorschot_betaald"
+        - name: "beschikking_type"
+          value: "DEFINITIEF"
+      transitions:
+        - to: "vereffening"
+
+    - id: "vereffening"
+      type: "action"
+      name: "Vereffening"
+      description: "Verrekening van het verschil tussen voorschot en definitief bedrag"
+      legal_basis:
+        law: "Algemene wet inkomensafhankelijke regelingen"
+        bwb_id: "BWBR0018472"
+        article: "24"
+        paragraph: "2"
+        url: "https://wetten.overheid.nl/BWBR0018472/2025-01-01#Hoofdstuk2_Paragraaf4_Artikel24"
+        explanation: "Het voorschot wordt verrekend met de definitieve tegemoetkoming."
+      conditions:
+        - id: "nabetaling"
+          description: "Definitief bedrag hoger dan voorschot: nabetaling aan burger"
+          test:
+            subject: "verschil"
+            operation: "GREATER_THAN"
+            value: 0
+          action:
+            type: "betaling"
+            bedrag: "verschil"
+            timing: "binnen 4 weken na beschikking"
+            legal_basis:
+              article: "24"
+        - id: "terugvordering"
+          description: "Definitief bedrag lager dan voorschot: terugvordering van burger"
+          test:
+            subject: "verschil"
+            operation: "LESS_THAN"
+            value: 0
+          action:
+            type: "terugvordering"
+            bedrag: "abs(verschil)"
+            legal_basis:
+              article: "26a"
+              explanation: "Terugvordering met inachtneming van doelmatigheidsgrens"
+        - id: "geen_verrekening"
+          description: "Geen verschil of binnen doelmatigheidsgrens"
+          test:
+            subject: "abs(verschil)"
+            operation: "LESS_OR_EQUAL"
+            value: "doelmatigheidsgrens"
+          action:
+            type: "geen_actie"
+      outputs:
+        - name: "vereffening_type"
+          type: "string"
+          values: ["NABETALING", "TERUGVORDERING", "GEEN"]
+        - name: "vereffening_bedrag"
+          type: "amount"
+      transitions:
+        - to: "einde"
+          condition: "geen_voortzetting"
+        - to: "aanvraag"
+          condition: "nieuw_berekeningsjaar AND voortzetting"
+          description: "Start nieuwe jaarcyclus"
+
+    - id: "einde"
+      type: "end"
+      name: "Einde proces"
+      description: "Proces is afgerond"
+
+  # State van een individuele aanvraag/burger
+  case_state:
+    description: "De actuele status van een toeslagaanvraag per burger per berekeningsjaar"
+
+    identifier:
+      - name: "TOESLAG_ID"
+        type: "string"
+        description: "Unieke identifier van de toeslagaanvraag (zaaknummer)"
+
+    # OID is gelijk aan de TOESLAG_ID
+    oid_format: "{TOESLAG_ID}"
+
+    fields:
+      # Workflow state
+      - name: "huidige_state"
+        type: "string"
+        description: "De huidige state in de workflow"
+        allowed_values:
+          - "aanvraag"
+          - "berekenen_aanspraak"
+          - "voorschot_beschikking"
+          - "maand_herberekening"
+          - "maand_betaling"
+          - "wijziging_check"
+          - "herzien_voorschot"
+          - "definitieve_beschikking"
+          - "vereffening"
+          - "einde"
+
+      - name: "huidige_maand"
+        type: "number"
+        description: "De huidige maand in de jaarcyclus (1-12)"
+        min: 1
+        max: 12
+
+      # Voorschot gegevens
+      - name: "voorschot_jaarbedrag"
+        type: "amount"
+        description: "Het vastgestelde voorschotbedrag voor het jaar"
+
+      - name: "voorschot_maandbedrag"
+        type: "amount"
+        description: "Het maandelijkse voorschotbedrag"
+
+      - name: "voorschot_beschikking_datum"
+        type: "date"
+        description: "Datum van de (laatste) voorschotbeschikking"
+
+      # Berekeningen per maand
+      - name: "maandelijkse_berekeningen"
+        type: "array"
+        description: "Lijst van berekeningen per maand"
+        items:
+          type: "object"
+          fields:
+            - name: "maand"
+              type: "number"
+            - name: "berekend_bedrag"
+              type: "amount"
+            - name: "berekening_datum"
+              type: "date"
+            - name: "trigger"
+              type: "string"
+              description: "Wat triggerde deze berekening (schedule/data_change)"
+            - name: "gewijzigde_data"
+              type: "array"
+              description: "Welke data is gewijzigd (indien data_change trigger)"
+
+      # Betalingen per maand
+      - name: "maandelijkse_betalingen"
+        type: "array"
+        description: "Lijst van betalingen per maand"
+        items:
+          type: "object"
+          fields:
+            - name: "maand"
+              type: "number"
+            - name: "betaald_bedrag"
+              type: "amount"
+            - name: "betaal_datum"
+              type: "date"
+            - name: "basis"
+              type: "string"
+              description: "Op basis van welke beschikking (voorschot/herzien)"
+
+      # Totalen
+      - name: "totaal_berekend"
+        type: "amount"
+        description: "Som van alle herberekende maandbedragen"
+
+      - name: "totaal_betaald"
+        type: "amount"
+        description: "Som van alle betaalde bedragen"
+
+      # Definitieve afrekening
+      - name: "definitief_jaarbedrag"
+        type: "amount"
+        description: "Het definitief vastgestelde jaarbedrag"
+
+      - name: "definitieve_beschikking_datum"
+        type: "date"
+        description: "Datum van de definitieve beschikking"
+
+      - name: "vereffening_type"
+        type: "string"
+        description: "Type vereffening"
+        allowed_values:
+          - "NABETALING"
+          - "TERUGVORDERING"
+          - "GEEN"
+
+      - name: "vereffening_bedrag"
+        type: "amount"
+        description: "Bedrag van de vereffening"
+
+      # Historie van beschikkingen
+      - name: "beschikkingen"
+        type: "array"
+        description: "Alle beschikkingen in dit proces"
+        items:
+          type: "object"
+          fields:
+            - name: "type"
+              type: "string"
+              allowed_values:
+                - "VOORSCHOT"
+                - "HERZIEN_VOORSCHOT"
+                - "AFWIJZING"
+                - "DEFINITIEF"
+            - name: "datum"
+              type: "date"
+            - name: "bedrag"
+              type: "amount"
+            - name: "reden"
+              type: "string"
+
+  # Overzicht van alle logs die worden bijgehouden
+  audit_log:
+    description: "Alle berekeningen en beslissingen worden gelogd voor verantwoording"
+    entries:
+      - name: "maandelijkse_berekeningen"
+        description: "Per maand: berekend vs betaald bedrag"
+        fields:
+          - "maand"
+          - "berekend_bedrag"
+          - "voorschot_bedrag"
+          - "betaald_bedrag"
+      - name: "beschikkingen"
+        description: "Alle uitgebrachte beschikkingen"
+        fields:
+          - "datum"
+          - "type"
+          - "bedrag"
+          - "reden"
+      - name: "wijzigingen"
+        description: "Alle doorgegeven en geconstateerde wijzigingen"
+        fields:
+          - "datum"
+          - "type_wijziging"
+          - "oude_waarde"
+          - "nieuwe_waarde"
+          - "bron"
+
+references:
+  - law: "Algemene wet inkomensafhankelijke regelingen"
+    bwb_id: "BWBR0018472"
+    articles:
+      - article: "14"
+        description: "Toekenning en afrondingsregels"
+      - article: "15"
+        description: "Aanvraag"
+      - article: "16"
+        description: "Voorschotverlening"
+      - article: "17"
+        description: "Meldingsplicht wijzigingen"
+      - article: "18"
+        description: "Informatieplicht"
+      - article: "19"
+        description: "Definitieve toekenning"
+      - article: "20"
+        description: "Herziening bij fiscale gegevens"
+      - article: "21"
+        description: "Herziening nadeel"
+      - article: "21a"
+        description: "Herziening voordeel"
+      - article: "22"
+        description: "Uitbetaling"
+      - article: "23"
+        description: "Opschorting"
+      - article: "24"
+        description: "Verrekening"
+      - article: "25"
+        description: "Bankrekening"
+      - article: "26a"
+        description: "Terugvordering"
