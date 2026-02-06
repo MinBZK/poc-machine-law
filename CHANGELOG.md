@@ -2,6 +2,97 @@
 
 <!-- version list -->
 
+## v1.8.0 (2026-02-06)
+
+### Bug Fixes
+
+- Add @skip-go tags to features without Go step definitions
+  ([`56c8cfb`](https://github.com/MinBZK/poc-machine-law/commit/56c8cfba8f7e59d4a3c4f3e6dc3dd047ac0435d1))
+
+- Add @skip-go to features with incomplete Go engine support
+  ([`ada3798`](https://github.com/MinBZK/poc-machine-law/commit/ada3798d585ccc9b2d9258eca5ba7015cdabb813))
+
+- Add missing step definitions and law file updates
+  ([`d01518a`](https://github.com/MinBZK/poc-machine-law/commit/d01518acac51757369ef685ff1b40bed4a8121ad))
+
+- Allow @skip-go tag in main features directory
+  ([`4498947`](https://github.com/MinBZK/poc-machine-law/commit/4498947d4f3a0f7da967ab513bee5774a84c55e6))
+
+- Improve Go engine and test compatibility
+  ([`73d28fc`](https://github.com/MinBZK/poc-machine-law/commit/73d28fcbcefa791a8ed74980d850d2b69436cc94))
+
+- Restore corrupted pending features and exclude from test script
+  ([`4780dd8`](https://github.com/MinBZK/poc-machine-law/commit/4780dd8e100a1771671c6eb55dae092154ade2e8))
+
+- Restore demo "uitvoeren" button after feature file reorganization
+  ([`e9ae9b8`](https://github.com/MinBZK/poc-machine-law/commit/e9ae9b865b32ae2444cfb6d7e8e6199de5d7b3ef))
+
+### Chores
+
+- Remove features/pending directory and references
+  ([`b000966`](https://github.com/MinBZK/poc-machine-law/commit/b000966adf4f9c1e0016c0f1b234684c8bcb2567))
+
+- Sync VERSION file to 1.7.0
+  ([`a09acfc`](https://github.com/MinBZK/poc-machine-law/commit/a09acfcb34c30a21c6583db6238bb9dda7ad63dd))
+
+- **deps**: Bump the go-deps group in /machinev2/machine with 4 updates
+  ([#355](https://github.com/MinBZK/poc-machine-law/pull/355),
+  [`e96fc05`](https://github.com/MinBZK/poc-machine-law/commit/e96fc05894504698961d6562ae8d80f2062281b6))
+
+- **deps**: Bump the python-minor-patch group across 1 directory with 9 updates
+  ([#361](https://github.com/MinBZK/poc-machine-law/pull/361),
+  [`5e19b4d`](https://github.com/MinBZK/poc-machine-law/commit/5e19b4d0e025a0b2fdea90f01181785d15cd6f72))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#356](https://github.com/MinBZK/poc-machine-law/pull/356),
+  [`598ac36`](https://github.com/MinBZK/poc-machine-law/commit/598ac3673ba411291fbd835d424b3307999f2a5b))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#357](https://github.com/MinBZK/poc-machine-law/pull/357),
+  [`f6c17b3`](https://github.com/MinBZK/poc-machine-law/commit/f6c17b301b818e29e921881f6a650f5cfaddbbb2))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([#358](https://github.com/MinBZK/poc-machine-law/pull/358),
+  [`c0ecb82`](https://github.com/MinBZK/poc-machine-law/commit/c0ecb826f9986fae3fbfb05296c4030994b09fab))
+
+### Features
+
+- Add COALESCE operation support to Go rules engine
+  ([`e41967a`](https://github.com/MinBZK/poc-machine-law/commit/e41967ac05525d18e65b12c866f99583dd228447))
+
+- Add generic Go step definitions and move features from pending
+  ([`ba3e4b2`](https://github.com/MinBZK/poc-machine-law/commit/ba3e4b23058244ed47f1b095b79a09a285281acc))
+
+- Graduate 5 passing features from pending to main test suite
+  ([`c9dddcf`](https://github.com/MinBZK/poc-machine-law/commit/c9dddcff7508744617213eb26bdeee262944ba6a))
+
+- Graduate 9 more features from pending to main test suite
+  ([`a7f39c3`](https://github.com/MinBZK/poc-machine-law/commit/a7f39c3b5fb6eb4bc27fc40f44f9cb74ed3f2d0d))
+
+- Graduate web_edit_values.feature with @ui and @skip-go tags
+  ([`f548af8`](https://github.com/MinBZK/poc-machine-law/commit/f548af81aa4ac393cb1dd334a2cfc30c534ca9f5))
+
+- Remove @skip-go from 6 features, add Go step definitions for 5 law domains
+  ([`ef1af1b`](https://github.com/MinBZK/poc-machine-law/commit/ef1af1bda75f7c685e5dfe2cf07ea39dc8349af8))
+
+### Refactoring
+
+- DRY up step definitions, standardize feature file naming
+  ([`4c0c317`](https://github.com/MinBZK/poc-machine-law/commit/4c0c31757c2ffe3582ec2009e6636bf7b8a50fc6))
+
+- Organize feature files into domain subdirectories
+  ([`0dd6a08`](https://github.com/MinBZK/poc-machine-law/commit/0dd6a08a17a8e61692fbd5d589b8f4ddafa3da91))
+
+- Quarantine broken test features to pending/ directory
+  ([`fdbab8e`](https://github.com/MinBZK/poc-machine-law/commit/fdbab8e2601949de420df438ee50d80171f9664a))
+
+- Replace boolean output assertions with prettier waar/onwaar steps
+  ([`e53f165`](https://github.com/MinBZK/poc-machine-law/commit/e53f165bd5905bb3b3bdda3952444eb2c8f76755))
+
+- Restore domain-specific prose steps for readability
+  ([`a371593`](https://github.com/MinBZK/poc-machine-law/commit/a37159380652bd783771fed61c9098869db415ea))
+
+
 ## v1.7.0 (2026-02-04)
 
 ### Bug Fixes
