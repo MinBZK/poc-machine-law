@@ -16,7 +16,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000005    | Karel Posthumus  | NAL-2024-00123   | 2024-06-01       | 2024-06-15        |             | ACTIEF |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "NAL-2024-00123"
     And bevat de output "subject_names" waarde "Nalatenschap Karel Posthumus"
     And bevat de output "subject_types" waarde "CITIZEN"
@@ -29,7 +29,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 999999999     | 888888888    | Andere Erflater| NAL-2024-99999   | 2024-01-01       | 2024-01-15        |             | ACTIEF |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Nalatenschap is afgewikkeld (status AFGEWIKKELD)
@@ -40,7 +40,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000005    | Karel Posthumus  | NAL-2024-00123   | 2024-06-01       | 2024-06-15        | 2025-01-15  | AFGEWIKKELD |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Executeur heeft benoeming afgewezen
@@ -51,7 +51,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000005    | Karel Posthumus  | NAL-2024-00123   | 2024-06-01       |                   |             | AFGEWEZEN  |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Executeur met meerdere actieve nalatenschappen
@@ -62,7 +62,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000006    | Marie de Vries  | NAL-2024-00456   | 2024-08-01       | 2024-08-10        |             | ACTIEF |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "NAL-2024-00123"
     And bevat de output "subject_ids" waarde "NAL-2024-00456"
 
@@ -74,7 +74,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000006    | Marie de Vries  | NAL-2023-00789   | 2023-02-01       | 2023-02-15        | 2024-03-01  | AFGEWIKKELD |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "NAL-2024-00123"
     And bevat de output "subject_ids" niet de waarde "NAL-2023-00789"
 
@@ -85,7 +85,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000005    | Karel Posthumus  | NAL-2024-00123   | 2024-06-01       | 2024-06-15        | 2026-06-15  | ACTIEF |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "NAL-2024-00123"
 
   Scenario: Executeurschap met einddatum in het verleden is niet meer actief
@@ -96,7 +96,7 @@ Feature: Burgerlijk Wetboek Executeur (BW 4:144-150)
       | 400000003     | 500000005    | Karel Posthumus  | NAL-2024-00123   | 2024-06-01       | 2024-06-15        | 2025-01-01  | ACTIEF |
     When de burgerlijk_wetboek_executeur wordt uitgevoerd door NOTARIAAT
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Executeur heeft correct rechten voor nalatenschap beheer

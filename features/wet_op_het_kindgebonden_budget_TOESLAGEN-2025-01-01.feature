@@ -24,7 +24,7 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen |
       | 200000001 | 5000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And is het kindgebonden budget ongeveer "€5.991,00" per jaar
 
@@ -48,7 +48,7 @@ Feature: Berekening Kindgebonden Budget
       | 200000002 | 8000000          |
       | 200000003 | 7000000          |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€0,00"
     And is het kindgebonden budget ongeveer "€3.925,00" per jaar
 
@@ -70,7 +70,7 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen |
       | 200000004 | 5000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het kindgebonden budget ongeveer "€0,00" per jaar
 
   Scenario: Alleenstaande met kind krijgt basisbedrag
@@ -91,7 +91,7 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen |
       | 200000005 | 3000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het kindgebonden budget ongeveer "€5.991,00" per jaar
 
   Scenario: Alleenstaande met kind en hoger inkomen
@@ -112,7 +112,7 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen |
       | 200000006 | 4000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het kindgebonden budget ongeveer "€5.991,00" per jaar
 
   Scenario: Geen kinderbijslag betekent geen kindgebonden budget
@@ -133,7 +133,7 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen |
       | 200000007 | 2000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon geen recht op kindgebonden budget
+    Then is niet voldaan aan de voorwaarden
 
   Scenario: Vermogen boven grens betekent geen kindgebonden budget
     Given een persoon met BSN "200000008"
@@ -153,7 +153,7 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen  |
       | 200000008 | 15000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon geen recht op kindgebonden budget
+    Then is niet voldaan aan de voorwaarden
 
   Scenario: Alleenstaande met laag inkomen krijgt maximaal kindgebonden budget
     Given een persoon met BSN "200000009"
@@ -173,6 +173,6 @@ Feature: Berekening Kindgebonden Budget
       | bsn       | vermogen |
       | 200000009 | 1000000  |
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And is het kindgebonden budget ongeveer "€5.991,00" per jaar

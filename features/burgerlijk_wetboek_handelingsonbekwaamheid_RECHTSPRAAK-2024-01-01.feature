@@ -17,8 +17,8 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus  | datum_ingang | datum_einde | status |
       | 400100001   | 500000001    | Sophie van Dam | 2022-01-15   |             | ACTIEF |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "is_onder_curatele" waarde "true"
-    And heeft de output "is_handelingsonbekwaam" waarde "true"
+    Then is de output "is_onder_curatele" waar
+    And is de output "is_handelingsonbekwaam" waar
     And bevat de output "base_permissions" waarde "LEZEN"
     And bevat de output "base_permissions" niet de waarde "CLAIMS_INDIENEN"
     And bevat de output "base_permissions" niet de waarde "BESLUITEN_ONTVANGEN"
@@ -30,8 +30,8 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus  | datum_ingang | datum_einde | status |
       | 400100001   | 500000001    | Sophie van Dam | 2022-01-15   |             | ACTIEF |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "is_onder_curatele" waarde "false"
-    And heeft de output "is_handelingsonbekwaam" waarde "false"
+    Then is de output "is_onder_curatele" onwaar
+    And is de output "is_handelingsonbekwaam" onwaar
     And bevat de output "base_permissions" waarde "LEZEN"
     And bevat de output "base_permissions" waarde "CLAIMS_INDIENEN"
     And bevat de output "base_permissions" waarde "BESLUITEN_ONTVANGEN"
@@ -43,8 +43,8 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus | datum_ingang | datum_einde | status    |
       | 400100007   | 500000009    | Jan de Boer   | 2020-01-01   | 2023-12-31  | BEEINDIGD |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "is_onder_curatele" waarde "false"
-    And heeft de output "is_handelingsonbekwaam" waarde "false"
+    Then is de output "is_onder_curatele" onwaar
+    And is de output "is_handelingsonbekwaam" onwaar
     And bevat de output "base_permissions" waarde "CLAIMS_INDIENEN"
 
   Scenario: Curatele met einddatum in verleden - persoon is weer handelingsbekwaam
@@ -54,8 +54,8 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus  | datum_ingang | datum_einde | status |
       | 400100001   | 500000001    | Sophie van Dam | 2020-01-01   | 2024-12-31  | ACTIEF |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "is_onder_curatele" waarde "false"
-    And heeft de output "is_handelingsonbekwaam" waarde "false"
+    Then is de output "is_onder_curatele" onwaar
+    And is de output "is_handelingsonbekwaam" onwaar
     And bevat de output "base_permissions" waarde "CLAIMS_INDIENEN"
 
   Scenario: Curatele met toekomstige einddatum - nog handelingsonbekwaam
@@ -65,8 +65,8 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus  | datum_ingang | datum_einde | status |
       | 400100001   | 500000001    | Sophie van Dam | 2022-01-15   | 2026-12-31  | ACTIEF |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "is_onder_curatele" waarde "true"
-    And heeft de output "is_handelingsonbekwaam" waarde "true"
+    Then is de output "is_onder_curatele" waar
+    And is de output "is_handelingsonbekwaam" waar
     And bevat de output "base_permissions" waarde "LEZEN"
     And bevat de output "base_permissions" niet de waarde "CLAIMS_INDIENEN"
 
@@ -79,7 +79,7 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus  | datum_ingang | datum_einde | status |
       | 400100001   | 500000001    | Sophie van Dam | 2022-01-15   |             | ACTIEF |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "heeft_delegaties" waarde "true"
+    Then is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000001"
     And bevat de output "subject_types" waarde "SELF"
     And bevat de output "delegation_types" waarde "EIGEN_ZAKEN"
@@ -91,6 +91,6 @@ Feature: Burgerlijk Wetboek Handelingsonbekwaamheid (BW 1:378-391)
       | bsn_curator | bsn_curandus | naam_curandus  | datum_ingang | datum_einde | status |
       | 400100001   | 500000001    | Sophie van Dam | 2022-01-15   |             | ACTIEF |
     When de burgerlijk_wetboek_handelingsonbekwaamheid wordt uitgevoerd door RECHTSPRAAK
-    Then heeft de output "heeft_delegaties" waarde "true"
+    Then is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "999993653"
     And bevat de output "permissions" waarde "['LEZEN', 'CLAIMS_INDIENEN', 'BESLUITEN_ONTVANGEN']"

@@ -17,7 +17,7 @@ Feature: Pensioenwet - Pensioenuitkering berekening
       | 100000001 | 30000000         | 40            | beschikbare_premie | 67               | 1750000   | 6000000             |
     When de pensioenwet wordt uitgevoerd door PENSIOENFONDS
     Then is voldaan aan de voorwaarden
-    And heeft de output "is_gepensioneerd" waarde "true"
+    And is de output "is_gepensioneerd" waar
     And heeft de output "pensioenkapitaal" waarde "30000000"
     # Maandelijkse uitkering: jaarlijks €15000 / 12 = €1250.00 per maand
     And is het pensioen "1250.00" euro
@@ -32,7 +32,7 @@ Feature: Pensioenwet - Pensioenuitkering berekening
       | 100000002 | 25000000         | 35            | middelloon    | 67               | 1750000   | 5500000             |
     When de pensioenwet wordt uitgevoerd door PENSIOENFONDS
     Then is voldaan aan de voorwaarden
-    And heeft de output "is_gepensioneerd" waarde "true"
+    And is de output "is_gepensioneerd" waar
     # Berekening jaarlijks: 0.0175 * 35 * (5500000 - 1750000) = 2296875 eurocent = 22968.75 euro/jaar
     # Maandelijks: 22968.75 / 12 = 1914.06 euro
     And is het pensioen "1914.06" euro
@@ -47,7 +47,7 @@ Feature: Pensioenwet - Pensioenuitkering berekening
       | 100000003 | 40000000         | 40            | eindloon      | 67               | 1750000   | 7000000             |
     When de pensioenwet wordt uitgevoerd door PENSIOENFONDS
     Then is voldaan aan de voorwaarden
-    And heeft de output "is_gepensioneerd" waarde "true"
+    And is de output "is_gepensioneerd" waar
     # Berekening jaarlijks: 0.0167 * 40 * (7000000 - 1750000) = 3507000 eurocent = 35070.00 euro/jaar
     # Maandelijks: 35070.00 / 12 = 2922.50 euro
     And is het pensioen "2922.50" euro

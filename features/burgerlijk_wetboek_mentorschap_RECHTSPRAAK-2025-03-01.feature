@@ -18,7 +18,7 @@ Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
       | 400000001   | 500000003      | Willem Jansen | 2023-06-15   |             | ACTIEF |
     When de burgerlijk_wetboek_mentorschap wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000003"
     And bevat de output "subject_names" waarde "Willem Jansen"
     And bevat de output "subject_types" waarde "CITIZEN"
@@ -32,7 +32,7 @@ Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
       | 400000001   | 500000003      | Willem Jansen | 2023-06-15   |             | ACTIEF |
     When de burgerlijk_wetboek_mentorschap wordt uitgevoerd door RECHTSPRAAK
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
     And is de output "subject_names" leeg
 
@@ -45,7 +45,7 @@ Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
       | 400000001   | 500000003      | Willem Jansen | 2023-06-15   | 2024-12-31  | BEEINDIGD |
     When de burgerlijk_wetboek_mentorschap wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Mentor met meerdere betrokkenen
@@ -56,7 +56,7 @@ Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
       | 400000001   | 500000004      | Anna Hulpbehoevend  | 2024-01-01   |             | ACTIEF |
     When de burgerlijk_wetboek_mentorschap wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000003"
     And bevat de output "subject_ids" waarde "500000004"
     And bevat de output "subject_names" waarde "Willem Jansen"
@@ -70,7 +70,7 @@ Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
       | 400000001   | 500000004      | Anna Hulpbehoevend  | 2022-01-01   | 2024-06-30  | BEEINDIGD |
     When de burgerlijk_wetboek_mentorschap wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000003"
     And bevat de output "subject_ids" niet de waarde "500000004"
     And bevat de output "subject_names" waarde "Willem Jansen"
@@ -83,5 +83,5 @@ Feature: Burgerlijk Wetboek Mentorschap (BW 1:450-462)
       | 400000001   | 500000003      | Willem Jansen | 2023-06-15   | 2026-12-31  | ACTIEF |
     When de burgerlijk_wetboek_mentorschap wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000003"

@@ -26,7 +26,7 @@ Feature: Anw - Nabestaandenuitkering
       | 300000001 | 0                         | 0                         | 0                     | 0                               | 0            |
     When de algemene_nabestaandenwet wordt uitgevoerd door SVB
     Then is voldaan aan de voorwaarden
-    And heeft de output "is_gerechtigd" waarde "true"
+    And is de output "is_gerechtigd" waar
     And heeft de output "bruto_uitkering" waarde "146500"
     And heeft de output "inkomenskorting" waarde "0"
     And heeft de output "netto_uitkering" waarde "146500"
@@ -44,7 +44,7 @@ Feature: Anw - Nabestaandenuitkering
       | 300000002 | 0                         | 0                         | 0                     | 0                               | 0            |
     When de algemene_nabestaandenwet wordt uitgevoerd door SVB
     Then is voldaan aan de voorwaarden
-    And heeft de output "is_gerechtigd" waarde "true"
+    And is de output "is_gerechtigd" waar
     And heeft de output "netto_uitkering" waarde "146500"
 
   Scenario: Nabestaande met inkomen boven vrijlating
@@ -63,7 +63,7 @@ Feature: Anw - Nabestaandenuitkering
       | 300000003 | 2400000                   | 0                         | 0                     | 0                               | 0            |
     When de algemene_nabestaandenwet wordt uitgevoerd door SVB
     Then is voldaan aan de voorwaarden
-    And heeft de output "is_gerechtigd" waarde "true"
+    And is de output "is_gerechtigd" waar
     # Maandelijks inkomen: 2400000 / 12 = 200000 eurocent = €2000
     # Korting: 200000 - 77000 = 123000 eurocent
     And heeft de output "inkomenskorting" waarde "123000"

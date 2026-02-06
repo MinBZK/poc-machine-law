@@ -14,7 +14,7 @@ Feature: WPM Rapportageverplichting
       | 12345678   | 100               | true                            |
     When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is voldaan aan de voorwaarden
-    And heeft de output "rapportageverplichting" waarde "true"
+    And is de output "rapportageverplichting" waar
     And heeft de output "aantal_werknemers" waarde "100"
 
   Scenario: Organisatie met 99 werknemers is niet verplicht te rapporteren
@@ -43,7 +43,7 @@ Feature: WPM Rapportageverplichting
       | 55555555   | 10000                  | 5000                  | 3000                  | 2000                 | 8000                       |
     When de omgevingswet/werkgebonden_personenmobiliteit wordt uitgevoerd door RVO
     Then is voldaan aan de voorwaarden
-    And heeft de output "rapportageverplichting" waarde "true"
+    And is de output "rapportageverplichting" waar
     When de omgevingswet/werkgebonden_personenmobiliteit/gegevens wordt uitgevoerd door RVO
     Then is voldaan aan de voorwaarden
     And heeft de output "woon_werk_auto_benzine" waarde "10000"

@@ -45,7 +45,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | true             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "true"
+    And is de output "heeft_recht_op_vergunning" waar
 
   Scenario: Succesvolle aanvraag - precies 21 jaar (grenswaarde artikel 8 lid 1 onder a)
     # Casus: Exploitant is precies 21 jaar oud op datum van aanvraag.
@@ -75,7 +75,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | true             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "true"
+    And is de output "heeft_recht_op_vergunning" waar
 
   Scenario: Succesvolle aanvraag - precies 35 m2 vloeroppervlakte (grenswaarde artikel 10 lid 2)
     # Casus: Horecalokaliteit heeft precies de minimaal vereiste 35 m2.
@@ -105,7 +105,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | true             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "true"
+    And is de output "heeft_recht_op_vergunning" waar
 
   # ====================
   # AFWIJZINGEN - LEEFTIJD (ARTIKEL 8 LID 1 ONDER A)
@@ -136,7 +136,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | false             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar
 
   Scenario: Afwijzing - exploitant is 18 jaar (significant onder minimumleeftijd)
     # Casus: Een 18-jarige ondernemer denkt dat de leeftijdsgrens gelijk is aan
@@ -163,7 +163,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | false             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar
 
   # ====================
   # AFWIJZINGEN - CURATELE (ARTIKEL 8 LID 1 ONDER C)
@@ -194,7 +194,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | true              |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar
 
   # ====================
   # AFWIJZINGEN - INRICHTINGSEISEN (ARTIKEL 10)
@@ -225,7 +225,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | false             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar
 
   Scenario: Afwijzing - vloeroppervlakte net onder minimum (34 m2)
     # Casus: Horecalokaliteit is 34 m2, net 1 m2 onder het minimum.
@@ -252,7 +252,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | false             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar
 
   # ====================
   # AFWIJZINGEN - BIBOB
@@ -288,7 +288,7 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | false             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar
 
   # ====================
   # AFWIJZINGEN - ONDERNEMING NIET ACTIEF
@@ -318,4 +318,4 @@ Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
       | 999999990 | false             |
     When de alcoholwet/vergunning wordt uitgevoerd door GEMEENTE_ROTTERDAM
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_recht_op_vergunning" waarde "false"
+    And is de output "heeft_recht_op_vergunning" onwaar

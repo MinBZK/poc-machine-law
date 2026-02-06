@@ -15,7 +15,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000007  | Sandra Meijer | R.18/23/789        | 2023-09-01      |             | ACTIEF |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000007"
     And bevat de output "subject_types" waarde "CITIZEN"
     And bevat de output "delegation_types" waarde "WSNP_BEWINDVOERDER_BOEDEL"
@@ -28,7 +28,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000007  | Sandra Meijer | R.18/23/789        | 2023-09-01      |             | ACTIEF |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # Scenario 3: Completed WSNP with schone lei (clean slate) - no longer active
@@ -41,7 +41,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000007  | Sandra Meijer | R.18/23/789        | 2023-09-01      | 2025-02-01  | SCHONE_LEI  |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # Scenario 4: WSNP ended without schone lei (beeindiging)
@@ -54,7 +54,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000007  | Sandra Meijer | R.18/23/789        | 2023-09-01      | 2024-06-15  | BEEINDIGD   |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # Scenario 5: Multiple sanieten per bewindvoerder
@@ -67,7 +67,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000009  | Maria Moeilijk   | R.18/24/456        | 2024-06-01      |             | ACTIEF |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000007"
     And bevat de output "subject_ids" waarde "500000008"
     And bevat de output "subject_ids" waarde "500000009"
@@ -81,7 +81,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000008  | Pieter Probleem  | R.18/24/123        | 2024-03-15      |             | ACTIEF      |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000008"
     And bevat de output "subject_ids" niet de waarde "500000007"
 
@@ -93,7 +93,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000007  | Sandra Meijer | R.18/23/789        | 2023-09-01      | 2025-09-01  | ACTIEF |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000007"
 
   # Scenario 8: Verify WSNP bewindvoerder permissions (LEZEN, CLAIMS_INDIENEN, BESLUITEN_ONTVANGEN)
@@ -104,7 +104,7 @@ Feature: Faillissementswet WSNP Bewindvoerder (Fw Titel III)
       | 400000005         | 500000007  | Sandra Meijer | R.18/23/789        | 2023-09-01      |             | ACTIEF |
     When de faillissementswet_wsnp_bewindvoerder wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
 
   # Scenario 9: WSNP standard duration is 18 months (since July 2023)
   Scenario: WSNP standaardduur van 18 maanden

@@ -30,8 +30,8 @@ Feature: Berekening Werkloosheidsuitkering (WW)
       | bsn       | is_gedetineerd |
       | 100000001 | false          |
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
-    And is de WW duur "10" maanden
+    Then is de output "heeft_recht_op_ww" waar
+    And heeft de output "ww_duur_maanden" waarde "10"
     And is de WW uitkering per maand ongeveer "€2.625,00"
 
   Scenario: Werknemer met te weinig arbeidsverleden krijgt geen WW
@@ -58,7 +58,7 @@ Feature: Berekening Werkloosheidsuitkering (WW)
       | bsn       | is_gedetineerd |
       | 100000002 | false          |
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon geen recht op WW
+    Then is de output "heeft_recht_op_ww" onwaar
 
   Scenario: Werknemer boven AOW-leeftijd krijgt geen WW
     Given een persoon met BSN "100000003"
@@ -84,7 +84,7 @@ Feature: Berekening Werkloosheidsuitkering (WW)
       | bsn       | is_gedetineerd |
       | 100000003 | false          |
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon geen recht op WW
+    Then is de output "heeft_recht_op_ww" onwaar
 
   Scenario: Werknemer met ziektewet krijgt geen WW
     Given een persoon met BSN "100000004"
@@ -110,7 +110,7 @@ Feature: Berekening Werkloosheidsuitkering (WW)
       | bsn       | is_gedetineerd |
       | 100000004 | false          |
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon geen recht op WW
+    Then is de output "heeft_recht_op_ww" onwaar
 
   Scenario: Maximale WW-uitkering bij hoog inkomen
     Given een persoon met BSN "100000005"
@@ -136,9 +136,9 @@ Feature: Berekening Werkloosheidsuitkering (WW)
       | bsn       | is_gedetineerd |
       | 100000005 | false          |
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
+    Then is de output "heeft_recht_op_ww" waar
     And is de WW uitkering per maand maximaal "€4.741,55"
-    And is de WW duur "12" maanden
+    And heeft de output "ww_duur_maanden" waarde "12"
 
   Scenario: Deeltijd werkloosheid (minimaal 5 uur minder)
     Given een persoon met BSN "100000006"
@@ -164,5 +164,5 @@ Feature: Berekening Werkloosheidsuitkering (WW)
       | bsn       | is_gedetineerd |
       | 100000006 | false          |
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
-    And is de WW duur "6" maanden
+    Then is de output "heeft_recht_op_ww" waar
+    And heeft de output "ww_duur_maanden" waarde "6"

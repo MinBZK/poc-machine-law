@@ -33,7 +33,7 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 0                                                                                                                                                                                                  | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then ontbreken er geen verplichte gegevens
-    And heeft de persoon recht op kinderopvangtoeslag
+    And is de output "is_gerechtigd" waar
     And is het toeslagbedrag "24400.00" euro
 
   Scenario: Tweeverdieners met hoger inkomen ontvangen lagere toeslag
@@ -61,7 +61,7 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "333333333", "uren_per_jaar": 2500, "uurtarief": 895, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "123456789"}] | verplichte gegevens |        |
       | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 30                                                                                                                                      | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then heeft de persoon recht op kinderopvangtoeslag
+    Then is de output "is_gerechtigd" waar
     And is het toeslagbedrag "7383.75" euro
 
   Scenario: Ouder met BSO en overschrijding van het maximale uurtarief
@@ -86,7 +86,7 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "444444444", "uren_per_jaar": 1200, "uurtarief": 790, "soort_opvang": "BSO", "LRK_registratienummer": "234567890"}, {"kind_bsn": "555555555", "uren_per_jaar": 1200, "uurtarief": 790, "soort_opvang": "BSO", "LRK_registratienummer": "234567890"}] | verplichte gegevens |        |
       | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 0                                                                                                                                                                                                                                                                  | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then heeft de persoon recht op kinderopvangtoeslag
+    Then is de output "is_gerechtigd" waar
     And is het toeslagbedrag "17648.64" euro
 
   Scenario: Partner werkt minder dan vereiste uren, geen recht op toeslag
@@ -114,7 +114,7 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "666666666", "uren_per_jaar": 1800, "uurtarief": 880, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "345678901"}] | verplichte gegevens |        |
       | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 15                                                                                                                                      | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then heeft de persoon geen recht op kinderopvangtoeslag
+    Then is de output "is_gerechtigd" onwaar
 
   Scenario: Gezin met meerdere soorten opvang
     Given de volgende RvIG personen gegevens:
@@ -141,5 +141,5 @@ Feature: Berekening Kinderopvangtoeslag
       | TOESLAGEN | wet_kinderopvang | AANGEGEVEN_UREN         | [{"kind_bsn": "888888881", "uren_per_jaar": 2000, "uurtarief": 899, "soort_opvang": "DAGOPVANG", "LRK_registratienummer": "567890123"}, {"kind_bsn": "888888882", "uren_per_jaar": 1000, "uurtarief": 750, "soort_opvang": "BSO", "LRK_registratienummer": "567890124"}] | verplichte gegevens |        |
       | TOESLAGEN | wet_kinderopvang | VERWACHTE_PARTNER_UREN | 30                                                                                                                                                                                                                                                                       | verplichte gegevens |        |
     When de wet_kinderopvang wordt uitgevoerd door TOESLAGEN met wijzigingen
-    Then heeft de persoon recht op kinderopvangtoeslag
+    Then is de output "is_gerechtigd" waar
     And is het toeslagbedrag "20384.00" euro

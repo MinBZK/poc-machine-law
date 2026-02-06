@@ -16,7 +16,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000006      | 500000008   | Gerda Groen-van Dijk | ECHTGENOOT   | true             | 2024-01-10              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000008"
     And bevat de output "subject_names" waarde "Gerda Groen-van Dijk"
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_PARTNER"
@@ -29,7 +29,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000010      | 500000010   | Jan Geregistreerd | GEREGISTREERD_PARTNER | true             | 2024-02-15              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000010"
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_PARTNER"
 
@@ -42,7 +42,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000011      | 500000011   | Henk Wilsbekwaam | ECHTGENOOT   | false            |                         |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # ===== Scenario 3: Hierarchie van vertegenwoordigers (Art. 7:465 lid 3 BW) =====
@@ -55,7 +55,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000012      | 500000012   | Marie Dochter    | OUDER        | true             | 2023-06-01              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_OUDER"
 
   Scenario: Kind is WGBO vertegenwoordiger voor wilsonbekwame ouder
@@ -65,7 +65,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000013      | 500000013   | Piet Vader     | KIND         | true             | 2024-03-20              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_KIND"
 
   Scenario: Broer is WGBO vertegenwoordiger voor wilsonbekwame zus
@@ -75,7 +75,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000014      | 500000014   | Anna Zus     | BROER        | true             | 2024-05-10              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_SIBLING"
 
   Scenario: Zus is WGBO vertegenwoordiger voor wilsonbekwame broer
@@ -85,7 +85,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000015      | 500000015   | Klaas Broer  | ZUS          | true             | 2024-04-01              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_SIBLING"
 
   Scenario: Levensgezel is WGBO vertegenwoordiger (gelijk aan partner in hierarchie)
@@ -95,7 +95,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000016      | 500000016   | Sara Levensgezel | LEVENSGEZEL  | true             | 2024-06-15              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "delegation_types" waarde "WGBO_VERTEGENWOORDIGER_PARTNER"
 
   # ===== Scenario 4: Geen familierelatie - geen delegatie =====
@@ -107,7 +107,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 999999999      | 500000099   | Andere Familie   | ECHTGENOOT   | true             | 2024-01-01              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
 
   # ===== Scenario 5: Meerdere wilsonbekwame familieleden =====
 
@@ -119,7 +119,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000018      | 500000019   | Vader Victor    | KIND         | true             | 2024-02-20              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000018"
     And bevat de output "subject_ids" waarde "500000019"
 
@@ -132,7 +132,7 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000019      | 500000020   | Oom Jan      | NEEF         | true             | 2024-01-01              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # ===== Scenario 7: Verificatie van vertegenwoordigingsrechten =====
@@ -156,6 +156,6 @@ Feature: WGBO Vertegenwoordiger (BW 7:465)
       | 400000020      | 500000022   | Opa Wilsonbekwaam | KIND         | true             | 2024-07-01              |
     When de wgbo_vertegenwoordiger wordt uitgevoerd door RvIG
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000022"
     And bevat de output "subject_ids" niet de waarde "500000021"

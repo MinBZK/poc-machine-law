@@ -16,7 +16,7 @@ Feature: Faillissementswet Curator (Fw Art. 64-71)
       | 400000004   | 500000006       | Henk Visser     | NATUURLIJK_PERSOON | F.10/24/123        | 2024-03-15      |             | ACTIEF |
     When de faillissementswet_curator wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000006"
     And bevat de output "subject_names" waarde "Boedel Henk Visser"
     And bevat de output "subject_types" waarde "CITIZEN"
@@ -32,7 +32,7 @@ Feature: Faillissementswet Curator (Fw Art. 64-71)
       | 400000004   | 87654321        | Failliete BV      | RECHTSPERSOON     | F.10/24/456        | 2024-06-01      |             | ACTIEF |
     When de faillissementswet_curator wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "87654321"
     And bevat de output "subject_names" waarde "Boedel Failliete BV"
     And bevat de output "subject_types" waarde "BUSINESS"
@@ -49,7 +49,7 @@ Feature: Faillissementswet Curator (Fw Art. 64-71)
       | 400000004   | 87654321        | Failliete BV      | RECHTSPERSOON      | F.10/24/456        | 2024-06-01      |             | ACTIEF |
     When de faillissementswet_curator wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000006"
     And bevat de output "subject_ids" waarde "87654321"
     And bevat de output "subject_names" waarde "Boedel Henk Visser"
@@ -66,7 +66,7 @@ Feature: Faillissementswet Curator (Fw Art. 64-71)
       | 400000004   | 500000006       | Henk Visser     | NATUURLIJK_PERSOON | F.10/24/123        | 2024-03-15      | 2025-01-15  | OPGEHEVEN |
     When de faillissementswet_curator wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # ===== Scenario 5: Persoon is geen faillissementscurator =====
@@ -78,7 +78,7 @@ Feature: Faillissementswet Curator (Fw Art. 64-71)
       | 400000004   | 500000006       | Henk Visser     | NATUURLIJK_PERSOON | F.10/24/123        | 2024-03-15      |             | ACTIEF |
     When de faillissementswet_curator wordt uitgevoerd door RECHTSPRAAK
     Then is niet voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   # ===== Scenario 6: Mix van actieve en opgeheven faillissementen =====
@@ -91,7 +91,7 @@ Feature: Faillissementswet Curator (Fw Art. 64-71)
       | 400000004   | 87654321        | Failliete BV      | RECHTSPERSOON      | F.10/24/456        | 2024-06-01      |             | ACTIEF    |
     When de faillissementswet_curator wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "87654321"
     And bevat de output "subject_ids" niet de waarde "500000006"
     And bevat de output "subject_names" waarde "Boedel Failliete BV"

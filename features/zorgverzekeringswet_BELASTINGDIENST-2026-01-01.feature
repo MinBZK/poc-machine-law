@@ -45,7 +45,7 @@ Feature: Zorgverzekeringswet - Inkomensafhankelijke bijdrage
     When de zorgverzekeringswet/bijdrage wordt uitgevoerd door BELASTINGDIENST
     Then is voldaan aan de voorwaarden
     And heeft de output "bijdrage_type" waarde "LAAG"
-    And heeft de output "is_aow_gerechtigd" waarde "true"
+    And is de output "is_aow_gerechtigd" waar
     # 3000000 * 0.0525 = 157500 eurocent = 1575.00 euro
     And heeft de output "verschuldigde_bijdrage" waarde "157500"
 

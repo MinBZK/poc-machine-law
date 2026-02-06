@@ -38,7 +38,7 @@ Feature: Berekening Huurtoeslag
       | TOESLAGEN | wet_op_de_huurtoeslag | SUBSIDIABELE_SERVICEKOSTEN | 4800          | verplichte gegevens |        |
     When de wet_op_de_huurtoeslag wordt uitgevoerd door TOESLAGEN met wijzigingen
     Then ontbreken er geen verplichte gegevens
-    And heeft de persoon recht op huurtoeslag
+    And is voldaan aan de voorwaarden
     And is de huurtoeslag "406.95" euro
 
   Scenario: Te hoog inkomen voor huurtoeslag

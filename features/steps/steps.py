@@ -69,22 +69,6 @@ def _check_output_empty(context, field: str) -> None:
     assertions.assertEqual(len(actual), 0, f"Expected {field} to be empty, but it was {actual}")
 
 
-def _check_output_bool(context, field: str, expected: bool, msg: str, default: bool | None = None) -> None:
-    """Assert a boolean output field value.
-
-    Args:
-        default: Value to use when field is missing. If None, uses `not expected`
-                 (missing field fails the assertion).
-    """
-    if default is None:
-        default = not expected
-    actual = context.result.output.get(field, default)
-    if expected:
-        assertions.assertTrue(actual, msg)
-    else:
-        assertions.assertFalse(actual, msg)
-
-
 def _check_eurocent_field(context, field: str, amount: str) -> None:
     """Check eurocent field values with field name mapping."""
     field_mapping = {
@@ -358,6 +342,16 @@ def step_impl(context, field, value):
     _check_output_field(context, field, value)
 
 
+@then('is de output "{field}" waar')
+def step_impl(context, field):
+    _check_output_field(context, field, "true")
+
+
+@then('is de output "{field}" onwaar')
+def step_impl(context, field):
+    _check_output_field(context, field, "false")
+
+
 @then('bevat de output "{field}" waarde "{value}"')
 def step_impl(context, field, value):
     _check_output_contains(context, field, value)
@@ -492,115 +486,6 @@ def step_impl(context, amount):
     compare_euro_amount(context.result.output["subsidiebedrag"], amount)
 
 
-# =============================================================================
-# Then Steps - Bbz 2004
-# =============================================================================
-
-
-@then('is de categorie_zelfstandige "{categorie}"')
-def step_impl(context, categorie):
-    actual = context.result.output["categorie_zelfstandige"]
-    assertions.assertEqual(actual, categorie, f"Expected categorie_zelfstandige to be {categorie}, but was {actual}")
-
-
-@then('is de max_duur_maanden "{maanden}"')
-def step_impl(context, maanden):
-    actual = context.result.output["max_duur_maanden"]
-    expected = int(maanden)
-    assertions.assertEqual(actual, expected, f"Expected max_duur_maanden to be {expected}, but was {actual}")
-
-
-@then('is het bedrijfskapitaal_type "{type}"')
-def step_impl(context, type):
-    actual = context.result.output["bedrijfskapitaal_type"]
-    assertions.assertEqual(actual, type, f"Expected bedrijfskapitaal_type to be {type}, but was {actual}")
-
-
-# =============================================================================
-# Then Steps - Zorgtoeslag
-# =============================================================================
-
-
-@then("heeft de persoon recht op zorgtoeslag")
-def step_impl(context):
-    assertions.assertTrue(
-        context.result.output["is_verzekerde_zorgtoeslag"],
-        "Expected person to be eligible for healthcare allowance, but they were not",
-    )
-
-
-# =============================================================================
-# Then Steps - Kinderopvangtoeslag
-# =============================================================================
-
-
-@then("heeft de persoon recht op kinderopvangtoeslag")
-def step_impl(context):
-    assertions.assertTrue(
-        "is_gerechtigd" in context.result.output and context.result.output["is_gerechtigd"],
-        "Expected person to be eligible for childcare allowance, but they were not",
-    )
-
-
-@then("heeft de persoon geen recht op kinderopvangtoeslag")
-def step_impl(context):
-    assertions.assertTrue(
-        "is_gerechtigd" not in context.result.output or not context.result.output["is_gerechtigd"],
-        "Expected person to NOT be eligible for childcare allowance, but they were",
-    )
-
-
-# =============================================================================
-# Then Steps - Huurtoeslag
-# =============================================================================
-
-
-@then("heeft de persoon recht op huurtoeslag")
-def step_impl(context):
-    assertions.assertTrue(context.result.requirements_met, "Persoon heeft toch geen recht op huurtoeslag")
-
-
-# =============================================================================
-# Then Steps - Stemrecht
-# =============================================================================
-
-
-@then("heeft de persoon stemrecht")
-def step_impl(context):
-    assertions.assertTrue(context.result.requirements_met, "Expected the person to have voting rights")
-
-
-@then("heeft de persoon geen stemrecht")
-def step_impl(context):
-    assertions.assertFalse(context.result.requirements_met, "Expected the person not to have voting rights")
-
-
-# =============================================================================
-# Then Steps - WW (Werkloosheidswet)
-# =============================================================================
-
-
-@then("heeft de persoon recht op WW")
-def step_impl(context):
-    _check_output_bool(
-        context, "heeft_recht_op_ww", True, "Expected person to have right to WW, but they did not", default=False
-    )
-
-
-@then("heeft de persoon geen recht op WW")
-def step_impl(context):
-    _check_output_bool(
-        context, "heeft_recht_op_ww", False, "Expected person to not have right to WW, but they did", default=False
-    )
-
-
-@then('is de WW duur "{maanden}" maanden')
-def step_impl(context, maanden):
-    expected = int(maanden)
-    actual = context.result.output.get("ww_duur_maanden")
-    assertions.assertEqual(actual, expected, f"Expected WW duration to be {expected} months, but was {actual}")
-
-
 @then('is de WW uitkering per maand ongeveer "{amount}"')
 def step_impl(context, amount):
     expected = parse_dutch_currency(amount)
@@ -635,20 +520,6 @@ def step_impl(context):
 # =============================================================================
 # Then Steps - Kindgebonden Budget
 # =============================================================================
-
-
-@then("heeft de persoon recht op kindgebonden budget")
-def step_impl(context):
-    assertions.assertTrue(
-        context.result.requirements_met, "Expected person to have right to kindgebonden budget, but they did not"
-    )
-
-
-@then("heeft de persoon geen recht op kindgebonden budget")
-def step_impl(context):
-    assertions.assertFalse(
-        context.result.requirements_met, "Expected person to not have right to kindgebonden budget, but they did"
-    )
 
 
 @then('is het ALO-kop bedrag "{amount}"')
@@ -734,41 +605,6 @@ def step_impl(context):
 
 
 # =============================================================================
-# Then Steps - LAA (Landelijke Aanpak Adreskwaliteit)
-# =============================================================================
-
-
-@then("genereert wet_brp/laa een signaal")
-def step_impl(context):
-    _check_output_bool(context, "genereer_signaal", True, "Expected LAA to generate a signal, but it did not")
-
-
-@then("genereert wet_brp/laa geen signaal")
-def step_impl(context):
-    _check_output_bool(context, "genereer_signaal", False, "Expected LAA not to generate a signal, but it did")
-
-
-@then('is het signaal_type "{signaal_type}"')
-def step_impl(context, signaal_type):
-    actual = context.result.output.get("signaal_type")
-    assertions.assertEqual(actual, signaal_type, f"Expected signaal_type to be '{signaal_type}', but was '{actual}'")
-
-
-@then('is de reactietermijn_weken "{weken}"')
-def step_impl(context, weken):
-    actual = context.result.output.get("reactietermijn_weken")
-    expected = int(weken)
-    assertions.assertEqual(actual, expected, f"Expected reactietermijn_weken to be {expected}, but was {actual}")
-
-
-@then('is de onderzoekstermijn_maanden "{maanden}"')
-def step_impl(context, maanden):
-    actual = context.result.output.get("onderzoekstermijn_maanden")
-    expected = int(maanden)
-    assertions.assertEqual(actual, expected, f"Expected onderzoekstermijn_maanden to be {expected}, but was {actual}")
-
-
-# =============================================================================
 # Then Steps - Case Management (Bezwaar/Beroep)
 # =============================================================================
 
@@ -822,164 +658,3 @@ def step_impl(context, competent_court):
     assertions.assertEqual(
         competent_court, case.appeal_status.get("competent_court"), "Expected another competent court"
     )
-
-
-# =============================================================================
-# Then Steps - Archiefwet
-# =============================================================================
-
-
-@then("moet het archiefstuk overgebracht worden")
-def step_impl(context):
-    _check_output_bool(
-        context, "moet_overgebracht_worden", True, "Expected archiefstuk to require overbrenging, but it does not"
-    )
-
-
-@then("hoeft het archiefstuk niet overgebracht te worden")
-def step_impl(context):
-    _check_output_bool(
-        context, "moet_overgebracht_worden", False, "Expected archiefstuk to NOT require overbrenging, but it does"
-    )
-
-
-@then('is de uiterste overbrengdatum "{date}"')
-def step_impl(context, date):
-    actual = context.result.output.get("uiterste_overbrengdatum")
-    assertions.assertEqual(actual, date, f"Expected uiterste_overbrengdatum to be {date}, but was {actual}")
-
-
-@then("is het archiefstuk openbaar")
-def step_impl(context):
-    _check_output_bool(context, "is_openbaar", True, "Expected archiefstuk to be openbaar, but it is not")
-
-
-@then("is het archiefstuk niet openbaar")
-def step_impl(context):
-    _check_output_bool(context, "is_openbaar", False, "Expected archiefstuk to NOT be openbaar, but it is")
-
-
-@then('is de beperking reden "{reason}"')
-def step_impl(context, reason):
-    actual = context.result.output.get("beperking_reden")
-    assertions.assertEqual(actual, reason, f"Expected beperking_reden to be '{reason}', but was '{actual}'")
-
-
-@then('is het archiefstuk openbaar vanaf "{date}"')
-def step_impl(context, date):
-    actual = context.result.output.get("openbaar_vanaf") or context.result.output.get("openbaar_vanaf_datum")
-    assertions.assertEqual(actual, date, f"Expected openbaar_vanaf to be {date}, but was {actual}")
-
-
-@then("mag het archiefstuk vernietigd worden")
-def step_impl(context):
-    _check_output_bool(
-        context, "mag_vernietigd_worden", True, "Expected archiefstuk mag vernietigd worden, but it may not"
-    )
-
-
-@then("mag het archiefstuk niet vernietigd worden")
-def step_impl(context):
-    _check_output_bool(
-        context, "mag_vernietigd_worden", False, "Expected archiefstuk mag NIET vernietigd worden, but it may"
-    )
-
-
-@then('mag het archiefstuk vernietigd worden vanaf "{date}"')
-def step_impl(context, date):
-    actual = context.result.output.get("vernietigingsdatum") or context.result.output.get("vernietig_vanaf_datum")
-    assertions.assertEqual(actual, date, f"Expected vernietigingsdatum to be {date}, but was {actual}")
-
-
-@then('is de reden van niet vernietigen "{reason}"')
-def step_impl(context, reason):
-    actual = context.result.output.get("reden_niet_vernietigen")
-    assertions.assertEqual(actual, reason, f"Expected reden_niet_vernietigen to be '{reason}', but was '{actual}'")
-
-
-# =============================================================================
-# Then Steps - Bibob/LBB
-# =============================================================================
-
-
-@then("is er geen advies uitgebracht")
-def step_impl(context):
-    _check_output_bool(context, "advies_uitgebracht", False, "Expected no advies uitgebracht, but advies was issued")
-
-
-@then("is er een advies uitgebracht")
-def step_impl(context):
-    _check_output_bool(context, "advies_uitgebracht", True, "Expected advies uitgebracht, but no advies was issued")
-
-
-@then("wordt verlening geadviseerd")
-def step_impl(context):
-    _check_output_bool(context, "verlening_geadviseerd", True, "Expected verlening geadviseerd, but it was not")
-
-
-@then("wordt verlening niet geadviseerd")
-def step_impl(context):
-    _check_output_bool(context, "verlening_geadviseerd", False, "Expected verlening NOT geadviseerd, but it was")
-
-
-@then("is weigering mogelijk")
-def step_impl(context):
-    _check_output_bool(context, "weigering_mogelijk", True, "Expected weigering mogelijk, but it is not")
-
-
-@then("is weigering niet mogelijk")
-def step_impl(context):
-    _check_output_bool(context, "weigering_mogelijk", False, "Expected weigering NOT mogelijk, but it is")
-
-
-@then("zijn voorschriften mogelijk")
-def step_impl(context):
-    _check_output_bool(context, "voorschriften_mogelijk", True, "Expected voorschriften mogelijk, but they are not")
-
-
-@then("zijn voorschriften niet mogelijk")
-def step_impl(context):
-    _check_output_bool(context, "voorschriften_mogelijk", False, "Expected voorschriften NOT mogelijk, but they are")
-
-
-@then('is de mate van gevaar "{mate}"')
-def step_impl(context, mate):
-    actual = context.result.output.get("mate_van_gevaar")
-    assertions.assertEqual(actual, mate, f"Expected mate_van_gevaar to be '{mate}', but was '{actual}'")
-
-
-@then("is er sprake van financieringsrisico")
-def step_impl(context):
-    _check_output_bool(context, "financieringsrisico", True, "Expected financieringsrisico, but there is none")
-
-
-@then("is er een relatie tot strafbare feiten")
-def step_impl(context):
-    _check_output_bool(
-        context, "relatie_strafbare_feiten", True, "Expected relatie tot strafbare feiten, but there is none"
-    )
-
-
-# =============================================================================
-# Then Steps - Adviesplicht / Bestuursorgaan
-# =============================================================================
-
-
-@then("valt het project onder adviesplicht")
-def step_impl(context):
-    _check_output_bool(context, "adviesplicht", True, "Expected project to fall under adviesplicht")
-
-
-@then("valt het project niet onder adviesplicht")
-def step_impl(context):
-    _check_output_bool(context, "adviesplicht", False, "Expected project to NOT fall under adviesplicht")
-
-
-@then("is de organisatie een bestuursorgaan")
-def step_impl(context):
-    _check_output_bool(context, "is_bestuursorgaan", True, "Expected organization to be a bestuursorgaan")
-
-
-@then("is de organisatie geen bestuursorgaan")
-def step_impl(context):
-    _check_output_bool(context, "is_bestuursorgaan", False, "Expected organization to NOT be a bestuursorgaan")

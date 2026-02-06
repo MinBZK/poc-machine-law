@@ -47,10 +47,10 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000001 | 4000000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
-    And is de WW duur "8" maanden
+    Then is de output "heeft_recht_op_ww" waar
+    And heeft de output "ww_duur_maanden" waarde "8"
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And is het totale kindgebonden budget ongeveer "€5.870,00" per jaar
 
@@ -94,10 +94,10 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000002 | 8000000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
+    Then is de output "heeft_recht_op_ww" waar
     And is de WW uitkering maximaal omdat het dagloon gemaximeerd is
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And is het kindgebonden budget lager door hoog inkomen
 
@@ -141,10 +141,10 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000003 | 3500000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
-    And is de WW duur "7" maanden
+    Then is de output "heeft_recht_op_ww" waar
+    And heeft de output "ww_duur_maanden" waarde "7"
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And ontvangt de persoon de ALO-kop omdat deze alleenstaand is
 
@@ -188,10 +188,10 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000004 | 2500000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon recht op WW
-    And is de WW duur "5" maanden
+    Then is de output "heeft_recht_op_ww" waar
+    And heeft de output "ww_duur_maanden" waarde "5"
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And is het kindgebonden budget hoog door laag inkomen en meerdere kinderen
     And ontvangt de persoon extra bedragen voor kinderen 12+ en 16+
@@ -236,8 +236,8 @@ Feature: Integratie WW en Kindgebonden Budget
       | 300000005 | 1200000  |
     # Tests
     When de werkloosheidswet wordt uitgevoerd door UWV
-    Then heeft de persoon geen recht op WW
+    Then is de output "heeft_recht_op_ww" onwaar
     When de wet_op_het_kindgebonden_budget wordt uitgevoerd door TOESLAGEN
-    Then heeft de persoon recht op kindgebonden budget
+    Then is voldaan aan de voorwaarden
     And is het ALO-kop bedrag "€3.480,00"
     And is het kindgebonden budget maximaal door laag inkomen

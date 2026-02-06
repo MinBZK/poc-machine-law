@@ -13,7 +13,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-001   | 1000000000    | MINISTERIE       | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project onder adviesplicht
+    Then is de output "adviesplicht" waar
     And zijn de project kosten "10000000.00" euro
 
   Scenario: ICT-project ZBO van €6 miljoen valt onder adviesplicht
@@ -22,7 +22,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-002   | 600000000     | ZBO              | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project onder adviesplicht
+    Then is de output "adviesplicht" waar
     And zijn de project kosten "6000000.00" euro
 
   Scenario: ICT-project politie van €5 miljoen valt precies op drempel
@@ -31,7 +31,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-003   | 500000000     | POLITIE          | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project onder adviesplicht
+    Then is de output "adviesplicht" waar
     And zijn de project kosten "5000000.00" euro
 
   Scenario: ICT-project ministerie van €4 miljoen valt niet onder adviesplicht
@@ -40,7 +40,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-004   | 400000000     | MINISTERIE       | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project niet onder adviesplicht
+    Then is de output "adviesplicht" onwaar
     And zijn de project kosten "4000000.00" euro
 
   Scenario: Wapensysteem defensie van €20 miljoen valt niet onder adviesplicht
@@ -49,7 +49,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-005   | 2000000000    | MINISTERIE       | WAPENSYSTEEM |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project niet onder adviesplicht
+    Then is de output "adviesplicht" onwaar
     And zijn de project kosten "20000000.00" euro
 
   Scenario: ICT-project rechterlijke macht van €8 miljoen valt onder adviesplicht
@@ -58,7 +58,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type  | project_type |
       | PROJ-006   | 800000000     | RECHTERLIJKE_MACHT | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project onder adviesplicht
+    Then is de output "adviesplicht" waar
     And zijn de project kosten "8000000.00" euro
 
   Scenario: ICT-project gemeente van €10 miljoen valt niet onder adviesplicht
@@ -67,7 +67,7 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-007   | 1000000000    | GEMEENTE         | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project niet onder adviesplicht
+    Then is de output "adviesplicht" onwaar
     And zijn de project kosten "10000000.00" euro
 
   Scenario: Complex ICT-project ZBO met hoge kosten valt onder adviesplicht
@@ -76,5 +76,5 @@ Feature: Bepalen adviesplicht ICT-projecten
       | project_id | totale_kosten | organisatie_type | project_type |
       | PROJ-008   | 5000000000    | ZBO              | REGULIER     |
     When de wet_adviescollege_ict_toetsing wordt uitgevoerd door ACICT
-    Then valt het project onder adviesplicht
+    Then is de output "adviesplicht" waar
     And zijn de project kosten "50000000.00" euro

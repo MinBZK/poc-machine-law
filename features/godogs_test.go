@@ -312,94 +312,14 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Then(`^is de zakelijk_auto_benzine "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputInt(ctx, "zakelijk_auto_benzine", v) })
 	ctx.Then(`^is de zakelijk_auto_diesel "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputInt(ctx, "zakelijk_auto_diesel", v) })
 
-	// String field assertions
-	ctx.Then(`^is de categorie_zelfstandige "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputString(ctx, "categorie_zelfstandige", v) })
-	ctx.Then(`^is het bedrijfskapitaal_type "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputString(ctx, "bedrijfskapitaal_type", v) })
-	ctx.Then(`^is de rapportageverplichting "([^"]*)"$`, isDeRapportageverplichting)
-
-	// Boolean assertions: voting rights
-	ctx.Then(`^heeft de persoon stemrecht$`, func(ctx context.Context) error { requirementsMet(ctx, "Expected the person to have voting rights"); return nil })
-	ctx.Then(`^heeft de persoon geen stemrecht$`, func(ctx context.Context) error { requirementsNotMet(ctx, "Expected the person to not have voting rights"); return nil })
-
-	// Boolean assertions: huurtoeslag
-	ctx.Then(`^heeft de persoon recht op huurtoeslag$`, func(ctx context.Context) error { requirementsMet(ctx, "Persoon heeft toch geen recht op huurtoeslag"); return nil })
-
-	// Boolean assertions: zorgtoeslag
-	ctx.Then(`^heeft de persoon recht op zorgtoeslag$`, func(ctx context.Context) error {
-		return checkOutputBoolTrue(ctx, "is_verzekerde_zorgtoeslag", "Expected person to be eligible for zorgtoeslag")
-	})
-
-	// Boolean assertions: kinderopvangtoeslag
-	ctx.Step(`^heeft de persoon recht op kinderopvangtoeslag$`, func(ctx context.Context) error {
-		return checkOutputBoolTrue(ctx, "is_gerechtigd", "Expected person to be eligible for kinderopvangtoeslag")
-	})
-	ctx.Step(`^heeft de persoon geen recht op kinderopvangtoeslag$`, func(ctx context.Context) error {
-		return checkOutputBoolFalse(ctx, "is_gerechtigd", "Expected person to NOT be eligible for kinderopvangtoeslag")
-	})
-
-	// Boolean assertions: WW
-	ctx.Step(`^heeft de persoon recht op WW$`, func(ctx context.Context) error {
-		return checkOutputBoolTrue(ctx, "heeft_recht_op_ww", "Expected person to be eligible for WW")
-	})
-	ctx.Step(`^heeft de persoon geen recht op WW$`, heeftDePersoonGeenRechtOpWW)
-
-	// Boolean assertions: kindgebonden budget
-	ctx.Step(`^heeft de persoon recht op kindgebonden budget$`, func(ctx context.Context) error { requirementsMet(ctx, "Expected person to have right to kindgebonden budget"); return nil })
-	ctx.Step(`^heeft de persoon geen recht op kindgebonden budget$`, func(ctx context.Context) error { requirementsNotMet(ctx, "Expected person to NOT have right to kindgebonden budget"); return nil })
-
-	// Boolean assertions: bestuursorgaan
-	ctx.Step(`^is de organisatie een bestuursorgaan$`, func(ctx context.Context) error {
-		return checkOutputBoolTrue(ctx, "is_bestuursorgaan", "Expected organisation to be a bestuursorgaan")
-	})
-	ctx.Step(`^is de organisatie geen bestuursorgaan$`, func(ctx context.Context) error {
-		return checkOutputBoolFalse(ctx, "is_bestuursorgaan", "Expected organisation to NOT be a bestuursorgaan")
-	})
-
-	// Boolean assertions: adviesplicht
-	ctx.Step(`^valt het project onder adviesplicht$`, func(ctx context.Context) error {
-		return checkOutputBoolTrue(ctx, "adviesplicht", "Expected project to be subject to adviesplicht")
-	})
-	ctx.Step(`^valt het project niet onder adviesplicht$`, func(ctx context.Context) error {
-		return checkOutputBoolFalse(ctx, "adviesplicht", "Expected project to NOT be subject to adviesplicht")
-	})
-
-	// WW-specific assertions
-	ctx.Step(`^is de WW duur "([^"]*)" maanden$`, func(ctx context.Context, v string) error { return checkOutputInt(ctx, "ww_duur_maanden", v) })
-	ctx.Step(`^is de WW uitkering per maand maximaal "([^"]*)"$`, func(ctx context.Context, amount string) error {
-		return checkDutchCurrencyExact(ctx, "ww_uitkering_per_maand", amount)
-	})
-	ctx.Step(`^is de WW uitkering per maand ongeveer "([^"]*)"$`, func(ctx context.Context, amount string) error {
-		return checkDutchCurrencyApprox(ctx, "ww_uitkering_per_maand", amount, 50)
-	})
-	ctx.Step(`^is de WW uitkering maximaal omdat het dagloon gemaximeerd is$`, isDeWWUitkeringMaximaal)
-
-	// Kindgebonden budget assertions
-	ctx.Step(`^is het ALO-kop bedrag "([^"]*)"$`, func(ctx context.Context, amount string) error {
-		return checkDutchCurrencyExact(ctx, "alo_kop_bedrag", amount)
-	})
-	ctx.Step(`^is het kindgebonden budget ongeveer "([^"]*)" per jaar$`, func(ctx context.Context, amount string) error {
-		return checkDutchCurrencyApprox(ctx, "kindgebonden_budget_jaar", amount, 50)
-	})
-	ctx.Step(`^is het totale kindgebonden budget ongeveer "([^"]*)" per jaar$`, isHetTotaleKindgebondenBudgetOngeveerPerJaar)
-	ctx.Step(`^is het kindgebonden budget lager door hoog inkomen$`, isHetKindgebondenBudgetLagerDoorHoogInkomen)
-	ctx.Step(`^ontvangt de persoon de ALO-kop omdat deze alleenstaand is$`, ontvangtDePersoonDeALOkopOmdatDezeAlleenstaandIs)
-	ctx.Step(`^is het kindgebonden budget hoog door laag inkomen en meerdere kinderen$`, isHetKindgebondenBudgetHoogDoorLaagInkomenEnMeerdereKinderen)
-	ctx.Step(`^ontvangt de persoon extra bedragen voor kinderen 12\+ en 16\+$`, ontvangtDePersoonExtraBedragenVoorKinderen12Plus)
-	ctx.Step(`^is het kindgebonden budget maximaal door laag inkomen$`, isHetKindgebondenBudgetMaximaalDoorLaagInkomen)
-
-	// LAA assertions
-	ctx.Step(`^genereert wet_brp/laa een signaal$`, func(ctx context.Context) error {
-		return checkOutputBoolTrue(ctx, "genereer_signaal", "Expected LAA to generate a signal")
-	})
-	ctx.Step(`^genereert wet_brp/laa geen signaal$`, func(ctx context.Context) error {
-		return checkOutputBoolFalse(ctx, "genereer_signaal", "Expected LAA to NOT generate a signal")
-	})
-	ctx.Step(`^is het signaal_type "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputString(ctx, "signaal_type", v) })
-	ctx.Step(`^is de reactietermijn_weken "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputInt(ctx, "reactietermijn_weken", v) })
-	ctx.Step(`^is de onderzoekstermijn_maanden "([^"]*)"$`, func(ctx context.Context, v string) error { return checkOutputInt(ctx, "onderzoekstermijn_maanden", v) })
-
 	// Generic output assertions
 	ctx.Step(`^heeft de output "([^"]*)" waarde "([^"]*)"$`, heeftDeOutputWaarde)
+	ctx.Step(`^is de output "([^"]*)" waar$`, func(ctx context.Context, field string) error {
+		return checkOutputBoolTrue(ctx, field, fmt.Sprintf("Expected '%s' to be true", field))
+	})
+	ctx.Step(`^is de output "([^"]*)" onwaar$`, func(ctx context.Context, field string) error {
+		return checkOutputBoolFalse(ctx, field, fmt.Sprintf("Expected '%s' to be false", field))
+	})
 	ctx.Step(`^bevat de output "([^"]*)" waarde "(\[.+\])"$`, bevatDeOutputWaarde)
 	ctx.Step(`^bevat de output "([^"]*)" waarde "([^"]*)"$`, bevatDeOutputWaarde)
 	ctx.Step(`^bevat de output "([^"]*)" niet de waarde "([^"]*)"$`, bevatDeOutputNietDeWaarde)
@@ -837,89 +757,6 @@ func isDeWerkgeversbijdrageEurocent(ctx context.Context, expected string) error 
 	expectedInt, err := strconv.Atoi(expected)
 	require.NoError(godog.T(ctx), err)
 	assert.Equal(godog.T(ctx), expectedInt, actual, "Expected werkgeversbijdrage to be %d eurocent, but was %d", expectedInt, actual)
-	return nil
-}
-
-// =============================================================================
-// Then steps: boolean field assertions
-// =============================================================================
-
-func isDeRapportageverplichting(ctx context.Context, expected string) error {
-	actual := requireOutputBool(ctx, "rapportageverplichting")
-	expectedBool := expected == "true" || expected == "True" || expected == "TRUE"
-	assert.Equal(godog.T(ctx), expectedBool, actual, "Expected rapportageverplichting to be %v, but was %v", expectedBool, actual)
-	return nil
-}
-
-// =============================================================================
-// Then steps: WW special
-// =============================================================================
-
-func heeftDePersoonGeenRechtOpWW(ctx context.Context) error {
-	result := getResult(ctx)
-	v, ok := result.Output["heeft_recht_op_ww"]
-	if !ok {
-		assert.False(godog.T(ctx), result.RequirementsMet, "Expected person to NOT be eligible for WW")
-		return nil
-	}
-	actual, ok := v.(bool)
-	require.True(godog.T(ctx), ok)
-	assert.False(godog.T(ctx), actual, "Expected person to NOT be eligible for WW, but they were")
-	return nil
-}
-
-func isDeWWUitkeringMaximaal(ctx context.Context) error {
-	dagloonValue := requireOutputInt(ctx, "ww_dagloon")
-	maxDagloon := 29067
-	assert.GreaterOrEqual(godog.T(ctx), dagloonValue, maxDagloon, "Expected dagloon to be at maximum")
-	return nil
-}
-
-// =============================================================================
-// Then steps: kindgebonden budget (narrative assertions)
-// =============================================================================
-
-func isHetTotaleKindgebondenBudgetOngeveerPerJaar(ctx context.Context, expectedAmount string) error {
-	actual := requireOutputInt(ctx, "kindgebonden_budget_jaar")
-	expected := parseDutchCurrency(ctx, expectedAmount)
-	expectedCents := int(expected * 100)
-	tolerance := float64(expectedCents) * 0.02
-	assert.InDelta(godog.T(ctx), expectedCents, actual, tolerance,
-		"Expected total kindgebonden budget approximately €%.2f, got €%.2f",
-		expected, float64(actual)/100.0)
-	return nil
-}
-
-func isHetKindgebondenBudgetLagerDoorHoogInkomen(ctx context.Context) error {
-	actual := requireOutputInt(ctx, "kindgebonden_budget_jaar")
-	maxBudget := 850200
-	assert.Less(godog.T(ctx), actual, maxBudget,
-		"Expected budget to be reduced from maximum €8,502, but was €%.2f", float64(actual)/100)
-	return nil
-}
-
-func ontvangtDePersoonDeALOkopOmdatDezeAlleenstaandIs(ctx context.Context) error {
-	actual := requireOutputInt(ctx, "alo_kop_bedrag")
-	assert.Positive(godog.T(ctx), actual, "Expected ALO-kop to be greater than 0 for single parent")
-	return nil
-}
-
-func isHetKindgebondenBudgetHoogDoorLaagInkomenEnMeerdereKinderen(ctx context.Context) error {
-	actual := requireOutputInt(ctx, "kindgebonden_budget_jaar")
-	assert.GreaterOrEqual(godog.T(ctx), actual, 700000,
-		"Expected budget to be high due to low income and multiple children, but was €%.2f", float64(actual)/100)
-	return nil
-}
-
-func ontvangtDePersoonExtraBedragenVoorKinderen12Plus(ctx context.Context) error {
-	_, ok := getOutputField(ctx, "kindgebonden_budget_jaar")
-	require.True(godog.T(ctx), ok, "Expected 'kindgebonden_budget_jaar' to be present in output")
-	return nil
-}
-
-func isHetKindgebondenBudgetMaximaalDoorLaagInkomen(ctx context.Context) error {
-	actual := requireOutputInt(ctx, "kindgebonden_budget_jaar")
-	assert.InDelta(godog.T(ctx), 599100, actual, 10000, "Expected budget to be near maximum for low income")
 	return nil
 }
 

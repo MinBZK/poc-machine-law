@@ -19,10 +19,10 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "1234AB", "huisnummer": "10"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa een signaal
-    And is het signaal_type "MELDING"
-    And is de reactietermijn_weken "4"
-    And is de onderzoekstermijn_maanden "6"
+    And is de output "genereer_signaal" waar
+    And heeft de output "signaal_type" waarde "MELDING"
+    And heeft de output "reactietermijn_weken" waarde "4"
+    And heeft de output "onderzoekstermijn_maanden" waarde "6"
 
   Scenario: Toeslagen meldt twijfel over adres - genereert signaal type MELDING
     Given een persoon met BSN "999993654"
@@ -36,8 +36,8 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "5678CD", "huisnummer": "25"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa een signaal
-    And is het signaal_type "MELDING"
+    And is de output "genereer_signaal" waar
+    And heeft de output "signaal_type" waarde "MELDING"
 
   Scenario: CJIB meldt twijfel over adres - genereert signaal type MELDING
     Given een persoon met BSN "999993655"
@@ -51,8 +51,8 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "9012EF", "huisnummer": "42"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa een signaal
-    And is het signaal_type "MELDING"
+    And is de output "genereer_signaal" waar
+    And heeft de output "signaal_type" waarde "MELDING"
 
   Scenario: Profiel "Overbewoning" - hoog aantal bewoners op adres zonder woonfunctie
     Given een persoon met BSN "999993657"
@@ -75,10 +75,10 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "3456GH", "huisnummer": "100"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa een signaal
-    And is het signaal_type "PROFIEL"
-    And is de reactietermijn_weken "4"
-    And is de onderzoekstermijn_maanden "6"
+    And is de output "genereer_signaal" waar
+    And heeft de output "signaal_type" waarde "PROFIEL"
+    And heeft de output "reactietermijn_weken" waarde "4"
+    And heeft de output "onderzoekstermijn_maanden" waarde "6"
 
   Scenario: Normaal adres zonder meldingen of profielen - geen signaal
     Given een persoon met BSN "999993658"
@@ -101,7 +101,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "7890IJ", "huisnummer": "15"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa geen signaal
+    And is de output "genereer_signaal" onwaar
 
   Scenario: Hoog aantal bewoners maar met woonfunctie - geen signaal
     Given een persoon met BSN "999993659"
@@ -124,7 +124,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "2345KL", "huisnummer": "200"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa geen signaal
+    And is de output "genereer_signaal" onwaar
 
   Scenario: Adres zonder woonfunctie maar met laag aantal bewoners - geen signaal
     Given een persoon met BSN "999993660"
@@ -147,7 +147,7 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "6789MN", "huisnummer": "50"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa geen signaal
+    And is de output "genereer_signaal" onwaar
 
   Scenario: Combinatie van melding en profiel - signaal type blijft MELDING
     Given een persoon met BSN "999993656"
@@ -164,5 +164,5 @@ Feature: Landelijke Aanpak Adreskwaliteit (LAA)
       | ADRES |
       | {"postcode": "4567OP", "huisnummer": "75"} |
     Then is voldaan aan de voorwaarden
-    And genereert wet_brp/laa een signaal
-    And is het signaal_type "MELDING"
+    And is de output "genereer_signaal" waar
+    And heeft de output "signaal_type" waarde "MELDING"

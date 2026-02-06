@@ -14,7 +14,7 @@ Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
       | bsn       | geboortedatum | heeft_handlichting |
       | 200000001 | 2011-06-15    | false              |
     When de burgerlijk_wetboek_minderjarigheid wordt uitgevoerd door RvIG
-    Then heeft de output "is_minderjarig" waarde "true"
+    Then is de output "is_minderjarig" waar
     And heeft de output "leeftijd" waarde "13"
     And bevat de output "base_permissions" waarde "LEZEN"
     And bevat de output "base_permissions" niet de waarde "CLAIMS_INDIENEN"
@@ -26,7 +26,7 @@ Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
       | bsn       | geboortedatum | heeft_handlichting |
       | 300000001 | 2006-01-01    | false              |
     When de burgerlijk_wetboek_minderjarigheid wordt uitgevoerd door RvIG
-    Then heeft de output "is_minderjarig" waarde "false"
+    Then is de output "is_minderjarig" onwaar
     And heeft de output "leeftijd" waarde "19"
     And bevat de output "base_permissions" waarde "CLAIMS_INDIENEN"
     And bevat de output "base_permissions" waarde "BESLUITEN_ONTVANGEN"
@@ -38,9 +38,9 @@ Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
       | bsn       | geboortedatum | heeft_handlichting | handlichting_gebieden     |
       | 400000001 | 2008-03-20    | true               | ["BEROEP_BEDRIJF"]        |
     When de burgerlijk_wetboek_minderjarigheid wordt uitgevoerd door RvIG
-    Then heeft de output "is_minderjarig" waarde "true"
+    Then is de output "is_minderjarig" waar
     And heeft de output "leeftijd" waarde "16"
-    And heeft de output "heeft_handlichting" waarde "true"
+    And is de output "heeft_handlichting" waar
     And bevat de output "base_permissions" waarde "CLAIMS_INDIENEN"
     And bevat de output "handlichting_gebieden" waarde "BEROEP_BEDRIJF"
 
@@ -51,7 +51,7 @@ Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
       | bsn       | geboortedatum | heeft_handlichting |
       | 500000001 | 2007-03-01    | false              |
     When de burgerlijk_wetboek_minderjarigheid wordt uitgevoerd door RvIG
-    Then heeft de output "is_minderjarig" waarde "false"
+    Then is de output "is_minderjarig" onwaar
     And heeft de output "leeftijd" waarde "18"
     And bevat de output "base_permissions" waarde "CLAIMS_INDIENEN"
 
@@ -62,7 +62,7 @@ Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
       | bsn       | geboortedatum | heeft_handlichting |
       | 600000001 | 2007-03-02    | false              |
     When de burgerlijk_wetboek_minderjarigheid wordt uitgevoerd door RvIG
-    Then heeft de output "is_minderjarig" waarde "true"
+    Then is de output "is_minderjarig" waar
     And heeft de output "leeftijd" waarde "17"
     And bevat de output "base_permissions" waarde "LEZEN"
     And bevat de output "base_permissions" niet de waarde "CLAIMS_INDIENEN"
@@ -73,7 +73,7 @@ Feature: Burgerlijk Wetboek Minderjarigheid - Handelingsbekwaamheid
       | bsn       | geboortedatum | heeft_handlichting |
       | 200000002 | 2020-01-01    | false              |
     When de burgerlijk_wetboek_minderjarigheid wordt uitgevoerd door RvIG
-    Then heeft de output "is_minderjarig" waarde "true"
+    Then is de output "is_minderjarig" waar
     And heeft de output "leeftijd" waarde "5"
     And bevat de output "base_permissions" waarde "LEZEN"
     And bevat de output "base_permissions" niet de waarde "CLAIMS_INDIENEN"

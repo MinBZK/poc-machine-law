@@ -15,7 +15,7 @@ Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
       | 400000001   | 500000001    | Sophie van Dam | 2022-01-15   |             | ACTIEF |
     When de burgerlijk_wetboek_curatele wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000001"
     And bevat de output "subject_names" waarde "Sophie van Dam"
     And bevat de output "subject_types" waarde "CITIZEN"
@@ -40,7 +40,7 @@ Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
       | 400000007   | 500000009    | Jan de Boer  | 2020-01-01   | 2023-12-31  | BEEINDIGD |
     When de burgerlijk_wetboek_curatele wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Curatele met einddatum in het verleden geeft geen delegaties
@@ -51,7 +51,7 @@ Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
       | 400000001   | 500000001    | Sophie van Dam | 2020-01-01   | 2024-12-31  | ACTIEF |
     When de burgerlijk_wetboek_curatele wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "false"
+    And is de output "heeft_delegaties" onwaar
     And is de output "subject_ids" leeg
 
   Scenario: Curator met meerdere curandussen heeft meerdere delegaties
@@ -63,7 +63,7 @@ Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
       | 400000001   | 500000010    | Pieter Zwak     | 2023-06-01   |             | ACTIEF |
     When de burgerlijk_wetboek_curatele wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000001"
     And bevat de output "subject_ids" waarde "500000010"
     And bevat de output "subject_names" waarde "Sophie van Dam"
@@ -78,7 +78,7 @@ Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
       | 400000001   | 500000009    | Jan de Boer    | 2020-01-01   | 2023-12-31  | BEEINDIGD |
     When de burgerlijk_wetboek_curatele wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000001"
     And bevat de output "subject_ids" niet de waarde "500000009"
 
@@ -90,6 +90,6 @@ Feature: Burgerlijk Wetboek Curatele (BW 1:378-391)
       | 400000001   | 500000001    | Sophie van Dam | 2022-01-15   | 2026-12-31  | ACTIEF |
     When de burgerlijk_wetboek_curatele wordt uitgevoerd door RECHTSPRAAK
     Then is voldaan aan de voorwaarden
-    And heeft de output "heeft_delegaties" waarde "true"
+    And is de output "heeft_delegaties" waar
     And bevat de output "subject_ids" waarde "500000001"
     And bevat de output "valid_until_dates" waarde "2026-12-31"
