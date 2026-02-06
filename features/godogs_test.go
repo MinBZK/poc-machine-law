@@ -397,6 +397,121 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 		return setParam(ctx, "BRUTO_LOON", f), nil
 	})
 
+	// Archiefstuk setup
+	ctx.Given(`^een archiefstuk met de volgende eigenschappen:$`, eenArchiefstukMetEigenschappen)
+	ctx.Given(`^een onderneming met KVK nummer "([^"]*)"$`, func(ctx context.Context, kvk string) (context.Context, error) {
+		return setParam(ctx, "KVK_NUMMER", kvk), nil
+	})
+	ctx.Given(`^de aanvraag betreft een "([^"]*)"$`, func(ctx context.Context, t string) (context.Context, error) {
+		return setParam(ctx, "AANVRAAG_TYPE", t), nil
+	})
+	ctx.Given(`^er is geen Bibob-advies uitgebracht voor deze onderneming$`, func(ctx context.Context) (context.Context, error) {
+		return setParam(ctx, "NO_BIBOB_ADVIES", true), nil
+	})
+
+	// AWB assertions
+	ctx.Then(`^is de organisatie een bestuursorgaan$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "is_bestuursorgaan", "Expected organisation to be a bestuursorgaan")
+	})
+	ctx.Then(`^is de organisatie geen bestuursorgaan$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "is_bestuursorgaan", "Expected organisation to NOT be a bestuursorgaan")
+	})
+
+	// ACICT assertions
+	ctx.Then(`^valt het project onder adviesplicht$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "adviesplicht", "Expected project to fall under adviesplicht")
+	})
+	ctx.Then(`^valt het project niet onder adviesplicht$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "adviesplicht", "Expected project to NOT fall under adviesplicht")
+	})
+
+	// Archiefwet assertions
+	ctx.Then(`^moet het archiefstuk overgebracht worden$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "moet_overgebracht_worden", "Expected archiefstuk to require transfer")
+	})
+	ctx.Then(`^hoeft het archiefstuk niet overgebracht te worden$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "moet_overgebracht_worden", "Expected archiefstuk to NOT require transfer")
+	})
+	ctx.Then(`^is het archiefstuk openbaar$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "is_openbaar", "Expected archiefstuk to be public")
+	})
+	ctx.Then(`^is het archiefstuk niet openbaar$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "is_openbaar", "Expected archiefstuk to NOT be public")
+	})
+	ctx.Then(`^is het archiefstuk openbaar vanaf "([^"]*)"$`, func(ctx context.Context, date string) error {
+		return checkOutputString(ctx, "openbaar_vanaf", date)
+	})
+	ctx.Then(`^mag het archiefstuk vernietigd worden$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "mag_vernietigd_worden", "Expected archiefstuk to be destroyable")
+	})
+	ctx.Then(`^mag het archiefstuk niet vernietigd worden$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "mag_vernietigd_worden", "Expected archiefstuk to NOT be destroyable")
+	})
+	ctx.Then(`^mag het archiefstuk vernietigd worden vanaf "([^"]*)"$`, func(ctx context.Context, date string) error {
+		return checkOutputString(ctx, "vernietigingsdatum", date)
+	})
+	ctx.Then(`^is de uiterste overbrengdatum "([^"]*)"$`, func(ctx context.Context, date string) error {
+		return checkOutputString(ctx, "uiterste_overbrengdatum", date)
+	})
+	ctx.Then(`^is de beperking reden "([^"]*)"$`, func(ctx context.Context, reason string) error {
+		return checkOutputString(ctx, "beperking_reden", reason)
+	})
+	ctx.Then(`^is de reden van niet vernietigen "([^"]*)"$`, func(ctx context.Context, reason string) error {
+		return checkOutputString(ctx, "reden_niet_vernietigen", reason)
+	})
+
+	// Bibob/LBB assertions
+	ctx.Then(`^is er een advies uitgebracht$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "advies_uitgebracht", "Expected advies to be issued")
+	})
+	ctx.Then(`^is er geen advies uitgebracht$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "advies_uitgebracht", "Expected no advies to be issued")
+	})
+	ctx.Then(`^wordt verlening geadviseerd$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "verlening_geadviseerd", "Expected granting to be advised")
+	})
+	ctx.Then(`^wordt verlening niet geadviseerd$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "verlening_geadviseerd", "Expected granting to NOT be advised")
+	})
+	ctx.Then(`^is weigering mogelijk$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "weigering_mogelijk", "Expected refusal to be possible")
+	})
+	ctx.Then(`^is weigering niet mogelijk$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "weigering_mogelijk", "Expected refusal to NOT be possible")
+	})
+	ctx.Then(`^zijn voorschriften mogelijk$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "voorschriften_mogelijk", "Expected conditions to be possible")
+	})
+	ctx.Then(`^zijn voorschriften niet mogelijk$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "voorschriften_mogelijk", "Expected conditions to NOT be possible")
+	})
+	ctx.Then(`^is de mate van gevaar "([^"]*)"$`, func(ctx context.Context, mate string) error {
+		return checkOutputString(ctx, "mate_van_gevaar", mate)
+	})
+	ctx.Then(`^is er sprake van financieringsrisico$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "financieringsrisico", "Expected financing risk")
+	})
+	ctx.Then(`^is er een relatie tot strafbare feiten$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "relatie_strafbare_feiten", "Expected relation to criminal offences")
+	})
+
+	// BRP/LAA assertions
+	ctx.Then(`^genereert wet_brp/laa een signaal$`, func(ctx context.Context) error {
+		return checkOutputBoolTrue(ctx, "genereer_signaal", "Expected LAA to generate a signal")
+	})
+	ctx.Then(`^genereert wet_brp/laa geen signaal$`, func(ctx context.Context) error {
+		return checkOutputBoolFalse(ctx, "genereer_signaal", "Expected LAA to NOT generate a signal")
+	})
+	ctx.Then(`^is het signaal_type "([^"]*)"$`, func(ctx context.Context, v string) error {
+		return checkOutputString(ctx, "signaal_type", v)
+	})
+	ctx.Then(`^is de reactietermijn_weken "([^"]*)"$`, func(ctx context.Context, v string) error {
+		return checkOutputInt(ctx, "reactietermijn_weken", v)
+	})
+	ctx.Then(`^is de onderzoekstermijn_maanden "([^"]*)"$`, func(ctx context.Context, v string) error {
+		return checkOutputInt(ctx, "onderzoekstermijn_maanden", v)
+	})
+
 	// Case manager wait after each step
 	ctx.StepContext().After(func(ctx context.Context, _ *godog.Step, _ godog.StepResultStatus, _ error) (context.Context, error) {
 		cm, ok := ctx.Value(caseManagerCtxKey{}).(casemanager.CaseManager)
@@ -553,6 +668,22 @@ func deDatumIs(ctx context.Context, arg1 string) (context.Context, error) {
 
 func eenPersoonMetBSN(ctx context.Context, bsn string) (context.Context, error) {
 	return setParam(ctx, "BSN", bsn), nil
+}
+
+func eenArchiefstukMetEigenschappen(ctx context.Context, data *godog.Table) (context.Context, error) {
+	if len(data.Rows) < 2 {
+		return ctx, errors.New("archiefstuk table must have at least a header and one data row")
+	}
+	for idx, row := range data.Rows {
+		if idx == 0 {
+			continue
+		}
+		for colIdx, cell := range row.Cells {
+			key := strings.ToUpper(data.Rows[0].Cells[colIdx].Value)
+			ctx = setParam(ctx, key, parseValue(cell.Value))
+		}
+	}
+	return ctx, nil
 }
 
 type SampleRater interface {

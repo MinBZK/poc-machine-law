@@ -1,4 +1,3 @@
-@skip-go
 Feature: Zorgverzekeringswet - Inkomensafhankelijke bijdrage
   Als belastingplichtige
   Wil ik weten wat mijn inkomensafhankelijke bijdrage Zvw is

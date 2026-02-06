@@ -1,4 +1,3 @@
-@skip-go
 Feature: Aanvraag Zorgtoeslag
   Als burger
   Wil ik een aanvraag voor zorgtoeslag kunnen indienen

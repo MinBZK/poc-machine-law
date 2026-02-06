@@ -1,4 +1,3 @@
-@skip-go
 Feature: Wijzigen gegevens
   Als burger
   Wil ik een gegevens kunnen wijzigen.
