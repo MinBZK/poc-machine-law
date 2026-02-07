@@ -68,11 +68,6 @@
                      @click="switchTab('zaaksysteem')">
                     <span class="tab-label">Zaaksysteem</span>
                 </div>
-                <div class="tab"
-                     :class="{ 'active': activeTab === 'regeldruk' }"
-                     @click="switchTab('regeldruk')">
-                    <span class="tab-label">Scenarios</span>
-                </div>
                 <!-- Temporary Tabs (dismissable) -->
                 <template x-for="tab in temporaryTabs" :key="tab.id">
                     <div class="tab"
@@ -234,15 +229,6 @@
                             frameborder="0"
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
-                </div>
-                <!-- Scenarios Tab (IFrame) -->
-                <div class="tab-content iframe-content"
-                     x-show="activeTab === 'regeldruk'"
-                     x-cloak>
-                    <iframe src="/regeldruk/?demo=true"
-                            frameborder="0"
-                            class="tab-iframe"
-                            title="Scenarios"></iframe>
                 </div>
                 <!-- Simulatie Tab (IFrame) -->
                 <div class="tab-content iframe-content"
@@ -576,7 +562,7 @@
 
                     // Check URL hash first
                     const hash = window.location.hash.substring(1);
-                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie', 'regeldruk'];
+                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'];
 
                     if (hash && validTabs.includes(hash)) {
                         this.activeTab = hash;
