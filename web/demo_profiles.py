@@ -6,7 +6,6 @@ feature paths, and other demo-specific settings.
 
 import os
 
-
 DEMO_PROFILES: dict[str, dict] = {
     "merijn": {
         "name": "Merijn",

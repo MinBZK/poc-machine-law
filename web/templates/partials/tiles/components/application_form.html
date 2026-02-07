@@ -109,40 +109,6 @@
             {% endif %}
         </div>
     </div>
-    {# Show activity update notice for exploitatievergunning when alcohol permit is active #}
-    {% if law == 'algemene_plaatselijke_verordening/exploitatievergunning' and profile_data and profile_data.vergunningen %}
-        {% set ns_activiteiten = namespace(current_activiteiten=[], heeft_alcohol_activiteit=false, alcohol_approved=false) %}
-        {% for v in profile_data.vergunningen %}
-            {% if v.kvk_nummer == kvk and v.heeft_exploitatievergunning %}
-                {% set ns_activiteiten.current_activiteiten = v.vergunde_activiteiten|default([]) %}
-                {% set ns_activiteiten.heeft_alcohol_activiteit = 'Alcoholhoudende dranken' in ns_activiteiten.current_activiteiten %}
-            {% endif %}
-        {% endfor %}
-        {% if path and path.VERSTREKT_ALCOHOL and path.VERSTREKT_ALCOHOL.result %}
-            {% set ns_activiteiten.alcohol_approved = true %}
-        {% endif %}
-        {% if ns_activiteiten.alcohol_approved and not ns_activiteiten.heeft_alcohol_activiteit %}
-            <div class="border-t border-blue-200 pt-4 mb-4">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div class="flex items-start">
-                        <svg class="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
-                            </path>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-medium text-green-800">Activiteit wordt toegevoegd</p>
-                            <p class="text-sm text-green-700 mt-1">
-                                Uw Alcoholwetvergunning is actief. De activiteit <strong>"Alcoholhoudende dranken"</strong> wordt toegevoegd aan uw exploitatievergunning.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    {% endif %}
     <!-- Submit Form -->
     <div x-data="{ isChecked: false }"
          class="space-y-4 border-t border-blue-200 pt-4">

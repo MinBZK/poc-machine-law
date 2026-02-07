@@ -1,11 +1,12 @@
 <div class="mb-6 px-6 py-4 bg-white rounded-lg shadow text-gray-600"
      id="demo-profile-selector">
     <h1 class="text-gray-900 text-3xl font-semibold mb-5">Demo Profiel</h1>
-    <p class="mb-5">Selecteer het actieve demo profiel. Dit bepaalt welke BSN, wetten en scenario's standaard worden getoond.</p>
+    <p class="mb-5">
+        Selecteer het actieve demo profiel. Dit bepaalt welke BSN, wetten en scenario's standaard worden getoond.
+    </p>
     <div class="flex space-x-4">
         {% for profile_name, profile in demo_profiles.items() %}
-            <button class="px-6 py-3 rounded-md text-sm font-medium transition-colors cursor-pointer
-                           {{ 'bg-blue-600 text-white' if active_profile == profile_name else 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
+            <button class="px-6 py-3 rounded-md text-sm font-medium transition-colors cursor-pointer {{ 'bg-blue-600 text-white' if active_profile == profile_name else 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
                     hx-post="/admin/set-demo-profile"
                     hx-target="#demo-profile-selector"
                     hx-swap="outerHTML"
@@ -13,7 +14,7 @@
                 <div class="font-semibold">{{ profile.name }}</div>
                 <div class="text-xs {{ 'text-blue-200' if active_profile == profile_name else 'text-gray-500' }}">
                     {{ profile.type | title }} &middot; BSN {{ profile.bsn }}
-                    {% if profile.kvk %} &middot; KVK {{ profile.kvk }}{% endif %}
+                    {% if profile.kvk %}&middot; KVK {{ profile.kvk }}{% endif %}
                 </div>
             </button>
         {% endfor %}
