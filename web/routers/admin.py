@@ -9,6 +9,7 @@ from starlette.responses import RedirectResponse
 from explain.llm_factory import LLMFactory
 from machine.utils import RuleResolver
 from web.config_loader import ConfigLoader
+from web.demo_profiles import DemoProfiles
 from web.dependencies import (
     get_case_manager,
     get_claim_manager,
@@ -150,6 +151,8 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "feature_flags": feature_flags,
             "law_flags": law_flags,
             "demo_mode": is_demo_mode(request),
+            "demo_profiles": DemoProfiles.get_all_profiles(),
+            "active_profile": DemoProfiles.get_active_profile_name(),
         },
     )
 
@@ -191,6 +194,38 @@ async def post_set_llm_provider(request: Request, provider_name: str = Form(...)
     return templates.TemplateResponse(
         "/admin/partials/llm_providers.html",
         {"request": request, "providers": providers, "current_provider": current_provider},
+    )
+
+
+@router.post("/set-demo-profile")
+async def post_set_demo_profile(
+    request: Request,
+    profile_name: str = Form(...),
+    source: str = Form(default="admin"),
+):
+    """Set the active demo profile (burger/ondernemer toggle)."""
+    try:
+        DemoProfiles.set_active_profile(profile_name)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if source == "demo":
+        return templates.TemplateResponse(
+            "demo/partials/demo_profile_selector.html",
+            {
+                "request": request,
+                "demo_profiles": DemoProfiles.get_all_profiles(),
+                "active_profile": DemoProfiles.get_active_profile_name(),
+            },
+        )
+
+    return templates.TemplateResponse(
+        "admin/partials/demo_profile_selector.html",
+        {
+            "request": request,
+            "demo_profiles": DemoProfiles.get_all_profiles(),
+            "active_profile": DemoProfiles.get_active_profile_name(),
+        },
     )
 
 

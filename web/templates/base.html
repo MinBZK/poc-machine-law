@@ -62,7 +62,7 @@
 
             // Get bsn, law, and service from URL params or form inputs
             const urlParams = new URLSearchParams(window.location.search);
-            const bsn = urlParams.get('bsn') || '{{ bsn }}' || '100000001';
+            const bsn = urlParams.get('bsn') || '{{ bsn }}';
             let service = urlParams.get('service') || '';
             let law = urlParams.get('law') || '';
 

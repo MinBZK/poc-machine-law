@@ -167,7 +167,7 @@
             isConnected: false,
 
             init(bsn, provider) {
-                this.bsn = bsn || '100000001'; // Default BSN if none provided
+                this.bsn = bsn || '{{ bsn }}';
                 this.selectedProvider = provider || 'claude'; // Default provider if none provided
                 console.log("Initializing chat with BSN:", this.bsn, "and provider:", this.selectedProvider);
 

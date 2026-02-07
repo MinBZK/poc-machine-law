@@ -9,6 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
+from web.demo_profiles import get_demo_bsn
 from web.dependencies import (
     STATIC_DIR,
     get_case_manager,
@@ -128,13 +129,16 @@ app.mount(
 @app.get("/")
 async def root(
     request: Request,
-    bsn: str = "100000001",
+    bsn: str = None,
     date: str = None,
     services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
+    if bsn is None:
+        bsn = get_demo_bsn()
+
     # Parse effective date
     try:
         effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
@@ -308,14 +312,17 @@ async def root(
 
 
 if __name__ == "__main__":
+    import os
+
     import uvicorn
 
     # Use single worker for demo mode to maintain in-memory state
     # Multiple workers would have separate memory spaces, breaking the _test_runs dictionary
+    port = int(os.environ.get("PORT", 8000))
     config = uvicorn.Config(
         app=app,
         host="0.0.0.0",
-        port=8000,
+        port=port,
         workers=1,
         reload=False,
     )

@@ -33,9 +33,11 @@
         <div class="workspace-container" x-data="workspaceData()" x-init="init()">
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
-                <!-- <div class="tab" :class="{ 'active': activeTab === 'presentatie' }" @click="switchTab('presentatie')">
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'presentatie' }"
+                     @click="switchTab('presentatie')">
                     <span class="tab-label">Presentatie</span>
-                </div> -->
+                </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'laws' }"
                      @click="switchTab('laws')">
@@ -46,12 +48,16 @@
                      @click="switchTab('graph')">
                     <span class="tab-label">Graaf analyse</span>
                 </div>
-                <!-- <div class="tab" :class="{ 'active': activeTab === 'features' }" @click="switchTab('features')">
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'features' }"
+                     @click="switchTab('features')">
                     <span class="tab-label">Scenarios</span>
-                </div> -->
-                <!-- <div class="tab" :class="{ 'active': activeTab === 'simulatie' }" @click="switchTab('simulatie')">
+                </div>
+                <div class="tab"
+                     :class="{ 'active': activeTab === 'simulatie' }"
+                     @click="switchTab('simulatie')">
                     <span class="tab-label">Simulatie</span>
-                </div> -->
+                </div>
                 <div class="tab"
                      :class="{ 'active': activeTab === 'burger' }"
                      @click="switchTab('burger')">
@@ -224,7 +230,7 @@
                 <div class="tab-content iframe-content"
                      x-show="activeTab === 'zaaksysteem'"
                      x-cloak>
-                    <iframe src="/admin/GEMEENTE_ROTTERDAM?demo=true"
+                    <iframe src="/admin/{{ active_profile_config.zaaksysteem_service }}?demo=true"
                             frameborder="0"
                             class="tab-iframe"
                             title="Zaaksysteem"></iframe>
@@ -239,9 +245,14 @@
                             title="Scenarios"></iframe>
                 </div>
                 <!-- Simulatie Tab (IFrame) -->
-                <!-- <div class="tab-content iframe-content" x-show="activeTab === 'simulatie'" x-cloak>
-                    <iframe src="/simulation/?demo=true" frameborder="0" class="tab-iframe" title="Simulatie"></iframe>
-                </div> -->
+                <div class="tab-content iframe-content"
+                     x-show="activeTab === 'simulatie'"
+                     x-cloak>
+                    <iframe src="/simulation/?demo=true"
+                            frameborder="0"
+                            class="tab-iframe"
+                            title="Simulatie"></iframe>
+                </div>
                 <!-- Temporary Tabs (IFrame) -->
                 <template x-for="tab in temporaryTabs" :key="tab.id">
                     <div class="tab-content iframe-content"
@@ -261,6 +272,10 @@
                  x-cloak
                  @click.away="menuOpen = false"
                  class="menu-dropdown-fixed">
+                <!-- Demo Profile Section -->
+                <div class="menu-section-title">Demo Profiel</div>
+                <div id="demo-profile-selector">{% include "demo/partials/demo_profile_selector.html" %}</div>
+                <div class="menu-divider"></div>
                 <!-- Feature Flags Section -->
                 <div class="menu-section-title">Feature Flags</div>
                 <div id="demo-feature-flags">{% include "demo/partials/feature_flags.html" %}</div>
@@ -503,7 +518,7 @@
         function workspaceData() {
             return {
                 activeTab: 'presentatie',
-                bsn: new URLSearchParams(window.location.search).get('bsn') || '999999990',  // Default to Claudia
+                bsn: new URLSearchParams(window.location.search).get('bsn') || '{{ active_profile_config.bsn }}',
                 lawsContent: '',
                 featuresContent: '',
                 lawsLoaded: false,
@@ -528,23 +543,8 @@
                     // Initialize theme
                     document.documentElement.setAttribute('data-theme', this.theme);
 
-                    // Default law tabs for demo (alcoholvergunning nationaal + gemeentelijk)
-                    const defaultLawTabs = [
-                        {
-                            id: 'law-tab-1',
-                            path: 'alcoholwet/vergunning/VWS-2024-01-01',
-                            name: 'Alcoholwet (nationaal)',
-                            law: 'alcoholwet/vergunning',
-                            service: 'VWS'
-                        },
-                        {
-                            id: 'law-tab-2',
-                            path: 'alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01',
-                            name: 'Alcoholwet (Rotterdam)',
-                            law: 'alcoholwet/vergunning',
-                            service: 'GEMEENTE_ROTTERDAM'
-                        }
-                    ];
+                    // Default law tabs from active demo profile
+                    const defaultLawTabs = {{ active_profile_config.default_law_tabs | tojson }};
 
                     // Load law tabs from localStorage
                     const savedLawTabs = localStorage.getItem('openedLawTabs');
@@ -569,8 +569,8 @@
                     // If no saved tabs, use default tabs for demo
                     if (this.openedLawTabs.length === 0) {
                         this.openedLawTabs = defaultLawTabs;
-                        this.activeLawTabId = 'law-tab-2'; // Start with Rotterdam (gemeentelijk)
-                        this.nextLawTabId = 3;
+                        this.activeLawTabId = defaultLawTabs.length > 0 ? defaultLawTabs[defaultLawTabs.length - 1].id : null;
+                        this.nextLawTabId = defaultLawTabs.length + 1;
                         this.saveLawTabsToStorage();
                     }
 
@@ -885,8 +885,8 @@
                                         currentFeaturePath = match[1];
                                     }
                                 } else {
-                                    // Default feature path
-                                    currentFeaturePath = 'submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature';
+                                    // Default feature path from active profile
+                                    currentFeaturePath = '{{ active_profile_config.default_feature_path }}';
                                 }
 
                                 // After content loads, attach click handlers and init sidebar

@@ -1,0 +1,13 @@
+{% for profile_name, profile in demo_profiles.items() %}
+    <div class="menu-feature-flag">
+        <span class="flag-label">{{ profile.name }} ({{ profile.type }})</span>
+        <button class="toggle-btn-mini {{ 'enabled' if active_profile == profile_name else '' }}"
+                hx-post="/admin/set-demo-profile"
+                hx-target="#demo-profile-selector"
+                hx-swap="innerHTML"
+                hx-on::after-request="localStorage.removeItem('openedLawTabs'); localStorage.removeItem('activeLawTabId'); setTimeout(() => window.location.reload(), 200)"
+                hx-vals='{"profile_name": "{{ profile_name }}", "source": "demo"}'>
+            <div class="toggle-knob"></div>
+        </button>
+    </div>
+{% endfor %}

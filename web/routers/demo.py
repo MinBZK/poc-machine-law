@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
+from web.demo_profiles import DemoProfiles
 from web.dependencies import templates
 from web.feature_flags import FeatureFlags
 
@@ -134,12 +135,18 @@ async def demo_index(request: Request) -> HTMLResponse:
     # Get feature flags (system flags only, not law-specific)
     feature_flags = FeatureFlags.get_all()
 
+    # Get active demo profile
+    active_profile_config = DemoProfiles.get_active_profile()
+
     return templates.TemplateResponse(
         "demo/workspace.html",
         {
             "request": request,
             "version": version,
             "feature_flags": feature_flags,
+            "active_profile_config": active_profile_config,
+            "demo_profiles": DemoProfiles.get_all_profiles(),
+            "active_profile": DemoProfiles.get_active_profile_name(),
         },
     )
 
@@ -147,15 +154,16 @@ async def demo_index(request: Request) -> HTMLResponse:
 @router.get("/workspace/laws", response_class=HTMLResponse)
 async def workspace_laws(request: Request) -> HTMLResponse:
     """Get laws tab content - redirects to default law."""
-    # Redirect to alcoholvergunning (gemeentelijk niveau) as default for demo
-    default_law_path = "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01"
+    active_profile = DemoProfiles.get_active_profile()
+    default_law_path = active_profile["default_law_path"]
     return RedirectResponse(url=f"/demo/workspace/law/{default_law_path}", status_code=307)
 
 
 @router.get("/workspace/features", response_class=HTMLResponse)
 async def workspace_features(request: Request) -> HTMLResponse:
-    """Get features tab content (defaults to Zorgtoeslag feature)."""
-    feature_path = "submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature"
+    """Get features tab content (defaults to active profile's feature)."""
+    active_profile = DemoProfiles.get_active_profile()
+    feature_path = active_profile["default_feature_path"]
     feature_file = Path(feature_path)
 
     if not feature_file.exists():
@@ -300,8 +308,10 @@ async def get_features_api() -> JSONResponse:
 @router.get("/features", response_class=RedirectResponse)
 async def list_features() -> RedirectResponse:
     """Redirect to default feature."""
+    active_profile = DemoProfiles.get_active_profile()
+    default_feature = active_profile["default_feature_path"]
     return RedirectResponse(
-        url="/demo/feature/submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature",
+        url=f"/demo/feature/{default_feature}",
         status_code=302,
     )
 
