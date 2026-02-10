@@ -574,7 +574,7 @@ async def zaken_tijdlijn(
                 return datetime.combine(d, datetime.min.time())
             return datetime.min
 
-        timeline.sort(key=get_sort_date)
+        timeline.sort(key=get_sort_date, reverse=True)
 
         # Group timeline by month
         grouped_timeline = group_timeline_by_month(timeline, simulated_date)
@@ -697,7 +697,7 @@ async def zaken_detail(
             return datetime.combine(d, datetime.min.time())
         return datetime.min
 
-    timeline.sort(key=get_sort_date)
+    timeline.sort(key=get_sort_date, reverse=True)
 
     # Group timeline by month for the new design
     logger.info(f"[ZAKEN] Combined timeline has {len(timeline)} events from {len(related_cases)} cases")
