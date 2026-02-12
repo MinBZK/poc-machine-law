@@ -180,8 +180,8 @@ class Case(Aggregate):
 
     @event("Objected")
     def object(self, reason: str) -> None:
-        if self.status != CaseStatus.DECIDED:
-            raise ValueError("Can only objection decided cases")
+        if self.status not in [CaseStatus.DECIDED, CaseStatus.AFGEWEZEN]:
+            raise ValueError("Can only object decided or rejected cases")
         self.status = CaseStatus.OBJECTED
         self.reason = reason
 

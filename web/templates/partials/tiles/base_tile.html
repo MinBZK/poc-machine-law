@@ -164,11 +164,25 @@
                             </p>
                         </div>
                     {% elif current_case.status == 'AFGEWEZEN' %}
-                        <div class="bg-red-50 border border-red-100 rounded-lg p-4">
-                            <p class="text-red-800 font-medium">Aanvraag afgewezen</p>
-                            <p class="text-sm text-red-700 mt-1">
-                                U heeft geen recht op deze toeslag.
-                            </p>
+                        <div class="space-y-4">
+                            <div class="bg-red-50 border border-red-100 rounded-lg p-4">
+                                <p class="text-red-800 font-medium">Aanvraag afgewezen</p>
+                                <p class="text-sm text-red-700 mt-1">
+                                    U heeft geen recht op deze toeslag.
+                                </p>
+                            </div>
+                            {# Demo: altijd bezwaar tonen bij AFGEWEZEN met standaard 6 weken #}
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot bezwaar</h4>
+                                <p class="text-sm text-gray-600 mb-4">
+                                    U kunt binnen 6 weken bezwaar maken tegen dit besluit.
+                                </p>
+                                <button type="button"
+                                        onclick="showAppealDialog('{{ current_case.id }}')"
+                                        class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                                    Ga in bezwaar
+                                </button>
+                            </div>
                         </div>
                     {% elif current_case.status == 'BEEINDIGD' %}
                         <div class="bg-gray-50 border border-gray-100 rounded-lg p-4">
