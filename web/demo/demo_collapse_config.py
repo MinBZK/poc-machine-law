@@ -136,6 +136,14 @@ DEMO_COLLAPSE_CONFIG = {
         ],
         "collapse_all_except_expanded": True,
     },
+    # Informatieplicht Energiebesparing - Show properties and output
+    "omgevingswet/energiebesparing/informatieplicht/RVO-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
 }
 
 

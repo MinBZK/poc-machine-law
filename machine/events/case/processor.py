@@ -1,5 +1,3 @@
-import asyncio
-
 from eventsourcing.dispatch import singledispatchmethod
 from eventsourcing.system import ProcessApplication
 
@@ -20,18 +18,6 @@ class CaseProcessor(ProcessApplication):
     @policy.register(Case.Decided)
     def _(self, domain_event, process_event) -> None:
         try:
-            # Create a new event loop in a new thread
-            def run_async():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                return loop.run_until_complete(self.rules_engine.apply_rules(domain_event))
-
-            # Run in a separate thread
-            import threading
-
-            thread = threading.Thread(target=run_async)
-            thread.start()
-            thread.join()  # Wait for completion
-
+            self.rules_engine.apply_rules(domain_event)
         except Exception as e:
             print(f"Error processing rules: {e}")

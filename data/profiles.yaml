@@ -4468,3 +4468,9 @@ profiles:
         - kvk_nummer: '85234567'
           aantal_werknemers: 0
           verstrekt_mobiliteitsvergoeding: false
+        # Informatieplicht energiebesparing - Koffiezaak Noon verbruikt boven drempel
+        rvo_energiegegevens:
+        - kvk_nummer: '85234567'
+          elektriciteit_kwh: 72000
+          gasverbruik_m3: 18000
+          is_woonfunctie: false

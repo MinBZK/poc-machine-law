@@ -49,6 +49,13 @@ DEMO_PROFILES: dict[str, dict] = {
                 "law": "alcoholwet/vergunning",
                 "service": "GEMEENTE_ROTTERDAM",
             },
+            {
+                "id": "law-tab-3",
+                "path": "omgevingswet/energiebesparing/informatieplicht/RVO-2024-01-01",
+                "name": "Informatieplicht Energie",
+                "law": "omgevingswet/energiebesparing/informatieplicht",
+                "service": "RVO",
+            },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
         "scenario_features": {
