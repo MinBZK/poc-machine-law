@@ -1,0 +1,403 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 3c5d7e9f-2b4a-4f6c-9d8e-0a1b2c3d4e5f
+name: Anw-uitkering
+law: algemene_nabestaandenwet
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+discoverable: "CITIZEN"
+valid_from: 2026-01-01
+service: "SVB"
+legal_basis:
+  law: "Algemene nabestaandenwet"
+  bwb_id: "BWBR0007795"
+  article: "14"
+  url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+  juriconnect: "jci1.3:c:BWBR0007795&artikel=14&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 14 Anw bepaalt het recht op nabestaandenuitkering"
+description: >
+  Regels voor het bepalen van het recht op nabestaandenuitkering volgens de
+  Algemene nabestaandenwet. De Anw voorziet in een uitkering voor nabestaanden
+  van een verzekerde die is overleden. Recht bestaat als de nabestaande een
+  kind heeft jonger dan 18 jaar of als de nabestaande arbeidsongeschikt is.
+  De uitkering wordt verminderd met eigen inkomen.
+
+references:
+  - law: "Algemene nabestaandenwet"
+    article: "14"
+    url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+  - law: "Algemene nabestaandenwet"
+    article: "15"
+    url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel15"
+  - law: "Algemene nabestaandenwet"
+    article: "17"
+    url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel17"
+  - law: "Algemene nabestaandenwet"
+    article: "18"
+    url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf2_Artikel18"
+
+properties:
+  parameters:
+    - name: "BSN"
+      description: "BSN van de nabestaande"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "33"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk4_Artikel33"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=33&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 33 Anw: aanvraag uitkering door nabestaande"
+
+  sources:
+    - name: "WAS_PARTNER_VERZEKERD"
+      description: "Was de overleden partner verzekerd voor de Anw"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "anw_dossiers"
+        field: "partner_verzekerd"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de nabestaande"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "6"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk2_Artikel6"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=6&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 6 Anw: verzekeringsvereiste voor recht op uitkering"
+
+    - name: "OVERLIJDENSDATUM_PARTNER"
+      description: "Overlijdensdatum van de partner"
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "anw_dossiers"
+        field: "overlijdensdatum_partner"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de nabestaande"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=14&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 lid 1 Anw: recht ontstaat bij overlijden van verzekerde"
+
+    - name: "ARBEIDSONGESCHIKTHEIDSPERCENTAGE"
+      description: "Mate van arbeidsongeschiktheid (0-100%)"
+      type: "number"
+      type_spec:
+        precision: 0
+        min: 0
+        max: 100
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "anw_dossiers"
+        field: "ao_percentage"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de nabestaande"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=14&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 lid 1 sub b Anw: recht bij arbeidsongeschiktheid van 45% of meer"
+
+    - name: "HEEFT_KINDEREN_ONDER_18"
+      description: "Heeft de nabestaande kinderen onder 18 jaar"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        table: "anw_dossiers"
+        field: "heeft_kinderen_onder_18"
+        select_on:
+          - name: "bsn"
+            description: "BSN van de nabestaande"
+            type: "string"
+            value: "$BSN"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "14"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=14&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 lid 1 sub a Anw: recht bij ongehuwd kind onder 18 jaar"
+
+  input:
+    - name: "LEEFTIJD"
+      description: "Leeftijd van de nabestaande"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        field: "leeftijd"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=14&z=2024-01-01&g=2024-01-01"
+        explanation: "Leeftijd is relevant voor recht en berekening uitkering"
+
+    - name: "GEBOORTEDATUM"
+      description: "Geboortedatum van de nabestaande"
+      type: "date"
+      service_reference:
+        service: "RvIG"
+        field: "geboortedatum"
+        law: "wet_brp"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=14&z=2024-01-01&g=2024-01-01"
+        explanation: "Geboortedatum voor bepaling AOW-leeftijd"
+
+    - name: "PENSIOENLEEFTIJD"
+      description: "AOW-leeftijd voor deze persoon"
+      type: "number"
+      service_reference:
+        service: "SVB"
+        field: "pensioenleeftijd"
+        law: "algemene_ouderdomswet/leeftijdsbepaling"
+        parameters:
+          - name: "GEBOORTEDATUM"
+            reference: "$GEBOORTEDATUM"
+      type_spec:
+        unit: "years"
+        precision: 2
+        min: 65
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "16"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel16"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=16&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 16 lid 1 Anw: uitkering eindigt bij AOW-leeftijd"
+
+
+    - name: "INKOMEN"
+      description: "Toetsingsinkomen van de nabestaande"
+      type: "amount"
+      service_reference:
+        service: "BELASTINGDIENST"
+        field: "inkomen"
+        law: "wet_inkomstenbelasting"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf2_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 Anw: inkomensverrekening"
+
+  output:
+    - name: "is_gerechtigd"
+      description: "Heeft de nabestaande recht op Anw-uitkering"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "14"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=14&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 14 Anw: voorwaarden voor recht op nabestaandenuitkering"
+
+    - name: "bruto_uitkering"
+      description: "Bruto maandelijkse nabestaandenuitkering"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "17"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel17"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=17&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 17 Anw: hoogte van de nabestaandenuitkering"
+
+    - name: "inkomenskorting"
+      description: "Korting op uitkering wegens inkomen"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf2_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 Anw: inkomensverrekening"
+
+    - name: "netto_uitkering"
+      description: "Netto maandelijkse nabestaandenuitkering na inkomenskorting"
+      type: "amount"
+      type_spec:
+        unit: "eurocent"
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "month"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Algemene nabestaandenwet"
+        bwb_id: "BWBR0007795"
+        article: "18"
+        url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf2_Artikel18"
+        juriconnect: "jci1.3:c:BWBR0007795&artikel=18&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 18 Anw: uitkering na inkomensverrekening"
+
+  definitions:
+    # Uitkeringsbedragen 2026 (geschat)
+    BRUTO_UITKERING: 146500  # €1.465 per maand (70% netto minimumloon)
+    # Vrijlatingsbedrag voor inkomensverrekening
+    VRIJLATING_MAANDELIJKS: 77000  # €770 per maand (50% bruto minimumloon)
+    # Drempel arbeidsongeschiktheid
+    AO_DREMPEL: 45  # 45% arbeidsongeschiktheid vereist
+    # Maanden per jaar
+    MAANDEN_PER_JAAR: 12
+
+requirements:
+  - all:
+      - subject: "$WAS_PARTNER_VERZEKERD"
+        operation: EQUALS
+        value: true
+      - subject: "$OVERLIJDENSDATUM_PARTNER"
+        operation: NOT_NULL
+      - subject: "$LEEFTIJD"
+        operation: LESS_THAN
+        value: "$PENSIOENLEEFTIJD"
+      - or:
+          - subject: "$HEEFT_KINDEREN_ONDER_18"
+            operation: EQUALS
+            value: true
+          - subject: "$ARBEIDSONGESCHIKTHEIDSPERCENTAGE"
+            operation: GREATER_OR_EQUAL
+            value: "$AO_DREMPEL"
+
+actions:
+  - output: "is_gerechtigd"
+    value: true
+    legal_basis:
+      law: "Algemene nabestaandenwet"
+      bwb_id: "BWBR0007795"
+      article: "14"
+      url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel14"
+      juriconnect: "jci1.3:c:BWBR0007795&artikel=14&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 14 Anw: toekenning recht op nabestaandenuitkering"
+
+  - output: "bruto_uitkering"
+    value: "$BRUTO_UITKERING"
+    legal_basis:
+      law: "Algemene nabestaandenwet"
+      bwb_id: "BWBR0007795"
+      article: "17"
+      url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf1_Artikel17"
+      juriconnect: "jci1.3:c:BWBR0007795&artikel=17&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 17 Anw: hoogte nabestaandenuitkering is 70% netto minimumloon"
+
+  - output: "inkomenskorting"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - operation: DIVIDE
+            values:
+              - "$INKOMEN"
+              - "$MAANDEN_PER_JAAR"
+          - "$VRIJLATING_MAANDELIJKS"
+      - 0
+    legal_basis:
+      law: "Algemene nabestaandenwet"
+      bwb_id: "BWBR0007795"
+      article: "18"
+      url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf2_Artikel18"
+      juriconnect: "jci1.3:c:BWBR0007795&artikel=18&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 18 Anw: inkomensverrekening met vrijlating"
+
+  - output: "netto_uitkering"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$bruto_uitkering"
+          - "$inkomenskorting"
+      - 0
+    legal_basis:
+      law: "Algemene nabestaandenwet"
+      bwb_id: "BWBR0007795"
+      article: "18"
+      url: "https://wetten.overheid.nl/BWBR0007795/2024-01-01#Hoofdstuk3_Paragraaf2_Artikel18"
+      juriconnect: "jci1.3:c:BWBR0007795&artikel=18&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 18 Anw: netto uitkering na inkomensverrekening"

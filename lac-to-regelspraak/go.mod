@@ -4,8 +4,8 @@ go 1.25.3
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/bmatcuk/doublestar/v4 v4.9.2
-	golang.org/x/text v0.33.0
+	github.com/bmatcuk/doublestar/v4 v4.10.0
+	golang.org/x/text v0.34.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

@@ -863,20 +863,18 @@
                                 this.featuresContent = await response.text();
                                 this.featuresLoaded = true;
 
-                                // Extract feature path from URL for global variable
-                                if (url) {
-                                    // URL format: /demo/workspace/feature/{feature_path}
-                                    const match = url.match(/\/demo\/workspace\/feature\/(.+)/);
-                                    if (match) {
-                                        currentFeaturePath = match[1];
-                                    }
-                                } else {
-                                    // Default feature path from active profile
-                                    currentFeaturePath = '{{ active_profile_config.default_feature_path }}';
-                                }
-
-                                // After content loads, attach click handlers and init sidebar
+                                // After content loads, extract feature path and attach handlers
                                 this.$nextTick(() => {
+                                    // Extract feature path from data attribute in partial
+                                    const pathEl = document.querySelector('[data-feature-path]');
+                                    if (pathEl) {
+                                        currentFeaturePath = pathEl.dataset.featurePath;
+                                    } else if (url) {
+                                        const match = url.match(/\/demo\/workspace\/feature\/(.+)/);
+                                        if (match) {
+                                            currentFeaturePath = match[1];
+                                        }
+                                    }
                                     this.attachFeatureClickHandlers();
                                     this.initFeaturesSidebar();
                                 });

@@ -73,7 +73,7 @@ app.include_router(simulation.router)
 app.include_router(delegation.router)
 app.include_router(regeldruk.router)
 
-app.mount("/analysis/laws/law", StaticFiles(directory="law"))
+app.mount("/analysis/laws/law", StaticFiles(directory="laws"))
 # app.mount(
 #     "/analysis/laws",
 #     StaticFiles(
@@ -102,7 +102,7 @@ def analysis_laws_fallback(request: Request):
     return FileResponse(str(base_dir / "index.html"))
 
 
-app.mount("/analysis/graph/law", StaticFiles(directory="law"))
+app.mount("/analysis/graph/law", StaticFiles(directory="laws"))
 app.mount(
     "/analysis/graph",
     StaticFiles(

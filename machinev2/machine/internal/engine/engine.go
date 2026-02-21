@@ -754,6 +754,23 @@ func (re *RulesEngine) evaluateRequirements(
 						break
 					}
 				}
+			} else if req.Action != nil {
+				// Direct action requirement (not wrapped in All/Or)
+				res, err := re.evaluateOperation(ctx, *req.Action, ruleCtx)
+				if err != nil {
+					return err
+				}
+
+				// Convert result to bool
+				switch v := res.(type) {
+				case bool:
+					result = v
+				case nil:
+					result = false
+				default:
+					// Non-bool, non-nil value is truthy
+					result = true
+				}
 			}
 
 			node.Result = result
@@ -1280,66 +1297,114 @@ func (re *RulesEngine) evaluateComparison(ctx context.Context, op string, left, 
 }
 
 // evaluateDateOperation evaluates date-specific operations
-func (re *RulesEngine) evaluateDateOperation(ctx context.Context, op string, values []any, unit string) (int, error) {
+func (re *RulesEngine) evaluateDateOperation(ctx context.Context, op string, values []any, unit string) (any, error) {
 	logr := logger.FromContext(ctx)
 
-	if op != "SUBTRACT_DATE" {
-		return 0, fmt.Errorf("unknown date operation: %s", op)
-	}
-
 	if len(values) != 2 {
-		logr.WithIndent().Warningf("Warning: SUBTRACT_DATE requires exactly 2 values")
-		return 0, nil
+		logr.WithIndent().Warningf("Warning: %s requires exactly 2 values", op)
+		return nil, nil
 	}
 
-	// Convert to time.Time
-	endDate, err := convertToTime(values[0])
-	if err != nil {
-		// enddate not specified take today
-		endDate = re.referenceDate
-	}
-
-	startDate, err := convertToTime(values[1])
-	if err != nil {
-		return 0, err
-	}
-
-	// Calculate difference based on unit
-	var result int
-
-	switch unit {
-	case "days":
-		duration := endDate.Sub(startDate)
-		result = int(duration.Hours() / 24)
-
-	case "years":
-		years := endDate.Year() - startDate.Year()
-
-		// Adjust for incomplete years
-		endMonth := endDate.Month()
-		startMonth := startDate.Month()
-		endDay := endDate.Day()
-		startDay := startDate.Day()
-
-		if endMonth < startMonth || (endMonth == startMonth && endDay < startDay) {
-			years--
+	switch op {
+	case "SUBTRACT_DATE":
+		// Convert to time.Time
+		endDate, err := convertToTime(values[0])
+		if err != nil {
+			// enddate not specified take today
+			endDate = re.referenceDate
 		}
 
-		result = years
+		startDate, err := convertToTime(values[1])
+		if err != nil {
+			return nil, err
+		}
 
-	case "months":
-		yearDiff := endDate.Year() - startDate.Year()
-		monthDiff := int(endDate.Month()) - int(startDate.Month())
+		// Calculate difference based on unit
+		var result int
 
-		result = yearDiff*12 + monthDiff
+		switch unit {
+		case "days":
+			duration := endDate.Sub(startDate)
+			result = int(duration.Hours() / 24)
+
+		case "years":
+			years := endDate.Year() - startDate.Year()
+
+			// Adjust for incomplete years
+			endMonth := endDate.Month()
+			startMonth := startDate.Month()
+			endDay := endDate.Day()
+			startDay := startDate.Day()
+
+			if endMonth < startMonth || (endMonth == startMonth && endDay < startDay) {
+				years--
+			}
+
+			result = years
+
+		case "months":
+			yearDiff := endDate.Year() - startDate.Year()
+			monthDiff := int(endDate.Month()) - int(startDate.Month())
+
+			result = yearDiff*12 + monthDiff
+
+		default:
+			logr.WithIndent().Warningf("Warning: Unknown date unit %s", unit)
+			result = 0
+		}
+
+		logr.Debugf("Compute %s(%v, %s) = %d", op, values, unit, result)
+		return result, nil
+
+	case "ADD_DATE":
+		// ADD_DATE adds a duration to a date and returns a date string
+		baseDate, err := convertToTime(values[0])
+		if err != nil {
+			return nil, err
+		}
+
+		// Amount must be a number
+		var amount int
+		switch v := values[1].(type) {
+		case int:
+			amount = v
+		case int64:
+			amount = int(v)
+		case float64:
+			amount = int(v)
+		case string:
+			var err error
+			amount, err = strconv.Atoi(v)
+			if err != nil {
+				logr.WithIndent().Warningf("Warning: ADD_DATE amount must be a number, got %v", values[1])
+				return nil, nil
+			}
+		default:
+			logr.WithIndent().Warningf("Warning: ADD_DATE amount must be a number, got %v (type %T)", values[1], values[1])
+			return nil, nil
+		}
+
+		// Calculate the new date based on unit
+		var resultDate time.Time
+		switch unit {
+		case "days":
+			resultDate = baseDate.AddDate(0, 0, amount)
+		case "years":
+			resultDate = baseDate.AddDate(amount, 0, 0)
+		case "months":
+			resultDate = baseDate.AddDate(0, amount, 0)
+		default:
+			logr.WithIndent().Warningf("Warning: Unknown date unit %s, defaulting to days", unit)
+			resultDate = baseDate.AddDate(0, 0, amount)
+		}
+
+		result := resultDate.Format("2006-01-02")
+		logr.Debugf("Compute %s(%v, %s) = %s", op, values, unit, result)
+		return result, nil
 
 	default:
-		logr.WithIndent().Warningf("Warning: Unknown date unit %s", unit)
-		result = 0
+		return nil, fmt.Errorf("unknown date operation: %s", op)
 	}
-
-	logr.Debugf("Compute %s(%v, %s) = %d", op, values, unit, result)
-	return result, nil
 }
 
 // Helper function to convert various types to time.Time
@@ -1496,6 +1561,56 @@ func (re *RulesEngine) evaluateOperation(
 
 		result = subject == nil
 		node.Details["subject_value"] = subject
+	case "EXISTS":
+		subject, err := re.evaluateValue(ctx, *operation.Subject, ruleCtx)
+		if err != nil {
+			return nil, err
+		}
+
+		// EXISTS returns true if subject is not nil and not empty
+		if subject == nil {
+			result = false
+		} else {
+			switch v := subject.(type) {
+			case []any:
+				result = len(v) > 0
+			case []string:
+				result = len(v) > 0
+			case []int:
+				result = len(v) > 0
+			case map[string]any:
+				result = len(v) > 0
+			case string:
+				result = v != ""
+			default:
+				// For other types, just check if not nil (which we already know)
+				result = true
+			}
+		}
+		node.Details["subject_value"] = subject
+		logr.Debugf("EXISTS result: %v", result)
+	case "COALESCE":
+		// COALESCE returns the first non-nil value from the values list (lazy evaluation)
+		if operation.Values == nil || operation.Values.ActionValues == nil {
+			return nil, fmt.Errorf("COALESCE operation requires values")
+		}
+
+		evaluatedValues := []any{}
+		for _, v := range *operation.Values.ActionValues {
+			val, err := re.evaluateActionValue(ctx, ruleCtx, v)
+			if err != nil {
+				return nil, err
+			}
+
+			evaluatedValues = append(evaluatedValues, val)
+			if val != nil {
+				result = val
+				logr.Debugf("Non-null value found in COALESCE: %v", val)
+				break
+			}
+		}
+		node.Details["evaluated_values"] = evaluatedValues
+		logr.Debugf("COALESCE result: %v", result)
 	case "AND":
 		err = logr.IndentBlock(ctx, "AND", func(ctx context.Context) error {
 			logr := logger.FromContext(ctx)
@@ -1565,7 +1680,7 @@ func (re *RulesEngine) evaluateOperation(
 			return nil
 		})
 
-	case "SUBTRACT_DATE":
+	case "SUBTRACT_DATE", "ADD_DATE":
 		var values []any
 		for _, v := range *operation.Values.ActionValues {
 			val, err := re.evaluateActionValue(ctx, ruleCtx, v)
@@ -1580,12 +1695,12 @@ func (re *RulesEngine) evaluateOperation(
 			unit = *operation.Unit
 		}
 
-		intResult, err := re.evaluateDateOperation(ctx, *operation.Operation, values, unit)
+		dateResult, err := re.evaluateDateOperation(ctx, *operation.Operation, values, unit)
 		if err != nil {
 			return nil, err
 		}
 
-		result = intResult
+		result = dateResult
 		node.Details["evaluated_values"] = values
 		node.Details["unit"] = unit
 

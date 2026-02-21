@@ -338,6 +338,30 @@ type Requirement struct {
 	// Logical operators - only one should be set
 	All *[]ActionRequirement `yaml:"all,omitempty"`
 	Or  *[]ActionRequirement `yaml:"or,omitempty"`
+	// Direct action requirement (when not wrapped in All/Or)
+	Action *Action `yaml:"-"`
+}
+
+// UnmarshalYAML custom unmarshaler for Requirement
+func (r *Requirement) UnmarshalYAML(unmarshal func(any) error) error {
+	// First try to unmarshal as a structured requirement with all/or
+	type requirementAlias Requirement
+	var req requirementAlias
+	if err := unmarshal(&req); err == nil {
+		if req.All != nil || req.Or != nil {
+			*r = Requirement(req)
+			return nil
+		}
+	}
+
+	// If not All/Or, try to unmarshal as a direct action
+	var action Action
+	if err := unmarshal(&action); err != nil {
+		return err
+	}
+
+	r.Action = &action
+	return nil
 }
 
 type ActionRequirement struct {
@@ -477,6 +501,7 @@ const (
 	OperationIf             OperationType = "IF"
 	OperationForeach        OperationType = "FOREACH"
 	OperationSubtractDate   OperationType = "SUBTRACT_DATE"
+	OperationAddDate        OperationType = "ADD_DATE"
 	OperationIsNull         OperationType = "IS_NULL"
 	OperationNotNull        OperationType = "NOT_NULL"
 )

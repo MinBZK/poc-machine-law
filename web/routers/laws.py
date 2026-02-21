@@ -87,7 +87,7 @@ def evaluate_law(
 async def list_laws():
     """List all available law files"""
 
-    laws_dir = os.path.join(os.path.dirname(__file__), "../../law")
+    laws_dir = os.path.join(os.path.dirname(__file__), "../../laws")
     law_files = []
     for root, _, files in os.walk(laws_dir):
         for file in files:

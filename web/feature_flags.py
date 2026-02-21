@@ -115,6 +115,23 @@ class FeatureFlags:
         return False
 
     @classmethod
+    def _get_law_flag_name(cls, service: str, law: str) -> str:
+        """
+        Get the feature flag name for a specific law.
+
+        Args:
+            service: Service name (e.g., "TOESLAGEN")
+            law: Law name (e.g., "zorgtoeslagwet" or "participatiewet/bijstand")
+
+        Returns:
+            Feature flag name (e.g., "LAW_TOESLAGEN_ZORGTOESLAGWET")
+        """
+        # Sanitize law name for environment variable
+        # Replace slashes with double underscores for safe environment variable names
+        sanitized_law = law.replace("/", "__")
+        return f"{cls.LAW_PREFIX}{service}_{sanitized_law}".upper()
+
+    @classmethod
     def is_law_enabled(cls, service: str, law: str) -> bool:
         """
         Check if a specific law is enabled.
@@ -127,11 +144,7 @@ class FeatureFlags:
             Boolean indicating if the law is enabled (default is True if not set,
             unless the law is in LAW_DEFAULTS with a False value)
         """
-        # Sanitize law name for environment variable
-        # Replace slashes with double underscores for safe environment variable names
-        sanitized_law = law.replace("/", "__")
-
-        flag_name = f"{cls.LAW_PREFIX}{service}_{sanitized_law}".upper()
+        flag_name = cls._get_law_flag_name(service, law)
         flag_key = f"{cls.PREFIX}{flag_name}"
 
         # Check if flag is set in environment
@@ -157,6 +170,30 @@ class FeatureFlags:
 
         # Convert boolean to string and set in environment
         os.environ[flag_key] = "1" if value else "0"
+
+    @classmethod
+    def enable_law(cls, service: str, law: str) -> None:
+        """
+        Enable a specific law by setting its feature flag.
+
+        Args:
+            service: Service name (e.g., "TOESLAGEN")
+            law: Law name (e.g., "zorgtoeslagwet" or "participatiewet/aio")
+        """
+        flag_name = cls._get_law_flag_name(service, law)
+        cls.set(flag_name, True)
+
+    @classmethod
+    def disable_law(cls, service: str, law: str) -> None:
+        """
+        Disable a specific law by setting its feature flag.
+
+        Args:
+            service: Service name (e.g., "TOESLAGEN")
+            law: Law name (e.g., "zorgtoeslagwet" or "participatiewet/aio")
+        """
+        flag_name = cls._get_law_flag_name(service, law)
+        cls.set(flag_name, False)
 
 
 # Convenience functions for checking flags

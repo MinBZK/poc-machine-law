@@ -1,0 +1,316 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+uuid: 3fc7f637-fe3e-44c8-a735-98f11584c2c9
+name: Archiefwet - Openbaarheid archiefbescheiden
+law: archiefwet/openbaarheid
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "TOEKENNING"
+valid_from: 2024-01-01
+service: "NATIONAAL_ARCHIEF"
+legal_basis:
+  law: "Archiefwet 1995"
+  bwb_id: "BWBR0007376"
+  article: "15"
+  url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+  juriconnect: "jci1.3:c:BWBR0007376&artikel=15&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 15 bepaalt onder welke voorwaarden beperkingen aan de openbaarheid van archiefbescheiden kunnen worden opgelegd"
+description: >
+  Bepaalt of archiefbescheiden openbaar toegankelijk zijn volgens artikel 15 van de
+  Archiefwet 1995. De openbaarheid kan beperkt worden ter bescherming van privacy,
+  staatsbelangen, of om onevenredige bevoordeling/benadeling te voorkomen. Beperkingen
+  vervallen automatisch na 75 jaar, tenzij anders bepaald.
+
+references:
+  - law: "Archiefwet 1995"
+    article: "15"
+    url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+
+properties:
+  parameters:
+    - name: "ARCHIEFSTUK_ID"
+      description: "Identificatie van het archiefstuk"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&z=2024-01-01&g=2024-01-01"
+        explanation: "Identificatie is nodig om het archiefstuk te kunnen beoordelen op openbaarheid"
+
+    - name: "AANMAAKDATUM"
+      description: "Datum waarop het archiefstuk is aangemaakt"
+      type: "date"
+      required: true
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 4 bepaalt dat beperkingen niet gelden voor archiefbescheiden ouder dan 75 jaar"
+
+    - name: "OVERBRENGDATUM"
+      description: "Datum waarop het archiefstuk is overgebracht naar de archiefbewaarplaats"
+      type: "date"
+      required: false
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 1 bepaalt dat beperkingen worden opgelegd bij overbrenging"
+
+    - name: "BEPERKING_TYPE"
+      description: "Type beperking dat is opgelegd"
+      type: "string"
+      required: false
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 1 noemt drie gronden voor beperkingen: privacy, staatsbelang, of onevenredige bevoordeling/benadeling"
+
+    - name: "BEPERKING_TERMIJN_JAREN"
+      description: "Termijn in jaren waarvoor de beperking is opgelegd"
+      type: "number"
+      required: false
+      type_spec:
+        unit: "years"
+        precision: 0
+        min: 0
+        max: 75
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 1 bepaalt dat beperkingen voor een bepaalde termijn worden opgelegd"
+
+    - name: "MINISTERRAAD_BESLUIT_STAATSBELANG"
+      description: "Is er een besluit van de ministerraad om beperking langer dan 75 jaar te handhaven voor documenten betreffende staatsbelangen"
+      type: "boolean"
+      required: false
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "6"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=6&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 6 bepaalt dat de ministerraad kan besluiten beperkingen voor staatsbelangen langer dan 75 jaar te handhaven"
+
+  output:
+    - name: "is_openbaar"
+      description: "Is het archiefstuk openbaar toegankelijk"
+      type: "boolean"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 bepaalt de voorwaarden voor openbaarheid van archiefbescheiden"
+
+    - name: "beperking_reden"
+      description: "Reden waarom het archiefstuk niet openbaar is"
+      type: "string"
+      required: false
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 1 noemt de gronden voor beperkingen"
+
+    - name: "openbaar_vanaf_datum"
+      description: "Datum vanaf wanneer het archiefstuk openbaar wordt"
+      type: "date"
+      required: false
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Archiefwet 1995"
+        bwb_id: "BWBR0007376"
+        article: "15"
+        paragraph: "4"
+        url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+        juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=4&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 15 lid 4 bepaalt dat beperkingen vervallen na 75 jaar"
+
+  definitions:
+    MAXIMALE_BEPERKING_JAREN: 75  # Artikel 15 lid 4 Archiefwet 1995
+    BEPERKING_PRIVACY: "PRIVACY"
+    BEPERKING_STAATSBELANG: "STAATSBELANG"
+    BEPERKING_ONEVENREDIGE_GEVOLGEN: "ONEVENREDIGE_GEVOLGEN"
+
+actions:
+  - output: "is_openbaar"
+    operation: OR
+    values:
+      # Situatie 1: Geen beperking opgelegd
+      - operation: AND
+        values:
+          - subject: "$BEPERKING_TYPE"
+            operation: IS_NULL
+          - subject: "$OVERBRENGDATUM"
+            operation: NOT_NULL
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "15"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=15&z=2024-01-01&g=2024-01-01"
+          explanation: "Archiefbescheiden zonder beperkingen zijn na overbrenging openbaar"
+
+      # Situatie 2: Ouder dan 75 jaar (automatisch openbaar, behalve staatsbelang met ministerraadsbesluit)
+      - operation: AND
+        values:
+          - operation: GREATER_OR_EQUAL
+            values:
+              - operation: SUBTRACT_DATE
+                unit: "years"
+                values:
+                  - "$calculation_date"
+                  - "$AANMAAKDATUM"
+              - "$MAXIMALE_BEPERKING_JAREN"
+          - operation: OR
+            values:
+              # Niet staatsbelang
+              - subject: "$BEPERKING_TYPE"
+                operation: NOT_EQUALS
+                value: "$BEPERKING_STAATSBELANG"
+              # Wel staatsbelang maar geen ministerraadsbesluit
+              - operation: AND
+                values:
+                  - subject: "$BEPERKING_TYPE"
+                    operation: EQUALS
+                    value: "$BEPERKING_STAATSBELANG"
+                  - subject: "$MINISTERRAAD_BESLUIT_STAATSBELANG"
+                    operation: EQUALS
+                    value: false
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "15"
+          paragraph: "4"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=4&z=2024-01-01&g=2024-01-01"
+          explanation: "Artikel 15 lid 4 bepaalt dat beperkingen niet gelden voor archiefbescheiden ouder dan 75 jaar, behalve bij ministerraadsbesluit voor staatsbelangen"
+
+      # Situatie 3: Beperking is verlopen (berekend vanaf overbrengdatum)
+      - operation: AND
+        values:
+          - subject: "$BEPERKING_TERMIJN_JAREN"
+            operation: NOT_NULL
+          - subject: "$OVERBRENGDATUM"
+            operation: NOT_NULL
+          - operation: GREATER_OR_EQUAL
+            values:
+              - operation: SUBTRACT_DATE
+                unit: "years"
+                values:
+                  - "$calculation_date"
+                  - "$OVERBRENGDATUM"
+              - "$BEPERKING_TERMIJN_JAREN"
+        legal_basis:
+          law: "Archiefwet 1995"
+          bwb_id: "BWBR0007376"
+          article: "15"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+          juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Beperkingen worden voor een bepaalde termijn opgelegd en vervallen daarna"
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "15"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=15&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 15 bepaalt de voorwaarden voor openbaarheid van archiefbescheiden"
+
+  - output: "beperking_reden"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_openbaar"
+          operation: EQUALS
+          value: false
+        then:
+          operation: IF
+          conditions:
+            - test:
+                subject: "$BEPERKING_TYPE"
+                operation: EQUALS
+                value: "$BEPERKING_PRIVACY"
+              then: "Beperkt vanwege eerbiediging van de persoonlijke levenssfeer"
+            - test:
+                subject: "$BEPERKING_TYPE"
+                operation: EQUALS
+                value: "$BEPERKING_STAATSBELANG"
+              then: "Beperkt vanwege het belang van de Staat of zijn bondgenoten"
+            - test:
+                subject: "$BEPERKING_TYPE"
+                operation: EQUALS
+                value: "$BEPERKING_ONEVENREDIGE_GEVOLGEN"
+              then: "Beperkt om onevenredige bevoordeling of benadeling te voorkomen"
+            - else: "Beperkt, reden onbekend"
+      - else: null
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "15"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 15 lid 1 noemt de drie gronden voor beperkingen"
+
+  - output: "openbaar_vanaf_datum"
+    operation: IF
+    conditions:
+      - test:
+          subject: "$is_openbaar"
+          operation: EQUALS
+          value: false
+        then:
+          operation: IF
+          conditions:
+            # Staatsbelang met ministerraadsbesluit: onbeperkt
+            - test:
+                operation: AND
+                values:
+                  - subject: "$BEPERKING_TYPE"
+                    operation: EQUALS
+                    value: "$BEPERKING_STAATSBELANG"
+                  - subject: "$MINISTERRAAD_BESLUIT_STAATSBELANG"
+                    operation: EQUALS
+                    value: true
+              then: null
+            # Altijd 75 jaar na aanmaakdatum (conform artikel 15 lid 4)
+            - else:
+                operation: ADD_DATE
+                unit: "years"
+                values:
+                  - "$AANMAAKDATUM"
+                  - "$MAXIMALE_BEPERKING_JAREN"
+      - else: null
+    legal_basis:
+      law: "Archiefwet 1995"
+      bwb_id: "BWBR0007376"
+      article: "15"
+      paragraph: "4"
+      url: "https://wetten.overheid.nl/BWBR0007376/2024-01-01#Hoofdstuk2_Artikel15"
+      juriconnect: "jci1.3:c:BWBR0007376&artikel=15&lid=4&z=2024-01-01&g=2024-01-01"
+      explanation: "Artikel 15 lid 4 bepaalt dat beperkingen niet gelden voor archiefbescheiden ouder dan 75 jaar"
