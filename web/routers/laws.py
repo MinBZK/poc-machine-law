@@ -239,35 +239,36 @@ async def submit_case(
 
     case = case_manager.get_case_by_id(case_id)
 
-    # For exploitatievergunning: if alcohol permit is active, create claim to add "Alcoholhoudende dranken"
-    if law == "algemene_plaatselijke_verordening/exploitatievergunning" and kvk:
-        verstrekt_alcohol = result.output.get("verstrekt_alcoholhoudende_dranken", False)
-        if verstrekt_alcohol:
-            # Get current activities from profile data
-            try:
-                profile = machine_service.get_profile_data(bsn)
-                if profile and "sources" in profile:
-                    profile_service_data = profile["sources"].get(service, {})
-                    vergunningen = profile_service_data.get("vergunningen", [])
-                    for v in vergunningen:
-                        if v.get("kvk_nummer") == kvk and v.get("heeft_exploitatievergunning"):
-                            current_activiteiten = v.get("vergunde_activiteiten", [])
-                            if "Alcoholhoudende dranken" not in current_activiteiten:
-                                new_activiteiten = current_activiteiten + ["Alcoholhoudende dranken"]
-                                claim_manager.submit_claim(
-                                    service=service,
-                                    key="VERGUNDE_ACTIVITEITEN",
-                                    old_value=current_activiteiten,
-                                    new_value=new_activiteiten,
-                                    reason="Alcoholwetvergunning is actief",
-                                    claimant="CITIZEN",
-                                    law=law,
-                                    bsn=bsn,
-                                    case_id=case_id,
-                                )
-                            break
-            except Exception as e:
-                logger.warning(f"Failed to create activity claim for exploitatievergunning: {e}")
+    # Cross-law updates: alcoholwet approval affects exploitatievergunning
+    # TODO: need to remove this hard-coded part
+    # Creates a PENDING claim so Claudia can review and confirm the change
+    if law == "alcoholwet/vergunning" and kvk and result.output.get("heeft_recht_op_vergunning"):
+        exploitatie_law = "algemene_plaatselijke_verordening/exploitatievergunning"
+        try:
+            profile = machine_service.get_profile_data(bsn)
+            if profile and "sources" in profile:
+                profile_service_data = profile["sources"].get(service, {})
+                vergunningen = profile_service_data.get("vergunningen", [])
+                for v in vergunningen:
+                    if v.get("kvk_nummer") == kvk and v.get("heeft_exploitatievergunning"):
+                        # Create pending claim for VERSTREKT_ALCOHOL so the
+                        # exploitatievergunning tile shows a data change warning
+                        if not v.get("heeft_alcoholvergunning"):
+                            claim_manager.submit_claim(
+                                service=service,
+                                key="VERSTREKT_ALCOHOL",
+                                old_value=False,
+                                new_value=True,
+                                reason="Alcoholwetvergunning toegekend",
+                                claimant="CITIZEN",
+                                law=exploitatie_law,
+                                bsn=bsn,
+                                case_id=case_id,
+                                auto_approve=False,
+                            )
+                        break
+        except Exception as e:
+            logger.warning(f"Failed to create claim for exploitatievergunning: {e}")
 
     # Re-evaluate the law AFTER the case is submitted so counts include the new case
     _, result, _ = evaluate_law(

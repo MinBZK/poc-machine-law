@@ -405,6 +405,10 @@ class RuleContext:
                             node.resolve_type = "SOURCE"
                             node.required = bool(spec.get("required", False))
 
+                            if result is None and node.required:
+                                self.missing_required = True
+                                logger.warning(f"Required source resolved to None: {path}")
+
                             # Add type information to the node
                             if "type" in spec:
                                 node.details["type"] = spec["type"]

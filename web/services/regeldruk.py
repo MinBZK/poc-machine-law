@@ -66,7 +66,6 @@ def load_law_yaml(service: str, law: str) -> dict[str, Any] | None:
     """Load a law YAML file by service and law path."""
     # Try multiple possible locations
     base_paths = [
-        Path("submodules/regelrecht-laws/laws"),
         Path("laws"),
     ]
 

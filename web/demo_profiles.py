@@ -13,7 +13,7 @@ DEMO_PROFILES: dict[str, dict] = {
         "bsn": "100000001",
         "kvk": None,
         "default_law_path": "zorgtoeslagwet/TOESLAGEN-2025-01-01",
-        "default_feature_path": "submodules/regelrecht-laws/laws/zorgtoeslagwet/TOESLAGEN-2025-01-01.feature",
+        "default_feature_path": "features/toeslagen/zorgtoeslagwet_TOESLAGEN-2025-01-01.feature",
         "default_law_tabs": [
             {
                 "id": "law-tab-1",
@@ -33,7 +33,7 @@ DEMO_PROFILES: dict[str, dict] = {
         "bsn": "999999990",
         "kvk": "85234567",
         "default_law_path": "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
-        "default_feature_path": "submodules/regelrecht-laws/laws/algemene_plaatselijke_verordening/exploitatievergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01.feature",
+        "default_feature_path": "features/overig/alcoholwet_GEMEENTE_ROTTERDAM-2024-01-01.feature",
         "default_law_tabs": [
             {
                 "id": "law-tab-1",
@@ -56,23 +56,38 @@ DEMO_PROFILES: dict[str, dict] = {
                 "law": "omgevingswet/energiebesparing/informatieplicht",
                 "service": "RVO",
             },
+            {
+                "id": "law-tab-4",
+                "path": "warenwet/haccp/NVWA-2024-01-01",
+                "name": "HACCP Voedselveiligheid",
+                "law": "warenwet/haccp",
+                "service": "NVWA",
+            },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
         "scenario_features": {
+            "alcoholwet": {
+                "path": "features/overig/alcoholwet_GEMEENTE_ROTTERDAM-2024-01-01.feature",
+                "name": "Alcoholwetvergunning",
+                "description": "Bepalen recht op Alcoholwetvergunning horeca Rotterdam",
+            },
             "exploitatievergunning": {
-                "path": "submodules/regelrecht-laws/laws/algemene_plaatselijke_verordening/exploitatievergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01.feature",
+                "path": "features/overig/apv_exploitatievergunning_GEMEENTE_ROTTERDAM-2024-01-01.feature",
                 "name": "Exploitatievergunning",
-                "description": "Horeca exploitatievergunning",
+                "description": "Exploitatievergunning voor openbare inrichtingen APV Rotterdam",
             },
             "terrassen": {
-                "path": "submodules/regelrecht-laws/laws/algemene_plaatselijke_verordening/terrassen/GEMEENTE_ROTTERDAM-2024-01-01.feature",
+                "path": "features/overig/apv_terrassen_GEMEENTE_ROTTERDAM-2024-01-01.feature",
                 "name": "Terrasvergunning",
-                "description": "Terrasvergunning bij horecabedrijf",
+                "description": "Terrasvergunning voor horecabedrijven APV Rotterdam",
             },
         },
         "scenario_metrics_laws": [
+            ("GEMEENTE_ROTTERDAM", "alcoholwet/vergunning"),
             ("GEMEENTE_ROTTERDAM", "algemene_plaatselijke_verordening/exploitatievergunning"),
             ("GEMEENTE_ROTTERDAM", "algemene_plaatselijke_verordening/terrassen"),
+            ("RVO", "omgevingswet/energiebesparing/informatieplicht"),
+            ("NVWA", "warenwet/haccp"),
         ],
     },
 }

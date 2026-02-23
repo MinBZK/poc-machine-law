@@ -4229,6 +4229,7 @@ profiles:
           rechtsvorm: EENMANSZAAK
           status: Actief
           activiteit: Horeca (SBI 56102, Cafés)
+          sbi_code: '56102'
           datum_aanvang: '2025-01-15'
           aantal_werknemers: 0
           datum_telling: '2025-01-01'
@@ -4468,9 +4469,22 @@ profiles:
         - kvk_nummer: '85234567'
           aantal_werknemers: 0
           verstrekt_mobiliteitsvergoeding: false
-        # Informatieplicht energiebesparing - Koffiezaak Noon verbruikt boven drempel
+        # Informatieplicht energiebesparing - kleine koffiezaak zit onder de drempels
+        # (drempel: 50.000 kWh elektriciteit of 25.000 m³ gas)
         rvo_energiegegevens:
         - kvk_nummer: '85234567'
-          elektriciteit_kwh: 72000
-          gasverbruik_m3: 18000
+          elektriciteit_kwh: 15000
+          gasverbruik_m3: 8000
           is_woonfunctie: false
+      NVWA:
+        # HACCP voedselveiligheid - Claudia's koffiezaak is een levensmiddelenbedrijf
+        nvwa_registratie:
+        - kvk_nummer: '85234567'
+          is_levensmiddelenbedrijf: true
+          is_geregistreerd_nvwa: true
+          heeft_haccp_systeem: true
+          type_haccp_systeem: 'hygienecode'
+        nvwa_inspectiegegevens:
+        - kvk_nummer: '85234567'
+          laatste_inspectiedatum: '2025-06-15'
+          laatste_inspectieresultaat: 'voldoende'

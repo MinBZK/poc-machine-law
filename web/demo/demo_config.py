@@ -168,6 +168,14 @@ DEMO_COLLAPSE_CONFIG = {
         ],
         "collapse_all_except_expanded": True,
     },
+    # HACCP Voedselveiligheid - Show properties and output
+    "warenwet/haccp/NVWA-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
 }
 
 

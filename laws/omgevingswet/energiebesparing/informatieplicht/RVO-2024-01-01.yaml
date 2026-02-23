@@ -1,0 +1,409 @@
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.7/schema.json
+uuid: d4ecfc05-c1a3-48f4-bd1c-184390cd0013
+name: Informatieplicht Energiebesparing
+law: omgevingswet/energiebesparing/informatieplicht
+law_type: "FORMELE_WET"
+legal_character: "BESCHIKKING"
+decision_type: "ANDERE_HANDELING"
+discoverable: "BUSINESS"
+requires_manual_approval: true
+valid_from: 2024-01-01
+service: "RVO"
+description: >
+  Bepaling van de informatieplicht energiebesparing op grond van artikel 5.15d van het Besluit activiteiten
+  leefomgeving. Bedrijven en instellingen met een jaarlijks energieverbruik boven de drempelwaarden
+  (50.000 kWh elektriciteit of 25.000 m³ aardgas) zijn verplicht om elke vier jaar via het RVO eLoket
+  te rapporteren over genomen energiebesparende maatregelen.
+
+legal_basis:
+  law: "Besluit activiteiten leefomgeving"
+  bwb_id: "BWBR0041330"
+  article: "5.15d"
+  url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+  juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+  explanation: "Artikel 5.15d Bal bepaalt de informatieplicht ter verduurzaming van het energiegebruik voor milieubelastende activiteiten"
+
+references:
+  - law: "Besluit activiteiten leefomgeving"
+    article: "5.15"
+    url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+  - law: "Besluit activiteiten leefomgeving"
+    article: "5.15a"
+    url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15a"
+  - law: "Besluit bouwwerken leefomgeving"
+    article: "3.84"
+    url: "https://wetten.overheid.nl/BWBR0041297/2024-01-01#Hoofdstuk3_Afdeling3.7_Paragraaf3.7.1_Artikel3.84"
+  - law: "Besluit bouwwerken leefomgeving"
+    article: "3.84b"
+    url: "https://wetten.overheid.nl/BWBR0041297/2024-01-01#Hoofdstuk3_Afdeling3.7_Paragraaf3.7.1_Artikel3.84b"
+
+properties:
+  parameters:
+    - name: "KVK_NUMMER"
+      description: "KvK-nummer van de organisatie"
+      type: "string"
+      required: true
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15d"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+        explanation: "Identificatie van de onderneming via het KvK-nummer voor rapportage via het RVO eLoket"
+
+  sources:
+    - name: "JAARLIJKS_ELEKTRICITEITSVERBRUIK_KWH"
+      description: "Jaarlijks elektriciteitsverbruik in kWh"
+      type: "number"
+      required: true
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "rvo_energiegegevens"
+        field: "elektriciteit_kwh"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK-nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Het elektriciteitsverbruik is bepalend voor de drempeltoets van 50.000 kWh per jaar"
+
+    - name: "JAARLIJKS_GASVERBRUIK_M3"
+      description: "Jaarlijks gasverbruik in m³ aardgasequivalenten"
+      type: "number"
+      required: true
+      type_spec:
+        precision: 0
+        min: 0
+      temporal:
+        type: "period"
+        period_type: "year"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "rvo_energiegegevens"
+        field: "gasverbruik_m3"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK-nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Het gasverbruik is bepalend voor de drempeltoets van 25.000 m³ aardgasequivalenten per jaar"
+
+    - name: "IS_WOONFUNCTIE"
+      description: "Of het pand uitsluitend een woonfunctie heeft"
+      type: "boolean"
+      required: true
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      source_reference:
+        source_type: "RVO"
+        table: "rvo_energiegegevens"
+        field: "is_woonfunctie"
+        select_on:
+          - name: "kvk_nummer"
+            description: "KvK-nummer van de organisatie"
+            type: "string"
+            value: "$KVK_NUMMER"
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Gebouwen met uitsluitend een woonfunctie zijn uitgezonderd van de energiebesparingsplicht"
+
+  input:
+    - name: "BAG_GEBRUIKSDOEL"
+      description: "Gebruiksdoel van het pand volgens de BAG"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "KADASTER"
+        law: "wet_bag"
+        field: "gebruiksdoel"
+      legal_basis:
+        law: "Wet basisregistratie adressen en gebouwen"
+        bwb_id: "BWBR0023466"
+        article: "6"
+        url: "https://wetten.overheid.nl/BWBR0023466/2024-01-01#Hoofdstuk2_Afdeling2_Artikel6"
+        juriconnect: "jci1.3:c:BWBR0023466&artikel=6&z=2024-01-01&g=2024-01-01"
+        explanation: "Het gebruiksdoel uit de BAG wordt gebruikt om te bepalen of sprake is van een woonfunctie"
+
+    - name: "ADRES"
+      description: "Vestigingsadres van het bedrijf"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      service_reference:
+        service: "KVK"
+        law: "handelsregisterwet/bedrijfsgegevens"
+        field: "vestigingsadres"
+      legal_basis:
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk3_Artikel9"
+        juriconnect: "jci1.3:c:BWBR0021777&artikel=9&z=2024-01-01&g=2024-01-01"
+        explanation: "Het vestigingsadres wordt opgehaald uit het handelsregister voor bepaling van het bevoegd gezag"
+
+  output:
+    - name: "heeft_energiebesparingsplicht"
+      description: "Of de energiebesparingsplicht van toepassing is op deze organisatie"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5.15 lid 1 Bal verplicht tot het treffen van alle energiebesparende maatregelen met een terugverdientijd van 5 jaar of minder"
+
+    - name: "heeft_informatieplicht"
+      description: "Of de informatieplicht energiebesparing geldt (rapportage aan RVO)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15d"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5.15d Bal verplicht tot het melden van getroffen energiebesparende maatregelen via het RVO eLoket"
+
+    - name: "heeft_onderzoeksplicht"
+      description: "Of de onderzoeksplicht geldt voor grote verbruikers (>=10 miljoen kWh of >=170.000 m³)"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15a"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15a"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15a&z=2024-01-01&g=2024-01-01"
+        explanation: "Artikel 5.15a Bal verplicht grote verbruikers tot het doen van onderzoek naar verdere verduurzaming"
+
+    - name: "rapportage_frequentie_jaren"
+      description: "Frequentie waarmee gerapporteerd moet worden (in jaren)"
+      type: "number"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15d"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+        explanation: "De rapportage vindt elke vier jaar plaats"
+
+    - name: "volgende_rapportage_deadline"
+      description: "Uiterste datum waarop de volgende rapportage moet zijn ingediend"
+      type: "date"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15d"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+        explanation: "De volgende rapportagedeadline is 1 december 2027; rapportage vindt elke vier jaar plaats"
+
+    - name: "rapportage_methode"
+      description: "De wijze waarop de rapportage moet worden ingediend"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: primary
+      legal_basis:
+        law: "Besluit activiteiten leefomgeving"
+        bwb_id: "BWBR0041330"
+        article: "5.15d"
+        url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+        juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+        explanation: "De rapportage wordt ingediend via het eLoket van RVO (mijn.rvo.nl) met eHerkenning niveau 2+"
+
+    - name: "bevoegd_gezag"
+      description: "Bestuursorgaan dat toezicht houdt op naleving"
+      type: "string"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Omgevingswet"
+        bwb_id: "BWBR0037885"
+        article: "5.1"
+        url: "https://wetten.overheid.nl/BWBR0037885/2024-01-01#Hoofdstuk5_Afdeling5.1_Paragraaf5.1.1_Artikel5.1"
+        juriconnect: "jci1.3:c:BWBR0037885&artikel=5.1&z=2024-01-01&g=2024-01-01"
+        explanation: "Voor de meeste bedrijven is de gemeente het bevoegd gezag; handhaving vindt plaats via de omgevingsdienst"
+
+  definitions:
+    DREMPEL_ELEKTRICITEIT_KWH: 50000
+    DREMPEL_GAS_M3: 25000
+    DREMPEL_ONDERZOEK_ELEKTRICITEIT_KWH: 10000000
+    DREMPEL_ONDERZOEK_GAS_M3: 170000
+    RAPPORTAGE_FREQUENTIE_JAREN: 4
+    VOLGENDE_DEADLINE: "2027-12-01"
+    RAPPORTAGE_METHODE: "RVO eLoket (mijn.rvo.nl) met eHerkenning niveau 2+"
+
+variables: []
+
+requirements:
+  - all:
+      - subject: "$IS_WOONFUNCTIE"
+        operation: EQUALS
+        value: false
+        legal_basis:
+          law: "Besluit activiteiten leefomgeving"
+          bwb_id: "BWBR0041330"
+          article: "5.15"
+          paragraph: "1"
+          url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+          juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+          explanation: "Gebouwen met uitsluitend een woonfunctie zijn uitgezonderd van de energiebesparingsplicht"
+
+      - or:
+          - subject: "$JAARLIJKS_ELEKTRICITEITSVERBRUIK_KWH"
+            operation: GREATER_OR_EQUAL
+            value: "$DREMPEL_ELEKTRICITEIT_KWH"
+            legal_basis:
+              law: "Besluit activiteiten leefomgeving"
+              bwb_id: "BWBR0041330"
+              article: "5.15"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+              juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+              explanation: "Drempelwaarde van 50.000 kWh elektriciteitsverbruik per jaar"
+
+          - subject: "$JAARLIJKS_GASVERBRUIK_M3"
+            operation: GREATER_OR_EQUAL
+            value: "$DREMPEL_GAS_M3"
+            legal_basis:
+              law: "Besluit activiteiten leefomgeving"
+              bwb_id: "BWBR0041330"
+              article: "5.15"
+              paragraph: "1"
+              url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+              juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+              explanation: "Drempelwaarde van 25.000 m³ aardgasequivalenten per jaar"
+
+actions:
+  - output: "heeft_energiebesparingsplicht"
+    value: true
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15"
+      paragraph: "1"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15&lid=1&z=2024-01-01&g=2024-01-01"
+      explanation: "De organisatie voldoet aan de drempelwaarden en heeft geen woonfunctie; de energiebesparingsplicht is van toepassing"
+
+  - output: "heeft_informatieplicht"
+    value: true
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15d"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+      explanation: "De informatieplicht geldt voor alle organisaties die onder de energiebesparingsplicht vallen"
+
+  - output: "heeft_onderzoeksplicht"
+    operation: OR
+    values:
+      - operation: GREATER_OR_EQUAL
+        subject: "$JAARLIJKS_ELEKTRICITEITSVERBRUIK_KWH"
+        value: "$DREMPEL_ONDERZOEK_ELEKTRICITEIT_KWH"
+      - operation: GREATER_OR_EQUAL
+        subject: "$JAARLIJKS_GASVERBRUIK_M3"
+        value: "$DREMPEL_ONDERZOEK_GAS_M3"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15a"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15a"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15a&z=2024-01-01&g=2024-01-01"
+      explanation: "De onderzoeksplicht geldt voor grote verbruikers met meer dan 10 miljoen kWh elektriciteit of 170.000 m³ aardgas per jaar"
+
+  - output: "rapportage_frequentie_jaren"
+    value: "$RAPPORTAGE_FREQUENTIE_JAREN"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15d"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+      explanation: "Rapportage is vierjaarlijks verplicht"
+
+  - output: "volgende_rapportage_deadline"
+    value: "$VOLGENDE_DEADLINE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15d"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+      explanation: "De volgende rapportagedeadline is 1 december 2027"
+
+  - output: "rapportage_methode"
+    value: "$RAPPORTAGE_METHODE"
+    legal_basis:
+      law: "Besluit activiteiten leefomgeving"
+      bwb_id: "BWBR0041330"
+      article: "5.15d"
+      url: "https://wetten.overheid.nl/BWBR0041330/2024-01-01#Hoofdstuk5_Afdeling5.4_Paragraaf5.4.1_Artikel5.15d"
+      juriconnect: "jci1.3:c:BWBR0041330&artikel=5.15d&z=2024-01-01&g=2024-01-01"
+      explanation: "Rapportage wordt ingediend via het RVO eLoket met eHerkenning"
+
+  - output: "bevoegd_gezag"
+    value: "gemeente"
+    legal_basis:
+      law: "Omgevingswet"
+      bwb_id: "BWBR0037885"
+      article: "5.1"
+      url: "https://wetten.overheid.nl/BWBR0037885/2024-01-01#Hoofdstuk5_Afdeling5.1_Paragraaf5.1.1_Artikel5.1"
+      juriconnect: "jci1.3:c:BWBR0037885&artikel=5.1&z=2024-01-01&g=2024-01-01"
+      explanation: "Voor de meeste bedrijven is de gemeente het bevoegd gezag; handhaving via de omgevingsdienst"
