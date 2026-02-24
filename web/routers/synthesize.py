@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import subprocess
+from datetime import datetime
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
@@ -18,12 +19,25 @@ SUBPROCESS_TIMEOUT = 300
 
 @router.get("/")
 async def synthesize_page(request: Request):
-    """Render the synthesis configuration page."""
+    """Render the harmonisatie configuration page."""
+    default_params = {
+        "num_people": 1000,
+        "simulation_date": datetime.now().strftime("%Y-%m-%d"),
+        "age_18_30": 18,
+        "age_30_45": 25,
+        "age_45_67": 32,
+        "age_67_85": 20,
+        "age_85_plus": 5,
+        "zero_income_prob": 5,
+        "rent_percentage": 43,
+        "student_percentage_young": 40,
+    }
     return templates.TemplateResponse(
         "synthesize.html",
         {
             "request": request,
             "demo_mode": is_demo_mode(request),
+            "default_params": default_params,
         },
     )
 

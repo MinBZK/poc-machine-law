@@ -7,6 +7,7 @@ from datetime import datetime
 
 import pandas as pd
 
+from run_simulation import apply_custom_parameters
 from simulate import LawSimulator
 from synthesize.learner import InterpretabilityConstraints, LearnedModel, SynthesisLearner
 from synthesize.validator import SynthesisValidator
@@ -147,6 +148,46 @@ def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
     }
 
 
+def extract_tree_structure(tree, feature_names: list[str]) -> dict:
+    """Export sklearn decision tree as a nested JSON structure for visualization."""
+    tree_ = tree.tree_
+    classes = tree.classes_
+
+    def _build_node(node_id: int) -> dict:
+        is_leaf = tree_.children_left[node_id] == tree_.children_right[node_id]
+        samples = int(tree_.n_node_samples[node_id])
+
+        if is_leaf:
+            # Leaf node: determine prediction and confidence
+            value = tree_.value[node_id][0]
+            predicted_class_idx = int(value.argmax())
+            total = value.sum()
+            confidence = float(value[predicted_class_idx] / total) if total > 0 else 0.0
+            prediction = str(classes[predicted_class_idx]) if len(classes) > predicted_class_idx else "unknown"
+            return {
+                "is_leaf": True,
+                "prediction": prediction,
+                "samples": samples,
+                "confidence": round(confidence, 3),
+            }
+
+        # Internal node: has a split
+        feature_idx = tree_.feature[node_id]
+        threshold = float(tree_.threshold[node_id])
+        feature = feature_names[feature_idx] if feature_idx < len(feature_names) else f"feature_{feature_idx}"
+
+        return {
+            "is_leaf": False,
+            "feature": feature,
+            "threshold": round(threshold, 2),
+            "samples": samples,
+            "left": _build_node(tree_.children_left[node_id]),
+            "right": _build_node(tree_.children_right[node_id]),
+        }
+
+    return _build_node(0)
+
+
 def run_train(params: dict) -> dict:
     """Train a synthesized law and return results as JSON."""
     num_people = params.get("num_people", 1000)
@@ -155,8 +196,9 @@ def run_train(params: dict) -> dict:
     min_samples = params.get("min_samples", 50)
     max_rules = params.get("max_rules", 10)
 
-    # Run simulation
+    # Run simulation with optional demographic params
     simulator = LawSimulator(simulation_date)
+    apply_custom_parameters(simulator, params)
     results_df = simulator.run_simulation(num_people=num_people)
     synthesis_df = simulator.export_for_synthesis(results_df)
 
@@ -204,8 +246,11 @@ def run_train(params: dict) -> dict:
     # Cross-validate
     cv_results = learner.cross_validate(synthesis_df)
 
-    # Per-law SHAP analysis
+    # Per-law analysis
     law_analysis = analyze_per_law(model, synthesis_df)
+
+    # Extract tree structure for visualization
+    tree_structure = extract_tree_structure(model._eligibility_tree, model.feature_names)
 
     return {
         "status": "success",
@@ -219,6 +264,7 @@ def run_train(params: dict) -> dict:
             "cross_validation": cv_results,
         },
         "rules": rules,
+        "tree_structure": tree_structure,
         "formulas": formulas,
         "yaml": yaml_string,
         "explanation": explanation,
@@ -236,8 +282,9 @@ def run_validate(params: dict) -> dict:
     accuracy_target = params.get("accuracy_target", 0.95)
     amount_tolerance = params.get("amount_tolerance", 50.0)
 
-    # Run simulation for validation
+    # Run simulation for validation with optional demographic params
     simulator = LawSimulator(simulation_date)
+    apply_custom_parameters(simulator, params)
     results_df = simulator.run_simulation(num_people=num_people)
     synthesis_df = simulator.export_for_synthesis(results_df)
 

@@ -62,7 +62,7 @@
                     <div class="tab"
                          :class="{ 'active': activeTab === 'synthesize' }"
                          @click="switchTab('synthesize')">
-                        <span class="tab-label">Synthese</span>
+                        <span class="tab-label">Harmonisatie</span>
                     </div>
                 {% endif %}
                 <div class="tab"
@@ -247,14 +247,14 @@
                             title="Simulatie"></iframe>
                 </div>
                 {% if feature_flags.get('SYNTHESIZE', False) %}
-                    <!-- Synthese Tab (IFrame) -->
+                    <!-- Harmonisatie Tab (IFrame) -->
                     <div class="tab-content iframe-content"
                          x-show="activeTab === 'synthesize'"
                          x-cloak>
                         <iframe src="/synthesize/?demo=true"
                                 frameborder="0"
                                 class="tab-iframe"
-                                title="Law Synthese"></iframe>
+                                title="Harmonisatie"></iframe>
                     </div>
                 {% endif %}
                 <!-- Temporary Tabs (IFrame) -->
