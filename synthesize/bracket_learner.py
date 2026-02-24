@@ -115,7 +115,13 @@ class BracketLearner:
         return X, y_eligible, y_amount
 
     def train(self, df: pd.DataFrame) -> BracketModel:
-        """Train bracket model on simulation data."""
+        """Train bracket model on simulation data.
+
+        Strategy: fit ONE global regression per household type across ALL income
+        data, then evaluate at each bracket boundary. This avoids overfitting
+        on small per-bracket samples and guarantees monotonically decreasing
+        benefits (since a single negative-slope line can only go down).
+        """
         X, y_eligible, y_amount = self.prepare_data(df)
 
         feature_names = list(X.columns)
@@ -141,67 +147,58 @@ class BracketLearner:
         else:
             household_types = [{}]
 
-        # Build segments: fit linear regression per household type x bracket
+        # Build segments: fit ONE global regression per household type,
+        # then evaluate at bracket boundaries for a smooth monotone curve.
         segments = []
         for ht in household_types:
             ht_mask = pd.Series(True, index=X.index)
             for key, val in ht.items():
                 ht_mask &= X[key] == val
 
-            for i in range(len(boundaries) - 1):
-                lower = boundaries[i]
-                upper = boundaries[i + 1]
+            ht_income = income[ht_mask].values.reshape(-1, 1)
+            ht_amount = y_amount[ht_mask].values
 
-                bracket_mask = ht_mask & (income >= lower)
-                if i < len(boundaries) - 2:
-                    bracket_mask &= income < upper
-                else:
-                    bracket_mask &= income <= upper
-
-                seg_income = income[bracket_mask].values.reshape(-1, 1)
-                seg_amount = y_amount[bracket_mask].values
-
-                if len(seg_income) < 3:
-                    # Not enough data: use mean or zero
-                    mean_amt = float(seg_amount.mean()) if len(seg_amount) > 0 else 0.0
-                    mean_amt = self._round_amount(max(0.0, mean_amt))
+            if len(ht_income) < 3:
+                # Not enough data for this household type
+                for i in range(len(boundaries) - 1):
                     segments.append(
                         BracketSegment(
-                            income_lower=lower,
-                            income_upper=upper,
-                            amount_at_lower=mean_amt,
-                            amount_at_upper=mean_amt,
+                            income_lower=boundaries[i],
+                            income_upper=boundaries[i + 1],
+                            amount_at_lower=0.0,
+                            amount_at_upper=0.0,
                             household_filter=ht if ht else None,
                         )
                     )
-                    continue
+                continue
 
-                # Fit linear regression: amount = a + b * income
-                reg = LinearRegression()
-                reg.fit(seg_income, seg_amount)
+            # Fit single global regression for this household type
+            reg = LinearRegression()
+            reg.fit(ht_income, ht_amount)
 
-                amt_lower = self._round_amount(max(0.0, float(reg.predict([[lower]])[0])))
-                amt_upper = self._round_amount(max(0.0, float(reg.predict([[upper]])[0])))
+            # Evaluate at each boundary, clamp to >= 0, enforce monotone decreasing
+            boundary_amounts = []
+            for b in boundaries:
+                amt = max(0.0, float(reg.predict([[b]])[0]))
+                boundary_amounts.append(self._round_amount(amt))
 
+            # Enforce monotonically decreasing: if a later boundary has a higher
+            # amount than the previous, cap it at the previous value.
+            for j in range(1, len(boundary_amounts)):
+                if boundary_amounts[j] > boundary_amounts[j - 1]:
+                    boundary_amounts[j] = boundary_amounts[j - 1]
+
+            # Build segments from boundary amounts
+            for i in range(len(boundaries) - 1):
                 segments.append(
                     BracketSegment(
-                        income_lower=lower,
-                        income_upper=upper,
-                        amount_at_lower=amt_lower,
-                        amount_at_upper=amt_upper,
+                        income_lower=boundaries[i],
+                        income_upper=boundaries[i + 1],
+                        amount_at_lower=boundary_amounts[i],
+                        amount_at_upper=boundary_amounts[i + 1],
                         household_filter=ht if ht else None,
                     )
                 )
-
-        # Ensure continuity: where adjacent segments meet, use the average
-        for ht in household_types:
-            ht_segs = [s for s in segments if s.household_filter == (ht if ht else None)]
-            for j in range(len(ht_segs) - 1):
-                # The upper of segment j should equal the lower of segment j+1
-                avg = (ht_segs[j].amount_at_upper + ht_segs[j + 1].amount_at_lower) / 2
-                avg = self._round_amount(max(0.0, avg))
-                ht_segs[j].amount_at_upper = avg
-                ht_segs[j + 1].amount_at_lower = avg
 
         # Estimate child supplement
         child_supplement = 0.0
