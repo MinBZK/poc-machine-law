@@ -1,0 +1,433 @@
+{% extends "simulation_base.html" %}
+{% block content %}
+    <div class="flex h-full w-full" x-data="synthesizeApp()">
+        <!-- Left Panel: Configuration -->
+        <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Law Synthese</h2>
+            <p class="text-sm text-gray-600 mb-6">
+                Combineer zorgtoeslag, huurtoeslag en kindgebonden budget tot een
+                vereenvoudigde, geharmoniseerde wet via machine learning.
+            </p>
+            <form @submit.prevent="train()" class="space-y-5">
+                <!-- Simulation Size -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Aantal simulatiepersonen
+                    </label>
+                    <input type="range"
+                           x-model.number="config.num_people"
+                           min="100"
+                           max="5000"
+                           step="100"
+                           class="w-full">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>100</span>
+                        <span class="font-medium text-gray-900" x-text="config.num_people"></span>
+                        <span>5000</span>
+                    </div>
+                </div>
+                <!-- Max Tree Depth -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        Maximale diepte beslisboom
+                    </label>
+                    <span class="block text-xs text-gray-400 mb-1">Hoe dieper, hoe complexer de regels. Lager = eenvoudiger.</span>
+                    <input type="range"
+                           x-model.number="config.max_depth"
+                           min="1"
+                           max="10"
+                           step="1"
+                           class="w-full">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>1</span>
+                        <span class="font-medium text-gray-900" x-text="config.max_depth"></span>
+                        <span>10</span>
+                    </div>
+                </div>
+                <!-- Min Samples per Leaf -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        Minimum aantal personen per regel
+                    </label>
+                    <span class="block text-xs text-gray-400 mb-1">Hoeveel personen er minstens onder een regel moeten vallen.</span>
+                    <input type="range"
+                           x-model.number="config.min_samples"
+                           min="10"
+                           max="200"
+                           step="10"
+                           class="w-full">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>10</span>
+                        <span class="font-medium text-gray-900" x-text="config.min_samples"></span>
+                        <span>200</span>
+                    </div>
+                </div>
+                <!-- Max Rules -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Maximaal aantal regels
+                    </label>
+                    <input type="range"
+                           x-model.number="config.max_rules"
+                           min="1"
+                           max="20"
+                           step="1"
+                           class="w-full">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>1</span>
+                        <span class="font-medium text-gray-900" x-text="config.max_rules"></span>
+                        <span>20</span>
+                    </div>
+                </div>
+                <!-- Train Button -->
+                <button type="submit"
+                        :disabled="loading"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-3 px-4 rounded-lg transition-colors cursor-pointer">
+                    <span x-show="!loading">Trainen</span>
+                    <span x-show="loading" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                             fill="none"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"></circle>
+                            <path class="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Bezig met trainen...
+                    </span>
+                </button>
+            </form>
+            <!-- Actions (shown after training) -->
+            <div x-show="result" x-cloak class="mt-6 space-y-3">
+                <button @click="validate()"
+                        :disabled="validating"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
+                    <span x-show="!validating">Valideer model</span>
+                    <span x-show="validating" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                             fill="none"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"></circle>
+                            <path class="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Valideren...
+                    </span>
+                </button>
+                <button @click="downloadYaml()"
+                        class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
+                    Download wetspecificatie (YAML)
+                </button>
+            </div>
+        </div>
+        <!-- Right Panel: Results -->
+        <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <!-- Empty State -->
+            <div x-show="!result && !loading && !error" class="flex items-center justify-center h-full">
+                <div class="text-center text-gray-500">
+                    <svg class="mx-auto h-16 w-16 text-gray-300 mb-4"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.5"
+                              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <p class="text-lg font-medium">Geen resultaten</p>
+                    <p class="text-sm mt-1">Configureer de parameters en klik op "Trainen" om te beginnen.</p>
+                </div>
+            </div>
+            <!-- Loading State -->
+            <div x-show="loading" x-cloak class="flex items-center justify-center h-full">
+                <div class="text-center">
+                    <svg class="animate-spin mx-auto h-12 w-12 text-indigo-600 mb-4"
+                         fill="none"
+                         viewBox="0 0 24 24">
+                        <circle class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"></circle>
+                        <path class="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-lg font-medium text-gray-700">Model wordt getraind...</p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Simulatie met <span x-text="config.num_people"></span> personen wordt uitgevoerd.
+                    </p>
+                </div>
+            </div>
+            <!-- Error State -->
+            <div x-show="error" x-cloak class="p-4">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h3 class="text-red-800 font-medium">Fout bij training</h3>
+                    <p class="text-red-700 text-sm mt-1" x-text="error"></p>
+                </div>
+            </div>
+            <!-- Results -->
+            <div x-show="result" x-cloak class="space-y-6">
+                <!-- Metrics Summary -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm font-medium text-gray-500">Nauwkeurigheid recht (Accuracy)</div>
+                        <div class="text-2xl font-bold text-gray-900"
+                             x-text="formatPct(result?.metrics?.eligibility_accuracy)"></div>
+                        <div class="text-xs text-gray-400 mt-1">Hoe vaak het model correct bepaalt of iemand recht heeft</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm font-medium text-gray-500">Verklarende waarde bedrag (R&sup2;)</div>
+                        <div class="text-2xl font-bold text-gray-900"
+                             x-text="formatNum(result?.metrics?.amount_r2)"></div>
+                        <div class="text-xs text-gray-400 mt-1">Hoe goed het model het bedrag kan voorspellen (1.0 = perfect)</div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <div class="text-sm font-medium text-gray-500">Gemiddelde afwijking bedrag (MAE)</div>
+                        <div class="text-2xl font-bold text-gray-900"
+                             x-text="'EUR ' + formatNum(result?.metrics?.amount_mae)"></div>
+                        <div class="text-xs text-gray-400 mt-1">Hoeveel het berekende bedrag gemiddeld afwijkt van het werkelijke</div>
+                    </div>
+                </div>
+                <!-- Cross Validation -->
+                <div x-show="result?.metrics?.cross_validation" class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Cross-validatie (5-fold)</h3>
+                    <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-500">Nauwkeurigheid (Accuracy):<br></span>
+                            <span class="font-medium"
+                                  x-text="formatPct(result?.metrics?.cross_validation?.accuracy_mean) + ' (&plusmn;' + formatPct(result?.metrics?.cross_validation?.accuracy_std) + ')'"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">F1-score (balans precisie/volledigheid):<br></span>
+                            <span class="font-medium"
+                                  x-text="formatPct(result?.metrics?.cross_validation?.f1_mean) + ' (&plusmn;' + formatPct(result?.metrics?.cross_validation?.f1_std) + ')'"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Recall (hoeveel rechthebbenden gevonden):<br></span>
+                            <span class="font-medium"
+                                  x-text="formatPct(result?.metrics?.cross_validation?.recall_mean) + ' (&plusmn;' + formatPct(result?.metrics?.cross_validation?.recall_std) + ')'"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Rules -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                        Regels voor recht op toeslag
+                        <span class="text-sm font-normal text-gray-500"
+                              x-text="'(' + (result?.rules?.length || 0) + ' regels)'"></span>
+                    </h3>
+                    <div class="space-y-3">
+                        <template x-for="(rule, idx) in (result?.rules || [])" :key="idx">
+                            <div class="border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-indigo-700"
+                                          x-text="'Regel ' + (idx + 1)"></span>
+                                    <div class="text-xs text-gray-500">
+                                        <span x-text="'personen (n): ' + rule.samples"></span>
+                                        <span class="ml-2"
+                                              x-text="'zekerheid (confidence): ' + formatPct(rule.confidence)"></span>
+                                    </div>
+                                </div>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <template x-for="(cond, ci) in rule.conditions" :key="ci">
+                                        <li class="flex items-start">
+                                            <span class="text-gray-400 mr-2">&#x2022;</span>
+                                            <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded"
+                                                  x-text="cond"></code>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <!-- Formulas -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                        Berekening toeslagbedrag
+                        <span class="text-sm font-normal text-gray-500"
+                              x-text="'(' + (result?.formulas?.length || 0) + ' groepen)'"></span>
+                    </h3>
+                    <div class="space-y-3">
+                        <template x-for="(formula, idx) in (result?.formulas || [])" :key="idx">
+                            <div class="border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-emerald-700"
+                                          x-text="'Groep ' + (idx + 1)"></span>
+                                    <div class="text-xs text-gray-500">
+                                        <span x-text="'personen (n): ' + formula.samples"></span>
+                                        <span class="ml-2"
+                                              x-text="'verkl. waarde (R&sup2;): ' + formatNum(formula.r2_score)"></span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-700">
+                                    <div class="mb-1">
+                                        <span class="text-gray-500">Basisbedrag (Intercept):</span>
+                                        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded"
+                                              x-text="formatNum(formula.intercept)"></code>
+                                    </div>
+                                    <template x-for="(coef, feat) in formula.coefficients" :key="feat">
+                                        <div class="ml-4">
+                                            <span class="text-gray-400"
+                                                  x-text="coef > 0 ? '+' : ''"></span>
+                                            <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded"
+                                                  x-text="formatNum(coef) + ' x ' + feat"></code>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Segment conditions -->
+                                <div x-show="formula.segment_conditions?.length > 0"
+                                     class="mt-2 pt-2 border-t border-gray-100">
+                                    <div class="text-xs text-gray-500 mb-1">Voorwaarden voor deze groep:</div>
+                                    <template x-for="(cond, ci) in formula.segment_conditions" :key="ci">
+                                        <code class="text-xs bg-yellow-50 px-1.5 py-0.5 rounded mr-1"
+                                              x-text="cond"></code>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <!-- Explanation -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Uitleg in het Nederlands</h3>
+                    <div class="prose prose-sm max-w-none text-gray-700"
+                         x-html="renderMarkdown(result?.explanation)"></div>
+                </div>
+                <!-- Generated YAML -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Gegenereerde YAML</h3>
+                    <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs leading-relaxed max-h-96 overflow-y-auto"><code x-text="result?.yaml"></code></pre>
+                </div>
+                <!-- Validation Report -->
+                <div x-show="validationResult" x-cloak class="bg-white rounded-lg shadow p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                        Validatierapport
+                        <span class="ml-2 text-sm font-normal"
+                              :class="validationResult?.passed ? 'text-green-600' : 'text-red-600'"
+                              x-text="validationResult?.passed ? 'GESLAAGD' : 'NIET GESLAAGD'"></span>
+                    </h3>
+                    <div class="prose prose-sm max-w-none text-gray-700"
+                         x-html="renderMarkdown(validationResult?.report_markdown)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <!-- Simple markdown renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+    function synthesizeApp() {
+        return {
+            config: {
+                num_people: 1000,
+                max_depth: 5,
+                min_samples: 50,
+                max_rules: 10,
+            },
+            loading: false,
+            validating: false,
+            error: null,
+            result: null,
+            validationResult: null,
+
+            formatPct(val) {
+                if (val == null) return '-';
+                return (val * 100).toFixed(1) + '%';
+            },
+
+            formatNum(val) {
+                if (val == null) return '-';
+                return Number(val).toFixed(2);
+            },
+
+            renderMarkdown(text) {
+                if (!text) return '';
+                if (typeof marked !== 'undefined') {
+                    return marked.parse(text);
+                }
+                // Fallback: basic newline → br conversion
+                const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return escaped.replace(/\n/g, '<br>');
+            },
+
+            async train() {
+                this.loading = true;
+                this.error = null;
+                this.result = null;
+                this.validationResult = null;
+
+                try {
+                    const response = await fetch('/synthesize/train', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(this.config),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'error') {
+                        this.error = data.message || 'Training failed';
+                    } else {
+                        this.result = data;
+                    }
+                } catch (e) {
+                    this.error = 'Kan geen verbinding maken met de server.';
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async validate() {
+                this.validating = true;
+                this.validationResult = null;
+
+                try {
+                    const response = await fetch('/synthesize/validate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(this.config),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'error') {
+                        this.error = data.message || 'Validation failed';
+                    } else {
+                        this.validationResult = data;
+                    }
+                } catch (e) {
+                    this.error = 'Validatie mislukt.';
+                } finally {
+                    this.validating = false;
+                }
+            },
+
+            downloadYaml() {
+                if (!this.result?.yaml) return;
+                const blob = new Blob([this.result.yaml], {type: 'text/yaml'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'geharmoniseerde_toeslag.yaml';
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+        };
+    }
+    </script>
+{% endblock %}
