@@ -396,6 +396,7 @@ class LawSimulator:
             "rent_amount": rent_amount,
             "rent_service_costs": rent_service_costs,
             "eligible_service_costs": eligible_service_costs,
+            "standaardpremie": 211200,  # €2.112/year, fixed for 2025
             "is_health_insured": is_health_insured,
             "receives_child_benefit": receives_child_benefit,
             "receives_study_financing": receives_study_financing,

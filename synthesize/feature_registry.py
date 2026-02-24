@@ -116,6 +116,13 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         is_grouping=True,
     ),
     FeatureSpec(
+        sim_column="standaardpremie",
+        display_name="Standaardpremie",
+        yaml_inputs=["STANDAARDPREMIE"],
+        laws=["zorgtoeslag"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
         sim_column="is_health_insured",
         display_name="Zorgverzekerd",
         yaml_inputs=["IS_VERZEKERDE"],
@@ -195,13 +202,11 @@ def get_missing_features_for_law(law: str) -> list[str]:
     """Get display names of features that a law needs but aren't available in simulation."""
     # These YAML inputs have no simulation equivalent yet
     unavailable_inputs = {
-        "STANDAARDPREMIE": "Standaardpremie (vast bedrag)",
         "PARTNER_GEWERKTE_UREN": "Gewerkte uren partner",
     }
 
     # Map law to its missing YAML inputs
     law_missing: dict[str, list[str]] = {
-        "zorgtoeslag": ["STANDAARDPREMIE"],
         "kinderopvangtoeslag": ["PARTNER_GEWERKTE_UREN"],
     }
 
