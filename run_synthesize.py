@@ -18,26 +18,6 @@ from synthesize.parametric_yaml_generator import ParametricYAMLConfig, Parametri
 from synthesize.validator import SynthesisValidator
 from synthesize.yaml_generator import YAMLGenerationConfig, YAMLGenerator
 
-# Mapping from feature names to the source laws they belong to
-FEATURE_LAW_MAP: dict[str, list[str]] = {
-    "rent_amount": ["huurtoeslag"],
-    "housing_type_rent": ["huurtoeslag"],
-    "children_count": ["kindgebonden_budget"],
-    "has_children": ["kindgebonden_budget"],
-    "youngest_child_age": ["kindgebonden_budget"],
-    "net_worth": ["zorgtoeslag"],
-    "is_student": ["zorgtoeslag"],
-    "income": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"],
-    "has_partner": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"],
-    "age": ["zorgtoeslag", "kindgebonden_budget"],
-}
-
-LAW_LABELS: dict[str, str] = {
-    "zorgtoeslag": "Zorgtoeslag",
-    "huurtoeslag": "Huurtoeslag",
-    "kindgebonden_budget": "Kindgebonden budget",
-}
-
 # All laws available for synthesis (financial laws only)
 AVAILABLE_LAWS: dict[str, dict] = {
     "zorgtoeslag": {"label": "Zorgtoeslag", "group": "Toeslagen"},
@@ -258,7 +238,7 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
     yaml_string = generator.to_yaml_string(yaml_spec)
 
     # Generate explanation
-    explanation = generate_explanation(model)
+    explanation = generate_explanation(model, selected_laws)
 
     # Extract rules as serializable dicts
     rules = [
@@ -666,7 +646,7 @@ def _format_condition_nl(condition: str, feature_nl: dict[str, str]) -> str:
     return f"{feature_text} is {op_text} {value_text}"
 
 
-def generate_explanation(model) -> str:
+def generate_explanation(model, selected_laws: list[str] | None = None) -> str:
     """Generate Dutch explanation from model."""
     feature_nl = {
         "age": "uw leeftijd",
@@ -684,11 +664,17 @@ def generate_explanation(model) -> str:
     num_rules = len(model.eligibility_rules)
     num_formulas = len(model.amount_formulas)
 
+    law_labels = {k: v["label"] for k, v in AVAILABLE_LAWS.items()}
+    if selected_laws:
+        law_names = [f"**{law_labels.get(law, law)}**" for law in selected_laws]
+        law_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
+    else:
+        law_text = "**zorgtoeslag**, **huurtoeslag** en **kindgebonden budget**"
+
     lines = [
         "# Geharmoniseerde Toeslag",
         "",
-        "Deze toeslag combineert **zorgtoeslag**, **huurtoeslag** en **kindgebonden budget** "
-        "in één vereenvoudigde regeling.",
+        f"Deze toeslag combineert {law_text} in één vereenvoudigde regeling.",
         "",
         "---",
         "",

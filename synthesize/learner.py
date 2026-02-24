@@ -90,8 +90,8 @@ class SynthesisLearner:
 
         Returns:
             X: Feature matrix
-            y_eligible: Combined eligibility target (OR of three toeslagen)
-            y_amount: Combined amount target (SUM of three toeslagen)
+            y_eligible: Combined eligibility target (OR of all selected laws)
+            y_amount: Combined amount target (SUM of all selected laws)
         """
         X = df.copy()
 
@@ -113,32 +113,24 @@ class SynthesisLearner:
         if "children_count" in X.columns:
             X["children_count"] = X["children_count"].fillna(0)
 
-        # Create combined eligibility target (eligible for ANY of the three)
-        eligibility_cols = [
-            "zorgtoeslag_eligible",
-            "huurtoeslag_eligible",
-            "kindgebonden_budget_eligible",
-        ]
-        available_elig = [c for c in eligibility_cols if c in df.columns]
-        if available_elig:
-            y_eligible = df[available_elig].any(axis=1).astype(int)
+        # Create combined eligibility target (eligible for ANY selected law)
+        elig_cols = [c for c in df.columns if c.endswith("_eligible")]
+        if elig_cols:
+            y_eligible = df[elig_cols].any(axis=1).astype(int)
         else:
             raise ValueError("No eligibility columns found in data")
 
-        # Create combined amount target (SUM of all three)
+        # Create combined amount target (SUM of all selected laws)
         amount_cols = [
-            "zorgtoeslag_amount",
-            "huurtoeslag_amount",
-            "kindgebonden_budget_amount",
+            c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols
         ]
-        available_amt = [c for c in amount_cols if c in df.columns]
-        if available_amt:
-            y_amount = df[available_amt].sum(axis=1)
+        if amount_cols:
+            y_amount = df[amount_cols].sum(axis=1)
         else:
             raise ValueError("No amount columns found in data")
 
         # Select only feature columns (drop target columns)
-        target_cols = eligibility_cols + amount_cols
+        target_cols = elig_cols + amount_cols
         feature_cols = [c for c in X.columns if c not in target_cols]
         X = X[feature_cols]
 

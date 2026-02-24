@@ -447,14 +447,14 @@
                             </p>
                         </div>
                     </template>
-                    <!-- Accordeon: Feature Importance (collapsed) -->
+                    <!-- Accordeon: Belang van kenmerken (collapsed) -->
                     <div x-show="activeRun?.result?.law_analysis"
                          x-cloak
                          class="bg-white rounded-lg shadow overflow-hidden">
                         <button type="button"
                                 @click="sections.features = !sections.features"
                                 class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
-                            <h3 class="text-lg font-semibold text-gray-900">Feature Importance</h3>
+                            <h3 class="text-lg font-semibold text-gray-900">Belang van kenmerken</h3>
                             <svg class="w-5 h-5 text-gray-500 transform transition-transform"
                                  :class="sections.features ? 'rotate-180' : ''"
                                  fill="none"
@@ -1458,14 +1458,17 @@
                 if (!run?.config) return '';
                 const c = run.config;
                 const methodLabel = this.methodLabels[c.method] || c.method;
-                if (c.method === 'bracket') return methodLabel + ', ' + c.num_people + ' pers, ' + (c.n_brackets || 5) + ' schijven';
-                if (c.method === 'parametric') return methodLabel + ', ' + c.num_people + ' pers';
-                return methodLabel + ', ' + c.num_people + ' pers, diepte ' + c.max_depth;
+                const lawCount = (c.selected_laws || []).length;
+                const lawSuffix = lawCount ? ', ' + lawCount + ' wetten' : '';
+                if (c.method === 'bracket') return methodLabel + ', ' + c.num_people + ' pers, ' + (c.n_brackets || 5) + ' schijven' + lawSuffix;
+                if (c.method === 'parametric') return methodLabel + ', ' + c.num_people + ' pers' + lawSuffix;
+                return methodLabel + ', ' + c.num_people + ' pers, diepte ' + c.max_depth + lawSuffix;
             },
 
             paramLabels: {
                 num_people: 'Aantal simulatiepersonen',
                 method: 'Methode',
+                selected_laws: 'Geselecteerde wetten',
                 max_depth: 'Maximale diepte',
                 min_samples: 'Minimum personen per regel',
                 max_rules: 'Maximaal aantal regels',
@@ -1475,11 +1478,27 @@
             paramDiffs(baseConfig, otherConfig) {
                 const diffs = [];
                 for (const key of Object.keys(this.paramLabels)) {
-                    if (baseConfig[key] !== otherConfig[key]) {
+                    const baseVal = baseConfig[key];
+                    const otherVal = otherConfig[key];
+                    if (key === 'selected_laws') {
+                        const baseLaws = (baseVal || []).slice().sort().join(',');
+                        const otherLaws = (otherVal || []).slice().sort().join(',');
+                        if (baseLaws !== otherLaws) {
+                            const lawLabel = (ids) => (ids || []).map(id => {
+                                const law = this.availableLaws.find(l => l.id === id);
+                                return law ? law.label : id;
+                            }).join(', ');
+                            diffs.push({
+                                label: this.paramLabels[key],
+                                from: lawLabel(baseVal),
+                                to: lawLabel(otherVal),
+                            });
+                        }
+                    } else if (baseVal !== otherVal) {
                         diffs.push({
                             label: this.paramLabels[key],
-                            from: baseConfig[key],
-                            to: otherConfig[key],
+                            from: baseVal,
+                            to: otherVal,
                         });
                     }
                 }
@@ -1628,6 +1647,7 @@
 
                 const runId = ++this.runCounter;
                 const configSnapshot = JSON.parse(JSON.stringify(this.config));
+                configSnapshot.selected_laws = [...this.selectedLaws];
                 this.runs[runId] = { config: configSnapshot, result: null, validationResult: null, validationError: null, error: null };
                 this.activeTab = runId;
                 // Reset accordion state for new run
@@ -1667,6 +1687,7 @@
                 this.validating = true;
                 const runId = this.activeTab;
                 this.runs[runId].validationResult = null;
+                this.runs[runId].validationError = null;
 
                 const formData = this.collectFormData();
 
@@ -1738,7 +1759,16 @@
                 csv += '\nPARAMETERS\n';
                 for (const [key, label] of Object.entries(this.paramLabels)) {
                     csv += '"' + label + '"';
-                    runs.forEach(r => { csv += ',' + (r.config[key] ?? ''); });
+                    runs.forEach(r => {
+                        let val = r.config[key] ?? '';
+                        if (key === 'selected_laws' && Array.isArray(val)) {
+                            val = val.map(id => {
+                                const law = this.availableLaws.find(l => l.id === id);
+                                return law ? law.label : id;
+                            }).join('; ');
+                        }
+                        csv += ',"' + val + '"';
+                    });
                     csv += '\n';
                 }
 
