@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 
 
 @dataclass
@@ -114,13 +113,53 @@ class BracketLearner:
 
         return X, y_eligible, y_amount
 
+    def _fit_hinge(self, income: np.ndarray, amount: np.ndarray) -> tuple[float, float, float]:
+        """Fit a hinge function: max(0, base - rate * max(0, income - threshold)).
+
+        Tries a grid of candidate thresholds and picks the best (lowest MAE).
+        Returns (base, rate, threshold).
+        """
+        if len(income) < 5:
+            return float(np.mean(amount)), 0.0, 0.0
+
+        # Candidate thresholds: percentiles of income where amount is still > 50% of max
+        max_amt = float(np.percentile(amount[amount > 0], 80)) if (amount > 0).sum() > 3 else float(np.mean(amount))
+        candidates = np.percentile(income, np.arange(10, 60, 5))
+
+        best_mae = float("inf")
+        best_params = (max_amt, 0.0, float(np.median(income)))
+
+        for thresh in candidates:
+            above = income > thresh
+            if above.sum() < 3:
+                continue
+            # For points above threshold, fit: amount = base - rate * (income - thresh)
+            # base = average amount at/below threshold
+            at_or_below = income <= thresh
+            base = float(np.mean(amount[at_or_below])) if at_or_below.sum() > 0 else max_amt
+
+            excess = income[above] - thresh
+            decline = base - amount[above]
+            # rate = decline / excess (least squares)
+            rate = float(np.sum(decline * excess) / np.sum(excess**2)) if np.sum(excess**2) > 0 else 0.0
+            rate = max(0.0, rate)  # rate must be non-negative
+
+            # Evaluate MAE
+            predicted = np.maximum(0.0, base - rate * np.maximum(0.0, income - thresh))
+            mae = float(np.mean(np.abs(amount - predicted)))
+
+            if mae < best_mae:
+                best_mae = mae
+                best_params = (base, rate, thresh)
+
+        return best_params
+
     def train(self, df: pd.DataFrame) -> BracketModel:
         """Train bracket model on simulation data.
 
-        Strategy: fit ONE global regression per household type across ALL income
-        data, then evaluate at each bracket boundary. This avoids overfitting
-        on small per-bracket samples and guarantees monotonically decreasing
-        benefits (since a single negative-slope line can only go down).
+        Strategy: fit a hinge function (max(0, base - rate * max(0, income - threshold)))
+        per household type, then evaluate at bracket boundaries. This captures the
+        typical benefit shape (flat then declining) without overfitting per bracket.
         """
         X, y_eligible, y_amount = self.prepare_data(df)
 
@@ -147,18 +186,18 @@ class BracketLearner:
         else:
             household_types = [{}]
 
-        # Build segments: fit ONE global regression per household type,
-        # then evaluate at bracket boundaries for a smooth monotone curve.
+        # Build segments: fit hinge function per household type,
+        # then evaluate at bracket boundaries.
         segments = []
         for ht in household_types:
             ht_mask = pd.Series(True, index=X.index)
             for key, val in ht.items():
                 ht_mask &= X[key] == val
 
-            ht_income = income[ht_mask].values.reshape(-1, 1)
+            ht_income = income[ht_mask].values
             ht_amount = y_amount[ht_mask].values
 
-            if len(ht_income) < 3:
+            if len(ht_income) < 5:
                 # Not enough data for this household type
                 for i in range(len(boundaries) - 1):
                     segments.append(
@@ -172,21 +211,14 @@ class BracketLearner:
                     )
                 continue
 
-            # Fit single global regression for this household type
-            reg = LinearRegression()
-            reg.fit(ht_income, ht_amount)
+            # Fit hinge: max(0, base - rate * max(0, income - threshold))
+            base, rate, threshold = self._fit_hinge(ht_income, ht_amount)
 
-            # Evaluate at each boundary, clamp to >= 0, enforce monotone decreasing
+            # Evaluate at each boundary
             boundary_amounts = []
             for b in boundaries:
-                amt = max(0.0, float(reg.predict([[b]])[0]))
+                amt = max(0.0, base - rate * max(0.0, b - threshold))
                 boundary_amounts.append(self._round_amount(amt))
-
-            # Enforce monotonically decreasing: if a later boundary has a higher
-            # amount than the previous, cap it at the previous value.
-            for j in range(1, len(boundary_amounts)):
-                if boundary_amounts[j] > boundary_amounts[j - 1]:
-                    boundary_amounts[j] = boundary_amounts[j - 1]
 
             # Build segments from boundary amounts
             for i in range(len(boundaries) - 1):

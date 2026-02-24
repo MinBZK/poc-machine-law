@@ -292,8 +292,12 @@ class ParametricLearner:
         return base, rate, threshold
 
     def train(self, df: pd.DataFrame, selected_laws: list[str]) -> ParametricModel:
-        """Train parametric model on simulation data."""
-        from scipy.optimize import minimize
+        """Train parametric model on simulation data.
+
+        Uses differential evolution (global optimizer) to avoid getting stuck
+        in local minima where components collapse to zero.
+        """
+        from scipy.optimize import differential_evolution, minimize
 
         X, y_eligible, y_amount = self.prepare_data(df)
         feature_names = list(X.columns)
@@ -301,22 +305,53 @@ class ParametricLearner:
         template = self.build_template(df, selected_laws)
         initial_params = template.to_vector()
 
+        # Scale initial bases so their sum ≈ mean total amount for eligible people
+        eligible_mask_init = y_eligible == 1
+        if eligible_mask_init.sum() > 0:
+            mean_total = float(y_amount[eligible_mask_init].mean())
+            base_sum = sum(c.base_single for c in template.components)
+            if base_sum > 0:
+                scale = mean_total / base_sum
+                for c in template.components:
+                    c.base_single = min(c.base_single * scale, 2000.0)
+                    c.base_partner = min(c.base_partner * scale, 2000.0)
+                initial_params = template.to_vector()
+
         income = X["income"].values if "income" in X.columns else np.zeros(len(X))
         has_partner = X["has_partner"].values if "has_partner" in X.columns else np.zeros(len(X))
 
-        # Objective: minimize MAE
         def objective(params):
             predictions = template.evaluate(params, income, has_partner)
             return np.mean(np.abs(y_amount.values - predictions))
 
         bounds = template.get_bounds()
 
+        # Clamp initial params to bounds
+        initial_params = np.clip(
+            initial_params,
+            [b[0] for b in bounds],
+            [b[1] for b in bounds],
+        )
+
+        # Phase 1: differential evolution for global search
+        de_result = differential_evolution(
+            objective,
+            bounds=bounds,
+            x0=initial_params,
+            maxiter=200,
+            seed=42,
+            tol=1e-4,
+            polish=False,
+            workers=1,
+        )
+
+        # Phase 2: polish with L-BFGS-B from the DE result
         result = minimize(
             objective,
-            initial_params,
+            de_result.x,
             method="L-BFGS-B",
             bounds=bounds,
-            options={"maxiter": 500, "ftol": 1e-6},
+            options={"maxiter": 500, "ftol": 1e-8},
         )
 
         fitted_params = result.x

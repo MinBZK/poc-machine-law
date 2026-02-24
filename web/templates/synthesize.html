@@ -677,10 +677,7 @@
                     <template x-if="activeRun?.result?.method === 'bracket'">
                         <div class="bg-white rounded-lg shadow p-4 mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Staffeltabel</h3>
-                            <p class="text-xs text-gray-500 mb-3">
-                                Bij een inkomen tussen twee grenzen wordt het bedrag lineair berekend
-                                (geen harde overgangen).
-                            </p>
+                            <p class="text-xs text-gray-500 mb-3">Binnen elke band wordt het bedrag lineair afgebouwd (geen harde overgangen).</p>
                             <template x-for="(group, gi) in bracketGroups()" :key="gi">
                                 <div class="mb-4">
                                     <h4 class="text-sm font-semibold text-gray-700 mb-1 px-1"
@@ -689,19 +686,23 @@
                                         <table class="min-w-full text-sm">
                                             <thead>
                                                 <tr class="bg-gray-50">
-                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen</th>
+                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen van</th>
+                                                    <th class="px-3 py-1.5 text-left text-xs">t/m</th>
                                                     <th class="px-3 py-1.5 text-right text-xs">Toeslag/maand</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <template x-for="(pt, idx) in group.points" :key="idx">
+                                                <template x-for="(band, idx) in group.bands" :key="idx">
                                                     <tr class="border-t border-gray-100">
                                                         <td class="px-3 py-1.5"
-                                                            x-text="'EUR ' + Number(pt.income).toLocaleString('nl-NL')">
+                                                            x-text="'€' + Number(band.income_from).toLocaleString('nl-NL')">
+                                                        </td>
+                                                        <td class="px-3 py-1.5"
+                                                            x-text="'€' + Number(band.income_to).toLocaleString('nl-NL')">
                                                         </td>
                                                         <td class="px-3 py-1.5 text-right font-mono font-semibold"
-                                                            :class="pt.amount > 0 ? 'text-green-700' : 'text-gray-400'"
-                                                            x-text="'EUR ' + Number(pt.amount).toFixed(0) + '/mnd'">
+                                                            :class="band.amount_from > 0 || band.amount_to > 0 ? 'text-green-700' : 'text-gray-400'"
+                                                            x-text="band.amount_from === band.amount_to ? '€' + Number(band.amount_from).toFixed(0) + '/mnd' : '€' + Number(band.amount_from).toFixed(0) + ' → €' + Number(band.amount_to).toFixed(0) + '/mnd'">
                                                         </td>
                                                     </tr>
                                                 </template>
@@ -1500,17 +1501,14 @@
                     seen.add(key);
                     const label = this.formatHouseholdFilter(row.household_filter, filterLabels);
                     const segs = rows.filter(r => JSON.stringify(r.household_filter || {}) === key);
-                    // Convert segments to boundary points: one row per income boundary
-                    const points = [];
-                    for (let i = 0; i < segs.length; i++) {
-                        points.push({income: segs[i].income_lower, amount: segs[i].amount_at_lower});
-                    }
-                    // Add final upper boundary of last segment
-                    if (segs.length > 0) {
-                        const last = segs[segs.length - 1];
-                        points.push({income: last.income_upper, amount: last.amount_at_upper});
-                    }
-                    groups.push({label, points});
+                    // Build bands: each row shows from/to income range with from/to amounts
+                    const bands = segs.map(s => ({
+                        income_from: s.income_lower,
+                        income_to: s.income_upper,
+                        amount_from: s.amount_at_lower,
+                        amount_to: s.amount_at_upper,
+                    }));
+                    groups.push({label, bands});
                 }
                 return groups;
             },
