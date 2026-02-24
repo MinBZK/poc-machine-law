@@ -700,7 +700,7 @@
                                           :key="key">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-gray-600 w-40 truncate"
-                                              x-text="({ 'has_partner': 'Heeft partner', 'has_children': 'Heeft kinderen', 'housing_type_rent': 'Woonsituatie', 'is_student': 'Is student', 'has_dutch_nationality': 'Nationaliteit', 'is_detained': 'Is gedetineerd', 'is_health_insured': 'Zorgverzekerd', 'receives_child_benefit': 'Kinderbijslag', 'receives_study_financing': 'Studiefinanciering', 'childcare_type': 'Soort opvang', })[key] || key"></span>
+                                              x-text="(() => { const labels = { 'has_partner': 'Heeft partner', 'has_children': 'Heeft kinderen', 'housing_type_rent': 'Woonsituatie', 'is_student': 'Is student', 'has_dutch_nationality': 'Nationaliteit', 'is_detained': 'Is gedetineerd', 'is_health_insured': 'Zorgverzekerd', 'receives_child_benefit': 'Kinderbijslag', 'receives_study_financing': 'Studiefinanciering', 'childcare_type': 'Soort opvang' }; if (labels[key]) return labels[key]; const disc = activeRun?.result?.discretized_features || {}; if (disc[key]) { const src = { age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur', children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste', work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren', standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen', childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief' }; return (src[disc[key].source] || disc[key].source) + ' > ' + Math.round(disc[key].threshold); } return key; })()"></span>
                                         <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                                             <div class="h-full rounded-full transition-all"
                                                  :class="value > 0.05 ? 'bg-blue-500' : 'bg-gray-300'"
@@ -1570,6 +1570,23 @@
                     has_dutch_nationality: ['Niet-Nederlands', 'Nederlands'],
                     is_detained: ['Niet gedetineerd', 'Gedetineerd'],
                 };
+                // Add labels for auto-discretized features (e.g. age_above_67)
+                const disc = this.activeRun?.result?.discretized_features || {};
+                const sourceLabels = {
+                    age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur',
+                    children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste kind',
+                    work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren',
+                    standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen',
+                    childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief',
+                };
+                for (const [derivedCol, info] of Object.entries(disc)) {
+                    const srcLabel = sourceLabels[info.source] || info.source;
+                    const thresh = Math.round(info.threshold);
+                    filterLabels[derivedCol] = [
+                        `${srcLabel} ≤ ${thresh}`,
+                        `${srcLabel} > ${thresh}`,
+                    ];
+                }
                 const groups = [];
                 const seen = new Set();
                 for (const row of rows) {
@@ -1607,8 +1624,17 @@
                     rent_amount: 'Huur', has_partner: 'Partner', has_children: 'Kinderen',
                     children_count: 'Aantal kinderen', youngest_child_age: 'Leeftijd jongste kind',
                     housing_type_rent: 'Huurwoning', is_student: 'Student',
+                    work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren',
+                    has_dutch_nationality: 'Nationaliteit', is_detained: 'Gedetineerd',
                 };
-                return labels[key] || key;
+                if (labels[key]) return labels[key];
+                // Handle auto-discretized feature names like age_above_67
+                const disc = this.activeRun?.result?.discretized_features || {};
+                if (disc[key]) {
+                    const srcLabels = { age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur', children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste', work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren' };
+                    return (srcLabels[disc[key].source] || disc[key].source) + ' > ' + Math.round(disc[key].threshold);
+                }
+                return key;
             },
 
             renderTreeNode(node, depth) {

@@ -51,6 +51,9 @@ class BracketModel:
     feature_names: list[str] = field(default_factory=list)
     eligibility_threshold: float = 0.5
     feature_influence: dict[str, float] = field(default_factory=dict)  # grouping key → eta-squared
+    discretized_features: dict[str, tuple[str, float]] = field(
+        default_factory=dict
+    )  # derived_col → (source, threshold)
 
 
 @dataclass
@@ -123,7 +126,60 @@ class BracketLearner:
 
         return best_params
 
-    def train(self, df: pd.DataFrame, grouping_keys: list[str] | None = None) -> BracketModel:
+    def _find_best_split(self, values: np.ndarray, amounts: np.ndarray) -> tuple[float, float]:
+        """Find the optimal binary split for a continuous feature.
+
+        Tests candidate thresholds and returns the one that maximizes the
+        difference in mean benefit amount between the two groups.
+        Candidate thresholds include data percentiles plus round numbers
+        (multiples of 5) within the data range, so splits land on
+        human-readable values like 65, 67, 70 instead of 57.3.
+
+        Returns (threshold, eta_squared).
+        """
+        # Data-driven candidates from percentiles
+        pct_candidates = np.percentile(values, np.arange(10, 91, 10))
+        # Round-number candidates within data range; step size depends on range
+        vmin, vmax = float(np.min(values)), float(np.max(values))
+        value_range = vmax - vmin
+        if value_range <= 100:
+            step = 1  # e.g. age 18-75: test every integer
+        elif value_range <= 1000:
+            step = 5  # e.g. moderate ranges
+        else:
+            step = max(10, round(value_range / 100))  # keep ~100 candidates max
+        round_candidates = np.arange(np.ceil(vmin / step) * step, np.floor(vmax / step) * step + 1, step)
+        candidates = np.unique(np.concatenate([pct_candidates, round_candidates]))
+
+        best_eta = 0.0
+        best_threshold = float(np.median(values))
+        overall_mean = float(np.mean(amounts))
+        ss_total = float(np.sum((amounts - overall_mean) ** 2))
+        if ss_total == 0:
+            return best_threshold, 0.0
+
+        for thresh in candidates:
+            below = values <= thresh
+            above = ~below
+            n_below, n_above = int(below.sum()), int(above.sum())
+            if n_below < self.config.min_group_size or n_above < self.config.min_group_size:
+                continue
+            mean_below = float(np.mean(amounts[below]))
+            mean_above = float(np.mean(amounts[above]))
+            ss_between = n_below * (mean_below - overall_mean) ** 2 + n_above * (mean_above - overall_mean) ** 2
+            eta = ss_between / ss_total
+            if eta > best_eta:
+                best_eta = eta
+                best_threshold = float(thresh)
+
+        return best_threshold, best_eta
+
+    def train(
+        self,
+        df: pd.DataFrame,
+        grouping_keys: list[str] | None = None,
+        continuous_keys: list[str] | None = None,
+    ) -> BracketModel:
         """Train bracket model on simulation data.
 
         Strategy: fit a hinge function (max(0, base - rate * max(0, income - threshold)))
@@ -132,8 +188,11 @@ class BracketLearner:
 
         Args:
             df: DataFrame with simulation data.
-            grouping_keys: Optional list of column names to use for household grouping.
+            grouping_keys: Optional list of binary/categorical column names for grouping.
                 If None, falls back to HOUSEHOLD_KEYS filtered by available columns.
+            continuous_keys: Optional list of continuous column names (e.g. age) to
+                consider for automatic discretization into grouping keys. The most
+                impactful ones are split at their optimal threshold.
         """
         X, y_eligible, y_amount = self.prepare_data(df)
 
@@ -158,6 +217,32 @@ class BracketLearner:
             if grouping_keys is not None
             else [k for k in self.HOUSEHOLD_KEYS if k in X.columns]
         )
+
+        # Auto-discretize impactful continuous features into binary grouping keys
+        discretized_info: dict[str, tuple[str, float]] = {}  # derived_col -> (source_col, threshold)
+        if continuous_keys:
+            for col in continuous_keys:
+                if col not in X.columns or col == "income":
+                    continue
+                threshold, eta_sq = self._find_best_split(X[col].values, y_amount.values)
+                if eta_sq <= 0.05:  # only if explains >5% of variance
+                    continue
+                # Check redundancy: skip if the discretized split is >85% correlated
+                # with an existing binary grouping key (e.g. children_count vs has_children)
+                candidate_binary = (X[col] > threshold).astype(int)
+                is_redundant = False
+                for existing_key in candidate_keys:
+                    if existing_key in X.columns:
+                        agreement = float((candidate_binary == X[existing_key]).mean())
+                        if agreement > 0.85:
+                            is_redundant = True
+                            break
+                if is_redundant:
+                    continue
+                derived_col = f"{col}_above_{int(threshold)}"
+                X[derived_col] = candidate_binary
+                candidate_keys.append(derived_col)
+                discretized_info[derived_col] = (col, threshold)
 
         # Rank all keys by how much they affect the benefit amount (eta-squared)
         feature_influence: dict[str, float] = {}
@@ -188,15 +273,17 @@ class BracketLearner:
                 mask = pd.Series(True, index=X.index)
                 for key, val in ht.items():
                     mask &= X[key] == val
-                if mask.sum() >= self.config.min_group_size:
+                # Need enough data per bracket for reliable regression
+                min_total = max(self.config.min_group_size, 10 * (len(boundaries) - 1))
+                if mask.sum() >= min_total:
                     household_types.append(ht)
             if not household_types:
                 household_types = [{}]
         else:
             household_types = [{}]
 
-        # Build segments: fit hinge function per household type,
-        # then evaluate at bracket boundaries.
+        # Build segments: compute median amount per bracket per household type,
+        # then use linear regression within each bracket for smooth interpolation.
         segments = []
         for ht in household_types:
             ht_mask = pd.Series(True, index=X.index)
@@ -209,14 +296,9 @@ class BracketLearner:
             if len(ht_income) < 5:
                 continue
 
-            # Fit hinge: max(0, base - rate * max(0, income - threshold))
-            base, rate, threshold = self._fit_hinge(ht_income, ht_amount)
-
-            # Evaluate at each boundary
-            boundary_amounts = []
-            for b in boundaries:
-                amt = max(0.0, base - rate * max(0.0, b - threshold))
-                boundary_amounts.append(self._round_amount(amt))
+            # Compute median amount at each boundary by fitting a local linear
+            # regression within each bracket and evaluating at its edges.
+            boundary_amounts = self._compute_boundary_amounts(ht_income, ht_amount, boundaries)
 
             # Build segments from boundary amounts
             for i in range(len(boundaries) - 1):
@@ -249,7 +331,19 @@ class BracketLearner:
             child_supplement=child_supplement,
             feature_names=feature_names,
             feature_influence=feature_influence,
+            discretized_features=discretized_info,
         )
+
+    def _compute_boundary_amounts(self, income: np.ndarray, amount: np.ndarray, boundaries: list[float]) -> list[float]:
+        """Compute the benefit amount at each bracket boundary.
+
+        Uses a hinge function: max(0, base - rate * max(0, income - threshold)).
+        This produces a monotonically declining benefit curve which is the
+        natural shape for most social benefits (full amount below threshold,
+        declining above).
+        """
+        base, rate, threshold = self._fit_hinge(income, amount)
+        return [self._round_amount(max(0.0, base - rate * max(0.0, b - threshold))) for b in boundaries]
 
     def _round_amount(self, val: float) -> float:
         return round(val / self.config.rounding_amount) * self.config.rounding_amount

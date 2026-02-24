@@ -12,7 +12,11 @@ from simulate import LawSimulator
 from synthesize.bracket_learner import BracketLearner, BracketLearnerConfig
 from synthesize.bracket_yaml_generator import BracketYAMLConfig, BracketYAMLGenerator
 from synthesize.constants import FEATURE_LABELS_NL
-from synthesize.feature_registry import get_feature_warnings, get_grouping_features_for_laws
+from synthesize.feature_registry import (
+    get_continuous_features_for_laws,
+    get_feature_warnings,
+    get_grouping_features_for_laws,
+)
 from synthesize.learner import InterpretabilityConstraints, LearnedModel, SynthesisLearner
 from synthesize.parametric_learner import ParametricConstraints, ParametricLearner
 from synthesize.parametric_yaml_generator import ParametricYAMLConfig, ParametricYAMLGenerator
@@ -316,24 +320,17 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
 
     # Get dynamic grouping keys based on selected laws
     grouping_features = get_grouping_features_for_laws(selected_laws)
-    # Convert to bracket model column names and filter out continuous features
-    continuous_features = (
-        "income",
-        "rent_amount",
-        "children_count",
-        "youngest_child_age",
-        "net_worth",
-        "age",
-        "work_years",
-    )
     grouping_keys = []
     for f in grouping_features:
         if f == "housing_type":
             grouping_keys.append("housing_type_rent")
-        elif f not in continuous_features:
+        else:
             grouping_keys.append(f)
 
-    model = learner.train(synthesis_df, grouping_keys=grouping_keys)
+    # Get continuous features that may be auto-discretized (e.g. age for AOW)
+    continuous_keys = get_continuous_features_for_laws(selected_laws)
+
+    model = learner.train(synthesis_df, grouping_keys=grouping_keys, continuous_keys=continuous_keys)
     metrics = learner.evaluate(model, synthesis_df)
 
     # Generate YAML
@@ -376,6 +373,7 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
         "income_brackets": model.income_brackets,
         "child_supplement": model.child_supplement,
         "feature_influence": model.feature_influence,
+        "discretized_features": {k: {"source": v[0], "threshold": v[1]} for k, v in model.discretized_features.items()},
         "yaml": yaml_string,
         "explanation": explanation,
         "feature_warnings": feature_warnings,

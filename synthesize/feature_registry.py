@@ -192,6 +192,12 @@ def get_grouping_features_for_laws(selected_laws: list[str]) -> list[str]:
     return [f.sim_column for f in features if f.is_grouping]
 
 
+def get_continuous_features_for_laws(selected_laws: list[str]) -> list[str]:
+    """Get continuous feature column names for the selected laws (excl. income)."""
+    features = get_features_for_laws(selected_laws)
+    return [f.sim_column for f in features if f.is_continuous and f.sim_column != "income"]
+
+
 def get_all_feature_columns_for_laws(selected_laws: list[str]) -> list[str]:
     """Get all feature column names needed for the selected laws."""
     features = get_features_for_laws(selected_laws)
