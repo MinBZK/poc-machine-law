@@ -154,12 +154,17 @@ class BracketLearner:
 
         return best_params
 
-    def train(self, df: pd.DataFrame) -> BracketModel:
+    def train(self, df: pd.DataFrame, grouping_keys: list[str] | None = None) -> BracketModel:
         """Train bracket model on simulation data.
 
         Strategy: fit a hinge function (max(0, base - rate * max(0, income - threshold)))
         per household type, then evaluate at bracket boundaries. This captures the
         typical benefit shape (flat then declining) without overfitting per bracket.
+
+        Args:
+            df: DataFrame with simulation data.
+            grouping_keys: Optional list of column names to use for household grouping.
+                If None, falls back to HOUSEHOLD_KEYS filtered by available columns.
         """
         X, y_eligible, y_amount = self.prepare_data(df)
 
@@ -179,7 +184,11 @@ class BracketLearner:
             boundaries = [float(income.min()), float(income.max())]
 
         # Determine household types
-        available_keys = [k for k in self.HOUSEHOLD_KEYS if k in X.columns]
+        available_keys = (
+            [k for k in grouping_keys if k in X.columns]
+            if grouping_keys is not None
+            else [k for k in self.HOUSEHOLD_KEYS if k in X.columns]
+        )
         if available_keys:
             household_groups = X.groupby(available_keys, observed=True)
             household_types = [dict(zip(available_keys, combo)) for combo in household_groups.groups]

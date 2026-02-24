@@ -1957,19 +1957,17 @@ class LawSimulator:
         - huurtoeslag_eligible, huurtoeslag_amount
         - kindgebonden_budget_eligible, kindgebonden_budget_amount
         """
-        # Input features
-        input_features = [
-            "age",
-            "income",
-            "net_worth",
-            "rent_amount",
-            "has_partner",
-            "has_children",
-            "children_count",
-            "youngest_child_age",
-            "housing_type",
-            "is_student",
-        ]
+        # Input features: dynamic based on selected laws
+        from synthesize.feature_registry import get_all_feature_columns_for_laws
+
+        if selected_laws:
+            input_features = get_all_feature_columns_for_laws(selected_laws)
+        else:
+            input_features = get_all_feature_columns_for_laws(["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"])
+
+        # Always include income as base feature
+        if "income" not in input_features:
+            input_features.insert(0, "income")
 
         # Target variables: dynamic based on selected laws, or default 3 toeslagen
         if selected_laws:

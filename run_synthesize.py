@@ -11,6 +11,7 @@ from run_simulation import apply_custom_parameters
 from simulate import LawSimulator
 from synthesize.bracket_learner import BracketLearner, BracketLearnerConfig
 from synthesize.bracket_yaml_generator import BracketYAMLConfig, BracketYAMLGenerator
+from synthesize.feature_registry import get_feature_warnings, get_grouping_features_for_laws
 from synthesize.learner import InterpretabilityConstraints, LearnedModel, SynthesisLearner
 from synthesize.parametric_learner import ParametricConstraints, ParametricLearner
 from synthesize.parametric_yaml_generator import ParametricYAMLConfig, ParametricYAMLGenerator
@@ -293,6 +294,9 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
     # Extract tree structure for visualization
     tree_structure = extract_tree_structure(model._eligibility_tree, model.feature_names)
 
+    # Feature warnings for missing simulation data
+    feature_warnings = get_feature_warnings(selected_laws)
+
     return {
         "status": "success",
         "method": "tree",
@@ -311,6 +315,7 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
         "yaml": yaml_string,
         "explanation": explanation,
         "law_analysis": law_analysis,
+        "feature_warnings": feature_warnings,
     }
 
 
@@ -327,7 +332,27 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
 
     config = BracketLearnerConfig(n_brackets=n_brackets)
     learner = BracketLearner(config=config)
-    model = learner.train(synthesis_df)
+
+    # Get dynamic grouping keys based on selected laws
+    grouping_features = get_grouping_features_for_laws(selected_laws)
+    # Convert to bracket model column names and filter out continuous features
+    continuous_features = (
+        "income",
+        "rent_amount",
+        "children_count",
+        "youngest_child_age",
+        "net_worth",
+        "age",
+        "work_years",
+    )
+    grouping_keys = []
+    for f in grouping_features:
+        if f == "housing_type":
+            grouping_keys.append("housing_type_rent")
+        elif f not in continuous_features:
+            grouping_keys.append(f)
+
+    model = learner.train(synthesis_df, grouping_keys=grouping_keys)
     metrics = learner.evaluate(model, synthesis_df)
 
     # Generate YAML
@@ -338,6 +363,9 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
 
     # Generate explanation
     explanation = _generate_bracket_explanation(model, selected_laws)
+
+    # Feature warnings for missing simulation data
+    feature_warnings = get_feature_warnings(selected_laws)
 
     # Build bracket table for UI
     bracket_table = []
@@ -368,6 +396,7 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
         "child_supplement": model.child_supplement,
         "yaml": yaml_string,
         "explanation": explanation,
+        "feature_warnings": feature_warnings,
     }
 
 
@@ -411,6 +440,9 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
             }
         )
 
+    # Feature warnings for missing simulation data
+    feature_warnings = get_feature_warnings(selected_laws)
+
     return {
         "status": "success",
         "method": "parametric",
@@ -425,6 +457,7 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
         "components": components,
         "yaml": yaml_string,
         "explanation": explanation,
+        "feature_warnings": feature_warnings,
     }
 
 
