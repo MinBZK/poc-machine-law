@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import subprocess
@@ -82,7 +83,7 @@ async def train_model(request: Request):
     """Train a synthesized law model via subprocess."""
     body = await request.json()
     body["operation"] = "train"
-    return _run_synthesize_subprocess(body)
+    return await asyncio.to_thread(_run_synthesize_subprocess, body)
 
 
 @router.post("/validate")
@@ -90,4 +91,4 @@ async def validate_model(request: Request):
     """Validate a synthesized law model via subprocess."""
     body = await request.json()
     body["operation"] = "validate"
-    return _run_synthesize_subprocess(body)
+    return await asyncio.to_thread(_run_synthesize_subprocess, body)

@@ -5,10 +5,146 @@ import json
 import sys
 from datetime import datetime
 
+import pandas as pd
+
 from simulate import LawSimulator
-from synthesize.learner import InterpretabilityConstraints, SynthesisLearner
+from synthesize.learner import InterpretabilityConstraints, LearnedModel, SynthesisLearner
 from synthesize.validator import SynthesisValidator
 from synthesize.yaml_generator import YAMLGenerationConfig, YAMLGenerator
+
+# Mapping from feature names to the source laws they belong to
+FEATURE_LAW_MAP: dict[str, list[str]] = {
+    "rent_amount": ["huurtoeslag"],
+    "housing_type_rent": ["huurtoeslag"],
+    "children_count": ["kindgebonden_budget"],
+    "has_children": ["kindgebonden_budget"],
+    "youngest_child_age": ["kindgebonden_budget"],
+    "net_worth": ["zorgtoeslag"],
+    "is_student": ["zorgtoeslag"],
+    "income": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"],
+    "has_partner": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"],
+    "age": ["zorgtoeslag", "kindgebonden_budget"],
+}
+
+LAW_LABELS: dict[str, str] = {
+    "zorgtoeslag": "Zorgtoeslag",
+    "huurtoeslag": "Huurtoeslag",
+    "kindgebonden_budget": "Kindgebonden budget",
+}
+
+
+def _count_splits_per_law(tree, feature_names: list[str]) -> dict[str, int]:
+    """Count how many splits in the decision tree use features belonging to each law.
+
+    More splits = the model needs more branching to capture that law's logic = more complex.
+    """
+    tree_ = tree.tree_
+    all_laws = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
+    law_splits: dict[str, int] = {law: 0 for law in all_laws}
+
+    for node_id in range(tree_.node_count):
+        feature_idx = tree_.feature[node_id]
+        if feature_idx == -2:  # leaf node
+            continue
+        feat = feature_names[feature_idx]
+        laws = FEATURE_LAW_MAP.get(feat, [])
+        for law in laws:
+            law_splits[law] += 1
+
+    return law_splits
+
+
+def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
+    """Analyze which source law the synthesized model resembles most and which is most complex.
+
+    Uses the decision tree's built-in Gini feature importances to determine which law
+    the model resembles most, and counts splits per law to determine complexity.
+    """
+    tree = model._eligibility_tree
+    feature_names = model.feature_names
+    importances = tree.feature_importances_  # Gini importance, shape: (n_features,)
+
+    all_laws = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
+
+    # --- A. Feature importance (Gini) ---
+    total_importance = importances.sum()
+    feature_importance = []
+    for i, feat in enumerate(feature_names):
+        laws = FEATURE_LAW_MAP.get(feat, [])
+        imp = float(importances[i] / total_importance) if total_importance > 0 else 0.0
+        feature_importance.append({"feature": feat, "importance": round(imp, 4), "laws": laws})
+
+    feature_importance.sort(key=lambda x: x["importance"], reverse=True)
+
+    # --- B. Per-law importance (shared features split evenly) ---
+    law_importance: dict[str, float] = {law: 0.0 for law in all_laws}
+    for i, feat in enumerate(feature_names):
+        laws = FEATURE_LAW_MAP.get(feat, [])
+        if not laws:
+            continue
+        share = 1.0 / len(laws)
+        for law in laws:
+            law_importance[law] += float(importances[i]) * share
+
+    total_law_imp = sum(law_importance.values())
+    law_importance_pct = {law: (v / total_law_imp if total_law_imp > 0 else 0.0) for law, v in law_importance.items()}
+
+    # --- C. Complexity: count splits per law in the tree ---
+    law_splits = _count_splits_per_law(tree, feature_names)
+    total_splits = sum(law_splits.values()) or 1
+    law_complexity = {law: splits / total_splits for law, splits in law_splits.items()}
+
+    # --- D. Amount contribution (exact: y_total = y_zorg + y_huur + y_kgb) ---
+    amount_cols = {
+        "zorgtoeslag": "zorgtoeslag_amount",
+        "huurtoeslag": "huurtoeslag_amount",
+        "kindgebonden_budget": "kindgebonden_budget_amount",
+    }
+    total_mean = sum(synthesis_df[col].mean() for col in amount_cols.values() if col in synthesis_df.columns)
+    amount_contribution = {}
+    for law, col in amount_cols.items():
+        if col in synthesis_df.columns and total_mean > 0:
+            amount_contribution[law] = round(float(synthesis_df[col].mean() / total_mean), 4)
+        else:
+            amount_contribution[law] = 0.0
+
+    # --- E. Eligibility rate per law ---
+    elig_cols = {
+        "zorgtoeslag": "zorgtoeslag_eligible",
+        "huurtoeslag": "huurtoeslag_eligible",
+        "kindgebonden_budget": "kindgebonden_budget_eligible",
+    }
+    eligibility_rate = {}
+    for law, col in elig_cols.items():
+        if col in synthesis_df.columns:
+            eligibility_rate[law] = round(float(synthesis_df[col].mean()), 4)
+        else:
+            eligibility_rate[law] = 0.0
+
+    # --- F. Determine most similar / most complex ---
+    most_similar = max(all_laws, key=lambda l: law_importance_pct[l])
+    most_complex = max(all_laws, key=lambda l: law_complexity[l])
+
+    # --- G. Build output ---
+    laws_output = {}
+    for law in all_laws:
+        laws_output[law] = {
+            "label": LAW_LABELS[law],
+            "importance": round(law_importance_pct[law], 4),
+            "complexity": round(law_complexity[law], 4),
+            "splits": law_splits[law],
+            "amount_contribution": amount_contribution[law],
+            "eligibility_rate": eligibility_rate[law],
+            "is_most_similar": law == most_similar,
+            "is_most_complex": law == most_complex,
+        }
+
+    return {
+        "feature_importance": feature_importance,
+        "laws": laws_output,
+        "most_similar": most_similar,
+        "most_complex": most_complex,
+    }
 
 
 def run_train(params: dict) -> dict:
@@ -68,6 +204,9 @@ def run_train(params: dict) -> dict:
     # Cross-validate
     cv_results = learner.cross_validate(synthesis_df)
 
+    # Per-law SHAP analysis
+    law_analysis = analyze_per_law(model, synthesis_df)
+
     return {
         "status": "success",
         "metrics": {
@@ -83,6 +222,7 @@ def run_train(params: dict) -> dict:
         "formulas": formulas,
         "yaml": yaml_string,
         "explanation": explanation,
+        "law_analysis": law_analysis,
     }
 
 
