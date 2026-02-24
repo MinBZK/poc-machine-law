@@ -695,7 +695,7 @@
                                                 <template x-for="(band, idx) in group.bands" :key="idx">
                                                     <tr class="border-t border-gray-100">
                                                         <td class="px-3 py-1.5"
-                                                            x-text="'€' + Number(band.income_from).toLocaleString('nl-NL')">
+                                                            x-text="'€' + Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL')">
                                                         </td>
                                                         <td class="px-3 py-1.5"
                                                             x-text="'€' + Number(band.income_to).toLocaleString('nl-NL')">
