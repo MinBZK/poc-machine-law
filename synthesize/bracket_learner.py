@@ -48,6 +48,7 @@ class BracketModel:
     child_supplement: float = 0.0
     feature_names: list[str] = field(default_factory=list)
     eligibility_threshold: float = 0.5
+    feature_influence: dict[str, float] = field(default_factory=dict)  # grouping key → eta-squared
 
 
 @dataclass
@@ -57,6 +58,8 @@ class BracketLearnerConfig:
     n_brackets: int = 5
     rounding_amount: float = 5.0  # round amounts to nearest €5
     rounding_bracket: float = 1000.0  # round bracket boundaries to nearest €1000
+    min_group_size: int = 30  # minimum data points per household group
+    max_grouping_keys: int = 4  # max grouping dimensions to prevent combinatorial explosion
 
 
 class BracketLearner:
@@ -116,31 +119,31 @@ class BracketLearner:
     def _fit_hinge(self, income: np.ndarray, amount: np.ndarray) -> tuple[float, float, float]:
         """Fit a hinge function: max(0, base - rate * max(0, income - threshold)).
 
-        Tries a grid of candidate thresholds and picks the best (lowest MAE).
+        Tries a grid of candidate thresholds across the full income range
+        and picks the best (lowest MAE).
         Returns (base, rate, threshold).
         """
         if len(income) < 5:
             return float(np.mean(amount)), 0.0, 0.0
 
-        # Candidate thresholds: percentiles of income where amount is still > 50% of max
-        max_amt = float(np.percentile(amount[amount > 0], 80)) if (amount > 0).sum() > 3 else float(np.mean(amount))
-        candidates = np.percentile(income, np.arange(10, 60, 5))
+        # Search thresholds across the full income range (5th to 90th percentile)
+        candidates = np.percentile(income, np.arange(5, 91, 5))
 
         best_mae = float("inf")
-        best_params = (max_amt, 0.0, float(np.median(income)))
+        best_params = (float(np.mean(amount)), 0.0, float(np.median(income)))
 
         for thresh in candidates:
             above = income > thresh
-            if above.sum() < 3:
-                continue
-            # For points above threshold, fit: amount = base - rate * (income - thresh)
-            # base = average amount at/below threshold
             at_or_below = income <= thresh
-            base = float(np.mean(amount[at_or_below])) if at_or_below.sum() > 0 else max_amt
+            if above.sum() < 3 or at_or_below.sum() < 3:
+                continue
 
+            # base = average amount at/below threshold
+            base = float(np.mean(amount[at_or_below]))
+
+            # rate via least squares: amount_above ≈ base - rate * (income_above - thresh)
             excess = income[above] - thresh
             decline = base - amount[above]
-            # rate = decline / excess (least squares)
             rate = float(np.sum(decline * excess) / np.sum(excess**2)) if np.sum(excess**2) > 0 else 0.0
             rate = max(0.0, rate)  # rate must be non-negative
 
@@ -183,15 +186,46 @@ class BracketLearner:
         if len(boundaries) < 2:
             boundaries = [float(income.min()), float(income.max())]
 
-        # Determine household types
-        available_keys = (
+        # Determine household types — select the most impactful grouping keys
+        candidate_keys = (
             [k for k in grouping_keys if k in X.columns]
             if grouping_keys is not None
             else [k for k in self.HOUSEHOLD_KEYS if k in X.columns]
         )
+
+        # Rank all keys by how much they affect the benefit amount (eta-squared)
+        feature_influence: dict[str, float] = {}
+        key_impact = []
+        overall_mean = y_amount.mean()
+        ss_total = ((y_amount - overall_mean) ** 2).sum()
+        for key in candidate_keys:
+            group_means = X.groupby(key, observed=True).apply(lambda g: y_amount.loc[g.index].mean())
+            ss_between = sum(
+                len(y_amount.loc[X[key] == val]) * (mean - overall_mean) ** 2 for val, mean in group_means.items()
+            )
+            eta_sq = float(ss_between / ss_total) if ss_total > 0 else 0.0
+            key_impact.append((key, eta_sq))
+            feature_influence[key] = eta_sq
+        key_impact.sort(key=lambda x: x[1], reverse=True)
+
+        if len(candidate_keys) > self.config.max_grouping_keys:
+            available_keys = [k for k, _ in key_impact[: self.config.max_grouping_keys]]
+        else:
+            available_keys = candidate_keys
+
         if available_keys:
             household_groups = X.groupby(available_keys, observed=True)
-            household_types = [dict(zip(available_keys, combo)) for combo in household_groups.groups]
+            household_types_raw = [dict(zip(available_keys, combo)) for combo in household_groups.groups]
+            # Filter out groups that are too small
+            household_types = []
+            for ht in household_types_raw:
+                mask = pd.Series(True, index=X.index)
+                for key, val in ht.items():
+                    mask &= X[key] == val
+                if mask.sum() >= self.config.min_group_size:
+                    household_types.append(ht)
+            if not household_types:
+                household_types = [{}]
         else:
             household_types = [{}]
 
@@ -207,17 +241,6 @@ class BracketLearner:
             ht_amount = y_amount[ht_mask].values
 
             if len(ht_income) < 5:
-                # Not enough data for this household type
-                for i in range(len(boundaries) - 1):
-                    segments.append(
-                        BracketSegment(
-                            income_lower=boundaries[i],
-                            income_upper=boundaries[i + 1],
-                            amount_at_lower=0.0,
-                            amount_at_upper=0.0,
-                            household_filter=ht if ht else None,
-                        )
-                    )
                 continue
 
             # Fit hinge: max(0, base - rate * max(0, income - threshold))
@@ -259,6 +282,7 @@ class BracketLearner:
             income_brackets=boundaries,
             child_supplement=child_supplement,
             feature_names=feature_names,
+            feature_influence=feature_influence,
         )
 
     def _round_amount(self, val: float) -> float:

@@ -688,6 +688,32 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Feature Influence (staffelmodel only) -->
+                    <template x-if="activeRun?.result?.feature_influence && Object.keys(activeRun.result.feature_influence).length > 0">
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Feature-invloed</h3>
+                            <p class="text-xs text-gray-500 mb-3">
+                                Kenmerken gesorteerd op invloed op het toeslagbedrag (eta-kwadraat). De meest invloedrijke kenmerken worden gebruikt voor de huishoudgroepen.
+                            </p>
+                            <div class="space-y-1.5">
+                                <template x-for="[key, value] in Object.entries(activeRun.result.feature_influence).sort((a,b) => b[1] - a[1])"
+                                          :key="key">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-600 w-40 truncate"
+                                              x-text="({ 'has_partner': 'Heeft partner', 'has_children': 'Heeft kinderen', 'housing_type_rent': 'Woonsituatie', 'is_student': 'Is student', 'has_dutch_nationality': 'Nationaliteit', 'is_detained': 'Is gedetineerd', 'is_health_insured': 'Zorgverzekerd', 'receives_child_benefit': 'Kinderbijslag', 'receives_study_financing': 'Studiefinanciering', 'childcare_type': 'Soort opvang', })[key] || key"></span>
+                                        <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                                            <div class="h-full rounded-full transition-all"
+                                                 :class="value > 0.05 ? 'bg-blue-500' : 'bg-gray-300'"
+                                                 :style="'width: ' + Math.max(2, value * 100) + '%'"></div>
+                                        </div>
+                                        <span class="text-xs font-mono w-12 text-right"
+                                              :class="value > 0.05 ? 'text-blue-600' : 'text-gray-400'"
+                                              x-text="(value * 100).toFixed(1) + '%'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
                     <!-- Bracket Table (staffelmodel only) -->
                     <template x-if="activeRun?.result?.method === 'bracket'">
                         <div class="bg-white rounded-lg shadow p-4 mb-4">

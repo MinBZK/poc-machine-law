@@ -394,6 +394,7 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
         "bracket_table": bracket_table,
         "income_brackets": model.income_brackets,
         "child_supplement": model.child_supplement,
+        "feature_influence": model.feature_influence,
         "yaml": yaml_string,
         "explanation": explanation,
         "feature_warnings": feature_warnings,
