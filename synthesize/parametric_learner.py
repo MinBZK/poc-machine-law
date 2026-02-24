@@ -74,17 +74,21 @@ class FormulaTemplate:
         bounds = []
         for c in self.components:
             # base_single, rate_single, threshold_single
-            bounds.extend([
-                (0, 2000),     # base: 0 to €2000/month
-                (0, 1.0),      # rate: 0 to 100%
-                (0, 100000),   # threshold: 0 to €100k
-            ])
+            bounds.extend(
+                [
+                    (0, 2000),  # base: 0 to €2000/month
+                    (0, 1.0),  # rate: 0 to 100%
+                    (0, 100000),  # threshold: 0 to €100k
+                ]
+            )
             if c.has_partner_variant:
-                bounds.extend([
-                    (0, 2000),
-                    (0, 1.0),
-                    (0, 100000),
-                ])
+                bounds.extend(
+                    [
+                        (0, 2000),
+                        (0, 1.0),
+                        (0, 100000),
+                    ]
+                )
         return bounds
 
     def evaluate(self, params_vec: np.ndarray, income: np.ndarray, has_partner: np.ndarray) -> np.ndarray:
@@ -133,8 +137,8 @@ class ParametricModel:
 class ParametricConstraints:
     """Configuration for parametric learner."""
 
-    rounding_base: float = 10.0       # round base amounts to €10
-    rounding_rate: float = 0.005      # round rates to 0.5%
+    rounding_base: float = 10.0  # round base amounts to €10
+    rounding_rate: float = 0.005  # round rates to 0.5%
     rounding_threshold: float = 100.0  # round thresholds to €100
 
 
@@ -173,7 +177,9 @@ class ParametricLearner:
             X["children_count"] = X["children_count"].fillna(0)
 
         elig_cols = [c for c in df.columns if c.endswith("_eligible")]
-        amount_cols = [c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols]
+        amount_cols = [
+            c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols
+        ]
 
         if elig_cols:
             y_eligible = df[elig_cols].any(axis=1).astype(int)
@@ -221,46 +227,42 @@ class ParametricLearner:
             income = df.get("income", pd.Series(dtype=float))
 
             if has_partner_variant:
-                base_s, rate_s, thresh_s = self._estimate_params(
-                    income[elig_without], amounts[elig_without]
-                )
-                base_p, rate_p, thresh_p = self._estimate_params(
-                    income[elig_with], amounts[elig_with]
-                )
+                base_s, rate_s, thresh_s = self._estimate_params(income[elig_without], amounts[elig_without])
+                base_p, rate_p, thresh_p = self._estimate_params(income[elig_with], amounts[elig_with])
             else:
-                base_s, rate_s, thresh_s = self._estimate_params(
-                    income[eligible], amounts[eligible]
-                )
+                base_s, rate_s, thresh_s = self._estimate_params(income[eligible], amounts[eligible])
                 base_p, rate_p, thresh_p = base_s, rate_s, thresh_s
 
-            components.append(FormulaComponent(
-                name=law_name,
-                base_single=base_s,
-                base_partner=base_p,
-                rate_single=rate_s,
-                rate_partner=rate_p,
-                threshold_single=thresh_s,
-                threshold_partner=thresh_p,
-                has_partner_variant=has_partner_variant,
-            ))
+            components.append(
+                FormulaComponent(
+                    name=law_name,
+                    base_single=base_s,
+                    base_partner=base_p,
+                    rate_single=rate_s,
+                    rate_partner=rate_p,
+                    threshold_single=thresh_s,
+                    threshold_partner=thresh_p,
+                    has_partner_variant=has_partner_variant,
+                )
+            )
 
         if not components:
             # Fallback: single generic component
-            components.append(FormulaComponent(
-                name="generic",
-                base_single=200.0,
-                base_partner=150.0,
-                rate_single=0.05,
-                rate_partner=0.05,
-                threshold_single=20000.0,
-                threshold_partner=25000.0,
-            ))
+            components.append(
+                FormulaComponent(
+                    name="generic",
+                    base_single=200.0,
+                    base_partner=150.0,
+                    rate_single=0.05,
+                    rate_partner=0.05,
+                    threshold_single=20000.0,
+                    threshold_partner=25000.0,
+                )
+            )
 
         return FormulaTemplate(components=components)
 
-    def _estimate_params(
-        self, income: pd.Series, amounts: pd.Series
-    ) -> tuple[float, float, float]:
+    def _estimate_params(self, income: pd.Series, amounts: pd.Series) -> tuple[float, float, float]:
         """Estimate base, rate, threshold from income-amount data."""
         if len(income) < 5:
             return 200.0, 0.05, 20000.0
@@ -271,10 +273,7 @@ class ParametricLearner:
         # Threshold: income where benefit starts declining
         # Approximate: income at which amount drops below 80% of base
         high_benefit = amounts > base * 0.8
-        if high_benefit.sum() > 0:
-            threshold = float(income[high_benefit].max())
-        else:
-            threshold = float(income.median())
+        threshold = float(income[high_benefit].max()) if high_benefit.sum() > 0 else float(income.median())
 
         # Rate: approximate decline rate above threshold
         above_thresh = income > threshold
@@ -369,9 +368,13 @@ class ParametricLearner:
                 # base
                 rounded[idx] = round(rounded[idx] / self.constraints.rounding_base) * self.constraints.rounding_base
                 # rate
-                rounded[idx + 1] = round(rounded[idx + 1] / self.constraints.rounding_rate) * self.constraints.rounding_rate
+                rounded[idx + 1] = (
+                    round(rounded[idx + 1] / self.constraints.rounding_rate) * self.constraints.rounding_rate
+                )
                 # threshold
-                rounded[idx + 2] = round(rounded[idx + 2] / self.constraints.rounding_threshold) * self.constraints.rounding_threshold
+                rounded[idx + 2] = (
+                    round(rounded[idx + 2] / self.constraints.rounding_threshold) * self.constraints.rounding_threshold
+                )
                 idx += 3
         return rounded
 

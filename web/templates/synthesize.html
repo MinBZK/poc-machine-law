@@ -93,6 +93,7 @@
                         {% set pop_num_people_step = 100 %}
                         {% set pop_show_saved = false %}
                         {% set pop_show_create = false %}
+                        {% set pop_show_header = false %}
                         {% include "partials/populatiebeheer.html" %}
                     </div>
                 </div>
@@ -1256,7 +1257,7 @@
             validating: false,
             showPopulatie: false,
             showInstellingen: true,
-            showWetSelectie: true,
+            showWetSelectie: false,
             showMethode: true,
             availableLaws: [
                 {id: 'zorgtoeslag', label: 'Zorgtoeslag', group: 'Toeslagen'},

@@ -10,9 +10,27 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+import numpy as np
 import yaml
 
 from synthesize.parametric_learner import ParametricModel
+
+
+def _to_native(obj: Any) -> Any:
+    """Recursively convert numpy types to native Python types for YAML serialization."""
+    if isinstance(obj, dict):
+        return {k: _to_native(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_native(v) for v in obj]
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, (np.floating,)):
+        return float(obj)
+    if isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
 
 
 LAW_DISPLAY_NAMES = {
@@ -86,7 +104,12 @@ class ParametricYAMLGenerator:
                 {"name": "HAS_PARTNER", "description": "Heeft toeslagpartner", "type": "boolean"},
             ],
             "output": [
-                {"name": "is_eligible", "description": "Recht op toeslag", "type": "boolean", "citizen_relevance": "secondary"},
+                {
+                    "name": "is_eligible",
+                    "description": "Recht op toeslag",
+                    "type": "boolean",
+                    "citizen_relevance": "secondary",
+                },
                 {
                     "name": "toeslag_bedrag",
                     "description": "Maandelijks toeslagbedrag (parametrische formule)",
@@ -109,38 +132,42 @@ class ParametricYAMLGenerator:
 
             if comp.has_partner_variant:
                 # IF HAS_PARTNER THEN partner_formula ELSE single_formula
-                actions.append({
-                    "output": output_name,
-                    "operation": "IF",
-                    "conditions": [
-                        {
-                            "test": {"operation": "EQUALS", "subject": "$HAS_PARTNER", "value": True},
-                            "then": self._make_formula(
-                                comp.base_partner, comp.rate_partner, comp.threshold_partner
-                            ),
-                        },
-                        {
-                            "else": self._make_formula(
-                                comp.base_single, comp.rate_single, comp.threshold_single
-                            ),
-                        },
-                    ],
-                })
+                actions.append(
+                    {
+                        "output": output_name,
+                        "operation": "IF",
+                        "conditions": [
+                            {
+                                "test": {"operation": "EQUALS", "subject": "$HAS_PARTNER", "value": True},
+                                "then": self._make_formula(
+                                    comp.base_partner, comp.rate_partner, comp.threshold_partner
+                                ),
+                            },
+                            {
+                                "else": self._make_formula(comp.base_single, comp.rate_single, comp.threshold_single),
+                            },
+                        ],
+                    }
+                )
             else:
-                actions.append({
-                    "output": output_name,
-                    **self._make_formula(comp.base_single, comp.rate_single, comp.threshold_single),
-                })
+                actions.append(
+                    {
+                        "output": output_name,
+                        **self._make_formula(comp.base_single, comp.rate_single, comp.threshold_single),
+                    }
+                )
 
         # Total = sum of components
         if len(component_refs) == 1:
             actions.append({"output": "toeslag_bedrag", "value": component_refs[0]})
         else:
-            actions.append({
-                "output": "toeslag_bedrag",
-                "operation": "ADD",
-                "values": component_refs,
-            })
+            actions.append(
+                {
+                    "output": "toeslag_bedrag",
+                    "operation": "ADD",
+                    "values": component_refs,
+                }
+            )
 
         return actions
 
@@ -174,4 +201,4 @@ class ParametricYAMLGenerator:
 
     def to_yaml_string(self, spec: dict[str, Any]) -> str:
         """Convert spec to YAML string."""
-        return yaml.dump(spec, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
+        return yaml.dump(_to_native(spec), default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)

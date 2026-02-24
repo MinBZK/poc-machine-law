@@ -93,7 +93,9 @@ class BracketLearner:
 
         # Find eligibility and amount columns dynamically
         elig_cols = [c for c in df.columns if c.endswith("_eligible")]
-        amount_cols = [c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols]
+        amount_cols = [
+            c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols
+        ]
 
         if elig_cols:
             y_eligible = df[elig_cols].any(axis=1).astype(int)
@@ -126,9 +128,7 @@ class BracketLearner:
         raw_boundaries = np.quantile(income, quantiles)
 
         # Round boundaries
-        boundaries = [
-            round(b / self.config.rounding_bracket) * self.config.rounding_bracket for b in raw_boundaries
-        ]
+        boundaries = [round(b / self.config.rounding_bracket) * self.config.rounding_bracket for b in raw_boundaries]
         # Ensure unique and sorted
         boundaries = sorted(set(boundaries))
         if len(boundaries) < 2:
@@ -138,7 +138,7 @@ class BracketLearner:
         available_keys = [k for k in self.HOUSEHOLD_KEYS if k in X.columns]
         if available_keys:
             household_groups = X.groupby(available_keys, observed=True)
-            household_types = [dict(zip(available_keys, combo)) for combo in household_groups.groups.keys()]
+            household_types = [dict(zip(available_keys, combo)) for combo in household_groups.groups]
         else:
             household_types = [{}]
 
@@ -207,7 +207,9 @@ class BracketLearner:
                 avg_without = float(y_amount[~has_kids].mean())
                 if avg_count > 0:
                     child_supplement = max(0.0, (avg_with - avg_without) / avg_count)
-                    child_supplement = round(child_supplement / self.config.rounding_amount) * self.config.rounding_amount
+                    child_supplement = (
+                        round(child_supplement / self.config.rounding_amount) * self.config.rounding_amount
+                    )
 
         return BracketModel(
             segments=segments,

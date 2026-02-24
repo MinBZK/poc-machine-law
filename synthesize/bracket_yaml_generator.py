@@ -10,9 +10,27 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+import numpy as np
 import yaml
 
 from synthesize.bracket_learner import BracketModel
+
+
+def _to_native(obj: Any) -> Any:
+    """Recursively convert numpy types to native Python types for YAML serialization."""
+    if isinstance(obj, dict):
+        return {k: _to_native(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_to_native(v) for v in obj]
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, (np.floating,)):
+        return float(obj)
+    if isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
 
 
 @dataclass
@@ -81,7 +99,12 @@ class BracketYAMLGenerator:
             "parameters": [{"name": "BSN", "description": "Burgerservicenummer", "type": "string", "required": True}],
             "input": inputs,
             "output": [
-                {"name": "is_eligible", "description": "Recht op toeslag", "type": "boolean", "citizen_relevance": "secondary"},
+                {
+                    "name": "is_eligible",
+                    "description": "Recht op toeslag",
+                    "type": "boolean",
+                    "citizen_relevance": "secondary",
+                },
                 {
                     "name": "toeslag_bedrag",
                     "description": "Maandelijks toeslagbedrag (staffelmodel)",
@@ -110,26 +133,32 @@ class BracketYAMLGenerator:
             test_parts = []
 
             # Income range test
-            test_parts.append({
-                "operation": "GREATER_OR_EQUAL",
-                "subject": "$INCOME",
-                "value": int(seg.income_lower),
-            })
-            test_parts.append({
-                "operation": "LESS_THAN",
-                "subject": "$INCOME",
-                "value": int(seg.income_upper),
-            })
+            test_parts.append(
+                {
+                    "operation": "GREATER_OR_EQUAL",
+                    "subject": "$INCOME",
+                    "value": int(seg.income_lower),
+                }
+            )
+            test_parts.append(
+                {
+                    "operation": "LESS_THAN",
+                    "subject": "$INCOME",
+                    "value": int(seg.income_upper),
+                }
+            )
 
             # Household filter
             if seg.household_filter:
                 for key, val in seg.household_filter.items():
                     mapped = self.FEATURE_TO_INPUT.get(key, {}).get("name", key.upper())
-                    test_parts.append({
-                        "operation": "EQUALS",
-                        "subject": f"${mapped}",
-                        "value": bool(val) if key.startswith("has_") or key.startswith("housing_") else val,
-                    })
+                    test_parts.append(
+                        {
+                            "operation": "EQUALS",
+                            "subject": f"${mapped}",
+                            "value": bool(val) if key.startswith(("has_", "housing_")) else val,
+                        }
+                    )
 
             test = {"all": test_parts} if len(test_parts) > 1 else test_parts[0]
 
@@ -171,20 +200,22 @@ class BracketYAMLGenerator:
 
         # Add child supplement if applicable
         if model.child_supplement > 0:
-            actions.append({
-                "output": "toeslag_bedrag",
-                "operation": "ADD",
-                "values": [
-                    "$toeslag_bedrag",
-                    {
-                        "operation": "MULTIPLY",
-                        "values": [round(model.child_supplement, 2), "$CHILDREN_COUNT"],
-                    },
-                ],
-            })
+            actions.append(
+                {
+                    "output": "toeslag_bedrag",
+                    "operation": "ADD",
+                    "values": [
+                        "$toeslag_bedrag",
+                        {
+                            "operation": "MULTIPLY",
+                            "values": [round(model.child_supplement, 2), "$CHILDREN_COUNT"],
+                        },
+                    ],
+                }
+            )
 
         return actions
 
     def to_yaml_string(self, spec: dict[str, Any]) -> str:
         """Convert spec to YAML string."""
-        return yaml.dump(spec, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
+        return yaml.dump(_to_native(spec), default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
