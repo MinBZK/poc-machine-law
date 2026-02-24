@@ -317,42 +317,75 @@ class SynthesisValidator:
 
         return True
 
+    def _pass_fail(self, passed: bool) -> str:
+        """Return a pass/fail indicator."""
+        return "PASS" if passed else "FAIL"
+
     def generate_report_markdown(self, report: ValidationReport) -> str:
         """Generate a markdown report from validation results."""
+        m = report.metrics
+
         lines = [
             "# Validatierapport Geharmoniseerde Toeslag",
             "",
             f"**Status**: {'GESLAAGD' if report.passed else 'NIET GESLAAGD'}",
             "",
-            "## Metrics Overzicht",
+            "---",
             "",
-            "### Eligibility Classificatie",
-            f"- Accuraatheid: {report.metrics.eligibility_accuracy:.1%}",
-            f"- Precision: {report.metrics.eligibility_precision:.1%}",
-            f"- Recall: {report.metrics.eligibility_recall:.1%}",
-            f"- F1-score: {report.metrics.eligibility_f1:.1%}",
+            "## Recht op toeslag (classificatie)",
             "",
-            "### Bedrag Regressie",
-            f"- Gemiddelde afwijking (MAE): EUR {report.metrics.amount_mae:.2f}/maand",
-            f"- RMSE: EUR {report.metrics.amount_rmse:.2f}/maand",
-            f"- R²: {report.metrics.amount_r2:.3f}",
+            "Hoe goed bepaalt het vereenvoudigde model wie er recht heeft op toeslag?",
             "",
-            "### Totaal",
-            f"- Algehele accuraatheid: {report.metrics.overall_accuracy:.1%}",
+            "| Metriek | Waarde | Drempel | Status |",
+            "|---------|--------|---------|--------|",
+            f"| Accuraatheid | {m.eligibility_accuracy:.1%} | ≥ {self.accuracy_threshold:.0%} "
+            f"| {self._pass_fail(m.eligibility_accuracy >= self.accuracy_threshold)} |",
+            f"| Recall | {m.eligibility_recall:.1%} | ≥ {self.recall_threshold:.0%} "
+            f"| {self._pass_fail(m.eligibility_recall >= self.recall_threshold)} |",
+            f"| Precision | {m.eligibility_precision:.1%} | — | |",
+            f"| F1-score | {m.eligibility_f1:.1%} | — | |",
             "",
-            "## Per-groep Accuraatheid",
+            "---",
             "",
+            "## Berekening toeslagbedrag (regressie)",
+            "",
+            "Hoe nauwkeurig berekent het model het maandelijkse bedrag?",
+            "",
+            "| Metriek | Waarde | Drempel | Status |",
+            "|---------|--------|---------|--------|",
+            f"| Gemiddelde afwijking (MAE) | EUR {m.amount_mae:.2f}/maand "
+            f"| ≤ EUR {self.amount_tolerance:.0f} "
+            f"| {self._pass_fail(m.amount_mae <= self.amount_tolerance)} |",
+            f"| RMSE | EUR {m.amount_rmse:.2f}/maand | — | |",
+            f"| R² | {m.amount_r2:.3f} | — | |",
+            "",
+            "---",
+            "",
+            "## Totaalscore",
+            "",
+            f"Algehele accuraatheid (recht correct + bedrag binnen tolerantie): "
+            f"**{m.overall_accuracy:.1%}** (drempel: ≥ {self.accuracy_threshold:.0%})",
+            "",
+            "---",
+            "",
+            "## Eerlijkheid per groep",
+            "",
+            f"Geen enkele groep mag onder {self.group_accuracy_threshold:.0%} accuraatheid vallen.",
+            "",
+            "| Groep | Accuraatheid | Aantal | Status |",
+            "|-------|-------------|--------|--------|",
         ]
 
-        # Group metrics table
-        lines.append("| Groep | Accuraatheid | Aantal |")
-        lines.append("|-------|-------------|--------|")
-        for group_name, group_data in report.metrics.group_metrics.items():
-            status = "ok" if group_data["accuracy"] >= self.group_accuracy_threshold else "laag"
-            lines.append(f"| {group_name} | {group_data['accuracy']:.1%} ({status}) | {group_data['count']} |")
+        for group_name, group_data in m.group_metrics.items():
+            passed = group_data["accuracy"] >= self.group_accuracy_threshold
+            lines.append(
+                f"| {group_name} | {group_data['accuracy']:.1%} | {group_data['count']} | {self._pass_fail(passed)} |"
+            )
 
         lines.extend(
             [
+                "",
+                "---",
                 "",
                 "## Aanbevelingen",
                 "",
@@ -366,10 +399,11 @@ class SynthesisValidator:
             lines.extend(
                 [
                     "",
-                    "## Problematische Gevallen",
+                    "---",
+                    "",
+                    "## Problematische gevallen",
                     "",
                     f"Er zijn {len(report.problematic_cases)} gevallen met significante afwijkingen geïdentificeerd.",
-                    "",
                 ]
             )
 

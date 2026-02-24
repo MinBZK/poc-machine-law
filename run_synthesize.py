@@ -291,6 +291,24 @@ def _parse_condition(condition: str) -> tuple[str, str, str]:
     return condition, "", ""
 
 
+def _format_condition_nl(condition: str, feature_nl: dict[str, str]) -> str:
+    """Format a single condition as readable Dutch text."""
+    feature, operator, value = _parse_condition(condition)
+    feature_text = feature_nl.get(feature, feature)
+
+    op_map = {"<=": "niet hoger dan", ">=": "minimaal", ">": "hoger dan", "<": "lager dan"}
+    op_text = op_map.get(operator, operator)
+
+    if feature == "income":
+        value_text = f"EUR {float(value):,.0f} per jaar"
+    elif feature in ("has_partner", "has_children", "housing_type_rent", "is_student"):
+        value_text = "ja" if value in ("1", "1.0", "True") else "nee"
+    else:
+        value_text = value
+
+    return f"{feature_text} is {op_text} {value_text}"
+
+
 def generate_explanation(model) -> str:
     """Generate Dutch explanation from model."""
     feature_nl = {
@@ -306,66 +324,82 @@ def generate_explanation(model) -> str:
         "is_student": "u student bent",
     }
 
+    num_rules = len(model.eligibility_rules)
+    num_formulas = len(model.amount_formulas)
+
     lines = [
         "# Geharmoniseerde Toeslag",
         "",
-        "Deze toeslag combineert zorgtoeslag, huurtoeslag en kindgebonden budget in een regeling.",
+        "Deze toeslag combineert **zorgtoeslag**, **huurtoeslag** en **kindgebonden budget** "
+        "in één vereenvoudigde regeling.",
         "",
-        "## Voorwaarden",
+        "---",
         "",
-        "U komt in aanmerking als u voldoet aan een van de volgende situaties:",
+        "## Wie komt in aanmerking?",
+        "",
+        f"U komt in aanmerking als u voldoet aan een van de volgende {num_rules} situaties:",
         "",
     ]
 
     for i, rule in enumerate(model.eligibility_rules, 1):
+        confidence_pct = f"{rule.confidence:.0%}"
         lines.append(f"### Situatie {i}")
         lines.append("")
+        lines.append(f"*Geldt voor {rule.samples} personen (zekerheid: {confidence_pct})*")
+        lines.append("")
+
         for condition in rule.conditions:
-            feature, operator, value = _parse_condition(condition)
-
-            feature_text = feature_nl.get(feature, feature)
-
-            if operator == "<=":
-                op_text = "niet hoger dan"
-            elif operator == ">=":
-                op_text = "minimaal"
-            elif operator == ">":
-                op_text = "hoger dan"
-            elif operator == "<":
-                op_text = "lager dan"
-            else:
-                op_text = operator
-
-            if feature == "income":
-                value_text = f"EUR {float(value):,.0f} per jaar"
-            elif feature in ["has_partner", "has_children", "housing_type_rent", "is_student"]:
-                value_text = "ja" if value in ["1", "1.0", "True"] else "nee"
-            else:
-                value_text = value
-
-            lines.append(f"- {feature_text} is {op_text} {value_text}")
+            lines.append(f"- {_format_condition_nl(condition, feature_nl)}")
         lines.append("")
 
     lines.extend(
         [
-            "## Berekening",
+            "---",
             "",
-            "Het bedrag wordt berekend op basis van uw persoonlijke situatie.",
+            "## Hoe wordt het bedrag berekend?",
+            "",
+            "Het maandelijkse toeslagbedrag wordt berekend op basis van uw persoonlijke situatie. "
+            f"Er zijn {num_formulas} berekeningsgroep(en).",
             "",
         ]
     )
 
-    if model.amount_formulas:
-        formula = model.amount_formulas[0]
-        lines.append(f"**Basisbedrag**: EUR {formula.intercept:.2f}")
+    for i, formula in enumerate(model.amount_formulas, 1):
+        lines.append(f"### Groep {i}")
+        lines.append("")
+
+        if formula.segment_conditions:
+            lines.append("**Van toepassing als:**")
+            for cond in formula.segment_conditions:
+                lines.append(f"- {_format_condition_nl(cond, feature_nl)}")
+            lines.append("")
+
+        lines.append(f"**Basisbedrag**: EUR {formula.intercept:.2f} per maand")
+        lines.append("")
+
+        adjustments = []
         for feature, coef in formula.coefficients.items():
             feature_text = feature_nl.get(feature, feature)
             if coef > 0:
-                lines.append(f"**Plus**: {coef:.4f} x {feature_text}")
+                adjustments.append(f"- **+** EUR {coef:.4f} per eenheid {feature_text}")
             else:
-                lines.append(f"**Min**: {abs(coef):.4f} x {feature_text}")
+                adjustments.append(f"- **−** EUR {abs(coef):.4f} per eenheid {feature_text}")
+
+        if adjustments:
+            lines.append("**Aanpassingen op basis van uw situatie:**")
+            lines.extend(adjustments)
+            lines.append("")
+
+        lines.append(f"*Verklaarde waarde (R²): {formula.r2_score:.2f} — gebaseerd op {formula.samples} personen*")
         lines.append("")
-        lines.append("*Het uiteindelijke bedrag is minimaal EUR 0.*")
+
+    lines.extend(
+        [
+            "---",
+            "",
+            "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*",
+        ]
+    )
 
     return "\n".join(lines)
 
