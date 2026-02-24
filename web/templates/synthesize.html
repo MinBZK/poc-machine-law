@@ -124,7 +124,7 @@
                     </button>
                     <div x-show="showMethode" x-cloak class="p-4 space-y-3">
                         <div class="flex gap-2">
-                            <template x-for="m in ['tree', 'bracket', 'parametric']" :key="m">
+                            <template x-for="m in ['bracket', 'tree', 'parametric']" :key="m">
                                 <button type="button"
                                         @click="config.method = m"
                                         class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer"
@@ -1341,7 +1341,7 @@
         return {
             config: {
                 num_people: 1000,
-                method: 'tree',
+                method: 'bracket',
                 max_depth: 5,
                 min_samples: 50,
                 max_rules: 10,
