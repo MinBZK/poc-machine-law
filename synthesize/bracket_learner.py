@@ -2,19 +2,24 @@
 Bracket (Staffel) Learner for Law Synthesis
 
 Trains a piecewise-linear lookup table model that assigns benefits based on
-income brackets, household type, and housing type. Linear interpolation within
-each bracket guarantees no cliff effects.
+income brackets and household type. The benefit at each income boundary is
+computed via linear regression within each segment, guaranteeing a smooth,
+continuous function with no cliff effects.
+
+The resulting table is simple to read: at each income boundary you see the
+exact benefit amount. Between boundaries the amount is linearly interpolated.
 """
 
 from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LinearRegression
 
 
 @dataclass
 class BracketSegment:
-    """One row of the lookup table: a bracket with linear interpolation."""
+    """One segment of the piecewise-linear staffel."""
 
     income_lower: float
     income_upper: float
@@ -31,7 +36,7 @@ class BracketSegment:
 
     def predict(self, income: float) -> float:
         clamped = max(self.income_lower, min(income, self.income_upper))
-        return self.amount_at_lower + self.slope * (clamped - self.income_lower)
+        return max(0.0, self.amount_at_lower + self.slope * (clamped - self.income_lower))
 
 
 @dataclass
@@ -41,9 +46,9 @@ class BracketModel:
     segments: list[BracketSegment]
     household_types: list[dict[str, int | float]]
     income_brackets: list[float]
-    child_supplement: float = 0.0  # per-child supplement
+    child_supplement: float = 0.0
     feature_names: list[str] = field(default_factory=list)
-    eligibility_threshold: float = 0.5  # predicted amount > this → eligible
+    eligibility_threshold: float = 0.5
 
 
 @dataclass
@@ -51,7 +56,7 @@ class BracketLearnerConfig:
     """Configuration for bracket learner."""
 
     n_brackets: int = 5
-    rounding_amount: float = 10.0  # round amounts to nearest €10
+    rounding_amount: float = 5.0  # round amounts to nearest €5
     rounding_bracket: float = 1000.0  # round bracket boundaries to nearest €1000
 
 
@@ -59,12 +64,9 @@ class BracketLearner:
     """
     Learn a staffel/bracket model from simulation data.
 
-    The model is a piecewise-linear lookup table indexed by:
-    - Income bracket
-    - Household type (partner yes/no, children yes/no, renter yes/no)
-
-    Within each bracket, the benefit amount is linearly interpolated between
-    the bracket boundaries, guaranteeing continuity (no cliff effects).
+    For each household type x income bracket, fits a linear regression
+    (amount ~ income) and evaluates it at the bracket boundaries. This
+    gives a clean, continuous piecewise-linear function.
     """
 
     HOUSEHOLD_KEYS = ["has_partner", "has_children", "housing_type_rent"]
@@ -91,7 +93,6 @@ class BracketLearner:
         if "children_count" in X.columns:
             X["children_count"] = X["children_count"].fillna(0)
 
-        # Find eligibility and amount columns dynamically
         elig_cols = [c for c in df.columns if c.endswith("_eligible")]
         amount_cols = [
             c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols
@@ -119,7 +120,6 @@ class BracketLearner:
 
         feature_names = list(X.columns)
 
-        # Determine income brackets using quantiles
         if "income" not in X.columns:
             raise ValueError("Income column required for bracket model")
 
@@ -129,12 +129,11 @@ class BracketLearner:
 
         # Round boundaries
         boundaries = [round(b / self.config.rounding_bracket) * self.config.rounding_bracket for b in raw_boundaries]
-        # Ensure unique and sorted
         boundaries = sorted(set(boundaries))
         if len(boundaries) < 2:
             boundaries = [float(income.min()), float(income.max())]
 
-        # Determine household types present in data
+        # Determine household types
         available_keys = [k for k in self.HOUSEHOLD_KEYS if k in X.columns]
         if available_keys:
             household_groups = X.groupby(available_keys, observed=True)
@@ -142,50 +141,47 @@ class BracketLearner:
         else:
             household_types = [{}]
 
-        # Build segments
+        # Build segments: fit linear regression per household type x bracket
         segments = []
         for ht in household_types:
-            mask = pd.Series(True, index=X.index)
+            ht_mask = pd.Series(True, index=X.index)
             for key, val in ht.items():
-                mask &= X[key] == val
+                ht_mask &= X[key] == val
 
             for i in range(len(boundaries) - 1):
                 lower = boundaries[i]
                 upper = boundaries[i + 1]
 
-                bracket_mask = mask & (income >= lower) & (income < upper)
-                if i == len(boundaries) - 2:
-                    bracket_mask = mask & (income >= lower) & (income <= upper)
+                bracket_mask = ht_mask & (income >= lower)
+                if i < len(boundaries) - 2:
+                    bracket_mask &= income < upper
+                else:
+                    bracket_mask &= income <= upper
 
-                if bracket_mask.sum() < 5:
+                seg_income = income[bracket_mask].values.reshape(-1, 1)
+                seg_amount = y_amount[bracket_mask].values
+
+                if len(seg_income) < 3:
+                    # Not enough data: use mean or zero
+                    mean_amt = float(seg_amount.mean()) if len(seg_amount) > 0 else 0.0
+                    mean_amt = self._round_amount(max(0.0, mean_amt))
                     segments.append(
                         BracketSegment(
                             income_lower=lower,
                             income_upper=upper,
-                            amount_at_lower=0.0,
-                            amount_at_upper=0.0,
+                            amount_at_lower=mean_amt,
+                            amount_at_upper=mean_amt,
                             household_filter=ht if ht else None,
                         )
                     )
                     continue
 
-                amounts = y_amount[bracket_mask]
-                incomes = income[bracket_mask]
+                # Fit linear regression: amount = a + b * income
+                reg = LinearRegression()
+                reg.fit(seg_income, seg_amount)
 
-                # Compute amounts at lower and upper boundary via median of nearest points
-                lower_half = amounts[incomes <= (lower + upper) / 2]
-                upper_half = amounts[incomes > (lower + upper) / 2]
-
-                amt_lower = float(lower_half.median()) if len(lower_half) > 0 else float(amounts.median())
-                amt_upper = float(upper_half.median()) if len(upper_half) > 0 else float(amounts.median())
-
-                # Round amounts
-                amt_lower = round(amt_lower / self.config.rounding_amount) * self.config.rounding_amount
-                amt_upper = round(amt_upper / self.config.rounding_amount) * self.config.rounding_amount
-
-                # Ensure non-negative
-                amt_lower = max(0.0, amt_lower)
-                amt_upper = max(0.0, amt_upper)
+                amt_lower = self._round_amount(max(0.0, float(reg.predict([[lower]])[0])))
+                amt_upper = self._round_amount(max(0.0, float(reg.predict([[upper]])[0])))
 
                 segments.append(
                     BracketSegment(
@@ -197,6 +193,16 @@ class BracketLearner:
                     )
                 )
 
+        # Ensure continuity: where adjacent segments meet, use the average
+        for ht in household_types:
+            ht_segs = [s for s in segments if s.household_filter == (ht if ht else None)]
+            for j in range(len(ht_segs) - 1):
+                # The upper of segment j should equal the lower of segment j+1
+                avg = (ht_segs[j].amount_at_upper + ht_segs[j + 1].amount_at_lower) / 2
+                avg = self._round_amount(max(0.0, avg))
+                ht_segs[j].amount_at_upper = avg
+                ht_segs[j + 1].amount_at_lower = avg
+
         # Estimate child supplement
         child_supplement = 0.0
         if "children_count" in X.columns:
@@ -207,9 +213,7 @@ class BracketLearner:
                 avg_without = float(y_amount[~has_kids].mean())
                 if avg_count > 0:
                     child_supplement = max(0.0, (avg_with - avg_without) / avg_count)
-                    child_supplement = (
-                        round(child_supplement / self.config.rounding_amount) * self.config.rounding_amount
-                    )
+                    child_supplement = self._round_amount(child_supplement)
 
         return BracketModel(
             segments=segments,
@@ -219,15 +223,17 @@ class BracketLearner:
             feature_names=feature_names,
         )
 
+    def _round_amount(self, val: float) -> float:
+        return round(val / self.config.rounding_amount) * self.config.rounding_amount
+
     def predict(self, model: BracketModel, X: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
         """Predict amounts and eligibility for a DataFrame."""
         predictions = np.zeros(len(X))
 
         for i in range(len(X)):
             row = X.iloc[i]
-            income = row.get("income", 0)
+            row_income = row.get("income", 0)
 
-            # Find matching segments
             best_amount = 0.0
             for seg in model.segments:
                 if seg.household_filter:
@@ -235,13 +241,12 @@ class BracketLearner:
                     if not match:
                         continue
 
-                if income < seg.income_lower or income > seg.income_upper:
+                if row_income < seg.income_lower or row_income > seg.income_upper:
                     continue
 
-                best_amount = seg.predict(income)
+                best_amount = seg.predict(row_income)
                 break
 
-            # Add child supplement
             if model.child_supplement > 0 and "children_count" in X.columns:
                 best_amount += model.child_supplement * row.get("children_count", 0)
 

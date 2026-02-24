@@ -676,7 +676,11 @@
                     <!-- Bracket Table (staffelmodel only) -->
                     <template x-if="activeRun?.result?.method === 'bracket'">
                         <div class="bg-white rounded-lg shadow p-4 mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Staffeltabel</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Staffeltabel</h3>
+                            <p class="text-xs text-gray-500 mb-3">
+                                Bij een inkomen tussen twee grenzen wordt het bedrag lineair berekend
+                                (geen harde overgangen).
+                            </p>
                             <template x-for="(group, gi) in bracketGroups()" :key="gi">
                                 <div class="mb-4">
                                     <h4 class="text-sm font-semibold text-gray-700 mb-1 px-1"
@@ -685,26 +689,19 @@
                                         <table class="min-w-full text-sm">
                                             <thead>
                                                 <tr class="bg-gray-50">
-                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen van</th>
-                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen tot</th>
-                                                    <th class="px-3 py-1.5 text-right text-xs">Bedrag ondergrens</th>
-                                                    <th class="px-3 py-1.5 text-right text-xs">Bedrag bovengrens</th>
+                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen</th>
+                                                    <th class="px-3 py-1.5 text-right text-xs">Toeslag/maand</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <template x-for="(row, idx) in group.rows" :key="idx">
+                                                <template x-for="(pt, idx) in group.points" :key="idx">
                                                     <tr class="border-t border-gray-100">
                                                         <td class="px-3 py-1.5"
-                                                            x-text="'EUR ' + Number(row.income_lower).toLocaleString('nl-NL')">
+                                                            x-text="'EUR ' + Number(pt.income).toLocaleString('nl-NL')">
                                                         </td>
-                                                        <td class="px-3 py-1.5"
-                                                            x-text="'EUR ' + Number(row.income_upper).toLocaleString('nl-NL')">
-                                                        </td>
-                                                        <td class="px-3 py-1.5 text-right font-mono"
-                                                            x-text="'EUR ' + Number(row.amount_at_lower).toFixed(2)">
-                                                        </td>
-                                                        <td class="px-3 py-1.5 text-right font-mono"
-                                                            x-text="'EUR ' + Number(row.amount_at_upper).toFixed(2)">
+                                                        <td class="px-3 py-1.5 text-right font-mono font-semibold"
+                                                            :class="pt.amount > 0 ? 'text-green-700' : 'text-gray-400'"
+                                                            x-text="'EUR ' + Number(pt.amount).toFixed(0) + '/mnd'">
                                                         </td>
                                                     </tr>
                                                 </template>
@@ -716,7 +713,7 @@
                             <template x-if="activeRun?.result?.child_supplement > 0">
                                 <p class="mt-3 text-sm text-gray-600">
                                     Kindtoeslag: <span class="font-semibold"
-       x-text="'EUR ' + Number(activeRun.result.child_supplement).toFixed(2)"></span> per kind per maand
+       x-text="'EUR ' + Number(activeRun.result.child_supplement).toFixed(0)"></span> extra per kind per maand
                                 </p>
                             </template>
                         </div>
@@ -724,55 +721,96 @@
                     <!-- Components (parametric only) -->
                     <template x-if="activeRun?.result?.method === 'parametric'">
                         <div class="bg-white rounded-lg shadow p-4 mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Formulecomponenten</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Formule</h3>
+                            <!-- Total formula summary -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                                <p class="text-sm text-gray-600 mb-2">Uw totale toeslag per maand:</p>
+                                <p class="font-mono text-sm font-semibold text-gray-800"
+                                   x-text="(activeRun?.result?.components || []).map(c => (c.label || c.name)).join(' + ')">
+                                </p>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    Elk onderdeel wordt apart berekend op basis van uw inkomen. Als een onderdeel onder nul uitkomt, wordt het op nul gezet.
+                                </p>
+                            </div>
+                            <!-- Per-component formulas -->
                             <div class="grid gap-3">
                                 <template x-for="(comp, idx) in (activeRun?.result?.components || [])"
                                           :key="idx">
-                                    <div class="border border-gray-200 rounded-lg p-3">
-                                        <h4 class="font-semibold text-gray-800 mb-2"
-                                            x-text="comp.label || comp.name"></h4>
-                                        <div class="grid grid-cols-2 gap-2 text-sm">
-                                            <div>
-                                                <span class="text-gray-500">Alleenstaand:</span>
-                                                <div class="font-mono text-xs mt-1">
-                                                    <div>
-                                                        Basis: <span class="text-blue-700"
-       x-text="'EUR ' + Number(comp.base_single).toFixed(2)"></span>/mnd
-                                                    </div>
-                                                    <div>
-                                                        Afbouw: <span class="text-red-700"
-       x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
-                                                    </div>
-                                                    <div>
-                                                        Drempel: <span class="text-green-700"
-       x-text="'EUR ' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>
-                                                    </div>
-                                                </div>
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <h4 class="font-semibold text-gray-800 mb-3"
+                                            x-text="(comp.label || comp.name)"></h4>
+                                        <!-- Alleenstaand formula -->
+                                        <div class="mb-3">
+                                            <p class="text-xs font-medium text-gray-500 mb-1"
+                                               x-text="comp.has_partner_variant ? 'Alleenstaand:' : ''"></p>
+                                            <div class="bg-gray-50 rounded px-3 py-2 font-mono text-sm">
+                                                <span x-show="comp.base_single > 0">
+                                                    max(0,
+                                                    <span class="text-blue-700 font-semibold"
+                                                          x-text="'€' + Number(comp.base_single).toFixed(0)"></span>
+                                                    &minus;
+                                                    <span class="text-red-700 font-semibold"
+                                                          x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
+                                                    &times; max(0, inkomen &minus;
+                                                    <span class="text-green-700 font-semibold"
+                                                          x-text="'€' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>))
+                                                </span>
+                                                <span x-show="comp.base_single <= 0" class="text-gray-400">€0 (niet van toepassing)</span>
                                             </div>
-                                            <template x-if="comp.has_partner_variant">
-                                                <div>
-                                                    <span class="text-gray-500">Met partner:</span>
-                                                    <div class="font-mono text-xs mt-1">
-                                                        <div>
-                                                            Basis: <span class="text-blue-700"
-       x-text="'EUR ' + Number(comp.base_partner).toFixed(2)"></span>/mnd
-                                                        </div>
-                                                        <div>
-                                                            Afbouw: <span class="text-red-700"
-       x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
-                                                        </div>
-                                                        <div>
-                                                            Drempel: <span class="text-green-700"
-       x-text="'EUR ' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </template>
+                                            <p class="text-xs text-gray-400 mt-1" x-show="comp.base_single > 0">
+                                                Basisbedrag
+                                                <span class="text-blue-600"
+                                                      x-text="'€' + Number(comp.base_single).toFixed(0)"></span>/mnd,
+                                                boven
+                                                <span class="text-green-600"
+                                                      x-text="'€' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>
+                                                inkomen wordt
+                                                <span class="text-red-600"
+                                                      x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
+                                                afgebouwd
+                                            </p>
                                         </div>
-                                        <p class="text-xs text-gray-400 mt-2 italic">max(0, basis - afbouw% x max(0, inkomen - drempel))</p>
+                                        <!-- Met partner formula -->
+                                        <template x-if="comp.has_partner_variant">
+                                            <div>
+                                                <p class="text-xs font-medium text-gray-500 mb-1">Met partner:</p>
+                                                <div class="bg-gray-50 rounded px-3 py-2 font-mono text-sm">
+                                                    <span x-show="comp.base_partner > 0">
+                                                        max(0,
+                                                        <span class="text-blue-700 font-semibold"
+                                                              x-text="'€' + Number(comp.base_partner).toFixed(0)"></span>
+                                                        &minus;
+                                                        <span class="text-red-700 font-semibold"
+                                                              x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
+                                                        &times; max(0, inkomen &minus;
+                                                        <span class="text-green-700 font-semibold"
+                                                              x-text="'€' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>))
+                                                    </span>
+                                                    <span x-show="comp.base_partner <= 0" class="text-gray-400">€0 (niet van toepassing)</span>
+                                                </div>
+                                                <p class="text-xs text-gray-400 mt-1" x-show="comp.base_partner > 0">
+                                                    Basisbedrag
+                                                    <span class="text-blue-600"
+                                                          x-text="'€' + Number(comp.base_partner).toFixed(0)"></span>/mnd,
+                                                    boven
+                                                    <span class="text-green-600"
+                                                          x-text="'€' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>
+                                                    inkomen wordt
+                                                    <span class="text-red-600"
+                                                          x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
+                                                    afgebouwd
+                                                </p>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
                             </div>
+                            <template x-if="activeRun?.result?.child_supplement > 0">
+                                <div class="mt-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700">
+                                    + <span class="font-semibold"
+       x-text="'€' + Number(activeRun.result.child_supplement).toFixed(0)"></span> extra per kind per maand
+                                </div>
+                            </template>
                         </div>
                     </template>
                     <!-- Accordeon: Uitleg in het Nederlands (collapsed) -->
@@ -1461,7 +1499,18 @@
                     if (seen.has(key)) continue;
                     seen.add(key);
                     const label = this.formatHouseholdFilter(row.household_filter, filterLabels);
-                    groups.push({label, rows: rows.filter(r => JSON.stringify(r.household_filter || {}) === key)});
+                    const segs = rows.filter(r => JSON.stringify(r.household_filter || {}) === key);
+                    // Convert segments to boundary points: one row per income boundary
+                    const points = [];
+                    for (let i = 0; i < segs.length; i++) {
+                        points.push({income: segs[i].income_lower, amount: segs[i].amount_at_lower});
+                    }
+                    // Add final upper boundary of last segment
+                    if (segs.length > 0) {
+                        const last = segs[segs.length - 1];
+                        points.push({income: last.income_upper, amount: last.amount_at_upper});
+                    }
+                    groups.push({label, points});
                 }
                 return groups;
             },
