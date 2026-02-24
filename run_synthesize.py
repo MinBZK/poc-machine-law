@@ -95,9 +95,10 @@ def analyze_per_law(
     Uses the decision tree's built-in Gini feature importances to determine which law
     the model resembles most, and counts splits per law to determine complexity.
     """
-    tree = model._eligibility_tree
+    # Use amount tree (primary model) for feature importances
+    tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
     feature_names = model.feature_names
-    importances = tree.feature_importances_  # Gini importance, shape: (n_features,)
+    importances = tree.feature_importances_  # Feature importance, shape: (n_features,)
 
     # --- A. Feature importance (Gini) ---
     total_importance = importances.sum()
@@ -123,8 +124,9 @@ def analyze_per_law(
     total_law_imp = sum(law_importance.values())
     law_importance_pct = {law: (v / total_law_imp if total_law_imp > 0 else 0.0) for law, v in law_importance.items()}
 
-    # --- C. Complexity: count splits per law in the tree ---
-    law_splits = _count_splits_per_law(tree, feature_names, feature_law_map, all_laws)
+    # --- C. Complexity: count splits per law in the amount tree ---
+    amount_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
+    law_splits = _count_splits_per_law(amount_tree, feature_names, feature_law_map, all_laws)
     total_splits = sum(law_splits.values()) or 1
     law_complexity = {law: splits / total_splits for law, splits in law_splits.items()}
 
@@ -174,21 +176,31 @@ def analyze_per_law(
 
 
 def extract_tree_structure(tree, feature_names: list[str]) -> dict:
-    """Export sklearn decision tree as a nested JSON structure for visualization."""
+    """Export sklearn decision tree as a nested JSON structure for visualization.
+
+    Supports both classifiers (class probabilities) and regressors (mean value).
+    """
     tree_ = tree.tree_
-    classes = tree.classes_
+    is_classifier = hasattr(tree, "classes_")
+    classes = tree.classes_ if is_classifier else None
 
     def _build_node(node_id: int) -> dict:
         is_leaf = tree_.children_left[node_id] == tree_.children_right[node_id]
         samples = int(tree_.n_node_samples[node_id])
 
         if is_leaf:
-            # Leaf node: determine prediction and confidence
             value = tree_.value[node_id][0]
-            predicted_class_idx = int(value.argmax())
-            total = value.sum()
-            confidence = float(value[predicted_class_idx] / total) if total > 0 else 0.0
-            prediction = str(classes[predicted_class_idx]) if len(classes) > predicted_class_idx else "unknown"
+            if is_classifier:
+                # Classifier: class probabilities
+                predicted_class_idx = int(value.argmax())
+                total = value.sum()
+                confidence = float(value[predicted_class_idx] / total) if total > 0 else 0.0
+                prediction = str(classes[predicted_class_idx]) if len(classes) > predicted_class_idx else "unknown"
+            else:
+                # Regressor: mean predicted value
+                mean_value = float(value[0])
+                prediction = f"{mean_value:.2f}"
+                confidence = 1.0  # Regressor leaves don't have class confidence
             return {
                 "is_leaf": True,
                 "prediction": prediction,
@@ -276,8 +288,9 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
     law_labels = {k: AVAILABLE_LAWS[k]["label"] for k in selected_laws if k in AVAILABLE_LAWS}
     law_analysis = analyze_per_law(model, synthesis_df, selected_laws, feature_law_map, law_labels)
 
-    # Extract tree structure for visualization
-    tree_structure = extract_tree_structure(model._eligibility_tree, model.feature_names)
+    # Extract tree structure for visualization (use amount tree as primary model)
+    vis_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
+    tree_structure = extract_tree_structure(vis_tree, model.feature_names)
 
     # Feature warnings for missing simulation data
     feature_warnings = get_feature_warnings(selected_laws)

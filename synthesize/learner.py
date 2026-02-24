@@ -1,17 +1,19 @@
 """
 Law Synthesis Learner
 
-Trains interpretable ML models (Decision Tree + Linear Regression) on simulation data
-to learn simplified eligibility rules and amount formulas.
+Trains interpretable ML models on simulation data to learn simplified
+eligibility rules and amount formulas. Uses a Decision Tree Regressor
+on the combined benefit amount as the primary model — this naturally
+captures which features drive the amount (age for AOW, income for
+toeslagen, etc.) without needing separate eligibility classification.
 """
 
 from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from synthesize.data_utils import prepare_synthesis_data
 
@@ -37,7 +39,7 @@ class ExtractedRule:
 
 @dataclass
 class LinearFormula:
-    """A linear formula for amount calculation."""
+    """A linear formula for amount calculation in a tree leaf."""
 
     intercept: float
     coefficients: dict[str, float]
@@ -57,16 +59,21 @@ class LearnedModel:
     amount_r2: float
     amount_mae: float
     # Store sklearn models for prediction
-    _eligibility_tree: DecisionTreeClassifier = field(default=None, repr=False)
-    _amount_models: dict[int, LinearRegression] = field(default_factory=dict, repr=False)
+    _eligibility_tree: DecisionTreeClassifier | None = field(default=None, repr=False)
+    _amount_tree: DecisionTreeRegressor | None = field(default=None, repr=False)
 
 
 class SynthesisLearner:
     """
     Learns simplified laws from simulation data.
 
-    Uses Decision Tree for eligibility classification and
-    Linear Regression for amount calculation per tree segment.
+    Uses a Decision Tree Regressor on the combined benefit amount as the
+    primary model. The regressor naturally splits on the features that
+    matter most for each law (e.g. age > 67 for AOW, income for toeslagen).
+    Eligibility is derived from the amount predictions (amount > 0 = eligible).
+
+    A separate Decision Tree Classifier is trained for eligibility rules
+    extraction and cross-validation metrics.
     """
 
     # Feature name mapping from simulation to YAML
@@ -101,14 +108,10 @@ class SynthesisLearner:
         """
         Train eligibility and amount models on simulation data.
 
-        Args:
-            df: Simulation results DataFrame
-            test_size: Fraction of data to hold out for testing
-
-        Returns:
-            LearnedModel with extracted rules and formulas
+        Uses a DecisionTreeRegressor on the amount as primary model.
+        This directly optimizes for predicting the benefit amount and
+        naturally discovers the right splits (age>67 for AOW, etc.).
         """
-        # Prepare data
         X, y_eligible, y_amount = self.prepare_data(df)
 
         # Split data
@@ -116,27 +119,38 @@ class SynthesisLearner:
             X, y_eligible, y_amount, test_size=test_size, random_state=42, stratify=y_eligible
         )
 
-        # Train eligibility decision tree
-        tree = DecisionTreeClassifier(
+        # Primary model: Decision Tree Regressor on amount
+        amount_tree = DecisionTreeRegressor(
             max_depth=self.constraints.max_tree_depth,
             min_samples_leaf=self.constraints.min_samples_leaf,
             random_state=42,
         )
-        tree.fit(X_train, y_elig_train)
-
-        # Calculate eligibility accuracy
-        eligibility_accuracy = tree.score(X_test, y_elig_test)
-
-        # Extract rules from tree
-        eligibility_rules = self._extract_rules(tree, list(X.columns))
-
-        # Train linear regression per tree segment (leaf)
-        amount_formulas, amount_models = self._train_segmented_regression(tree, X_train, y_amt_train, list(X.columns))
+        amount_tree.fit(X_train, y_amt_train)
 
         # Calculate amount metrics on test set
-        y_amt_pred = self._predict_amount(tree, amount_models, X_test)
-        amount_r2 = 1 - np.sum((y_amt_test - y_amt_pred) ** 2) / np.sum((y_amt_test - y_amt_test.mean()) ** 2)
-        amount_mae = np.mean(np.abs(y_amt_test - y_amt_pred))
+        y_amt_pred = np.maximum(0, amount_tree.predict(X_test))
+        ss_res = np.sum((y_amt_test - y_amt_pred) ** 2)
+        ss_tot = np.sum((y_amt_test - y_amt_test.mean()) ** 2)
+        amount_r2 = float(1 - ss_res / ss_tot) if ss_tot > 0 else 1.0
+        amount_mae = float(np.mean(np.abs(y_amt_test - y_amt_pred)))
+
+        # Eligibility derived from amount predictions
+        y_elig_pred = (y_amt_pred > 0).astype(int)
+        eligibility_accuracy = float(np.mean(y_elig_pred == y_elig_test))
+
+        # Also train a classifier for rule extraction and CV metrics
+        elig_tree = DecisionTreeClassifier(
+            max_depth=self.constraints.max_tree_depth,
+            min_samples_leaf=self.constraints.min_samples_leaf,
+            random_state=42,
+        )
+        elig_tree.fit(X_train, y_elig_train)
+
+        # Extract rules from the eligibility tree
+        eligibility_rules = self._extract_rules(elig_tree, list(X.columns))
+
+        # Extract amount formulas from the regressor tree leaves
+        amount_formulas = self._extract_amount_formulas(amount_tree, X_train, y_amt_train, list(X.columns))
 
         return LearnedModel(
             eligibility_rules=eligibility_rules,
@@ -145,12 +159,20 @@ class SynthesisLearner:
             eligibility_accuracy=eligibility_accuracy,
             amount_r2=amount_r2,
             amount_mae=amount_mae,
-            _eligibility_tree=tree,
-            _amount_models=amount_models,
+            _eligibility_tree=elig_tree,
+            _amount_tree=amount_tree,
         )
 
+    def predict(self, model: LearnedModel, X: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+        """Predict eligibility and amounts using the amount regressor tree."""
+        if model._amount_tree is not None:
+            amounts = np.maximum(0, model._amount_tree.predict(X))
+            eligibility = (amounts > 0).astype(int)
+            return eligibility, amounts
+        return np.zeros(len(X), dtype=int), np.zeros(len(X))
+
     def _extract_rules(self, tree: DecisionTreeClassifier, feature_names: list[str]) -> list[ExtractedRule]:
-        """Extract human-readable rules from decision tree."""
+        """Extract human-readable rules from the eligibility decision tree."""
         rules = []
         tree_ = tree.tree_
 
@@ -175,78 +197,60 @@ class SynthesisLearner:
             else:
                 feature_name = feature_names[tree_.feature[node]]
                 threshold = tree_.threshold[node]
-
-                # Format threshold nicely
                 threshold_str = str(int(threshold)) if threshold == int(threshold) else f"{threshold:.2f}"
-
-                # Left branch (<=)
                 recurse(tree_.children_left[node], conditions + [f"{feature_name} <= {threshold_str}"])
-
-                # Right branch (>)
                 recurse(tree_.children_right[node], conditions + [f"{feature_name} > {threshold_str}"])
 
         recurse(0, [])
         return rules[: self.constraints.max_rules]
 
-    def _train_segmented_regression(
-        self, tree: DecisionTreeClassifier, X: pd.DataFrame, y: pd.Series, feature_names: list[str]
-    ) -> tuple[list[LinearFormula], dict[int, LinearRegression]]:
-        """Train linear regression models for each decision tree segment."""
+    def _extract_amount_formulas(
+        self, tree: DecisionTreeRegressor, X: pd.DataFrame, y: pd.Series, feature_names: list[str]
+    ) -> list[LinearFormula]:
+        """Extract amount formulas from the regressor tree.
+
+        Each leaf in the regressor tree predicts a constant amount.
+        We extract these as LinearFormula objects with zero coefficients
+        (constant prediction) plus the path conditions to reach the leaf.
+        """
         leaf_ids = tree.apply(X)
         unique_leaves = np.unique(leaf_ids)
-
         formulas = []
-        models = {}
 
         for leaf_id in unique_leaves:
             mask = leaf_ids == leaf_id
-            X_segment = X[mask]
             y_segment = y[mask]
 
-            # Skip if too few samples or no positive amounts
-            if len(X_segment) < self.constraints.min_samples_leaf:
-                continue
-            if y_segment.sum() == 0:
+            if len(y_segment) < self.constraints.min_samples_leaf:
                 continue
 
-            # Train linear regression
-            model = LinearRegression()
-            model.fit(X_segment, y_segment)
+            mean_amount = float(y_segment.mean())
+            if mean_amount <= 0:
+                continue
 
-            # Calculate R² for this segment
-            y_pred = model.predict(X_segment)
-            ss_res = np.sum((y_segment - y_pred) ** 2)
-            ss_tot = np.sum((y_segment - y_segment.mean()) ** 2)
-            r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0
-
-            # Get conditions for this leaf
             conditions = self._get_leaf_conditions(tree, feature_names, leaf_id)
 
-            # Filter coefficients to only significant ones
-            coefficients = {}
-            for feat, coef in zip(feature_names, model.coef_):
-                if abs(coef) > 0.01:  # Skip negligible coefficients
-                    coefficients[feat] = float(coef)
+            # Regressor leaves predict a constant — R² is 0 within a single leaf
+            r2 = 0.0
 
             formulas.append(
                 LinearFormula(
-                    intercept=float(model.intercept_),
-                    coefficients=coefficients,
+                    intercept=mean_amount,
+                    coefficients={},
                     segment_conditions=conditions,
-                    r2_score=float(r2),
-                    samples=int(len(X_segment)),
+                    r2_score=r2,
+                    samples=int(len(y_segment)),
                 )
             )
-            models[leaf_id] = model
 
-        return formulas, models
+        return formulas
 
     def _get_leaf_conditions(
-        self, tree: DecisionTreeClassifier, feature_names: list[str], target_leaf: int
+        self, tree: DecisionTreeClassifier | DecisionTreeRegressor, feature_names: list[str], target_leaf: int
     ) -> list[str]:
         """Extract path conditions to reach a specific leaf."""
         tree_ = tree.tree_
-        conditions = []
+        conditions: list[str] = []
 
         def find_path(node: int, path: list[str]) -> bool:
             if node == target_leaf:
@@ -258,35 +262,15 @@ class SynthesisLearner:
 
             feature_name = feature_names[tree_.feature[node]]
             threshold = tree_.threshold[node]
-
-            # Format threshold
             threshold_str = str(int(threshold)) if threshold == int(threshold) else f"{threshold:.2f}"
 
-            # Try left branch
             if find_path(tree_.children_left[node], path + [f"{feature_name} <= {threshold_str}"]):
                 return True
 
-            # Try right branch
             return find_path(tree_.children_right[node], path + [f"{feature_name} > {threshold_str}"])
 
         find_path(0, [])
         return conditions
-
-    def _predict_amount(
-        self, tree: DecisionTreeClassifier, models: dict[int, LinearRegression], X: pd.DataFrame
-    ) -> np.ndarray:
-        """Predict amounts using segmented regression models."""
-        leaf_ids = tree.apply(X)
-        predictions = np.zeros(len(X))
-
-        for leaf_id, model in models.items():
-            mask = leaf_ids == leaf_id
-            if mask.any():
-                predictions[mask] = model.predict(X[mask])
-
-        # Ensure non-negative predictions
-        predictions = np.maximum(predictions, 0)
-        return predictions
 
     def cross_validate(self, df: pd.DataFrame, cv: int = 5) -> dict[str, float]:
         """Perform cross-validation to estimate model performance."""

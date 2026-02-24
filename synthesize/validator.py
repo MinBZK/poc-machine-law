@@ -85,9 +85,8 @@ class SynthesisValidator:
         learner = SynthesisLearner()
         X, y_elig_true, y_amt_true = learner.prepare_data(test_df)
 
-        # Get predictions
-        y_elig_pred = model._eligibility_tree.predict(X)
-        y_amt_pred = learner._predict_amount(model._eligibility_tree, model._amount_models, X)
+        # Get predictions using the amount regressor tree
+        y_elig_pred, y_amt_pred = learner.predict(model, X)
 
         # Calculate metrics
         metrics = self._calculate_metrics(X, y_elig_true, y_elig_pred, y_amt_true, y_amt_pred)
