@@ -9,7 +9,11 @@ import pandas as pd
 
 from run_simulation import apply_custom_parameters
 from simulate import LawSimulator
+from synthesize.bracket_learner import BracketLearner, BracketLearnerConfig
+from synthesize.bracket_yaml_generator import BracketYAMLConfig, BracketYAMLGenerator
 from synthesize.learner import InterpretabilityConstraints, LearnedModel, SynthesisLearner
+from synthesize.parametric_learner import ParametricConstraints, ParametricLearner
+from synthesize.parametric_yaml_generator import ParametricYAMLConfig, ParametricYAMLGenerator
 from synthesize.validator import SynthesisValidator
 from synthesize.yaml_generator import YAMLGenerationConfig, YAMLGenerator
 
@@ -33,14 +37,51 @@ LAW_LABELS: dict[str, str] = {
     "kindgebonden_budget": "Kindgebonden budget",
 }
 
+# All laws available for synthesis (financial laws only)
+AVAILABLE_LAWS: dict[str, dict] = {
+    "zorgtoeslag": {"label": "Zorgtoeslag", "group": "Toeslagen"},
+    "huurtoeslag": {"label": "Huurtoeslag", "group": "Toeslagen"},
+    "kindgebonden_budget": {"label": "Kindgebonden budget", "group": "Toeslagen"},
+    "kinderopvangtoeslag": {"label": "Kinderopvangtoeslag", "group": "Toeslagen"},
+    "bijstand": {"label": "Bijstand", "group": "Sociale zekerheid"},
+    "aow": {"label": "AOW", "group": "Sociale zekerheid"},
+    "ww": {"label": "WW-uitkering", "group": "Sociale zekerheid"},
+}
 
-def _count_splits_per_law(tree, feature_names: list[str]) -> dict[str, int]:
+DEFAULT_SELECTED_LAWS = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
+
+
+def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
+    """Build feature-to-law mapping for selected laws only."""
+    full_map: dict[str, list[str]] = {
+        "rent_amount": ["huurtoeslag"],
+        "housing_type_rent": ["huurtoeslag"],
+        "children_count": ["kindgebonden_budget", "kinderopvangtoeslag"],
+        "has_children": ["kindgebonden_budget", "kinderopvangtoeslag"],
+        "youngest_child_age": ["kindgebonden_budget"],
+        "net_worth": ["zorgtoeslag"],
+        "is_student": ["zorgtoeslag"],
+        "income": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget", "bijstand", "ww", "aow", "kinderopvangtoeslag"],
+        "has_partner": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget", "bijstand", "aow"],
+        "age": ["zorgtoeslag", "kindgebonden_budget", "aow", "ww"],
+    }
+    # Filter to only selected laws
+    result = {}
+    for feat, laws in full_map.items():
+        filtered = [l for l in laws if l in selected_laws]
+        if filtered:
+            result[feat] = filtered
+    return result
+
+
+def _count_splits_per_law(
+    tree, feature_names: list[str], feature_law_map: dict[str, list[str]], all_laws: list[str]
+) -> dict[str, int]:
     """Count how many splits in the decision tree use features belonging to each law.
 
     More splits = the model needs more branching to capture that law's logic = more complex.
     """
     tree_ = tree.tree_
-    all_laws = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
     law_splits: dict[str, int] = {law: 0 for law in all_laws}
 
     for node_id in range(tree_.node_count):
@@ -48,14 +89,21 @@ def _count_splits_per_law(tree, feature_names: list[str]) -> dict[str, int]:
         if feature_idx == -2:  # leaf node
             continue
         feat = feature_names[feature_idx]
-        laws = FEATURE_LAW_MAP.get(feat, [])
+        laws = feature_law_map.get(feat, [])
         for law in laws:
-            law_splits[law] += 1
+            if law in law_splits:
+                law_splits[law] += 1
 
     return law_splits
 
 
-def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
+def analyze_per_law(
+    model: LearnedModel,
+    synthesis_df: pd.DataFrame,
+    all_laws: list[str],
+    feature_law_map: dict[str, list[str]],
+    law_labels: dict[str, str],
+) -> dict:
     """Analyze which source law the synthesized model resembles most and which is most complex.
 
     Uses the decision tree's built-in Gini feature importances to determine which law
@@ -65,13 +113,11 @@ def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
     feature_names = model.feature_names
     importances = tree.feature_importances_  # Gini importance, shape: (n_features,)
 
-    all_laws = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
-
     # --- A. Feature importance (Gini) ---
     total_importance = importances.sum()
     feature_importance = []
     for i, feat in enumerate(feature_names):
-        laws = FEATURE_LAW_MAP.get(feat, [])
+        laws = feature_law_map.get(feat, [])
         imp = float(importances[i] / total_importance) if total_importance > 0 else 0.0
         feature_importance.append({"feature": feat, "importance": round(imp, 4), "laws": laws})
 
@@ -80,27 +126,24 @@ def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
     # --- B. Per-law importance (shared features split evenly) ---
     law_importance: dict[str, float] = {law: 0.0 for law in all_laws}
     for i, feat in enumerate(feature_names):
-        laws = FEATURE_LAW_MAP.get(feat, [])
+        laws = feature_law_map.get(feat, [])
         if not laws:
             continue
         share = 1.0 / len(laws)
         for law in laws:
-            law_importance[law] += float(importances[i]) * share
+            if law in law_importance:
+                law_importance[law] += float(importances[i]) * share
 
     total_law_imp = sum(law_importance.values())
     law_importance_pct = {law: (v / total_law_imp if total_law_imp > 0 else 0.0) for law, v in law_importance.items()}
 
     # --- C. Complexity: count splits per law in the tree ---
-    law_splits = _count_splits_per_law(tree, feature_names)
+    law_splits = _count_splits_per_law(tree, feature_names, feature_law_map, all_laws)
     total_splits = sum(law_splits.values()) or 1
     law_complexity = {law: splits / total_splits for law, splits in law_splits.items()}
 
-    # --- D. Amount contribution (exact: y_total = y_zorg + y_huur + y_kgb) ---
-    amount_cols = {
-        "zorgtoeslag": "zorgtoeslag_amount",
-        "huurtoeslag": "huurtoeslag_amount",
-        "kindgebonden_budget": "kindgebonden_budget_amount",
-    }
+    # --- D. Amount contribution (dynamic based on selected laws) ---
+    amount_cols = {law: f"{law}_amount" for law in all_laws}
     total_mean = sum(synthesis_df[col].mean() for col in amount_cols.values() if col in synthesis_df.columns)
     amount_contribution = {}
     for law, col in amount_cols.items():
@@ -110,11 +153,7 @@ def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
             amount_contribution[law] = 0.0
 
     # --- E. Eligibility rate per law ---
-    elig_cols = {
-        "zorgtoeslag": "zorgtoeslag_eligible",
-        "huurtoeslag": "huurtoeslag_eligible",
-        "kindgebonden_budget": "kindgebonden_budget_eligible",
-    }
+    elig_cols = {law: f"{law}_eligible" for law in all_laws}
     eligibility_rate = {}
     for law, col in elig_cols.items():
         if col in synthesis_df.columns:
@@ -130,7 +169,7 @@ def analyze_per_law(model: LearnedModel, synthesis_df: pd.DataFrame) -> dict:
     laws_output = {}
     for law in all_laws:
         laws_output[law] = {
-            "label": LAW_LABELS[law],
+            "label": law_labels.get(law, law),
             "importance": round(law_importance_pct[law], 4),
             "complexity": round(law_complexity[law], 4),
             "splits": law_splits[law],
@@ -188,8 +227,8 @@ def extract_tree_structure(tree, feature_names: list[str]) -> dict:
     return _build_node(0)
 
 
-def run_train(params: dict) -> dict:
-    """Train a synthesized law and return results as JSON."""
+def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
+    """Train a decision-tree synthesized law and return results as JSON."""
     num_people = params.get("num_people", 1000)
     simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
     max_depth = params.get("max_depth", 5)
@@ -200,7 +239,7 @@ def run_train(params: dict) -> dict:
     simulator = LawSimulator(simulation_date)
     apply_custom_parameters(simulator, params)
     results_df = simulator.run_simulation(num_people=num_people)
-    synthesis_df = simulator.export_for_synthesis(results_df)
+    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     # Configure and train
     constraints = InterpretabilityConstraints(
@@ -247,13 +286,16 @@ def run_train(params: dict) -> dict:
     cv_results = learner.cross_validate(synthesis_df)
 
     # Per-law analysis
-    law_analysis = analyze_per_law(model, synthesis_df)
+    feature_law_map = _build_feature_law_map(selected_laws)
+    law_labels = {k: AVAILABLE_LAWS[k]["label"] for k in selected_laws if k in AVAILABLE_LAWS}
+    law_analysis = analyze_per_law(model, synthesis_df, selected_laws, feature_law_map, law_labels)
 
     # Extract tree structure for visualization
     tree_structure = extract_tree_structure(model._eligibility_tree, model.feature_names)
 
     return {
         "status": "success",
+        "method": "tree",
         "metrics": {
             "eligibility_accuracy": model.eligibility_accuracy,
             "amount_r2": model.amount_r2,
@@ -272,6 +314,239 @@ def run_train(params: dict) -> dict:
     }
 
 
+def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
+    """Train a bracket/staffel model and return results as JSON."""
+    num_people = params.get("num_people", 1000)
+    simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
+    n_brackets = params.get("n_brackets", 5)
+
+    simulator = LawSimulator(simulation_date)
+    apply_custom_parameters(simulator, params)
+    results_df = simulator.run_simulation(num_people=num_people)
+    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    config = BracketLearnerConfig(n_brackets=n_brackets)
+    learner = BracketLearner(config=config)
+    model = learner.train(synthesis_df)
+    metrics = learner.evaluate(model, synthesis_df)
+
+    # Generate YAML
+    yaml_config = BracketYAMLConfig()
+    generator = BracketYAMLGenerator(config=yaml_config)
+    yaml_spec = generator.generate(model)
+    yaml_string = generator.to_yaml_string(yaml_spec)
+
+    # Generate explanation
+    explanation = _generate_bracket_explanation(model, selected_laws)
+
+    # Build bracket table for UI
+    bracket_table = []
+    for seg in model.segments:
+        bracket_table.append(
+            {
+                "income_lower": seg.income_lower,
+                "income_upper": seg.income_upper,
+                "amount_at_lower": seg.amount_at_lower,
+                "amount_at_upper": seg.amount_at_upper,
+                "household_filter": seg.household_filter,
+            }
+        )
+
+    return {
+        "status": "success",
+        "method": "bracket",
+        "metrics": {
+            "eligibility_accuracy": metrics["eligibility_accuracy"],
+            "amount_r2": metrics["amount_r2"],
+            "amount_mae": metrics["amount_mae"],
+            "num_brackets": len(model.income_brackets) - 1,
+            "num_segments": len(model.segments),
+            "num_people": num_people,
+        },
+        "bracket_table": bracket_table,
+        "income_brackets": model.income_brackets,
+        "child_supplement": model.child_supplement,
+        "yaml": yaml_string,
+        "explanation": explanation,
+    }
+
+
+def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
+    """Train a parametric formula model and return results as JSON."""
+    num_people = params.get("num_people", 1000)
+    simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
+
+    simulator = LawSimulator(simulation_date)
+    apply_custom_parameters(simulator, params)
+    results_df = simulator.run_simulation(num_people=num_people)
+    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    constraints = ParametricConstraints()
+    learner = ParametricLearner(constraints=constraints)
+    model = learner.train(synthesis_df, selected_laws)
+
+    # Generate YAML
+    yaml_config = ParametricYAMLConfig()
+    generator = ParametricYAMLGenerator(config=yaml_config)
+    yaml_spec = generator.generate(model)
+    yaml_string = generator.to_yaml_string(yaml_spec)
+
+    # Generate explanation
+    explanation = _generate_parametric_explanation(model, selected_laws)
+
+    # Build component data for UI (convert numpy types to native Python)
+    components = []
+    for comp in model.template.components:
+        components.append(
+            {
+                "name": comp.name,
+                "label": AVAILABLE_LAWS.get(comp.name, {}).get("label", comp.name),
+                "base_single": float(comp.base_single),
+                "base_partner": float(comp.base_partner),
+                "rate_single": float(comp.rate_single),
+                "rate_partner": float(comp.rate_partner),
+                "threshold_single": float(comp.threshold_single),
+                "threshold_partner": float(comp.threshold_partner),
+                "has_partner_variant": bool(comp.has_partner_variant),
+            }
+        )
+
+    return {
+        "status": "success",
+        "method": "parametric",
+        "metrics": {
+            "eligibility_accuracy": model.metrics["eligibility_accuracy"],
+            "amount_r2": model.metrics["amount_r2"],
+            "amount_mae": model.metrics["amount_mae"],
+            "optimization_mae": model.metrics.get("optimization_mae", 0),
+            "num_components": len(model.template.components),
+            "num_people": num_people,
+        },
+        "components": components,
+        "yaml": yaml_string,
+        "explanation": explanation,
+    }
+
+
+def _generate_bracket_explanation(model, selected_laws: list[str]) -> str:
+    """Generate Dutch explanation for bracket model."""
+    law_names = [AVAILABLE_LAWS.get(l, {}).get("label", l) for l in selected_laws]
+    laws_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
+
+    lines = [
+        "# Geharmoniseerde Toeslag — Staffelmodel",
+        "",
+        f"Deze toeslag combineert **{laws_text}** in een inkomensafhankelijke staffel.",
+        "",
+        "---",
+        "",
+        "## Hoe werkt het?",
+        "",
+        "Uw toeslagbedrag wordt bepaald door uw inkomen en huishoudsituatie.",
+        "Binnen elke inkomensband wordt het bedrag vloeiend berekend (lineaire interpolatie),",
+        "zodat er geen harde grenzen ('cliff effects') zijn.",
+        "",
+        "## Inkomensschijven",
+        "",
+        "| Van | Tot | Bedrag ondergrens | Bedrag bovengrens |",
+        "|-----|-----|-------------------|-------------------|",
+    ]
+
+    seen_brackets = set()
+    for seg in model.segments:
+        key = (seg.income_lower, seg.income_upper)
+        if key not in seen_brackets:
+            seen_brackets.add(key)
+            lines.append(
+                f"| EUR {seg.income_lower:,.0f} | EUR {seg.income_upper:,.0f} "
+                f"| EUR {seg.amount_at_lower:,.2f}/mnd | EUR {seg.amount_at_upper:,.2f}/mnd |"
+            )
+
+    if model.child_supplement > 0:
+        lines.extend(
+            [
+                "",
+                "## Kindtoeslag",
+                "",
+                f"Per kind ontvangt u **EUR {model.child_supplement:.2f}** extra per maand.",
+            ]
+        )
+
+    lines.extend(
+        [
+            "",
+            "---",
+            "",
+            "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
+def _generate_parametric_explanation(model, selected_laws: list[str]) -> str:
+    """Generate Dutch explanation for parametric model."""
+    law_names = [AVAILABLE_LAWS.get(l, {}).get("label", l) for l in selected_laws]
+    laws_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
+
+    lines = [
+        "# Geharmoniseerde Toeslag — Vereenvoudigde formule",
+        "",
+        f"Uw toeslag combineert **{laws_text}** en bestaat uit {len(model.template.components)} onderdeel(en):",
+        "",
+        "---",
+        "",
+    ]
+
+    for i, comp in enumerate(model.template.components, 1):
+        label = AVAILABLE_LAWS.get(comp.name, {}).get("label", comp.name)
+        lines.append(f"## {i}. {label}-component")
+        lines.append("")
+
+        if comp.has_partner_variant:
+            lines.append("**Alleenstaand:**")
+            lines.append(f"- Basisbedrag: EUR {comp.base_single:.2f}/maand")
+            lines.append(f"- Afbouw: {comp.rate_single:.1%} van inkomen boven EUR {comp.threshold_single:,.0f}")
+            lines.append("")
+            lines.append("**Met partner:**")
+            lines.append(f"- Basisbedrag: EUR {comp.base_partner:.2f}/maand")
+            lines.append(f"- Afbouw: {comp.rate_partner:.1%} van inkomen boven EUR {comp.threshold_partner:,.0f}")
+        else:
+            lines.append(f"- Basisbedrag: EUR {comp.base_single:.2f}/maand")
+            lines.append(f"- Afbouw: {comp.rate_single:.1%} van inkomen boven EUR {comp.threshold_single:,.0f}")
+
+        lines.append("")
+        lines.append("*Formule: max(EUR 0, basisbedrag - afbouw% x max(EUR 0, inkomen - drempelinkomen))*")
+        lines.append("")
+
+    lines.extend(
+        [
+            "---",
+            "",
+            "## Totaal",
+            "",
+            "Uw toeslag = som van alle componenten (minimaal EUR 0/maand)",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
+def run_train(params: dict) -> dict:
+    """Route to the appropriate training method."""
+    method = params.get("method", "tree")
+    selected_laws = params.get("selected_laws", DEFAULT_SELECTED_LAWS)
+
+    if method == "tree":
+        return run_train_tree(params, selected_laws)
+    elif method == "bracket":
+        return run_train_bracket(params, selected_laws)
+    elif method == "parametric":
+        return run_train_parametric(params, selected_laws)
+    else:
+        return {"status": "error", "message": f"Unknown method: {method}"}
+
+
 def run_validate(params: dict) -> dict:
     """Validate a synthesized law and return report as JSON."""
     num_people = params.get("num_people", 500)
@@ -286,7 +561,8 @@ def run_validate(params: dict) -> dict:
     simulator = LawSimulator(simulation_date)
     apply_custom_parameters(simulator, params)
     results_df = simulator.run_simulation(num_people=num_people)
-    synthesis_df = simulator.export_for_synthesis(results_df)
+    selected_laws = params.get("selected_laws", DEFAULT_SELECTED_LAWS)
+    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     # Train model
     constraints = InterpretabilityConstraints(

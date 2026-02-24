@@ -1933,12 +1933,19 @@ class LawSimulator:
 
         return breakdowns
 
-    def export_for_synthesis(self, results_df: pd.DataFrame) -> pd.DataFrame:
+    def export_for_synthesis(self, results_df: pd.DataFrame, selected_laws: list[str] | None = None) -> pd.DataFrame:
         """
         Export simulation results in format suitable for law synthesis.
 
         Returns a DataFrame with input features and target variables for
         training ML models to synthesize simplified laws.
+
+        Args:
+            results_df: DataFrame with simulation results.
+            selected_laws: Optional list of law names to include. For each law,
+                the columns {law}_eligible and {law}_amount are included if they
+                exist in results_df. When None or empty, defaults to the three
+                standard toeslagen (zorgtoeslag, huurtoeslag, kindgebonden_budget).
 
         Input features:
         - age, income, net_worth, rent_amount
@@ -1964,15 +1971,25 @@ class LawSimulator:
             "is_student",
         ]
 
-        # Target variables for the three toeslagen we want to harmonize
-        target_variables = [
-            "zorgtoeslag_eligible",
-            "zorgtoeslag_amount",
-            "huurtoeslag_eligible",
-            "huurtoeslag_amount",
-            "kindgebonden_budget_eligible",
-            "kindgebonden_budget_amount",
-        ]
+        # Target variables: dynamic based on selected laws, or default 3 toeslagen
+        if selected_laws:
+            target_variables = []
+            for law in selected_laws:
+                elig_col = f"{law}_eligible"
+                amt_col = f"{law}_amount"
+                if elig_col in results_df.columns:
+                    target_variables.append(elig_col)
+                if amt_col in results_df.columns:
+                    target_variables.append(amt_col)
+        else:
+            target_variables = [
+                "zorgtoeslag_eligible",
+                "zorgtoeslag_amount",
+                "huurtoeslag_eligible",
+                "huurtoeslag_amount",
+                "kindgebonden_budget_eligible",
+                "kindgebonden_budget_amount",
+            ]
 
         # Select columns that exist in the results
         available_columns = [col for col in input_features + target_variables if col in results_df.columns]

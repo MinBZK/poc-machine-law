@@ -5,10 +5,65 @@
         <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Harmonisatie</h2>
             <p class="text-sm text-gray-600 mb-6">
-                Combineer zorgtoeslag, huurtoeslag en kindgebonden budget tot een
-                vereenvoudigde, geharmoniseerde wet via machine learning.
+                Combineer meerdere toeslagen en uitkeringen tot een
+                vereenvoudigde, geharmoniseerde wet.
             </p>
             <form id="harmonisatie-form" @submit.prevent="train()" class="space-y-5">
+                <!-- Accordeon: Wetselectie -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button type="button"
+                            @click="showWetSelectie = !showWetSelectie"
+                            class="w-full px-4 py-3 flex justify-between items-center bg-gradient-to-r from-blue-50 to-sky-50 hover:from-blue-100 hover:to-sky-100 transition-colors cursor-pointer">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Wetselectie
+                            <span class="ml-2 text-xs font-normal text-gray-500"
+                                  x-text="'(' + selectedLaws.length + ' geselecteerd)'"></span>
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                             :class="showWetSelectie ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="showWetSelectie" x-cloak class="p-4 space-y-3">
+                        <p class="text-xs text-gray-500 mb-2">Selecteer welke wetten geharmoniseerd worden:</p>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Toeslagen</h4>
+                            <template x-for="law in availableLaws.filter(l => l.group === 'Toeslagen')"
+                                      :key="law.id">
+                                <label class="flex items-center space-x-2 py-1 cursor-pointer">
+                                    <input type="checkbox"
+                                           :value="law.id"
+                                           x-model="selectedLaws"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-gray-700" x-text="law.label"></span>
+                                </label>
+                            </template>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Sociale zekerheid</h4>
+                            <template x-for="law in availableLaws.filter(l => l.group === 'Sociale zekerheid')"
+                                      :key="law.id">
+                                <label class="flex items-center space-x-2 py-1 cursor-pointer">
+                                    <input type="checkbox"
+                                           :value="law.id"
+                                           x-model="selectedLaws"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-gray-700" x-text="law.label"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </div>
                 <!-- Accordeon 1: Populatiebeheer (collapsed by default) -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <button type="button"
@@ -41,6 +96,45 @@
                         {% include "partials/populatiebeheer.html" %}
                     </div>
                 </div>
+                <!-- Accordeon: Methode -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button type="button"
+                            @click="showMethode = !showMethode"
+                            class="w-full px-4 py-3 flex justify-between items-center bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-colors cursor-pointer">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-amber-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                                </path>
+                            </svg>
+                            Methode
+                            <span class="ml-2 text-xs font-normal text-gray-500"
+                                  x-text="methodLabels[config.method]"></span>
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                             :class="showMethode ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="showMethode" x-cloak class="p-4 space-y-3">
+                        <div class="flex gap-2">
+                            <template x-for="m in ['tree', 'bracket', 'parametric']" :key="m">
+                                <button type="button"
+                                        @click="config.method = m"
+                                        class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer"
+                                        :class="config.method === m ? 'bg-amber-100 border-amber-400 text-amber-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
+                                        x-text="methodLabels[m]"></button>
+                            </template>
+                        </div>
+                        <p class="text-xs text-gray-500"
+                           x-text="methodDescriptions[config.method]"></p>
+                    </div>
+                </div>
                 <!-- Accordeon 2: Harmonisatie Instellingen (open by default) -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <button type="button"
@@ -66,53 +160,84 @@
                         </svg>
                     </button>
                     <div x-show="showInstellingen" x-cloak class="p-4 space-y-4">
-                        <!-- Max Tree Depth -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Maximale diepte beslisboom</label>
-                            <span class="block text-xs text-gray-400 mb-1">Hoe dieper, hoe complexer de regels. Lager = eenvoudiger.</span>
-                            <input type="range"
-                                   x-model.number="config.max_depth"
-                                   min="1"
-                                   max="10"
-                                   step="1"
-                                   class="w-full">
-                            <div class="flex justify-between text-xs text-gray-500">
-                                <span>1</span>
-                                <span class="font-medium text-gray-900" x-text="config.max_depth"></span>
-                                <span>10</span>
+                        <!-- Tree-specific settings -->
+                        <template x-if="config.method === 'tree'">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Maximale diepte beslisboom</label>
+                                    <span class="block text-xs text-gray-400 mb-1">Hoe dieper, hoe complexer de regels. Lager = eenvoudiger.</span>
+                                    <input type="range"
+                                           x-model.number="config.max_depth"
+                                           min="1"
+                                           max="10"
+                                           step="1"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>1</span>
+                                        <span class="font-medium text-gray-900" x-text="config.max_depth"></span>
+                                        <span>10</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Minimum aantal personen per regel</label>
+                                    <span class="block text-xs text-gray-400 mb-1">Hoeveel personen er minstens onder een regel moeten vallen.</span>
+                                    <input type="range"
+                                           x-model.number="config.min_samples"
+                                           min="10"
+                                           max="200"
+                                           step="10"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>10</span>
+                                        <span class="font-medium text-gray-900" x-text="config.min_samples"></span>
+                                        <span>200</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Maximaal aantal regels</label>
+                                    <input type="range"
+                                           x-model.number="config.max_rules"
+                                           min="1"
+                                           max="20"
+                                           step="1"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>1</span>
+                                        <span class="font-medium text-gray-900" x-text="config.max_rules"></span>
+                                        <span>20</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Min Samples per Leaf -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Minimum aantal personen per regel</label>
-                            <span class="block text-xs text-gray-400 mb-1">Hoeveel personen er minstens onder een regel moeten vallen.</span>
-                            <input type="range"
-                                   x-model.number="config.min_samples"
-                                   min="10"
-                                   max="200"
-                                   step="10"
-                                   class="w-full">
-                            <div class="flex justify-between text-xs text-gray-500">
-                                <span>10</span>
-                                <span class="font-medium text-gray-900" x-text="config.min_samples"></span>
-                                <span>200</span>
+                        </template>
+                        <!-- Bracket-specific settings -->
+                        <template x-if="config.method === 'bracket'">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Aantal inkomensschijven</label>
+                                    <span class="block text-xs text-gray-400 mb-1">Meer schijven = fijnmaziger, maar complexer.</span>
+                                    <input type="range"
+                                           x-model.number="config.n_brackets"
+                                           min="3"
+                                           max="10"
+                                           step="1"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>3</span>
+                                        <span class="font-medium text-gray-900" x-text="config.n_brackets"></span>
+                                        <span>10</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Max Rules -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Maximaal aantal regels</label>
-                            <input type="range"
-                                   x-model.number="config.max_rules"
-                                   min="1"
-                                   max="20"
-                                   step="1"
-                                   class="w-full">
-                            <div class="flex justify-between text-xs text-gray-500">
-                                <span>1</span>
-                                <span class="font-medium text-gray-900" x-text="config.max_rules"></span>
-                                <span>20</span>
+                        </template>
+                        <!-- Parametric-specific settings -->
+                        <template x-if="config.method === 'parametric'">
+                            <div>
+                                <p class="text-sm text-gray-600">
+                                    De parametrische formule wordt automatisch afgeleid uit de geselecteerde wetten.
+                                    Geen aanvullende instellingen nodig.
+                                </p>
                             </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
                 <!-- Train Button -->
@@ -369,7 +494,7 @@
                         </button>
                         <div x-show="sections.laws" x-cloak class="px-4 pb-4">
                             <div class="grid grid-cols-3 gap-4">
-                                <template x-for="lawKey in ['zorgtoeslag', 'huurtoeslag', 'kindgebonden_budget']"
+                                <template x-for="lawKey in Object.keys(activeRun?.result?.law_analysis?.laws || {})"
                                           :key="lawKey">
                                     <div class="border border-gray-200 rounded-lg p-4">
                                         <div class="flex items-center gap-2 mb-3">
@@ -455,8 +580,9 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Accordeon: Regels (OPEN by default) -->
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <!-- Accordeon: Regels (OPEN by default, tree only) -->
+                    <div x-show="activeRun?.result?.method === 'tree' || !activeRun?.result?.method"
+                         class="bg-white rounded-lg shadow overflow-hidden">
                         <button type="button"
                                 @click="sections.rules = !sections.rules"
                                 class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
@@ -487,8 +613,9 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Accordeon: Berekening toeslagbedrag (collapsed) -->
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <!-- Accordeon: Berekening toeslagbedrag (collapsed, tree only) -->
+                    <div x-show="activeRun?.result?.method === 'tree' || !activeRun?.result?.method"
+                         class="bg-white rounded-lg shadow overflow-hidden">
                         <button type="button"
                                 @click="sections.formulas = !sections.formulas"
                                 class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
@@ -545,6 +672,101 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Bracket Table (staffelmodel only) -->
+                    <template x-if="activeRun?.result?.method === 'bracket'">
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Staffeltabel</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-50">
+                                            <th class="px-3 py-2 text-left">Inkomen van</th>
+                                            <th class="px-3 py-2 text-left">Inkomen tot</th>
+                                            <th class="px-3 py-2 text-right">Bedrag ondergrens</th>
+                                            <th class="px-3 py-2 text-right">Bedrag bovengrens</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="(row, idx) in (activeRun?.result?.bracket_table || [])"
+                                                  :key="idx">
+                                            <tr class="border-t border-gray-100">
+                                                <td class="px-3 py-2"
+                                                    x-text="'EUR ' + Number(row.income_lower).toLocaleString('nl-NL')">
+                                                </td>
+                                                <td class="px-3 py-2"
+                                                    x-text="'EUR ' + Number(row.income_upper).toLocaleString('nl-NL')">
+                                                </td>
+                                                <td class="px-3 py-2 text-right font-mono"
+                                                    x-text="'EUR ' + Number(row.amount_at_lower).toFixed(2)"></td>
+                                                <td class="px-3 py-2 text-right font-mono"
+                                                    x-text="'EUR ' + Number(row.amount_at_upper).toFixed(2)"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <template x-if="activeRun?.result?.child_supplement > 0">
+                                <p class="mt-3 text-sm text-gray-600">
+                                    Kindtoeslag: <span class="font-semibold"
+       x-text="'EUR ' + Number(activeRun.result.child_supplement).toFixed(2)"></span> per kind per maand
+                                </p>
+                            </template>
+                        </div>
+                    </template>
+                    <!-- Components (parametric only) -->
+                    <template x-if="activeRun?.result?.method === 'parametric'">
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Formulecomponenten</h3>
+                            <div class="grid gap-3">
+                                <template x-for="(comp, idx) in (activeRun?.result?.components || [])"
+                                          :key="idx">
+                                    <div class="border border-gray-200 rounded-lg p-3">
+                                        <h4 class="font-semibold text-gray-800 mb-2"
+                                            x-text="comp.label || comp.name"></h4>
+                                        <div class="grid grid-cols-2 gap-2 text-sm">
+                                            <div>
+                                                <span class="text-gray-500">Alleenstaand:</span>
+                                                <div class="font-mono text-xs mt-1">
+                                                    <div>
+                                                        Basis: <span class="text-blue-700"
+       x-text="'EUR ' + Number(comp.base_single).toFixed(2)"></span>/mnd
+                                                    </div>
+                                                    <div>
+                                                        Afbouw: <span class="text-red-700"
+       x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
+                                                    </div>
+                                                    <div>
+                                                        Drempel: <span class="text-green-700"
+       x-text="'EUR ' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <template x-if="comp.has_partner_variant">
+                                                <div>
+                                                    <span class="text-gray-500">Met partner:</span>
+                                                    <div class="font-mono text-xs mt-1">
+                                                        <div>
+                                                            Basis: <span class="text-blue-700"
+       x-text="'EUR ' + Number(comp.base_partner).toFixed(2)"></span>/mnd
+                                                        </div>
+                                                        <div>
+                                                            Afbouw: <span class="text-red-700"
+       x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
+                                                        </div>
+                                                        <div>
+                                                            Drempel: <span class="text-green-700"
+       x-text="'EUR ' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <p class="text-xs text-gray-400 mt-2 italic">max(0, basis - afbouw% x max(0, inkomen - drempel))</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
                     <!-- Accordeon: Uitleg in het Nederlands (collapsed) -->
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <button type="button"
@@ -1021,9 +1243,11 @@
         return {
             config: {
                 num_people: 1000,
+                method: 'tree',
                 max_depth: 5,
                 min_samples: 50,
                 max_rules: 10,
+                n_brackets: 5,
             },
             runs: {},
             runCounter: 0,
@@ -1032,6 +1256,24 @@
             validating: false,
             showPopulatie: false,
             showInstellingen: true,
+            showWetSelectie: true,
+            showMethode: true,
+            availableLaws: [
+                {id: 'zorgtoeslag', label: 'Zorgtoeslag', group: 'Toeslagen'},
+                {id: 'huurtoeslag', label: 'Huurtoeslag', group: 'Toeslagen'},
+                {id: 'kindgebonden_budget', label: 'Kindgebonden budget', group: 'Toeslagen'},
+                {id: 'kinderopvangtoeslag', label: 'Kinderopvangtoeslag', group: 'Toeslagen'},
+                {id: 'bijstand', label: 'Bijstand', group: 'Sociale zekerheid'},
+                {id: 'aow', label: 'AOW', group: 'Sociale zekerheid'},
+                {id: 'ww', label: 'WW-uitkering', group: 'Sociale zekerheid'},
+            ],
+            selectedLaws: ['zorgtoeslag', 'huurtoeslag', 'kindgebonden_budget'],
+            methodLabels: {tree: 'Beslisboom', bracket: 'Staffelmodel', parametric: 'Parametrisch'},
+            methodDescriptions: {
+                tree: 'Beslisboom + lineaire regressie. Goed interpreteerbaar, flexibele regels.',
+                bracket: 'Inkomensafhankelijke staffel met lineaire interpolatie. Geen cliff effects.',
+                parametric: 'Vereenvoudigde formule: max(0, basis - afbouw% x (inkomen - drempel)). Meest compact.',
+            },
             sections: {
                 metrics: false,
                 features: false,
@@ -1088,9 +1330,12 @@
                 return {
                     num_people: getVal('num_people'),
                     simulation_date: getStr('simulation_date'),
+                    method: this.config.method,
+                    selected_laws: this.selectedLaws,
                     max_depth: this.config.max_depth,
                     min_samples: this.config.min_samples,
                     max_rules: this.config.max_rules,
+                    n_brackets: this.config.n_brackets,
                     age_distribution: {
                         age_18_30: getVal('age_18_30'),
                         age_30_45: getVal('age_30_45'),
@@ -1114,14 +1359,19 @@
             runParamSummary(run) {
                 if (!run?.config) return '';
                 const c = run.config;
-                return c.num_people + ' pers, diepte ' + c.max_depth + ', min ' + c.min_samples + ', max ' + c.max_rules + ' regels';
+                const methodLabel = this.methodLabels[c.method] || c.method;
+                if (c.method === 'bracket') return methodLabel + ', ' + c.num_people + ' pers, ' + (c.n_brackets || 5) + ' schijven';
+                if (c.method === 'parametric') return methodLabel + ', ' + c.num_people + ' pers';
+                return methodLabel + ', ' + c.num_people + ' pers, diepte ' + c.max_depth;
             },
 
             paramLabels: {
                 num_people: 'Aantal simulatiepersonen',
+                method: 'Methode',
                 max_depth: 'Maximale diepte',
                 min_samples: 'Minimum personen per regel',
                 max_rules: 'Maximaal aantal regels',
+                n_brackets: 'Aantal schijven',
             },
 
             paramDiffs(baseConfig, otherConfig) {
@@ -1168,19 +1418,14 @@
             },
 
             lawLabel(key) {
-                const labels = {
-                    zorgtoeslag: 'Zorgtoeslag',
-                    huurtoeslag: 'Huurtoeslag',
-                    kindgebonden_budget: 'Kindgebonden budget',
-                };
-                return labels[key] || key || '-';
+                const law = this.availableLaws.find(l => l.id === key);
+                return law ? law.label : key || '-';
             },
 
             lawShortLabel(key) {
                 const labels = {
-                    zorgtoeslag: 'ZT',
-                    huurtoeslag: 'HT',
-                    kindgebonden_budget: 'KGB',
+                    zorgtoeslag: 'ZT', huurtoeslag: 'HT', kindgebonden_budget: 'KGB',
+                    kinderopvangtoeslag: 'KOT', bijstand: 'BIJ', aow: 'AOW', ww: 'WW',
                 };
                 return labels[key] || key;
             },
@@ -1190,6 +1435,10 @@
                     zorgtoeslag: 'bg-blue-100 text-blue-800',
                     huurtoeslag: 'bg-emerald-100 text-emerald-800',
                     kindgebonden_budget: 'bg-purple-100 text-purple-800',
+                    kinderopvangtoeslag: 'bg-pink-100 text-pink-800',
+                    bijstand: 'bg-amber-100 text-amber-800',
+                    aow: 'bg-cyan-100 text-cyan-800',
+                    ww: 'bg-orange-100 text-orange-800',
                 };
                 return classes[key] || 'bg-gray-100 text-gray-800';
             },
