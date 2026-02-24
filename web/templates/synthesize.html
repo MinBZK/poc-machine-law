@@ -677,35 +677,42 @@
                     <template x-if="activeRun?.result?.method === 'bracket'">
                         <div class="bg-white rounded-lg shadow p-4 mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 mb-3">Staffeltabel</h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-50">
-                                            <th class="px-3 py-2 text-left">Inkomen van</th>
-                                            <th class="px-3 py-2 text-left">Inkomen tot</th>
-                                            <th class="px-3 py-2 text-right">Bedrag ondergrens</th>
-                                            <th class="px-3 py-2 text-right">Bedrag bovengrens</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template x-for="(row, idx) in (activeRun?.result?.bracket_table || [])"
-                                                  :key="idx">
-                                            <tr class="border-t border-gray-100">
-                                                <td class="px-3 py-2"
-                                                    x-text="'EUR ' + Number(row.income_lower).toLocaleString('nl-NL')">
-                                                </td>
-                                                <td class="px-3 py-2"
-                                                    x-text="'EUR ' + Number(row.income_upper).toLocaleString('nl-NL')">
-                                                </td>
-                                                <td class="px-3 py-2 text-right font-mono"
-                                                    x-text="'EUR ' + Number(row.amount_at_lower).toFixed(2)"></td>
-                                                <td class="px-3 py-2 text-right font-mono"
-                                                    x-text="'EUR ' + Number(row.amount_at_upper).toFixed(2)"></td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <template x-for="(group, gi) in bracketGroups()" :key="gi">
+                                <div class="mb-4">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-1 px-1"
+                                        x-text="group.label"></h4>
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full text-sm">
+                                            <thead>
+                                                <tr class="bg-gray-50">
+                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen van</th>
+                                                    <th class="px-3 py-1.5 text-left text-xs">Inkomen tot</th>
+                                                    <th class="px-3 py-1.5 text-right text-xs">Bedrag ondergrens</th>
+                                                    <th class="px-3 py-1.5 text-right text-xs">Bedrag bovengrens</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template x-for="(row, idx) in group.rows" :key="idx">
+                                                    <tr class="border-t border-gray-100">
+                                                        <td class="px-3 py-1.5"
+                                                            x-text="'EUR ' + Number(row.income_lower).toLocaleString('nl-NL')">
+                                                        </td>
+                                                        <td class="px-3 py-1.5"
+                                                            x-text="'EUR ' + Number(row.income_upper).toLocaleString('nl-NL')">
+                                                        </td>
+                                                        <td class="px-3 py-1.5 text-right font-mono"
+                                                            x-text="'EUR ' + Number(row.amount_at_lower).toFixed(2)">
+                                                        </td>
+                                                        <td class="px-3 py-1.5 text-right font-mono"
+                                                            x-text="'EUR ' + Number(row.amount_at_upper).toFixed(2)">
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </template>
                             <template x-if="activeRun?.result?.child_supplement > 0">
                                 <p class="mt-3 text-sm text-gray-600">
                                     Kindtoeslag: <span class="font-semibold"
@@ -1442,6 +1449,32 @@
                     ww: 'bg-orange-100 text-orange-800',
                 };
                 return classes[key] || 'bg-gray-100 text-gray-800';
+            },
+
+            bracketGroups() {
+                const rows = this.activeRun?.result?.bracket_table || [];
+                const filterLabels = {has_partner: ['Zonder partner', 'Met partner'], has_children: ['Zonder kinderen', 'Met kinderen'], housing_type_rent: ['Koopwoning', 'Huurwoning']};
+                const groups = [];
+                const seen = new Set();
+                for (const row of rows) {
+                    const key = JSON.stringify(row.household_filter || {});
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const label = this.formatHouseholdFilter(row.household_filter, filterLabels);
+                    groups.push({label, rows: rows.filter(r => JSON.stringify(r.household_filter || {}) === key)});
+                }
+                return groups;
+            },
+
+            formatHouseholdFilter(filter, labels) {
+                if (!filter || Object.keys(filter).length === 0) return 'Alle huishoudens';
+                const parts = [];
+                for (const [key, val] of Object.entries(filter)) {
+                    const pair = labels[key];
+                    if (pair) { parts.push(val ? pair[1] : pair[0]); }
+                    else { parts.push(key + ': ' + val); }
+                }
+                return parts.join(', ');
             },
 
             featureLabel(key) {
