@@ -134,17 +134,17 @@ class SynthesisLearner:
         amount_r2 = float(1 - ss_res / ss_tot) if ss_tot > 0 else 1.0
         amount_mae = float(np.mean(np.abs(y_amt_test - y_amt_pred)))
 
-        # Eligibility derived from amount predictions
-        y_elig_pred = (y_amt_pred > 0).astype(int)
-        eligibility_accuracy = float(np.mean(y_elig_pred == y_elig_test))
-
-        # Also train a classifier for rule extraction and CV metrics
+        # Train a classifier for eligibility rule extraction, CV metrics,
+        # and the reported eligibility accuracy (classifier is optimized for
+        # classification, whereas deriving eligibility from the regressor
+        # via amount>0 is unstable with small samples).
         elig_tree = DecisionTreeClassifier(
             max_depth=self.constraints.max_tree_depth,
             min_samples_leaf=self.constraints.min_samples_leaf,
             random_state=42,
         )
         elig_tree.fit(X_train, y_elig_train)
+        eligibility_accuracy = float(np.mean(elig_tree.predict(X_test) == y_elig_test))
 
         # Extract rules from the eligibility tree
         eligibility_rules = self._extract_rules(elig_tree, list(X.columns))
@@ -164,12 +164,21 @@ class SynthesisLearner:
         )
 
     def predict(self, model: LearnedModel, X: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
-        """Predict eligibility and amounts using the amount regressor tree."""
+        """Predict eligibility and amounts.
+
+        Uses the eligibility classifier for eligibility (more stable) and
+        the amount regressor for amounts.
+        """
+        amounts = np.zeros(len(X))
         if model._amount_tree is not None:
             amounts = np.maximum(0, model._amount_tree.predict(X))
+
+        if model._eligibility_tree is not None:
+            eligibility = model._eligibility_tree.predict(X).astype(int)
+        else:
             eligibility = (amounts > 0).astype(int)
-            return eligibility, amounts
-        return np.zeros(len(X), dtype=int), np.zeros(len(X))
+
+        return eligibility, amounts
 
     def _extract_rules(self, tree: DecisionTreeClassifier, feature_names: list[str]) -> list[ExtractedRule]:
         """Extract human-readable rules from the eligibility decision tree."""
