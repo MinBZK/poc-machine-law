@@ -19,6 +19,9 @@ class FeatureSpec:
     laws: list[str]  # Which laws need this feature
     is_grouping: bool = False  # Can be used to segment (bracket model)
     is_continuous: bool = False  # Continuous numeric feature
+    discretize_laws: list[str] | None = (
+        None  # Laws where this feature has a hard threshold (eligible for auto-discretization)
+    )
     available: bool = True  # Available in current simulation
 
 
@@ -37,6 +40,7 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         yaml_inputs=["LEEFTIJD"],
         laws=["zorgtoeslag", "huurtoeslag", "bijstand", "aow", "ww"],
         is_continuous=True,
+        discretize_laws=["aow", "bijstand", "ww"],  # Only these have hard age thresholds
     ),
     FeatureSpec(
         sim_column="has_partner",
@@ -86,6 +90,7 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         yaml_inputs=["VERMOGEN", "BEZITTINGEN"],
         laws=["zorgtoeslag", "huurtoeslag", "kindgebonden_budget", "bijstand"],
         is_continuous=True,
+        discretize_laws=["zorgtoeslag", "huurtoeslag", "kindgebonden_budget", "bijstand"],  # All have asset thresholds
     ),
     FeatureSpec(
         sim_column="is_student",
@@ -193,9 +198,21 @@ def get_grouping_features_for_laws(selected_laws: list[str]) -> list[str]:
 
 
 def get_continuous_features_for_laws(selected_laws: list[str]) -> list[str]:
-    """Get continuous feature column names for the selected laws (excl. income)."""
+    """Get continuous feature column names eligible for auto-discretization.
+
+    Only returns features that have explicit discretize_laws matching
+    the selected laws. This prevents spurious splits (e.g. age split
+    at 55 when only zorgtoeslag/huurtoeslag are selected).
+    """
     features = get_features_for_laws(selected_laws)
-    return [f.sim_column for f in features if f.is_continuous and f.sim_column != "income"]
+    return [
+        f.sim_column
+        for f in features
+        if f.is_continuous
+        and f.sim_column != "income"
+        and f.discretize_laws
+        and any(law in f.discretize_laws for law in selected_laws)
+    ]
 
 
 def get_all_feature_columns_for_laws(selected_laws: list[str]) -> list[str]:

@@ -58,10 +58,10 @@
                      @click="switchTab('simulatie')">
                     <span class="tab-label">Simulatie</span>
                 </div>
-                {% if feature_flags.get('SYNTHESIZE', False) %}
+                {% if feature_flags.get('HARMONIZE', False) %}
                     <div class="tab"
-                         :class="{ 'active': activeTab === 'synthesize' }"
-                         @click="switchTab('synthesize')">
+                         :class="{ 'active': activeTab === 'harmonize' }"
+                         @click="switchTab('harmonize')">
                         <span class="tab-label">Harmonisatie</span>
                     </div>
                 {% endif %}
@@ -246,12 +246,12 @@
                             class="tab-iframe"
                             title="Simulatie"></iframe>
                 </div>
-                {% if feature_flags.get('SYNTHESIZE', False) %}
+                {% if feature_flags.get('HARMONIZE', False) %}
                     <!-- Harmonisatie Tab (IFrame) -->
                     <div class="tab-content iframe-content"
-                         x-show="activeTab === 'synthesize'"
+                         x-show="activeTab === 'harmonize'"
                          x-cloak>
-                        <iframe src="/synthesize/?demo=true"
+                        <iframe src="/harmonize/?demo=true"
                                 frameborder="0"
                                 class="tab-iframe"
                                 title="Harmonisatie"></iframe>
@@ -564,7 +564,7 @@
 
                     // Check URL hash first
                     const hash = window.location.hash.substring(1);
-                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('SYNTHESIZE', False) %}, 'synthesize'{% endif %}];
+                    const validTabs = ['presentatie', 'laws', 'features', 'graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
 
                     if (hash && validTabs.includes(hash)) {
                         this.activeTab = hash;
@@ -633,7 +633,7 @@
                             if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
                                 e.preventDefault(); // Prevent full page refresh
 
-                                const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('SYNTHESIZE', False) %}, 'synthesize'{% endif %}];
+                                const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
 
                                 if (iframeTabs.includes(self.activeTab)) {
                                     // Find and reload the active iframe
@@ -655,7 +655,7 @@
                     // Listen for postMessage from iframes when Ctrl-R is pressed inside them
                     window.addEventListener('message', (e) => {
                         if (e.origin === window.location.origin && e.data.type === 'refresh-iframe') {
-                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('SYNTHESIZE', False) %}, 'synthesize'{% endif %}];
+                            const iframeTabs = ['graph', 'burger', 'zaaksysteem', 'simulatie'{% if feature_flags.get('HARMONIZE', False) %}, 'harmonize'{% endif %}];
 
                             if (iframeTabs.includes(this.activeTab)) {
                                 const iframe = document.querySelector(`.iframe-content[x-show="activeTab === '${this.activeTab}'"] iframe`);

@@ -11,14 +11,14 @@ from web.dependencies import is_demo_mode, templates
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/synthesize", tags=["synthesize"])
+router = APIRouter(prefix="/harmonize", tags=["harmonize"])
 
 # Timeout in seconds: ~25 persons/sec means 5000 persons takes ~200s, plus training overhead
 SUBPROCESS_TIMEOUT = 300
 
 
 @router.get("/")
-async def synthesize_page(request: Request):
+async def harmonize_page(request: Request):
     """Render the harmonisatie configuration page."""
     default_params = {
         "num_people": 1000,
@@ -33,7 +33,7 @@ async def synthesize_page(request: Request):
         "student_percentage_young": 40,
     }
     return templates.TemplateResponse(
-        "synthesize.html",
+        "harmonize.html",
         {
             "request": request,
             "demo_mode": is_demo_mode(request),

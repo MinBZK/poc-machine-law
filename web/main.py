@@ -34,11 +34,11 @@ from web.routers import (
     delegation,
     demo,
     edit,
+    harmonize,
     importer,
     laws,
     mcp,
     simulation,
-    synthesize,
     wallet,
 )
 
@@ -69,7 +69,7 @@ app.include_router(importer.router)
 app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
-app.include_router(synthesize.router)
+app.include_router(harmonize.router)
 app.include_router(delegation.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="laws"))

@@ -1685,7 +1685,7 @@
 
             async _fetchTrainResult(runId, formData) {
                 try {
-                    const response = await fetch('/synthesize/train', {
+                    const response = await fetch('/harmonize/train', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(formData),
@@ -1718,7 +1718,7 @@
                 const formData = this.collectFormData();
 
                 try {
-                    const response = await fetch('/synthesize/validate', {
+                    const response = await fetch('/harmonize/validate', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(formData),
