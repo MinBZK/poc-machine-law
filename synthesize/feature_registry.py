@@ -115,6 +115,62 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         laws=["bijstand", "ww"],
         is_grouping=True,
     ),
+    FeatureSpec(
+        sim_column="is_health_insured",
+        display_name="Zorgverzekerd",
+        yaml_inputs=["IS_VERZEKERDE"],
+        laws=["zorgtoeslag"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="receives_child_benefit",
+        display_name="Ontvangt kinderbijslag",
+        yaml_inputs=["ONTVANGT_KINDERBIJSLAG"],
+        laws=["kindgebonden_budget"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="receives_study_financing",
+        display_name="Ontvangt studiefinanciering",
+        yaml_inputs=["ONTVANGT_STUDIEFINANCIERING"],
+        laws=["bijstand"],
+        is_grouping=True,
+    ),
+    FeatureSpec(
+        sim_column="business_income",
+        display_name="Bedrijfsinkomen",
+        yaml_inputs=["BEDRIJFSINKOMEN"],
+        laws=["bijstand"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="work_hours_per_week",
+        display_name="Werkuren per week",
+        yaml_inputs=["GEWERKTE_UREN", "GEMIDDELD_ARBEIDSUREN_PER_WEEK"],
+        laws=["ww", "kinderopvangtoeslag"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="childcare_hours_per_child",
+        display_name="Opvanguren per kind",
+        yaml_inputs=["AANGEGEVEN_UREN"],
+        laws=["kinderopvangtoeslag"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="childcare_hourly_rate",
+        display_name="Uurtarief opvang",
+        yaml_inputs=["UURTARIEF"],
+        laws=["kinderopvangtoeslag"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="childcare_type",
+        display_name="Soort opvang",
+        yaml_inputs=["SOORT_OPVANG"],
+        laws=["kinderopvangtoeslag"],
+        is_grouping=True,
+    ),
 ]
 
 
@@ -137,32 +193,16 @@ def get_all_feature_columns_for_laws(selected_laws: list[str]) -> list[str]:
 
 def get_missing_features_for_law(law: str) -> list[str]:
     """Get display names of features that a law needs but aren't available in simulation."""
-    # These YAML inputs have no simulation equivalent
+    # These YAML inputs have no simulation equivalent yet
     unavailable_inputs = {
-        "IS_VERZEKERDE": "Zorgverzekeringsstatus",
-        "STANDAARDPREMIE": "Standaardpremie",
-        "ONTVANGT_KINDERBIJSLAG": "Ontvangt kinderbijslag",
-        "GEWERKTE_UREN": "Gewerkte uren per week",
+        "STANDAARDPREMIE": "Standaardpremie (vast bedrag)",
         "PARTNER_GEWERKTE_UREN": "Gewerkte uren partner",
-        "AANGEGEVEN_UREN": "Opvanguren per kind",
-        "UURTARIEF": "Uurtarief opvang",
-        "SOORT_OPVANG": "Soort opvang",
-        "ONTVANGT_STUDIEFINANCIERING": "Ontvangt studiefinanciering",
-        "BEDRIJFSINKOMEN": "Bedrijfsinkomen",
     }
 
     # Map law to its missing YAML inputs
     law_missing: dict[str, list[str]] = {
-        "kinderopvangtoeslag": [
-            "GEWERKTE_UREN",
-            "PARTNER_GEWERKTE_UREN",
-            "AANGEGEVEN_UREN",
-            "UURTARIEF",
-            "SOORT_OPVANG",
-        ],
-        "zorgtoeslag": ["IS_VERZEKERDE", "STANDAARDPREMIE"],
-        "kindgebonden_budget": ["ONTVANGT_KINDERBIJSLAG"],
-        "bijstand": ["BEDRIJFSINKOMEN", "ONTVANGT_STUDIEFINANCIERING"],
+        "zorgtoeslag": ["STANDAARDPREMIE"],
+        "kinderopvangtoeslag": ["PARTNER_GEWERKTE_UREN"],
     }
 
     missing_inputs = law_missing.get(law, [])
