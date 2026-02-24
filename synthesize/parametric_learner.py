@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
+from synthesize.data_utils import prepare_synthesis_data
+
 
 @dataclass
 class FormulaComponent:
@@ -159,43 +161,7 @@ class ParametricLearner:
 
     def prepare_data(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
         """Prepare data, same interface as SynthesisLearner."""
-        X = df.copy()
-
-        if "housing_type" in X.columns:
-            X["housing_type_rent"] = (X["housing_type"] == "rent").astype(int)
-            X = X.drop(columns=["housing_type"])
-
-        for col in ["has_partner", "has_children", "is_student"]:
-            if col in X.columns:
-                X[col] = X[col].astype(int)
-
-        if "youngest_child_age" in X.columns:
-            X["youngest_child_age"] = X["youngest_child_age"].fillna(-1)
-        if "rent_amount" in X.columns:
-            X["rent_amount"] = X["rent_amount"].fillna(0)
-        if "children_count" in X.columns:
-            X["children_count"] = X["children_count"].fillna(0)
-
-        elig_cols = [c for c in df.columns if c.endswith("_eligible")]
-        amount_cols = [
-            c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols
-        ]
-
-        if elig_cols:
-            y_eligible = df[elig_cols].any(axis=1).astype(int)
-        else:
-            raise ValueError("No eligibility columns found")
-
-        if amount_cols:
-            y_amount = df[amount_cols].sum(axis=1)
-        else:
-            raise ValueError("No amount columns found")
-
-        target_cols = elig_cols + amount_cols
-        feature_cols = [c for c in X.columns if c not in target_cols]
-        X = X[feature_cols]
-
-        return X, y_eligible, y_amount
+        return prepare_synthesis_data(df)
 
     def build_template(self, df: pd.DataFrame, selected_laws: list[str]) -> FormulaTemplate:
         """Build formula template with initial parameter estimates from data."""

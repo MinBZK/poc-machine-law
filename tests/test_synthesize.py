@@ -297,8 +297,8 @@ class TestValidator:
         markdown = validator.generate_report_markdown(report)
 
         assert "# Validatierapport" in markdown
-        assert "Eligibility Classificatie" in markdown
-        assert "Bedrag Regressie" in markdown
+        assert "Recht op toeslag (classificatie)" in markdown
+        assert "Berekening toeslagbedrag (regressie)" in markdown
 
 
 class TestIntegration:

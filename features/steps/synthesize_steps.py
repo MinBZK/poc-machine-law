@@ -6,6 +6,7 @@ import yaml
 from behave import given, then, when
 
 from simulate import LawSimulator
+from synthesize.constants import FEATURE_LABELS_NL
 from synthesize.learner import SynthesisLearner
 from synthesize.validator import SynthesisValidator
 from synthesize.yaml_generator import YAMLGenerator
@@ -140,19 +141,7 @@ def step_check_report(context):
 @when("de Nederlandse uitleg wordt gegenereerd")
 def step_genereer_uitleg(context):
     """Generate Dutch explanation."""
-    # Feature name translations
-    feature_nl = {
-        "age": "uw leeftijd",
-        "income": "uw toetsingsinkomen",
-        "net_worth": "uw vermogen",
-        "rent_amount": "uw maandelijkse huur",
-        "has_partner": "u een toeslagpartner heeft",
-        "has_children": "u kinderen heeft",
-        "children_count": "het aantal kinderen",
-        "youngest_child_age": "de leeftijd van uw jongste kind",
-        "housing_type_rent": "u een huurwoning heeft",
-        "is_student": "u student bent",
-    }
+    feature_nl = FEATURE_LABELS_NL
 
     lines = [
         "# Geharmoniseerde Toeslag",

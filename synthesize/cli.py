@@ -3,13 +3,15 @@ Command-line interface for Law Synthesis.
 
 Usage:
     uv run python -m synthesize train --num-people 1000 --output output.yaml
-    uv run python -m synthesize validate --yaml output.yaml --num-people 500
+    uv run python -m synthesize validate --num-people 500
 """
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
+from synthesize.constants import FEATURE_LABELS_NL
 from synthesize.learner import InterpretabilityConstraints, SynthesisLearner
 from synthesize.validator import SynthesisValidator
 from synthesize.yaml_generator import YAMLGenerationConfig, YAMLGenerator
@@ -156,31 +158,20 @@ def explain_command(args: argparse.Namespace) -> int:
         "",
     ]
 
-    # Feature name translations
-    feature_nl = {
-        "age": "uw leeftijd",
-        "income": "uw toetsingsinkomen",
-        "net_worth": "uw vermogen",
-        "rent_amount": "uw maandelijkse huur",
-        "has_partner": "u een toeslagpartner heeft",
-        "has_children": "u kinderen heeft",
-        "children_count": "het aantal kinderen",
-        "youngest_child_age": "de leeftijd van uw jongste kind",
-        "housing_type_rent": "u een huurwoning heeft",
-        "is_student": "u student bent",
-    }
+    feature_nl = FEATURE_LABELS_NL
 
     for i, rule in enumerate(model.eligibility_rules, 1):
         lines.append(f"### Situatie {i}")
         lines.append("")
         for condition in rule.conditions:
-            # Parse and translate condition
-            parts = (
-                condition.replace("<=", " <= ").replace(">=", " >= ").replace(">", " > ").replace("<", " < ").split()
-            )
-            feature = parts[0]
-            operator = parts[1]
-            value = parts[2]
+            # Parse condition using regex to avoid issues with chained replace on >= vs >
+            match = re.match(r"(\w+)\s*(<=|>=|>|<|==|!=)\s*(.+)", condition.strip())
+            if not match:
+                lines.append(f"- {condition}")
+                continue
+            feature = match.group(1)
+            operator = match.group(2)
+            value = match.group(3).strip()
 
             feature_text = feature_nl.get(feature, feature)
 
@@ -267,7 +258,9 @@ def main() -> int:
 
     # Validate command
     validate_parser = subparsers.add_parser("validate", help="Validate a synthesized law")
-    validate_parser.add_argument("--yaml", type=str, required=True, help="YAML file to validate")
+    validate_parser.add_argument(
+        "--yaml", type=str, help="YAML file to validate (not yet implemented; model is retrained for validation)"
+    )
     validate_parser.add_argument("--num-people", type=int, default=500, help="Number of people to simulate")
     validate_parser.add_argument("--accuracy-target", type=float, default=0.95, help="Target accuracy")
     validate_parser.add_argument("--amount-tolerance", type=float, default=50.0, help="Amount tolerance in EUR")

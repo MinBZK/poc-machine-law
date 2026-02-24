@@ -398,9 +398,15 @@ class YAMLGenerator:
                 return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
             return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
-        yaml.add_representer(str, str_representer)
+        # Use a local Dumper subclass to avoid mutating global yaml state
+        class CustomDumper(yaml.SafeDumper):
+            pass
 
-        return yaml.dump(spec, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
+        CustomDumper.add_representer(str, str_representer)
+
+        return yaml.dump(
+            spec, Dumper=CustomDumper, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120
+        )
 
     def save_yaml(self, spec: dict[str, Any], filepath: str) -> None:
         """Save spec to YAML file."""

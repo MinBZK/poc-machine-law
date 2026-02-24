@@ -92,10 +92,40 @@ def _run_synthesize_subprocess(body: dict) -> JSONResponse:
         )
 
 
+VALID_METHODS = {"tree", "bracket", "parametric"}
+MAX_NUM_PEOPLE = 10000
+
+
+def _validate_body(body: dict) -> str | None:
+    """Validate request body, return error message or None if valid."""
+    num_people = body.get("num_people")
+    if num_people is not None:
+        try:
+            num_people = int(num_people)
+        except (TypeError, ValueError):
+            return f"num_people moet een geheel getal zijn, kreeg: {num_people}"
+        if num_people < 10 or num_people > MAX_NUM_PEOPLE:
+            return f"num_people moet tussen 10 en {MAX_NUM_PEOPLE} liggen, kreeg: {num_people}"
+        body["num_people"] = num_people
+
+    method = body.get("method")
+    if method is not None and method not in VALID_METHODS:
+        return f"Onbekende methode: {method}. Kies uit: {', '.join(VALID_METHODS)}"
+
+    selected_laws = body.get("selected_laws")
+    if selected_laws is not None and (not isinstance(selected_laws, list) or len(selected_laws) == 0):
+        return "Selecteer minimaal één wet"
+
+    return None
+
+
 @router.post("/train")
 async def train_model(request: Request):
     """Train a synthesized law model via subprocess."""
     body = await request.json()
+    error = _validate_body(body)
+    if error:
+        return JSONResponse(status_code=400, content={"status": "error", "message": error})
     body["operation"] = "train"
     return await asyncio.to_thread(_run_synthesize_subprocess, body)
 
@@ -104,5 +134,8 @@ async def train_model(request: Request):
 async def validate_model(request: Request):
     """Validate a synthesized law model via subprocess."""
     body = await request.json()
+    error = _validate_body(body)
+    if error:
+        return JSONResponse(status_code=400, content={"status": "error", "message": error})
     body["operation"] = "validate"
     return await asyncio.to_thread(_run_synthesize_subprocess, body)

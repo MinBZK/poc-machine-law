@@ -13,6 +13,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
+from synthesize.data_utils import prepare_synthesis_data
+
 
 @dataclass
 class InterpretabilityConstraints:
@@ -93,48 +95,7 @@ class SynthesisLearner:
             y_eligible: Combined eligibility target (OR of all selected laws)
             y_amount: Combined amount target (SUM of all selected laws)
         """
-        X = df.copy()
-
-        # Encode categorical variables
-        if "housing_type" in X.columns:
-            X["housing_type_rent"] = (X["housing_type"] == "rent").astype(int)
-            X = X.drop(columns=["housing_type"])
-
-        # Convert booleans to int
-        for col in ["has_partner", "has_children", "is_student"]:
-            if col in X.columns:
-                X[col] = X[col].astype(int)
-
-        # Handle missing values
-        if "youngest_child_age" in X.columns:
-            X["youngest_child_age"] = X["youngest_child_age"].fillna(-1)
-        if "rent_amount" in X.columns:
-            X["rent_amount"] = X["rent_amount"].fillna(0)
-        if "children_count" in X.columns:
-            X["children_count"] = X["children_count"].fillna(0)
-
-        # Create combined eligibility target (eligible for ANY selected law)
-        elig_cols = [c for c in df.columns if c.endswith("_eligible")]
-        if elig_cols:
-            y_eligible = df[elig_cols].any(axis=1).astype(int)
-        else:
-            raise ValueError("No eligibility columns found in data")
-
-        # Create combined amount target (SUM of all selected laws)
-        amount_cols = [
-            c for c in df.columns if c.endswith("_amount") and c.replace("_amount", "_eligible") in elig_cols
-        ]
-        if amount_cols:
-            y_amount = df[amount_cols].sum(axis=1)
-        else:
-            raise ValueError("No amount columns found in data")
-
-        # Select only feature columns (drop target columns)
-        target_cols = elig_cols + amount_cols
-        feature_cols = [c for c in X.columns if c not in target_cols]
-        X = X[feature_cols]
-
-        return X, y_eligible, y_amount
+        return prepare_synthesis_data(df)
 
     def train(self, df: pd.DataFrame, test_size: float = 0.2) -> LearnedModel:
         """

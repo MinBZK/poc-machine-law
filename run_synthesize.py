@@ -11,6 +11,7 @@ from run_simulation import apply_custom_parameters
 from simulate import LawSimulator
 from synthesize.bracket_learner import BracketLearner, BracketLearnerConfig
 from synthesize.bracket_yaml_generator import BracketYAMLConfig, BracketYAMLGenerator
+from synthesize.constants import FEATURE_LABELS_NL
 from synthesize.feature_registry import get_feature_warnings, get_grouping_features_for_laws
 from synthesize.learner import InterpretabilityConstraints, LearnedModel, SynthesisLearner
 from synthesize.parametric_learner import ParametricConstraints, ParametricLearner
@@ -648,18 +649,7 @@ def _format_condition_nl(condition: str, feature_nl: dict[str, str]) -> str:
 
 def generate_explanation(model, selected_laws: list[str] | None = None) -> str:
     """Generate Dutch explanation from model."""
-    feature_nl = {
-        "age": "uw leeftijd",
-        "income": "uw toetsingsinkomen",
-        "net_worth": "uw vermogen",
-        "rent_amount": "uw maandelijkse huur",
-        "has_partner": "u een toeslagpartner heeft",
-        "has_children": "u kinderen heeft",
-        "children_count": "het aantal kinderen",
-        "youngest_child_age": "de leeftijd van uw jongste kind",
-        "housing_type_rent": "u een huurwoning heeft",
-        "is_student": "u student bent",
-    }
+    feature_nl = FEATURE_LABELS_NL
 
     num_rules = len(model.eligibility_rules)
     num_formulas = len(model.amount_formulas)

@@ -10,27 +10,10 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
-import numpy as np
 import yaml
 
 from synthesize.bracket_learner import BracketModel
-
-
-def _to_native(obj: Any) -> Any:
-    """Recursively convert numpy types to native Python types for YAML serialization."""
-    if isinstance(obj, dict):
-        return {k: _to_native(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_to_native(v) for v in obj]
-    if isinstance(obj, (np.integer,)):
-        return int(obj)
-    if isinstance(obj, (np.floating,)):
-        return float(obj)
-    if isinstance(obj, (np.bool_,)):
-        return bool(obj)
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    return obj
+from synthesize.constants import to_native
 
 
 @dataclass
@@ -160,7 +143,7 @@ class BracketYAMLGenerator:
                         }
                     )
 
-            test = {"all": test_parts} if len(test_parts) > 1 else test_parts[0]
+            test = {"operation": "AND", "values": test_parts} if len(test_parts) > 1 else test_parts[0]
 
             # Linear interpolation: amt_lower + slope * (income - income_lower)
             slope = seg.slope
@@ -218,4 +201,4 @@ class BracketYAMLGenerator:
 
     def to_yaml_string(self, spec: dict[str, Any]) -> str:
         """Convert spec to YAML string."""
-        return yaml.dump(_to_native(spec), default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
+        return yaml.dump(to_native(spec), default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
