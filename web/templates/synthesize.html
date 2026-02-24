@@ -701,8 +701,8 @@
                                                             x-text="'€' + Number(band.income_to).toLocaleString('nl-NL')">
                                                         </td>
                                                         <td class="px-3 py-1.5 text-right font-mono font-semibold"
-                                                            :class="band.amount_from > 0 || band.amount_to > 0 ? 'text-green-700' : 'text-gray-400'"
-                                                            x-text="band.amount_from === band.amount_to ? '€' + Number(band.amount_from).toFixed(0) + '/mnd' : '€' + Number(band.amount_from).toFixed(0) + ' → €' + Number(band.amount_to).toFixed(0) + '/mnd'">
+                                                            :class="band.amount_from > 0 ? 'text-green-700' : 'text-gray-400'"
+                                                            x-text="'€' + Number(band.amount_from).toFixed(0) + '/mnd'">
                                                         </td>
                                                     </tr>
                                                 </template>
