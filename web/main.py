@@ -72,7 +72,6 @@ app.include_router(wallet.router)
 app.include_router(simulation.router)
 app.include_router(harmonize.router)
 app.include_router(delegation.router)
-app.include_router(regeldruk.router)
 
 app.mount("/analysis/laws/law", StaticFiles(directory="laws"))
 # app.mount(

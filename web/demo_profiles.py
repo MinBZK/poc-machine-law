@@ -24,8 +24,6 @@ DEMO_PROFILES: dict[str, dict] = {
             },
         ],
         "zaaksysteem_service": "TOESLAGEN",
-        "scenario_features": {},
-        "scenario_metrics_laws": [],
     },
     "claudia": {
         "name": "Claudia",
@@ -65,30 +63,6 @@ DEMO_PROFILES: dict[str, dict] = {
             },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
-        "scenario_features": {
-            "alcoholwet": {
-                "path": "features/overig/alcoholwet_GEMEENTE_ROTTERDAM-2024-01-01.feature",
-                "name": "Alcoholwetvergunning",
-                "description": "Bepalen recht op Alcoholwetvergunning horeca Rotterdam",
-            },
-            "exploitatievergunning": {
-                "path": "features/overig/apv_exploitatievergunning_GEMEENTE_ROTTERDAM-2024-01-01.feature",
-                "name": "Exploitatievergunning",
-                "description": "Exploitatievergunning voor openbare inrichtingen APV Rotterdam",
-            },
-            "terrassen": {
-                "path": "features/overig/apv_terrassen_GEMEENTE_ROTTERDAM-2024-01-01.feature",
-                "name": "Terrasvergunning",
-                "description": "Terrasvergunning voor horecabedrijven APV Rotterdam",
-            },
-        },
-        "scenario_metrics_laws": [
-            ("GEMEENTE_ROTTERDAM", "alcoholwet/vergunning"),
-            ("GEMEENTE_ROTTERDAM", "algemene_plaatselijke_verordening/exploitatievergunning"),
-            ("GEMEENTE_ROTTERDAM", "algemene_plaatselijke_verordening/terrassen"),
-            ("RVO", "omgevingswet/energiebesparing/informatieplicht"),
-            ("NVWA", "warenwet/haccp"),
-        ],
     },
 }
 
