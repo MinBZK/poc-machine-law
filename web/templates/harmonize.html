@@ -1782,7 +1782,7 @@
                         this.runs[runId].result = data;
                         if (!this.baselineRunId) this.baselineRunId = runId;
                         // Auto-start prose generation in the background
-                        if (data.yaml) this._fetchProse(runId, data.yaml);
+                        if (data.yaml) this._fetchProse(runId, data.yaml, data.explanation || '');
                     }
                 } catch (e) {
                     if (!this.runs[runId]) return;
@@ -1838,10 +1838,10 @@
             async generateProse() {
                 const run = this.activeRun;
                 if (!run?.result?.yaml || run.proseLoading) return;
-                this._fetchProse(this.activeTab, run.result.yaml);
+                this._fetchProse(this.activeTab, run.result.yaml, run.result.explanation || '');
             },
 
-            async _fetchProse(runId, yaml) {
+            async _fetchProse(runId, yaml, explanation) {
                 if (!this.runs[runId]) return;
                 this.runs[runId].proseLoading = true;
                 this.runs[runId].proseError = null;
@@ -1852,7 +1852,7 @@
                     const resp = await fetch('/harmonize/generate-prose', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ yaml }),
+                        body: JSON.stringify({ yaml, explanation }),
                     });
                     const data = await resp.json();
                     if (!this.runs[runId]) return;

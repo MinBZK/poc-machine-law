@@ -170,14 +170,15 @@ YAML-specificatie:
 ```yaml
 {yaml_text}
 ```
-
-Schrijf de volledige wettekst."""
+{extra_context}
+Schrijf de volledige wettekst. Let op: neem ALLE berekeningen, operaties (ADD, MULTIPLY, IF) \
+en bedragen uit de YAML nauwkeurig over. Mis geen enkele regel of toeslag."""
 
 
 MAX_YAML_SIZE = 50_000  # ~50KB limit for YAML sent to LLM
 
 
-def _make_llm_call(provider: str, api_key: str, yaml_text: str) -> str:
+def _make_llm_call(provider: str, api_key: str, yaml_text: str, extra_context: str = "") -> str:
     """Create a request-scoped LLM client and generate prose law text.
 
     This avoids mutating the shared singleton service, making it safe
@@ -186,7 +187,10 @@ def _make_llm_call(provider: str, api_key: str, yaml_text: str) -> str:
     Raises:
         RuntimeError: If the LLM call fails or returns no response.
     """
-    messages = [{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text)}]
+    ctx = ""
+    if extra_context:
+        ctx = f"\nSamenvatting van het model (ter referentie):\n{extra_context}\n"
+    messages = [{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text, extra_context=ctx)}]
 
     if provider == LLMFactory.PROVIDER_CLAUDE:
         import anthropic
@@ -225,6 +229,7 @@ async def generate_prose(request: Request):
     """Generate a prose law text from a YAML specification using an LLM."""
     body = await request.json()
     yaml_text = body.get("yaml", "")
+    explanation = body.get("explanation", "")
 
     if not yaml_text:
         return JSONResponse(status_code=400, content={"status": "error", "message": "Geen YAML opgegeven"})
@@ -254,7 +259,7 @@ async def generate_prose(request: Request):
     api_key = service.get_api_key(request)
 
     try:
-        prose = await asyncio.to_thread(_make_llm_call, provider, api_key, yaml_text)
+        prose = await asyncio.to_thread(_make_llm_call, provider, api_key, yaml_text, explanation)
         return JSONResponse({"status": "success", "prose": prose, "provider": provider})
     except Exception as e:
         logger.error("Failed to generate prose: %s", str(e))
