@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v1.9.1 (2026-02-25)
+
+### Bug Fixes
+
+- Resolve ruff v0.15.2 lint and format errors
+  ([`e28dbf9`](https://github.com/MinBZK/poc-machine-law/commit/e28dbf93e5f6810b27798a9d15a69bc9e9505314))
+
+### Chores
+
+- Pre-commit autoupdate
+  ([`e28dbf9`](https://github.com/MinBZK/poc-machine-law/commit/e28dbf93e5f6810b27798a9d15a69bc9e9505314))
+
+- Sync VERSION file to 1.9.0
+  ([`afd9381`](https://github.com/MinBZK/poc-machine-law/commit/afd9381307a6b935d4d283f178996c426cd01908))
+
+
 ## v1.9.0 (2026-02-25)
 
 ### Bug Fixes
