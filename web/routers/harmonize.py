@@ -7,6 +7,7 @@ from datetime import datetime
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
+from explain.llm_factory import llm_factory
 from web.dependencies import is_demo_mode, templates
 
 logger = logging.getLogger(__name__)
@@ -139,3 +140,70 @@ async def validate_model(request: Request):
         return JSONResponse(status_code=400, content={"status": "error", "message": error})
     body["operation"] = "validate"
     return await asyncio.to_thread(_run_synthesize_subprocess, body)
+
+
+PROSE_SYSTEM_PROMPT = (
+    "Je bent een wetgevingsjurist die YAML-wetspecificaties omzet naar formele Nederlandse wetteksten. "
+    "Je schrijft in de stijl van het Staatsblad van het Koninkrijk der Nederlanden."
+)
+
+PROSE_USER_PROMPT = """Hieronder staat een machine-leesbare wetspecificatie in YAML-formaat.
+Schrijf een volledige, overtuigende Nederlandse wettekst die:
+
+1. Alle definities, voorwaarden, berekeningen en bedragen uit de YAML nauwkeurig overneemt
+2. De structuur volgt van echte Nederlandse wetgeving (hoofdstukken, artikelen, leden)
+3. Formeel juridisch Nederlands gebruikt
+4. Een titel, considerans en inhoudsopgave bevat
+5. Bedragen in euro's vermeldt (de YAML bevat eurocenten, deel door 100)
+
+YAML-specificatie:
+```yaml
+{yaml_text}
+```
+
+Schrijf de volledige wettekst."""
+
+
+def _generate_prose_text(service, yaml_text: str) -> str:
+    """Call the LLM to generate prose law text from YAML."""
+    response = service.chat_completion(
+        messages=[{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text)}],
+        max_tokens=4000,
+        temperature=0.3,
+        system=PROSE_SYSTEM_PROMPT,
+    )
+    return service.get_completion_text(response)
+
+
+@router.post("/generate-prose")
+async def generate_prose(request: Request):
+    """Generate a prose law text from a YAML specification using an LLM."""
+    body = await request.json()
+    yaml_text = body.get("yaml", "")
+
+    if not yaml_text:
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Geen YAML opgegeven"})
+
+    provider = llm_factory.get_provider(request)
+    if not llm_factory.is_provider_configured(provider, request):
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": f"LLM provider '{provider}' is niet geconfigureerd. "
+                "Stel een API-sleutel in via de instellingen.",
+            },
+        )
+
+    service = llm_factory.get_service(provider)
+    service.configure_for_request(request)
+
+    try:
+        prose = await asyncio.to_thread(_generate_prose_text, service, yaml_text)
+        return JSONResponse({"status": "success", "prose": prose, "provider": provider})
+    except Exception as e:
+        logger.error("Failed to generate prose: %s", str(e))
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": f"Wettekst genereren mislukt: {e}"},
+        )
