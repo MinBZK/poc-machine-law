@@ -4,6 +4,7 @@ import os
 from typing import Any
 from urllib.parse import unquote
 
+import pandas as pd
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
@@ -17,6 +18,19 @@ from web.feature_flags import is_wallet_enabled
 router = APIRouter(prefix="/laws", tags=["laws"])
 
 logger = logging.getLogger(__name__)
+
+# In-memory profile data overrides (keyed by (service, table, kvk))
+_profile_data_overrides: dict[tuple[str, str, str], list[dict]] = {}
+
+
+def _apply_profile_overrides(profile_data: dict, service: str, kvk: str) -> dict:
+    """Merge any in-memory profile data overrides into the profile data dict."""
+    if not profile_data or not kvk:
+        return profile_data
+    for (svc, table, k), rows in _profile_data_overrides.items():
+        if svc == service and k == kvk and table in profile_data:
+            profile_data[table] = rows
+    return profile_data
 
 
 def get_tile_template(service: str, law: str) -> str:
@@ -169,7 +183,7 @@ async def execute_law(
         try:
             profile = machine_service.get_profile_data(bsn)
             if profile and "sources" in profile:
-                profile_data = profile["sources"].get(service, {})
+                profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
         except Exception as e:
             logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
@@ -299,7 +313,7 @@ async def submit_case(
         try:
             profile = machine_service.get_profile_data(bsn)
             if profile and "sources" in profile:
-                profile_data = profile["sources"].get(service, {})
+                profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
         except Exception as e:
             logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
@@ -539,7 +553,7 @@ async def application_panel(
             try:
                 profile = machine_service.get_profile_data(bsn)
                 if profile and "sources" in profile:
-                    profile_data = profile["sources"].get(service, {})
+                    profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
             except Exception as e:
                 logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
@@ -577,3 +591,69 @@ async def application_panel(
                 "current_engine_id": get_engine_id(),
             },
         )
+
+
+@router.post("/update-profile-table")
+async def update_profile_table(
+    request: Request,
+    service: str,
+    table: str,
+    kvk: str,
+    bsn: str,
+    law: str,
+    machine_service: EngineInterface = Depends(get_machine_service),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+) -> JSONResponse:
+    """Update a profile data table in memory (for editable profile data like energy measures)."""
+    law = unquote(law)
+    body = await request.json()
+    rows = body.get("rows", [])
+
+    # Store override for profile_data rendering
+    _profile_data_overrides[(service, table, kvk)] = rows
+
+    # Also update the source DataFrame so law evaluation reflects changes
+    df = pd.DataFrame(rows)
+    machine_service.set_source_dataframe(service, table, df)
+
+    # Re-evaluate the law and return the updated tile
+    parameters = {"BSN": bsn}
+    if kvk:
+        parameters["KVK_NUMMER"] = kvk
+    result = machine_service.evaluate(
+        service=service,
+        law=law,
+        parameters=parameters,
+        reference_date=TODAY,
+    )
+
+    existing_case = case_manager.get_case(bsn, service, law)
+    template_path = get_tile_template(service, law)
+    rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+    profile_data = None
+    try:
+        profile = machine_service.get_profile_data(bsn)
+        if profile and "sources" in profile:
+            profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
+    except Exception as e:
+        logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
+    return templates.TemplateResponse(
+        template_path,
+        {
+            "bsn": bsn,
+            "effective_bsn": bsn,
+            "kvk": kvk,
+            "request": request,
+            "law": law,
+            "service": service,
+            "rule_spec": rule_spec,
+            "result": result.output,
+            "input": result.input,
+            "requirements_met": result.requirements_met,
+            "missing_required": result.missing_required,
+            "current_case": existing_case,
+            "profile_data": profile_data,
+        },
+    )

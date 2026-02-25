@@ -218,14 +218,14 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         sim_column="sbi_is_food",
         display_name="SBI-code levensmiddelen",
         yaml_inputs=["SBI_CODE"],
-        laws=["haccp"],
+        laws=["haccp", "nvwa_meldplicht"],
         is_grouping=True,
     ),
     FeatureSpec(
         sim_column="bereidt_of_serveert_voedsel",
         display_name="Bereidt/serveert voedsel",
         yaml_inputs=["BEREIDT_OF_SERVEERT_VOEDSEL"],
-        laws=["haccp"],
+        laws=["haccp", "nvwa_meldplicht"],
         is_grouping=True,
     ),
     FeatureSpec(
@@ -249,6 +249,30 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         display_name="Woonfunctie",
         yaml_inputs=["IS_WOONFUNCTIE"],
         laws=["energie_informatieplicht"],
+        is_grouping=True,
+    ),
+    # --- CBS Enquete ---
+    FeatureSpec(
+        sim_column="is_geselecteerd_cbs_enquete",
+        display_name="Geselecteerd voor CBS-enquête",
+        yaml_inputs=["IS_GESELECTEERD_CBS_ENQUETE"],
+        laws=["cbs_enquete"],
+        is_grouping=True,
+    ),
+    # --- KVK Jaarrekening ---
+    FeatureSpec(
+        sim_column="rechtsvorm_vereist_jaarrekening",
+        display_name="Rechtsvorm vereist jaarrekening",
+        yaml_inputs=["RECHTSVORM"],
+        laws=["kvk_jaarrekening"],
+        is_grouping=True,
+    ),
+    # --- NVWA Meldplicht ---
+    FeatureSpec(
+        sim_column="heeft_actief_incident",
+        display_name="Actief voedselincident",
+        yaml_inputs=["HEEFT_ACTIEF_INCIDENT"],
+        laws=["nvwa_meldplicht"],
         is_grouping=True,
     ),
 ]

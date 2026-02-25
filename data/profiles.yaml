@@ -4148,7 +4148,18 @@ profiles:
     properties:
       - Ondernemer
     sources:
-      CBS: *id001
+      CBS:
+        levensverwachting:
+        - jaar: 2025
+          verwachting_65: 20.5
+        cbs_enquetes:
+        - kvk_nummer: '85234567'
+          is_geselecteerd_cbs_enquete: true
+          enquete_type: Productiestatistiek
+          frequentie: jaarlijks
+          volgende_deadline: '2026-06-30'
+          gebruikt_rgs_boekhouding: true
+          rgs_versie: '3.5'
       KIESRAAD: *id002
       JenV: *id003
       RvIG:
@@ -4260,6 +4271,11 @@ profiles:
           datum_telling: '2025-01-01'
           datum_aanvang: '2025-01-15'
           vestigingsadres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
+        jaarrekeningen:
+        - kvk_nummer: '85234567'
+          rechtsvorm: EENMANSZAAK
+          heeft_depot_plicht: false
+          laatste_boekjaar_einde: '2025-12-31'
       UWV:
         arbeidsverhoudingen:
         - bsn: '999999990'
@@ -4469,11 +4485,51 @@ profiles:
         - kvk_nummer: '85234567'
           aantal_werknemers: 0
           verstrekt_mobiliteitsvergoeding: false
-        # Informatieplicht energiebesparing - kleine koffiezaak zit onder de drempels
+        # Informatieplicht energiebesparing - koffiezaak met professionele apparatuur
         # (drempel: 50.000 kWh elektriciteit of 25.000 m³ gas)
+        rvo_rapportages:
+        - kvk_nummer: '85234567'
+          rapportages:
+          - datum: '2023-11-28'
+            status: goedgekeurd
+            rapportage_jaar: 2023
+            elektriciteit_kwh: 58000
+            gasverbruik_m3: 9200
+            maatregelen:
+            - beschrijving: LED-verlichting in zaak
+              status: uitgevoerd
+              jaar: 2023
+              besparing_kwh: 2400
+            - beschrijving: Thermostaatkranen geïnstalleerd
+              status: uitgevoerd
+              jaar: 2022
+              besparing_m3: 400
+            - beschrijving: HR-107 CV-ketel geïnstalleerd
+              status: gepland
+              jaar: 2025
+              besparing_m3: 1500
+        rvo_energiemaatregelen:
+        - kvk_nummer: '85234567'
+          maatregelen:
+          - beschrijving: LED-verlichting in zaak en keuken
+            status: uitgevoerd
+            jaar: 2025
+            besparing_kwh: 3200
+          - beschrijving: HR-107 CV-ketel geïnstalleerd
+            status: uitgevoerd
+            jaar: 2025
+            besparing_m3: 1500
+          - beschrijving: Energiezuinige koelingen (A++ label)
+            status: uitgevoerd
+            jaar: 2025
+            besparing_kwh: 4800
+          - beschrijving: Isolatie van warmwaterleidingen
+            status: gepland
+            jaar: 2026
+            besparing_m3: 800
         rvo_energiegegevens:
         - kvk_nummer: '85234567'
-          elektriciteit_kwh: 15000
+          elektriciteit_kwh: 62000
           gasverbruik_m3: 8000
           is_woonfunctie: false
       NVWA:
@@ -4488,3 +4544,7 @@ profiles:
         - kvk_nummer: '85234567'
           laatste_inspectiedatum: '2025-06-15'
           laatste_inspectieresultaat: 'voldoende'
+        nvwa_meldplicht:
+        - kvk_nummer: '85234567'
+          is_levensmiddelenbedrijf: true
+          heeft_actief_incident: false

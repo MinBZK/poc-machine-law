@@ -1,17 +1,237 @@
 <div>
     {% if result.heeft_informatieplicht %}
-        <h4 class="text-sm font-medium text-green-700 mb-2">Informatieplicht van toepassing</h4>
+        <h4 class="text-sm font-medium text-green-700 mb-3">Informatieplicht van toepassing</h4>
+        {# Previous rapportage #}
+        {% if profile_data and profile_data.rvo_rapportages %}
+            {% set rns = namespace(rapportage=none) %}
+            {% for r in profile_data.rvo_rapportages %}
+                {% if r.kvk_nummer == kvk and r.rapportages %}
+                    {% set rns.rapportage = r.rapportages[-1] %}
+                {% endif %}
+            {% endfor %}
+            {% if rns.rapportage %}
+                <div class="mb-3" x-data="{ open: false }">
+                    <button x-on:click="open = !open"
+                            class="w-full flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3 hover:bg-blue-100 transition-colors cursor-pointer">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-blue-600 mr-2 flex-shrink-0"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span class="text-sm font-medium text-blue-800">Vorige rapportage ({{ rns.rapportage.rapportage_jaar }})</span>
+                            <span class="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
+                                {{ rns.rapportage.status|capitalize }}
+                            </span>
+                        </div>
+                        <svg class="w-4 h-4 text-blue-400 transition-transform"
+                             x-bind:class="open ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="open"
+                         x-cloak
+                         class="mt-2 border border-blue-100 rounded-lg p-3 space-y-3">
+                        <div class="grid grid-cols-2 gap-1 text-sm">
+                            <div class="text-gray-600">Ingediend:</div>
+                            <div class="text-right font-medium">{{ rns.rapportage.datum }}</div>
+                            <div class="text-gray-600">Elektriciteit:</div>
+                            <div class="text-right font-medium">{{ "{:,}".format(rns.rapportage.elektriciteit_kwh) |replace(",", ".") }} kWh</div>
+                            <div class="text-gray-600">Gasverbruik:</div>
+                            <div class="text-right font-medium">{{ "{:,}".format(rns.rapportage.gasverbruik_m3) |replace(",", ".") }} m&sup3;</div>
+                        </div>
+                        {% if rns.rapportage.maatregelen %}
+                            <div class="border-t border-blue-100 pt-2">
+                                <h6 class="text-xs font-medium text-gray-500 mb-1.5">Gerapporteerde maatregelen</h6>
+                                <div class="space-y-1.5">
+                                    {% for m in rns.rapportage.maatregelen %}
+                                        <div class="flex items-start text-sm">
+                                            {% if m.status == 'uitgevoerd' %}
+                                                <svg class="w-3.5 h-3.5 text-green-600 mr-1.5 mt-0.5 flex-shrink-0"
+                                                     fill="currentColor"
+                                                     viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                </svg>
+                                            {% else %}
+                                                <svg class="w-3.5 h-3.5 text-gray-400 mr-1.5 mt-0.5 flex-shrink-0"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            {% endif %}
+                                            <div>
+                                                <span class="text-gray-700">{{ m.beschrijving }}</span>
+                                                <span class="text-xs text-gray-400 ml-1">({{ m.status }}, {{ m.jaar }})</span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+        {# Energy consumption vs thresholds #}
+        {% if profile_data and profile_data.rvo_energiegegevens %}
+            {% set ns = namespace(energie=none) %}
+            {% for e in profile_data.rvo_energiegegevens %}
+                {% if e.kvk_nummer == kvk %}
+                    {% set ns.energie = e %}
+                {% endif %}
+            {% endfor %}
+            {% if ns.energie %}
+                <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                    <h5 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Uw energieverbruik</h5>
+                    <div class="grid grid-cols-2 gap-1 text-sm">
+                        <div class="text-gray-600">Elektriciteit:</div>
+                        <div class="text-right font-medium">
+                            {{ "{:,}".format(ns.energie.elektriciteit_kwh) |replace(",", ".") }} kWh
+                            <span class="text-xs text-gray-400">(drempel: 50.000)</span>
+                        </div>
+                        <div class="text-gray-600">Gasverbruik:</div>
+                        <div class="text-right font-medium">
+                            {{ "{:,}".format(ns.energie.gasverbruik_m3) |replace(",", ".") }} m&sup3;
+                            <span class="text-xs text-gray-400">(drempel: 25.000)</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+        {# Energy measures - editable with Alpine.js #}
+        {% if profile_data and profile_data.rvo_energiemaatregelen %}
+            {% set mns = namespace(maatregelen=none) %}
+            {% for m in profile_data.rvo_energiemaatregelen %}
+                {% if m.kvk_nummer == kvk %}
+                    {% set mns.maatregelen = m.maatregelen %}
+                {% endif %}
+            {% endfor %}
+            {% if mns.maatregelen %}
+                <div class="mb-3"
+                     x-data='{ editing: false, saving: false, maatregelen: {{ mns.maatregelen|tojson }}, addMaatregel() { this.maatregelen.push({ beschrijving: "", status: "gepland", jaar: new Date().getFullYear(), besparing_kwh: 0 }); }, removeMaatregel(index) { this.maatregelen.splice(index, 1); }, async save() { this.saving = true; try { const rows = [{ kvk_nummer: "{{ kvk }}", maatregelen: this.maatregelen.map(m => ({ ...m, jaar: parseInt(m.jaar) || new Date().getFullYear(), besparing_kwh: m.besparing_kwh ? parseInt(m.besparing_kwh) : undefined, besparing_m3: m.besparing_m3 ? parseInt(m.besparing_m3) : undefined })) }]; const params = new URLSearchParams({ service: "{{ service }}", table: "rvo_energiemaatregelen", kvk: "{{ kvk }}", bsn: "{{ bsn }}", law: "{{ law }}" }); const resp = await fetch(`/laws/update-profile-table?${params}`, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({rows: rows}) }); if (resp.ok) { this.editing = false; htmx.trigger(document.body, "reload-page"); } } finally { this.saving = false; } } }'>
+                    <div class="flex items-center justify-between mb-2">
+                        <h5 class="text-xs font-medium text-gray-500 uppercase tracking-wide">Te rapporteren maatregelen (art. 5.15d Bal)</h5>
+                        <button x-show="!editing"
+                                x-on:click="editing = true"
+                                class="text-xs text-blue-600 hover:text-blue-800 cursor-pointer">Aanpassen</button>
+                    </div>
+                    {# Read-only view #}
+                    <div x-show="!editing" class="space-y-2">
+                        <template x-for="(m, i) in maatregelen" :key="i">
+                            <div class="flex items-start text-sm bg-gray-50 rounded p-2">
+                                <template x-if="m.status === 'uitgevoerd'">
+                                    <svg class="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0"
+                                         fill="currentColor"
+                                         viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </template>
+                                <template x-if="m.status !== 'uitgevoerd'">
+                                    <svg class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </template>
+                                <div class="flex-grow">
+                                    <span class="font-medium" x-text="m.beschrijving"></span>
+                                    <div class="text-xs text-gray-500 mt-0.5">
+                                        <span x-text="m.status.charAt(0).toUpperCase() + m.status.slice(1)"></span>
+                                        (<span x-text="m.jaar"></span>)
+                                        <template x-if="m.besparing_kwh">
+                                            <span>
+                                                — besparing <span x-text="Number(m.besparing_kwh).toLocaleString('nl-NL')"></span> kWh
+                                            </span>
+                                        </template>
+                                        <template x-if="m.besparing_m3 && !m.besparing_kwh">
+                                            <span>
+                                                — besparing <span x-text="Number(m.besparing_m3).toLocaleString('nl-NL')"></span> m&sup3;
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    {# Edit view #}
+                    <div x-show="editing" x-cloak class="space-y-3">
+                        <template x-for="(m, i) in maatregelen" :key="i">
+                            <div class="bg-gray-50 rounded-lg p-3 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-medium text-gray-500"
+                                          x-text="'Maatregel ' + (i + 1)"></span>
+                                    <button x-on:click="removeMaatregel(i)"
+                                            class="text-xs text-red-500 hover:text-red-700 cursor-pointer">
+                                        Verwijderen
+                                    </button>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">Beschrijving</label>
+                                    <input type="text"
+                                           x-model="m.beschrijving"
+                                           class="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Status</label>
+                                        <select x-model="m.status"
+                                                class="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                            <option value="uitgevoerd">Uitgevoerd</option>
+                                            <option value="gepland">Gepland</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Jaar</label>
+                                        <input type="number"
+                                               x-model="m.jaar"
+                                               class="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">Besparing</label>
+                                        <div class="flex items-center gap-1">
+                                            <input type="number"
+                                                   x-model="m.besparing_kwh || m.besparing_m3"
+                                                   x-on:input=" if (m.besparing_m3 && !m.besparing_kwh) { m.besparing_m3 = parseInt($event.target.value) || 0 } else { m.besparing_kwh = parseInt($event.target.value) || 0 } "
+                                                   class="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                                            <span class="text-xs text-gray-400 flex-shrink-0"
+                                                  x-text="m.besparing_m3 && !m.besparing_kwh ? 'm3' : 'kWh'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <button x-on:click="addMaatregel()"
+                                class="w-full text-sm text-blue-600 hover:text-blue-800 border border-dashed border-blue-300 rounded-lg py-2 hover:bg-blue-50 transition-colors cursor-pointer">
+                            + Maatregel toevoegen
+                        </button>
+                        <div class="flex gap-2 pt-1">
+                            <button x-on:click="editing = false; maatregelen = {{ mns.maatregelen|tojson }}"
+                                    class="flex-1 text-sm px-3 py-1.5 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors cursor-pointer">
+                                Annuleren
+                            </button>
+                            <button x-on:click="save()"
+                                    x-bind:disabled="saving"
+                                    class="flex-1 text-sm px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50">
+                                <span x-show="!saving">Opslaan</span>
+                                <span x-show="saving">Opslaan...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+        {# Deadline and method info #}
         <div class="bg-gray-50 p-3 rounded-lg">
             <div class="grid grid-cols-2 gap-1 text-sm">
-                <div class="text-gray-600">Energiebesparingsplicht:</div>
-                <div class="text-right font-medium text-green-700">Ja</div>
-                <div class="text-gray-600">Informatieplicht:</div>
-                <div class="text-right font-medium text-green-700">Ja</div>
                 {% if result.volgende_rapportage_deadline %}
-                    <div class="text-gray-600 mt-2 pt-2 border-t border-gray-200">Volgende deadline:</div>
-                    <div class="text-right font-medium mt-2 pt-2 border-t border-gray-200 text-amber-700">
-                        {{ result.volgende_rapportage_deadline|format_date }}
-                    </div>
+                    <div class="text-gray-600">Deadline:</div>
+                    <div class="text-right font-medium text-amber-700">{{ result.volgende_rapportage_deadline|format_date }}</div>
                 {% endif %}
                 {% if result.rapportage_frequentie_jaren %}
                     <div class="text-gray-600">Frequentie:</div>

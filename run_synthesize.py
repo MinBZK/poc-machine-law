@@ -65,11 +65,14 @@ def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
         "vloeroppervlakte": ["alcoholwet"],
         "type_bedrijf_horeca": ["alcoholwet"],
         "is_onder_curatele": ["alcoholwet"],
-        "sbi_is_food": ["haccp"],
-        "bereidt_of_serveert_voedsel": ["haccp"],
+        "sbi_is_food": ["haccp", "nvwa_meldplicht"],
+        "bereidt_of_serveert_voedsel": ["haccp", "nvwa_meldplicht"],
         "jaarlijks_elektriciteitsverbruik_kwh": ["energie_informatieplicht"],
         "jaarlijks_gasverbruik_m3": ["energie_informatieplicht"],
         "is_woonfunctie": ["energie_informatieplicht"],
+        "is_geselecteerd_cbs_enquete": ["cbs_enquete"],
+        "rechtsvorm_vereist_jaarrekening": ["kvk_jaarrekening"],
+        "heeft_actief_incident": ["nvwa_meldplicht"],
     }
     # Filter to only selected laws
     result = {}

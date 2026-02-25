@@ -14,9 +14,9 @@
             </div>
             {% if missing_required %}
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-600">Er ontbreken gegevens om te bepalen of de informatieplicht van toepassing is.</p>
+                    <p class="text-sm text-gray-600">Er ontbreken gegevens om te bepalen of de jaarrekening deponeringsplicht van toepassing is.</p>
                 </div>
-            {% elif result and result.heeft_informatieplicht %}
+            {% elif result and result.heeft_deponeringsplicht %}
                 <div class="space-y-4">
                     <div class="flex items-center text-green-700">
                         <svg class="w-5 h-5 mr-2 flex-shrink-0"
@@ -24,7 +24,7 @@
                              viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="font-medium">Informatieplicht van toepassing</span>
+                        <span class="font-medium">Deponeringsplicht van toepassing</span>
                         <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
@@ -32,7 +32,7 @@
                             waarom?
                         </button>
                     </div>
-                    {% if result.volgende_rapportage_deadline %}
+                    {% if result.volgende_deadline %}
                         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
                             <div class="flex items-start">
                                 <svg class="w-5 h-5 text-amber-600 mr-2 mt-0.5 flex-shrink-0"
@@ -43,9 +43,8 @@
                                 </svg>
                                 <div>
                                     <p class="text-sm font-medium text-amber-800">
-                                        Lever uw gegevens aan voor
-                                        <span class="font-bold">{{ result.volgende_rapportage_deadline|format_date }}</span>
-                                        om aan de rapportageverplichting te voldoen.
+                                        Deponeer uw jaarrekening voor
+                                        <span class="font-bold">{{ result.volgende_deadline|format_date }}</span>
                                     </p>
                                     {% if result.rapportage_methode %}
                                         <p class="text-sm text-amber-700 mt-1">Via: {{ result.rapportage_methode }}</p>
@@ -54,54 +53,30 @@
                             </div>
                         </div>
                     {% endif %}
-                    {% if result.rapportage_frequentie_jaren %}
-                        <p class="text-sm text-gray-600">
-                            Rapportage is elke <span class="font-medium">{{ result.rapportage_frequentie_jaren }} jaar</span> verplicht.
-                        </p>
-                    {% endif %}
-                    {% if profile_data and profile_data.rvo_energiemaatregelen %}
-                        {% set mns = namespace(maatregelen=none, uitgevoerd=0, totaal=0) %}
-                        {% for m in profile_data.rvo_energiemaatregelen %}
-                            {% if m.kvk_nummer == kvk %}
-                                {% set mns.maatregelen = m.maatregelen %}
-                                {% set mns.totaal = m.maatregelen|length %}
-                                {% for maatregel in m.maatregelen %}
-                                    {% if maatregel.status == 'uitgevoerd' %}
-                                        {% set mns.uitgevoerd = mns.uitgevoerd + 1 %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if mns.maatregelen %}
-                            <div class="flex items-center text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
-                                <svg class="w-4 h-4 text-gray-500 mr-2 flex-shrink-0"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                                </svg>
-                                <span>
-                                    <span class="font-medium">{{ mns.uitgevoerd }} van {{ mns.totaal }}</span> energiebesparende maatregelen uitgevoerd
-                                </span>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            {% elif result and result.heeft_energiebesparingsplicht and not result.heeft_informatieplicht %}
-                <div class="space-y-4">
-                    <p class="text-sm text-gray-600">De energiebesparingsplicht is van toepassing, maar de informatieplicht niet.</p>
                 </div>
             {% else %}
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-500">
-                        De informatieplicht is niet van toepassing op uw organisatie.
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 mr-2 flex-shrink-0 text-gray-400"
+                             fill="currentColor"
+                             viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-medium">Niet van toepassing</span>
                         <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
-                                class="ml-2 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
+                                class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
                             waarom?
                         </button>
-                    </p>
+                    </div>
+                    {% if result and result.reden_vrijstelling %}
+                        <p class="text-sm text-gray-500">{{ result.reden_vrijstelling }}</p>
+                    {% else %}
+                        <p class="text-sm text-gray-500">
+                            Uw organisatie is een eenmanszaak en daarmee vrijgesteld van de deponeringsplicht.
+                        </p>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
@@ -111,7 +86,7 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <h4 class="font-medium text-gray-900 mb-2">Gegevens aanleveren</h4>
                     <p class="text-sm text-gray-600 mb-4">
-                        Vul uw energieverbruik in om te bepalen of de informatieplicht op u van toepassing is.
+                        Vul uw bedrijfsgegevens in om te bepalen of de deponeringsplicht op u van toepassing is.
                     </p>
                     <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                             hx-target="#shared-application-panel"
@@ -121,36 +96,18 @@
                     </button>
                 </div>
             </div>
-        {% elif result and result.heeft_informatieplicht %}
+        {% elif result and result.heeft_deponeringsplicht %}
             <div class="mt-6 pt-4 border-t border-gray-100">
                 {% if not current_case %}
                     <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                             hx-target="#shared-application-panel"
                             hx-swap="innerHTML"
                             class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
-                        Rapportage indienen
+                        Jaarrekening deponeren
                     </button>
                 {% elif current_case.status == 'SUBMITTED' %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                        <p class="text-sm text-blue-800">Uw rapportage is ontvangen en wordt verwerkt door RVO.</p>
-                    </div>
-                {% elif current_case.status == 'IN_REVIEW' %}
-                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                        <h4 class="font-medium text-blue-900 mb-3">Wat gebeurt er nu?</h4>
-                        <ol class="space-y-2 text-sm text-blue-800">
-                            <li class="flex items-start">
-                                <span class="font-medium mr-2">1.</span>
-                                <span>RVO controleert uw rapportage op volledigheid</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="font-medium mr-2">2.</span>
-                                <span>U ontvangt een bevestiging per e-mail</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="font-medium mr-2">3.</span>
-                                <span>Uw volgende rapportage is over {{ result.rapportage_frequentie_jaren }} jaar</span>
-                            </li>
-                        </ol>
+                        <p class="text-sm text-blue-800">Uw jaarrekening is ontvangen en wordt verwerkt door de KVK.</p>
                     </div>
                 {% elif current_case.status == 'DECIDED' and current_case.approved %}
                     <div class="bg-green-50 border border-green-100 rounded-lg p-4">
@@ -160,11 +117,8 @@
                                  viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
-                            <span class="font-medium">Uw rapportage is goedgekeurd door RVO</span>
+                            <span class="font-medium">Uw jaarrekening is gedeponeerd bij de KVK</span>
                         </div>
-                        {% if result.rapportage_frequentie_jaren %}
-                            <p class="text-sm text-green-700 mt-2 ml-7">Volgende rapportage over {{ result.rapportage_frequentie_jaren }} jaar.</p>
-                        {% endif %}
                     </div>
                 {% endif %}
             </div>

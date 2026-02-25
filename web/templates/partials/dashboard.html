@@ -635,30 +635,57 @@
     <div class="bg-gray-50 rounded-lg p-6">
         <h3 class="font-semibold text-lg mb-4">Beschikbare regelingen</h3>
         <ul class="space-y-2">
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
-                <span>Zorgtoeslag (Wet op de zorgtoeslag)</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
-                <span>AOW (Algemene Ouderdomswet)</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
-                <span>Bijstand (Participatiewet)</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
-                <span>Inkomstenbelasting</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-indigo-200 rounded-full mr-2"></span>
-                <span>Huurtoeslag</span>
-            </li>
-            <li class="flex items-center">
-                <span class="w-4 h-4 bg-pink-200 rounded-full mr-2"></span>
-                <span>Kieswet</span>
-            </li>
+            {% if active_profile_config and active_profile_config.type == 'ondernemer' %}
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
+                    <span>Alcoholwetvergunning</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+                    <span>Exploitatievergunning Horeca</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
+                    <span>Informatieplicht Energiebesparing</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-amber-200 rounded-full mr-2"></span>
+                    <span>HACCP Voedselveiligheid</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-indigo-200 rounded-full mr-2"></span>
+                    <span>Jaarrekening Deponeringsplicht</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-red-200 rounded-full mr-2"></span>
+                    <span>Meldplicht Voedselveiligheid</span>
+                </li>
+            {% else %}
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-green-200 rounded-full mr-2"></span>
+                    <span>Zorgtoeslag (Wet op de zorgtoeslag)</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+                    <span>AOW (Algemene Ouderdomswet)</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-purple-200 rounded-full mr-2"></span>
+                    <span>Bijstand (Participatiewet)</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-blue-200 rounded-full mr-2"></span>
+                    <span>Inkomstenbelasting</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-indigo-200 rounded-full mr-2"></span>
+                    <span>Huurtoeslag</span>
+                </li>
+                <li class="flex items-center">
+                    <span class="w-4 h-4 bg-pink-200 rounded-full mr-2"></span>
+                    <span>Kieswet</span>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </section>

@@ -33,8 +33,18 @@ _BUSINESS_LAWS = [
     {"id": "alcoholwet", "label": "Alcoholwet", "group": "Vergunningen"},
     {"id": "haccp", "label": "HACCP Voedselveiligheid", "group": "Verplichtingen"},
     {"id": "energie_informatieplicht", "label": "Informatieplicht Energiebesparing", "group": "Verplichtingen"},
+    {"id": "cbs_enquete", "label": "CBS Statistiekverplichting", "group": "Rapportageverplichtingen"},
+    {"id": "kvk_jaarrekening", "label": "Jaarrekening Deponeringsplicht", "group": "Rapportageverplichtingen"},
+    {"id": "nvwa_meldplicht", "label": "Meldplicht Voedselveiligheid", "group": "Rapportageverplichtingen"},
 ]
-_BUSINESS_DEFAULT = ["alcoholwet", "haccp", "energie_informatieplicht"]
+_BUSINESS_DEFAULT = [
+    "alcoholwet",
+    "haccp",
+    "energie_informatieplicht",
+    "cbs_enquete",
+    "kvk_jaarrekening",
+    "nvwa_meldplicht",
+]
 
 
 @router.get("/")

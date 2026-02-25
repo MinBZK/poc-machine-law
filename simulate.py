@@ -2145,6 +2145,22 @@ class LawSimulator:
 
         is_woonfunctie = random.random() < 0.05
 
+        # Legal form of the business
+        rechtsvorm = random.choices(
+            ["BV", "Eenmanszaak", "VOF", "NV", "Stichting", "Vereniging", "Cooperatie", "Maatschap"],
+            weights=[35, 30, 15, 5, 5, 3, 5, 2],
+        )[0]
+
+        # CBS survey selection (~25% probability)
+        is_geselecteerd_cbs_enquete = random.random() < 0.25
+
+        # Whether the legal form requires annual report filing (jaarrekening)
+        rechtsvorm_vereist_jaarrekening = rechtsvorm in ("BV", "NV", "Cooperatie", "Stichting", "Vereniging")
+
+        # Active food safety incident (~8% for food businesses, ~1% for others)
+        is_levensmiddelenbedrijf = is_food_sbi or bereidt_of_serveert_voedsel
+        heeft_actief_incident = random.random() < (0.08 if is_levensmiddelenbedrijf else 0.01)
+
         return {
             "kvk_nummer": kvk_nummer,
             "sbi_code": sbi_code,
@@ -2158,6 +2174,10 @@ class LawSimulator:
             "jaarlijks_elektriciteitsverbruik_kwh": jaarlijks_elektriciteitsverbruik_kwh,
             "jaarlijks_gasverbruik_m3": jaarlijks_gasverbruik_m3,
             "is_woonfunctie": is_woonfunctie,
+            "rechtsvorm": rechtsvorm,
+            "rechtsvorm_vereist_jaarrekening": rechtsvorm_vereist_jaarrekening,
+            "is_geselecteerd_cbs_enquete": is_geselecteerd_cbs_enquete,
+            "heeft_actief_incident": heeft_actief_incident,
         }
 
     def create_business_population(self, num_businesses: int) -> list[dict]:
@@ -2190,6 +2210,16 @@ class LawSimulator:
             b["jaarlijks_elektriciteitsverbruik_kwh"] >= 50000 or b["jaarlijks_gasverbruik_m3"] >= 25000
         )
 
+        # 4. CBS Enquete: eligible if selected by CBS
+        cbs_enquete_eligible = b["is_geselecteerd_cbs_enquete"]
+
+        # 5. KVK Jaarrekening: eligible if rechtsvorm requires annual report filing
+        kvk_jaarrekening_eligible = b["rechtsvorm_vereist_jaarrekening"]
+
+        # 6. NVWA Meldplicht: eligible if food business
+        is_levensmiddelenbedrijf = b["sbi_is_food"] or b["bereidt_of_serveert_voedsel"]
+        nvwa_meldplicht_eligible = is_levensmiddelenbedrijf
+
         return {
             **b,
             "alcoholwet_eligible": alcoholwet_eligible,
@@ -2198,6 +2228,12 @@ class LawSimulator:
             "haccp_amount": 0,
             "energie_informatieplicht_eligible": energie_informatieplicht_eligible,
             "energie_informatieplicht_amount": 0,
+            "cbs_enquete_eligible": cbs_enquete_eligible,
+            "cbs_enquete_amount": 0,
+            "kvk_jaarrekening_eligible": kvk_jaarrekening_eligible,
+            "kvk_jaarrekening_amount": 0,
+            "nvwa_meldplicht_eligible": nvwa_meldplicht_eligible,
+            "nvwa_meldplicht_amount": 0,
         }
 
     def run_business_simulation(self, num_businesses: int = 500) -> pd.DataFrame:

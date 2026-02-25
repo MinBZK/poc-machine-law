@@ -11,9 +11,16 @@ This module defines:
 DEMO_DISABLED_LAWS = {
     "BELASTINGDIENST": [
         "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
+        "zvw/werkgeversbijdrage",  # Werkgeversbijdrage Zorgverzekeringswet
+    ],
+    "NVWA": [
+        "warenwet/haccp",  # HACCP Voedselveiligheid
     ],
     "PENSIOENFONDS": [
         "pensioenwet",  # Pensioenuitkering
+    ],
+    "RVO": [
+        "omgevingswet/werkgebonden_personenmobiliteit",  # WPM rapportageverplichting
     ],
     "SVB": [
         "algemene_kinderbijslagwet",  # Kinderbijslag gegevens
@@ -170,6 +177,30 @@ DEMO_COLLAPSE_CONFIG = {
     },
     # HACCP Voedselveiligheid - Show properties and output
     "warenwet/haccp/NVWA-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # CBS Statistiekverplichting - Show properties and output
+    "wet_op_het_centraal_bureau_voor_de_statistiek/enquete/CBS-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # KVK Jaarrekening Deponeringsplicht - Show properties and output
+    "handelsregisterwet/jaarrekening/KVK-2024-01-01": {
+        "expand_paths": [
+            "properties",
+            "properties.output",
+        ],
+        "collapse_all_except_expanded": True,
+    },
+    # NVWA Meldplicht Voedselveiligheidsincident - Show properties and output
+    "warenwet/meldplicht/NVWA-2024-01-01": {
         "expand_paths": [
             "properties",
             "properties.output",
