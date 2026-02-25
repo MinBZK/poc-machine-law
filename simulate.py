@@ -2161,6 +2161,10 @@ class LawSimulator:
         is_levensmiddelenbedrijf = is_food_sbi or bereidt_of_serveert_voedsel
         heeft_actief_incident = random.random() < (0.08 if is_levensmiddelenbedrijf else 0.01)
 
+        # Terrace: only horeca businesses can have a terrace (~70%)
+        has_terrace = (type_bedrijf == "horecabedrijf") and random.random() < 0.70
+        terras_oppervlakte = round(vloeroppervlakte * random.uniform(0.3, 0.8), 1) if has_terrace else 0.0
+
         return {
             "kvk_nummer": kvk_nummer,
             "sbi_code": sbi_code,
@@ -2178,6 +2182,8 @@ class LawSimulator:
             "rechtsvorm_vereist_jaarrekening": rechtsvorm_vereist_jaarrekening,
             "is_geselecteerd_cbs_enquete": is_geselecteerd_cbs_enquete,
             "heeft_actief_incident": heeft_actief_incident,
+            "has_terrace": has_terrace,
+            "terras_oppervlakte": terras_oppervlakte,
         }
 
     def create_business_population(self, num_businesses: int) -> list[dict]:
@@ -2186,7 +2192,7 @@ class LawSimulator:
 
     @staticmethod
     def simulate_business(business: dict) -> dict:
-        """Evaluate 3 ondernemer laws for a single business (eligibility-only)."""
+        """Evaluate ondernemer laws for a single business (eligibility + costs)."""
         b = business
 
         # 1. Alcoholwet: leeftijd >= 21 AND NOT curatele AND oppervlakte check
@@ -2202,8 +2208,21 @@ class LawSimulator:
             oppervlakte_ok = True  # Not applicable for non-horeca
         alcoholwet_eligible = (is_horeca or is_slijter) and age_ok and not_curatele and oppervlakte_ok
 
+        # Alcoholwet leges: gemeentelijke leges based on vloeroppervlakte + bedrijfstype
+        alcoholwet_amount = 0.0
+        if alcoholwet_eligible:
+            if is_horeca:
+                alcoholwet_amount = min(1500, 500 + max(0, b["vloeroppervlakte"] - 35) * 5)
+            elif is_slijter:
+                alcoholwet_amount = min(800, 350 + max(0, b["vloeroppervlakte"] - 15) * 3)
+
         # 2. HACCP Voedselveiligheid: food SBI or prepares food
         haccp_eligible = b["sbi_is_food"] or b["bereidt_of_serveert_voedsel"]
+
+        # HACCP nalevingskosten: training, documentatie, hygiëne-inspecties
+        haccp_amount = 0.0
+        if haccp_eligible:
+            haccp_amount = 200 + b["vloeroppervlakte"] * 3  # basiskosten + per m² werkruimte
 
         # 3. Informatieplicht Energiebesparing: NOT woonfunctie AND (elektriciteit >= 50000 OR gas >= 25000)
         energie_informatieplicht_eligible = not b["is_woonfunctie"] and (
@@ -2220,12 +2239,19 @@ class LawSimulator:
         is_levensmiddelenbedrijf = b["sbi_is_food"] or b["bereidt_of_serveert_voedsel"]
         nvwa_meldplicht_eligible = is_levensmiddelenbedrijf
 
+        # 7. Precariobelasting: terras_oppervlakte × tarief (EUR 12-25/m²/jaar)
+        precariobelasting_eligible = b["has_terrace"] and b["terras_oppervlakte"] > 0
+        precario_tarief_per_m2 = random.uniform(12, 25)  # Rotterdam tarief varieert per gebied
+        precariobelasting_amount = (
+            round(b["terras_oppervlakte"] * precario_tarief_per_m2, 2) if precariobelasting_eligible else 0.0
+        )
+
         return {
             **b,
             "alcoholwet_eligible": alcoholwet_eligible,
-            "alcoholwet_amount": 0,
+            "alcoholwet_amount": round(alcoholwet_amount, 2),
             "haccp_eligible": haccp_eligible,
-            "haccp_amount": 0,
+            "haccp_amount": round(haccp_amount, 2),
             "energie_informatieplicht_eligible": energie_informatieplicht_eligible,
             "energie_informatieplicht_amount": 0,
             "cbs_enquete_eligible": cbs_enquete_eligible,
@@ -2234,6 +2260,8 @@ class LawSimulator:
             "kvk_jaarrekening_amount": 0,
             "nvwa_meldplicht_eligible": nvwa_meldplicht_eligible,
             "nvwa_meldplicht_amount": 0,
+            "precariobelasting_eligible": precariobelasting_eligible,
+            "precariobelasting_amount": round(precariobelasting_amount, 2),
         }
 
     def run_business_simulation(self, num_businesses: int = 500) -> pd.DataFrame:

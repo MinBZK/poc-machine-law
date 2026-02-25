@@ -50,92 +50,8 @@ properties:
         url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel3"
         explanation: "Het KVK-nummer is nodig voor identificatie van de onderneming die het horecabedrijf uitoefent"
 
-    - name: "BEVESTIG_ENIGE_LEIDINGGEVENDE"
-      description: "Bevestiging dat de aanvrager de enige leidinggevende is"
-      type: "boolean"
-      required: true
-      legal_basis:
-        law: "Alcoholwet"
-        bwb_id: "BWBR0002458"
-        article: "8"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
-        explanation: "Alle leidinggevenden moeten worden opgegeven bij de aanvraag"
-
-    - name: "EXTRA_LEIDINGGEVENDEN"
-      description: "Gegevens van eventuele extra leidinggevenden (indien niet de enige)"
-      type: "array"
-      required: false
-      type_spec:
-        fields:
-          - name: "naam"
-            type: "string"
-            description: "Volledige naam van de leidinggevende"
-          - name: "geboortedatum"
-            type: "date"
-            description: "Geboortedatum van de leidinggevende"
-          - name: "bsn"
-            type: "string"
-            description: "BSN van de leidinggevende"
-          - name: "svh_registratienummer"
-            type: "string"
-            description: "SVH-registratienummer van de leidinggevende"
-      legal_basis:
-        law: "Alcoholwet"
-        bwb_id: "BWBR0002458"
-        article: "8"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
-        explanation: "Alle leidinggevenden moeten aan de eisen van artikel 8 voldoen"
-
   sources:
-    # Leeftijd exploitant uit gemeentelijke leidinggevenden-administratie
-    - name: "LEEFTIJD_EXPLOITANT"
-      description: "Leeftijd van de exploitant (eerste leidinggevende)"
-      type: "number"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        table: "leidinggevenden"
-        field: "leeftijd"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KVK-nummer van de onderneming"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Alcoholwet"
-        bwb_id: "BWBR0002458"
-        article: "8"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
-        explanation: "Artikel 8 lid 1 onder a bepaalt dat leidinggevenden de leeftijd van 21 jaar moeten hebben bereikt"
-
-    # Curatele-status exploitant
-    - name: "IS_ONDER_CURATELE_EXPLOITANT"
-      description: "Of de exploitant onder curatele staat"
-      type: "boolean"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      source_reference:
-        table: "leidinggevenden"
-        field: "is_onder_curatele"
-        select_on:
-          - name: "kvk_nummer"
-            description: "KVK-nummer van de onderneming"
-            type: "string"
-            value: "$KVK_NUMMER"
-      legal_basis:
-        law: "Alcoholwet"
-        bwb_id: "BWBR0002458"
-        article: "8"
-        paragraph: "1"
-        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
-        explanation: "Artikel 8 lid 1 onder c bepaalt dat leidinggevenden niet onder curatele mogen staan"
-
-    # BSN van de leidinggevende voor SVH-verificatie
+    # BSN van de leidinggevende voor SVH-verificatie en BRP/curatele lookups
     - name: "BSN_LEIDINGGEVENDE"
       description: "BSN van de eerste leidinggevende voor verificatie in SVH-register"
       type: "string"
@@ -229,6 +145,50 @@ properties:
         explanation: "Controleert of er een actieve Alcoholwetvergunning is verleend"
 
   input:
+    # Leeftijd exploitant uit BRP (geboortedatum)
+    - name: "LEEFTIJD_EXPLOITANT"
+      description: "Leeftijd van de exploitant (eerste leidinggevende), berekend uit geboortedatum in BRP"
+      type: "number"
+      service_reference:
+        service: "RvIG"
+        law: "wet_brp"
+        field: "leeftijd"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN_LEIDINGGEVENDE"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Artikel 8 lid 1 onder a bepaalt dat leidinggevenden de leeftijd van 21 jaar moeten hebben bereikt"
+
+    # Curatele-status exploitant uit Rechtspraak
+    - name: "IS_ONDER_CURATELE_EXPLOITANT"
+      description: "Of de exploitant onder curatele staat (uit curateleregister Rechtspraak)"
+      type: "boolean"
+      service_reference:
+        service: "RECHTSPRAAK"
+        law: "burgerlijk_wetboek_handelingsonbekwaamheid"
+        field: "is_onder_curatele"
+        parameters:
+          - name: "BSN"
+            reference: "$BSN_LEIDINGGEVENDE"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      legal_basis:
+        law: "Alcoholwet"
+        bwb_id: "BWBR0002458"
+        article: "8"
+        paragraph: "1"
+        url: "https://wetten.overheid.nl/BWBR0002458/2024-01-01#Hoofdstuk2_Artikel8"
+        explanation: "Artikel 8 lid 1 onder c bepaalt dat leidinggevenden niet onder curatele mogen staan"
+
     # Bedrijfsstatus via KVK
     - name: "BEDRIJF_STATUS"
       description: "Status van de onderneming in het handelsregister"

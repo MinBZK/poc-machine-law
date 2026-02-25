@@ -14,7 +14,9 @@
             </div>
             {% if missing_required %}
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-600">Er ontbreken gegevens om te bepalen of de jaarrekening deponeringsplicht van toepassing is.</p>
+                    <p class="text-sm text-gray-600">
+                        Er ontbreken gegevens om te bepalen of de jaarrekening deponeringsplicht van toepassing is.
+                    </p>
                 </div>
             {% elif result and result.heeft_deponeringsplicht %}
                 <div class="space-y-4">
@@ -73,9 +75,7 @@
                     {% if result and result.reden_vrijstelling %}
                         <p class="text-sm text-gray-500">{{ result.reden_vrijstelling }}</p>
                     {% else %}
-                        <p class="text-sm text-gray-500">
-                            Uw organisatie is een eenmanszaak en daarmee vrijgesteld van de deponeringsplicht.
-                        </p>
+                        <p class="text-sm text-gray-500">Uw organisatie is een eenmanszaak en daarmee vrijgesteld van de deponeringsplicht.</p>
                     {% endif %}
                 </div>
             {% endif %}

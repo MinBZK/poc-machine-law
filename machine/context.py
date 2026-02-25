@@ -236,6 +236,12 @@ class RuleContext:
                     claim = self.claims.get(path)
                     value = claim.new_value
                     logger.debug(f"Resolving from CLAIM: {value}")
+
+                    # Coerce claim values to match the expected type from the spec
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        value = self._coerce_claim_value(value, spec)
+
                     node.result = value
                     node.resolve_type = "CLAIM"
 
@@ -286,8 +292,16 @@ class RuleContext:
 
                 # Check parameters
                 if path in self.parameters:
-                    logger.debug(f"Resolving from PARAMETERS: {self.parameters[path]}")
-                    node.result = self.parameters[path]
+                    value = self.parameters[path]
+
+                    # Coerce parameter values to match the expected type from the spec
+                    # (form-submitted values may be stored as strings in case parameters)
+                    if path in self.property_specs:
+                        spec = self.property_specs[path]
+                        value = self._coerce_claim_value(value, spec)
+
+                    logger.debug(f"Resolving from PARAMETERS: {value}")
+                    node.result = value
                     node.resolve_type = "PARAMETER"
 
                     # Add spec information if available
@@ -299,7 +313,7 @@ class RuleContext:
                         if "type_spec" in spec:
                             node.details["type_spec"] = spec["type_spec"]
 
-                    return self.parameters[path]
+                    return value
 
                 # Check outputs
                 if path in self.outputs:
@@ -599,6 +613,8 @@ class RuleContext:
         try:
             # First check if there's an approved case for this service/law/parameters combination
             # This allows service_references to see approved vergunningen
+            found_approved_case = False
+            approved_case_parameters = None
             if self.service_provider and hasattr(self.service_provider, "case_manager"):
                 case_manager = self.service_provider.case_manager
                 if case_manager:
@@ -621,6 +637,7 @@ class RuleContext:
                                     break
 
                             if params_match:
+                                found_approved_case = True
                                 # Found an approved case with matching parameters
                                 field = service_ref["field"]
 
@@ -642,6 +659,8 @@ class RuleContext:
                                     elif field in claimed:
                                         resolved_value = claimed[field]
                                     else:
+                                        # Store the case's parameters for re-evaluation fallback
+                                        approved_case_parameters = case_params
                                         continue  # Field not found, try next case or fall through
 
                                     logger.debug(f"Resolved {field} from approved case {case.id}: {resolved_value}")
@@ -685,11 +704,17 @@ class RuleContext:
 
                                 return resolved_value
 
-            # No approved case found, evaluate normally
+            # If an approved case exists but the specific field wasn't in its stored
+            # results, re-evaluate using the case's stored parameters (which include
+            # user-submitted values like TERRAS_OPPERVLAKTE that aren't available from
+            # the outer evaluation's parameters alone).
+            eval_parameters = parameters
+            if found_approved_case and approved_case_parameters:
+                eval_parameters = {**parameters, **approved_case_parameters}
             result = self.service_provider.evaluate(
                 service_ref["service"],
                 service_ref["law"],
-                parameters,
+                eval_parameters,
                 reference_date,
                 self.overwrite_input,
                 requested_output=service_ref["field"],
@@ -705,11 +730,65 @@ class RuleContext:
             service_node.result = value
             service_node.children.append(result.path)
 
-            self.missing_required = self.missing_required or result.missing_required
+            # Only propagate missing_required from inner evaluation if this field
+            # is itself required and couldn't be resolved. Otherwise, an optional
+            # service_reference whose inner law has unresolved inputs would
+            # incorrectly mark the outer law as having missing required values.
+            if value is None and spec.get("required", False):
+                self.missing_required = True
 
             return value
         finally:
             self.pop_path()
+
+    @staticmethod
+    def _coerce_claim_value(value: Any, spec: dict[str, Any]) -> Any:
+        """Coerce a claim value to match the expected type from the spec.
+
+        Claim values from form submissions are often strings. This method
+        casts them to the type declared in the spec (number, boolean, enum)
+        so that downstream comparisons work correctly.
+        """
+        if value is None:
+            return value
+
+        expected_type = spec.get("type")
+        type_spec = spec.get("type_spec", {})
+
+        # For enums, try to match the value to the actual enum value type
+        if expected_type == "enum" and "enum" in type_spec and isinstance(value, str):
+            enum_values = type_spec["enum"]
+            # Check if enum values are numeric
+            if enum_values and isinstance(enum_values[0], int):
+                try:
+                    int_val = int(value)
+                    if int_val in enum_values:
+                        return int_val
+                except (ValueError, TypeError):
+                    pass
+            elif enum_values and isinstance(enum_values[0], float):
+                try:
+                    float_val = float(value)
+                    return float_val
+                except (ValueError, TypeError):
+                    pass
+
+        # For number type, cast string to number
+        if expected_type == "number" and isinstance(value, str):
+            try:
+                float_val = float(value)
+                return int(float_val) if float_val == int(float_val) else float_val
+            except (ValueError, TypeError):
+                pass
+
+        # For boolean type, cast string to bool
+        if expected_type == "boolean" and isinstance(value, str):
+            if value.lower() in ("true", "1", "yes"):
+                return True
+            if value.lower() in ("false", "0", "no"):
+                return False
+
+        return value
 
     def _resolve_type_spec_enums(self, spec: dict[str, Any], type_spec: dict[str, Any]) -> dict[str, Any]:
         """

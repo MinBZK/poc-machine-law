@@ -11,7 +11,10 @@ This module defines:
 DEMO_DISABLED_LAWS = {
     "BELASTINGDIENST": [
         "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
-        "zvw/werkgeversbijdrage",  # Werkgeversbijdrage Zorgverzekeringswet
+        "zvw",  # Werkgeversbijdrage Zorgverzekeringswet (law field is "zvw", not "zvw/werkgeversbijdrage")
+    ],
+    "KVK": [
+        "handelsregisterwet/jaarrekening",  # Jaarrekening Deponeringsplicht
     ],
     "NVWA": [
         "warenwet/haccp",  # HACCP Voedselveiligheid

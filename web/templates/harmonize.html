@@ -214,7 +214,10 @@
                         <template x-if="config.method === 'bracket'">
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Aantal inkomensschijven</label>
+                                    <label class="block text-sm font-medium text-gray-700"
+                                           x-text="profileType === 'ondernemer' ? 'Aantal oppervlakteschijven' : 'Aantal inkomensschijven'">
+                                        Aantal inkomensschijven
+                                    </label>
                                     <span class="block text-xs text-gray-400 mb-1">Meer schijven = fijnmaziger, maar complexer.</span>
                                     <input type="range"
                                            x-model.number="config.n_brackets"
@@ -598,7 +601,8 @@
                                           x-text="formatPct(activeRun?.result?.metrics?.cross_validation?.f1_mean) + ' (\u00b1' + formatPct(activeRun?.result?.metrics?.cross_validation?.f1_std) + ')'"></span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-500">Recall (hoeveel rechthebbenden gevonden):
+                                    <span class="text-gray-500"
+                                          x-text="profileType === 'ondernemer' ? 'Recall (hoeveel verplichte bedrijven gevonden):' : 'Recall (hoeveel rechthebbenden gevonden):'">
                                         <br>
                                     </span>
                                     <span class="font-medium"
@@ -724,25 +728,29 @@
                                             <summary class="px-3 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center">
                                                 <span class="text-sm font-medium text-gray-700" x-text="group.label"></span>
                                                 <span class="text-xs text-gray-400"
-                                                      x-text="'max €' + Math.max(...group.bands.map(b => b.amount_from)).toFixed(0) + '/mnd'"></span>
+                                                      x-text="'max €' + Math.max(...group.bands.map(b => b.amount_from)).toFixed(0) + (profileType === 'ondernemer' ? '' : '/mnd')"></span>
                                             </summary>
                                             <div class="px-3 pb-2">
                                                 <table class="min-w-full text-sm">
                                                     <thead>
                                                         <tr class="bg-gray-50">
-                                                            <th class="px-2 py-1 text-left text-xs">Inkomen van</th>
+                                                            <th class="px-2 py-1 text-left text-xs"
+                                                                x-text="profileType === 'ondernemer' ? 'Oppervlakte van' : 'Inkomen van'">
+                                                            </th>
                                                             <th class="px-2 py-1 text-left text-xs">t/m</th>
-                                                            <th class="px-2 py-1 text-right text-xs">Toeslag/mnd</th>
+                                                            <th class="px-2 py-1 text-right text-xs"
+                                                                x-text="profileType === 'ondernemer' ? 'Kosten' : 'Toeslag/mnd'">
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <template x-for="(band, idx) in group.bands" :key="idx">
                                                             <tr class="border-t border-gray-100">
                                                                 <td class="px-2 py-1 text-sm"
-                                                                    x-text="'€' + Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL')">
+                                                                    x-text="profileType === 'ondernemer' ? Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL') + ' m²' : '€' + Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL')">
                                                                 </td>
                                                                 <td class="px-2 py-1 text-sm"
-                                                                    x-text="'€' + Number(band.income_to).toLocaleString('nl-NL')">
+                                                                    x-text="profileType === 'ondernemer' ? Number(band.income_to).toLocaleString('nl-NL') + ' m²' : '€' + Number(band.income_to).toLocaleString('nl-NL')">
                                                                 </td>
                                                                 <td class="px-2 py-1 text-right font-mono font-semibold"
                                                                     :class="band.amount_from > 0 ? 'text-green-700' : 'text-gray-400'"
@@ -758,9 +766,9 @@
                                 </template>
                             </div>
                             <p class="text-xs text-gray-400 mt-2"
-                               x-text="'Groepen zonder toeslag (' + bracketGroups().filter(g => !g.bands.some(b => b.amount_from > 0)).length + ') zijn verborgen'">
+                               x-text="'Groepen zonder ' + (profileType === 'ondernemer' ? 'kosten' : 'toeslag') + ' (' + bracketGroups().filter(g => !g.bands.some(b => b.amount_from > 0)).length + ') zijn verborgen'">
                             </p>
-                            <template x-if="activeRun?.result?.child_supplement > 0">
+                            <template x-if="activeRun?.result?.child_supplement > 0 && profileType !== 'ondernemer'">
                                 <p class="mt-3 text-sm text-gray-600">
                                     Kindtoeslag: <span class="font-semibold"
        x-text="'EUR ' + Number(activeRun.result.child_supplement).toFixed(0)"></span> extra per kind per maand
@@ -986,7 +994,9 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr>
-                                        <td class="px-4 py-2 text-gray-700">Nauwkeurigheid recht (Accuracy)</td>
+                                        <td class="px-4 py-2 text-gray-700"
+                                            x-text="profileType === 'ondernemer' ? 'Nauwkeurigheid compliance (Accuracy)' : 'Nauwkeurigheid recht (Accuracy)'">
+                                        </td>
                                         <template x-for="(run, i) in completedRuns" :key="'acc-'+run.id">
                                             <td class="px-4 py-2 text-right">
                                                 <span x-text="formatPct(run.result?.metrics?.eligibility_accuracy)"></span>
@@ -998,7 +1008,7 @@
                                             </td>
                                         </template>
                                     </tr>
-                                    <tr>
+                                    <tr x-show="profileType !== 'ondernemer'">
                                         <td class="px-4 py-2 text-gray-700">Verklarende waarde bedrag (R&sup2;)</td>
                                         <template x-for="(run, i) in completedRuns" :key="'r2-'+run.id">
                                             <td class="px-4 py-2 text-right">
@@ -1011,7 +1021,7 @@
                                             </td>
                                         </template>
                                     </tr>
-                                    <tr>
+                                    <tr x-show="profileType !== 'ondernemer'">
                                         <td class="px-4 py-2 text-gray-700">Gemiddelde afwijking bedrag (MAE)</td>
                                         <template x-for="(run, i) in completedRuns" :key="'mae-'+run.id">
                                             <td class="px-4 py-2 text-right">
@@ -1360,10 +1370,10 @@
             availableLaws: {{ available_laws | tojson }},
             selectedLaws: {{ default_selected | tojson }},
             methodLabels: {tree: 'Beslisboom', bracket: 'Staffelmodel', parametric: 'Parametrisch'},
-            availableMethods: {{ (['tree'] if profile_type == 'ondernemer' else ['bracket', 'tree', 'parametric']) | tojson }},
+            availableMethods: {{ (['bracket', 'tree'] if profile_type == 'ondernemer' else ['bracket', 'tree', 'parametric']) | tojson }},
             methodDescriptions: {
                 tree: 'Beslisboom + lineaire regressie. Goed interpreteerbaar, flexibele regels.',
-                bracket: 'Inkomensafhankelijke staffel met lineaire interpolatie. Geen cliff effects.',
+                bracket: '{{ "Oppervlakteafhankelijke staffel met lineaire interpolatie. Geen cliff effects." if profile_type == "ondernemer" else "Inkomensafhankelijke staffel met lineaire interpolatie. Geen cliff effects." }}',
                 parametric: 'Vereenvoudigde formule: max(0, basis - afbouw% x (inkomen - drempel)). Meest compact.',
             },
             sections: {
@@ -1585,6 +1595,7 @@
                     sbi_is_food: ['Geen levensmiddelen-SBI', 'Levensmiddelen-SBI'],
                     bereidt_of_serveert_voedsel: ['Geen voedsel', 'Bereidt/serveert voedsel'],
                     is_woonfunctie: ['Geen woonfunctie', 'Woonfunctie'],
+                    has_terrace: ['Zonder terras', 'Met terras'],
                 };
                 // Add labels for auto-discretized features (e.g. age_above_67)
                 const disc = this.activeRun?.result?.discretized_features || {};
@@ -1628,7 +1639,7 @@
             },
 
             formatHouseholdFilter(filter, labels) {
-                if (!filter || Object.keys(filter).length === 0) return 'Alle huishoudens';
+                if (!filter || Object.keys(filter).length === 0) return this.profileType === 'ondernemer' ? 'Alle bedrijven' : 'Alle huishoudens';
                 const parts = [];
                 for (const [key, val] of Object.entries(filter)) {
                     const pair = labels[key];

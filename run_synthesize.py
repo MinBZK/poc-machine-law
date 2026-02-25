@@ -36,14 +36,15 @@ AVAILABLE_LAWS: dict[str, dict] = {
 
 DEFAULT_SELECTED_LAWS = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
 
-# Business laws available for ondernemer profile (eligibility-only, no amounts)
+# Business laws available for ondernemer profile
 AVAILABLE_BUSINESS_LAWS: dict[str, dict] = {
     "alcoholwet": {"label": "Alcoholwet", "group": "Vergunningen"},
     "haccp": {"label": "HACCP Voedselveiligheid", "group": "Verplichtingen"},
     "energie_informatieplicht": {"label": "Informatieplicht Energiebesparing", "group": "Verplichtingen"},
+    "precariobelasting": {"label": "Precariobelasting", "group": "Belastingen"},
 }
 
-DEFAULT_SELECTED_BUSINESS_LAWS = ["alcoholwet", "haccp", "energie_informatieplicht"]
+DEFAULT_SELECTED_BUSINESS_LAWS = ["alcoholwet", "haccp", "energie_informatieplicht", "precariobelasting"]
 
 
 def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
@@ -62,7 +63,7 @@ def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
         "age": ["zorgtoeslag", "kindgebonden_budget", "aow", "ww"],
         # Business features
         "leeftijd_leidinggevende": ["alcoholwet"],
-        "vloeroppervlakte": ["alcoholwet"],
+        "vloeroppervlakte": ["alcoholwet", "haccp", "precariobelasting"],
         "type_bedrijf_horeca": ["alcoholwet"],
         "is_onder_curatele": ["alcoholwet"],
         "sbi_is_food": ["haccp", "nvwa_meldplicht"],
@@ -73,6 +74,8 @@ def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
         "is_geselecteerd_cbs_enquete": ["cbs_enquete"],
         "rechtsvorm_vereist_jaarrekening": ["kvk_jaarrekening"],
         "heeft_actief_incident": ["nvwa_meldplicht"],
+        "terras_oppervlakte": ["precariobelasting"],
+        "has_terrace": ["precariobelasting"],
     }
     # Filter to only selected laws
     result = {}
@@ -388,7 +391,22 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
         results_df = simulator.run_simulation(num_people=num_people)
         synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
-    config = BracketLearnerConfig(n_brackets=n_brackets)
+    is_business = _is_business_profile(params, selected_laws)
+    if is_business:
+        primary_feature = "vloeroppervlakte"
+        rounding_bracket = 10.0  # nearest 10m²
+        rounding_amount = 5.0
+    else:
+        primary_feature = "income"
+        rounding_bracket = 1000.0  # nearest EUR 1000
+        rounding_amount = 5.0
+
+    config = BracketLearnerConfig(
+        n_brackets=n_brackets,
+        primary_feature=primary_feature,
+        rounding_bracket=rounding_bracket,
+        rounding_amount=rounding_amount,
+    )
     learner = BracketLearner(config=config)
 
     # Get dynamic grouping keys based on selected laws
@@ -401,13 +419,21 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
             grouping_keys.append(f)
 
     # Get continuous features that may be auto-discretized (e.g. age for AOW)
-    continuous_keys = get_continuous_features_for_laws(selected_laws)
+    continuous_keys = get_continuous_features_for_laws(selected_laws, exclude_primary=primary_feature)
 
     model = learner.train(synthesis_df, grouping_keys=grouping_keys, continuous_keys=continuous_keys)
     metrics = learner.evaluate(model, synthesis_df)
 
     # Generate YAML
-    yaml_config = BracketYAMLConfig()
+    if is_business:
+        yaml_config = BracketYAMLConfig(
+            service_name="GEMEENTE_ROTTERDAM",
+            law_name="geharmoniseerde_nalevingskosten_staffel",
+            law_display_name="Geharmoniseerde Nalevingskosten (Staffelmodel)",
+            description="Geharmoniseerde nalevingskosten op basis van oppervlakteafhankelijke staffels",
+        )
+    else:
+        yaml_config = BracketYAMLConfig()
     generator = BracketYAMLGenerator(config=yaml_config)
     yaml_spec = generator.generate(model)
     yaml_string = generator.to_yaml_string(yaml_spec)
@@ -444,6 +470,7 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
         },
         "bracket_table": bracket_table,
         "income_brackets": model.income_brackets,
+        "primary_feature": model.primary_feature,
         "child_supplement": model.child_supplement,
         "feature_influence": model.feature_influence,
         "discretized_features": {k: {"source": v[0], "threshold": v[1]} for k, v in model.discretized_features.items()},
@@ -525,34 +552,52 @@ def _generate_bracket_explanation(model, selected_laws: list[str]) -> str:
     law_names = [all_laws_dict.get(l, {}).get("label", l) for l in selected_laws]
     laws_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
 
-    lines = [
-        "# Geharmoniseerde Toeslag — Staffelmodel",
-        "",
-        f"Deze toeslag combineert **{laws_text}** in een inkomensafhankelijke staffel.",
-        "",
-        "---",
-        "",
-        "## Hoe werkt het?",
-        "",
-        "Uw toeslagbedrag wordt bepaald door uw inkomen en huishoudsituatie.",
-        "Binnen elke inkomensband wordt het bedrag vloeiend berekend (lineaire interpolatie),",
-        "zodat er geen harde grenzen ('cliff effects') zijn.",
-        "",
-        "## Inkomensschijven",
-        "",
-        "| Van | Tot | Bedrag ondergrens | Bedrag bovengrens |",
-        "|-----|-----|-------------------|-------------------|",
-    ]
+    is_business = model.primary_feature != "income"
+
+    if is_business:
+        title = "# Geharmoniseerde Nalevingskosten — Staffelmodel"
+        intro = f"Deze kostenregeling combineert **{laws_text}** in een oppervlakteafhankelijke staffel."
+        how_it_works = [
+            "Uw nalevingskosten worden bepaald door de vloeroppervlakte en bedrijfssituatie.",
+            "Binnen elke oppervlakteband worden de kosten vloeiend berekend (lineaire interpolatie),",
+            "zodat er geen harde grenzen ('cliff effects') zijn.",
+        ]
+        bracket_title = "## Oppervlakteschijven"
+        header = "| Van | Tot | Kosten ondergrens | Kosten bovengrens |"
+        separator = "|-----|-----|-------------------|-------------------|"
+        footer = "*Het uiteindelijke bedrag is minimaal EUR 0.*"
+    else:
+        title = "# Geharmoniseerde Toeslag — Staffelmodel"
+        intro = f"Deze toeslag combineert **{laws_text}** in een inkomensafhankelijke staffel."
+        how_it_works = [
+            "Uw toeslagbedrag wordt bepaald door uw inkomen en huishoudsituatie.",
+            "Binnen elke inkomensband wordt het bedrag vloeiend berekend (lineaire interpolatie),",
+            "zodat er geen harde grenzen ('cliff effects') zijn.",
+        ]
+        bracket_title = "## Inkomensschijven"
+        header = "| Van | Tot | Bedrag ondergrens | Bedrag bovengrens |"
+        separator = "|-----|-----|-------------------|-------------------|"
+        footer = "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*"
+
+    lines = [title, "", intro, "", "---", "", "## Hoe werkt het?", ""]
+    lines.extend(how_it_works)
+    lines.extend(["", bracket_title, "", header, separator])
 
     seen_brackets = set()
     for seg in model.segments:
         key = (seg.income_lower, seg.income_upper)
         if key not in seen_brackets:
             seen_brackets.add(key)
-            lines.append(
-                f"| EUR {seg.income_lower:,.0f} | EUR {seg.income_upper:,.0f} "
-                f"| EUR {seg.amount_at_lower:,.2f}/mnd | EUR {seg.amount_at_upper:,.2f}/mnd |"
-            )
+            if is_business:
+                lines.append(
+                    f"| {seg.income_lower:,.0f} m² | {seg.income_upper:,.0f} m² "
+                    f"| EUR {seg.amount_at_lower:,.2f} | EUR {seg.amount_at_upper:,.2f} |"
+                )
+            else:
+                lines.append(
+                    f"| EUR {seg.income_lower:,.0f} | EUR {seg.income_upper:,.0f} "
+                    f"| EUR {seg.amount_at_lower:,.2f}/mnd | EUR {seg.amount_at_upper:,.2f}/mnd |"
+                )
 
     if model.child_supplement > 0:
         lines.extend(
@@ -564,14 +609,7 @@ def _generate_bracket_explanation(model, selected_laws: list[str]) -> str:
             ]
         )
 
-    lines.extend(
-        [
-            "",
-            "---",
-            "",
-            "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*",
-        ]
-    )
+    lines.extend(["", "---", "", footer])
 
     return "\n".join(lines)
 
@@ -650,12 +688,18 @@ def run_validate(params: dict) -> dict:
     accuracy_target = params.get("accuracy_target", 0.95)
     amount_tolerance = params.get("amount_tolerance", 50.0)
 
-    # Run simulation for validation with optional demographic params
-    simulator = LawSimulator(simulation_date)
-    apply_custom_parameters(simulator, params)
-    results_df = simulator.run_simulation(num_people=num_people)
     selected_laws = params.get("selected_laws", DEFAULT_SELECTED_LAWS)
-    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    # Run simulation for validation
+    simulator = LawSimulator(simulation_date)
+
+    if _is_business_profile(params, selected_laws):
+        results_df = simulator.run_business_simulation(num_businesses=num_people)
+        synthesis_df = simulator.export_for_business_synthesis(results_df, selected_laws=selected_laws)
+    else:
+        apply_custom_parameters(simulator, params)
+        results_df = simulator.run_simulation(num_people=num_people)
+        synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     # Train model
     constraints = InterpretabilityConstraints(

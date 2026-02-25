@@ -6,7 +6,6 @@ law_type: "GEMEENTELIJKE_VERORDENING"
 legal_character: "BESCHIKKING"
 decision_type: "TOEKENNING"
 discoverable: "BUSINESS"
-requires_manual_approval: true
 valid_from: 2024-01-01
 service: "GEMEENTE_ROTTERDAM"
 legal_basis:

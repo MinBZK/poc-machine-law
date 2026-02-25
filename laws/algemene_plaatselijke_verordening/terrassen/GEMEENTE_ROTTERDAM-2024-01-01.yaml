@@ -494,6 +494,19 @@ properties:
         url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
         explanation: "De burgemeester kan de vergunning weigeren indien niet wordt voldaan aan de voorwaarden"
 
+    - name: "heeft_actieve_vergunning"
+      description: "Of er een actieve (goedgekeurde) terrasvergunning is"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Een actieve terrasvergunning wordt verleend wanneer aan alle voorwaarden is voldaan"
+
     - name: "vergunde_oppervlakte"
       description: "Vergunde oppervlakte van het terras in vierkante meters"
       type: "number"
@@ -716,6 +729,14 @@ actions:
       article: "2:30b"
       url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
       explanation: "Alle voorwaarden moeten worden vervuld voor een terrasvergunning"
+
+  - output: "heeft_actieve_vergunning"
+    value: true
+    legal_basis:
+      law: "Algemene plaatselijke verordening Rotterdam 2012"
+      article: "2:30b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+      explanation: "Een actieve vergunning wordt verleend wanneer aan alle voorwaarden is voldaan"
 
   - output: "weigeringsgrond"
     operation: IF

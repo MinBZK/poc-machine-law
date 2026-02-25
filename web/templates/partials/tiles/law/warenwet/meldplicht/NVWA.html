@@ -14,7 +14,9 @@
             </div>
             {% if missing_required %}
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-600">Er ontbreken gegevens om te bepalen of de meldplicht voedselveiligheid van toepassing is.</p>
+                    <p class="text-sm text-gray-600">
+                        Er ontbreken gegevens om te bepalen of de meldplicht voedselveiligheid van toepassing is.
+                    </p>
                 </div>
             {% elif result and result.heeft_meldplicht %}
                 <div class="space-y-4">

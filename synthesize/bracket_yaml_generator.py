@@ -40,6 +40,12 @@ class BracketYAMLGenerator:
         "has_children": {"name": "HAS_CHILDREN", "description": "Heeft kinderen", "type": "boolean"},
         "children_count": {"name": "CHILDREN_COUNT", "description": "Aantal kinderen", "type": "number"},
         "housing_type_rent": {"name": "IS_RENTER", "description": "Huurt woning", "type": "boolean"},
+        "vloeroppervlakte": {"name": "VLOEROPPERVLAKTE", "description": "Vloeroppervlakte (m²)", "type": "number"},
+        "terras_oppervlakte": {"name": "TERRAS_OPPERVLAKTE", "description": "Terrasoppervlakte (m²)", "type": "number"},
+        "type_bedrijf_horeca": {"name": "TYPE_BEDRIJF_HORECA", "description": "Horecabedrijf", "type": "boolean"},
+        "is_onder_curatele": {"name": "IS_ONDER_CURATELE", "description": "Onder curatele", "type": "boolean"},
+        "sbi_is_food": {"name": "SBI_IS_FOOD", "description": "Levensmiddelen-SBI", "type": "boolean"},
+        "has_terrace": {"name": "HAS_TERRACE", "description": "Heeft terras", "type": "boolean"},
     }
 
     def __init__(self, config: BracketYAMLConfig | None = None) -> None:
@@ -47,6 +53,7 @@ class BracketYAMLGenerator:
 
     def generate(self, model: BracketModel) -> dict[str, Any]:
         """Generate YAML spec from bracket model."""
+        is_business = model.primary_feature != "income"
         yaml_spec = {
             "$id": "https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.4/schema.json",
             "uuid": str(uuid.uuid4()),
@@ -55,7 +62,7 @@ class BracketYAMLGenerator:
             "law_type": "MATERIELE_WET",
             "legal_character": "BESCHIKKING",
             "decision_type": "TOEKENNING",
-            "discoverable": "CITIZEN",
+            "discoverable": "BUSINESS" if is_business else "CITIZEN",
             "valid_from": self.config.valid_from.isoformat(),
             "service": self.config.service_name,
             "description": self.config.description,
@@ -66,8 +73,9 @@ class BracketYAMLGenerator:
 
     def _generate_properties(self, model: BracketModel) -> dict[str, Any]:
         """Generate properties section."""
+        is_business = model.primary_feature != "income"
         inputs = []
-        used_features = {"income"}  # Always need income
+        used_features = {model.primary_feature}  # Always need primary feature
         for seg in model.segments:
             if seg.household_filter:
                 used_features.update(seg.household_filter.keys())
@@ -78,19 +86,28 @@ class BracketYAMLGenerator:
             if feat in self.FEATURE_TO_INPUT:
                 inputs.append(self.FEATURE_TO_INPUT[feat].copy())
 
+        if is_business:
+            parameters = [{"name": "KVK_NUMMER", "description": "KVK-nummer", "type": "string", "required": True}]
+            output_name = "nalevingskosten"
+            output_desc = "Nalevingskosten (staffelmodel)"
+        else:
+            parameters = [{"name": "BSN", "description": "Burgerservicenummer", "type": "string", "required": True}]
+            output_name = "toeslag_bedrag"
+            output_desc = "Maandelijks toeslagbedrag (staffelmodel)"
+
         return {
-            "parameters": [{"name": "BSN", "description": "Burgerservicenummer", "type": "string", "required": True}],
+            "parameters": parameters,
             "input": inputs,
             "output": [
                 {
                     "name": "is_eligible",
-                    "description": "Recht op toeslag",
+                    "description": "Recht op toeslag" if not is_business else "Verplichting van toepassing",
                     "type": "boolean",
                     "citizen_relevance": "secondary",
                 },
                 {
-                    "name": "toeslag_bedrag",
-                    "description": "Maandelijks toeslagbedrag (staffelmodel)",
+                    "name": output_name,
+                    "description": output_desc,
                     "type": "amount",
                     "type_spec": {"unit": "eurocent", "precision": 0, "min": 0},
                     "citizen_relevance": "primary",
@@ -101,13 +118,21 @@ class BracketYAMLGenerator:
 
     def _generate_definitions(self, model: BracketModel) -> dict[str, Any]:
         """Generate definitions with bracket table."""
+        is_business = model.primary_feature != "income"
+        prefix = "OPPERVLAKTEGRENS" if is_business else "INKOMENSGRENS"
         defs = {}
         for i, boundary in enumerate(model.income_brackets):
-            defs[f"INKOMENSGRENS_{i}"] = int(boundary)
+            defs[f"{prefix}_{i}"] = int(boundary)
         return defs
 
     def _generate_actions(self, model: BracketModel) -> list[dict[str, Any]]:
         """Generate actions with IF/THEN per bracket."""
+        is_business = model.primary_feature != "income"
+        output_name = "nalevingskosten" if is_business else "toeslag_bedrag"
+        # Map primary feature to YAML variable name
+        pf_input = self.FEATURE_TO_INPUT.get(model.primary_feature, {}).get("name", model.primary_feature.upper())
+        pf_var = f"${pf_input}"
+
         actions: list[dict[str, Any]] = [{"output": "is_eligible", "value": True}]
 
         # Group segments by household type
@@ -115,18 +140,18 @@ class BracketYAMLGenerator:
         for seg in model.segments:
             test_parts = []
 
-            # Income range test
+            # Primary feature range test
             test_parts.append(
                 {
                     "operation": "GREATER_OR_EQUAL",
-                    "subject": "$INCOME",
+                    "subject": pf_var,
                     "value": int(seg.income_lower),
                 }
             )
             test_parts.append(
                 {
                     "operation": "LESS_THAN",
-                    "subject": "$INCOME",
+                    "subject": pf_var,
                     "value": int(seg.income_upper),
                 }
             )
@@ -165,7 +190,7 @@ class BracketYAMLGenerator:
                                         round(slope, 6),
                                         {
                                             "operation": "SUBTRACT",
-                                            "values": ["$INCOME", int(seg.income_lower)],
+                                            "values": [pf_var, int(seg.income_lower)],
                                         },
                                     ],
                                 },
@@ -179,16 +204,16 @@ class BracketYAMLGenerator:
 
         conditions.append({"else": {"value": 0}})
 
-        actions.append({"output": "toeslag_bedrag", "operation": "IF", "conditions": conditions})
+        actions.append({"output": output_name, "operation": "IF", "conditions": conditions})
 
         # Add child supplement if applicable
         if model.child_supplement > 0:
             actions.append(
                 {
-                    "output": "toeslag_bedrag",
+                    "output": output_name,
                     "operation": "ADD",
                     "values": [
-                        "$toeslag_bedrag",
+                        f"${output_name}",
                         {
                             "operation": "MULTIPLY",
                             "values": [round(model.child_supplement, 2), "$CHILDREN_COUNT"],

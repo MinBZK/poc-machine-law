@@ -4257,12 +4257,6 @@ profiles:
         vestigingen:
         - kvk_nummer: '85234567'
           adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
-          schenkt_alcohol: false
-          heeft_terras: true
-          terras_oppervlakte_m2: null
-        is_entrepreneur:
-        - bsn: '999999990'
-          waarde: true
         organisaties:
         - kvk_nummer: '85234567'
           rechtsvorm: EENMANSZAAK
@@ -4274,7 +4268,6 @@ profiles:
         jaarrekeningen:
         - kvk_nummer: '85234567'
           rechtsvorm: EENMANSZAAK
-          heeft_depot_plicht: false
           laatste_boekjaar_einde: '2025-12-31'
       UWV:
         arbeidsverhoudingen:
@@ -4362,6 +4355,7 @@ profiles:
         - kvk_nummer: '85234567'
           adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
           schenkt_alcohol: false
+          heeft_terras: true
         vergunningen:
         - kvk_nummer: '85234567'
           heeft_exploitatievergunning: true
@@ -4407,11 +4401,6 @@ profiles:
           alle_hebben_vog: true
           alle_voldoen_leeftijd: true
           geen_onder_curatele: true
-        bibob_adviezen:
-        - kvk_nummer: '85234567'
-          bsn: '999999990'
-          advies_uitgebracht: false
-          mate_van_gevaar: geen_gevaar
         # Data voor alcoholwetvergunning - leidinggevenden tabel
         leidinggevenden:
         - kvk_nummer: '85234567'
@@ -4455,7 +4444,7 @@ profiles:
         bgt_terraslocaties:
         - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
           locatie: voor
-          beschikbare_oppervlakte: 15.0
+          beschikbare_oppervlakte: 100.0
           functie_oppervlak: voetpad
           is_openbare_weg: true
         terrassenbeleid:
@@ -4463,21 +4452,17 @@ profiles:
           seizoen: jaarrond
           gebied: Rotterdam West
           max_oppervlakte: 20.0
-          max_sluitingstijd_doordeweeks: 1
-          max_sluitingstijd_weekend: 2
+          max_sluitingstijd_doordeweeks: 25
+          max_sluitingstijd_weekend: 26
           seizoensregels: jaarrond toegestaan
           toegestane_locaties:
             - voor
             - zij
-        precario_tarieven:
-        - adres: Nieuwe Binnenweg 225A, 3021GC Rotterdam
-          gebruik: terras
-          tarief_per_m2: 45.50
       LBB:
         bibob_adviezen:
         - kvk_nummer: '85234567'
           bsn: '999999990'
-          advies_uitgebracht: false
+          advies_uitgebracht: true
           mate_van_gevaar: geen_gevaar
       RVO:
         # WPM rapportageverplichting gegevens - Claudia heeft geen werknemers

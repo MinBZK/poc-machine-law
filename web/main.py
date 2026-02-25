@@ -175,6 +175,21 @@ async def root(
             logger = logging.getLogger(__name__)
             logger.warning(f"Failed to get delegations for user {bsn}: {e}")
 
+        # Auto-activate business delegation for ondernemer demo profiles
+        # When delegation is enabled and the profile has a kvk but no active delegation,
+        # automatically set the delegation context via the machtigingenwet
+        if delegation_context is None:
+            active_profile = DemoProfiles.get_active_profile()
+            profile_kvk = active_profile.get("kvk")
+            if profile_kvk and delegations:
+                for d in delegations:
+                    if getattr(d, "subject_id", None) == profile_kvk and getattr(d, "subject_type", None) == "BUSINESS":
+                        context = delegation_manager.get_delegation_context(bsn, profile_kvk)
+                        if context:
+                            delegation_context = context
+                            request.session[DELEGATION_SESSION_KEY] = context.to_dict()
+                        break
+
     # Determine effective BSN for data fetching
     # When acting on behalf of a CITIZEN (child), use the child's BSN
     effective_bsn = bsn

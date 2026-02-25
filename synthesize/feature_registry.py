@@ -196,7 +196,7 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         sim_column="vloeroppervlakte",
         display_name="Vloeroppervlakte (m²)",
         yaml_inputs=["VLOEROPPERVLAKTE"],
-        laws=["alcoholwet"],
+        laws=["alcoholwet", "haccp", "precariobelasting"],
         is_continuous=True,
         discretize_laws=["alcoholwet"],
     ),
@@ -275,6 +275,21 @@ FEATURE_REGISTRY: list[FeatureSpec] = [
         laws=["nvwa_meldplicht"],
         is_grouping=True,
     ),
+    # --- Precariobelasting ---
+    FeatureSpec(
+        sim_column="terras_oppervlakte",
+        display_name="Terrasoppervlakte (m²)",
+        yaml_inputs=["TERRAS_OPPERVLAKTE"],
+        laws=["precariobelasting"],
+        is_continuous=True,
+    ),
+    FeatureSpec(
+        sim_column="has_terrace",
+        display_name="Heeft terras",
+        yaml_inputs=["HEEFT_TERRAS"],
+        laws=["precariobelasting"],
+        is_grouping=True,
+    ),
 ]
 
 
@@ -289,19 +304,26 @@ def get_grouping_features_for_laws(selected_laws: list[str]) -> list[str]:
     return [f.sim_column for f in features if f.is_grouping]
 
 
-def get_continuous_features_for_laws(selected_laws: list[str]) -> list[str]:
+def get_continuous_features_for_laws(
+    selected_laws: list[str],
+    exclude_primary: str = "income",
+) -> list[str]:
     """Get continuous feature column names eligible for auto-discretization.
 
     Only returns features that have explicit discretize_laws matching
     the selected laws. This prevents spurious splits (e.g. age split
     at 55 when only zorgtoeslag/huurtoeslag are selected).
+
+    Args:
+        selected_laws: Laws to get features for.
+        exclude_primary: Primary feature to exclude (used as X-axis in bracket model).
     """
     features = get_features_for_laws(selected_laws)
     return [
         f.sim_column
         for f in features
         if f.is_continuous
-        and f.sim_column != "income"
+        and f.sim_column != exclude_primary
         and f.discretize_laws
         and any(law in f.discretize_laws for law in selected_laws)
     ]
