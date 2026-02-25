@@ -1242,7 +1242,7 @@ func compareCaseCanAppeal(c *casemanager.Case) bool     { return c.CanAppeal() }
 func getCaseByID(ctx context.Context, cm casemanager.CaseManager, caseID uuid.UUID, fn func(c *casemanager.Case) bool) (*casemanager.Case, error) {
 	var err error
 	var c *casemanager.Case
-	for range 300 {
+	for range 1000 {
 		c, err = cm.GetCaseByID(ctx, caseID)
 		if err == nil && c != nil && fn(c) {
 			return c, nil
