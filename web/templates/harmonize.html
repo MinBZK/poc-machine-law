@@ -950,7 +950,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200 max-h-[600px] overflow-y-auto"
+                                <div class="prose-law text-gray-700 text-sm bg-gray-50 p-6 rounded-lg border border-gray-200 max-h-[600px] overflow-y-auto"
                                      x-html="renderMarkdown(activeRun?.proseText)"></div>
                             </div>
                         </div>
@@ -1252,6 +1252,25 @@
         color: #9ca3af;
         margin-left: 4px;
     }
+    /* Prose/typography styles for rendered markdown (Tailwind v4 browser CDN lacks typography plugin) */
+    .prose-law h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+    .prose-law h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1f2937; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.25rem; }
+    .prose-law h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.4rem; color: #374151; }
+    .prose-law h4 { font-size: 1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #4b5563; }
+    .prose-law p { margin-top: 0.4rem; margin-bottom: 0.4rem; line-height: 1.65; }
+    .prose-law ol { list-style-type: decimal; padding-left: 1.5rem; margin-top: 0.4rem; margin-bottom: 0.4rem; }
+    .prose-law ul { list-style-type: disc; padding-left: 1.5rem; margin-top: 0.4rem; margin-bottom: 0.4rem; }
+    .prose-law li { margin-top: 0.15rem; margin-bottom: 0.15rem; line-height: 1.55; }
+    .prose-law hr { border-top: 1px solid #d1d5db; margin-top: 1rem; margin-bottom: 1rem; }
+    .prose-law strong { font-weight: 700; }
+    .prose-law em { font-style: italic; }
+    .prose-law blockquote { border-left: 3px solid #6366f1; padding-left: 1rem; margin: 0.75rem 0; color: #4b5563; font-style: italic; }
+    .prose-law table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
+    .prose-law th { background-color: #f9fafb; font-weight: 600; text-align: left; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; }
+    .prose-law td { padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; }
+    .prose-law code { background-color: #f3f4f6; padding: 0.15rem 0.35rem; border-radius: 0.25rem; font-size: 0.85em; }
+    .prose-law pre { background-color: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; }
+    .prose-law pre code { background: none; padding: 0; }
     </style>
     <script>
     // --- Populatiebeheer helper functions (shared with simulation) ---
@@ -1762,6 +1781,8 @@
                     } else {
                         this.runs[runId].result = data;
                         if (!this.baselineRunId) this.baselineRunId = runId;
+                        // Auto-start prose generation in the background
+                        if (data.yaml) this._fetchProse(runId, data.yaml);
                     }
                 } catch (e) {
                     if (!this.runs[runId]) return;
@@ -1817,8 +1838,11 @@
             async generateProse() {
                 const run = this.activeRun;
                 if (!run?.result?.yaml || run.proseLoading) return;
+                this._fetchProse(this.activeTab, run.result.yaml);
+            },
 
-                const runId = this.activeTab;
+            async _fetchProse(runId, yaml) {
+                if (!this.runs[runId]) return;
                 this.runs[runId].proseLoading = true;
                 this.runs[runId].proseError = null;
                 this.runs[runId].proseText = null;
@@ -1828,7 +1852,7 @@
                     const resp = await fetch('/harmonize/generate-prose', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ yaml: run.result.yaml }),
+                        body: JSON.stringify({ yaml }),
                     });
                     const data = await resp.json();
                     if (!this.runs[runId]) return;

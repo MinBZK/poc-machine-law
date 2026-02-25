@@ -157,6 +157,15 @@ Schrijf een volledige, overtuigende Nederlandse wettekst die:
 4. Een titel, considerans en inhoudsopgave bevat
 5. Bedragen in euro's vermeldt (de YAML bevat eurocenten, deel door 100)
 
+Gebruik markdown-opmaak:
+- # voor de titel van de wet
+- ## voor hoofdstukken (bijv. "## Hoofdstuk 1 – Algemene bepalingen")
+- ### voor artikelen (bijv. "### Artikel 1. Begripsbepalingen")
+- Gewone tekst voor leden
+- **Vet** voor gedefinieerde termen bij eerste gebruik
+- Genummerde lijsten (a. b. c.) voor opsommingen binnen artikelen
+- --- voor horizontale scheidingslijnen tussen grote secties
+
 YAML-specificatie:
 ```yaml
 {yaml_text}
