@@ -144,35 +144,82 @@ async def validate_model(request: Request):
 
 
 PROSE_SYSTEM_PROMPT = (
-    "Je bent een wetgevingsjurist die YAML-wetspecificaties omzet naar formele Nederlandse wetteksten. "
-    "Je schrijft in de stijl van het Staatsblad van het Koninkrijk der Nederlanden."
+    "Je bent een ervaren wetgevingsjurist bij de Directie Wetgeving van het Ministerie van "
+    "Sociale Zaken en Werkgelegenheid. Je schrijft wetteksten conform de Aanwijzingen voor de "
+    "regelgeving (Ar) en in de stijl van het Staatsblad van het Koninkrijk der Nederlanden. "
+    "Je kent de Wet op de zorgtoeslag, de Participatiewet en de Algemene wet inkomensafhankelijke "
+    "regelingen (Awir) goed en gebruikt dezelfde formuleringen en structuur."
 )
 
-PROSE_USER_PROMPT = """Hieronder staat een machine-leesbare wetspecificatie in YAML-formaat.
-Schrijf een volledige, overtuigende Nederlandse wettekst die:
+PROSE_USER_PROMPT = """Hieronder staat een machine-leesbare wetspecificatie in YAML-formaat die \
+een geharmoniseerde regeling beschrijft. Schrijf hiervan een volledige, formele Nederlandse wettekst.
 
-1. Alle definities, voorwaarden, berekeningen en bedragen uit de YAML nauwkeurig overneemt
-2. De structuur volgt van echte Nederlandse wetgeving (hoofdstukken, artikelen, leden)
-3. Formeel juridisch Nederlands gebruikt
-4. Een titel, considerans en inhoudsopgave bevat
-5. Bedragen in euro's vermeldt (de YAML bevat bedragen in hele euro's per maand)
+## Structuur (volg de Aanwijzingen voor de regelgeving)
 
-Gebruik markdown-opmaak:
-- # voor de titel van de wet
-- ## voor hoofdstukken (bijv. "## Hoofdstuk 1 – Algemene bepalingen")
-- ### voor artikelen (bijv. "### Artikel 1. Begripsbepalingen")
-- Gewone tekst voor leden
-- **Vet** voor gedefinieerde termen bij eerste gebruik
-- Genummerde lijsten (a. b. c.) voor opsommingen binnen artikelen
-- --- voor horizontale scheidingslijnen tussen grote secties
+Gebruik EXACT deze opbouw:
 
-YAML-specificatie:
+1. **Aanhef**: Begin met de considerans in de vorm:
+   "Wet van [huidige datum], houdende regels inzake [korte omschrijving] ([citeertitel])"
+   Gevolgd door: "Wij Willem-Alexander, bij de gratie Gods, Koning der Nederlanden, ..."
+   En: "Alzo Wij in overweging genomen hebben, dat het wenselijk is [motivering];"
+   Eindigend met: "Zo is het, dat Wij, de Raad van State gehoord, en met gemeen overleg \
+der Staten-Generaal, hebben goedgevonden en verstaan, gelijk Wij goedvinden en verstaan bij deze:"
+
+2. **Hoofdstuk 1 – Algemene bepalingen**: Met een Artikel 1 "Begripsbepalingen" dat begint met:
+   "In deze wet en de daarop berustende bepalingen wordt verstaan onder:"
+   Gevolgd door een alfabetisch geordende opsomming (a. b. c.) van alle termen uit de YAML, \
+gescheiden door puntkomma's.
+
+3. **Hoofdstuk 2 – Aanspraken en berekeningen**: Artikelen die de daadwerkelijke berekeningen \
+beschrijven. Gebruik de volgende formuleringen:
+   - Voor bedragen: "EUR [bedrag]" (bijv. "EUR 160" — de YAML bevat hele euro's per maand)
+   - Voor percentages: "bedraagt [X]% van [grondslag]"
+   - Voor optelling: "vermeerderd met"
+   - Voor aftrek: "verminderd met"
+   - Voor drempels: "voorzover dat [bedrag] het [drempel] te boven gaat"
+   - Voor voorwaarden: "Indien" (niet "Als")
+   - Voor uitzonderingen: "In afwijking van [artikel X]" of "tenzij anders bepaald"
+   - Voor aanspraken: "heeft de belanghebbende aanspraak op" of "bestaat recht op"
+   - Voor afwezigheid van recht: "Geen aanspraak op [X] bestaat indien"
+
+4. **Hoofdstuk 3 – Slotbepalingen**: Met:
+   - Inwerkingtredingsartikel: "Deze wet treedt in werking op een bij koninklijk besluit \
+te bepalen tijdstip."
+   - Citeertitelartikel: "Deze wet wordt aangehaald als: [naam]."
+
+## Artikelopbouw (conform Ar 3.58 en 3.59)
+
+- Elk artikel heeft een nummer: "Artikel 1.", "Artikel 2.", etc.
+- Binnen een artikel zijn leden genummerd: 1. 2. 3.
+- Opsommingen binnen een lid gebruiken letters: a. b. c. (gescheiden door puntkomma's)
+- Sub-onderdelen gebruiken: 1°. 2°. 3°.
+- Verwijs naar andere artikelen als: "bedoeld in artikel [X], [N]e lid, onderdeel [Y]"
+
+## Taalgebruik
+
+- Schrijf in de tegenwoordige tijd, lijdende vorm waar passend
+- Gebruik "de belanghebbende", "de verzekerde", "het toetsingsinkomen" — niet "u" of "je"
+- Gebruik "Onze Minister" voor delegatiebepalingen
+- Gebruik "Bij ministeriële regeling" of "Bij algemene maatregel van bestuur" voor delegatie
+- Elke berekening, toeslag, drempel en voorwaarde uit de YAML MOET in de wettekst staan
+
+## Markdown-opmaak
+
+- `#` voor de citeertitel
+- `##` voor hoofdstukken ("## Hoofdstuk 1. Algemene bepalingen")
+- `###` voor artikelen ("### Artikel 1. Begripsbepalingen")
+- Gewone tekst voor leden (genummerd met 1. 2. 3.)
+- Opsommingen met a. b. c. voor onderdelen
+- `---` als scheiding tussen de aanhef en het eerste hoofdstuk
+
+## YAML-specificatie
+
 ```yaml
 {yaml_text}
 ```
 {extra_context}
-Schrijf de volledige wettekst. Let op: neem ALLE berekeningen, operaties (ADD, MULTIPLY, IF) \
-en bedragen uit de YAML nauwkeurig over. Mis geen enkele regel of toeslag."""
+Schrijf nu de volledige wettekst. Neem ALLE berekeningen, operaties, bedragen, toeslagen \
+en voorwaarden uit de YAML nauwkeurig over — mis geen enkele regel of component."""
 
 
 MAX_YAML_SIZE = 50_000  # ~50KB limit for YAML sent to LLM
