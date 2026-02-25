@@ -14,7 +14,7 @@ class ClaudeService(BaseLLMService):
     ENV_KEY = "ANTHROPIC_API_KEY"
 
     def __init__(self) -> None:
-        self._model_id = "claude-3-7-sonnet-20250219"
+        self._model_id = "claude-sonnet-4-6"
         self.api_key = os.getenv(self.ENV_KEY)
         self.client = None
         self._session_key = None

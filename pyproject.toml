@@ -1,6 +1,6 @@
 [project]
 name = "poc-machine-law"
-version = "1.9.0"
+version = "1.10.0"
 description = "Proof of Concept - Machine Law"
 readme = "README.md"
 requires-python = ">=3.12.0,<3.14"
@@ -50,7 +50,7 @@ dev = [
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-exclude = ["features/steps/steps.py", "script"]
+exclude = ["features/steps/steps.py", "script", "wallet"]
 
 [tool.ruff.format]
 line-ending = "lf"

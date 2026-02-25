@@ -137,7 +137,7 @@ async def create_dynamic_tools() -> list:
         return []
 
 
-model = ChatAnthropic(model="claude-sonnet-4-20250514", temperature=0, max_retries=2, max_tokens_to_sample=4000)
+model = ChatAnthropic(model="claude-sonnet-4-6", temperature=0, max_retries=2, max_tokens_to_sample=4000)
 
 # Global variable to store current thread_id for debug messages
 current_thread_id = None

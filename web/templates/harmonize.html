@@ -908,6 +908,73 @@
                             <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs leading-relaxed max-h-96 overflow-y-auto"><code x-text="activeRun?.result?.yaml"></code></pre>
                         </div>
                     </div>
+                    <!-- Accordeon: Wettekst proza (collapsed) -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.prose = !sections.prose"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Wettekst (proza)</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.prose ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.prose" x-cloak class="px-4 pb-4">
+                            <!-- Generate button (show when no prose yet and not loading) -->
+                            <div x-show="!activeRun?.proseText && !activeRun?.proseLoading && !activeRun?.proseError">
+                                <p class="text-sm text-gray-500 mb-3">
+                                    Genereer een formele Nederlandse wettekst op basis van de YAML-specificatie via een LLM.
+                                </p>
+                                <button @click="generateProse()"
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors cursor-pointer">
+                                    Genereer wettekst
+                                </button>
+                            </div>
+                            <!-- Loading spinner -->
+                            <div x-show="activeRun?.proseLoading" class="flex items-center py-4">
+                                <svg class="animate-spin h-5 w-5 text-indigo-600 mr-3"
+                                     fill="none"
+                                     viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                <span class="text-sm text-gray-600">Wettekst wordt gegenereerd...</span>
+                            </div>
+                            <!-- Error -->
+                            <div x-show="activeRun?.proseError"
+                                 x-cloak
+                                 class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <p class="text-red-700 text-sm" x-text="activeRun?.proseError"></p>
+                                <button @click="generateProse()"
+                                        class="mt-2 text-sm text-red-600 hover:text-red-800 underline cursor-pointer">
+                                    Opnieuw proberen
+                                </button>
+                            </div>
+                            <!-- Result -->
+                            <div x-show="activeRun?.proseText" x-cloak>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs text-gray-400"
+                                          x-text="'Gegenereerd met ' + (activeRun?.proseProvider || 'LLM')"></span>
+                                    <div class="flex gap-2">
+                                        <button @click="downloadProse()"
+                                                class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded transition-colors cursor-pointer">
+                                            Download .md
+                                        </button>
+                                        <button @click="generateProse()"
+                                                class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded transition-colors cursor-pointer">
+                                            Opnieuw genereren
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="prose-law text-gray-700 text-sm bg-gray-50 p-6 rounded-lg border border-gray-200 max-h-[600px] overflow-y-auto"
+                                     x-html="renderMarkdown(activeRun?.proseText)"></div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Validation Error -->
                     <div x-show="activeRun?.validationError"
                          x-cloak
@@ -1147,6 +1214,7 @@
 {% block scripts %}
     <!-- Simple markdown renderer -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
     <style>
     .tree-container .tree-node {
         position: relative;
@@ -1206,6 +1274,25 @@
         color: #9ca3af;
         margin-left: 4px;
     }
+    /* Prose/typography styles for rendered markdown (Tailwind v4 browser CDN lacks typography plugin) */
+    .prose-law h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+    .prose-law h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1f2937; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.25rem; }
+    .prose-law h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.4rem; color: #374151; }
+    .prose-law h4 { font-size: 1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #4b5563; }
+    .prose-law p { margin-top: 0.4rem; margin-bottom: 0.4rem; line-height: 1.65; }
+    .prose-law ol { list-style-type: decimal; padding-left: 1.5rem; margin-top: 0.4rem; margin-bottom: 0.4rem; }
+    .prose-law ul { list-style-type: disc; padding-left: 1.5rem; margin-top: 0.4rem; margin-bottom: 0.4rem; }
+    .prose-law li { margin-top: 0.15rem; margin-bottom: 0.15rem; line-height: 1.55; }
+    .prose-law hr { border-top: 1px solid #d1d5db; margin-top: 1rem; margin-bottom: 1rem; }
+    .prose-law strong { font-weight: 700; }
+    .prose-law em { font-style: italic; }
+    .prose-law blockquote { border-left: 3px solid #6366f1; padding-left: 1rem; margin: 0.75rem 0; color: #4b5563; font-style: italic; }
+    .prose-law table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
+    .prose-law th { background-color: #f9fafb; font-weight: 600; text-align: left; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; }
+    .prose-law td { padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; }
+    .prose-law code { background-color: #f3f4f6; padding: 0.15rem 0.35rem; border-radius: 0.25rem; font-size: 0.85em; }
+    .prose-law pre { background-color: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; }
+    .prose-law pre code { background: none; padding: 0; }
     </style>
     <script>
     // --- Populatiebeheer helper functions (shared with simulation) ---
@@ -1385,6 +1472,7 @@
 
                 explanation: false,
                 yaml: false,
+                prose: false,
                 validation: false,
             },
 
@@ -1702,11 +1790,17 @@
 
             renderMarkdown(text) {
                 if (!text) return '';
+                let html;
                 if (typeof marked !== 'undefined') {
-                    return marked.parse(text);
+                    html = marked.parse(text);
+                } else {
+                    const escaped = text.replace(/&/g, '&amp;').replace(/</g , '&lt;').replace( />/g, '&gt;');
+                    html = escaped.replace(/\n/g, '<br>');
                 }
-                const escaped = text.replace(/&/g, '&amp;').replace(/</g , '&lt;').replace( />/g, '&gt;');
-                return escaped.replace(/\n/g, '<br>');
+                if (typeof DOMPurify !== 'undefined') {
+                    return DOMPurify.sanitize(html);
+                }
+                return html;
             },
 
             async train() {
@@ -1716,10 +1810,10 @@
                 const runId = ++this.runCounter;
                 const configSnapshot = JSON.parse(JSON.stringify(this.config));
                 configSnapshot.selected_laws = [...this.selectedLaws];
-                this.runs[runId] = { config: configSnapshot, result: null, validationResult: null, validationError: null, error: null };
+                this.runs[runId] = { config: configSnapshot, result: null, validationResult: null, validationError: null, error: null, proseText: null, proseLoading: false, proseError: null, proseProvider: null };
                 this.activeTab = runId;
                 // Reset accordion state for new run
-                this.sections = { metrics: false, features: false, laws: false, cv: false, rules: true, formulas: false, explanation: false, yaml: false, validation: false };
+                this.sections = { metrics: false, features: false, laws: false, cv: false, rules: true, formulas: false, explanation: false, yaml: false, prose: false, validation: false };
 
                 // Fire-and-forget: don't await so the UI stays responsive for new trains
                 this._fetchTrainResult(runId, formData);
@@ -1743,6 +1837,8 @@
                     } else {
                         this.runs[runId].result = data;
                         if (!this.baselineRunId) this.baselineRunId = runId;
+                        // Auto-start prose generation in the background
+                        if (data.yaml) this._fetchProse(runId, data.yaml, data.explanation || '');
                     }
                 } catch (e) {
                     if (!this.runs[runId]) return;
@@ -1791,6 +1887,55 @@
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'geharmoniseerde_toeslag_run' + this.activeTab + '.yaml';
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+
+            async generateProse() {
+                const run = this.activeRun;
+                if (!run?.result?.yaml || run.proseLoading) return;
+                this._fetchProse(this.activeTab, run.result.yaml, run.result.explanation || '');
+            },
+
+            async _fetchProse(runId, yaml, explanation) {
+                if (!this.runs[runId]) return;
+                this.runs[runId].proseLoading = true;
+                this.runs[runId].proseError = null;
+                this.runs[runId].proseText = null;
+                this.runs[runId].proseProvider = null;
+
+                try {
+                    const resp = await fetch('/harmonize/generate-prose', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ yaml, explanation }),
+                    });
+                    const data = await resp.json();
+                    if (!this.runs[runId]) return;
+                    if (data.status === 'success') {
+                        this.runs[runId].proseText = data.prose;
+                        this.runs[runId].proseProvider = data.provider;
+                    } else {
+                        this.runs[runId].proseError = data.message || 'Wettekst genereren mislukt.';
+                    }
+                } catch (e) {
+                    if (this.runs[runId]) {
+                        this.runs[runId].proseError = 'Wettekst genereren mislukt.';
+                    }
+                } finally {
+                    if (this.runs[runId]) {
+                        this.runs[runId].proseLoading = false;
+                    }
+                }
+            },
+
+            downloadProse() {
+                if (!this.activeRun?.proseText) return;
+                const blob = new Blob([this.activeRun.proseText], {type: 'text/markdown'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'geharmoniseerde_wet_run' + this.activeTab + '.md';
                 a.click();
                 URL.revokeObjectURL(url);
             },

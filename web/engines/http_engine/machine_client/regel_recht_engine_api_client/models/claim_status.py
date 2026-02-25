@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class ClaimStatus(str, Enum):
+class ClaimStatus(StrEnum):
     APPROVED = "APPROVED"
     PENDING = "PENDING"
     REJECTED = "REJECTED"

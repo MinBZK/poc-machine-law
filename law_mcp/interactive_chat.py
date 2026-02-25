@@ -43,9 +43,7 @@ class OfficialLangChainMCP:
                 sys.exit(1)
 
         # Initialize Claude LLM
-        self.llm = ChatAnthropic(
-            api_key=self.api_key, model="claude-3-5-sonnet-20241022", temperature=0.1, max_tokens=2000
-        )
+        self.llm = ChatAnthropic(api_key=self.api_key, model="claude-sonnet-4-6", temperature=0.1, max_tokens=2000)
 
         # MCP client configuration for our law server
         self.mcp_client = MultiServerMCPClient(

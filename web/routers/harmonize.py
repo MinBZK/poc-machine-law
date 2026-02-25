@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 import subprocess
 from datetime import datetime
 
@@ -8,6 +9,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from web.demo_profiles import get_demo_profile_type
+from explain.llm_factory import LLMFactory, llm_factory
 from web.dependencies import is_demo_mode, templates
 
 logger = logging.getLogger(__name__)
@@ -193,3 +195,129 @@ async def validate_model(request: Request):
         return JSONResponse(status_code=400, content={"status": "error", "message": error})
     body["operation"] = "validate"
     return await asyncio.to_thread(_run_synthesize_subprocess, body)
+
+
+PROSE_SYSTEM_PROMPT = (
+    "Je bent een wetgevingsjurist die YAML-wetspecificaties omzet naar formele Nederlandse wetteksten. "
+    "Je schrijft in de stijl van het Staatsblad van het Koninkrijk der Nederlanden."
+)
+
+PROSE_USER_PROMPT = """Hieronder staat een machine-leesbare wetspecificatie in YAML-formaat.
+Schrijf een volledige, overtuigende Nederlandse wettekst die:
+
+1. Alle definities, voorwaarden, berekeningen en bedragen uit de YAML nauwkeurig overneemt
+2. De structuur volgt van echte Nederlandse wetgeving (hoofdstukken, artikelen, leden)
+3. Formeel juridisch Nederlands gebruikt
+4. Een titel, considerans en inhoudsopgave bevat
+5. Bedragen in euro's vermeldt (de YAML bevat bedragen in hele euro's per maand)
+
+Gebruik markdown-opmaak:
+- # voor de titel van de wet
+- ## voor hoofdstukken (bijv. "## Hoofdstuk 1 – Algemene bepalingen")
+- ### voor artikelen (bijv. "### Artikel 1. Begripsbepalingen")
+- Gewone tekst voor leden
+- **Vet** voor gedefinieerde termen bij eerste gebruik
+- Genummerde lijsten (a. b. c.) voor opsommingen binnen artikelen
+- --- voor horizontale scheidingslijnen tussen grote secties
+
+YAML-specificatie:
+```yaml
+{yaml_text}
+```
+{extra_context}
+Schrijf de volledige wettekst. Let op: neem ALLE berekeningen, operaties (ADD, MULTIPLY, IF) \
+en bedragen uit de YAML nauwkeurig over. Mis geen enkele regel of toeslag."""
+
+
+MAX_YAML_SIZE = 50_000  # ~50KB limit for YAML sent to LLM
+
+
+def _make_llm_call(provider: str, api_key: str, yaml_text: str, extra_context: str = "") -> str:
+    """Create a request-scoped LLM client and generate prose law text.
+
+    This avoids mutating the shared singleton service, making it safe
+    to call from a worker thread without racing other requests.
+
+    Raises:
+        RuntimeError: If the LLM call fails or returns no response.
+    """
+    ctx = ""
+    if extra_context:
+        ctx = f"\nSamenvatting van het model (ter referentie):\n{extra_context}\n"
+    messages = [{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text, extra_context=ctx)}]
+
+    if provider == LLMFactory.PROVIDER_CLAUDE:
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=api_key)
+        response = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=8000,
+            temperature=0.3,
+            system=PROSE_SYSTEM_PROMPT,
+            messages=messages,
+        )
+        return response.content[0].text
+
+    elif provider == LLMFactory.PROVIDER_VLAM:
+        from openai import OpenAI
+
+        base_url = os.getenv("VLAM_BASE_URL", "https://api.demo.vlam.ai/v2.1/projects/poc/openai-compatible/v1")
+        model_id = os.getenv("VLAM_MODEL_ID", "ubiops-deployment/bzk-dig-chat//chat-model")
+        client = OpenAI(api_key=api_key, base_url=base_url)
+        all_messages = [{"role": "system", "content": PROSE_SYSTEM_PROMPT}, *messages]
+        response = client.chat.completions.create(
+            model=model_id,
+            messages=all_messages,
+            max_tokens=4000,
+            temperature=0.3,
+        )
+        return response.choices[0].message.content
+
+    else:
+        raise RuntimeError(f"Onbekende LLM provider: {provider}")
+
+
+@router.post("/generate-prose")
+async def generate_prose(request: Request):
+    """Generate a prose law text from a YAML specification using an LLM."""
+    body = await request.json()
+    yaml_text = body.get("yaml", "")
+    explanation = body.get("explanation", "")
+
+    if not yaml_text:
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Geen YAML opgegeven"})
+
+    if len(yaml_text) > MAX_YAML_SIZE:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": f"YAML is te groot ({len(yaml_text)} tekens, max {MAX_YAML_SIZE}).",
+            },
+        )
+
+    provider = llm_factory.get_provider(request)
+    if not llm_factory.is_provider_configured(provider, request):
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": f"LLM provider '{provider}' is niet geconfigureerd. "
+                "Stel een API-sleutel in via de instellingen.",
+            },
+        )
+
+    # Extract the API key on the async thread (safe to access request.session here).
+    service = llm_factory.get_service(provider)
+    api_key = service.get_api_key(request)
+
+    try:
+        prose = await asyncio.to_thread(_make_llm_call, provider, api_key, yaml_text, explanation)
+        return JSONResponse({"status": "success", "prose": prose, "provider": provider})
+    except Exception as e:
+        logger.error("Failed to generate prose: %s", str(e))
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Wettekst genereren mislukt. Probeer het later opnieuw."},
+        )
