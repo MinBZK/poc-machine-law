@@ -36,9 +36,11 @@ def format_message(text: str, is_user_message: bool = False) -> Markup:
         # First convert URLs to markdown links if they're not already in a link format
         text_with_links = re.sub(
             url_regex,
-            lambda m: m.group(0)
-            if "[" in text[: m.start()] and "](" in text[m.start() :]
-            else f"[{m.group(0)}]({m.group(0)})",
+            lambda m: (
+                m.group(0)
+                if "[" in text[: m.start()] and "](" in text[m.start() :]
+                else f"[{m.group(0)}]({m.group(0)})"
+            ),
             text,
         )
 

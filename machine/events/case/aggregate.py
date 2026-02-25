@@ -1,11 +1,11 @@
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
 
 
-class CaseStatus(str, Enum):
+class CaseStatus(StrEnum):
     SUBMITTED = "SUBMITTED"
     DECIDED = "DECIDED"
     IN_REVIEW = "IN_REVIEW"

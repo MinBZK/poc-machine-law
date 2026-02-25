@@ -1,12 +1,12 @@
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from eventsourcing.domain import Aggregate, event
 from eventsourcing.persistence import Transcoding
 
 
-class ClaimStatus(str, Enum):
+class ClaimStatus(StrEnum):
     PENDING = "PENDING"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"

@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
 
 @dataclass
-class CaseStatus(str, Enum):
+class CaseStatus(StrEnum):
     SUBMITTED = "SUBMITTED"
     DECIDED = "DECIDED"
     IN_REVIEW = "IN_REVIEW"
