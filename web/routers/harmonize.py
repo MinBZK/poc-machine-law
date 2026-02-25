@@ -7,6 +7,7 @@ from datetime import datetime
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
+from explain.base_llm_service import BaseLLMService
 from explain.llm_factory import llm_factory
 from web.dependencies import is_demo_mode, templates
 
@@ -164,14 +165,23 @@ YAML-specificatie:
 Schrijf de volledige wettekst."""
 
 
-def _generate_prose_text(service, yaml_text: str) -> str:
-    """Call the LLM to generate prose law text from YAML."""
+MAX_YAML_SIZE = 50_000  # ~50KB limit for YAML sent to LLM
+
+
+def _generate_prose_text(service: BaseLLMService, yaml_text: str) -> str:
+    """Call the LLM to generate prose law text from YAML.
+
+    Raises:
+        RuntimeError: If the LLM response is empty/None (service misconfigured).
+    """
     response = service.chat_completion(
         messages=[{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text)}],
         max_tokens=4000,
         temperature=0.3,
         system=PROSE_SYSTEM_PROMPT,
     )
+    if response is None:
+        raise RuntimeError("LLM service returned no response — provider may not be configured correctly.")
     return service.get_completion_text(response)
 
 
@@ -183,6 +193,15 @@ async def generate_prose(request: Request):
 
     if not yaml_text:
         return JSONResponse(status_code=400, content={"status": "error", "message": "Geen YAML opgegeven"})
+
+    if len(yaml_text) > MAX_YAML_SIZE:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": f"YAML is te groot ({len(yaml_text)} tekens, max {MAX_YAML_SIZE}).",
+            },
+        )
 
     provider = llm_factory.get_provider(request)
     if not llm_factory.is_provider_configured(provider, request):
@@ -205,5 +224,5 @@ async def generate_prose(request: Request):
         logger.error("Failed to generate prose: %s", str(e))
         return JSONResponse(
             status_code=500,
-            content={"status": "error", "message": f"Wettekst genereren mislukt: {e}"},
+            content={"status": "error", "message": "Wettekst genereren mislukt. Probeer het later opnieuw."},
         )

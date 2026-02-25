@@ -1192,6 +1192,7 @@
 {% block scripts %}
     <!-- Simple markdown renderer -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
     <style>
     .tree-container .tree-node {
         position: relative;
@@ -1714,11 +1715,17 @@
 
             renderMarkdown(text) {
                 if (!text) return '';
+                let html;
                 if (typeof marked !== 'undefined') {
-                    return marked.parse(text);
+                    html = marked.parse(text);
+                } else {
+                    const escaped = text.replace(/&/g, '&amp;').replace(/</g , '&lt;').replace( />/g, '&gt;');
+                    html = escaped.replace(/\n/g, '<br>');
                 }
-                const escaped = text.replace(/&/g, '&amp;').replace(/</g , '&lt;').replace( />/g, '&gt;');
-                return escaped.replace(/\n/g, '<br>');
+                if (typeof DOMPurify !== 'undefined') {
+                    return DOMPurify.sanitize(html);
+                }
+                return html;
             },
 
             async train() {
