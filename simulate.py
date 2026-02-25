@@ -331,6 +331,52 @@ class LawSimulator:
                         }
                     )
 
+        # Health insurance: virtually everyone in NL is insured
+        is_health_insured = not is_detained and age >= 18
+
+        # Receives child benefit: nearly all parents with children <18
+        receives_child_benefit = has_children and any(c["age"] < 18 for c in children_data)
+
+        # Receives study financing: most students get it
+        receives_study_financing = is_student and random.random() < 0.85
+
+        # Self-employment income: ~12% of workforce is self-employed
+        is_self_employed = not is_student and 18 <= age < 67 and random.random() < 0.12
+        business_income = annual_income if is_self_employed else 0
+
+        # Work hours per week (derived from income and employment status)
+        if is_student:
+            work_hours_per_week = random.choice([0, 8, 12, 16, 20])
+        elif age < 18 or age >= 67 or is_detained:
+            work_hours_per_week = 0
+        elif annual_income < 500000:  # <€5k: likely unemployed or minimal work
+            work_hours_per_week = random.choice([0, 0, 0, 8, 12])
+        elif annual_income < 2000000:  # <€20k: part-time
+            work_hours_per_week = random.randint(12, 28)
+        elif annual_income < 4000000:  # <€40k: near full-time
+            work_hours_per_week = random.randint(28, 40)
+        else:  # >€40k: full-time
+            work_hours_per_week = random.randint(32, 45)
+
+        # Childcare data for parents with young children who work
+        childcare_hours_per_child = 0
+        childcare_hourly_rate = 0
+        childcare_type = "none"
+        if has_children and work_hours_per_week >= 12:
+            young_children = [c for c in children_data if c["age"] < 12]
+            if young_children:
+                youngest = min(c["age"] for c in young_children)
+                childcare_type = "dagopvang" if youngest < 4 else "bso"
+                # Hours roughly proportional to work hours, 2-5 days
+                childcare_days = min(5, max(2, work_hours_per_week // 8))
+                hours_per_day = 10 if childcare_type == "dagopvang" else 4
+                childcare_hours_per_child = childcare_days * hours_per_day * 46  # ~46 weeks/year
+                # Hourly rate: €8-9 for dagopvang, €7-8 for bso
+                if childcare_type == "dagopvang":
+                    childcare_hourly_rate = random.randint(800, 920)  # eurocents
+                else:
+                    childcare_hourly_rate = random.randint(700, 780)  # eurocents
+
         return {
             "bsn": self.generate_bsn(),
             "birth_date": birth_date,
@@ -350,6 +396,15 @@ class LawSimulator:
             "rent_amount": rent_amount,
             "rent_service_costs": rent_service_costs,
             "eligible_service_costs": eligible_service_costs,
+            "standaardpremie": 211200,  # €2.112/year, fixed for 2025
+            "is_health_insured": is_health_insured,
+            "receives_child_benefit": receives_child_benefit,
+            "receives_study_financing": receives_study_financing,
+            "business_income": business_income,
+            "work_hours_per_week": work_hours_per_week,
+            "childcare_hours_per_child": childcare_hours_per_child,
+            "childcare_hourly_rate": childcare_hourly_rate,
+            "childcare_type": childcare_type,
         }
 
     def generate_paired_people(self, num_people):
@@ -1932,6 +1987,94 @@ class LawSimulator:
                     }
 
         return breakdowns
+
+    def export_for_synthesis(self, results_df: pd.DataFrame, selected_laws: list[str] | None = None) -> pd.DataFrame:
+        """
+        Export simulation results in format suitable for law synthesis.
+
+        Returns a DataFrame with input features and target variables for
+        training ML models to synthesize simplified laws.
+
+        Args:
+            results_df: DataFrame with simulation results.
+            selected_laws: Optional list of law names to include. For each law,
+                the columns {law}_eligible and {law}_amount are included if they
+                exist in results_df. When None or empty, defaults to the three
+                standard toeslagen (zorgtoeslag, huurtoeslag, kindgebonden_budget).
+
+        Input features:
+        - age, income, net_worth, rent_amount
+        - has_partner, has_children, children_count, youngest_child_age
+        - housing_type, is_student
+
+        Target variables (for harmonized toeslag):
+        - zorgtoeslag_eligible, zorgtoeslag_amount
+        - huurtoeslag_eligible, huurtoeslag_amount
+        - kindgebonden_budget_eligible, kindgebonden_budget_amount
+        """
+        # Input features: dynamic based on selected laws
+        from synthesize.feature_registry import get_all_feature_columns_for_laws
+
+        if selected_laws:
+            input_features = get_all_feature_columns_for_laws(selected_laws)
+        else:
+            input_features = get_all_feature_columns_for_laws(["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"])
+
+        # Always include income as base feature
+        if "income" not in input_features:
+            input_features.insert(0, "income")
+
+        # Target variables: dynamic based on selected laws, or default 3 toeslagen
+        if selected_laws:
+            target_variables = []
+            for law in selected_laws:
+                elig_col = f"{law}_eligible"
+                amt_col = f"{law}_amount"
+                if elig_col in results_df.columns:
+                    target_variables.append(elig_col)
+                if amt_col in results_df.columns:
+                    target_variables.append(amt_col)
+        else:
+            target_variables = [
+                "zorgtoeslag_eligible",
+                "zorgtoeslag_amount",
+                "huurtoeslag_eligible",
+                "huurtoeslag_amount",
+                "kindgebonden_budget_eligible",
+                "kindgebonden_budget_amount",
+            ]
+
+        # Select columns that exist in the results
+        available_columns = [col for col in input_features + target_variables if col in results_df.columns]
+
+        synthesis_df = results_df[available_columns].copy()
+
+        # Handle missing values
+        if "youngest_child_age" in synthesis_df.columns:
+            synthesis_df["youngest_child_age"] = synthesis_df["youngest_child_age"].fillna(-1)
+
+        if "rent_amount" in synthesis_df.columns:
+            synthesis_df["rent_amount"] = synthesis_df["rent_amount"].fillna(0)
+
+        if "children_count" in synthesis_df.columns:
+            synthesis_df["children_count"] = synthesis_df["children_count"].fillna(0)
+
+        if "business_income" in synthesis_df.columns:
+            synthesis_df["business_income"] = synthesis_df["business_income"].fillna(0)
+
+        if "work_hours_per_week" in synthesis_df.columns:
+            synthesis_df["work_hours_per_week"] = synthesis_df["work_hours_per_week"].fillna(0)
+
+        if "childcare_hours_per_child" in synthesis_df.columns:
+            synthesis_df["childcare_hours_per_child"] = synthesis_df["childcare_hours_per_child"].fillna(0)
+
+        if "childcare_hourly_rate" in synthesis_df.columns:
+            synthesis_df["childcare_hourly_rate"] = synthesis_df["childcare_hourly_rate"].fillna(0)
+
+        if "childcare_type" in synthesis_df.columns:
+            synthesis_df["childcare_type"] = synthesis_df["childcare_type"].fillna("none")
+
+        return synthesis_df
 
     def get_summary_with_breakdowns(self, results_df, simulation_date):
         """Generate summary statistics with demographic breakdowns for web API."""

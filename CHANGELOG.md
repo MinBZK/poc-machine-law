@@ -2,6 +2,133 @@
 
 <!-- version list -->
 
+## v1.9.0 (2026-02-25)
+
+### Bug Fixes
+
+- Clean-up front-end
+  ([`104abd5`](https://github.com/MinBZK/poc-machine-law/commit/104abd5bc4756de8f90435e12cefa33bbc1007c1))
+
+- Format textual output
+  ([`d053490`](https://github.com/MinBZK/poc-machine-law/commit/d053490a7651d46a3143bdcb583908981551abda))
+
+- Group staffeltabel by household type with readable labels
+  ([`1597313`](https://github.com/MinBZK/poc-machine-law/commit/159731364a655b3da65429c96195053eb597cc1f))
+
+- Improve bracket learner with linear regression and parametric formula display
+  ([`211c02b`](https://github.com/MinBZK/poc-machine-law/commit/211c02b67a76ea59e83c5a1645a79b5c5fff5dec))
+
+- Improve bracket table UX and parametric optimizer
+  ([`aafc0bd`](https://github.com/MinBZK/poc-machine-law/commit/aafc0bd043512221c457ade38ffc0eb1eec2a6c2))
+
+- Make staffelmodel the default method and show it first
+  ([`815ca8c`](https://github.com/MinBZK/poc-machine-law/commit/815ca8cad4e6d4fb1fe9dd958e4d71eca73cd81c))
+
+- Prevent overlapping income bands in staffeltabel
+  ([`751426d`](https://github.com/MinBZK/poc-machine-law/commit/751426db6061aeeedf2f23f5f448d639e1593d82))
+
+- Resolve all code review findings
+  ([`311d553`](https://github.com/MinBZK/poc-machine-law/commit/311d55319e082678cad1396a3aec692fa2f1a72c))
+
+- Resolve duplicate header, numpy YAML serialization, and UI defaults
+  ([`bb21725`](https://github.com/MinBZK/poc-machine-law/commit/bb2172537f404faf8a6577b3943b697414c7d180))
+
+- Show selected laws in run comparison and fix critical bugs
+  ([`15fadaf`](https://github.com/MinBZK/poc-machine-law/commit/15fadafd796c27cc1dd18edb6495d4b556ed980c))
+
+- Show single amount per band instead of from/to arrow
+  ([`14ff901`](https://github.com/MinBZK/poc-machine-law/commit/14ff901945cae36e0507e8dfc45a8dd2bcd3e4bf))
+
+- Use eligibility classifier for stable accuracy metrics
+  ([`7b2fadb`](https://github.com/MinBZK/poc-machine-law/commit/7b2fadbde1efcfb28c52b777fdab3cc88ba9e05e))
+
+- Use global regression per household type to prevent overfitting in bracket model
+  ([`0ae8adc`](https://github.com/MinBZK/poc-machine-law/commit/0ae8adcecb5195688f73d4488734cab7b27ee382))
+
+### Chores
+
+- Sync VERSION file to 1.8.0
+  ([`b39dfb2`](https://github.com/MinBZK/poc-machine-law/commit/b39dfb2b513184842d1dcda5a750c50c621a8c86))
+
+- **deps**: Bump github.com/gammazero/workerpool
+  ([`e28c28b`](https://github.com/MinBZK/poc-machine-law/commit/e28c28beb3931ec4e3ad5f3afe2d1dacaa42bb7b))
+
+- **deps**: Bump golang.org/x/text
+  ([`6512860`](https://github.com/MinBZK/poc-machine-law/commit/651286043b011a70bbcf6016d3f13bd3b6210d44))
+
+- **deps**: Bump golang.org/x/text
+  ([`d649986`](https://github.com/MinBZK/poc-machine-law/commit/d649986e26f2e9208be9d230c9721c32c32bafd1))
+
+- **deps**: Bump the go-deps group in /machinev2/backend with 2 updates
+  ([`69c0b19`](https://github.com/MinBZK/poc-machine-law/commit/69c0b19120cdae955d7c2de60c310e00ca6b7e41))
+
+- **deps**: Bump the npm-minor-patch group across 1 directory with 12 updates
+  ([`ee6d067`](https://github.com/MinBZK/poc-machine-law/commit/ee6d06773b78fa9e21c69cb1afd0c6b01265541c))
+
+- **deps**: Bump the python-minor-patch group across 1 directory with 11 updates
+  ([`b4c5f97`](https://github.com/MinBZK/poc-machine-law/commit/b4c5f977964694045c767383d6d177dbd4ec8236))
+
+- **deps**: Bump the python-minor-patch group with 8 updates
+  ([`1e04903`](https://github.com/MinBZK/poc-machine-law/commit/1e049034955d4c66874b27963c543f2839b27091))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([`1fc6634`](https://github.com/MinBZK/poc-machine-law/commit/1fc66344e7b0950e114c7bdff19c804a224d2fe6))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([`ea0d0c6`](https://github.com/MinBZK/poc-machine-law/commit/ea0d0c6e711b47823f4a6ff283cdf863da760133))
+
+- **deps-dev**: Bump the npm-minor-patch group
+  ([`69dbc10`](https://github.com/MinBZK/poc-machine-law/commit/69dbc102e20a57a5b45d372a40171afe12a1e50e))
+
+- **deps-dev**: Bump the npm-minor-patch group across 1 directory with 11 updates
+  ([`59261ac`](https://github.com/MinBZK/poc-machine-law/commit/59261ac0983d89465e866f420cd24ad226d31c10))
+
+- **deps-dev**: Bump the npm-minor-patch group across 1 directory with 11 updates
+  ([`582a4a7`](https://github.com/MinBZK/poc-machine-law/commit/582a4a77d916de681e7eaa5ab96da664bbd3e5c5))
+
+### Code Style
+
+- Apply ruff formatting
+  ([`fd19fa7`](https://github.com/MinBZK/poc-machine-law/commit/fd19fa7d3e25017576e263686044aebc78ffad3f))
+
+### Features
+
+- Add feature influence analysis and smart grouping for bracket model
+  ([`3f20244`](https://github.com/MinBZK/poc-machine-law/commit/3f20244661e781e148ea68b019425270407e8987))
+
+- Add feature influence and comparison between runs
+  ([`835f3ee`](https://github.com/MinBZK/poc-machine-law/commit/835f3eee35c7b209e6ff8b55bc0479a9293a5880))
+
+- Add feature registry with dynamic feature selection and warnings
+  ([`312bc69`](https://github.com/MinBZK/poc-machine-law/commit/312bc699508bf647db3a3ea6a4425b8674f2dab2))
+
+- Add front-end of law synthesis
+  ([`1087d53`](https://github.com/MinBZK/poc-machine-law/commit/1087d53a66cc537efa40dec3a78a62673867b005))
+
+- Add law synthesis module for generating harmonized laws from simulation
+  ([`205cde8`](https://github.com/MinBZK/poc-machine-law/commit/205cde8f1f1044c72f0e5c95cf8df677a814496e))
+
+- Add missing simulation features and update feature registry
+  ([`93457fc`](https://github.com/MinBZK/poc-machine-law/commit/93457fc203dcda7bbbb1bd0d7f0db1694981a775))
+
+- Add standaardpremie as fixed simulation field
+  ([`4ad6e4e`](https://github.com/MinBZK/poc-machine-law/commit/4ad6e4e2edce5f593a73ded9ff4386164fcd92f0))
+
+- Add three harmonization methods with dynamic law selection
+  ([`3545b91`](https://github.com/MinBZK/poc-machine-law/commit/3545b91a4f74c04b5718447e43ec69a0a5f2cbeb))
+
+- Auto-discretize continuous features for bracket model grouping
+  ([`e103aea`](https://github.com/MinBZK/poc-machine-law/commit/e103aea736a9784a082f28c23d199994a7ce222e))
+
+### Refactoring
+
+- Rename synthesize to harmonize in web layer
+  ([`7543431`](https://github.com/MinBZK/poc-machine-law/commit/7543431e8964815a8a094942daa0ab1f931db8ae))
+
+- Use DecisionTreeRegressor as primary model for law synthesis
+  ([`a2185de`](https://github.com/MinBZK/poc-machine-law/commit/a2185de5541e3a82689f556cdc8c3dc33429637f))
+
+
 ## v1.8.0 (2026-02-06)
 
 ### Bug Fixes

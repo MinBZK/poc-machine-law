@@ -35,10 +35,10 @@ from web.routers import (
     delegation,
     demo,
     edit,
+    harmonize,
     importer,
     laws,
     mcp,
-    regeldruk,
     simulation,
     wallet,
 )
@@ -70,6 +70,7 @@ app.include_router(importer.router)
 app.include_router(mcp.router)
 app.include_router(wallet.router)
 app.include_router(simulation.router)
+app.include_router(harmonize.router)
 app.include_router(delegation.router)
 app.include_router(regeldruk.router)
 
