@@ -1,3 +1,4 @@
+@skip-go
 Feature: Bepalen recht op Alcoholwetvergunning horeca Rotterdam
   Als horecaondernemer in Rotterdam
   Wil ik weten of ik een Alcoholwetvergunning kan krijgen

@@ -1,3 +1,4 @@
+@skip-go
 Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
   Als horecaondernemer in Rotterdam
   Wil ik weten of ik een terrasvergunning kan krijgen

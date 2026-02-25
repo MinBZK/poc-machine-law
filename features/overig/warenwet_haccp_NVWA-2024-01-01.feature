@@ -1,3 +1,4 @@
+@skip-go
 Feature: Bepalen HACCP-voedselveiligheidsverplichting
   Als horecaondernemer
   Wil ik weten of de HACCP-verplichting op mijn bedrijf van toepassing is

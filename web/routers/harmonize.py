@@ -8,8 +8,8 @@ from datetime import datetime
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from web.demo_profiles import get_demo_profile_type
 from explain.llm_factory import LLMFactory, llm_factory
+from web.demo_profiles import get_demo_profile_type
 from web.dependencies import is_demo_mode, templates
 
 logger = logging.getLogger(__name__)
