@@ -1,14 +1,14 @@
 import asyncio
 import json
 import logging
+import os
 import subprocess
 from datetime import datetime
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from explain.base_llm_service import BaseLLMService
-from explain.llm_factory import llm_factory
+from explain.llm_factory import LLMFactory, llm_factory
 from web.dependencies import is_demo_mode, templates
 
 logger = logging.getLogger(__name__)
@@ -168,21 +168,47 @@ Schrijf de volledige wettekst."""
 MAX_YAML_SIZE = 50_000  # ~50KB limit for YAML sent to LLM
 
 
-def _generate_prose_text(service: BaseLLMService, yaml_text: str) -> str:
-    """Call the LLM to generate prose law text from YAML.
+def _make_llm_call(provider: str, api_key: str, yaml_text: str) -> str:
+    """Create a request-scoped LLM client and generate prose law text.
+
+    This avoids mutating the shared singleton service, making it safe
+    to call from a worker thread without racing other requests.
 
     Raises:
-        RuntimeError: If the LLM response is empty/None (service misconfigured).
+        RuntimeError: If the LLM call fails or returns no response.
     """
-    response = service.chat_completion(
-        messages=[{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text)}],
-        max_tokens=4000,
-        temperature=0.3,
-        system=PROSE_SYSTEM_PROMPT,
-    )
-    if response is None:
-        raise RuntimeError("LLM service returned no response — provider may not be configured correctly.")
-    return service.get_completion_text(response)
+    messages = [{"role": "user", "content": PROSE_USER_PROMPT.format(yaml_text=yaml_text)}]
+
+    if provider == LLMFactory.PROVIDER_CLAUDE:
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=api_key)
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=4000,
+            temperature=0.3,
+            system=PROSE_SYSTEM_PROMPT,
+            messages=messages,
+        )
+        return response.content[0].text
+
+    elif provider == LLMFactory.PROVIDER_VLAM:
+        from openai import OpenAI
+
+        base_url = os.getenv("VLAM_BASE_URL", "https://api.demo.vlam.ai/v2.1/projects/poc/openai-compatible/v1")
+        model_id = os.getenv("VLAM_MODEL_ID", "ubiops-deployment/bzk-dig-chat//chat-model")
+        client = OpenAI(api_key=api_key, base_url=base_url)
+        all_messages = [{"role": "system", "content": PROSE_SYSTEM_PROMPT}, *messages]
+        response = client.chat.completions.create(
+            model=model_id,
+            messages=all_messages,
+            max_tokens=4000,
+            temperature=0.3,
+        )
+        return response.choices[0].message.content
+
+    else:
+        raise RuntimeError(f"Onbekende LLM provider: {provider}")
 
 
 @router.post("/generate-prose")
@@ -214,11 +240,12 @@ async def generate_prose(request: Request):
             },
         )
 
+    # Extract the API key on the async thread (safe to access request.session here).
     service = llm_factory.get_service(provider)
-    service.configure_for_request(request)
+    api_key = service.get_api_key(request)
 
     try:
-        prose = await asyncio.to_thread(_generate_prose_text, service, yaml_text)
+        prose = await asyncio.to_thread(_make_llm_call, provider, api_key, yaml_text)
         return JSONResponse({"status": "success", "prose": prose, "provider": provider})
     except Exception as e:
         logger.error("Failed to generate prose: %s", str(e))

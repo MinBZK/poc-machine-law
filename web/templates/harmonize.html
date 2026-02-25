@@ -1816,7 +1816,7 @@
 
             async generateProse() {
                 const run = this.activeRun;
-                if (!run?.result?.yaml) return;
+                if (!run?.result?.yaml || run.proseLoading) return;
 
                 const runId = this.activeTab;
                 this.runs[runId].proseLoading = true;
