@@ -197,8 +197,8 @@ def _make_llm_call(provider: str, api_key: str, yaml_text: str, extra_context: s
 
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=4000,
+            model="claude-opus-4-6",
+            max_tokens=8000,
             temperature=0.3,
             system=PROSE_SYSTEM_PROMPT,
             messages=messages,
