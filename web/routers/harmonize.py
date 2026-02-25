@@ -155,7 +155,7 @@ Schrijf een volledige, overtuigende Nederlandse wettekst die:
 2. De structuur volgt van echte Nederlandse wetgeving (hoofdstukken, artikelen, leden)
 3. Formeel juridisch Nederlands gebruikt
 4. Een titel, considerans en inhoudsopgave bevat
-5. Bedragen in euro's vermeldt (de YAML bevat eurocenten, deel door 100)
+5. Bedragen in euro's vermeldt (de YAML bevat bedragen in hele euro's per maand)
 
 Gebruik markdown-opmaak:
 - # voor de titel van de wet
