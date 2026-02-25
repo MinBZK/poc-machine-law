@@ -1,0 +1,1824 @@
+{% extends "simulation_base.html" %}
+{% block content %}
+    <div class="flex h-full w-full" x-data="synthesizeApp()">
+        <!-- Left Panel: Configuration -->
+        <div class="w-1/3 bg-white shadow-lg p-6 overflow-y-auto flex-shrink-0">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Harmonisatie</h2>
+            <p class="text-sm text-gray-600 mb-6">
+                Combineer meerdere toeslagen en uitkeringen tot een
+                vereenvoudigde, geharmoniseerde wet.
+            </p>
+            <form id="harmonisatie-form" @submit.prevent="train()" class="space-y-5">
+                <!-- Accordeon: Wetselectie -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button type="button"
+                            @click="showWetSelectie = !showWetSelectie"
+                            class="w-full px-4 py-3 flex justify-between items-center bg-gradient-to-r from-blue-50 to-sky-50 hover:from-blue-100 hover:to-sky-100 transition-colors cursor-pointer">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Wetselectie
+                            <span class="ml-2 text-xs font-normal text-gray-500"
+                                  x-text="'(' + selectedLaws.length + ' geselecteerd)'"></span>
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                             :class="showWetSelectie ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="showWetSelectie" x-cloak class="p-4 space-y-3">
+                        <p class="text-xs text-gray-500 mb-2">Selecteer welke wetten geharmoniseerd worden:</p>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Toeslagen</h4>
+                            <template x-for="law in availableLaws.filter(l => l.group === 'Toeslagen')"
+                                      :key="law.id">
+                                <label class="flex items-center space-x-2 py-1 cursor-pointer">
+                                    <input type="checkbox"
+                                           :value="law.id"
+                                           x-model="selectedLaws"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-gray-700" x-text="law.label"></span>
+                                </label>
+                            </template>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Sociale zekerheid</h4>
+                            <template x-for="law in availableLaws.filter(l => l.group === 'Sociale zekerheid')"
+                                      :key="law.id">
+                                <label class="flex items-center space-x-2 py-1 cursor-pointer">
+                                    <input type="checkbox"
+                                           :value="law.id"
+                                           x-model="selectedLaws"
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-gray-700" x-text="law.label"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <!-- Accordeon 1: Populatiebeheer (collapsed by default) -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button type="button"
+                            @click="showPopulatie = !showPopulatie"
+                            class="w-full px-4 py-3 flex justify-between items-center bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-colors cursor-pointer">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                            Populatiebeheer
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                             :class="showPopulatie ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="showPopulatie" x-cloak class="p-4">
+                        {% set pop_num_input_type = "range" %}
+                        {% set pop_num_people_max = 2000 %}
+                        {% set pop_num_people_step = 100 %}
+                        {% set pop_show_saved = false %}
+                        {% set pop_show_create = false %}
+                        {% set pop_show_header = false %}
+                        {% include "partials/populatiebeheer.html" %}
+                    </div>
+                </div>
+                <!-- Accordeon: Methode -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button type="button"
+                            @click="showMethode = !showMethode"
+                            class="w-full px-4 py-3 flex justify-between items-center bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-colors cursor-pointer">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-amber-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                                </path>
+                            </svg>
+                            Methode
+                            <span class="ml-2 text-xs font-normal text-gray-500"
+                                  x-text="methodLabels[config.method]"></span>
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                             :class="showMethode ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="showMethode" x-cloak class="p-4 space-y-3">
+                        <div class="flex gap-2">
+                            <template x-for="m in ['bracket', 'tree', 'parametric']" :key="m">
+                                <button type="button"
+                                        @click="config.method = m"
+                                        class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer"
+                                        :class="config.method === m ? 'bg-amber-100 border-amber-400 text-amber-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'"
+                                        x-text="methodLabels[m]"></button>
+                            </template>
+                        </div>
+                        <p class="text-xs text-gray-500"
+                           x-text="methodDescriptions[config.method]"></p>
+                    </div>
+                </div>
+                <!-- Accordeon 2: Harmonisatie Instellingen (open by default) -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button type="button"
+                            @click="showInstellingen = !showInstellingen"
+                            class="w-full px-4 py-3 flex justify-between items-center bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 transition-colors cursor-pointer">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Harmonisatie Instellingen
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                             :class="showInstellingen ? 'rotate-180' : ''"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div x-show="showInstellingen" x-cloak class="p-4 space-y-4">
+                        <!-- Tree-specific settings -->
+                        <template x-if="config.method === 'tree'">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Maximale diepte beslisboom</label>
+                                    <span class="block text-xs text-gray-400 mb-1">Hoe dieper, hoe complexer de regels. Lager = eenvoudiger.</span>
+                                    <input type="range"
+                                           x-model.number="config.max_depth"
+                                           min="1"
+                                           max="10"
+                                           step="1"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>1</span>
+                                        <span class="font-medium text-gray-900" x-text="config.max_depth"></span>
+                                        <span>10</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Minimum aantal personen per regel</label>
+                                    <span class="block text-xs text-gray-400 mb-1">Hoeveel personen er minstens onder een regel moeten vallen.</span>
+                                    <input type="range"
+                                           x-model.number="config.min_samples"
+                                           min="10"
+                                           max="200"
+                                           step="10"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>10</span>
+                                        <span class="font-medium text-gray-900" x-text="config.min_samples"></span>
+                                        <span>200</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Maximaal aantal regels</label>
+                                    <input type="range"
+                                           x-model.number="config.max_rules"
+                                           min="1"
+                                           max="20"
+                                           step="1"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>1</span>
+                                        <span class="font-medium text-gray-900" x-text="config.max_rules"></span>
+                                        <span>20</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- Bracket-specific settings -->
+                        <template x-if="config.method === 'bracket'">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Aantal inkomensschijven</label>
+                                    <span class="block text-xs text-gray-400 mb-1">Meer schijven = fijnmaziger, maar complexer.</span>
+                                    <input type="range"
+                                           x-model.number="config.n_brackets"
+                                           min="3"
+                                           max="10"
+                                           step="1"
+                                           class="w-full">
+                                    <div class="flex justify-between text-xs text-gray-500">
+                                        <span>3</span>
+                                        <span class="font-medium text-gray-900" x-text="config.n_brackets"></span>
+                                        <span>10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- Parametric-specific settings -->
+                        <template x-if="config.method === 'parametric'">
+                            <div>
+                                <p class="text-sm text-gray-600">
+                                    De parametrische formule wordt automatisch afgeleid uit de geselecteerde wetten.
+                                    Geen aanvullende instellingen nodig.
+                                </p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <!-- Train Button -->
+                <button type="submit"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors cursor-pointer">
+                    <span>Trainen</span>
+                    <span x-show="loadingCount > 0"
+                          x-cloak
+                          class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-indigo-400 text-white rounded-full">
+                        <svg class="animate-spin -ml-0.5 mr-1 h-3 w-3 text-white"
+                             fill="none"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        <span x-text="loadingCount"></span>
+                    </span>
+                </button>
+            </form>
+            <!-- Actions (shown when active run has result) -->
+            <div x-show="activeRun?.result" x-cloak class="mt-6 space-y-3">
+                <button @click="validate()"
+                        :disabled="validating"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
+                    <span x-show="!validating">Valideer model</span>
+                    <span x-show="validating" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                             fill="none"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Valideren...
+                    </span>
+                </button>
+                <button @click="downloadYaml()"
+                        class="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
+                    Download wetspecificatie (YAML)
+                </button>
+            </div>
+            <!-- Compare button (shown when 2+ runs completed) -->
+            <div x-show="canCompare" x-cloak class="mt-3">
+                <button @click="activeTab = 'comparison'"
+                        class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer">
+                    Vergelijk runs
+                </button>
+            </div>
+        </div>
+        <!-- Right Panel: Tabs + Results -->
+        <div class="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+            <!-- Tab Bar -->
+            <div x-show="Object.keys(runs).length > 0"
+                 x-cloak
+                 class="bg-gray-100 border-b border-gray-200 flex items-center min-h-[44px] overflow-x-auto">
+                <template x-for="id in runIds" :key="id">
+                    <button @click="activeTab = id"
+                            class="relative inline-flex items-center px-4 py-2 text-sm font-medium border-r border-gray-200 cursor-pointer whitespace-nowrap"
+                            :class="activeTab === id ? 'bg-white text-gray-900 border-b-2 border-b-indigo-500' : (runs[id]?.error ? 'bg-red-50 text-gray-600 hover:text-gray-900' : (runs[id]?.result ? 'bg-green-50 text-gray-600 hover:text-gray-900' : 'bg-yellow-50 text-gray-500 hover:text-gray-700'))">
+                        <!-- Status icon: completed -->
+                        <template x-if="runs[id]?.result">
+                            <svg class="w-3.5 h-3.5 text-green-600 mr-1.5"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </template>
+                        <!-- Status icon: error -->
+                        <template x-if="runs[id]?.error">
+                            <svg class="w-3.5 h-3.5 text-red-600 mr-1.5"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                        </template>
+                        <!-- Status icon: loading -->
+                        <template x-if="!runs[id]?.result && !runs[id]?.error">
+                            <svg class="w-3.5 h-3.5 text-yellow-600 animate-spin mr-1.5"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                </path>
+                            </svg>
+                        </template>
+                        <span x-text="'Run ' + id"></span>
+                        <button @click.stop="closeRun(id)"
+                                class="ml-2 p-0.5 rounded hover:bg-gray-300 cursor-pointer">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </button>
+                </template>
+                <!-- Comparison tab -->
+                <button x-show="canCompare"
+                        @click="activeTab = 'comparison'"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium cursor-pointer whitespace-nowrap"
+                        :class="activeTab === 'comparison' ? 'bg-white text-amber-700 border-b-2 border-b-amber-500' : 'text-amber-600 hover:text-amber-800 bg-amber-50'">
+                    <svg class="w-3.5 h-3.5 mr-1.5"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    Vergelijking
+                </button>
+            </div>
+            <!-- Tab Content Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- Empty State -->
+                <div x-show="runIds.length === 0"
+                     class="flex items-center justify-center h-full">
+                    <div class="text-center text-gray-500">
+                        <svg class="mx-auto h-16 w-16 text-gray-300 mb-4"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-lg font-medium">Geen resultaten</p>
+                        <p class="text-sm mt-1">Configureer de parameters en klik op "Trainen" om te beginnen.</p>
+                    </div>
+                </div>
+                <!-- Per-run Loading State (shown when active tab is a run without result) -->
+                <div x-show="activeRun && !activeRun.result && !activeRun.error"
+                     x-cloak
+                     class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <svg class="animate-spin mx-auto h-12 w-12 text-indigo-600 mb-4"
+                             fill="none"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        <p class="text-lg font-medium text-gray-700">Model wordt getraind...</p>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Simulatie met <span x-text="activeRun?.config?.num_people || '?'"></span> personen wordt uitgevoerd.
+                        </p>
+                    </div>
+                </div>
+                <!-- Per-run Error State -->
+                <div x-show="activeRun?.error" x-cloak class="p-4">
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h3 class="text-red-800 font-medium">Fout bij training</h3>
+                        <p class="text-red-700 text-sm mt-1" x-text="activeRun?.error"></p>
+                    </div>
+                </div>
+                <!-- Single Run Results -->
+                <div x-show="activeRun?.result" x-cloak class="space-y-4">
+                    <!-- Accordeon: Metrics Summary (collapsed) -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.metrics = !sections.metrics"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Samenvatting Metrieken</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.metrics ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.metrics" x-cloak class="px-4 pb-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="text-sm font-medium text-gray-500">Nauwkeurigheid recht (Accuracy)</div>
+                                    <div class="text-2xl font-bold text-gray-900"
+                                         x-text="formatPct(activeRun?.result?.metrics?.eligibility_accuracy)"></div>
+                                    <div class="text-xs text-gray-400 mt-1">Hoe vaak het model correct bepaalt of iemand recht heeft</div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="text-sm font-medium text-gray-500">Verklarende waarde bedrag (R&sup2;)</div>
+                                    <div class="text-2xl font-bold text-gray-900"
+                                         x-text="formatNum(activeRun?.result?.metrics?.amount_r2)"></div>
+                                    <div class="text-xs text-gray-400 mt-1">Hoe goed het model het bedrag kan voorspellen (1.0 = perfect)</div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="text-sm font-medium text-gray-500">Gemiddelde afwijking bedrag (MAE)</div>
+                                    <div class="text-2xl font-bold text-gray-900"
+                                         x-text="'EUR ' + formatNum(activeRun?.result?.metrics?.amount_mae)"></div>
+                                    <div class="text-xs text-gray-400 mt-1">Hoeveel het berekende bedrag gemiddeld afwijkt van het werkelijke</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feature warnings -->
+                    <template x-if="activeRun?.result?.feature_warnings?.length > 0">
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                            <h4 class="text-sm font-semibold text-amber-800 mb-2">Ontbrekende gegevens</h4>
+                            <template x-for="(warn, wi) in activeRun.result.feature_warnings" :key="wi">
+                                <div class="text-sm text-amber-700 mb-1">
+                                    <span class="font-medium" x-text="lawLabel(warn.law)"></span>:
+                                    <span x-text="warn.missing.join(', ')"></span>
+                                </div>
+                            </template>
+                            <p class="text-xs text-amber-600 mt-2">
+                                Deze gegevens zijn niet beschikbaar in de simulatie. De nauwkeurigheid voor deze wetten kan lager zijn.
+                            </p>
+                        </div>
+                    </template>
+                    <!-- Accordeon: Belang van kenmerken (collapsed) -->
+                    <div x-show="activeRun?.result?.law_analysis"
+                         x-cloak
+                         class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.features = !sections.features"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Belang van kenmerken</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.features ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.features" x-cloak class="px-4 pb-4">
+                            <p class="text-xs text-gray-500 mb-3">
+                                Hoe sterk elke feature bijdraagt aan de besluitvorming van het model (Gini importance).
+                            </p>
+                            <div class="space-y-2">
+                                <template x-for="fi in (activeRun?.result?.law_analysis?.feature_importance || [])"
+                                          :key="fi.feature">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-36 text-sm text-gray-700 font-mono truncate"
+                                             x-text="fi.feature"></div>
+                                        <div class="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                                            <div class="h-full rounded-full bg-indigo-500 transition-all"
+                                                 :style="'width: ' + (fi.importance * 100) + '%'"></div>
+                                            <span class="absolute inset-0 flex items-center justify-end pr-2 text-xs font-medium"
+                                                  :class="fi.importance > 0.3 ? 'text-white' : 'text-gray-600'"
+                                                  x-text="(fi.importance * 100).toFixed(1) + '%'"></span>
+                                        </div>
+                                        <div class="flex gap-1 flex-shrink-0">
+                                            <template x-for="law in fi.laws" :key="law">
+                                                <span class="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
+                                                      :class="lawBadgeClass(law)"
+                                                      x-text="lawShortLabel(law)"></span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Accordeon: Per-wet kaarten (collapsed) -->
+                    <div x-show="activeRun?.result?.law_analysis"
+                         x-cloak
+                         class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.laws = !sections.laws"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Analyse per wet</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.laws ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.laws" x-cloak class="px-4 pb-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <template x-for="lawKey in Object.keys(activeRun?.result?.law_analysis?.laws || {})"
+                                          :key="lawKey">
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <h4 class="text-base font-semibold text-gray-900"
+                                                x-text="activeRun?.result?.law_analysis?.laws?.[lawKey]?.label"></h4>
+                                        </div>
+                                        <div class="flex flex-wrap gap-1.5 mb-3">
+                                            <span x-show="activeRun?.result?.law_analysis?.laws?.[lawKey]?.is_most_similar"
+                                                  class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                                Meest gelijkend
+                                            </span>
+                                            <span x-show="activeRun?.result?.law_analysis?.laws?.[lawKey]?.is_most_complex"
+                                                  class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-800 rounded-full"
+                                                  title="Deze wet heeft de meeste splits in de beslisboom.">
+                                                Meest complex
+                                            </span>
+                                        </div>
+                                        <div class="space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Gewicht in model</span>
+                                                <span class="font-medium"
+                                                      x-text="formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.importance)"></span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Splits in boom</span>
+                                                <span class="font-medium"
+                                                      x-text="(activeRun?.result?.law_analysis?.laws?.[lawKey]?.splits ?? '-') + ' (' + formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.complexity) + ')'"></span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Bedragbijdrage</span>
+                                                <span class="font-medium"
+                                                      x-text="formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.amount_contribution)"></span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Bereik</span>
+                                                <span class="font-medium"
+                                                      x-text="formatPct(activeRun?.result?.law_analysis?.laws?.[lawKey]?.eligibility_rate)"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Accordeon: Cross Validation (collapsed) -->
+                    <div x-show="activeRun?.result?.metrics?.cross_validation"
+                         class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.cv = !sections.cv"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Cross-validatie (5-fold)</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.cv ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.cv" x-cloak class="px-4 pb-4">
+                            <div class="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Nauwkeurigheid (Accuracy):
+                                        <br>
+                                    </span>
+                                    <span class="font-medium"
+                                          x-text="formatPct(activeRun?.result?.metrics?.cross_validation?.accuracy_mean) + ' (\u00b1' + formatPct(activeRun?.result?.metrics?.cross_validation?.accuracy_std) + ')'"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">F1-score (balans precisie/volledigheid):
+                                        <br>
+                                    </span>
+                                    <span class="font-medium"
+                                          x-text="formatPct(activeRun?.result?.metrics?.cross_validation?.f1_mean) + ' (\u00b1' + formatPct(activeRun?.result?.metrics?.cross_validation?.f1_std) + ')'"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Recall (hoeveel rechthebbenden gevonden):
+                                        <br>
+                                    </span>
+                                    <span class="font-medium"
+                                          x-text="formatPct(activeRun?.result?.metrics?.cross_validation?.recall_mean) + ' (\u00b1' + formatPct(activeRun?.result?.metrics?.cross_validation?.recall_std) + ')'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Accordeon: Regels (OPEN by default, tree only) -->
+                    <div x-show="activeRun?.result?.method === 'tree' || !activeRun?.result?.method"
+                         class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.rules = !sections.rules"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                Regels voor recht op toeslag
+                                <span class="text-sm font-normal text-gray-500"
+                                      x-text="'(' + (activeRun?.result?.rules?.length || 0) + ' regels)'"></span>
+                            </h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.rules ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.rules" x-cloak class="px-4 pb-4">
+                            <!-- Tree Visualization -->
+                            <div x-show="activeRun?.result?.tree_structure" class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">Beslisboom</h4>
+                                <div class="overflow-x-auto pb-2">
+                                    <div class="tree-container">
+                                        <template x-if="activeRun?.result?.tree_structure">
+                                            <div x-html="renderTreeNode(activeRun.result.tree_structure, 0)"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Berekening toeslagbedrag (inline within rules) -->
+                            <div x-show="activeRun?.result?.formulas?.length > 0" class="mt-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">
+                                    Berekening toeslagbedrag
+                                    <span class="text-sm font-normal text-gray-500"
+                                          x-text="'(' + (activeRun?.result?.formulas?.length || 0) + ' groepen)'"></span>
+                                </h4>
+                                <div class="space-y-3">
+                                    <template x-for="(formula, idx) in (activeRun?.result?.formulas || [])"
+                                              :key="idx">
+                                        <div class="border border-gray-200 rounded-lg p-3">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-sm font-medium text-emerald-700"
+                                                      x-text="'Groep ' + (idx + 1)"></span>
+                                                <div class="text-xs text-gray-500">
+                                                    <span x-text="'personen (n): ' + formula.samples"></span>
+                                                    <span class="ml-2"
+                                                          x-text="'verkl. waarde (R\u00b2): ' + formatNum(formula.r2_score)"></span>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-700">
+                                                <div class="mb-1">
+                                                    <span class="text-gray-500">Basisbedrag (Intercept):</span>
+                                                    <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded"
+                                                          x-text="formatNum(formula.intercept)"></code>
+                                                </div>
+                                                <template x-for="(coef, feat) in formula.coefficients" :key="feat">
+                                                    <div class="ml-4">
+                                                        <span class="text-gray-400" x-text="coef > 0 ? '+' : ''"></span>
+                                                        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded"
+                                                              x-text="formatNum(coef) + ' x ' + feat"></code>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <div x-show="formula.segment_conditions?.length > 0"
+                                                 class="mt-2 pt-2 border-t border-gray-100">
+                                                <div class="text-xs text-gray-500 mb-1">Voorwaarden voor deze groep:</div>
+                                                <template x-for="(cond, ci) in formula.segment_conditions" :key="ci">
+                                                    <code class="text-xs bg-yellow-50 px-1.5 py-0.5 rounded mr-1" x-text="cond"></code>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feature Influence (staffelmodel only) -->
+                    <template x-if="activeRun?.result?.feature_influence && Object.keys(activeRun.result.feature_influence).length > 0">
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Feature-invloed</h3>
+                            <p class="text-xs text-gray-500 mb-3">
+                                Kenmerken gesorteerd op invloed op het toeslagbedrag (eta-kwadraat). De meest invloedrijke kenmerken worden gebruikt voor de huishoudgroepen.
+                            </p>
+                            <div class="space-y-1.5">
+                                <template x-for="[key, value] in Object.entries(activeRun.result.feature_influence).sort((a,b) => b[1] - a[1])"
+                                          :key="key">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-600 w-40 truncate"
+                                              x-text="(() => { const labels = { 'has_partner': 'Heeft partner', 'has_children': 'Heeft kinderen', 'housing_type_rent': 'Woonsituatie', 'is_student': 'Is student', 'has_dutch_nationality': 'Nationaliteit', 'is_detained': 'Is gedetineerd', 'is_health_insured': 'Zorgverzekerd', 'receives_child_benefit': 'Kinderbijslag', 'receives_study_financing': 'Studiefinanciering', 'childcare_type': 'Soort opvang' }; if (labels[key]) return labels[key]; const disc = activeRun?.result?.discretized_features || {}; if (disc[key]) { const src = { age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur', children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste', work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren', standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen', childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief' }; return (src[disc[key].source] || disc[key].source) + ' > ' + Math.round(disc[key].threshold); } return key; })()"></span>
+                                        <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                                            <div class="h-full rounded-full transition-all"
+                                                 :class="value > 0.05 ? 'bg-blue-500' : 'bg-gray-300'"
+                                                 :style="'width: ' + Math.max(2, value * 100) + '%'"></div>
+                                        </div>
+                                        <span class="text-xs font-mono w-12 text-right"
+                                              :class="value > 0.05 ? 'text-blue-600' : 'text-gray-400'"
+                                              x-text="(value * 100).toFixed(1) + '%'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                    <!-- Bracket Table (staffelmodel only) -->
+                    <template x-if="activeRun?.result?.method === 'bracket'">
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Staffeltabel</h3>
+                            <p class="text-xs text-gray-500 mb-3">Binnen elke band wordt het bedrag lineair afgebouwd (geen harde overgangen).</p>
+                            <div class="space-y-1">
+                                <template x-for="(group, gi) in bracketGroups()" :key="gi">
+                                    <template x-if="group.bands.some(b => b.amount_from > 0)">
+                                        <details class="border border-gray-200 rounded-lg" :open="gi === 0">
+                                            <summary class="px-3 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center">
+                                                <span class="text-sm font-medium text-gray-700" x-text="group.label"></span>
+                                                <span class="text-xs text-gray-400"
+                                                      x-text="'max €' + Math.max(...group.bands.map(b => b.amount_from)).toFixed(0) + '/mnd'"></span>
+                                            </summary>
+                                            <div class="px-3 pb-2">
+                                                <table class="min-w-full text-sm">
+                                                    <thead>
+                                                        <tr class="bg-gray-50">
+                                                            <th class="px-2 py-1 text-left text-xs">Inkomen van</th>
+                                                            <th class="px-2 py-1 text-left text-xs">t/m</th>
+                                                            <th class="px-2 py-1 text-right text-xs">Toeslag/mnd</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template x-for="(band, idx) in group.bands" :key="idx">
+                                                            <tr class="border-t border-gray-100">
+                                                                <td class="px-2 py-1 text-sm"
+                                                                    x-text="'€' + Number(idx === 0 ? band.income_from : band.income_from + 1).toLocaleString('nl-NL')">
+                                                                </td>
+                                                                <td class="px-2 py-1 text-sm"
+                                                                    x-text="'€' + Number(band.income_to).toLocaleString('nl-NL')">
+                                                                </td>
+                                                                <td class="px-2 py-1 text-right font-mono font-semibold"
+                                                                    :class="band.amount_from > 0 ? 'text-green-700' : 'text-gray-400'"
+                                                                    x-text="'€' + Number(band.amount_from).toFixed(0)">
+                                                                </td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </details>
+                                    </template>
+                                </template>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2"
+                               x-text="'Groepen zonder toeslag (' + bracketGroups().filter(g => !g.bands.some(b => b.amount_from > 0)).length + ') zijn verborgen'">
+                            </p>
+                            <template x-if="activeRun?.result?.child_supplement > 0">
+                                <p class="mt-3 text-sm text-gray-600">
+                                    Kindtoeslag: <span class="font-semibold"
+       x-text="'EUR ' + Number(activeRun.result.child_supplement).toFixed(0)"></span> extra per kind per maand
+                                </p>
+                            </template>
+                        </div>
+                    </template>
+                    <!-- Components (parametric only) -->
+                    <template x-if="activeRun?.result?.method === 'parametric'">
+                        <div class="bg-white rounded-lg shadow p-4 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Formule</h3>
+                            <!-- Total formula summary -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                                <p class="text-sm text-gray-600 mb-2">Uw totale toeslag per maand:</p>
+                                <p class="font-mono text-sm font-semibold text-gray-800"
+                                   x-text="(activeRun?.result?.components || []).map(c => (c.label || c.name)).join(' + ')">
+                                </p>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    Elk onderdeel wordt apart berekend op basis van uw inkomen. Als een onderdeel onder nul uitkomt, wordt het op nul gezet.
+                                </p>
+                            </div>
+                            <!-- Per-component formulas -->
+                            <div class="grid gap-3">
+                                <template x-for="(comp, idx) in (activeRun?.result?.components || [])"
+                                          :key="idx">
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <h4 class="font-semibold text-gray-800 mb-3"
+                                            x-text="(comp.label || comp.name)"></h4>
+                                        <!-- Alleenstaand formula -->
+                                        <div class="mb-3">
+                                            <p class="text-xs font-medium text-gray-500 mb-1"
+                                               x-text="comp.has_partner_variant ? 'Alleenstaand:' : ''"></p>
+                                            <div class="bg-gray-50 rounded px-3 py-2 font-mono text-sm">
+                                                <span x-show="comp.base_single > 0">
+                                                    max(0,
+                                                    <span class="text-blue-700 font-semibold"
+                                                          x-text="'€' + Number(comp.base_single).toFixed(0)"></span>
+                                                    &minus;
+                                                    <span class="text-red-700 font-semibold"
+                                                          x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
+                                                    &times; max(0, inkomen &minus;
+                                                    <span class="text-green-700 font-semibold"
+                                                          x-text="'€' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>))
+                                                </span>
+                                                <span x-show="comp.base_single <= 0" class="text-gray-400">€0 (niet van toepassing)</span>
+                                            </div>
+                                            <p class="text-xs text-gray-400 mt-1" x-show="comp.base_single > 0">
+                                                Basisbedrag
+                                                <span class="text-blue-600"
+                                                      x-text="'€' + Number(comp.base_single).toFixed(0)"></span>/mnd,
+                                                boven
+                                                <span class="text-green-600"
+                                                      x-text="'€' + Number(comp.threshold_single).toLocaleString('nl-NL')"></span>
+                                                inkomen wordt
+                                                <span class="text-red-600"
+                                                      x-text="(comp.rate_single * 100).toFixed(1) + '%'"></span>
+                                                afgebouwd
+                                            </p>
+                                        </div>
+                                        <!-- Met partner formula -->
+                                        <template x-if="comp.has_partner_variant">
+                                            <div>
+                                                <p class="text-xs font-medium text-gray-500 mb-1">Met partner:</p>
+                                                <div class="bg-gray-50 rounded px-3 py-2 font-mono text-sm">
+                                                    <span x-show="comp.base_partner > 0">
+                                                        max(0,
+                                                        <span class="text-blue-700 font-semibold"
+                                                              x-text="'€' + Number(comp.base_partner).toFixed(0)"></span>
+                                                        &minus;
+                                                        <span class="text-red-700 font-semibold"
+                                                              x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
+                                                        &times; max(0, inkomen &minus;
+                                                        <span class="text-green-700 font-semibold"
+                                                              x-text="'€' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>))
+                                                    </span>
+                                                    <span x-show="comp.base_partner <= 0" class="text-gray-400">€0 (niet van toepassing)</span>
+                                                </div>
+                                                <p class="text-xs text-gray-400 mt-1" x-show="comp.base_partner > 0">
+                                                    Basisbedrag
+                                                    <span class="text-blue-600"
+                                                          x-text="'€' + Number(comp.base_partner).toFixed(0)"></span>/mnd,
+                                                    boven
+                                                    <span class="text-green-600"
+                                                          x-text="'€' + Number(comp.threshold_partner).toLocaleString('nl-NL')"></span>
+                                                    inkomen wordt
+                                                    <span class="text-red-600"
+                                                          x-text="(comp.rate_partner * 100).toFixed(1) + '%'"></span>
+                                                    afgebouwd
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <template x-if="activeRun?.result?.child_supplement > 0">
+                                <div class="mt-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700">
+                                    + <span class="font-semibold"
+       x-text="'€' + Number(activeRun.result.child_supplement).toFixed(0)"></span> extra per kind per maand
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <!-- Accordeon: Uitleg in het Nederlands (collapsed) -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.explanation = !sections.explanation"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Uitleg in het Nederlands</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.explanation ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.explanation" x-cloak class="px-4 pb-4">
+                            <div class="prose prose-sm max-w-none text-gray-700"
+                                 x-html="renderMarkdown(activeRun?.result?.explanation)"></div>
+                        </div>
+                    </div>
+                    <!-- Accordeon: Gegenereerde YAML (collapsed) -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.yaml = !sections.yaml"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">Gegenereerde YAML</h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.yaml ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.yaml" x-cloak class="px-4 pb-4">
+                            <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs leading-relaxed max-h-96 overflow-y-auto"><code x-text="activeRun?.result?.yaml"></code></pre>
+                        </div>
+                    </div>
+                    <!-- Validation Error -->
+                    <div x-show="activeRun?.validationError"
+                         x-cloak
+                         class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h3 class="text-red-800 font-medium">Fout bij validatie</h3>
+                        <p class="text-red-700 text-sm mt-1" x-text="activeRun?.validationError"></p>
+                    </div>
+                    <!-- Accordeon: Validatierapport (collapsed) -->
+                    <div x-show="activeRun?.validationResult"
+                         x-cloak
+                         class="bg-white rounded-lg shadow overflow-hidden">
+                        <button type="button"
+                                @click="sections.validation = !sections.validation"
+                                class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                Validatierapport
+                                <span class="ml-2 text-sm font-normal"
+                                      :class="activeRun?.validationResult?.passed ? 'text-green-600' : 'text-red-600'"
+                                      x-text="activeRun?.validationResult?.passed ? 'GESLAAGD' : 'NIET GESLAAGD'"></span>
+                            </h3>
+                            <svg class="w-5 h-5 text-gray-500 transform transition-transform"
+                                 :class="sections.validation ? 'rotate-180' : ''"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="sections.validation" x-cloak class="px-4 pb-4">
+                            <div class="prose prose-sm max-w-none text-gray-700"
+                                 x-html="renderMarkdown(activeRun?.validationResult?.report_markdown)"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Comparison View -->
+                <div x-show="activeTab === 'comparison'" x-cloak class="space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Vergelijking Training Runs</h3>
+                            <button @click="exportComparisonCSV()"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer">
+                                <svg class="w-4 h-4 mr-1.5"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                                Export CSV
+                            </button>
+                        </div>
+                        <!-- Baseline selector -->
+                        <div class="bg-blue-50 p-3 rounded-lg mb-4 flex items-center gap-3">
+                            <label class="text-sm font-medium text-blue-700 whitespace-nowrap">Baseline:</label>
+                            <select x-model.number="baselineRunId"
+                                    class="text-sm bg-white border border-blue-200 rounded-md px-2 py-1 text-blue-800 cursor-pointer">
+                                <template x-for="run in completedRuns" :key="'bl-'+run.id">
+                                    <option :value="run.id"
+                                            x-text="'Run ' + run.id + ' (' + runParamSummary(run) + ')'"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <!-- Metrics Table -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left font-medium text-gray-500">Metriek</th>
+                                        <template x-for="run in completedRuns" :key="run.id">
+                                            <th class="px-4 py-2 text-right font-medium text-gray-500">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <span x-text="'Run ' + run.id"></span>
+                                                    <span x-show="run.id === baselineRun?.id"
+                                                          class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">baseline</span>
+                                                </div>
+                                                <span class="block text-xs font-normal text-gray-400"
+                                                      x-text="runParamSummary(run)"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-[10px] font-normal text-gray-400">verschil</span>
+                                                </template>
+                                            </th>
+                                        </template>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">Nauwkeurigheid recht (Accuracy)</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'acc-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="formatPct(run.result?.metrics?.eligibility_accuracy)"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs"
+                                                          :class="deltaColor(run.result?.metrics?.eligibility_accuracy, baselineRun.result?.metrics?.eligibility_accuracy, true)"
+                                                          x-text="formatDelta(run.result?.metrics?.eligibility_accuracy, baselineRun.result?.metrics?.eligibility_accuracy, 'pct')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">Verklarende waarde bedrag (R&sup2;)</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'r2-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="formatNum(run.result?.metrics?.amount_r2)"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs"
+                                                          :class="deltaColor(run.result?.metrics?.amount_r2, baselineRun.result?.metrics?.amount_r2, true)"
+                                                          x-text="formatDelta(run.result?.metrics?.amount_r2, baselineRun.result?.metrics?.amount_r2, 'num')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">Gemiddelde afwijking bedrag (MAE)</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'mae-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="'EUR ' + formatNum(run.result?.metrics?.amount_mae)"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs"
+                                                          :class="deltaColor(run.result?.metrics?.amount_mae, baselineRun.result?.metrics?.amount_mae, false)"
+                                                          x-text="formatDelta(run.result?.metrics?.amount_mae, baselineRun.result?.metrics?.amount_mae, 'num')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">Aantal regels</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'rules-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="run.result?.rules?.length || 0"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs text-gray-500"
+                                                          x-text="formatDelta(run.result?.rules?.length || 0, baselineRun.result?.rules?.length || 0, 'int')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">Aantal formules</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'form-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="run.result?.formulas?.length || 0"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs text-gray-500"
+                                                          x-text="formatDelta(run.result?.formulas?.length || 0, baselineRun.result?.formulas?.length || 0, 'int')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">CV Nauwkeurigheid</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'cvacc-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="formatPct(run.result?.metrics?.cross_validation?.accuracy_mean) + ' (\u00b1' + formatPct(run.result?.metrics?.cross_validation?.accuracy_std) + ')'"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs"
+                                                          :class="deltaColor(run.result?.metrics?.cross_validation?.accuracy_mean, baselineRun.result?.metrics?.cross_validation?.accuracy_mean, true)"
+                                                          x-text="formatDelta(run.result?.metrics?.cross_validation?.accuracy_mean, baselineRun.result?.metrics?.cross_validation?.accuracy_mean, 'pct')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">CV F1-score</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'cvf1-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="formatPct(run.result?.metrics?.cross_validation?.f1_mean) + ' (\u00b1' + formatPct(run.result?.metrics?.cross_validation?.f1_std) + ')'"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs"
+                                                          :class="deltaColor(run.result?.metrics?.cross_validation?.f1_mean, baselineRun.result?.metrics?.cross_validation?.f1_mean, true)"
+                                                          x-text="formatDelta(run.result?.metrics?.cross_validation?.f1_mean, baselineRun.result?.metrics?.cross_validation?.f1_mean, 'pct')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">CV Recall</td>
+                                        <template x-for="(run, i) in completedRuns" :key="'cvrec-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span x-text="formatPct(run.result?.metrics?.cross_validation?.recall_mean) + ' (\u00b1' + formatPct(run.result?.metrics?.cross_validation?.recall_std) + ')'"></span>
+                                                <template x-if="run.id !== baselineRun?.id">
+                                                    <span class="block text-xs"
+                                                          :class="deltaColor(run.result?.metrics?.cross_validation?.recall_mean, baselineRun.result?.metrics?.cross_validation?.recall_mean, true)"
+                                                          x-text="formatDelta(run.result?.metrics?.cross_validation?.recall_mean, baselineRun.result?.metrics?.cross_validation?.recall_mean, 'pct')"></span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <td class="px-4 py-2 text-gray-700 font-medium">Meest gelijkend aan</td>
+                                        <template x-for="run in completedRuns" :key="'sim-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full"
+                                                      x-text="lawLabel(run.result?.law_analysis?.most_similar)"></span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <td class="px-4 py-2 text-gray-700 font-medium">Meest complex</td>
+                                        <template x-for="run in completedRuns" :key="'cplx-'+run.id">
+                                            <td class="px-4 py-2 text-right">
+                                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-orange-100 text-orange-800 rounded-full"
+                                                      x-text="lawLabel(run.result?.law_analysis?.most_complex)"></span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Parameter Differences -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Parameter Verschillen</h3>
+                        <template x-for="run in completedRuns.filter(r => r.id !== baselineRun?.id)"
+                                  :key="'pdiff-'+run.id">
+                            <div class="mb-4 last:mb-0">
+                                <h4 class="text-sm font-medium text-gray-700 mb-2"
+                                    x-text="'Run ' + run.id + ' vs. Baseline (Run ' + baselineRun?.id + ')'"></h4>
+                                <div x-show="paramDiffs(baselineRun?.config, run.config).length === 0"
+                                     class="text-sm text-gray-500 italic">Identieke parameters</div>
+                                <template x-for="diff in paramDiffs(baselineRun?.config || {}, run.config)"
+                                          :key="diff.label">
+                                    <div class="text-sm text-gray-700 ml-2">
+                                        <span class="text-gray-500" x-text="diff.label + ': '"></span>
+                                        <span class="font-medium" x-text="diff.from + ' \u2192 ' + diff.to"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <!-- Simple markdown renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+    .tree-container .tree-node {
+        position: relative;
+        padding-left: 24px;
+    }
+    .tree-container .tree-node::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: #d1d5db;
+    }
+    .tree-container .tree-branch {
+        position: relative;
+        margin-top: 4px;
+    }
+    .tree-container .tree-branch::before {
+        content: '';
+        position: absolute;
+        left: -16px;
+        top: 14px;
+        width: 16px;
+        height: 1px;
+        background-color: #d1d5db;
+    }
+    .tree-container > div > .tree-node::before {
+        display: none;
+    }
+    .tree-container .tree-label {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.4;
+        margin: 2px 0;
+    }
+    .tree-container .tree-split {
+        background-color: #eef2ff;
+        border: 1px solid #c7d2fe;
+        color: #4338ca;
+    }
+    .tree-container .tree-leaf-eligible {
+        background-color: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #065f46;
+    }
+    .tree-container .tree-leaf-not {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        color: #6b7280;
+    }
+    .tree-container .tree-branch-label {
+        font-size: 10px;
+        color: #9ca3af;
+        margin-left: 4px;
+    }
+    </style>
+    <script>
+    // --- Populatiebeheer helper functions (shared with simulation) ---
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const chevron = document.getElementById(sectionId + '-chevron');
+        if (section.classList.contains('hidden')) {
+            section.classList.remove('hidden');
+            if (chevron) chevron.classList.add('rotate-180');
+        } else {
+            section.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+        }
+    }
+
+    function updateSliderValue(sliderId) {
+        const slider = document.getElementById(sliderId);
+        const valueSpan = document.getElementById(sliderId + '_value');
+        if (slider && valueSpan) valueSpan.textContent = slider.value + '%';
+    }
+
+    function updateNumPeopleDisplay() {
+        const slider = document.getElementById('num_people');
+        const display = document.getElementById('num_people_display');
+        if (slider && display) display.textContent = slider.value;
+    }
+
+    let previousAgeValues = {
+        age_18_30: {{ default_params.age_18_30 }},
+        age_30_45: {{ default_params.age_30_45 }},
+        age_45_67: {{ default_params.age_45_67 }},
+        age_67_85: {{ default_params.age_67_85 }},
+        age_85_plus: {{ default_params.age_85_plus }}
+    };
+
+    function validateAgeDistribution(changedField) {
+        const ageFields = ['age_18_30', 'age_30_45', 'age_45_67', 'age_67_85', 'age_85_plus'];
+        const currentValues = {};
+        ageFields.forEach(field => {
+            currentValues[field] = parseInt(document.getElementById(field).value);
+        });
+        const total = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+        if (changedField && total !== 100) {
+            const difference = 100 - total;
+            const otherFields = ageFields.filter(f => f !== changedField);
+            const sumOthers = otherFields.reduce((sum, field) => sum + currentValues[field], 0);
+            if (sumOthers > 0) {
+                otherFields.forEach(field => {
+                    const proportion = currentValues[field] / sumOthers;
+                    let newValue = currentValues[field] + Math.round(difference * proportion);
+                    newValue = Math.max(0, Math.min(100, newValue));
+                    document.getElementById(field).value = newValue;
+                    updateSliderValue(field);
+                    currentValues[field] = newValue;
+                });
+            }
+            const newTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+            if (newTotal !== 100) {
+                const finalDiff = 100 - newTotal;
+                const largestOther = otherFields.reduce((max, field) =>
+                    currentValues[field] > currentValues[max] ? field : max, otherFields[0]);
+                const adjustedValue = Math.max(0, Math.min(100, currentValues[largestOther] + finalDiff));
+                document.getElementById(largestOther).value = adjustedValue;
+                updateSliderValue(largestOther);
+                currentValues[largestOther] = adjustedValue;
+            }
+        }
+        previousAgeValues = {...currentValues};
+        const finalTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+        document.getElementById('age-total-value').textContent = finalTotal + '%';
+        const warning = document.getElementById('age-warning');
+        if (finalTotal !== 100) { warning.classList.remove('hidden'); }
+        else { warning.classList.add('hidden'); }
+    }
+
+    let previousIncomeValues = { income_low_pct: 30, income_middle_pct: 50, income_high_pct: 20 };
+
+    function updateIncomeDistribution(changedField) {
+        const incomeFields = ['income_low_pct', 'income_middle_pct', 'income_high_pct'];
+        const currentValues = {};
+        incomeFields.forEach(field => {
+            currentValues[field] = parseInt(document.getElementById(field).value);
+        });
+        const total = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+        if (changedField && total !== 100) {
+            const difference = 100 - total;
+            const otherFields = incomeFields.filter(f => f !== changedField);
+            const sumOthers = otherFields.reduce((sum, field) => sum + currentValues[field], 0);
+            if (sumOthers > 0) {
+                otherFields.forEach(field => {
+                    const proportion = currentValues[field] / sumOthers;
+                    let newValue = currentValues[field] + Math.round(difference * proportion);
+                    newValue = Math.max(0, Math.min(100, newValue));
+                    document.getElementById(field).value = newValue;
+                    updateSliderValue(field);
+                    currentValues[field] = newValue;
+                });
+            }
+            const newTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+            if (newTotal !== 100) {
+                const finalDiff = 100 - newTotal;
+                const largestOther = otherFields.reduce((max, field) =>
+                    currentValues[field] > currentValues[max] ? field : max, otherFields[0]);
+                const adjustedValue = Math.max(0, Math.min(100, currentValues[largestOther] + finalDiff));
+                document.getElementById(largestOther).value = adjustedValue;
+                updateSliderValue(largestOther);
+                currentValues[largestOther] = adjustedValue;
+            }
+        }
+        previousIncomeValues = {...currentValues};
+        const finalTotal = Object.values(currentValues).reduce((sum, val) => sum + val, 0);
+        document.getElementById('income-total-value').textContent = finalTotal + '%';
+        const warning = document.getElementById('income-warning');
+        if (finalTotal !== 100) { warning.classList.remove('hidden'); }
+        else { warning.classList.add('hidden'); }
+    }
+
+    function loadPreset(presetName) {
+        const presets = {
+            current: { age_18_30: 18, age_30_45: 25, age_45_67: 32, age_67_85: 20, age_85_plus: 5, income_low_pct: 30, income_middle_pct: 50, income_high_pct: 20, zero_income_prob: 5, rent_percentage: 43, student_percentage_young: 40 },
+            recession: { age_18_30: 18, age_30_45: 25, age_45_67: 32, age_67_85: 20, age_85_plus: 5, income_low_pct: 45, income_middle_pct: 40, income_high_pct: 15, zero_income_prob: 12, rent_percentage: 50, student_percentage_young: 35 },
+            housing_crisis: { age_18_30: 18, age_30_45: 25, age_45_67: 32, age_67_85: 20, age_85_plus: 5, income_low_pct: 30, income_middle_pct: 50, income_high_pct: 20, zero_income_prob: 5, rent_percentage: 55, student_percentage_young: 40 },
+            aging: { age_18_30: 12, age_30_45: 20, age_45_67: 30, age_67_85: 28, age_85_plus: 10, income_low_pct: 35, income_middle_pct: 45, income_high_pct: 20, zero_income_prob: 5, rent_percentage: 43, student_percentage_young: 30 },
+            healthcare: { age_18_30: 18, age_30_45: 25, age_45_67: 32, age_67_85: 20, age_85_plus: 5, income_low_pct: 35, income_middle_pct: 45, income_high_pct: 20, zero_income_prob: 5, rent_percentage: 43, student_percentage_young: 40 },
+        };
+        const preset = presets[presetName];
+        if (!preset) return;
+        for (const [key, value] of Object.entries(preset)) {
+            const el = document.getElementById(key);
+            if (el) {
+                el.value = value;
+                updateSliderValue(key);
+            }
+        }
+        validateAgeDistribution();
+        updateIncomeDistribution();
+    }
+
+    // --- Alpine.js app ---
+    function synthesizeApp() {
+        return {
+            config: {
+                num_people: 1000,
+                method: 'bracket',
+                max_depth: 5,
+                min_samples: 50,
+                max_rules: 10,
+                n_brackets: 5,
+            },
+            runs: {},
+            runCounter: 0,
+            activeTab: null,
+            baselineRunId: null,
+            validating: false,
+            showPopulatie: false,
+            showInstellingen: true,
+            showWetSelectie: false,
+            showMethode: true,
+            availableLaws: [
+                {id: 'zorgtoeslag', label: 'Zorgtoeslag', group: 'Toeslagen'},
+                {id: 'huurtoeslag', label: 'Huurtoeslag', group: 'Toeslagen'},
+                {id: 'kindgebonden_budget', label: 'Kindgebonden budget', group: 'Toeslagen'},
+                {id: 'kinderopvangtoeslag', label: 'Kinderopvangtoeslag', group: 'Toeslagen'},
+                {id: 'bijstand', label: 'Bijstand', group: 'Sociale zekerheid'},
+                {id: 'aow', label: 'AOW', group: 'Sociale zekerheid'},
+                {id: 'ww', label: 'WW-uitkering', group: 'Sociale zekerheid'},
+            ],
+            selectedLaws: ['zorgtoeslag', 'huurtoeslag', 'kindgebonden_budget'],
+            methodLabels: {tree: 'Beslisboom', bracket: 'Staffelmodel', parametric: 'Parametrisch'},
+            methodDescriptions: {
+                tree: 'Beslisboom + lineaire regressie. Goed interpreteerbaar, flexibele regels.',
+                bracket: 'Inkomensafhankelijke staffel met lineaire interpolatie. Geen cliff effects.',
+                parametric: 'Vereenvoudigde formule: max(0, basis - afbouw% x (inkomen - drempel)). Meest compact.',
+            },
+            sections: {
+                metrics: false,
+                features: false,
+                laws: false,
+                cv: false,
+                rules: true,
+
+                explanation: false,
+                yaml: false,
+                validation: false,
+            },
+
+            get runIds() {
+                return Object.keys(this.runs).map(Number).sort((a, b) => a - b);
+            },
+
+            get activeRun() {
+                if (typeof this.activeTab === 'number' && this.runs[this.activeTab]) {
+                    return this.runs[this.activeTab];
+                }
+                return null;
+            },
+
+            get loadingCount() {
+                return this.runIds.filter(id => !this.runs[id]?.result && !this.runs[id]?.error).length;
+            },
+
+            get completedRuns() {
+                return this.runIds
+                    .filter(id => this.runs[id]?.result)
+                    .map(id => ({ id, ...this.runs[id] }));
+            },
+
+            get baselineRun() {
+                const bl = this.completedRuns.find(r => r.id === this.baselineRunId);
+                return bl || this.completedRuns[0] || null;
+            },
+
+            get canCompare() {
+                return this.completedRuns.length >= 2;
+            },
+
+            collectFormData() {
+                const form = document.getElementById('harmonisatie-form');
+                if (!form) return {};
+                const getVal = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? parseInt(el.value) || 0 : 0;
+                };
+                const getStr = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? el.value : '';
+                };
+                return {
+                    num_people: getVal('num_people'),
+                    simulation_date: getStr('simulation_date'),
+                    method: this.config.method,
+                    selected_laws: this.selectedLaws,
+                    max_depth: this.config.max_depth,
+                    min_samples: this.config.min_samples,
+                    max_rules: this.config.max_rules,
+                    n_brackets: this.config.n_brackets,
+                    age_distribution: {
+                        age_18_30: getVal('age_18_30'),
+                        age_30_45: getVal('age_30_45'),
+                        age_45_67: getVal('age_45_67'),
+                        age_67_85: getVal('age_67_85'),
+                        age_85_plus: getVal('age_85_plus'),
+                    },
+                    income_distribution: {
+                        income_low_pct: getVal('income_low_pct'),
+                        income_middle_pct: getVal('income_middle_pct'),
+                        income_high_pct: getVal('income_high_pct'),
+                    },
+                    economic_params: {
+                        zero_income_prob: getVal('zero_income_prob'),
+                        rent_percentage: getVal('rent_percentage'),
+                        student_percentage_young: getVal('student_percentage_young'),
+                    },
+                };
+            },
+
+            runParamSummary(run) {
+                if (!run?.config) return '';
+                const c = run.config;
+                const methodLabel = this.methodLabels[c.method] || c.method;
+                const lawCount = (c.selected_laws || []).length;
+                const lawSuffix = lawCount ? ', ' + lawCount + ' wetten' : '';
+                if (c.method === 'bracket') return methodLabel + ', ' + c.num_people + ' pers, ' + (c.n_brackets || 5) + ' schijven' + lawSuffix;
+                if (c.method === 'parametric') return methodLabel + ', ' + c.num_people + ' pers' + lawSuffix;
+                return methodLabel + ', ' + c.num_people + ' pers, diepte ' + c.max_depth + lawSuffix;
+            },
+
+            paramLabels: {
+                num_people: 'Aantal simulatiepersonen',
+                method: 'Methode',
+                selected_laws: 'Geselecteerde wetten',
+                max_depth: 'Maximale diepte',
+                min_samples: 'Minimum personen per regel',
+                max_rules: 'Maximaal aantal regels',
+                n_brackets: 'Aantal schijven',
+            },
+
+            paramDiffs(baseConfig, otherConfig) {
+                const diffs = [];
+                for (const key of Object.keys(this.paramLabels)) {
+                    const baseVal = baseConfig[key];
+                    const otherVal = otherConfig[key];
+                    if (key === 'selected_laws') {
+                        const baseLaws = (baseVal || []).slice().sort().join(',');
+                        const otherLaws = (otherVal || []).slice().sort().join(',');
+                        if (baseLaws !== otherLaws) {
+                            const lawLabel = (ids) => (ids || []).map(id => {
+                                const law = this.availableLaws.find(l => l.id === id);
+                                return law ? law.label : id;
+                            }).join(', ');
+                            diffs.push({
+                                label: this.paramLabels[key],
+                                from: lawLabel(baseVal),
+                                to: lawLabel(otherVal),
+                            });
+                        }
+                    } else if (baseVal !== otherVal) {
+                        diffs.push({
+                            label: this.paramLabels[key],
+                            from: baseVal,
+                            to: otherVal,
+                        });
+                    }
+                }
+                return diffs;
+            },
+
+            formatPct(val) {
+                if (val == null) return '-';
+                return (val * 100).toFixed(1) + '%';
+            },
+
+            formatNum(val) {
+                if (val == null) return '-';
+                return Number(val).toFixed(2);
+            },
+
+            formatDelta(val, base, format) {
+                if (val == null || base == null) return '';
+                const diff = val - base;
+                const sign = diff > 0 ? '+' : '';
+                if (format === 'pct') return sign + (diff * 100).toFixed(1) + 'pp';
+                if (format === 'int') return sign + Math.round(diff);
+                return sign + diff.toFixed(2);
+            },
+
+            deltaColor(val, base, higherIsBetter) {
+                if (val == null || base == null) return 'text-gray-500';
+                const diff = val - base;
+                if (Math.abs(diff) < 0.0001) return 'text-gray-500';
+                if (higherIsBetter) {
+                    return diff > 0 ? 'text-green-600' : 'text-red-600';
+                }
+                return diff < 0 ? 'text-green-600' : 'text-red-600';
+            },
+
+            lawLabel(key) {
+                const law = this.availableLaws.find(l => l.id === key);
+                return law ? law.label : key || '-';
+            },
+
+            lawShortLabel(key) {
+                const labels = {
+                    zorgtoeslag: 'ZT', huurtoeslag: 'HT', kindgebonden_budget: 'KGB',
+                    kinderopvangtoeslag: 'KOT', bijstand: 'BIJ', aow: 'AOW', ww: 'WW',
+                };
+                return labels[key] || key;
+            },
+
+            lawBadgeClass(key) {
+                const classes = {
+                    zorgtoeslag: 'bg-blue-100 text-blue-800',
+                    huurtoeslag: 'bg-emerald-100 text-emerald-800',
+                    kindgebonden_budget: 'bg-purple-100 text-purple-800',
+                    kinderopvangtoeslag: 'bg-pink-100 text-pink-800',
+                    bijstand: 'bg-amber-100 text-amber-800',
+                    aow: 'bg-cyan-100 text-cyan-800',
+                    ww: 'bg-orange-100 text-orange-800',
+                };
+                return classes[key] || 'bg-gray-100 text-gray-800';
+            },
+
+            bracketGroups() {
+                const rows = this.activeRun?.result?.bracket_table || [];
+                const filterLabels = {
+                    has_partner: ['Zonder partner', 'Met partner'],
+                    has_children: ['Zonder kinderen', 'Met kinderen'],
+                    housing_type_rent: ['Koopwoning', 'Huurwoning'],
+                    is_student: ['Niet-student', 'Student'],
+                    has_dutch_nationality: ['Niet-Nederlands', 'Nederlands'],
+                    is_detained: ['Niet gedetineerd', 'Gedetineerd'],
+                };
+                // Add labels for auto-discretized features (e.g. age_above_67)
+                const disc = this.activeRun?.result?.discretized_features || {};
+                const sourceLabels = {
+                    age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur',
+                    children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste kind',
+                    work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren',
+                    standaardpremie: 'Standaardpremie', business_income: 'Bedrijfsinkomen',
+                    childcare_hours_per_child: 'Opvanguren', childcare_hourly_rate: 'Uurtarief',
+                };
+                for (const [derivedCol, info] of Object.entries(disc)) {
+                    const srcLabel = sourceLabels[info.source] || info.source;
+                    const thresh = Math.round(info.threshold);
+                    filterLabels[derivedCol] = [
+                        `${srcLabel} ≤ ${thresh}`,
+                        `${srcLabel} > ${thresh}`,
+                    ];
+                }
+                const groups = [];
+                const seen = new Set();
+                for (const row of rows) {
+                    const key = JSON.stringify(row.household_filter || {});
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const label = this.formatHouseholdFilter(row.household_filter, filterLabels);
+                    const segs = rows.filter(r => JSON.stringify(r.household_filter || {}) === key);
+                    // Build bands: each row shows from/to income range with from/to amounts
+                    const bands = segs.map(s => ({
+                        income_from: s.income_lower,
+                        income_to: s.income_upper,
+                        amount_from: s.amount_at_lower,
+                        amount_to: s.amount_at_upper,
+                    }));
+                    groups.push({label, bands});
+                }
+                return groups;
+            },
+
+            formatHouseholdFilter(filter, labels) {
+                if (!filter || Object.keys(filter).length === 0) return 'Alle huishoudens';
+                const parts = [];
+                for (const [key, val] of Object.entries(filter)) {
+                    const pair = labels[key];
+                    if (pair) { parts.push(val ? pair[1] : pair[0]); }
+                    else { parts.push(key + ': ' + val); }
+                }
+                return parts.join(', ');
+            },
+
+            featureLabel(key) {
+                const labels = {
+                    age: 'Leeftijd', income: 'Inkomen', net_worth: 'Vermogen',
+                    rent_amount: 'Huur', has_partner: 'Partner', has_children: 'Kinderen',
+                    children_count: 'Aantal kinderen', youngest_child_age: 'Leeftijd jongste kind',
+                    housing_type_rent: 'Huurwoning', is_student: 'Student',
+                    work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren',
+                    has_dutch_nationality: 'Nationaliteit', is_detained: 'Gedetineerd',
+                };
+                if (labels[key]) return labels[key];
+                // Handle auto-discretized feature names like age_above_67
+                const disc = this.activeRun?.result?.discretized_features || {};
+                if (disc[key]) {
+                    const srcLabels = { age: 'Leeftijd', net_worth: 'Vermogen', rent_amount: 'Huur', children_count: 'Kinderen', youngest_child_age: 'Leeftijd jongste', work_years: 'Arbeidsjaren', work_hours_per_week: 'Werkuren' };
+                    return (srcLabels[disc[key].source] || disc[key].source) + ' > ' + Math.round(disc[key].threshold);
+                }
+                return key;
+            },
+
+            renderTreeNode(node, depth) {
+                if (!node) return '';
+                if (node.is_leaf) {
+                    const isEligible = node.prediction === 'True' || node.prediction === '1' || node.prediction === 'eligible' || node.prediction === true;
+                    const cls = isEligible ? 'tree-leaf-eligible' : 'tree-leaf-not';
+                    const label = isEligible ? 'Recht' : 'Geen recht';
+                    const pct = (node.confidence * 100).toFixed(0);
+                    return '<div class="tree-branch"><span class="tree-label ' + cls + '">' +
+                           label + ' <span style="opacity:0.7; margin-left:4px;">(' + pct + '%, n=' + node.samples + ')</span></span></div>';
+                }
+                const featureText = this.featureLabel(node.feature);
+                const html = '<div class="tree-branch">' +
+                    '<span class="tree-label tree-split">' + featureText + ' &le; ' + node.threshold + ' <span style="opacity:0.6; margin-left:4px;">n=' + node.samples + '</span></span>' +
+                    '<div class="tree-node">' +
+                      '<div><span class="tree-branch-label">ja (&#x2264; ' + node.threshold + ')</span>' + this.renderTreeNode(node.left, depth + 1) + '</div>' +
+                      '<div><span class="tree-branch-label">nee (&gt; ' + node.threshold + ')</span>' + this.renderTreeNode(node.right, depth + 1) + '</div>' +
+                    '</div>' +
+                    '</div>';
+                return html;
+            },
+
+            renderMarkdown(text) {
+                if (!text) return '';
+                if (typeof marked !== 'undefined') {
+                    return marked.parse(text);
+                }
+                const escaped = text.replace(/&/g, '&amp;').replace(/</g , '&lt;').replace( />/g, '&gt;');
+                return escaped.replace(/\n/g, '<br>');
+            },
+
+            async train() {
+                const formData = this.collectFormData();
+                this.config.num_people = formData.num_people;
+
+                const runId = ++this.runCounter;
+                const configSnapshot = JSON.parse(JSON.stringify(this.config));
+                configSnapshot.selected_laws = [...this.selectedLaws];
+                this.runs[runId] = { config: configSnapshot, result: null, validationResult: null, validationError: null, error: null };
+                this.activeTab = runId;
+                // Reset accordion state for new run
+                this.sections = { metrics: false, features: false, laws: false, cv: false, rules: true, formulas: false, explanation: false, yaml: false, validation: false };
+
+                // Fire-and-forget: don't await so the UI stays responsive for new trains
+                this._fetchTrainResult(runId, formData);
+            },
+
+            async _fetchTrainResult(runId, formData) {
+                try {
+                    const response = await fetch('/harmonize/train', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    // Run may have been closed while waiting
+                    if (!this.runs[runId]) return;
+
+                    if (data.status === 'error') {
+                        this.runs[runId].error = data.message || 'Training failed';
+                    } else {
+                        this.runs[runId].result = data;
+                        if (!this.baselineRunId) this.baselineRunId = runId;
+                    }
+                } catch (e) {
+                    if (!this.runs[runId]) return;
+                    this.runs[runId].error = 'Kan geen verbinding maken met de server.';
+                }
+            },
+
+            async validate() {
+                if (!this.activeRun?.result) return;
+                this.validating = true;
+                const runId = this.activeTab;
+                this.runs[runId].validationResult = null;
+                this.runs[runId].validationError = null;
+
+                const formData = this.collectFormData();
+
+                try {
+                    const response = await fetch('/harmonize/validate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    if (!this.runs[runId]) return;
+
+                    if (data.status === 'error') {
+                        this.runs[runId].validationError = data.message || 'Validation failed';
+                    } else {
+                        this.runs[runId].validationResult = data;
+                    }
+                } catch (e) {
+                    if (this.runs[runId]) {
+                        this.runs[runId].validationError = 'Validatie mislukt.';
+                    }
+                } finally {
+                    this.validating = false;
+                }
+            },
+
+            downloadYaml() {
+                if (!this.activeRun?.result?.yaml) return;
+                const blob = new Blob([this.activeRun.result.yaml], {type: 'text/yaml'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'geharmoniseerde_toeslag_run' + this.activeTab + '.yaml';
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+
+            closeRun(id) {
+                id = Number(id);
+                delete this.runs[id];
+                if (this.activeTab === id) {
+                    const remaining = this.runIds;
+                    if (remaining.length > 0) {
+                        this.activeTab = remaining[remaining.length - 1];
+                    } else {
+                        this.activeTab = null;
+                    }
+                }
+                if (this.baselineRunId === id) {
+                    const completed = this.completedRuns;
+                    this.baselineRunId = completed.length > 0 ? completed[0].id : null;
+                }
+                if (!this.canCompare && this.activeTab === 'comparison') {
+                    const remaining = this.runIds;
+                    this.activeTab = remaining.length > 0 ? remaining[remaining.length - 1] : null;
+                }
+            },
+
+            exportComparisonCSV() {
+                const runs = this.completedRuns;
+                if (runs.length < 2) return;
+
+                let csv = 'Metriek';
+                runs.forEach(r => { csv += ',Run ' + r.id; });
+                csv += '\n';
+
+                csv += '\nPARAMETERS\n';
+                for (const [key, label] of Object.entries(this.paramLabels)) {
+                    csv += '"' + label + '"';
+                    runs.forEach(r => {
+                        let val = r.config[key] ?? '';
+                        if (key === 'selected_laws' && Array.isArray(val)) {
+                            val = val.map(id => {
+                                const law = this.availableLaws.find(l => l.id === id);
+                                return law ? law.label : id;
+                            }).join('; ');
+                        }
+                        csv += ',"' + val + '"';
+                    });
+                    csv += '\n';
+                }
+
+                csv += '\nMETRICS\n';
+                const metricRows = [
+                    ['Nauwkeurigheid (Accuracy)', r => r.result?.metrics?.eligibility_accuracy, 'pct'],
+                    ['R\u00b2', r => r.result?.metrics?.amount_r2, 'num'],
+                    ['MAE', r => r.result?.metrics?.amount_mae, 'num'],
+                    ['Aantal regels', r => r.result?.rules?.length || 0, 'int'],
+                    ['Aantal formules', r => r.result?.formulas?.length || 0, 'int'],
+                    ['CV Accuracy (mean)', r => r.result?.metrics?.cross_validation?.accuracy_mean, 'pct'],
+                    ['CV Accuracy (std)', r => r.result?.metrics?.cross_validation?.accuracy_std, 'pct'],
+                    ['CV F1 (mean)', r => r.result?.metrics?.cross_validation?.f1_mean, 'pct'],
+                    ['CV F1 (std)', r => r.result?.metrics?.cross_validation?.f1_std, 'pct'],
+                    ['CV Recall (mean)', r => r.result?.metrics?.cross_validation?.recall_mean, 'pct'],
+                    ['CV Recall (std)', r => r.result?.metrics?.cross_validation?.recall_std, 'pct'],
+                ];
+
+                metricRows.forEach(([label, getter, fmt]) => {
+                    csv += '"' + label + '"';
+                    runs.forEach(r => {
+                        const val = getter(r);
+                        if (val == null) { csv += ',-'; }
+                        else if (fmt === 'pct') { csv += ',' + (val * 100).toFixed(1) + '%'; }
+                        else if (fmt === 'int') { csv += ',' + val; }
+                        else { csv += ',' + Number(val).toFixed(2); }
+                    });
+                    csv += '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'harmonisatie_vergelijking_' + new Date().toISOString().split('T')[0] + '.csv';
+                link.click();
+                URL.revokeObjectURL(link.href);
+            },
+        };
+    }
+    </script>
+{% endblock %}

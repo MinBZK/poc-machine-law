@@ -25,6 +25,7 @@ class FeatureFlags:
         "TOTAL_INCOME_WIDGET": False,  # Total income dashboard widget is disabled by default
         "AUTO_APPROVE_CLAIMS": False,  # Auto-approve claims for demos is disabled by default
         "DELEGATION": False,  # Delegation feature (act on behalf of) is disabled by default
+        "HARMONIZE": False,  # Harmonize feature (ML-based law harmonization) is disabled by default
     }
 
     @classmethod
@@ -209,3 +210,8 @@ def is_auto_approve_claims_enabled() -> bool:
 def is_delegation_enabled() -> bool:
     """Check if the delegation feature (act on behalf of) is enabled."""
     return FeatureFlags.is_enabled("DELEGATION")
+
+
+def is_harmonize_enabled() -> bool:
+    """Check if the harmonize feature (ML-based law harmonization) is enabled."""
+    return FeatureFlags.is_enabled("HARMONIZE")
