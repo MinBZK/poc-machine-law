@@ -2076,6 +2076,164 @@ class LawSimulator:
 
         return synthesis_df
 
+    # --- Business simulation (ondernemer profile) ---
+
+    # SBI codes associated with food preparation/serving
+    FOOD_SBI_CODES = {
+        "5610",  # Restaurants
+        "5621",  # Eventcatering
+        "5629",  # Overige eetgelegenheden
+        "5630",  # Cafés
+        "4711",  # Supermarkten
+        "4721",  # Groentewinkels
+        "4722",  # Slagerijen
+        "4723",  # Viswinkels
+        "4724",  # Bakkerijen
+        "4729",  # Overige levensmiddelen
+    }
+
+    # All SBI codes used in simulation (food + non-food)
+    ALL_SBI_CODES = [
+        "5610",
+        "5621",
+        "5630",
+        "4711",
+        "4724",
+        "4729",
+        "6201",  # Softwareontwikkeling
+        "6910",  # Advocaten
+        "8621",  # Huisartsen
+        "4771",  # Kledingwinkels
+        "4532",  # Autohandel onderdelen
+        "4120",  # Bouw
+    ]
+
+    SBI_WEIGHTS = [0.12, 0.05, 0.08, 0.06, 0.04, 0.05, 0.12, 0.08, 0.06, 0.10, 0.08, 0.16]
+
+    def generate_business(self) -> dict:
+        """Generate a single simulated business with realistic attributes."""
+        kvk_nummer = f"{random.randint(10000000, 99999999)}"
+        sbi_code = random.choices(self.ALL_SBI_CODES, weights=self.SBI_WEIGHTS)[0]
+        is_food_sbi = sbi_code in self.FOOD_SBI_CODES
+
+        # Business type derived from SBI
+        if sbi_code in ("5610", "5621", "5629", "5630"):
+            type_bedrijf = "horecabedrijf"
+        elif sbi_code.startswith("47") and is_food_sbi:
+            type_bedrijf = "slijtersbedrijf" if random.random() < 0.15 else "horecabedrijf"
+        else:
+            type_bedrijf = "overig"
+
+        # Food preparation correlated with SBI
+        bereidt_of_serveert_voedsel = random.random() < 0.9 if is_food_sbi else random.random() < 0.05
+
+        leeftijd_leidinggevende = random.randint(18, 70)
+        is_onder_curatele = random.random() < 0.01
+
+        # Floor area correlated with business type
+        if type_bedrijf == "horecabedrijf":
+            vloeroppervlakte = max(5.0, np.random.lognormal(mean=3.8, sigma=0.5))  # median ~45m²
+        elif type_bedrijf == "slijtersbedrijf":
+            vloeroppervlakte = max(5.0, np.random.lognormal(mean=3.0, sigma=0.4))  # median ~20m²
+        else:
+            vloeroppervlakte = max(5.0, np.random.lognormal(mean=4.2, sigma=0.6))  # median ~67m²
+        vloeroppervlakte = min(vloeroppervlakte, 200.0)
+
+        # Energy consumption (log-normal)
+        jaarlijks_elektriciteitsverbruik_kwh = int(min(500000, max(5000, np.random.lognormal(mean=10.2, sigma=0.8))))
+        jaarlijks_gasverbruik_m3 = int(min(100000, max(1000, np.random.lognormal(mean=9.5, sigma=0.7))))
+
+        is_woonfunctie = random.random() < 0.05
+
+        return {
+            "kvk_nummer": kvk_nummer,
+            "sbi_code": sbi_code,
+            "sbi_is_food": is_food_sbi,
+            "bereidt_of_serveert_voedsel": bereidt_of_serveert_voedsel,
+            "type_bedrijf": type_bedrijf,
+            "type_bedrijf_horeca": type_bedrijf in ("horecabedrijf", "slijtersbedrijf"),
+            "leeftijd_leidinggevende": leeftijd_leidinggevende,
+            "is_onder_curatele": is_onder_curatele,
+            "vloeroppervlakte": round(vloeroppervlakte, 1),
+            "jaarlijks_elektriciteitsverbruik_kwh": jaarlijks_elektriciteitsverbruik_kwh,
+            "jaarlijks_gasverbruik_m3": jaarlijks_gasverbruik_m3,
+            "is_woonfunctie": is_woonfunctie,
+        }
+
+    def create_business_population(self, num_businesses: int) -> list[dict]:
+        """Generate N simulated businesses."""
+        return [self.generate_business() for _ in range(num_businesses)]
+
+    @staticmethod
+    def simulate_business(business: dict) -> dict:
+        """Evaluate 3 ondernemer laws for a single business (eligibility-only)."""
+        b = business
+
+        # 1. Alcoholwet: leeftijd >= 21 AND NOT curatele AND oppervlakte check
+        is_horeca = b["type_bedrijf"] == "horecabedrijf"
+        is_slijter = b["type_bedrijf"] == "slijtersbedrijf"
+        age_ok = b["leeftijd_leidinggevende"] >= 21
+        not_curatele = not b["is_onder_curatele"]
+        if is_horeca:
+            oppervlakte_ok = b["vloeroppervlakte"] >= 35
+        elif is_slijter:
+            oppervlakte_ok = b["vloeroppervlakte"] >= 15
+        else:
+            oppervlakte_ok = True  # Not applicable for non-horeca
+        alcoholwet_eligible = (is_horeca or is_slijter) and age_ok and not_curatele and oppervlakte_ok
+
+        # 2. HACCP Voedselveiligheid: food SBI or prepares food
+        haccp_eligible = b["sbi_is_food"] or b["bereidt_of_serveert_voedsel"]
+
+        # 3. Informatieplicht Energiebesparing: NOT woonfunctie AND (elektriciteit >= 50000 OR gas >= 25000)
+        energie_informatieplicht_eligible = not b["is_woonfunctie"] and (
+            b["jaarlijks_elektriciteitsverbruik_kwh"] >= 50000 or b["jaarlijks_gasverbruik_m3"] >= 25000
+        )
+
+        return {
+            **b,
+            "alcoholwet_eligible": alcoholwet_eligible,
+            "alcoholwet_amount": 0,
+            "haccp_eligible": haccp_eligible,
+            "haccp_amount": 0,
+            "energie_informatieplicht_eligible": energie_informatieplicht_eligible,
+            "energie_informatieplicht_amount": 0,
+        }
+
+    def run_business_simulation(self, num_businesses: int = 500) -> pd.DataFrame:
+        """Generate business population and evaluate all business laws."""
+        businesses = self.create_business_population(num_businesses)
+        results = [self.simulate_business(b) for b in businesses]
+        return pd.DataFrame(results)
+
+    def export_for_business_synthesis(
+        self, results_df: pd.DataFrame, selected_laws: list[str] | None = None
+    ) -> pd.DataFrame:
+        """Export business simulation results for synthesis training.
+
+        Similar to export_for_synthesis but for business/ondernemer laws.
+        """
+        from synthesize.feature_registry import get_all_feature_columns_for_laws
+
+        if not selected_laws:
+            selected_laws = ["alcoholwet", "haccp", "energie_informatieplicht"]
+
+        input_features = get_all_feature_columns_for_laws(selected_laws)
+
+        # Target variables
+        target_variables = []
+        for law in selected_laws:
+            elig_col = f"{law}_eligible"
+            amt_col = f"{law}_amount"
+            if elig_col in results_df.columns:
+                target_variables.append(elig_col)
+            if amt_col in results_df.columns:
+                target_variables.append(amt_col)
+
+        available_columns = [col for col in input_features + target_variables if col in results_df.columns]
+        synthesis_df = results_df[available_columns].copy()
+        return synthesis_df
+
     def get_summary_with_breakdowns(self, results_df, simulation_date):
         """Generate summary statistics with demographic breakdowns for web API."""
         # Calculate summary statistics

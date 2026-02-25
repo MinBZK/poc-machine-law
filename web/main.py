@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from web.demo_profiles import get_demo_bsn
+from web.demo_profiles import DemoProfiles, get_demo_bsn
 from web.dependencies import (
     STATIC_DIR,
     get_case_manager,
@@ -307,6 +307,7 @@ async def root(
             "can_submit_claims": can_submit_claims,
             "business_profile": business_profile,
             "demo_mode": is_demo_mode(request),
+            "active_profile_config": DemoProfiles.get_active_profile(),
         },
     )
 

@@ -21,6 +21,16 @@ FEATURE_LABELS_NL: dict[str, str] = {
     "youngest_child_age": "de leeftijd van uw jongste kind",
     "housing_type_rent": "u een huurwoning heeft",
     "is_student": "u student bent",
+    # Business features
+    "leeftijd_leidinggevende": "de leeftijd van de leidinggevende",
+    "vloeroppervlakte": "de vloeroppervlakte (m²)",
+    "type_bedrijf_horeca": "het bedrijf een horecabedrijf is",
+    "is_onder_curatele": "de leidinggevende onder curatele staat",
+    "sbi_is_food": "de SBI-code een levensmiddelenbedrijf aanduidt",
+    "bereidt_of_serveert_voedsel": "het bedrijf voedsel bereidt of serveert",
+    "jaarlijks_elektriciteitsverbruik_kwh": "het jaarlijks elektriciteitsverbruik (kWh)",
+    "jaarlijks_gasverbruik_m3": "het jaarlijks gasverbruik (m³)",
+    "is_woonfunctie": "het gebouw een woonfunctie heeft",
 }
 
 

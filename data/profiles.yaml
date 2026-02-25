@@ -45,7 +45,7 @@ case_seeds:
     law: "algemene_plaatselijke_verordening/ontheffingspas_geluid"
     table: "ontheffingen_geluid_historie"
     bsn_lookup:
-      table: "inschrijvingen"
+      table: "exploitatie_inschrijvingen"
       match_field: "kvk_nummer"
       bsn_field: "bsn_eigenaar"
     parameters:
@@ -2678,7 +2678,7 @@ profiles:
           uren_per_week: 32
           worked_hours: 1664
         wet_structuur_uitvoeringsorganisatie_werk_en_inkomen:
-        - BSN: '888888888'
+        - bsn: '888888888'
           insured_years: 5
       BELASTINGDIENST:
         box1:
@@ -4373,7 +4373,7 @@ profiles:
         - kvk_nummer: '85234567'
           heeft_actieve_klachten: false
         # Data voor exploitatievergunning
-        inschrijvingen:
+        exploitatie_inschrijvingen:
         - kvk_nummer: '85234567'
           bsn_eigenaar: '999999990'
           aangevraagde_categorie: licht

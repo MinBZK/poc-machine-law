@@ -23,7 +23,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
     And de volgende KVK organisaties gegevens:
       | kvk_nummer | status | rechtsvorm | vestigingsadres       |
       | 85234567   | Actief | VOF        | Witte de Withstraat 1 |
-    And de volgende GEMEENTE_ROTTERDAM inschrijvingen gegevens:
+    And de volgende GEMEENTE_ROTTERDAM exploitatie_inschrijvingen gegevens:
       | kvk_nummer | bsn_eigenaar |
       | 85234567   | 999999990    |
     And de volgende GEMEENTE_ROTTERDAM personen_vog gegevens:

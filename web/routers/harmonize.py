@@ -7,6 +7,7 @@ from datetime import datetime
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
+from web.demo_profiles import get_demo_profile_type
 from web.dependencies import is_demo_mode, templates
 
 logger = logging.getLogger(__name__)
@@ -16,28 +17,69 @@ router = APIRouter(prefix="/harmonize", tags=["harmonize"])
 # Timeout in seconds: ~25 persons/sec means 5000 persons takes ~200s, plus training overhead
 SUBPROCESS_TIMEOUT = 300
 
+# Available laws per profile type
+_CITIZEN_LAWS = [
+    {"id": "zorgtoeslag", "label": "Zorgtoeslag", "group": "Toeslagen"},
+    {"id": "huurtoeslag", "label": "Huurtoeslag", "group": "Toeslagen"},
+    {"id": "kindgebonden_budget", "label": "Kindgebonden budget", "group": "Toeslagen"},
+    {"id": "kinderopvangtoeslag", "label": "Kinderopvangtoeslag", "group": "Toeslagen"},
+    {"id": "bijstand", "label": "Bijstand", "group": "Sociale zekerheid"},
+    {"id": "aow", "label": "AOW", "group": "Sociale zekerheid"},
+    {"id": "ww", "label": "WW-uitkering", "group": "Sociale zekerheid"},
+]
+_CITIZEN_DEFAULT = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
+
+_BUSINESS_LAWS = [
+    {"id": "alcoholwet", "label": "Alcoholwet", "group": "Vergunningen"},
+    {"id": "haccp", "label": "HACCP Voedselveiligheid", "group": "Verplichtingen"},
+    {"id": "energie_informatieplicht", "label": "Informatieplicht Energiebesparing", "group": "Verplichtingen"},
+]
+_BUSINESS_DEFAULT = ["alcoholwet", "haccp", "energie_informatieplicht"]
+
 
 @router.get("/")
 async def harmonize_page(request: Request):
     """Render the harmonisatie configuration page."""
-    default_params = {
-        "num_people": 1000,
-        "simulation_date": datetime.now().strftime("%Y-%m-%d"),
-        "age_18_30": 18,
-        "age_30_45": 25,
-        "age_45_67": 32,
-        "age_67_85": 20,
-        "age_85_plus": 5,
-        "zero_income_prob": 5,
-        "rent_percentage": 43,
-        "student_percentage_young": 40,
-    }
+    profile_type = get_demo_profile_type()
+    is_business = profile_type == "ondernemer"
+
+    if is_business:
+        available_laws = _BUSINESS_LAWS
+        default_selected = _BUSINESS_DEFAULT
+        default_params = {
+            "num_people": 500,
+            "simulation_date": datetime.now().strftime("%Y-%m-%d"),
+            "horeca_percentage": 30,
+            "levensmiddelen_percentage": 25,
+            "bedrijfsgrootte_klein": 50,
+            "bedrijfsgrootte_middel": 35,
+            "bedrijfsgrootte_groot": 15,
+        }
+    else:
+        available_laws = _CITIZEN_LAWS
+        default_selected = _CITIZEN_DEFAULT
+        default_params = {
+            "num_people": 1000,
+            "simulation_date": datetime.now().strftime("%Y-%m-%d"),
+            "age_18_30": 18,
+            "age_30_45": 25,
+            "age_45_67": 32,
+            "age_67_85": 20,
+            "age_85_plus": 5,
+            "zero_income_prob": 5,
+            "rent_percentage": 43,
+            "student_percentage_young": 40,
+        }
+
     return templates.TemplateResponse(
         "harmonize.html",
         {
             "request": request,
             "demo_mode": is_demo_mode(request),
             "default_params": default_params,
+            "profile_type": profile_type,
+            "available_laws": available_laws,
+            "default_selected": default_selected,
         },
     )
 

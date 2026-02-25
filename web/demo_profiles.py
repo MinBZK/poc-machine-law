@@ -26,10 +26,14 @@ DEMO_PROFILES: dict[str, dict] = {
             },
         ],
         "zaaksysteem_service": "TOESLAGEN",
+        "portal_tab_label": "Burger.nl",
+        "portal_heading": "Waar heb ik recht op? Wat zijn mijn plichten?",
+        "portal_subtitle": "Bekijk hier uw toeslagen, uitkeringen, aangiften, en andere regelingen van de overheid.",
         "feature_flags": {
             "DELEGATION": False,
             "AUTO_APPROVE_CLAIMS": False,
             "HARMONIZE": False,
+            "SIMULATION": True,
         },
         "graph_selected_laws": [],
     },
@@ -71,10 +75,17 @@ DEMO_PROFILES: dict[str, dict] = {
             },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
+        "portal_tab_label": "Overheid.nl",
+        "portal_heading": "Welke regelingen passen bij mijn bedrijf?",
+        "portal_subtitle": (
+            "Bekijk beschikbare subsidies, rapportageverplichtingen, vergunningen,"
+            " wetten en andere ondernemersregelingen."
+        ),
         "feature_flags": {
             "DELEGATION": True,
             "AUTO_APPROVE_CLAIMS": True,
             "HARMONIZE": True,
+            "SIMULATION": False,
         },
         "graph_selected_laws": [
             "8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c",

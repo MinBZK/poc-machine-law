@@ -154,7 +154,7 @@ def _seed_historical_cases(services_instance: Services) -> None:
         law: "algemene_plaatselijke_verordening/ontheffingspas_geluid"
         table: "ontheffingen_geluid_historie"
         bsn_lookup:
-          table: "inschrijvingen"
+          table: "exploitatie_inschrijvingen"
           match_field: "kvk_nummer"
           bsn_field: "bsn_eigenaar"
         parameters:
