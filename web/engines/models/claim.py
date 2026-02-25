@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
 
 @dataclass
-class ClaimStatus(str, Enum):
+class ClaimStatus(StrEnum):
     PENDING = "PENDING"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"

@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class CaseStatus(str, Enum):
+class CaseStatus(StrEnum):
     DECIDED = "DECIDED"
     IN_REVIEW = "IN_REVIEW"
     OBJECTED = "OBJECTED"

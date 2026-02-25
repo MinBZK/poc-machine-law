@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
 @dataclass
-class EventType(str, Enum):
+class EventType(StrEnum):
     SUBMITTED = "SUBMITTED"
     DECIDED = "DECIDED"
     IN_REVIEW = "IN_REVIEW"
