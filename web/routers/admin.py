@@ -206,11 +206,7 @@ async def post_set_demo_profile(
     """Set the active demo profile (burger/ondernemer toggle)."""
     try:
         DemoProfiles.set_active_profile(profile_name)
-        # Auto-enable features for ondernemer profiles
-        profile = DemoProfiles.get_active_profile()
-        is_ondernemer = profile.get("type") == "ondernemer"
-        FeatureFlags.set("DELEGATION", is_ondernemer)
-        FeatureFlags.set("AUTO_APPROVE_CLAIMS", is_ondernemer)
+        DemoProfiles.apply_feature_flags()
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

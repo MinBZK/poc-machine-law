@@ -30,15 +30,6 @@
     };
   };
 
-  // Demo mode configuration - Horeca ondernemers Rotterdam
-  const DEMO_LAW_UUIDS = [
-    '8a3f4b2c-7d1e-4f8a-9c3b-5e6d7f8a9b0c', // Exploitatievergunning
-    '3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f', // Terrassen
-    '56ec10fc-cf5b-468f-927f-4a4615f4dbfa', // Ontheffingspas geluid
-    '9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c', // BAG (Kadaster)
-    '1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f', // KVK Bedrijfsgegevens
-  ];
-
   // Check if demo mode is enabled via URL parameter
   const isDemoMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demo') === 'true';
 
@@ -144,8 +135,18 @@
 
       // Initialize selected laws based on demo mode
       if (isDemoMode) {
-        // Demo mode: pre-select only the 3 demo laws
-        selectedLaws = DEMO_LAW_UUIDS.filter(uuid => laws.some(law => law.uuid === uuid));
+        try {
+          const demoResp = await fetch('/laws/demo-selection');
+          const demoUuids: string[] = await demoResp.json();
+          if (demoUuids.length > 0) {
+            selectedLaws = demoUuids.filter(uuid => laws.some(law => law.uuid === uuid));
+          } else {
+            selectedLaws = laws.map((law) => law.uuid);
+          }
+        } catch {
+          // Fallback: select all laws on error
+          selectedLaws = laws.map((law) => law.uuid);
+        }
       } else {
         // Normal mode: select all laws
         selectedLaws = laws.map((law) => law.uuid);

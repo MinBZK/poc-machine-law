@@ -6,6 +6,8 @@ feature paths, and other demo-specific settings.
 
 import os
 
+from web.feature_flags import FeatureFlags
+
 DEMO_PROFILES: dict[str, dict] = {
     "merijn": {
         "name": "Merijn",
@@ -24,6 +26,12 @@ DEMO_PROFILES: dict[str, dict] = {
             },
         ],
         "zaaksysteem_service": "TOESLAGEN",
+        "feature_flags": {
+            "DELEGATION": False,
+            "AUTO_APPROVE_CLAIMS": False,
+            "HARMONIZE": False,
+        },
+        "graph_selected_laws": [],
     },
     "claudia": {
         "name": "Claudia",
@@ -63,6 +71,15 @@ DEMO_PROFILES: dict[str, dict] = {
             },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
+        "feature_flags": {
+            "DELEGATION": True,
+            "AUTO_APPROVE_CLAIMS": True,
+            "HARMONIZE": True,
+        },
+        "graph_selected_laws": [
+            "8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c",
+            "7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c",
+        ],
     },
 }
 
@@ -96,6 +113,13 @@ class DemoProfiles:
     def get_all_profiles(cls) -> dict[str, dict]:
         """Get all available profiles."""
         return DEMO_PROFILES
+
+    @classmethod
+    def apply_feature_flags(cls) -> None:
+        """Apply the feature flags from the active profile via FeatureFlags.set()."""
+        profile = cls.get_active_profile()
+        for flag_name, value in profile.get("feature_flags", {}).items():
+            FeatureFlags.set(flag_name, value)
 
 
 def get_demo_bsn() -> str:

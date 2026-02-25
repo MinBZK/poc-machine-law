@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_factory import llm_factory
+from web.demo_profiles import DemoProfiles
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
@@ -95,6 +96,16 @@ async def list_laws():
                 law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
 
     return JSONResponse(content=law_files)
+
+
+@router.get("/demo-selection")
+async def demo_selection():
+    """Return the graph_selected_laws UUIDs for the active demo profile.
+
+    An empty array means 'select all laws'.
+    """
+    profile = DemoProfiles.get_active_profile()
+    return JSONResponse(content=profile.get("graph_selected_laws", []))
 
 
 @router.get("/execute")

@@ -28,6 +28,7 @@ _active_tasks: set[asyncio.Task] = set()
 
 # Configure demo feature flags on module load
 configure_demo_feature_flags()
+DemoProfiles.apply_feature_flags()
 
 
 def filter_behave_output(output: str) -> str:
