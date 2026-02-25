@@ -94,7 +94,7 @@ Contains all information needed for reproducibility:
     "regelrecht_laws_dirty": false
   },
   "llm_params": {
-    "model_id": "claude-3-7-sonnet-20250219",
+    "model_id": "claude-sonnet-4-6",
     "max_tokens": 1500,
     "temperature": 0.3,
     "system_prompt": "Je bent een behulpzame assistent..."
