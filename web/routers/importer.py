@@ -41,7 +41,7 @@ router = APIRouter(prefix="/importer", tags=["importer"])
 
 # Initialize model without API key initially - will be set dynamically when needed
 model = ChatAnthropic(
-    model="claude-3-7-sonnet-latest",
+    model="claude-sonnet-4-6",
     temperature=0,
     max_retries=2,
     max_tokens_to_sample=4000,  # Note: default is 1024 tokens
