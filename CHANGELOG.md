@@ -2,6 +2,45 @@
 
 <!-- version list -->
 
+## v1.10.0 (2026-02-25)
+
+### Bug Fixes
+
+- Address security and robustness issues in prose generation
+  ([`6a8b4e6`](https://github.com/MinBZK/poc-machine-law/commit/6a8b4e68eb2f5211024f284763ed1e9cfc61f429))
+
+- Correct prose prompt — YAML contains euros, not eurocents
+  ([`0e6c01f`](https://github.com/MinBZK/poc-machine-law/commit/0e6c01f11d4685b7fa3b3ca4c922f7612476b2fd))
+
+- Pass model explanation as extra context to prose LLM prompt
+  ([`d95677f`](https://github.com/MinBZK/poc-machine-law/commit/d95677f77ccba7e7340dd2a9bb843f475b678e8c))
+
+- Thread-safe LLM calls, XSS sanitization, and debounce in prose generation
+  ([`dfd99d4`](https://github.com/MinBZK/poc-machine-law/commit/dfd99d4a72ba34b37c2206f6f3827d9c82f36ac2))
+
+### Chores
+
+- Bump Claude model to claude-sonnet-4-6 across repo
+  ([`e0ee67c`](https://github.com/MinBZK/poc-machine-law/commit/e0ee67cff9e27d3aa9fb2a6dc8ee452668c0192c))
+
+- Sync VERSION file to 1.9.1
+  ([`3d9c4e7`](https://github.com/MinBZK/poc-machine-law/commit/3d9c4e75595c82f29bf72504fb2d1400d46eb262))
+
+### Features
+
+- Add LLM-generated prose law text in harmonisatie workflow
+  ([`dbeef0c`](https://github.com/MinBZK/poc-machine-law/commit/dbeef0ca2f5bcf699d10d0a0e3704b5fd2cc06f7))
+
+- Auto-start prose generation and improve rendering
+  ([`b18ee2f`](https://github.com/MinBZK/poc-machine-law/commit/b18ee2f3abef2abd3d0ec0450c7edd322c143317))
+
+- Load .env file at startup for API keys
+  ([`55ed11f`](https://github.com/MinBZK/poc-machine-law/commit/55ed11f8887da718483cbad5c7d2a4ff7916693f))
+
+- Use claude-opus-4-6 for prose generation
+  ([`dee1f08`](https://github.com/MinBZK/poc-machine-law/commit/dee1f08ec5c1ceb6ccf7d7bde219fec98c8ee392))
+
+
 ## v1.9.1 (2026-02-25)
 
 ### Bug Fixes
