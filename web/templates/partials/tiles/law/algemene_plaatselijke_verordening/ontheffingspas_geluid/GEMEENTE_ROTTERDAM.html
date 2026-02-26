@@ -32,24 +32,26 @@
             </div>
             {# Rejection explanation when case was rejected #}
             {% if current_case and current_case.status == 'DECIDED' and current_case.approved == false %}
-                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&default_tab=explanation"
+                <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=explanation"
                         hx-target="#shared-application-panel"
                         hx-swap="innerHTML"
                         class="ml-4 text-sm text-gray-400 hover:text-gray-900 border-b border-dotted border-gray-300 hover:border-gray-600 cursor-pointer">
                     waarom?
                 </button>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot bezwaar</h4>
-                    <p class="text-sm text-gray-600 mb-4">
-                        U kunt binnen {{ current_case.objection_status.objection_period }} weken
-                        bezwaar maken tegen dit besluit.
-                    </p>
-                    <button type="button"
-                            onclick="showAppealDialog('{{ current_case.id }}')"
-                            class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
-                        Ga in bezwaar
-                    </button>
-                </div>
+                {% if current_case.can_object() %}
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot bezwaar</h4>
+                        <p class="text-sm text-gray-600 mb-4">
+                            U kunt binnen {{ current_case.objection_status.objection_period }} weken
+                            bezwaar maken tegen dit besluit.
+                        </p>
+                        <button type="button"
+                                onclick="showAppealDialog('{{ current_case.id }}')"
+                                class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
+                            Ga in bezwaar
+                        </button>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
         <!-- Actions Section -->
@@ -116,8 +118,49 @@
             {% endif %}
         </div>
     </div>
+    <!-- Appeal Dialog -->
+    {% if current_case %}
+        <dialog id="objection-dialog-{{ current_case.id }}"
+                class="rounded-lg shadow-lg p-0 border-0 backdrop:bg-gray-500/50">
+            <div class="w-[32rem] m-8">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="text-xl font-semibold">Reden voor bezwaar</h3>
+                </div>
+                <div class="px-8 py-6">
+                    <form hx-post="/laws/objection-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&case_id={{ current_case.id }}"
+                          hx-target="closest div.law-result-card"
+                          hx-swap="outerHTML">
+                        <label class="block text-lg mb-3">Geef een reden voor uw bezwaar:</label>
+                        <textarea name="reason"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  rows="4"
+                                  required></textarea>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button"
+                                    class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base cursor-pointer"
+                                    onclick="closeAppealDialog('{{ current_case.id }}')">Annuleren</button>
+                            <button type="submit"
+                                    class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-base cursor-pointer">
+                                Bevestigen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </dialog>
+    {% endif %}
 </div>
 <script>
+    function showAppealDialog(caseId) {
+        const dialog = document.getElementById(`objection-dialog-${caseId}`);
+        dialog.showModal();
+    }
+
+    function closeAppealDialog(caseId) {
+        const dialog = document.getElementById(`objection-dialog-${caseId}`);
+        dialog.close();
+    }
+
     // Listen for the close-panel event and close the shared panel
     document.addEventListener('close-panel', function() {
         const panel = document.getElementById('shared-application-panel');

@@ -78,11 +78,22 @@ def evaluate_law(
             if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
         ]
 
-        # Build overwrite_input from claims
+        # Build overwrite_input from claims, but route parameter claims to parameters dict
         if relevant_claims:
             overwrite_input = {}
+            # Get declared parameter names to distinguish parameter claims from source claims
+            rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+            param_names = {p["name"] for p in rule_spec.get("properties", {}).get("parameters", [])}
+
             for claim in relevant_claims:
-                overwrite_input[claim.key] = claim.new_value
+                if claim.key in param_names:
+                    # User-input parameter (e.g., ACTIVITEITSDATUM) — add to parameters dict
+                    parameters[claim.key] = claim.new_value
+                else:
+                    overwrite_input[claim.key] = claim.new_value
+
+            if not overwrite_input:
+                overwrite_input = None
 
     # Execute the law using EngineInterface
     result = machine_service.evaluate(
@@ -349,14 +360,17 @@ async def objection_case(
     service: str,
     law: str,
     bsn: str,
-    reason: str = Form(...),  # Changed this line to use Form
+    kvk: str = None,
+    reason: str = Form(...),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit an objection for an existing case"""
-    # First calculate the new result with disputed parameters
     law = unquote(law)
+
+    if not kvk:
+        kvk = request.query_params.get("kvk")
 
     # Submit the objection with new claimed result
     case_manager.objection(
@@ -365,7 +379,13 @@ async def objection_case(
     )
 
     law, result, parameters = evaluate_law(
-        bsn, law, service, machine_service, claim_manager=claim_manager, effective_date=request.query_params.get("date")
+        bsn,
+        law,
+        service,
+        machine_service,
+        claim_manager=claim_manager,
+        effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk,
     )
 
     template_path = get_tile_template(service, law)
@@ -374,6 +394,8 @@ async def objection_case(
         template_path,
         {
             "bsn": bsn,
+            "effective_bsn": bsn,
+            "kvk": kvk,
             "request": request,
             "law": law,
             "service": service,

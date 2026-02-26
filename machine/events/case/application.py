@@ -136,12 +136,26 @@ class CaseManager(Application):
                 parameters=parameters,
                 approved=True,
             )
+            # AWB art. 7:1, 6:7, 7:10: bezwaar mogelijk binnen 6 weken, beslistermijn 6 weken
+            case.determine_objection_status(
+                possible=True,
+                objection_period=6,
+                decision_period=6,
+                extension_period=6,
+            )
         elif results_match and not needs_manual_review and not requirements_met:
             # Requirements not met - auto-reject
             case.decide_automatically(
                 verified_result=verified_result,
                 parameters=parameters,
                 approved=False,
+            )
+            # AWB art. 7:1, 6:7, 7:10: bezwaar mogelijk binnen 6 weken, beslistermijn 6 weken
+            case.determine_objection_status(
+                possible=True,
+                objection_period=6,
+                decision_period=6,
+                extension_period=6,
             )
         else:
             # Route to manual review with reason
