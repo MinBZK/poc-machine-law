@@ -848,14 +848,20 @@ actions:
         then:
           operation: MULTIPLY
           values:
-            - operation: MIN
+            - operation: MAX
               values:
-                - "$TERRAS_OPPERVLAKTE"
-                - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+                - operation: SUBTRACT
+                  values:
+                    - operation: MIN
+                      values:
+                        - "$TERRAS_OPPERVLAKTE"
+                        - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+                    - 50
+                - 0
             - "$PRECARIO_TARIEF_PER_M2"
       - else: 0
     legal_basis:
-      law: "Verordening precariobelasting Rotterdam 2024"
+      law: "Verordening precario- en reclamebelasting Rotterdam 2024"
       article: "5"
-      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
-      explanation: "Precariobelasting wordt berekend op basis van oppervlakte en tarief per m2"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR704478/1"
+      explanation: "De eerste 50 m² van een terras is vrijgesteld; voor elke m² daarboven geldt het tarief per m² per jaar"

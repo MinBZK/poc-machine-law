@@ -85,7 +85,7 @@ Feature: Bepalen recht op Terrasvergunning horeca Rotterdam
     And heeft de output "vergunde_sluitingstijd_doordeweeks" waarde "23"
     And heeft de output "vergunde_sluitingstijd_weekend" waarde "24"
     And is de output "precariobelasting_verschuldigd" waar
-    And heeft de output "precariobelasting_per_jaar" waarde "250"
+    And heeft de output "precariobelasting_per_jaar" waarde "0"
 
   Scenario: Succesvolle aanvraag - grenswaarde obstakelvrije ruimte (precies 1.8m)
     # Casus: Obstakelvrije ruimte is precies het minimum van 1.8 meter (GREATER_OR_EQUAL).

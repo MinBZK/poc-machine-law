@@ -227,7 +227,8 @@ properties:
 
   definitions:
     BELASTINGJAAR: 2024
-    PRECARIO_TARIEF_PER_M2: 4550
+    PRECARIO_TARIEF_PER_M2: 3610
+    VRIJSTELLINGSDREMPEL_M2: 50
 
 variables: []
 
@@ -272,26 +273,35 @@ actions:
   - output: "tarief_per_m2"
     value: "$PRECARIO_TARIEF_PER_M2"
     legal_basis:
-      law: "Verordening precariobelasting Rotterdam 2024"
+      law: "Verordening precario- en reclamebelasting Rotterdam 2024"
       article: "5"
-      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
-      explanation: "Het tarief van € 45,50 per m2 per jaar is vastgelegd in de tarieventabel bij de verordening"
+      paragraph: "b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR704478/1"
+      explanation: "Het tarief van € 36,10 per m² per jaar is vastgelegd in artikel 5 lid b van de verordening"
 
   - output: "heffingsmaatstaf_m2"
-    value: "$VERGUNDE_OPPERVLAKTE"
+    operation: MAX
+    values:
+      - operation: SUBTRACT
+        values:
+          - "$VERGUNDE_OPPERVLAKTE"
+          - "$VRIJSTELLINGSDREMPEL_M2"
+      - 0
     legal_basis:
       law: "Verordening precariobelasting Rotterdam 2024"
-      article: "4"
-      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
-      explanation: "De heffingsmaatstaf is de oppervlakte van het terras"
+      article: "5"
+      paragraph: "a"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR704478/1"
+      explanation: "De eerste 50 m² van een terras is vrijgesteld; de heffingsmaatstaf is de oppervlakte boven deze drempel"
 
   - output: "belasting_per_jaar"
     operation: MULTIPLY
     values:
-      - "$VERGUNDE_OPPERVLAKTE"
+      - "$heffingsmaatstaf_m2"
       - "$PRECARIO_TARIEF_PER_M2"
     legal_basis:
       law: "Verordening precariobelasting Rotterdam 2024"
       article: "5"
-      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
-      explanation: "Precariobelasting = oppervlakte (m2) x tarief per m2 per jaar"
+      paragraph: "b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR704478/1"
+      explanation: "Precariobelasting = € 36,10 per jaar voor elke m² die de oppervlakte van het terras van 50 m² te boven gaat"
