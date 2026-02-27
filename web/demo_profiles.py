@@ -35,7 +35,22 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": False,
             "SIMULATION": True,
         },
-        "graph_selected_laws": [],
+        "graph_selected_laws": [
+            "cdd0ec9f-4975-4969-9d8a-808f2d6abfc9",  # Inkomstenbelasting
+            "60e71675-38bc-4297-87ac-0c145613e481",  # Zorgtoeslag (2025)
+            "a611a7ea-98d5-42f5-a05c-475b1be4590e",  # Huurtoeslag (2025)
+            "5d8e4b3a-6f9c-4a2d-8e7b-1c9f2a5b8d3e",  # Kindgebonden Budget (2025)
+            "f8e7d6c5-4321-4f0f-bbbb-123456789abc",  # Kinderopvangtoeslag
+            "2b4c6d8e-1a3f-4e5b-8c7d-9f0e1a2b3c4d",  # Inkomensafhankelijke bijdrage Zvw
+            "7d4e8f2a-3b6c-4a9d-8e1f-5c2d7a9b4e3f",  # Bbz 2004
+            "8a7f3c2d-9e4b-4f5a-b8c1-2d6e9f1a3b7c",  # Werkloosheidswet
+            "b1d3a15b-45a2-44a3-b26a-d636785032c0",  # Bijstand Amsterdam
+            "13dc8a31-91eb-4598-998c-012c9129b9ea",  # AOW-uitkering
+            "3c5d7e9f-2b4a-4f6c-9d8e-0a1b2c3d4e5f",  # Anw-uitkering
+            "4d6e8f0a-3c5b-4e7f-a8b9-1c2d3e4f5a6b",  # AIO-aanvulling
+            "8a3f5c2d-4e6b-4a1f-9c8d-7e2f3a4b5c6d",  # Pensioenuitkering
+            "96d926a0-b45f-4cf3-92af-01b167221a00",  # Kiesrecht
+        ],
     },
     "claudia": {
         "name": "Claudia",

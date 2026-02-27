@@ -146,10 +146,10 @@ profiles:
           buitenlands_inkomen: 0
         monthly_income:
         - bsn: '100000001'
-          bedrag: 50000
+          bedrag: 208333
         maandelijks_inkomen:
         - bsn: '100000001'
-          bedrag: 0
+          bedrag: 201250
         assets:
         - bsn: '100000001'
           bedrag: 500000
@@ -158,10 +158,10 @@ profiles:
           bedrag: 500000
         business_income:
         - bsn: '100000001'
-          bedrag: 600000
+          bedrag: 208333
         bedrijfsinkomen:
         - bsn: '100000001'
-          bedrag: 600000
+          bedrag: 208333
         buitenlands_inkomen:
         - bsn: '100000001'
           bedrag: 0
@@ -228,7 +228,7 @@ profiles:
           verzekerd_wia: false
         uwv_toetsingsinkomen:
         - bsn: '100000001'
-          toetsingsinkomen: 600000
+          toetsingsinkomen: 2415000
         uwv_werkgegevens:
         - bsn: '100000001'
           gemiddeld_uren_per_week: 0.0
