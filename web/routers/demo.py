@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
-from web.demo.demo_config import configure_demo_feature_flags, is_law_enabled_in_demo
+from web.demo.demo_config import configure_demo_feature_flags
 from web.demo.feature_parser import discover_feature_files, parse_feature_file
 from web.demo.feature_renderer import render_feature_to_html
 from web.demo.yaml_renderer import discover_laws, parse_law_yaml, render_yaml_to_html
@@ -28,6 +28,21 @@ _active_tasks: set[asyncio.Task] = set()
 
 # Configure demo feature flags on module load
 configure_demo_feature_flags()
+
+
+def _filter_sidebar_laws(grouped_laws: dict[str, list]) -> dict[str, list]:
+    """Filter grouped laws to only include those in the active profile's sidebar_laws whitelist."""
+    sidebar_laws = DemoProfiles.get_active_profile().get("sidebar_laws")
+    if sidebar_laws is None:
+        return grouped_laws
+
+    sidebar_set = set(sidebar_laws)
+    filtered = {}
+    for directory, laws_in_dir in grouped_laws.items():
+        matching = [law for law in laws_in_dir if law.get("path") in sidebar_set]
+        if matching:
+            filtered[directory] = matching
+    return filtered
 
 
 def filter_behave_output(output: str) -> str:
@@ -205,7 +220,7 @@ async def workspace_law(request: Request, law_path: str) -> HTMLResponse:
 
     try:
         law_data = parse_law_yaml(yaml_file, law_dir=LAWS_DIR, law_path=law_path)
-        grouped_laws = discover_laws(LAWS_DIR, grouped=True)
+        grouped_laws = _filter_sidebar_laws(discover_laws(LAWS_DIR, grouped=True))
         yaml_html = render_yaml_to_html(law_data)
 
         return templates.TemplateResponse(
@@ -262,13 +277,13 @@ async def workspace_feature(request: Request, feature_path: str) -> HTMLResponse
 
 @router.get("/api/laws", response_class=JSONResponse)
 async def get_laws() -> JSONResponse:
-    """Get list of all available laws as JSON, filtered for demo mode."""
+    """Get list of all available laws as JSON, filtered by sidebar_laws whitelist."""
     all_laws = discover_laws(LAWS_DIR)
-
-    # Filter laws based on feature flags (configured per profile)
-    enabled_laws = [law for law in all_laws if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))]
-
-    return JSONResponse(content=enabled_laws)
+    sidebar_laws = DemoProfiles.get_active_profile().get("sidebar_laws")
+    if sidebar_laws is not None:
+        sidebar_set = set(sidebar_laws)
+        return JSONResponse(content=[law for law in all_laws if law.get("path") in sidebar_set])
+    return JSONResponse(content=all_laws)
 
 
 @router.get("/law/{law_path:path}", response_class=HTMLResponse)
@@ -281,16 +296,7 @@ async def view_law(request: Request, law_path: str) -> HTMLResponse:
 
     try:
         law_data = parse_law_yaml(yaml_file, law_dir=LAWS_DIR, law_path=law_path)
-        all_grouped_laws = discover_laws(LAWS_DIR, grouped=True)
-
-        # Filter grouped laws based on demo configuration
-        grouped_laws = {}
-        for directory, laws_in_dir in all_grouped_laws.items():
-            filtered_laws = [
-                law for law in laws_in_dir if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))
-            ]
-            if filtered_laws:
-                grouped_laws[directory] = filtered_laws
+        grouped_laws = _filter_sidebar_laws(discover_laws(LAWS_DIR, grouped=True))
 
         # Render YAML to HTML
         yaml_html = render_yaml_to_html(law_data)

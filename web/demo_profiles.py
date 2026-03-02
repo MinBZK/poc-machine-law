@@ -2,6 +2,10 @@
 
 Provides centralized profile configurations with BSN, KVK, default laws,
 feature paths, and other demo-specific settings.
+
+Law visibility per profile is controlled by two whitelists:
+- sidebar_laws: law paths shown in the Wetten tab sidebar
+- graph_laws: law paths shown in the Graaf analyse tab
 """
 
 import os
@@ -35,6 +39,19 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": False,
             "SIMULATION": True,
         },
+        # Wetten tab sidebar: only zorgtoeslag
+        "sidebar_laws": [
+            "zorgtoeslagwet/TOESLAGEN-2025-01-01",
+        ],
+        # Graaf analyse: no whitelist = show all non-hidden laws
+        "graph_laws": None,
+        # Pre-select the detentiestatus → zorgtoeslag → verzekeringsstatus chain (UUIDs)
+        "graph_selected_laws": [
+            "292c11ff-8318-4b7a-bb11-3ea545b04c8e",  # Bepalen detentiestatus
+            "60e71675-38bc-4297-87ac-0c145613e481",  # Zorgtoeslag
+            "aba2b8fa-4b34-420f-883a-e78da326a8f4",  # Bepalen verzekeringsstatus
+        ],
+        # Laws disabled for the portal/burger tab (feature flags)
         "disabled_laws": {
             "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
             "GEMEENTE_ROTTERDAM": [
@@ -60,65 +77,21 @@ DEMO_PROFILES: dict[str, dict] = {
             ],
             "TOESLAGEN": ["wet_kinderopvang"],
         },
-        "graph_selected_laws": [
-            "cdd0ec9f-4975-4969-9d8a-808f2d6abfc9",  # Inkomstenbelasting
-            "60e71675-38bc-4297-87ac-0c145613e481",  # Zorgtoeslag (2025)
-            "a611a7ea-98d5-42f5-a05c-475b1be4590e",  # Huurtoeslag (2025)
-            "5d8e4b3a-6f9c-4a2d-8e7b-1c9f2a5b8d3e",  # Kindgebonden Budget (2025)
-            "f8e7d6c5-4321-4f0f-bbbb-123456789abc",  # Kinderopvangtoeslag
-            "2b4c6d8e-1a3f-4e5b-8c7d-9f0e1a2b3c4d",  # Inkomensafhankelijke bijdrage Zvw
-            "7d4e8f2a-3b6c-4a9d-8e1f-5c2d7a9b4e3f",  # Bbz 2004
-            "8a7f3c2d-9e4b-4f5a-b8c1-2d6e9f1a3b7c",  # Werkloosheidswet
-            "b1d3a15b-45a2-44a3-b26a-d636785032c0",  # Bijstand Amsterdam
-            "13dc8a31-91eb-4598-998c-012c9129b9ea",  # AOW-uitkering
-            "3c5d7e9f-2b4a-4f6c-9d8e-0a1b2c3d4e5f",  # Anw-uitkering
-            "4d6e8f0a-3c5b-4e7f-a8b9-1c2d3e4f5a6b",  # AIO-aanvulling
-            "8a3f5c2d-4e6b-4a1f-9c8d-7e2f3a4b5c6d",  # Pensioenuitkering
-            "96d926a0-b45f-4cf3-92af-01b167221a00",  # Kiesrecht
-        ],
     },
     "claudia": {
         "name": "Claudia",
         "type": "ondernemer",
         "bsn": "999999990",
         "kvk": "85234567",
-        "default_law_path": "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
-        "default_feature_path": "features/overig/alcoholwet_GEMEENTE_ROTTERDAM-2024-01-01.feature",
+        "default_law_path": "verordening_precariobelasting/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
+        "default_feature_path": "features/overig/precariobelasting_GEMEENTE_ROTTERDAM-2024-01-01.feature",
         "default_law_tabs": [
             {
                 "id": "law-tab-1",
-                "path": "alcoholwet/vergunning/VWS-2024-01-01",
-                "name": "Alcoholwet (nationaal)",
-                "law": "alcoholwet/vergunning",
-                "service": "VWS",
-            },
-            {
-                "id": "law-tab-2",
-                "path": "alcoholwet/vergunning/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
-                "name": "Alcoholwet (Rotterdam)",
-                "law": "alcoholwet/vergunning",
+                "path": "verordening_precariobelasting/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
+                "name": "Precariobelasting",
+                "law": "verordening_precariobelasting",
                 "service": "GEMEENTE_ROTTERDAM",
-            },
-            {
-                "id": "law-tab-3",
-                "path": "omgevingswet/energiebesparing/informatieplicht/RVO-2024-01-01",
-                "name": "Informatieplicht Energie",
-                "law": "omgevingswet/energiebesparing/informatieplicht",
-                "service": "RVO",
-            },
-            {
-                "id": "law-tab-4",
-                "path": "handelsregisterwet/jaarrekening/KVK-2024-01-01",
-                "name": "Jaarrekening (KVK)",
-                "law": "handelsregisterwet/jaarrekening",
-                "service": "KVK",
-            },
-            {
-                "id": "law-tab-5",
-                "path": "warenwet/meldplicht/NVWA-2024-01-01",
-                "name": "Meldplicht Voedselveiligheid",
-                "law": "warenwet/meldplicht",
-                "service": "NVWA",
             },
         ],
         "zaaksysteem_service": "GEMEENTE_ROTTERDAM",
@@ -134,6 +107,24 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": True,
             "SIMULATION": False,
         },
+        # Wetten tab sidebar: only precariobelasting
+        "sidebar_laws": [
+            "verordening_precariobelasting/gemeenten/GEMEENTE_ROTTERDAM-2024-01-01",
+        ],
+        # Graaf analyse: no whitelist = show all non-hidden laws
+        "graph_laws": None,
+        # Pre-select the horeca Rotterdam law chain (UUIDs)
+        "graph_selected_laws": [
+            "7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c",  # Alcoholwet Rotterdam
+            "8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c",  # Alcoholvergunning (nationaal)
+            "3e7f9b2a-5d8c-4a1e-9f6b-8c2d4e7a3b1f",  # Terrasvergunning
+            "b5d8e2f4-3a6c-4b9e-a7d1-9c4f2e8b1a53",  # Precariobelasting
+            "8a3f4b2c-7d1e-4f8a-9c3b-5e6d7f8a9b0c",  # Exploitatievergunning
+            "9c4e8f2a-7d3b-4e1f-8a5c-6f9d2e3a7b4c",  # BAG register
+            "8b59ef92-03f8-4294-bce9-4eaac01ba0ed",  # Bepalen ondernemerschap
+            "1b3c8d9e-5f2a-4c7b-8e1d-9a2b3c4d5e6f",  # Bedrijfsgegevens organisatie
+        ],
+        # Laws disabled for the portal tab (feature flags)
         "disabled_laws": {
             "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
             "DUO": ["wet_studiefinanciering"],
@@ -165,10 +156,6 @@ DEMO_PROFILES: dict[str, dict] = {
                 "wet_inkomstenbelasting",
             ],
         },
-        "graph_selected_laws": [
-            "8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c",
-            "7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c",
-        ],
     },
 }
 

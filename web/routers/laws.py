@@ -195,16 +195,22 @@ def evaluate_law(
 
 @router.get("/list")
 async def list_laws():
-    """List all available law files, filtered by the active demo profile."""
-    from web.demo.demo_config import is_law_enabled_in_demo
+    """List available law files, filtered by the active profile's graph_laws whitelist."""
     from web.demo.yaml_renderer import discover_laws
 
     laws_dir = os.path.join(os.path.dirname(__file__), "../../laws")
     all_laws = discover_laws(laws_dir)
 
-    return JSONResponse(
-        content=[law["file_path"] for law in all_laws if is_law_enabled_in_demo(law["law"], law["service"])]
-    )
+    graph_laws = DemoProfiles.get_active_profile().get("graph_laws")
+    if graph_laws is not None:
+        graph_set = set(graph_laws)
+        return JSONResponse(content=[law["file_path"] for law in all_laws if law["path"] in graph_set])
+
+    # No whitelist: show all laws except hidden/infrastructure ones from LAW_DEFAULTS
+    from web.feature_flags import FeatureFlags
+
+    hidden = {(s, l) for (s, l), v in FeatureFlags.LAW_DEFAULTS.items() if not v}
+    return JSONResponse(content=[law["file_path"] for law in all_laws if (law["service"], law["law"]) not in hidden])
 
 
 @router.get("/demo-selection")

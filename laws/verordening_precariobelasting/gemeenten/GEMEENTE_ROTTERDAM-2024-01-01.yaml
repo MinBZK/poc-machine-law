@@ -39,15 +39,16 @@ references:
 
 properties:
   parameters:
-    - name: "BSN"
-      description: "BSN van de persoon"
+    - name: "KVK_NUMMER"
+      description: "KvK-nummer van de organisatie"
       type: "string"
       required: true
       legal_basis:
-        law: "Verordening precariobelasting Rotterdam 2024"
-        article: "3"
-        url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
-        explanation: "Identificatie van de belastingplichtige"
+        law: "Handelsregisterwet 2007"
+        bwb_id: "BWBR0021777"
+        article: "9"
+        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel9"
+        explanation: "Het KvK-nummer identificeert de onderneming die belastingplichtig is"
 
   sources:
     - name: "HEEFT_TERRAS"
@@ -94,26 +95,6 @@ properties:
         explanation: "Precariobelasting is alleen verschuldigd voor voorwerpen op voor de openbare dienst bestemde gemeentegrond"
 
   input:
-    - name: "KVK_NUMMER"
-      description: "KvK-nummer van de organisatie (uit Handelsregister)"
-      type: "string"
-      service_reference:
-        service: "KVK"
-        law: "handelsregisterwet"
-        field: "kvk_nummer"
-        parameters:
-          - name: "BSN"
-            reference: "$BSN"
-      temporal:
-        type: "point_in_time"
-        reference: "$calculation_date"
-      legal_basis:
-        law: "Handelsregisterwet 2007"
-        bwb_id: "BWBR0021777"
-        article: "9"
-        url: "https://wetten.overheid.nl/BWBR0021777/2024-01-01#Hoofdstuk2_Artikel9"
-        explanation: "Het KvK-nummer wordt opgehaald uit het Handelsregister op basis van het BSN van de belastingplichtige"
-
     - name: "HEEFT_ACTIEVE_VERGUNNING"
       description: "Of er een actieve (goedgekeurde) terrasvergunning is"
       type: "boolean"
