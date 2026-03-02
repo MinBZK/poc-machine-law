@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.11.0 (2026-02-26)
+
+### Chores
+
+- Sync VERSION file to 1.10.0
+  ([`5aa8b23`](https://github.com/MinBZK/poc-machine-law/commit/5aa8b230ec54666095f392e2b94211fd7245532d))
+
+### Features
+
+- Improve prose generation prompt with real Dutch legislation patterns
+  ([`c72c719`](https://github.com/MinBZK/poc-machine-law/commit/c72c71969617edd1f87c021ee76404795c54a769))
+
+
 ## v1.10.0 (2026-02-25)
 
 ### Bug Fixes
