@@ -35,6 +35,31 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": False,
             "SIMULATION": True,
         },
+        "disabled_laws": {
+            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
+            "GEMEENTE_ROTTERDAM": [
+                "alcoholwet/vergunning",
+                "algemene_plaatselijke_verordening/exploitatievergunning",
+                "algemene_plaatselijke_verordening/terrassen",
+                "algemene_plaatselijke_verordening/ontheffingspas_geluid",
+                "verordening_precariobelasting",
+            ],
+            "KVK": ["handelsregisterwet/jaarrekening"],
+            "NVWA": ["warenwet/haccp", "warenwet/meldplicht"],
+            "PENSIOENFONDS": ["pensioenwet"],
+            "RVO": [
+                "omgevingswet/werkgebonden_personenmobiliteit",
+                "omgevingswet/energiebesparing/informatieplicht",
+            ],
+            "SVB": [
+                "algemene_kinderbijslagwet",
+                "algemene_nabestaandenwet",
+                "algemene_ouderdomswet/leeftijdsbepaling",
+                "algemene_ouderdomswet_gegevens",
+                "participatiewet/aio",
+            ],
+            "TOESLAGEN": ["wet_kinderopvang"],
+        },
         "graph_selected_laws": [
             "cdd0ec9f-4975-4969-9d8a-808f2d6abfc9",  # Inkomstenbelasting
             "60e71675-38bc-4297-87ac-0c145613e481",  # Zorgtoeslag (2025)
@@ -109,6 +134,37 @@ DEMO_PROFILES: dict[str, dict] = {
             "HARMONIZE": True,
             "SIMULATION": False,
         },
+        "disabled_laws": {
+            "BELASTINGDIENST": ["zorgverzekeringswet/bijdrage", "zvw"],
+            "DUO": ["wet_studiefinanciering"],
+            "GEMEENTE_AMSTERDAM": ["participatiewet/bijstand"],
+            "KIESRAAD": ["kieswet"],
+            "PENSIOENFONDS": ["pensioenwet"],
+            "RVO": ["omgevingswet/werkgebonden_personenmobiliteit"],
+            "SVB": [
+                "algemene_kinderbijslagwet",
+                "algemene_nabestaandenwet",
+                "algemene_ouderdomswet/leeftijdsbepaling",
+                "algemene_ouderdomswet_gegevens",
+                "participatiewet/aio",
+            ],
+            "SZW": ["participatiewet/bijstand", "besluit_bijstandverlening_zelfstandigen"],
+            "TOESLAGEN": [
+                "zorgtoeslagwet",
+                "wet_op_de_huurtoeslag",
+                "wet_op_het_kindgebonden_budget",
+                "wet_kinderopvang",
+            ],
+            "UWV": [
+                "werkloosheidswet",
+                "ziektewet",
+                "uwv_toetsingsinkomen",
+                "uwv_werkgegevens",
+                "wet_werk_en_inkomen_naar_arbeidsvermogen",
+                "wet_structuur_uitvoeringsorganisatie_werk_en_inkomen",
+                "wet_inkomstenbelasting",
+            ],
+        },
         "graph_selected_laws": [
             "8a3f9b5c-4d2e-4f0a-b6c3-1e9d8f7a5b4c",
             "7c2e8f4a-3b9d-4e1f-a5c2-9d8b7e6f4a3c",
@@ -149,10 +205,16 @@ class DemoProfiles:
 
     @classmethod
     def apply_feature_flags(cls) -> None:
-        """Apply the feature flags from the active profile via FeatureFlags.set()."""
+        """Apply the feature flags and law visibility from the active profile."""
         profile = cls.get_active_profile()
         for flag_name, value in profile.get("feature_flags", {}).items():
             FeatureFlags.set(flag_name, value)
+
+        # Reset all law flags, then disable profile-specific laws
+        FeatureFlags.reset_law_flags()
+        for service, laws in profile.get("disabled_laws", {}).items():
+            for law in laws:
+                FeatureFlags.disable_law(service, law)
 
 
 def get_demo_bsn() -> str:

@@ -641,13 +641,13 @@ class RuleContext:
                                 # Found an approved case with matching parameters
                                 field = service_ref["field"]
 
-                                # For "heeft_actieve_vergunning", the existence of an approved case
-                                # means the vergunning is active - return True regardless of claimed_result
-                                if field == "heeft_actieve_vergunning":
+                                # If the service_reference declares resolve_from_case_existence,
+                                # the existence of an approved case is sufficient — return True
+                                if service_ref.get("resolve_from_case_existence", False):
                                     resolved_value = True
                                     logger.debug(
                                         f"Resolved {field}=True from approved case {case.id} "
-                                        f"(approved case exists = active vergunning)"
+                                        f"(resolve_from_case_existence=True)"
                                     )
                                 else:
                                     # For other fields, use verified_result (the decided values)
@@ -706,8 +706,8 @@ class RuleContext:
 
             # If an approved case exists but the specific field wasn't in its stored
             # results, re-evaluate using the case's stored parameters (which include
-            # user-submitted values like TERRAS_OPPERVLAKTE that aren't available from
-            # the outer evaluation's parameters alone).
+            # user-submitted values that aren't available from the outer evaluation's
+            # parameters alone).
             eval_parameters = parameters
             if found_approved_case and approved_case_parameters:
                 eval_parameters = {**parameters, **approved_case_parameters}

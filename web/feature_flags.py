@@ -33,14 +33,18 @@ class FeatureFlags:
     # Laws not in this list are enabled by default
     # Note: law identifier comes from the 'law' field in the YAML, not the file path
     LAW_DEFAULTS = {
-        # BUSINESS laws that should be disabled by default
-        ("ANVS", "besluit_kerninstallaties"): False,
-        ("ANVS", "besluit_basisveiligheidsnormen_stralingsbescherming"): False,
-        ("ANVS", "kernenergiewet"): False,
+        # HIDDEN laws (not shown in any sidebar)
+        ("LBB", "wet_bibob"): False,
+        ("SVH", "alcoholwet/register_sociale_hygiene"): False,
+        ("VWS", "alcoholwet/vergunning"): False,
+        # Internal/infrastructure laws (always disabled in sidebar)
         ("ACICT", "wet_adviescollege_ict_toetsing"): False,
-        ("RvIG", "wet_brp"): False,
-        ("AWB", "algemene_wet_bestuursrecht"): False,  # Bestuursorgaan Definitie
+        ("ANVS", "besluit_basisveiligheidsnormen_stralingsbescherming"): False,
+        ("ANVS", "besluit_kerninstallaties"): False,
+        ("ANVS", "kernenergiewet"): False,
+        ("AWB", "algemene_wet_bestuursrecht"): False,
         ("RVO", "omgevingswet/werkgebonden_personenmobiliteit/gegevens"): False,
+        ("RvIG", "wet_brp"): False,
     }
 
     @classmethod
@@ -171,6 +175,14 @@ class FeatureFlags:
 
         # Convert boolean to string and set in environment
         os.environ[flag_key] = "1" if value else "0"
+
+    @classmethod
+    def reset_law_flags(cls) -> None:
+        """Remove all FEATURE_LAW_* environment variables, resetting to LAW_DEFAULTS."""
+        prefix = f"{cls.PREFIX}{cls.LAW_PREFIX}"
+        keys_to_remove = [k for k in os.environ if k.startswith(prefix)]
+        for key in keys_to_remove:
+            del os.environ[key]
 
     @classmethod
     def enable_law(cls, service: str, law: str) -> None:

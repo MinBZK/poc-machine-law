@@ -33,6 +33,90 @@ def _apply_profile_overrides(profile_data: dict, service: str, kvk: str) -> dict
     return profile_data
 
 
+def _process_side_effects(
+    rule_spec: dict,
+    result: RuleResult,
+    bsn: str,
+    service: str,
+    kvk: str | None,
+    case_id: str,
+    machine_service: EngineInterface,
+    claim_manager: ClaimManagerInterface,
+) -> None:
+    """Process side_effects declared in the law YAML after case submission.
+
+    Side effects allow a law to trigger claims in other laws when specific
+    output conditions are met (e.g., alcoholwet approval creates a pending
+    claim on the exploitatievergunning).
+    """
+    for effect in rule_spec.get("side_effects", []):
+        try:
+            trigger = effect["trigger"]
+            if result.output.get(trigger["output_field"]) != trigger["value"]:
+                continue
+            if not kvk:
+                continue
+
+            # Check profile-based condition if specified
+            condition = effect.get("condition")
+            if condition:
+                profile = machine_service.get_profile_data(bsn)
+                if not profile or "sources" not in profile:
+                    continue
+                table_data = profile["sources"].get(service, {}).get(condition["profile_table"], [])
+                condition_met = False
+                for row in table_data:
+                    fields_match = all(
+                        row.get(k) == (kvk if v == "$KVK_NUMMER" else v) for k, v in condition["match_fields"].items()
+                    )
+                    if fields_match and not row.get(condition.get("require_false", ""), True):
+                        condition_met = True
+                        break
+                if not condition_met:
+                    continue
+
+            # Submit the claim
+            claim_spec = effect["claim"]
+            claim_manager.submit_claim(
+                service=service,
+                key=claim_spec["key"],
+                old_value=not claim_spec["new_value"],
+                new_value=claim_spec["new_value"],
+                reason=claim_spec["reason"],
+                claimant="CITIZEN",
+                law=effect["target"]["law"],
+                bsn=bsn,
+                case_id=case_id,
+                auto_approve=claim_spec.get("auto_approve", False),
+            )
+        except Exception as e:
+            logger.warning(f"Failed to process side effect: {e}")
+
+
+def _compute_changed_values(
+    claim_map: dict,
+    service: str,
+    law: str,
+) -> dict:
+    """Build data-change warnings from pending claims for a law.
+
+    Returns a dict of field names to change info dicts suitable for render_path().
+    Any pending claim on this service/law will appear as a data change warning.
+    """
+    changed_values: dict = {}
+    for (svc, claim_law, key), claim in claim_map.items():
+        if svc == service and claim_law == law and claim.status == "PENDING":
+            old_display = (
+                "Nee" if claim.old_value is False else str(claim.old_value) if claim.old_value is not None else ""
+            )
+            changed_values[key] = {
+                "old": claim.old_value,
+                "new": claim.new_value,
+                "old_display": old_display,
+            }
+    return changed_values
+
+
 def get_tile_template(service: str, law: str) -> str:
     """
     Get the appropriate tile template for the service and law.
@@ -111,16 +195,16 @@ def evaluate_law(
 
 @router.get("/list")
 async def list_laws():
-    """List all available law files"""
+    """List all available law files, filtered by the active demo profile."""
+    from web.demo.demo_config import is_law_enabled_in_demo
+    from web.demo.yaml_renderer import discover_laws
 
     laws_dir = os.path.join(os.path.dirname(__file__), "../../laws")
-    law_files = []
-    for root, _, files in os.walk(laws_dir):
-        for file in files:
-            if file.endswith(".yaml"):  # Return only YAML files
-                law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
+    all_laws = discover_laws(laws_dir)
 
-    return JSONResponse(content=law_files)
+    return JSONResponse(
+        content=[law["file_path"] for law in all_laws if is_law_enabled_in_demo(law["law"], law["service"])]
+    )
 
 
 @router.get("/demo-selection")
@@ -275,36 +359,8 @@ async def submit_case(
 
     case = case_manager.get_case_by_id(case_id)
 
-    # Cross-law updates: alcoholwet approval affects exploitatievergunning
-    # TODO: need to remove this hard-coded part
-    # Creates a PENDING claim so Claudia can review and confirm the change
-    if law == "alcoholwet/vergunning" and kvk and result.output.get("heeft_recht_op_vergunning"):
-        exploitatie_law = "algemene_plaatselijke_verordening/exploitatievergunning"
-        try:
-            profile = machine_service.get_profile_data(bsn)
-            if profile and "sources" in profile:
-                profile_service_data = profile["sources"].get(service, {})
-                vergunningen = profile_service_data.get("vergunningen", [])
-                for v in vergunningen:
-                    if v.get("kvk_nummer") == kvk and v.get("heeft_exploitatievergunning"):
-                        # Create pending claim for VERSTREKT_ALCOHOL so the
-                        # exploitatievergunning tile shows a data change warning
-                        if not v.get("heeft_alcoholvergunning"):
-                            claim_manager.submit_claim(
-                                service=service,
-                                key="VERSTREKT_ALCOHOL",
-                                old_value=False,
-                                new_value=True,
-                                reason="Alcoholwetvergunning toegekend",
-                                claimant="CITIZEN",
-                                law=exploitatie_law,
-                                bsn=bsn,
-                                case_id=case_id,
-                                auto_approve=False,
-                            )
-                        break
-        except Exception as e:
-            logger.warning(f"Failed to create claim for exploitatievergunning: {e}")
+    # Process any side_effects declared in the law YAML (e.g., cross-law claim submission)
+    _process_side_effects(rule_spec, result, bsn, service, kvk, case_id, machine_service, claim_manager)
 
     # Re-evaluate the law AFTER the case is submitted so counts include the new case
     _, result, _ = evaluate_law(
@@ -579,6 +635,8 @@ async def application_panel(
             except Exception as e:
                 logger.warning(f"Failed to get profile data for {bsn}: {e}")
 
+        changed_values = _compute_changed_values(claim_map, service, law)
+
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
             {
@@ -595,6 +653,7 @@ async def application_panel(
                 "kvk": kvk,
                 "current_case": existing_case,
                 "claim_map": claim_map,
+                "changed_values": changed_values,
                 "missing_required": result.missing_required,
                 "wallet_enabled": is_wallet_enabled(),
                 "current_engine_id": get_engine_id(),

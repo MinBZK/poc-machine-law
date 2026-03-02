@@ -28,7 +28,6 @@ _active_tasks: set[asyncio.Task] = set()
 
 # Configure demo feature flags on module load
 configure_demo_feature_flags()
-DemoProfiles.apply_feature_flags()
 
 
 def filter_behave_output(output: str) -> str:
@@ -266,7 +265,7 @@ async def get_laws() -> JSONResponse:
     """Get list of all available laws as JSON, filtered for demo mode."""
     all_laws = discover_laws(LAWS_DIR)
 
-    # Filter laws based on demo configuration
+    # Filter laws based on feature flags (configured per profile)
     enabled_laws = [law for law in all_laws if is_law_enabled_in_demo(law.get("law", ""), law.get("service", ""))]
 
     return JSONResponse(content=enabled_laws)

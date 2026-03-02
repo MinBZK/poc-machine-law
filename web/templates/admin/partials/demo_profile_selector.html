@@ -10,6 +10,7 @@
                     hx-post="/admin/set-demo-profile"
                     hx-target="#demo-profile-selector"
                     hx-swap="outerHTML"
+                    hx-on::after-request="localStorage.removeItem('openedLawTabs'); localStorage.removeItem('activeLawTabId'); localStorage.removeItem('activeTab'); setTimeout(() => window.location.reload(), 200)"
                     hx-vals='{"profile_name": "{{ profile_name }}", "source": "admin"}'>
                 <div class="font-semibold">{{ profile.name }}</div>
                 <div class="text-xs {{ 'text-blue-200' if active_profile == profile_name else 'text-gray-500' }}">

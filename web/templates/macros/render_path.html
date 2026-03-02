@@ -230,11 +230,6 @@
     {% else %}
         {% set display_result = node.result if node is mapping and node.result is defined else node %}
         {% if (display_result is not none and display_result != {} and display_result != {'value': None} and display_result != '') or (node is mapping and node.required) %}
-            {# Check if this field has a known source law to display #}
-            {% set source_law = none %}
-            {% if key|upper == 'HEEFT_EXPLOITATIEVERGUNNING' %}
-                {% set source_law = "APV Exploitatievergunning" %}
-            {% endif %}
             <div class="text-sm leading-5 py-0.5">
                 <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
                 <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>

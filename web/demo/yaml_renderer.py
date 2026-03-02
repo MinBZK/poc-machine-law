@@ -47,6 +47,7 @@ def _discover_laws_cached(
                 "service": data.get("service", ""),
                 "description": data.get("description", ""),
                 "valid_from": str(data.get("valid_from", "")),
+                "discoverable": data.get("discoverable", "CITIZEN"),
                 "directory": str(relative_path.parts[0])
                 if relative_path.parts
                 else str(relative_path.parent),  # Top-level directory only

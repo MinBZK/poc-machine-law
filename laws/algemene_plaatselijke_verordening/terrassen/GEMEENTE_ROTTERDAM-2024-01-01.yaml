@@ -395,6 +395,7 @@ properties:
         service: "GEMEENTE_ROTTERDAM"
         law: "algemene_plaatselijke_verordening/exploitatievergunning"
         field: "heeft_actieve_vergunning"
+        resolve_from_case_existence: true
         parameters:
           - name: "KVK_NUMMER"
             reference: "$KVK_NUMMER"

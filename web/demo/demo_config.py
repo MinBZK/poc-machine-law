@@ -5,38 +5,8 @@ This module defines:
 2. Which sections should be expanded/collapsed by default when viewing specific laws
 """
 
-# Laws to DISABLE in demo mode (by service)
-# All other laws will be enabled by default
-# This list drives the FEATURE_LAW_* environment variable settings
-DEMO_DISABLED_LAWS = {
-    "BELASTINGDIENST": [
-        "zorgverzekeringswet/bijdrage",  # Disable inkomensafhankelijke bijdrage
-        "zvw",  # Werkgeversbijdrage Zorgverzekeringswet (law field is "zvw", not "zvw/werkgeversbijdrage")
-    ],
-    "KVK": [
-        "handelsregisterwet/jaarrekening",  # Jaarrekening Deponeringsplicht
-    ],
-    "NVWA": [
-        "warenwet/haccp",  # HACCP Voedselveiligheid
-    ],
-    "PENSIOENFONDS": [
-        "pensioenwet",  # Pensioenuitkering
-    ],
-    "RVO": [
-        "omgevingswet/werkgebonden_personenmobiliteit",  # WPM rapportageverplichting
-    ],
-    "SVB": [
-        "algemene_kinderbijslagwet",  # Kinderbijslag gegevens
-        "algemene_nabestaandenwet",  # Anw-uitkering
-        "algemene_ouderdomswet/leeftijdsbepaling",  # AOW leeftijdsbepaling
-        "algemene_ouderdomswet_gegevens",  # AOW gegevens
-        "participatiewet/aio",  # AIO-aanvulling
-    ],
-    "TOESLAGEN": [
-        "wet_kinderopvang",  # Kinderopvangtoeslag uit, maar huurtoeslag aan
-    ],
-}
-
+# Per-profile disabled laws are now configured in demo_profiles.py (DemoProfiles).
+# Each profile has its own "disabled_laws" dict that explicitly controls law visibility.
 
 # Demo collapse configuration per law file
 DEMO_COLLAPSE_CONFIG = {
@@ -262,18 +232,16 @@ def should_expand_in_demo_mode(law_path: str, item_path: str) -> bool:
     return False
 
 
-def configure_demo_feature_flags():
+def configure_demo_feature_flags() -> None:
     """
-    Configure feature flags for demo mode based on DEMO_DISABLED_LAWS.
+    Configure feature flags for demo mode based on the active profile.
 
-    This sets FEATURE_LAW_* environment variables to disable specific laws.
-    Should be called once at application startup when in demo mode.
+    Delegates to DemoProfiles.apply_feature_flags() which handles both
+    general feature flags and per-profile law visibility.
     """
-    from web.feature_flags import FeatureFlags
+    from web.demo_profiles import DemoProfiles
 
-    for service, disabled_laws in DEMO_DISABLED_LAWS.items():
-        for law in disabled_laws:
-            FeatureFlags.disable_law(service, law)
+    DemoProfiles.apply_feature_flags()
 
 
 def is_law_enabled_in_demo(law: str, service: str) -> bool:

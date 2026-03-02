@@ -553,6 +553,18 @@
 
                     // Default law tabs from active demo profile
                     const defaultLawTabs = {{ active_profile_config.default_law_tabs | tojson }};
+                    const activeProfileName = '{{ active_profile }}';
+
+                    // Check if stored profile matches the active profile
+                    const savedProfile = localStorage.getItem('demoProfile');
+                    const profileChanged = savedProfile && savedProfile !== activeProfileName;
+
+                    if (profileChanged) {
+                        // Profile changed — clear stale tabs
+                        localStorage.removeItem('openedLawTabs');
+                        localStorage.removeItem('activeLawTabId');
+                    }
+                    localStorage.setItem('demoProfile', activeProfileName);
 
                     // Load law tabs from localStorage
                     const savedLawTabs = localStorage.getItem('openedLawTabs');

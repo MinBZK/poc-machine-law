@@ -7,6 +7,23 @@ legal_character: "BESCHIKKING"
 decision_type: "TOEKENNING"
 discoverable: "BUSINESS"
 requires_manual_approval: true
+side_effects:
+  - trigger:
+      output_field: "heeft_recht_op_vergunning"
+      value: true
+    target:
+      law: "algemene_plaatselijke_verordening/exploitatievergunning"
+    claim:
+      key: "VERSTREKT_ALCOHOL"
+      new_value: true
+      reason: "Alcoholwetvergunning toegekend"
+      auto_approve: false
+    condition:
+      profile_table: "vergunningen"
+      match_fields:
+        kvk_nummer: "$KVK_NUMMER"
+        heeft_exploitatievergunning: true
+      require_false: "heeft_alcoholvergunning"
 valid_from: 2024-01-01
 service: "GEMEENTE_ROTTERDAM"
 legal_basis:
