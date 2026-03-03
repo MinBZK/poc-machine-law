@@ -248,30 +248,6 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-{% macro render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values=none) %}
-    {# Render a service reference node without its children (to avoid duplicate rendering) #}
-    {% set change_info = changed_values[key] if changed_values and key in changed_values else none %}
-    {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
-        <div class="text-sm leading-5 py-0.5">
-            <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
-            <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
-            {% if change_info %}
-                <span class="text-gray-500 text-xs">{{ change_info.old_display }}</span>
-                <span class="text-gray-500 text-xs">→</span>
-                <span class="text-gray-500 text-xs">
-                    {% if change_info.new is boolean %}
-                        {{ 'Ja' if change_info.new else 'Nee' }}
-                    {% else %}
-                        {{ change_info.new }}
-                    {% endif %}
-                </span>
-            {% endif %}
-            <span class="ml-2 text-green-600 text-xs">({{ node.law|replace('_', ' ') |title }})</span>
-        </div>
-    {% else %}
-        {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
-    {% endif %}
-{% endmacro %}
 {% macro render_missing_required_form(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
     {% set missing_required = [] %}
     {% for key, node in path.items() %}
@@ -574,37 +550,8 @@
     });
     </script>
     <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
-        {# Track which laws have already shown their children (to avoid duplicate trees) #}
-        {% set ns = namespace(shown_law_children=[], service_ref_child_keys=[]) %}
-        {# Collect all keys that are children of service_reference nodes #}
         {% for key, node in path.items() %}
-            {% if node is mapping and 'service' in node and 'children' in node and node.children %}
-                {% for child_key in node.children.keys() %}
-                    {% set _ = ns.service_ref_child_keys.append(child_key) %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-        {# Render nodes #}
-        {% for key, node in path.items() %}
-            {% set is_service_ref_node = node is mapping and 'service' in node and 'children' in node and node.children %}
-            {% set is_child_of_service_ref = key in ns.service_ref_child_keys %}
-            {# Only render if: it's a service_reference node itself, OR it's not already a child of a service_reference node #}
-            {% if is_service_ref_node or not is_child_of_service_ref %}
-                {% if is_service_ref_node %}
-                    {# Check if we already showed children for this law #}
-                    {% set law_key = node.service ~ '/' ~ node.law %}
-                    {% if law_key in ns.shown_law_children %}
-                        {# Already showed children for this law - render without children #}
-                        {{ render_node_without_children(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
-                    {% else %}
-                        {# First time seeing this law - show with children #}
-                        {% set _ = ns.shown_law_children.append(law_key) %}
-                        {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
-                    {% endif %}
-                {% else %}
-                    {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
-                {% endif %}
-            {% endif %}
+            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
         {% endfor %}
     </div>
     <div id="edit-form-container" class="relative z-[100]"></div>
