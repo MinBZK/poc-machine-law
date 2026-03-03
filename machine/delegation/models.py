@@ -21,6 +21,7 @@ class Delegation:
         subject_type: Whether the subject is a citizen or business
         subject_name: Human-readable name of the subject (company or person name)
         delegation_type: The type of delegation (e.g., EIGENAAR, BESTUURDER)
+        legal_category: Legal category (BEVOEGDHEID, MACHTIGING, VERTEGENWOORDIGING_VAN_RECHTSWEGE)
         permissions: List of permissions granted (e.g., LEZEN, CLAIMS_INDIENEN)
         valid_from: Date from which the delegation is valid
         valid_until: Optional end date for the delegation
@@ -30,6 +31,7 @@ class Delegation:
     subject_type: Literal["CITIZEN", "BUSINESS"]
     subject_name: str
     delegation_type: str
+    legal_category: str
     permissions: list[str]
     valid_from: date
     valid_until: date | None = None
@@ -65,6 +67,7 @@ class DelegationContext:
         subject_type: Whether the subject is a citizen or business
         subject_name: Human-readable name for display in UI
         delegation_type: The type of delegation (e.g., EIGENAAR, BESTUURDER)
+        legal_category: Legal category (BEVOEGDHEID, MACHTIGING, VERTEGENWOORDIGING_VAN_RECHTSWEGE)
         permissions: List of permissions the actor has
     """
 
@@ -73,6 +76,7 @@ class DelegationContext:
     subject_type: Literal["CITIZEN", "BUSINESS"]
     subject_name: str
     delegation_type: str
+    legal_category: str
     permissions: list[str]
 
     def can_read(self) -> bool:
@@ -95,6 +99,7 @@ class DelegationContext:
             "subject_type": self.subject_type,
             "subject_name": self.subject_name,
             "delegation_type": self.delegation_type,
+            "legal_category": self.legal_category,
             "permissions": self.permissions,
         }
 
@@ -114,5 +119,6 @@ class DelegationContext:
             subject_type=data["subject_type"],
             subject_name=data["subject_name"],
             delegation_type=data["delegation_type"],
+            legal_category=data.get("legal_category", ""),
             permissions=data["permissions"],
         )

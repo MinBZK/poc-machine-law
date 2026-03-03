@@ -1,4 +1,4 @@
-$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.6/schema.json
+$id: https://raw.githubusercontent.com/MinBZK/poc-machine-law/refs/heads/main/schema/v0.1.8/schema.json
 uuid: 5a437c98-30bb-4044-af1a-11701a9bf7ea
 name: Bepalen volmacht en vertegenwoordigingsbevoegdheid gevolmachtigde
 law: burgerlijk_wetboek_volmacht
@@ -7,7 +7,8 @@ legal_character: "BESCHIKKING"
 decision_type: "ANDERE_HANDELING"
 valid_from: 2024-01-01
 service: "NOTARIAAT"
-discoverable: "DELEGATION_PROVIDER"
+discoverable: "REPRESENTATION_PROVIDER"
+legal_category: "MACHTIGING"
 legal_basis:
   law: "Burgerlijk Wetboek Boek 3"
   bwb_id: "BWBR0005291"
