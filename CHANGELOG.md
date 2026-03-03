@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v1.11.1 (2026-03-03)
+
+### Bug Fixes
+
+- Structure overwrite_input correctly for claim-based evaluation
+  ([`0db1a6d`](https://github.com/MinBZK/poc-machine-law/commit/0db1a6d6e4b48d2443ecb1e1d3bf0e60b9dc15c6))
+
+### Chores
+
+- Pre-commit autoupdate
+  ([`99f3ac0`](https://github.com/MinBZK/poc-machine-law/commit/99f3ac0006a4188bcfc324a8a04180e050cb9328))
+
+- Sync VERSION file to 1.11.0
+  ([`1697ea9`](https://github.com/MinBZK/poc-machine-law/commit/1697ea9af49db6a390c7c19fe9546cee469cd914))
+
+
 ## v1.11.0 (2026-02-26)
 
 ### Chores
