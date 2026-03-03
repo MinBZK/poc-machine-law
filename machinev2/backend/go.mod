@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/looplab/eventhorizon v0.16.0
 	github.com/minbzk/poc-machine-law/machinev2/machine v0.0.0-20260116124632-985df45d619c
-	github.com/oapi-codegen/runtime v1.1.2
+	github.com/oapi-codegen/runtime v1.2.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/sirupsen/logrus v1.9.4
 	gitlab.com/digilab.overheid.nl/ecosystem/common v0.0.0-20251104090035-1b5c24bac90a
@@ -72,7 +72,7 @@ require (
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260116145544-c6413dc483f5 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260128011058-8636f8732409 // indirect
