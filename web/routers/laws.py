@@ -155,14 +155,11 @@ def evaluate_law(
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
     if not approved and claim_manager:
         claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
-        # Filter claims for this service and law that are pending or approved
-        relevant_claims = [
-            claim
-            for claim in claims
-            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
-        ]
+        # Include all pending/approved claims for this BSN (including cross-service lookups)
+        relevant_claims = [claim for claim in claims if claim.status in ["PENDING", "APPROVED"]]
 
-        # Build overwrite_input from claims, but route parameter claims to parameters dict
+        # Build overwrite_input as {service: {field: value}} structure expected by the engine
+        # Route parameter claims to parameters dict instead
         if relevant_claims:
             overwrite_input = {}
             # Get declared parameter names to distinguish parameter claims from source claims
@@ -174,7 +171,9 @@ def evaluate_law(
                     # User-input parameter (e.g., ACTIVITEITSDATUM) — add to parameters dict
                     parameters[claim.key] = claim.new_value
                 else:
-                    overwrite_input[claim.key] = claim.new_value
+                    if claim.service not in overwrite_input:
+                        overwrite_input[claim.service] = {}
+                    overwrite_input[claim.service][claim.key] = claim.new_value
 
             if not overwrite_input:
                 overwrite_input = None
