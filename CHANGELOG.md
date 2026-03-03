@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.12.0 (2026-03-03)
+
+### Chores
+
+- Sync VERSION file to 1.11.1
+  ([`8f3bb0b`](https://github.com/MinBZK/poc-machine-law/commit/8f3bb0b548e19805de01a0b20b6df18ec9804d36))
+
+
 ## v1.11.1 (2026-03-03)
 
 ### Bug Fixes
