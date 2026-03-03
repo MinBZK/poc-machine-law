@@ -29,8 +29,13 @@
         }
         </style>
     </head>
-    <body>
-        <div class="workspace-container" x-data="workspaceData()" x-init="init()">
+    <body hx-on:profile-switched="refreshAfterProfileSwitch()">
+        <div class="workspace-container"
+             x-data="workspaceData()"
+             x-init="init()"
+             data-bsn="{{ active_profile_config.bsn }}"
+             data-profile="{{ active_profile }}"
+             data-default-law-tabs='{{ active_profile_config.default_law_tabs | tojson }}'>
             <!-- Tab Bar (Browser-like) -->
             <div class="tab-bar">
                 <div class="tab"
@@ -327,10 +332,45 @@
         <!-- JavaScript -->
         <script src="/static/js/demo.js"></script>
         <script>
+        // Refresh after profile switch: in-page content swap to preserve fullscreen.
+        // Fullscreen is on document.documentElement, so replacing body content won't exit it.
+        function refreshAfterProfileSwitch() {
+            localStorage.removeItem('openedLawTabs');
+            localStorage.removeItem('activeLawTabId');
+            // Keep activeTab in localStorage so the current tab stays focused
+
+            fetch('/demo/')
+                .then(r => r.text())
+                .then(html => {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                    // Replace body children — preserves body element and its attributes
+                    // (including hx-on:profile-switched). Fullscreen stays because
+                    // the fullscreen element is document.documentElement (<html>), not <body>.
+                    document.body.innerHTML = doc.body.innerHTML;
+
+                    // Scripts inserted via innerHTML don't execute, so re-create them.
+                    // Skip external scripts (already loaded), only re-run inline scripts.
+                    document.body.querySelectorAll('script:not([src])').forEach(old => {
+                        const s = document.createElement('script');
+                        s.textContent = old.textContent;
+                        old.parentNode.replaceChild(s, old);
+                    });
+
+                    // Re-initialize HTMX on the new content
+                    htmx.process(document.body);
+                })
+                .catch(error => {
+                    console.error('Failed to refresh workspace:', error);
+                    window.location.reload();
+                });
+        }
+
         // Global variables for feature testing (needed by feature_viewer_partial.html)
-        let currentFeaturePath = '';
-        let currentRunId = null;
-        let pollInterval = null;
+        // Using var instead of let so they can be re-declared during profile switch content swap
+        var currentFeaturePath = '';
+        var currentRunId = null;
+        var pollInterval = null;
 
         // Global functions for feature scenarios (called by onclick handlers in rendered HTML)
         function toggleScenario(element) {
@@ -526,7 +566,7 @@
         function workspaceData() {
             return {
                 activeTab: 'presentatie',
-                bsn: new URLSearchParams(window.location.search).get('bsn') || '{{ active_profile_config.bsn }}',
+                bsn: new URLSearchParams(window.location.search).get('bsn') || document.querySelector('.workspace-container').dataset.bsn,
                 lawsContent: '',
                 featuresContent: '',
                 lawsLoaded: false,
@@ -551,9 +591,12 @@
                     // Initialize theme
                     document.documentElement.setAttribute('data-theme', this.theme);
 
-                    // Default law tabs from active demo profile
-                    const defaultLawTabs = {{ active_profile_config.default_law_tabs | tojson }};
-                    const activeProfileName = '{{ active_profile }}';
+                    // Sync fullscreen state (preserved during in-page profile switches)
+                    this.isFullscreen = !!document.fullscreenElement;
+
+                    // Default law tabs from active demo profile (read from data attributes)
+                    const defaultLawTabs = JSON.parse(this.$el.dataset.defaultLawTabs);
+                    const activeProfileName = this.$el.dataset.profile;
 
                     // Check if stored profile matches the active profile
                     const savedProfile = localStorage.getItem('demoProfile');
@@ -702,14 +745,13 @@
 
                 toggleFullscreen() {
                     if (!document.fullscreenElement) {
-                        // Enter fullscreen
-                        const element = document.querySelector('.workspace-container');
+                        // Enter fullscreen on documentElement so swapping .workspace-container
+                        // during profile switches doesn't exit fullscreen
+                        const element = document.documentElement;
                         if (element.requestFullscreen) {
                             element.requestFullscreen();
                         } else if (element.webkitRequestFullscreen) {
                             element.webkitRequestFullscreen(); // Safari
-                        } else if (element.msRequestFullscreen) {
-                            element.msRequestFullscreen(); // IE11
                         }
                         this.isFullscreen = true;
                     } else {
@@ -718,8 +760,6 @@
                             document.exitFullscreen();
                         } else if (document.webkitExitFullscreen) {
                             document.webkitExitFullscreen(); // Safari
-                        } else if (document.msExitFullscreen) {
-                            document.msExitFullscreen(); // IE11
                         }
                         this.isFullscreen = false;
                     }

@@ -211,7 +211,7 @@ async def post_set_demo_profile(
         raise HTTPException(status_code=400, detail=str(e))
 
     if source == "demo":
-        return templates.TemplateResponse(
+        response = templates.TemplateResponse(
             "demo/partials/demo_profile_selector.html",
             {
                 "request": request,
@@ -219,6 +219,8 @@ async def post_set_demo_profile(
                 "active_profile": DemoProfiles.get_active_profile_name(),
             },
         )
+        response.headers["HX-Trigger"] = "profile-switched"
+        return response
 
     return templates.TemplateResponse(
         "admin/partials/demo_profile_selector.html",

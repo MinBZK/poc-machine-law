@@ -5,7 +5,6 @@
                 hx-post="/admin/set-demo-profile"
                 hx-target="#demo-profile-selector"
                 hx-swap="innerHTML"
-                hx-on::after-request="localStorage.removeItem('openedLawTabs'); localStorage.removeItem('activeLawTabId'); localStorage.removeItem('activeTab'); setTimeout(() => window.location.reload(), 200)"
                 hx-vals='{"profile_name": "{{ profile_name }}", "source": "demo"}'>
             <div class="toggle-knob"></div>
         </button>
