@@ -51,18 +51,16 @@ def evaluate_law(
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
     if not approved and claim_manager:
         claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
-        # Filter claims for this service and law that are pending or approved
-        relevant_claims = [
-            claim
-            for claim in claims
-            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
-        ]
+        # Include all pending/approved claims for this BSN (including cross-service lookups)
+        relevant_claims = [claim for claim in claims if claim.status in ["PENDING", "APPROVED"]]
 
-        # Build overwrite_input from claims
+        # Build overwrite_input as {service: {field: value}} structure expected by the engine
         if relevant_claims:
             overwrite_input = {}
             for claim in relevant_claims:
-                overwrite_input[claim.key] = claim.new_value
+                if claim.service not in overwrite_input:
+                    overwrite_input[claim.service] = {}
+                overwrite_input[claim.service][claim.key] = claim.new_value
 
     # Execute the law using EngineInterface
     result = machine_service.evaluate(
