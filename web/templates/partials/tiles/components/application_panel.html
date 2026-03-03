@@ -25,7 +25,9 @@
         <div class="p-6 space-y-6">
             <div class="border-b border-blue-200 pb-4 mb-4" style="display: none;">
                 <div class="flex items-center justify-between">
-                    <h4 class="text-base font-medium text-gray-900">Reken met eigen aanpassingen in gegevens</h4>
+                    <h4 class="text-base font-medium text-gray-900">
+                        {{ t.panel_calculate_with_adjustments if t else 'Reken met eigen aanpassingen in gegevens' }}
+                    </h4>
                     <label class="inline-flex items-center cursor-pointer">
                         <input type="checkbox"
                                class="sr-only peer"
@@ -45,7 +47,7 @@
             <div class="border-t pt-4">
                 <button @click="showExplanation = !showExplanation"
                         class="flex items-center justify-between w-full text-left cursor-pointer">
-                    <span class="text-sm font-medium text-gray-900">Uitleg</span>
+                    <span class="text-sm font-medium text-gray-900">{{ t.panel_explanation if t else 'Uitleg' }}</span>
                     <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
                          :class="{ 'rotate-180': showExplanation }"
                          fill="none"
@@ -74,7 +76,7 @@
             <div class="border-t pt-4">
                 <button @click="showTechnical = !showTechnical"
                         class="flex items-center justify-between w-full text-left cursor-pointer">
-                    <span class="text-sm font-medium text-gray-900">Technische details</span>
+                    <span class="text-sm font-medium text-gray-900">{{ t.panel_technical_details if t else 'Technische details' }}</span>
                     <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
                          :class="{ 'rotate-180': showTechnical }"
                          fill="none"
@@ -95,8 +97,8 @@
                         <div class="text-xs text-gray-500 space-y-1">
                             <div>Wet: {{ law }}</div>
                             <div>Service: {{ service }}</div>
-                            <div>Geldig vanaf: {{ rule_spec.valid_from }}</div>
-                            <div>Versie: {{ rule_spec.uuid }}</div>
+                            <div>{{ t.panel_valid_from if t else 'Geldig vanaf:' }} {{ rule_spec.valid_from }}</div>
+                            <div>{{ t.panel_version if t else 'Versie:' }} {{ rule_spec.uuid }}</div>
                         </div>
                     </div>
                 </div>
