@@ -59,7 +59,7 @@
                                 <span class="text-gray-400 mt-0.5">•</span>
                                 <span class="flex-1">
                                     {% for key, val in item.items() %}
-                                        {% if key not in ['bsn', 'kind_bsn'] %}
+                                        {% if key|lower not in ['bsn', 'kind_bsn'] and val is not none %}
                                             <span class="text-gray-700">{{ key|replace('_', ' ') |title }}:</span>
                                             <span class="font-medium">{{ val }}</span>
                                             {% if not loop.last %}<span class="text-gray-400 mx-1">|</span>{% endif %}
@@ -187,14 +187,27 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) %}
+{% macro render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values=none) %}
+    {# Check if this key has a changed value #}
+    {% set change_info = changed_values[key] if changed_values and key in changed_values else none %}
     {% if node is mapping and ('service' in node and 'children' in node and node.children) %}
         <div x-data="{ open: false }" class="text-sm leading-5">
             <div class="hover:bg-gray-50 transition-colors duration-150 py-0.5 flex items-start cursor-pointer gap-2"
                  @click="open = !open">
-                <div class="text-sm leading-5 py-0.5">
+                <div class="text-sm leading-5 py-0.5 flex items-center gap-2">
                     <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
                     <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                    {% if change_info %}
+                        <span class="text-gray-500 text-xs">{{ change_info.old_display }}</span>
+                        <span class="text-gray-500 text-xs">→</span>
+                        <span class="text-gray-500 text-xs">
+                            {% if change_info.new is boolean %}
+                                {{ 'Ja' if change_info.new else 'Nee' }}
+                            {% else %}
+                                {{ change_info.new }}
+                            {% endif %}
+                        </span>
+                    {% endif %}
                 </div>
                 <div class="min-w-0 flex items-center">
                     <svg :class="{'rotate-[270deg]': open, 'rotate-90': !open}"
@@ -209,17 +222,28 @@
             <div x-show="open" class="ml-6 border-l border-gray-200 pl-4">
                 {% if node.children %}
                     {% for child_key, child_node in node.children.items() %}
-                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant) }}
+                        {{ render_node(child_key, child_node, case_id, node.service, node.law, bsn, claim_map, show_approve, claimant, changed_values) }}
                     {% endfor %}
                 {% endif %}
             </div>
         </div>
     {% else %}
         {% set display_result = node.result if node is mapping and node.result is defined else node %}
-        {% if display_result is not none and display_result != {} and display_result != {'value': None} or (node is mapping and node.required) %}
+        {% if (display_result is not none and display_result != {} and display_result != {'value': None} and display_result != '') or (node is mapping and node.required) %}
             <div class="text-sm leading-5 py-0.5">
                 <span class="text-gray-600">{{ key|title|replace('_', ' ') }}:</span>
                 <span class="ml-2">{{ render_value(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}</span>
+                {% if change_info %}
+                    <span class="text-gray-500 text-xs">{{ change_info.old_display }}</span>
+                    <span class="text-gray-500 text-xs">→</span>
+                    <span class="text-gray-500 text-xs">
+                        {% if change_info.new is boolean %}
+                            {{ 'Ja' if change_info.new else 'Nee' }}
+                        {% else %}
+                            {{ change_info.new }}
+                        {% endif %}
+                    </span>
+                {% endif %}
             </div>
         {% endif %}
     {% endif %}
@@ -267,7 +291,9 @@
             </div>
             <form hx-post="/edit/update-missing-values"
                   hx-target="#missing-form-result"
+                  hx-on::after-request="setTimeout(function() { htmx.ajax('GET', this.dataset.refreshUrl, {target: '#application-panel', swap: 'innerHTML'}); }.bind(this), 200)"
                   class="space-y-4"
+                  data-refresh-url="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ bsn }}{% if kvk %}&kvk={{ kvk }}{% endif %}&approved=false"
                   data-children-bsns="{{ path.CHILDREN_BSNS|join(',') if path.CHILDREN_BSNS is defined else '' }}">
                 <input type="hidden" name="case_id" value="{{ case_id }}">
                 <input type="hidden" name="service" value="{{ service }}">
@@ -427,12 +453,42 @@
                                            {% if loop.first %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="date">
-                                {% else %}
-                                    <input type="text"
+                                {% elif item.node.details and item.node.details.type == 'time' %}
+                                    <input type="time"
                                            id="value-{{ item.key }}"
                                            name="values[{{ loop.index0 }}]"
                                            class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                            {% if loop.first %}autofocus{% endif %}
+                                           required>
+                                    <input type="hidden" name="types[{{ loop.index0 }}]" value="time">
+                                {% elif item.node.details and item.node.details.type == 'enum' and item.node.details.type_spec and item.node.details.type_spec.enum %}
+                                    <select id="value-{{ item.key }}"
+                                            name="values[{{ loop.index0 }}]"
+                                            class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            {% if loop.first %}autofocus{% endif %}
+                                            required>
+                                        <option value="">Selecteer {{ item.key|title|replace('_', ' ') }}</option>
+                                        {% for enum_value in item.node.details.type_spec.enum %}
+                                            {% if item.node.details.type_spec.enum_labels and enum_value in item.node.details.type_spec.enum_labels %}
+                                                <option value="{{ enum_value }}">{{ item.node.details.type_spec.enum_labels[enum_value] }}</option>
+                                            {% else %}
+                                                <option value="{{ enum_value }}">{{ enum_value|title|replace('_', ' ') }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <input type="hidden" name="types[{{ loop.index0 }}]" value="string">
+                                {% else %}
+                                    {# Check if this is a KVK field and we have kvk in context #}
+                                    {% set prefill_value = "" %}
+                                    {% if item.key|lower in ['kvk_nummer', 'kvk', 'kvknummer'] and kvk is defined and kvk %}
+                                        {% set prefill_value = kvk %}
+                                    {% endif %}
+                                    <input type="text"
+                                           id="value-{{ item.key }}"
+                                           name="values[{{ loop.index0 }}]"
+                                           class="px-2 py-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           {% if prefill_value %}value="{{ prefill_value }}"{% endif %}
+                                           {% if loop.first and not prefill_value %}autofocus{% endif %}
                                            required>
                                     <input type="hidden" name="types[{{ loop.index0 }}]" value="string">
                                 {% endif %}
@@ -452,7 +508,7 @@
         </div>
     {% endif %}
 {% endmacro %}
-{% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN") %}
+{% macro render_path(path, case_id, service, law, bsn, claim_map, show_approve=False, claimant="CITIZEN", changed_values=none) %}
     <!-- Alpine.js store for managing dialog state -->
     <script>
     document.addEventListener('alpine:init', () => {
@@ -495,7 +551,7 @@
     </script>
     <div class="bg-gray-50 rounded-lg text-sm p-4 border border-gray-100">
         {% for key, node in path.items() %}
-            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant) }}
+            {{ render_node(key, node, case_id, service, law, bsn, claim_map, show_approve, claimant, changed_values) }}
         {% endfor %}
     </div>
     <div id="edit-form-container" class="relative z-[100]"></div>

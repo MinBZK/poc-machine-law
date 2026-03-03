@@ -4,11 +4,13 @@ import os
 from typing import Any
 from urllib.parse import unquote
 
+import pandas as pd
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import JSONResponse
 from jinja2 import TemplateNotFound
 
 from explain.llm_factory import llm_factory
+from web.demo_profiles import DemoProfiles
 from web.dependencies import TODAY, get_case_manager, get_claim_manager, get_engine_id, get_machine_service, templates
 from web.engines import CaseManagerInterface, ClaimManagerInterface, EngineInterface, RuleResult
 from web.feature_flags import is_wallet_enabled
@@ -16,6 +18,103 @@ from web.feature_flags import is_wallet_enabled
 router = APIRouter(prefix="/laws", tags=["laws"])
 
 logger = logging.getLogger(__name__)
+
+# In-memory profile data overrides (keyed by (service, table, kvk))
+_profile_data_overrides: dict[tuple[str, str, str], list[dict]] = {}
+
+
+def _apply_profile_overrides(profile_data: dict, service: str, kvk: str) -> dict:
+    """Merge any in-memory profile data overrides into the profile data dict."""
+    if not profile_data or not kvk:
+        return profile_data
+    for (svc, table, k), rows in _profile_data_overrides.items():
+        if svc == service and k == kvk and table in profile_data:
+            profile_data[table] = rows
+    return profile_data
+
+
+def _process_side_effects(
+    rule_spec: dict,
+    result: RuleResult,
+    bsn: str,
+    service: str,
+    kvk: str | None,
+    case_id: str,
+    machine_service: EngineInterface,
+    claim_manager: ClaimManagerInterface,
+) -> None:
+    """Process side_effects declared in the law YAML after case submission.
+
+    Side effects allow a law to trigger claims in other laws when specific
+    output conditions are met (e.g., alcoholwet approval creates a pending
+    claim on the exploitatievergunning).
+    """
+    for effect in rule_spec.get("side_effects", []):
+        try:
+            trigger = effect["trigger"]
+            if result.output.get(trigger["output_field"]) != trigger["value"]:
+                continue
+            if not kvk:
+                continue
+
+            # Check profile-based condition if specified
+            condition = effect.get("condition")
+            if condition:
+                profile = machine_service.get_profile_data(bsn)
+                if not profile or "sources" not in profile:
+                    continue
+                table_data = profile["sources"].get(service, {}).get(condition["profile_table"], [])
+                condition_met = False
+                for row in table_data:
+                    fields_match = all(
+                        row.get(k) == (kvk if v == "$KVK_NUMMER" else v) for k, v in condition["match_fields"].items()
+                    )
+                    if fields_match and not row.get(condition.get("require_false", ""), True):
+                        condition_met = True
+                        break
+                if not condition_met:
+                    continue
+
+            # Submit the claim
+            claim_spec = effect["claim"]
+            claim_manager.submit_claim(
+                service=service,
+                key=claim_spec["key"],
+                old_value=not claim_spec["new_value"],
+                new_value=claim_spec["new_value"],
+                reason=claim_spec["reason"],
+                claimant="CITIZEN",
+                law=effect["target"]["law"],
+                bsn=bsn,
+                case_id=case_id,
+                auto_approve=claim_spec.get("auto_approve", False),
+            )
+        except Exception as e:
+            logger.warning(f"Failed to process side effect: {e}")
+
+
+def _compute_changed_values(
+    claim_map: dict,
+    service: str,
+    law: str,
+) -> dict:
+    """Build data-change warnings from pending claims for a law.
+
+    Returns a dict of field names to change info dicts suitable for render_path().
+    Any pending claim on this service/law will appear as a data change warning.
+    """
+    changed_values: dict = {}
+    for (svc, claim_law, key), claim in claim_map.items():
+        if svc == service and claim_law == law and claim.status == "PENDING":
+            old_display = (
+                "Nee" if claim.old_value is False else str(claim.old_value) if claim.old_value is not None else ""
+            )
+            changed_values[key] = {
+                "old": claim.old_value,
+                "new": claim.new_value,
+                "old_display": old_display,
+            }
+    return changed_values
 
 
 def get_tile_template(service: str, law: str) -> str:
@@ -40,29 +139,44 @@ def evaluate_law(
     approved: bool = True,
     claim_manager: ClaimManagerInterface | None = None,
     effective_date: str | None = None,
+    kvk_nummer: str | None = None,
 ) -> tuple[str, RuleResult, dict[str, Any]]:
-    """Evaluate a law for a given BSN"""
+    """Evaluate a law for a given BSN or KVK_NUMMER"""
 
-    logger.warn(f"evalute law {service} {law} for {bsn}")
+    logger.warn(f"evalute law {service} {law} for {bsn} (kvk={kvk_nummer})")
 
+    # Determine parameters based on law type
+    # Business laws may need KVK_NUMMER as the primary parameter
     parameters = {"BSN": bsn}
+    if kvk_nummer:
+        parameters["KVK_NUMMER"] = kvk_nummer
     overwrite_input = None
 
     # If not approved (i.e., showing pending changes), get claims and apply them as overwrites
     if not approved and claim_manager:
         claims = claim_manager.get_claims_by_bsn(bsn, include_rejected=False)
-        # Filter claims for this service and law that are pending or approved
-        relevant_claims = [
-            claim
-            for claim in claims
-            if claim.service == service and claim.law == law and claim.status in ["PENDING", "APPROVED"]
-        ]
+        # Include all pending/approved claims for this BSN (including cross-service lookups)
+        relevant_claims = [claim for claim in claims if claim.status in ["PENDING", "APPROVED"]]
 
-        # Build overwrite_input from claims
+        # Build overwrite_input as {service: {field: value}} structure expected by the engine
+        # Route parameter claims to parameters dict instead
         if relevant_claims:
             overwrite_input = {}
+            # Get declared parameter names to distinguish parameter claims from source claims
+            rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+            param_names = {p["name"] for p in rule_spec.get("properties", {}).get("parameters", [])}
+
             for claim in relevant_claims:
-                overwrite_input[claim.key] = claim.new_value
+                if claim.key in param_names:
+                    # User-input parameter (e.g., ACTIVITEITSDATUM) — add to parameters dict
+                    parameters[claim.key] = claim.new_value
+                else:
+                    if claim.service not in overwrite_input:
+                        overwrite_input[claim.service] = {}
+                    overwrite_input[claim.service][claim.key] = claim.new_value
+
+            if not overwrite_input:
+                overwrite_input = None
 
     # Execute the law using EngineInterface
     result = machine_service.evaluate(
@@ -80,16 +194,32 @@ def evaluate_law(
 
 @router.get("/list")
 async def list_laws():
-    """List all available law files"""
+    """List available law files, filtered by the active profile's graph_laws whitelist."""
+    from web.demo.yaml_renderer import discover_laws
 
     laws_dir = os.path.join(os.path.dirname(__file__), "../../laws")
-    law_files = []
-    for root, _, files in os.walk(laws_dir):
-        for file in files:
-            if file.endswith(".yaml"):  # Return only YAML files
-                law_files.append(os.path.relpath(os.path.join(root, file), laws_dir))
+    all_laws = discover_laws(laws_dir)
 
-    return JSONResponse(content=law_files)
+    graph_laws = DemoProfiles.get_active_profile().get("graph_laws")
+    if graph_laws is not None:
+        graph_set = set(graph_laws)
+        return JSONResponse(content=[law["file_path"] for law in all_laws if law["path"] in graph_set])
+
+    # No whitelist: show all laws except hidden/infrastructure ones from LAW_DEFAULTS
+    from web.feature_flags import FeatureFlags
+
+    hidden = {(s, l) for (s, l), v in FeatureFlags.LAW_DEFAULTS.items() if not v}
+    return JSONResponse(content=[law["file_path"] for law in all_laws if (law["service"], law["law"]) not in hidden])
+
+
+@router.get("/demo-selection")
+async def demo_selection():
+    """Return the graph_selected_laws UUIDs for the active demo profile.
+
+    An empty array means 'select all laws'.
+    """
+    profile = DemoProfiles.get_active_profile()
+    return JSONResponse(content=profile.get("graph_selected_laws", []))
 
 
 @router.get("/execute")
@@ -99,6 +229,7 @@ async def execute_law(
     law: str,
     bsn: str,
     date: str = None,
+    kvk: str = None,
     can_submit_claims: bool = True,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -106,12 +237,19 @@ async def execute_law(
 ):
     """Execute a law and render its result"""
 
-    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims})")
+    logger.warn(f"[LAWS] execute {service} {law} (can_submit_claims={can_submit_claims}, kvk={kvk})")
 
     try:
         law = unquote(law)
         law, result, parameters = evaluate_law(
-            bsn, law, service, machine_service, approved=False, claim_manager=claim_manager, effective_date=date
+            bsn,
+            law,
+            service,
+            machine_service,
+            approved=False,
+            claim_manager=claim_manager,
+            effective_date=date,
+            kvk_nummer=kvk,
         )
 
     except Exception as e:
@@ -139,21 +277,37 @@ async def execute_law(
 
     logger.warn(f"[LAWS] result {result}")
 
+    # For business laws, get profile data to check existing vergunning status
+    profile_data = None
+    if kvk:
+        try:
+            profile = machine_service.get_profile_data(bsn)
+            if profile and "sources" in profile:
+                profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
+        except Exception as e:
+            logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
+    # Extract value tree from path for templates to access resolved values
+    value_tree = machine_service.extract_value_tree(result.path)
+
     return templates.TemplateResponse(
         template_path,
         {
             "bsn": bsn,
             "effective_bsn": bsn,  # For tile templates
+            "kvk": kvk,
             "request": request,
             "law": law,
             "service": service,
             "rule_spec": rule_spec,
             "result": result.output,
             "input": result.input,
+            "path": value_tree,
             "requirements_met": result.requirements_met,
             "missing_required": result.missing_required,
             "current_case": existing_case,
             "can_submit_claims": can_submit_claims,
+            "profile_data": profile_data,
         },
     )
 
@@ -165,12 +319,17 @@ async def submit_case(
     law: str,
     bsn: str,
     approved: bool = False,
+    kvk: str = None,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit a new case"""
     law = unquote(law)
+
+    # Get kvk from query params if not provided directly
+    if not kvk:
+        kvk = request.query_params.get("kvk")
 
     law, result, parameters = evaluate_law(
         bsn,
@@ -180,34 +339,77 @@ async def submit_case(
         approved=approved,
         claim_manager=claim_manager,
         effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk,
     )
+
+    # Get user-provided parameter names from rule spec and merge their values
+    rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+    param_names = {p["name"] for p in rule_spec.get("properties", {}).get("parameters", [])}
+    user_params = {
+        k.lstrip("$"): v for k, v in (result.input or {}).items() if k.lstrip("$") in param_names and v is not None
+    }
+
+    # Check if this law requires manual approval (from YAML metadata)
+    requires_manual_approval = rule_spec.get("requires_manual_approval", False)
 
     case_id = case_manager.submit_case(
         bsn=bsn,
         service=service,
         law=law,
-        parameters=parameters,
+        parameters={**parameters, **user_params},
         claimed_result=result.output,
         approved_claims_only=approved,
+        force_manual_review=requires_manual_approval,
     )
 
     case = case_manager.get_case_by_id(case_id)
 
-    rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+    # Process any side_effects declared in the law YAML (e.g., cross-law claim submission)
+    _process_side_effects(rule_spec, result, bsn, service, kvk, case_id, machine_service, claim_manager)
+
+    # Re-evaluate the law AFTER the case is submitted so counts include the new case
+    _, result, _ = evaluate_law(
+        bsn,
+        law,
+        service,
+        machine_service,
+        approved=approved,
+        claim_manager=claim_manager,
+        effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk,
+    )
+
+    # For business laws, get profile data to display after submission
+    profile_data = None
+    if kvk:
+        try:
+            profile = machine_service.get_profile_data(bsn)
+            if profile and "sources" in profile:
+                profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
+        except Exception as e:
+            logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
+    # Extract value tree from the re-evaluated result (includes the new case in counts)
+    value_tree = machine_service.extract_value_tree(result.path)
 
     # Return the updated law result with the new case
     return templates.TemplateResponse(
         get_tile_template(service, law),
         {
             "bsn": bsn,
+            "effective_bsn": bsn,
+            "kvk": kvk,
             "request": request,
             "law": law,
             "service": service,
             "rule_spec": rule_spec,
             "result": result.output,
             "input": result.input,
+            "path": value_tree,
             "requirements_met": result.requirements_met,
+            "missing_required": result.missing_required,
             "current_case": case,
+            "profile_data": profile_data,
         },
     )
 
@@ -219,14 +421,17 @@ async def objection_case(
     service: str,
     law: str,
     bsn: str,
-    reason: str = Form(...),  # Changed this line to use Form
+    kvk: str = None,
+    reason: str = Form(...),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
     machine_service: EngineInterface = Depends(get_machine_service),
 ):
     """Submit an objection for an existing case"""
-    # First calculate the new result with disputed parameters
     law = unquote(law)
+
+    if not kvk:
+        kvk = request.query_params.get("kvk")
 
     # Submit the objection with new claimed result
     case_manager.objection(
@@ -235,7 +440,13 @@ async def objection_case(
     )
 
     law, result, parameters = evaluate_law(
-        bsn, law, service, machine_service, claim_manager=claim_manager, effective_date=request.query_params.get("date")
+        bsn,
+        law,
+        service,
+        machine_service,
+        claim_manager=claim_manager,
+        effective_date=request.query_params.get("date"),
+        kvk_nummer=kvk,
     )
 
     template_path = get_tile_template(service, law)
@@ -244,6 +455,8 @@ async def objection_case(
         template_path,
         {
             "bsn": bsn,
+            "effective_bsn": bsn,
+            "kvk": kvk,
             "request": request,
             "law": law,
             "service": service,
@@ -277,6 +490,7 @@ async def explanation(
     service: str,
     law: str,
     bsn: str,
+    kvk: str = None,
     provider: str = None,  # Add provider parameter
     approved: bool = False,
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -294,6 +508,7 @@ async def explanation(
             approved=approved,
             claim_manager=claim_manager,
             effective_date=request.query_params.get("date"),
+            kvk_nummer=kvk,
         )
 
         # Convert path and rule_spec to JSON strings
@@ -387,6 +602,7 @@ async def application_panel(
     service: str,
     law: str,
     bsn: str,
+    kvk: str = None,
     approved: bool = False,
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
@@ -403,6 +619,7 @@ async def application_panel(
             approved=approved,
             claim_manager=claim_manager,
             effective_date=request.query_params.get("date"),
+            kvk_nummer=kvk,
         )
 
         value_tree = machine_service.extract_value_tree(result.path)
@@ -412,6 +629,18 @@ async def application_panel(
         claim_map = {(claim.service, claim.law, claim.key): claim for claim in claims}
 
         rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+        # For business laws, get profile data (used in templates for display purposes)
+        profile_data = None
+        if kvk:
+            try:
+                profile = machine_service.get_profile_data(bsn)
+                if profile and "sources" in profile:
+                    profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
+            except Exception as e:
+                logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
+        changed_values = _compute_changed_values(claim_map, service, law)
 
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
@@ -425,15 +654,19 @@ async def application_panel(
                 "requirements_met": result.requirements_met,
                 "path": value_tree,
                 "bsn": bsn,
+                "effective_bsn": bsn,
+                "kvk": kvk,
                 "current_case": existing_case,
                 "claim_map": claim_map,
+                "changed_values": changed_values,
                 "missing_required": result.missing_required,
                 "wallet_enabled": is_wallet_enabled(),
                 "current_engine_id": get_engine_id(),
+                "profile_data": profile_data,
             },
         )
     except Exception as e:
-        print(f"Error in application panel: {e}")
+        logger.error(f"Error in application panel: {e}")
         return templates.TemplateResponse(
             "partials/tiles/components/application_panel.html",
             {
@@ -444,3 +677,69 @@ async def application_panel(
                 "current_engine_id": get_engine_id(),
             },
         )
+
+
+@router.post("/update-profile-table")
+async def update_profile_table(
+    request: Request,
+    service: str,
+    table: str,
+    kvk: str,
+    bsn: str,
+    law: str,
+    machine_service: EngineInterface = Depends(get_machine_service),
+    case_manager: CaseManagerInterface = Depends(get_case_manager),
+) -> JSONResponse:
+    """Update a profile data table in memory (for editable profile data like energy measures)."""
+    law = unquote(law)
+    body = await request.json()
+    rows = body.get("rows", [])
+
+    # Store override for profile_data rendering
+    _profile_data_overrides[(service, table, kvk)] = rows
+
+    # Also update the source DataFrame so law evaluation reflects changes
+    df = pd.DataFrame(rows)
+    machine_service.set_source_dataframe(service, table, df)
+
+    # Re-evaluate the law and return the updated tile
+    parameters = {"BSN": bsn}
+    if kvk:
+        parameters["KVK_NUMMER"] = kvk
+    result = machine_service.evaluate(
+        service=service,
+        law=law,
+        parameters=parameters,
+        reference_date=TODAY,
+    )
+
+    existing_case = case_manager.get_case(bsn, service, law)
+    template_path = get_tile_template(service, law)
+    rule_spec = machine_service.get_rule_spec(law, TODAY, service)
+
+    profile_data = None
+    try:
+        profile = machine_service.get_profile_data(bsn)
+        if profile and "sources" in profile:
+            profile_data = _apply_profile_overrides(profile["sources"].get(service, {}), service, kvk)
+    except Exception as e:
+        logger.warning(f"Failed to get profile data for {bsn}: {e}")
+
+    return templates.TemplateResponse(
+        template_path,
+        {
+            "bsn": bsn,
+            "effective_bsn": bsn,
+            "kvk": kvk,
+            "request": request,
+            "law": law,
+            "service": service,
+            "rule_spec": rule_spec,
+            "result": result.output,
+            "input": result.input,
+            "requirements_met": result.requirements_met,
+            "missing_required": result.missing_required,
+            "current_case": existing_case,
+            "profile_data": profile_data,
+        },
+    )

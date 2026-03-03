@@ -122,6 +122,7 @@ def step_impl(context, service, table):
 
     STRING_FIELDS = {
         "bsn",
+        "bsn_eigenaar",
         "partner_bsn",
         "jaar",
         "kind_bsn",

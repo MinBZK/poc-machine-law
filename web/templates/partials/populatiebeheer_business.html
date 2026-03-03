@@ -1,0 +1,174 @@
+{# Populatiebeheer partial for business/ondernemer simulation.
+   Required context: default_params (dict with horeca_percentage, levensmiddelen_percentage, etc.)
+   Optional context:
+     - pop_num_people_max (int, default 2000)
+     - pop_num_people_step (int, default 100)
+     - pop_num_input_type ("number" or "range", default "range")
+     - pop_show_header (bool, default true)
+#}
+{% if pop_show_header is not defined or pop_show_header %}
+    <div class="bg-white shadow-lg rounded-lg border-2 border-green-200">
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 border-b border-green-200">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-green-600"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                    </path>
+                </svg>
+                Bedrijfspopulatie
+            </h2>
+            <p class="text-sm text-gray-600 mt-1 ml-8">Definieer de samenstelling van de bedrijfspopulatie</p>
+        </div>
+    {% endif %}
+    <div class="{% if pop_show_header is not defined or pop_show_header %}p-4 {% endif %}space-y-4">
+        <!-- Basis Instellingen -->
+        <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <h3 class="text-base font-medium text-gray-900 mb-3">Basis Instellingen</h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <label for="num_people" class="block text-sm font-medium text-gray-700">Aantal bedrijven</label>
+                    <input type="range"
+                           name="num_people"
+                           id="num_people"
+                           value="{{ default_params.num_people }}"
+                           min="100"
+                           max="{{ pop_num_people_max|default(2000) }}"
+                           step="{{ pop_num_people_step|default(100) }}"
+                           oninput="updateNumPeopleDisplay()"
+                           class="mt-1 w-full">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>100</span>
+                        <span id="num_people_display" class="font-medium text-gray-900">{{ default_params.num_people }}</span>
+                        <span>{{ pop_num_people_max|default(2000) }}</span>
+                    </div>
+                </div>
+                <div>
+                    <label for="simulation_date" class="block text-sm font-medium text-gray-700">Simulatiedatum</label>
+                    <input type="date"
+                           name="simulation_date"
+                           id="simulation_date"
+                           value="{{ default_params.simulation_date }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <p class="mt-1 text-sm text-gray-500">Datum voor wetsevaluatie</p>
+                </div>
+            </div>
+        </div>
+        <!-- Bedrijfstypeverdeling -->
+        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <button type="button"
+                    onclick="toggleSection('business-type-section')"
+                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                <h3 class="text-base font-medium text-gray-900">Bedrijfstypeverdeling</h3>
+                <svg id="business-type-section-chevron"
+                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="business-type-section" class="px-4 pb-4 hidden">
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm">
+                            <label for="horeca_percentage" class="font-medium text-gray-700">Horecabedrijven</label>
+                            <span id="horeca_percentage_value" class="text-gray-500">{{ default_params.horeca_percentage }}%</span>
+                        </div>
+                        <input type="range"
+                               name="horeca_percentage"
+                               id="horeca_percentage"
+                               value="{{ default_params.horeca_percentage }}"
+                               min="0"
+                               max="100"
+                               step="5"
+                               oninput="updateSliderValue('horeca_percentage')"
+                               class="mt-1 w-full">
+                        <p class="text-xs text-gray-400">Restaurants, cafes, bars</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm">
+                            <label for="levensmiddelen_percentage" class="font-medium text-gray-700">Levensmiddelenbedrijven</label>
+                            <span id="levensmiddelen_percentage_value" class="text-gray-500">{{ default_params.levensmiddelen_percentage }}%</span>
+                        </div>
+                        <input type="range"
+                               name="levensmiddelen_percentage"
+                               id="levensmiddelen_percentage"
+                               value="{{ default_params.levensmiddelen_percentage }}"
+                               min="0"
+                               max="100"
+                               step="5"
+                               oninput="updateSliderValue('levensmiddelen_percentage')"
+                               class="mt-1 w-full">
+                        <p class="text-xs text-gray-400">Supermarkten, bakkerijen, slagerijen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bedrijfsgrootteverdeling -->
+        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <button type="button"
+                    onclick="toggleSection('business-size-section')"
+                    class="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors cursor-pointer">
+                <h3 class="text-base font-medium text-gray-900">Bedrijfsgrootte</h3>
+                <svg id="business-size-section-chevron"
+                     class="w-5 h-5 text-gray-500 transform transition-transform"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="business-size-section" class="px-4 pb-4 hidden">
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-sm">
+                            <label for="bedrijfsgrootte_klein" class="font-medium text-gray-700">Klein (&lt;50 m²)</label>
+                            <span id="bedrijfsgrootte_klein_value" class="text-gray-500">{{ default_params.bedrijfsgrootte_klein }}%</span>
+                        </div>
+                        <input type="range"
+                               name="bedrijfsgrootte_klein"
+                               id="bedrijfsgrootte_klein"
+                               value="{{ default_params.bedrijfsgrootte_klein }}"
+                               min="0"
+                               max="100"
+                               step="5"
+                               oninput="updateSliderValue('bedrijfsgrootte_klein')"
+                               class="mt-1 w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm">
+                            <label for="bedrijfsgrootte_middel" class="font-medium text-gray-700">Middel (50-100 m²)</label>
+                            <span id="bedrijfsgrootte_middel_value" class="text-gray-500">{{ default_params.bedrijfsgrootte_middel }}%</span>
+                        </div>
+                        <input type="range"
+                               name="bedrijfsgrootte_middel"
+                               id="bedrijfsgrootte_middel"
+                               value="{{ default_params.bedrijfsgrootte_middel }}"
+                               min="0"
+                               max="100"
+                               step="5"
+                               oninput="updateSliderValue('bedrijfsgrootte_middel')"
+                               class="mt-1 w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm">
+                            <label for="bedrijfsgrootte_groot" class="font-medium text-gray-700">Groot (&gt;100 m²)</label>
+                            <span id="bedrijfsgrootte_groot_value" class="text-gray-500">{{ default_params.bedrijfsgrootte_groot }}%</span>
+                        </div>
+                        <input type="range"
+                               name="bedrijfsgrootte_groot"
+                               id="bedrijfsgrootte_groot"
+                               value="{{ default_params.bedrijfsgrootte_groot }}"
+                               min="0"
+                               max="100"
+                               step="5"
+                               oninput="updateSliderValue('bedrijfsgrootte_groot')"
+                               class="mt-1 w-full">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if pop_show_header is not defined or pop_show_header %}</div>{% endif %}

@@ -12,6 +12,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 sys.path.append(str(Path(__file__).parent.parent))
 
+from web.demo_profiles import DemoProfiles, get_demo_bsn
 from web.dependencies import (
     STATIC_DIR,
     get_case_manager,
@@ -131,13 +132,16 @@ app.mount(
 @app.get("/")
 async def root(
     request: Request,
-    bsn: str = "100000001",
+    bsn: str = None,
     date: str = None,
     services: EngineInterface = Depends(get_machine_service),
     case_manager: CaseManagerInterface = Depends(get_case_manager),
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """Render the main dashboard page"""
+    if bsn is None:
+        bsn = get_demo_bsn()
+
     # Parse effective date
     try:
         effective_date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
@@ -173,6 +177,21 @@ async def root(
 
             logger = logging.getLogger(__name__)
             logger.warning(f"Failed to get delegations for user {bsn}: {e}")
+
+        # Auto-activate business delegation for ondernemer demo profiles
+        # When delegation is enabled and the profile has a kvk but no active delegation,
+        # automatically set the delegation context via the machtigingenwet
+        if delegation_context is None:
+            active_profile = DemoProfiles.get_active_profile()
+            profile_kvk = active_profile.get("kvk")
+            if profile_kvk and delegations:
+                for d in delegations:
+                    if getattr(d, "subject_id", None) == profile_kvk and getattr(d, "subject_type", None) == "BUSINESS":
+                        context = delegation_manager.get_delegation_context(bsn, profile_kvk)
+                        if context:
+                            delegation_context = context
+                            request.session[DELEGATION_SESSION_KEY] = context.to_dict()
+                        break
 
     # Determine effective BSN for data fetching
     # When acting on behalf of a CITIZEN (child), use the child's BSN
@@ -306,19 +325,23 @@ async def root(
             "can_submit_claims": can_submit_claims,
             "business_profile": business_profile,
             "demo_mode": is_demo_mode(request),
+            "active_profile_config": DemoProfiles.get_active_profile(),
         },
     )
 
 
 if __name__ == "__main__":
+    import os
+
     import uvicorn
 
     # Use single worker for demo mode to maintain in-memory state
     # Multiple workers would have separate memory spaces, breaking the _test_runs dictionary
+    port = int(os.environ.get("PORT", 8000))
     config = uvicorn.Config(
         app=app,
         host="0.0.0.0",
-        port=8000,
+        port=port,
         workers=1,
         reload=False,
     )

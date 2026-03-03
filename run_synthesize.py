@@ -36,10 +36,21 @@ AVAILABLE_LAWS: dict[str, dict] = {
 
 DEFAULT_SELECTED_LAWS = ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget"]
 
+# Business laws available for ondernemer profile
+AVAILABLE_BUSINESS_LAWS: dict[str, dict] = {
+    "alcoholwet": {"label": "Alcoholwet", "group": "Vergunningen"},
+    "haccp": {"label": "HACCP Voedselveiligheid", "group": "Verplichtingen"},
+    "energie_informatieplicht": {"label": "Informatieplicht Energiebesparing", "group": "Verplichtingen"},
+    "precariobelasting": {"label": "Precariobelasting", "group": "Belastingen"},
+}
+
+DEFAULT_SELECTED_BUSINESS_LAWS = ["alcoholwet", "haccp", "energie_informatieplicht", "precariobelasting"]
+
 
 def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
     """Build feature-to-law mapping for selected laws only."""
     full_map: dict[str, list[str]] = {
+        # Citizen features
         "rent_amount": ["huurtoeslag"],
         "housing_type_rent": ["huurtoeslag"],
         "children_count": ["kindgebonden_budget", "kinderopvangtoeslag"],
@@ -50,6 +61,21 @@ def _build_feature_law_map(selected_laws: list[str]) -> dict[str, list[str]]:
         "income": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget", "bijstand", "ww", "aow", "kinderopvangtoeslag"],
         "has_partner": ["zorgtoeslag", "huurtoeslag", "kindgebonden_budget", "bijstand", "aow"],
         "age": ["zorgtoeslag", "kindgebonden_budget", "aow", "ww"],
+        # Business features
+        "leeftijd_leidinggevende": ["alcoholwet"],
+        "vloeroppervlakte": ["alcoholwet", "haccp", "precariobelasting"],
+        "type_bedrijf_horeca": ["alcoholwet"],
+        "is_onder_curatele": ["alcoholwet"],
+        "sbi_is_food": ["haccp", "nvwa_meldplicht"],
+        "bereidt_of_serveert_voedsel": ["haccp", "nvwa_meldplicht"],
+        "jaarlijks_elektriciteitsverbruik_kwh": ["energie_informatieplicht"],
+        "jaarlijks_gasverbruik_m3": ["energie_informatieplicht"],
+        "is_woonfunctie": ["energie_informatieplicht"],
+        "is_geselecteerd_cbs_enquete": ["cbs_enquete"],
+        "rechtsvorm_vereist_jaarrekening": ["kvk_jaarrekening"],
+        "heeft_actief_incident": ["nvwa_meldplicht"],
+        "terras_oppervlakte": ["precariobelasting"],
+        "has_terrace": ["precariobelasting"],
     }
     # Filter to only selected laws
     result = {}
@@ -89,14 +115,22 @@ def analyze_per_law(
     all_laws: list[str],
     feature_law_map: dict[str, list[str]],
     law_labels: dict[str, str],
+    *,
+    eligibility_only: bool = False,
 ) -> dict:
     """Analyze which source law the synthesized model resembles most and which is most complex.
 
     Uses the decision tree's built-in Gini feature importances to determine which law
     the model resembles most, and counts splits per law to determine complexity.
+
+    When eligibility_only=True (business laws), uses the eligibility tree instead of amount tree
+    since all amounts are 0 and the amount tree would have zero importances.
     """
-    # Use amount tree (primary model) for feature importances
-    tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
+    # For eligibility-only laws (business), always use the eligibility tree
+    if eligibility_only:
+        tree = model._eligibility_tree
+    else:
+        tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
     feature_names = model.feature_names
     importances = tree.feature_importances_  # Feature importance, shape: (n_features,)
 
@@ -124,8 +158,11 @@ def analyze_per_law(
     total_law_imp = sum(law_importance.values())
     law_importance_pct = {law: (v / total_law_imp if total_law_imp > 0 else 0.0) for law, v in law_importance.items()}
 
-    # --- C. Complexity: count splits per law in the amount tree ---
-    amount_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
+    # --- C. Complexity: count splits per law in the primary tree ---
+    if eligibility_only:
+        amount_tree = model._eligibility_tree
+    else:
+        amount_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
     law_splits = _count_splits_per_law(amount_tree, feature_names, feature_law_map, all_laws)
     total_splits = sum(law_splits.values()) or 1
     law_complexity = {law: splits / total_splits for law, splits in law_splits.items()}
@@ -225,6 +262,13 @@ def extract_tree_structure(tree, feature_names: list[str]) -> dict:
     return _build_node(0)
 
 
+def _is_business_profile(params: dict, selected_laws: list[str]) -> bool:
+    """Check if the request is for ondernemer/business profile."""
+    if params.get("profile_type") == "ondernemer":
+        return True
+    return any(law in AVAILABLE_BUSINESS_LAWS for law in selected_laws)
+
+
 def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
     """Train a decision-tree synthesized law and return results as JSON."""
     num_people = params.get("num_people", 1000)
@@ -233,11 +277,17 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
     min_samples = params.get("min_samples", 50)
     max_rules = params.get("max_rules", 10)
 
-    # Run simulation with optional demographic params
     simulator = LawSimulator(simulation_date)
-    apply_custom_parameters(simulator, params)
-    results_df = simulator.run_simulation(num_people=num_people)
-    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    if _is_business_profile(params, selected_laws):
+        # Business simulation: generate businesses and evaluate business laws
+        results_df = simulator.run_business_simulation(num_businesses=num_people)
+        synthesis_df = simulator.export_for_business_synthesis(results_df, selected_laws=selected_laws)
+    else:
+        # Standard citizen simulation
+        apply_custom_parameters(simulator, params)
+        results_df = simulator.run_simulation(num_people=num_people)
+        synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     # Configure and train
     constraints = InterpretabilityConstraints(
@@ -285,11 +335,19 @@ def run_train_tree(params: dict, selected_laws: list[str]) -> dict:
 
     # Per-law analysis
     feature_law_map = _build_feature_law_map(selected_laws)
-    law_labels = {k: AVAILABLE_LAWS[k]["label"] for k in selected_laws if k in AVAILABLE_LAWS}
-    law_analysis = analyze_per_law(model, synthesis_df, selected_laws, feature_law_map, law_labels)
+    all_laws_dict = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}
+    law_labels = {k: all_laws_dict[k]["label"] for k in selected_laws if k in all_laws_dict}
+    is_business = _is_business_profile(params, selected_laws)
+    law_analysis = analyze_per_law(
+        model, synthesis_df, selected_laws, feature_law_map, law_labels, eligibility_only=is_business
+    )
 
-    # Extract tree structure for visualization (use amount tree as primary model)
-    vis_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
+    # Extract tree structure for visualization
+    # For business (eligibility-only), use eligibility tree since amount tree trains on constant 0
+    if is_business:
+        vis_tree = model._eligibility_tree
+    else:
+        vis_tree = model._amount_tree if model._amount_tree is not None else model._eligibility_tree
     tree_structure = extract_tree_structure(vis_tree, model.feature_names)
 
     # Feature warnings for missing simulation data
@@ -324,11 +382,31 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
     n_brackets = params.get("n_brackets", 5)
 
     simulator = LawSimulator(simulation_date)
-    apply_custom_parameters(simulator, params)
-    results_df = simulator.run_simulation(num_people=num_people)
-    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
-    config = BracketLearnerConfig(n_brackets=n_brackets)
+    if _is_business_profile(params, selected_laws):
+        results_df = simulator.run_business_simulation(num_businesses=num_people)
+        synthesis_df = simulator.export_for_business_synthesis(results_df, selected_laws=selected_laws)
+    else:
+        apply_custom_parameters(simulator, params)
+        results_df = simulator.run_simulation(num_people=num_people)
+        synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    is_business = _is_business_profile(params, selected_laws)
+    if is_business:
+        primary_feature = "vloeroppervlakte"
+        rounding_bracket = 10.0  # nearest 10m²
+        rounding_amount = 5.0
+    else:
+        primary_feature = "income"
+        rounding_bracket = 1000.0  # nearest EUR 1000
+        rounding_amount = 5.0
+
+    config = BracketLearnerConfig(
+        n_brackets=n_brackets,
+        primary_feature=primary_feature,
+        rounding_bracket=rounding_bracket,
+        rounding_amount=rounding_amount,
+    )
     learner = BracketLearner(config=config)
 
     # Get dynamic grouping keys based on selected laws
@@ -341,13 +419,21 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
             grouping_keys.append(f)
 
     # Get continuous features that may be auto-discretized (e.g. age for AOW)
-    continuous_keys = get_continuous_features_for_laws(selected_laws)
+    continuous_keys = get_continuous_features_for_laws(selected_laws, exclude_primary=primary_feature)
 
     model = learner.train(synthesis_df, grouping_keys=grouping_keys, continuous_keys=continuous_keys)
     metrics = learner.evaluate(model, synthesis_df)
 
     # Generate YAML
-    yaml_config = BracketYAMLConfig()
+    if is_business:
+        yaml_config = BracketYAMLConfig(
+            service_name="GEMEENTE_ROTTERDAM",
+            law_name="geharmoniseerde_nalevingskosten_staffel",
+            law_display_name="Geharmoniseerde Nalevingskosten (Staffelmodel)",
+            description="Geharmoniseerde nalevingskosten op basis van oppervlakteafhankelijke staffels",
+        )
+    else:
+        yaml_config = BracketYAMLConfig()
     generator = BracketYAMLGenerator(config=yaml_config)
     yaml_spec = generator.generate(model)
     yaml_string = generator.to_yaml_string(yaml_spec)
@@ -384,6 +470,7 @@ def run_train_bracket(params: dict, selected_laws: list[str]) -> dict:
         },
         "bracket_table": bracket_table,
         "income_brackets": model.income_brackets,
+        "primary_feature": model.primary_feature,
         "child_supplement": model.child_supplement,
         "feature_influence": model.feature_influence,
         "discretized_features": {k: {"source": v[0], "threshold": v[1]} for k, v in model.discretized_features.items()},
@@ -399,9 +486,14 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
     simulation_date = params.get("simulation_date", datetime.now().strftime("%Y-%m-%d"))
 
     simulator = LawSimulator(simulation_date)
-    apply_custom_parameters(simulator, params)
-    results_df = simulator.run_simulation(num_people=num_people)
-    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    if _is_business_profile(params, selected_laws):
+        results_df = simulator.run_business_simulation(num_businesses=num_people)
+        synthesis_df = simulator.export_for_business_synthesis(results_df, selected_laws=selected_laws)
+    else:
+        apply_custom_parameters(simulator, params)
+        results_df = simulator.run_simulation(num_people=num_people)
+        synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     constraints = ParametricConstraints()
     learner = ParametricLearner(constraints=constraints)
@@ -422,7 +514,7 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
         components.append(
             {
                 "name": comp.name,
-                "label": AVAILABLE_LAWS.get(comp.name, {}).get("label", comp.name),
+                "label": {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}.get(comp.name, {}).get("label", comp.name),
                 "base_single": float(comp.base_single),
                 "base_partner": float(comp.base_partner),
                 "rate_single": float(comp.rate_single),
@@ -456,37 +548,56 @@ def run_train_parametric(params: dict, selected_laws: list[str]) -> dict:
 
 def _generate_bracket_explanation(model, selected_laws: list[str]) -> str:
     """Generate Dutch explanation for bracket model."""
-    law_names = [AVAILABLE_LAWS.get(l, {}).get("label", l) for l in selected_laws]
+    all_laws_dict = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}
+    law_names = [all_laws_dict.get(l, {}).get("label", l) for l in selected_laws]
     laws_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
 
-    lines = [
-        "# Geharmoniseerde Toeslag — Staffelmodel",
-        "",
-        f"Deze toeslag combineert **{laws_text}** in een inkomensafhankelijke staffel.",
-        "",
-        "---",
-        "",
-        "## Hoe werkt het?",
-        "",
-        "Uw toeslagbedrag wordt bepaald door uw inkomen en huishoudsituatie.",
-        "Binnen elke inkomensband wordt het bedrag vloeiend berekend (lineaire interpolatie),",
-        "zodat er geen harde grenzen ('cliff effects') zijn.",
-        "",
-        "## Inkomensschijven",
-        "",
-        "| Van | Tot | Bedrag ondergrens | Bedrag bovengrens |",
-        "|-----|-----|-------------------|-------------------|",
-    ]
+    is_business = model.primary_feature != "income"
+
+    if is_business:
+        title = "# Geharmoniseerde Nalevingskosten — Staffelmodel"
+        intro = f"Deze kostenregeling combineert **{laws_text}** in een oppervlakteafhankelijke staffel."
+        how_it_works = [
+            "Uw nalevingskosten worden bepaald door de vloeroppervlakte en bedrijfssituatie.",
+            "Binnen elke oppervlakteband worden de kosten vloeiend berekend (lineaire interpolatie),",
+            "zodat er geen harde grenzen ('cliff effects') zijn.",
+        ]
+        bracket_title = "## Oppervlakteschijven"
+        header = "| Van | Tot | Kosten ondergrens | Kosten bovengrens |"
+        separator = "|-----|-----|-------------------|-------------------|"
+        footer = "*Het uiteindelijke bedrag is minimaal EUR 0.*"
+    else:
+        title = "# Geharmoniseerde Toeslag — Staffelmodel"
+        intro = f"Deze toeslag combineert **{laws_text}** in een inkomensafhankelijke staffel."
+        how_it_works = [
+            "Uw toeslagbedrag wordt bepaald door uw inkomen en huishoudsituatie.",
+            "Binnen elke inkomensband wordt het bedrag vloeiend berekend (lineaire interpolatie),",
+            "zodat er geen harde grenzen ('cliff effects') zijn.",
+        ]
+        bracket_title = "## Inkomensschijven"
+        header = "| Van | Tot | Bedrag ondergrens | Bedrag bovengrens |"
+        separator = "|-----|-----|-------------------|-------------------|"
+        footer = "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*"
+
+    lines = [title, "", intro, "", "---", "", "## Hoe werkt het?", ""]
+    lines.extend(how_it_works)
+    lines.extend(["", bracket_title, "", header, separator])
 
     seen_brackets = set()
     for seg in model.segments:
         key = (seg.income_lower, seg.income_upper)
         if key not in seen_brackets:
             seen_brackets.add(key)
-            lines.append(
-                f"| EUR {seg.income_lower:,.0f} | EUR {seg.income_upper:,.0f} "
-                f"| EUR {seg.amount_at_lower:,.2f}/mnd | EUR {seg.amount_at_upper:,.2f}/mnd |"
-            )
+            if is_business:
+                lines.append(
+                    f"| {seg.income_lower:,.0f} m² | {seg.income_upper:,.0f} m² "
+                    f"| EUR {seg.amount_at_lower:,.2f} | EUR {seg.amount_at_upper:,.2f} |"
+                )
+            else:
+                lines.append(
+                    f"| EUR {seg.income_lower:,.0f} | EUR {seg.income_upper:,.0f} "
+                    f"| EUR {seg.amount_at_lower:,.2f}/mnd | EUR {seg.amount_at_upper:,.2f}/mnd |"
+                )
 
     if model.child_supplement > 0:
         lines.extend(
@@ -498,21 +609,15 @@ def _generate_bracket_explanation(model, selected_laws: list[str]) -> str:
             ]
         )
 
-    lines.extend(
-        [
-            "",
-            "---",
-            "",
-            "*Het uiteindelijke bedrag is minimaal EUR 0 per maand.*",
-        ]
-    )
+    lines.extend(["", "---", "", footer])
 
     return "\n".join(lines)
 
 
 def _generate_parametric_explanation(model, selected_laws: list[str]) -> str:
     """Generate Dutch explanation for parametric model."""
-    law_names = [AVAILABLE_LAWS.get(l, {}).get("label", l) for l in selected_laws]
+    all_laws_dict = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}
+    law_names = [all_laws_dict.get(l, {}).get("label", l) for l in selected_laws]
     laws_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]
 
     lines = [
@@ -525,7 +630,7 @@ def _generate_parametric_explanation(model, selected_laws: list[str]) -> str:
     ]
 
     for i, comp in enumerate(model.template.components, 1):
-        label = AVAILABLE_LAWS.get(comp.name, {}).get("label", comp.name)
+        label = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}.get(comp.name, {}).get("label", comp.name)
         lines.append(f"## {i}. {label}-component")
         lines.append("")
 
@@ -583,12 +688,18 @@ def run_validate(params: dict) -> dict:
     accuracy_target = params.get("accuracy_target", 0.95)
     amount_tolerance = params.get("amount_tolerance", 50.0)
 
-    # Run simulation for validation with optional demographic params
-    simulator = LawSimulator(simulation_date)
-    apply_custom_parameters(simulator, params)
-    results_df = simulator.run_simulation(num_people=num_people)
     selected_laws = params.get("selected_laws", DEFAULT_SELECTED_LAWS)
-    synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
+
+    # Run simulation for validation
+    simulator = LawSimulator(simulation_date)
+
+    if _is_business_profile(params, selected_laws):
+        results_df = simulator.run_business_simulation(num_businesses=num_people)
+        synthesis_df = simulator.export_for_business_synthesis(results_df, selected_laws=selected_laws)
+    else:
+        apply_custom_parameters(simulator, params)
+        results_df = simulator.run_simulation(num_people=num_people)
+        synthesis_df = simulator.export_for_synthesis(results_df, selected_laws=selected_laws)
 
     # Train model
     constraints = InterpretabilityConstraints(
@@ -665,7 +776,8 @@ def generate_explanation(model, selected_laws: list[str] | None = None) -> str:
     num_rules = len(model.eligibility_rules)
     num_formulas = len(model.amount_formulas)
 
-    law_labels = {k: v["label"] for k, v in AVAILABLE_LAWS.items()}
+    all_laws_dict = {**AVAILABLE_LAWS, **AVAILABLE_BUSINESS_LAWS}
+    law_labels = {k: v["label"] for k, v in all_laws_dict.items()}
     if selected_laws:
         law_names = [f"**{law_labels.get(law, law)}**" for law in selected_laws]
         law_text = ", ".join(law_names[:-1]) + " en " + law_names[-1] if len(law_names) > 1 else law_names[0]

@@ -58,6 +58,7 @@ class CaseManager(CaseManagerInterface):
         claimed_result: dict[str, Any],
         approved_claims_only: bool,
         effective_date: datetime.date | None = None,
+        force_manual_review: bool = False,
     ) -> UUID:
         # Note: The underlying machine.service library does not support effective_date yet
         # For now, we pass the existing parameters and ignore effective_date
@@ -68,6 +69,7 @@ class CaseManager(CaseManagerInterface):
             parameters=parameters,
             claimed_result=claimed_result,
             approved_claims_only=approved_claims_only,
+            force_manual_review=force_manual_review,
         )
 
     def complete_manual_review(

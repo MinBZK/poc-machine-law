@@ -1,12 +1,14 @@
 {% from "macros/render_path.html" import render_path, render_missing_required_form with context %}
 <!-- Start of Shared Application Form Section -->
+{# changed_values is computed in the backend from pending claims (see _compute_changed_values in laws.py) #}
+{% set changed_values = changed_values|default({}) %}
 <div class="border border-blue-200 rounded-lg p-5 mb-6 bg-blue-50/30">
     <!-- Result Summary -->
     <div class="mb-4">
         {% set template = "partials/tiles/law/"+ law+ "/" + service + "/computation.html" %}
         {% include [template, "partials/tiles/law/fallback/computation.html"] ignore missing %}
     </div>
-    <!-- Missing Required Data Form -->
+    <!-- Missing Required Data Form - uses standard claim flow -->
     <div class="mb-4">
         {{ render_missing_required_form(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
                 show_approve=False, claimant="CITIZEN") }}
@@ -34,7 +36,10 @@
              x-transition:leave-end="opacity-0 transform -translate-y-2"
              class="mt-4">
             {{ render_path(path, current_case.id|string if current_case else '', service, law, bsn, claim_map,
-                        show_approve=False, claimant="CITIZEN") }}
+                        show_approve=False, claimant="CITIZEN", changed_values=changed_values) }}
+            {# Include optional law-specific details partial (e.g., permit info for exploitatievergunning) #}
+            {% set details_template = "partials/tiles/law/" + law + "/" + service + "/details.html" %}
+            {% include details_template ignore missing %}
         </div>
     </div>
     <!-- Submit Form -->
@@ -70,7 +75,7 @@
             </div>
         {% else %}
             <!-- Standard panel submit button -->
-            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}"
+            <form hx-post="/laws/submit-case?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}&approved={{ request.query_params.get('approved', 'false') }}{% if kvk %}&kvk={{ kvk }}{% endif %}"
                   hx-target="#tile-{{ law|replace('/', '-') }}"
                   hx-swap="outerHTML"
                   hx-on::after-request="document.getElementById('shared-application-panel').innerHTML = ''; document.dispatchEvent(new CustomEvent('close-panel'))"

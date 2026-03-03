@@ -30,13 +30,6 @@
     };
   };
 
-  // Demo mode configuration
-  const DEMO_LAW_UUIDS = [
-    '60e71675-38bc-4297-87ac-0c145613e481', // Zorgtoeslag
-    'aba2b8fa-4b34-420f-883a-e78da326a8f4', // ZVW
-    '292c11ff-8318-4b7a-bb11-3ea545b04c8e', // Penitentiaire Beginselenwet
-  ];
-
   // Check if demo mode is enabled via URL parameter
   const isDemoMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('demo') === 'true';
 
@@ -142,8 +135,18 @@
 
       // Initialize selected laws based on demo mode
       if (isDemoMode) {
-        // Demo mode: pre-select only the 3 demo laws
-        selectedLaws = DEMO_LAW_UUIDS.filter(uuid => laws.some(law => law.uuid === uuid));
+        try {
+          const demoResp = await fetch('/laws/demo-selection');
+          const demoUuids: string[] = await demoResp.json();
+          if (demoUuids.length > 0) {
+            selectedLaws = demoUuids.filter(uuid => laws.some(law => law.uuid === uuid));
+          } else {
+            selectedLaws = laws.map((law) => law.uuid);
+          }
+        } catch {
+          // Fallback: select all laws on error
+          selectedLaws = laws.map((law) => law.uuid);
+        }
       } else {
         // Normal mode: select all laws
         selectedLaws = laws.map((law) => law.uuid);

@@ -28,6 +28,25 @@ class FeatureFlags:
         "HARMONIZE": False,  # Harmonize feature (ML-based law harmonization) is disabled by default
     }
 
+    # Laws that should be DISABLED by default (for demo purposes)
+    # Format: {(service, law): False} means disabled by default
+    # Laws not in this list are enabled by default
+    # Note: law identifier comes from the 'law' field in the YAML, not the file path
+    LAW_DEFAULTS = {
+        # HIDDEN laws (not shown in any sidebar)
+        ("LBB", "wet_bibob"): False,
+        ("SVH", "alcoholwet/register_sociale_hygiene"): False,
+        ("VWS", "alcoholwet/vergunning"): False,
+        # Internal/infrastructure laws (always disabled in sidebar)
+        ("ACICT", "wet_adviescollege_ict_toetsing"): False,
+        ("ANVS", "besluit_basisveiligheidsnormen_stralingsbescherming"): False,
+        ("ANVS", "besluit_kerninstallaties"): False,
+        ("ANVS", "kernenergiewet"): False,
+        ("AWB", "algemene_wet_bestuursrecht"): False,
+        ("RVO", "omgevingswet/werkgebonden_personenmobiliteit/gegevens"): False,
+        ("RvIG", "wet_brp"): False,
+    }
+
     @classmethod
     def get_all(cls) -> dict[str, bool]:
         """Get all feature flags with their current values (excluding law flags)."""
@@ -127,7 +146,8 @@ class FeatureFlags:
             law: Law name (e.g., "zorgtoeslagwet" or "participatiewet/bijstand")
 
         Returns:
-            Boolean indicating if the law is enabled (default is True if not set)
+            Boolean indicating if the law is enabled (default is True if not set,
+            unless the law is in LAW_DEFAULTS with a False value)
         """
         flag_name = cls._get_law_flag_name(service, law)
         flag_key = f"{cls.PREFIX}{flag_name}"
@@ -135,12 +155,17 @@ class FeatureFlags:
         # Check if flag is set in environment
         env_value = os.environ.get(flag_key)
 
-        # Default to True (enabled) if not set
-        if env_value is None:
-            return True
+        # If explicitly set in environment, use that value
+        if env_value is not None:
+            return env_value.lower() in ("1", "true", "yes", "y")
 
-        # Otherwise, convert the value to boolean
-        return env_value.lower() in ("1", "true", "yes", "y")
+        # Check if there's a default value for this specific law
+        law_key = (service, law)
+        if law_key in cls.LAW_DEFAULTS:
+            return cls.LAW_DEFAULTS[law_key]
+
+        # Default to True (enabled) if not in LAW_DEFAULTS
+        return True
 
     @classmethod
     def set(cls, flag_name: str, value: bool) -> None:
@@ -150,6 +175,14 @@ class FeatureFlags:
 
         # Convert boolean to string and set in environment
         os.environ[flag_key] = "1" if value else "0"
+
+    @classmethod
+    def reset_law_flags(cls) -> None:
+        """Remove all FEATURE_LAW_* environment variables, resetting to LAW_DEFAULTS."""
+        prefix = f"{cls.PREFIX}{cls.LAW_PREFIX}"
+        keys_to_remove = [k for k in os.environ if k.startswith(prefix)]
+        for key in keys_to_remove:
+            del os.environ[key]
 
     @classmethod
     def enable_law(cls, service: str, law: str) -> None:

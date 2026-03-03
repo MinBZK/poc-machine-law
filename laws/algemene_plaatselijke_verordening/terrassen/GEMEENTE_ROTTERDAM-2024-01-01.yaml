@@ -395,6 +395,7 @@ properties:
         service: "GEMEENTE_ROTTERDAM"
         law: "algemene_plaatselijke_verordening/exploitatievergunning"
         field: "heeft_actieve_vergunning"
+        resolve_from_case_existence: true
         parameters:
           - name: "KVK_NUMMER"
             reference: "$KVK_NUMMER"
@@ -493,6 +494,19 @@ properties:
         article: "2:30b"
         url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
         explanation: "De burgemeester kan de vergunning weigeren indien niet wordt voldaan aan de voorwaarden"
+
+    - name: "heeft_actieve_vergunning"
+      description: "Of er een actieve (goedgekeurde) terrasvergunning is"
+      type: "boolean"
+      temporal:
+        type: "point_in_time"
+        reference: "$calculation_date"
+      citizen_relevance: secondary
+      legal_basis:
+        law: "Algemene plaatselijke verordening Rotterdam 2012"
+        article: "2:30b"
+        url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+        explanation: "Een actieve terrasvergunning wordt verleend wanneer aan alle voorwaarden is voldaan"
 
     - name: "vergunde_oppervlakte"
       description: "Vergunde oppervlakte van het terras in vierkante meters"
@@ -717,6 +731,14 @@ actions:
       url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
       explanation: "Alle voorwaarden moeten worden vervuld voor een terrasvergunning"
 
+  - output: "heeft_actieve_vergunning"
+    value: true
+    legal_basis:
+      law: "Algemene plaatselijke verordening Rotterdam 2012"
+      article: "2:30b"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR373493/11"
+      explanation: "Een actieve vergunning wordt verleend wanneer aan alle voorwaarden is voldaan"
+
   - output: "weigeringsgrond"
     operation: IF
     conditions:
@@ -827,14 +849,20 @@ actions:
         then:
           operation: MULTIPLY
           values:
-            - operation: MIN
+            - operation: MAX
               values:
-                - "$TERRAS_OPPERVLAKTE"
-                - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+                - operation: SUBTRACT
+                  values:
+                    - operation: MIN
+                      values:
+                        - "$TERRAS_OPPERVLAKTE"
+                        - "$BGT_OPPERVLAKTE_BESCHIKBAAR"
+                    - 50
+                - 0
             - "$PRECARIO_TARIEF_PER_M2"
       - else: 0
     legal_basis:
-      law: "Verordening precariobelasting Rotterdam 2024"
+      law: "Verordening precario- en reclamebelasting Rotterdam 2024"
       article: "5"
-      url: "https://lokaleregelgeving.overheid.nl/CVDR719500/1"
-      explanation: "Precariobelasting wordt berekend op basis van oppervlakte en tarief per m2"
+      url: "https://lokaleregelgeving.overheid.nl/CVDR704478/1"
+      explanation: "De eerste 50 m² van een terras is vrijgesteld; voor elke m² daarboven geldt het tarief per m² per jaar"
