@@ -606,7 +606,10 @@ async def explanation(
             "partials/tiles/components/explanation.html",
             {
                 "request": request,
-                "error": "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                "error": t.get(
+                    "error_generating_explanation",
+                    "Er is een fout opgetreden bij het genereren van de uitleg. Probeer het later opnieuw.",
+                ),
                 "service": service,
                 "law": law,
                 "bsn": bsn,
@@ -697,7 +700,10 @@ async def application_panel(
             "partials/tiles/components/application_panel.html",
             {
                 "request": request,
-                "error": "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
+                "error": t.get(
+                    "error_generating_application",
+                    "Er is een fout opgetreden bij het genereren van het aanvraagformulier. Probeer het later opnieuw.",
+                ),
                 "service": service,
                 "law": law,
                 "current_engine_id": get_engine_id(),

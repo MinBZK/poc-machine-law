@@ -6,8 +6,10 @@
             <!-- Header -->
             <div class="flex items-start justify-between border-b border-gray-100 pb-4">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Horeca Vergunning Rotterdam</h3>
-                    <p class="text-xs text-gray-500 mt-1">Exploitatievergunning + Terrasvergunning gecombineerd</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ t.horeca_title if t else 'Horeca Vergunning Rotterdam' }}</h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                        {{ t.horeca_subtitle if t else 'Exploitatievergunning + Terrasvergunning gecombineerd' }}
+                    </p>
                 </div>
                 <div class="-mt-2 -mr-2">{{ org_logo(service) }}</div>
             </div>
@@ -17,13 +19,13 @@
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
-                    Exploitatievergunning
+                    {{ t.horeca_exploitation_permit if t else 'Exploitatievergunning' }}
                 </div>
                 <div class="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
-                    Terrasvergunning
+                    {{ t.horeca_terrace_permit if t else 'Terrasvergunning' }}
                 </div>
             </div>
             <!-- Auto-retrieved data -->
@@ -35,7 +37,7 @@
                          viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-sm font-medium text-blue-900">Automatisch opgehaald uit basisregistraties</span>
+                    <span class="text-sm font-medium text-blue-900">{{ t.horeca_auto_retrieved if t else 'Automatisch opgehaald uit basisregistraties' }}</span>
                 </div>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
@@ -48,11 +50,11 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-blue-700">BGT</span>
-                        <span class="text-blue-900 font-medium">Max. terras: 15 m² (voetpad, voorzijde)</span>
+                        <span class="text-blue-900 font-medium">{{ t.horeca_max_terrace if t else 'Max. terras:' }} 15 m² (voetpad, voorzijde)</span>
                     </div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-blue-200 flex justify-between text-sm">
-                    <span class="text-blue-700">Precariobelasting</span>
+                    <span class="text-blue-700">{{ t.horeca_precario_tax if t else 'Precariobelasting' }}</span>
                     <span class="text-blue-900 font-medium">15 m² × €45,50 = €682,50/jaar</span>
                 </div>
             </div>
@@ -65,20 +67,20 @@
                          viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-sm font-medium text-green-900">Regeldruk besparing</span>
+                    <span class="text-sm font-medium text-green-900">{{ t.horeca_regulatory_savings if t else 'Regeldruk besparing' }}</span>
                 </div>
                 <div class="grid grid-cols-3 gap-2 text-center">
                     <div>
                         <div class="text-lg font-bold text-green-700">2 → 1</div>
-                        <div class="text-xs text-green-600">aanvragen</div>
+                        <div class="text-xs text-green-600">{{ t.horeca_applications if t else 'aanvragen' }}</div>
                     </div>
                     <div>
                         <div class="text-lg font-bold text-green-700">0</div>
-                        <div class="text-xs text-green-600">velden invullen</div>
+                        <div class="text-xs text-green-600">{{ t.horeca_fields_fill if t else 'velden invullen' }}</div>
                     </div>
                     <div>
                         <div class="text-lg font-bold text-green-700">~45 min</div>
-                        <div class="text-xs text-green-600">bespaard</div>
+                        <div class="text-xs text-green-600">{{ t.horeca_time_saved if t else 'bespaard' }}</div>
                     </div>
                 </div>
             </div>
@@ -89,7 +91,7 @@
                     hx-target="#shared-application-panel"
                     hx-swap="innerHTML"
                     class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer font-medium">
-                Gecombineerde aanvraag starten
+                {{ t.horeca_start_combined if t else 'Gecombineerde aanvraag starten' }}
             </button>
         </div>
     </div>

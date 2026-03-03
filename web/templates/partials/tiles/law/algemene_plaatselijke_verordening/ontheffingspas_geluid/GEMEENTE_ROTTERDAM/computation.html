@@ -13,7 +13,7 @@
     {% set remaining = max_count - used %}
     {% set percentage = (used / max_count * 100)|int %}
     <div class="flex items-center justify-between mb-2">
-        <h4 class="text-sm font-medium text-gray-600">Geluidjes gebruikt dit jaar</h4>
+        <h4 class="text-sm font-medium text-gray-600">{{ t.apv_sound_used_year if t else 'Geluidjes gebruikt dit jaar' }}</h4>
         <span class="text-lg font-semibold text-gray-900">{{ used }} / {{ max_count }}</span>
     </div>
     {# Progress bar #}
@@ -36,6 +36,6 @@
         </div>
     </div>
     <p class="text-sm text-gray-600 text-center">
-        U heeft nog <strong>{{ remaining }}</strong> geluidsontheffingen beschikbaar dit jaar.
+        {{ t.apv_sound_remaining.format(remaining='<strong>' ~ remaining ~ '</strong>') if t else 'U heeft nog <strong>' ~ remaining ~ '</strong> geluidsontheffingen beschikbaar dit jaar.' }}
     </p>
 </div>

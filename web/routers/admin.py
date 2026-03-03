@@ -126,6 +126,8 @@ async def reset(request: Request):
 @router.get("/control")
 async def control(request: Request, services: EngineInterface = Depends(get_machine_service)):
     """Show a button to reset the state of the application"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     providers, current_provider = get_llm_providers(request)
     feature_flags = FeatureFlags.get_all()
 
@@ -154,6 +156,8 @@ async def control(request: Request, services: EngineInterface = Depends(get_mach
             "demo_mode": is_demo_mode(request),
             "demo_profiles": DemoProfiles.get_all_profiles(),
             "active_profile": DemoProfiles.get_active_profile_name(),
+            "t": t,
+            "lang": lang,
         },
     )
 
@@ -511,6 +515,8 @@ async def view_case(
     claim_manager: ClaimManagerInterface = Depends(get_claim_manager),
 ):
     """View details of a specific case"""
+    lang = get_lang(request)
+    t = get_translations(lang)
     try:
         case = case_manager.get_case_by_id(case_id)
     except AggregateNotFoundError:
@@ -538,5 +544,7 @@ async def view_case(
             "person_name": person_name,
             "current_engine_id": get_engine_id(),
             "demo_mode": is_demo_mode(request),
+            "t": t,
+            "lang": lang,
         },
     )

@@ -2,7 +2,7 @@
 <html lang="nl">
     <head>
         <title>
-            {% block title %}Zaaksysteem{% endblock %}
+            {% block title %}{{ t.admin_case_system if t else 'Zaaksysteem' }}{% endblock %}
         </title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

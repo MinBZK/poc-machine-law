@@ -1,6 +1,6 @@
 <!-- templates/base.html -->
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ lang or 'nl' }}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,7 +115,7 @@
                 <!-- Mobile Menu Button (Left Side) -->
                 <button class="lg:hidden focus:outline-none cursor-pointer"
                         @click="mobileMenuOpen = !mobileMenuOpen"
-                        aria-label="Toon/verberg menu">
+                        aria-label="{{ t.base_show_hide_menu if t else 'Toon/verberg menu' }}">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="h-6 w-6"
                          fill="none"
@@ -145,7 +145,7 @@
                         <ul class="flex space-x-6">
                             <li>
                                 <a href="/?bsn={{ bsn }}"
-                                   class="text-white hover:text-blue-200 font-medium">Dashboard</a>
+                                   class="text-white hover:text-blue-200 font-medium">{{ t.nav_dashboard if t else 'Dashboard' }}</a>
                             </li>
                             {% if chat_enabled %}
                                 <li>
@@ -179,8 +179,7 @@
                             </div>
                             <div class="flex-grow truncate">
                                 <div class="font-semibold">
-                                    {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer
-                                    profiel" }}
+                                    {{ all_profiles[bsn].name if bsn in all_profiles else (t.base_select_profile if t else "Selecteer profiel") }}
                                 </div>
                                 <div class="text-xs text-gray-500 truncate">
                                     {{ all_profiles[bsn].description if bsn in
@@ -202,8 +201,7 @@
                              @click.away="profileSelectorOpen = false"
                              class="absolute right-0 mt-2 w-[450px] bg-white rounded-md shadow-lg z-50 py-1 text-sm max-h-96 overflow-y-auto">
                             <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">
-                                Gesimuleerde
-                                DigiD Profielen
+                                {{ t.base_simulated_profiles if t else 'Gesimuleerde DigiD Profielen' }}
                             </div>
                             {% for bsn_key, profile_data in all_profiles.items() %}
                                 <a href="/?bsn={{ bsn_key }}"
@@ -283,7 +281,7 @@
                         <ul class="space-y-4">
                             <li>
                                 <a href="/?bsn={{ bsn }}"
-                                   class="block text-white hover:text-blue-200 font-medium py-2">Dashboard</a>
+                                   class="block text-white hover:text-blue-200 font-medium py-2">{{ t.nav_dashboard if t else 'Dashboard' }}</a>
                             </li>
                             {% if chat_enabled %}
                                 <li>
@@ -314,7 +312,7 @@
                                                  stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                             </svg>
-                                            Meer opties
+                                            {{ t.nav_more_options if t else 'Meer opties' }}
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              class="h-5 w-5"
@@ -335,7 +333,7 @@
                                                  stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                             </svg>
-                                            Homepage
+                                            {{ t.nav_homepage if t else 'Homepage' }}
                                         </a>
                                         <a href="/admin"
                                            class="block text-white hover:text-blue-200 font-medium py-2 pl-8 flex items-center">
@@ -346,7 +344,7 @@
                                                  stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                             </svg>
-                                            Zaaksysteem
+                                            {{ t.nav_case_system if t else 'Zaaksysteem' }}
                                         </a>
                                         <a href="/admin/control"
                                            class="block text-white hover:text-blue-200 font-medium py-2 pl-8 flex items-center">
@@ -369,7 +367,7 @@
                                                  stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
-                                            Simulatie
+                                            {{ t.nav_simulation if t else 'Simulatie' }}
                                         </a>
                                         <a href="/analysis/laws/"
                                            class="block text-white hover:text-blue-200 font-medium py-2 pl-8 flex items-center">
@@ -378,7 +376,7 @@
                                                  viewBox="0 0 24 24">
                                                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 0 0 2-2V9.414a1 1 0 0 0-.293-.707l-5.414-5.414A1 1 0 0 0 12.586 3H7a2 2 0 0 0-2 2v11m0 5l4.879-4.879m0 0a3 3 0 1 0 4.243-4.242a3 3 0 0 0-4.243 4.242" />
                                             </svg>
-                                            Wet-details
+                                            {{ t.nav_law_details if t else 'Wet-details' }}
                                         </a>
                                         <a href="/analysis/graph/"
                                            class="block text-white hover:text-blue-200 font-medium py-2 pl-8 flex items-center">
@@ -389,7 +387,7 @@
                                                  stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                             </svg>
-                                            Graaf analyse
+                                            {{ t.nav_graph_analysis if t else 'Graaf analyse' }}
                                         </a>
                                         <a href="/importer"
                                            class="block text-white hover:text-blue-200 font-medium py-2 pl-8 flex items-center">
@@ -398,14 +396,16 @@
                                                  viewBox="0 0 24 24">
                                                 <path fill="currentColor" fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v.756a49 49 0 0 1 9.152 1a.75.75 0 0 1-.152 1.485h-1.918l2.474 10.124a.75.75 0 0 1-.375.84A6.7 6.7 0 0 1 18.75 18a6.7 6.7 0 0 1-3.181-.795a.75.75 0 0 1-.375-.84l2.474-10.124H12.75v13.28c1.293.076 2.534.343 3.697.776a.75.75 0 0 1-.262 1.453h-8.37a.75.75 0 0 1-.262-1.453c1.162-.433 2.404-.7 3.697-.775V6.24H6.332l2.474 10.124a.75.75 0 0 1-.375.84A6.7 6.7 0 0 1 5.25 18a6.7 6.7 0 0 1-3.181-.795a.75.75 0 0 1-.375-.84L4.168 6.241H2.25a.75.75 0 0 1-.152-1.485a49 49 0 0 1 9.152-1V3a.75.75 0 0 1 .75-.75m4.878 13.543l1.872-7.662l1.872 7.662zm-9.756 0L5.25 8.131l-1.872 7.662z" clip-rule="evenodd" />
                                             </svg>
-                                            Wet-importer
+                                            {{ t.nav_law_importer if t else 'Wet-importer' }}
                                         </a>
                                     </div>
                                 </li>
                             {% endif %}
                             <!-- Mobile Profile Switcher Header -->
                             <li class="pt-4 border-t border-blue-800">
-                                <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">Profiel Wisselen</div>
+                                <div class="flex items-center text-xs font-medium text-blue-300 uppercase py-2">
+                                    {{ t.base_switch_profile if t else 'Profiel Wisselen' }}
+                                </div>
                                 <div x-data="{ mobileProfilesOpen: false }" class="relative">
                                     <button @click="mobileProfilesOpen = !mobileProfilesOpen"
                                             class="w-full flex items-center justify-between bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded cursor-pointer">
@@ -413,7 +413,7 @@
                                             <div class="w-6 h-6 mr-2 rounded-md overflow-hidden">
                                                 <img src="/static/img/digid-logo.svg" alt="DigiD" class="w-full h-full" />
                                             </div>
-                                            {{ all_profiles[bsn].name if bsn in all_profiles else "Selecteer profiel" }}
+                                            {{ all_profiles[bsn].name if bsn in all_profiles else (t.base_select_profile if t else "Selecteer profiel") }}
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              class="h-5 w-5"
@@ -426,7 +426,9 @@
                                     <div x-show="mobileProfilesOpen"
                                          x-cloak
                                          class="bg-white rounded-md shadow-lg mt-1 py-1 text-sm max-h-96 overflow-y-auto">
-                                        <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">Gesimuleerde DigiD Profielen</div>
+                                        <div class="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-200">
+                                            {{ t.base_simulated_profiles if t else 'Gesimuleerde DigiD Profielen' }}
+                                        </div>
                                         {% for bsn_key, profile_data in all_profiles.items() %}
                                             <a href="/?bsn={{ bsn_key }}"
                                                class="flex items-center px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 {% if bsn == bsn_key %}bg-blue-50{% endif %}">
@@ -544,12 +546,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h4 class="font-semibold text-gray-900 mb-4">RegelRecht</h4>
-                    <p class="text-gray-600">Een demonstratie van Nederlandse wetgeving als uitvoerbare code</p>
+                    <p class="text-gray-600">
+                        {{ t.base_footer_desc if t else 'Een demonstratie van Nederlandse wetgeving als uitvoerbare code' }}
+                    </p>
                     <a href="https://minbzk.github.io/regelrecht"
                        target="_blank"
                        rel="noopener noreferrer"
                        class="text-blue-600 hover:text-blue-800 text-sm flex items-center mt-2">
-                        Bezoek de RegelRecht website
+                        {{ t.base_footer_visit if t else 'Bezoek de RegelRecht website' }}
                         <svg class="w-4 h-4 ml-1"
                              fill="none"
                              stroke="currentColor"
@@ -559,10 +563,9 @@
                     </a>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-4">Disclaimer</h4>
+                    <h4 class="font-semibold text-gray-900 mb-4">{{ t.base_footer_disclaimer_title if t else 'Disclaimer' }}</h4>
                     <p class="text-gray-600 text-sm">
-                        Dit is een proof of concept. Alle gegevens zijn fictief.
-                        Niet gebruiken voor daadwerkelijke besluitvorming.
+                        {{ t.base_footer_disclaimer if t else 'Dit is een proof of concept. Alle gegevens zijn fictief. Niet gebruiken voor daadwerkelijke besluitvorming.' }}
                     </p>
                 </div>
             </div>

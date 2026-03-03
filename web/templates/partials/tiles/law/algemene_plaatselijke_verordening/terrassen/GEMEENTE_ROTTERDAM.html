@@ -12,7 +12,9 @@
                         <div class="mt-2">{% include "partials/tiles/components/case_status_badge.html" %}</div>
                     {% endif %}
                     <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p class="text-red-600">Er is een fout opgetreden bij het berekenen: {{ message }}</p>
+                        <p class="text-red-600">
+                            {{ t.tile_error_occurred if t else 'Er is een fout opgetreden bij het berekenen' }}: {{ message }}
+                        </p>
                     </div>
                 </div>
                 <div class="p-2">{{ org_logo(service) }}</div>
@@ -30,20 +32,22 @@
                 </div>
                 <div class="space-y-6">
                     <div class="flex items-center">
-                        <h4 class="text-sm font-medium text-gray-500 mb-1">Er ontbreken gegevens voor de terrasvergunning.</h4>
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">
+                            {{ t.apv_terrace_missing if t else 'Er ontbreken gegevens voor de terrasvergunning.' }}
+                        </h4>
                     </div>
                 </div>
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <h4 class="font-medium text-gray-900 mb-2">Gegevens aanleveren</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ t.haccp_provide_data if t else 'Gegevens aanleveren' }}</h4>
                     <p class="text-sm text-gray-600 mb-4">
-                        Om te weten of u in aanmerking komt voor een terrasvergunning zijn extra gegevens nodig.
+                        {{ t.apv_terrace_extra_data if t else 'Om te weten of u in aanmerking komt voor een terrasvergunning zijn extra gegevens nodig.' }}
                     </p>
                     {% if can_submit_claims|default(true) %}
                         <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                                 hx-target="#shared-application-panel"
                                 hx-swap="innerHTML"
                                 class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
-                            Gegevens aanleveren
+                            {{ t.haccp_provide_data if t else 'Gegevens aanleveren' }}
                         </button>
                     {% endif %}
                 </div>
@@ -76,22 +80,24 @@
                                     hx-target="#shared-application-panel"
                                     hx-swap="innerHTML"
                                     class="w-full px-6 py-3 bg-green-600 text-white text-center rounded-md hover:bg-green-700 transition-colors cursor-pointer">
-                                Terrasvergunning aanvragen
+                                {{ t.apv_apply_terrace if t else 'Terrasvergunning aanvragen' }}
                             </button>
                         {% endif %}
                     {% else %}
                         {# Not eligible but can still apply #}
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid om toch aan te vragen</h4>
+                            <h4 class="font-medium text-gray-900 mb-2">
+                                {{ t.apv_terr_apply_anyway_title if t else 'Mogelijkheid om toch aan te vragen' }}
+                            </h4>
                             <p class="text-sm text-gray-600 mb-4">
-                                U lijkt niet in aanmerking te komen. Als u denkt dat u toch recht heeft kunt u een aanvraag indienen.
+                                {{ t.apv_terr_apply_anyway_desc if t else 'U lijkt niet in aanmerking te komen. Als u denkt dat u toch recht heeft kunt u een aanvraag indienen.' }}
                             </p>
                             {% if can_submit_claims|default(true) %}
                                 <button hx-get="/laws/application-panel?service={{ service }}&law={{ law|urlencode }}&bsn={{ effective_bsn|default(bsn) }}{% if kvk %}&kvk={{ kvk }}{% endif %}&default_tab=application"
                                         hx-target="#shared-application-panel"
                                         hx-swap="innerHTML"
                                         class="w-full px-4 py-2 bg-gray-600 text-white text-center rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
-                                    Toch aanvragen
+                                    {{ t.apv_terr_apply_anyway_btn if t else 'Toch aanvragen' }}
                                 </button>
                             {% endif %}
                         </div>
@@ -99,28 +105,28 @@
                 {% elif current_case.status == 'SUBMITTED' %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
                         <p class="text-sm text-blue-800">
-                            Uw aanvraag wordt beoordeeld. Heeft u vragen? <a href="#" class="underline">Klik hier</a>, of bel 14010.
+                            {{ t.tile_application_reviewing if t else 'Uw aanvraag wordt beoordeeld. Heeft u vragen?' }} <a href="#" class="underline">{{ t.tile_click_here if t else 'Klik hier' }}</a>, of bel 14010.
                         </p>
                     </div>
                 {% elif current_case.status == 'IN_REVIEW' %}
                     <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                        <h4 class="font-medium text-blue-900 mb-3">Wat gebeurt er nu?</h4>
+                        <h4 class="font-medium text-blue-900 mb-3">{{ t.tile_what_happens_now if t else 'Wat gebeurt er nu?' }}</h4>
                         <ol class="space-y-2 text-sm text-blue-800">
                             <li class="flex items-start">
                                 <span class="font-medium mr-2">1.</span>
-                                <span>Een medewerker bekijkt uw aanvraag binnen 5 werkdagen</span>
+                                <span>{{ t.tile_step1 if t else 'Een medewerker bekijkt uw aanvraag binnen 5 werkdagen' }}</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="font-medium mr-2">2.</span>
-                                <span>U krijgt mogelijk een uitnodiging voor een gesprek</span>
+                                <span>{{ t.tile_step2 if t else 'U krijgt mogelijk een uitnodiging voor een gesprek' }}</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="font-medium mr-2">3.</span>
-                                <span>Binnen 6 weken ontvangt u bericht over uw aanvraag</span>
+                                <span>{{ t.tile_step3 if t else 'Binnen 6 weken ontvangt u bericht over uw aanvraag' }}</span>
                             </li>
                         </ol>
                         <p class="mt-3 text-sm text-blue-800">
-                            Heeft u vragen? <a href="#" class="underline">Klik hier</a>, of bel 14010.
+                            {{ t.tile_questions if t else 'Heeft u vragen?' }} <a href="#" class="underline">{{ t.tile_click_here if t else 'Klik hier' }}</a>, of bel 14010.
                         </p>
                     </div>
                 {% elif current_case.status == 'DECIDED' %}
@@ -134,29 +140,28 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
                                     </path>
                                 </svg>
-                                <span class="text-green-800 font-medium">Terrasvergunning geldig tot de einddatum van de exploitatievergunning.</span>
+                                <span class="text-green-800 font-medium">{{ t.apv_terrace_valid if t else 'Terrasvergunning geldig tot de einddatum van de exploitatievergunning.' }}</span>
                             </div>
                         </div>
                     {% elif not current_case.can_object() %}
                         <div class="space-y-4">
                             <div class="bg-red-50 border border-red-100 rounded-lg p-4">
                                 <p class="text-red-800">
-                                    Uw aanvraag is afgekeurd. U kunt niet in bezwaar want
+                                    {{ t.apv_terr_rejected_no_objection if t else 'Uw aanvraag is afgekeurd. U kunt niet in bezwaar want' }}
                                     {{ current_case.objection_status.not_possible_reason }}
                                 </p>
                             </div>
                         </div>
                     {% elif current_case.can_object() %}
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <h4 class="font-medium text-gray-900 mb-2">Mogelijkheid tot bezwaar</h4>
+                            <h4 class="font-medium text-gray-900 mb-2">{{ t.apv_terr_objection_option if t else 'Mogelijkheid tot bezwaar' }}</h4>
                             <p class="text-sm text-gray-600 mb-4">
-                                U kunt binnen {{ current_case.objection_status.objection_period }} weken
-                                bezwaar maken tegen dit besluit.
+                                {{ t.apv_terr_objection_text.format(weeks=current_case.objection_status.objection_period) if t else 'U kunt binnen ' ~ current_case.objection_status.objection_period ~ ' weken bezwaar maken tegen dit besluit.' }}
                             </p>
                             <button type="button"
                                     onclick="showAppealDialog('{{ current_case.id }}')"
                                     class="w-full px-4 py-2 bg-red-600 text-white text-center rounded-md hover:bg-red-700 transition-colors cursor-pointer">
-                                Ga in bezwaar
+                                {{ t.apv_terr_object if t else 'Ga in bezwaar' }}
                             </button>
                         </div>
                     {% endif %}
@@ -172,9 +177,9 @@
                 <div class="px-6 py-4 border-b">
                     <h3 class="text-xl font-semibold">
                         {% if current_case.can_object() %}
-                            Reden voor bezwaar
+                            {{ t.apv_terr_objection_reason if t else 'Reden voor bezwaar' }}
                         {% else %}
-                            Reden voor beroep
+                            {{ t.apv_terr_appeal_reason if t else 'Reden voor beroep' }}
                         {% endif %}
                     </h3>
                 </div>
@@ -184,9 +189,9 @@
                           hx-swap="outerHTML">
                         <label class="block text-lg mb-3">
                             {% if current_case.can_object() %}
-                                Geef een reden voor uw bezwaar:
+                                {{ t.apv_terr_give_objection_reason if t else 'Geef een reden voor uw bezwaar:' }}
                             {% else %}
-                                Geef een reden voor uw beroep:
+                                {{ t.apv_terr_give_appeal_reason if t else 'Geef een reden voor uw beroep:' }}
                             {% endif %}
                         </label>
                         <textarea name="reason"
@@ -196,10 +201,12 @@
                         <div class="mt-6 flex justify-end space-x-3">
                             <button type="button"
                                     class="px-5 py-2.5 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 text-base cursor-pointer"
-                                    onclick="closeAppealDialog('{{ current_case.id }}')">Annuleren</button>
+                                    onclick="closeAppealDialog('{{ current_case.id }}')">
+                                {{ t.tile_cancel if t else 'Annuleren' }}
+                            </button>
                             <button type="submit"
                                     class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-base cursor-pointer">
-                                Bevestigen
+                                {{ t.tile_confirm if t else 'Bevestigen' }}
                             </button>
                         </div>
                     </form>
